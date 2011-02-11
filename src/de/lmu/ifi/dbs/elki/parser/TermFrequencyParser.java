@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +117,6 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
 
   @Override
   protected SparseFloatVector getPrototype(int dimensionality) {
-    final Map<Integer, Float> emptyMap = Collections.emptyMap();
-    return new SparseFloatVector(emptyMap, dimensionality);
+    return new SparseFloatVector(new int[] {}, new float[] {}, dimensionality);
   }
 }

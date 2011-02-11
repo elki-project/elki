@@ -1,16 +1,13 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.parser.FloatVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.SparseFloatVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -28,20 +25,33 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 // TODO: implement ByteArraySerializer<SparseFloatVector>
 public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> implements SparseNumberVector<SparseFloatVector, Float> {
   /**
-   * Mapping of indices and corresponding values. Only non-zero values will to
-   * be stored.
+   * Indexes of values
    */
-  private HashMap<Integer, Float> values;
+  private int[] indexes;
 
   /**
-   * The maximal occurring index of any dimension.
+   * Stored values
    */
-  private Integer maximumIndex = -1;
+  private float[] values;
 
   /**
    * The dimensionality of this feature vector.
    */
   private int dimensionality;
+
+  /**
+   * Direct constructor.
+   * 
+   * @param indexes Indexes Must be sorted!
+   * @param values Associated value.
+   * @param dimensionality "true" dimensionality
+   */
+  public SparseFloatVector(int[] indexes, float[] values, int dimensionality) {
+    super();
+    this.indexes = indexes;
+    this.values = values;
+    this.dimensionality = dimensionality;
+  }
 
   /**
    * Provides a SparseFloatVector consisting of double values according to the
@@ -58,19 +68,41 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
 
-    this.values = new HashMap<Integer, Float>();
-    for(Integer index : values.keySet()) {
-      if(index > maximumIndex) {
-        maximumIndex = index;
+    this.indexes = new int[values.size()];
+    this.values = new float[values.size()];
+    // Import and sort the indexes
+    {
+      int i = 0;
+      for(Integer index : values.keySet()) {
+        this.indexes[i] = index;
+        i++;
       }
-      Float value = values.get(index);
-      if(value != 0) {
-        this.values.put(index, value);
+      Arrays.sort(this.indexes);
+    }
+    // Import the values accordingly
+    {
+      for(int i = 0; i < values.size(); i++) {
+        this.values[i] = values.get(this.indexes[i]);
       }
     }
     this.dimensionality = dimensionality;
-    if(maximumIndex > dimensionality) {
-      throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maximumIndex + ").");
+    final int maxdim = getMaxDim();
+    if(maxdim > dimensionality) {
+      throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maxdim + ").");
+    }
+  }
+
+  /**
+   * Get the maximum dimensionality.
+   * 
+   * @return the maximum dimensionality seen
+   */
+  private int getMaxDim() {
+    if(this.indexes.length == 0) {
+      return 0;
+    }
+    else {
+      return this.indexes[this.indexes.length - 1];
     }
   }
 
@@ -85,18 +117,29 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    */
   public SparseFloatVector(float[] values) throws IllegalArgumentException {
     this.dimensionality = values.length;
-    this.values = new HashMap<Integer, Float>();
-    for(int i = 0; i < values.length; i++) {
-      float value = values[i];
-      if(value != 0.0f) {
-        if(i + 1 > maximumIndex) {
-          maximumIndex = i + 1;
+
+    // Count the number of non-zero entries
+    int size = 0;
+    {
+      for(int i = 0; i < values.length; i++) {
+        if(values[i] != 0.0f) {
+          size++;
         }
-        this.values.put(i + 1, value);
       }
     }
-    if(maximumIndex > dimensionality) {
-      throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maximumIndex + ").");
+    this.indexes = new int[size];
+    this.values = new float[size];
+
+    // Copy the values
+    {
+      int pos = 0;
+      for(int i = 0; i < values.length; i++) {
+        float value = values[i];
+        if(value != 0.0f) {
+          this.indexes[pos] = i + 1;
+          this.values[pos] = value;
+        }
+      }
     }
   }
 
@@ -147,17 +190,18 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    *         zero is bigger than the given dimensionality)
    */
   public void setDimensionality(int dimensionality) throws IllegalArgumentException {
-    if(maximumIndex > dimensionality) {
-      throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maximumIndex + ").");
+    final int maxdim = getMaxDim();
+    if(maxdim > dimensionality) {
+      throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maxdim + ").");
     }
     this.dimensionality = dimensionality;
   }
 
   @Override
   public Float getValue(int dimension) {
-    Float d = values.get(dimension);
-    if(d != null) {
-      return d;
+    int pos = Arrays.binarySearch(this.indexes, dimension);
+    if(pos >= 0) {
+      return values[pos];
     }
     else {
       return 0.0f;
@@ -166,23 +210,23 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   @Override
   public double doubleValue(int dimension) {
-    Float d = values.get(dimension);
-    if(d != null) {
-      return d;
+    int pos = Arrays.binarySearch(this.indexes, dimension);
+    if(pos >= 0) {
+      return values[pos];
     }
     else {
-      return 0.0f;
+      return 0.0;
     }
   }
 
   @Override
   public long longValue(int dimension) {
-    Float d = values.get(dimension);
-    if(d != null) {
-      return d.longValue();
+    int pos = Arrays.binarySearch(this.indexes, dimension);
+    if(pos >= 0) {
+      return (long) values[pos];
     }
     else {
-      return 0L;
+      return 0;
     }
   }
 
@@ -203,17 +247,69 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
-    Map<Integer, Float> newValues = new HashMap<Integer, Float>(this.values);
-
-    for(Integer fvkey : fv.values.keySet()) {
-      if(newValues.containsKey(fvkey)) {
-        newValues.put(fvkey, newValues.get(fvkey) + fv.values.get(fvkey));
-      }
-      else {
-        newValues.put(fvkey, fv.values.get(fvkey));
+    // Compute size of result vector
+    int destsize = 0;
+    {
+      int po = 0;
+      int pt = 0;
+      while(po < fv.indexes.length && pt < this.indexes.length) {
+        final int delta = fv.indexes[po] - this.indexes[pt];
+        if(delta == 0) {
+          final float fdelta = this.values[pt] - fv.values[po];
+          if(fdelta != 0.0f) {
+            destsize++;
+          }
+          po++;
+          pt++;
+        }
+        else if(delta < 0) {
+          // next index in this bigger than in fv
+          po++;
+          destsize++;
+        }
+        else {
+          // next index in fv bigger than in this
+          pt++;
+          destsize++;
+        }
       }
     }
-    return new SparseFloatVector(newValues, this.dimensionality);
+    int[] newindexes = new int[destsize];
+    float[] newvalues = new float[destsize];
+    // Compute difference
+    {
+      int outp = 0;
+      int po = 0;
+      int pt = 0;
+      while(po < fv.indexes.length && pt < this.indexes.length) {
+        final int delta = fv.indexes[po] - this.indexes[pt];
+        if(delta == 0) {
+          final float fdelta = this.values[pt] + fv.values[po];
+          if(fdelta != 0.0f) {
+            newindexes[outp] = fv.indexes[po];
+            newvalues[outp] = fdelta;
+            outp++;
+          }
+          po++;
+          pt++;
+        }
+        else if(delta < 0) {
+          // next index in this bigger than in fv
+          newindexes[outp] = fv.indexes[po];
+          newvalues[outp] = fv.values[po];
+          outp++;
+          po++;
+        }
+        else {
+          // next index in fv bigger than in this
+          newindexes[outp] = this.indexes[pt];
+          newvalues[outp] = this.values[pt];
+          outp++;
+          pt++;
+        }
+      }
+    }
+    return new SparseFloatVector(newindexes, newvalues, this.dimensionality);
   }
 
   @Override
@@ -221,22 +317,74 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     if(fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
-    Map<Integer, Float> newValues = new HashMap<Integer, Float>(this.values);
-
-    for(Integer fvkey : fv.values.keySet()) {
-      if(newValues.containsKey(fvkey)) {
-        newValues.put(fvkey, newValues.get(fvkey) - fv.values.get(fvkey));
-      }
-      else {
-        newValues.put(fvkey, -fv.values.get(fvkey));
+    // Compute size of result vector
+    int destsize = 0;
+    {
+      int po = 0;
+      int pt = 0;
+      while(po < fv.indexes.length && pt < this.indexes.length) {
+        final int delta = fv.indexes[po] - this.indexes[pt];
+        if(delta == 0) {
+          final float fdelta = this.values[pt] - fv.values[po];
+          if(fdelta != 0.0f) {
+            destsize++;
+          }
+          po++;
+          pt++;
+        }
+        else if(delta < 0) {
+          // next index in this bigger than in fv
+          po++;
+          destsize++;
+        }
+        else {
+          // next index in fv bigger than in this
+          pt++;
+          destsize++;
+        }
       }
     }
-    return new SparseFloatVector(newValues, this.dimensionality);
+    int[] newindexes = new int[destsize];
+    float[] newvalues = new float[destsize];
+    // Compute difference
+    {
+      int outp = 0;
+      int po = 0;
+      int pt = 0;
+      while(po < fv.indexes.length && pt < this.indexes.length) {
+        final int delta = fv.indexes[po] - this.indexes[pt];
+        if(delta == 0) {
+          final float fdelta = this.values[pt] - fv.values[po];
+          if(fdelta != 0.0f) {
+            newindexes[outp] = fv.indexes[po];
+            newvalues[outp] = fdelta;
+            outp++;
+          }
+          po++;
+          pt++;
+        }
+        else if(delta < 0) {
+          // next index in this bigger than in fv
+          newindexes[outp] = fv.indexes[po];
+          newvalues[outp] = -fv.values[po];
+          outp++;
+          po++;
+        }
+        else {
+          // next index in fv bigger than in this
+          newindexes[outp] = this.indexes[pt];
+          newvalues[outp] = this.values[pt];
+          outp++;
+          pt++;
+        }
+      }
+    }
+    return new SparseFloatVector(newindexes, newvalues, this.dimensionality);
   }
 
   @Override
   public SparseFloatVector nullVector() {
-    return new SparseFloatVector(new HashMap<Integer, Float>(), dimensionality);
+    return new SparseFloatVector(new int[] {}, new float[] {}, dimensionality);
   }
 
   @Override
@@ -246,36 +394,12 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   @Override
   public SparseFloatVector multiplicate(double k) {
-    Map<Integer, Float> newValues = new HashMap<Integer, Float>(this.values.size(), 1);
-    for(Integer key : this.values.keySet()) {
-      newValues.put(key, (float) (values.get(key) * k));
+    int[] newindexes = indexes.clone();
+    float[] newvalues = new float[this.values.length];
+    for(int i = 0; i < this.indexes.length; i++) {
+      newvalues[i] = (float) (this.values[i] * k);
     }
-    return new SparseFloatVector(newValues, this.dimensionality);
-  }
-
-  /**
-   * Provides a String representation of this SparseFloatVector as suitable for
-   * {@link FloatVectorLabelParser}.
-   * 
-   * This includes zero valued attributes but no indices.
-   * 
-   * <p>
-   * Example: a vector (0,1.2,1.3,0)<sup>T</sup> would result in the String<br>
-   * <code>0 1.2 1.3 0</code><br>
-   * </p>
-   * 
-   * @return a String representation of this SparseFloatVector as a list of all
-   *         values
-   */
-  public String toCompleteString() {
-    StringBuffer featureLine = new StringBuffer();
-    for(int i = 0; i < dimensionality; i++) {
-      featureLine.append(getValue(i + 1));
-      if(i + 1 < dimensionality) {
-        featureLine.append(ATTRIBUTE_SEPARATOR);
-      }
-    }
-    return featureLine.toString();
+    return new SparseFloatVector(newindexes, newvalues, this.dimensionality);
   }
 
   /**
@@ -302,14 +426,12 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   @Override
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
-    featureLine.append(this.values.size());
-    List<Integer> keys = new ArrayList<Integer>(this.values.keySet());
-    Collections.sort(keys);
-    for(Integer key : keys) {
+    featureLine.append(this.indexes.length);
+    for(int i = 0; i < this.indexes.length; i++) {
       featureLine.append(ATTRIBUTE_SEPARATOR);
-      featureLine.append(key);
+      featureLine.append(this.indexes[i]);
       featureLine.append(ATTRIBUTE_SEPARATOR);
-      featureLine.append(this.values.get(key));
+      featureLine.append(this.values[i]);
     }
 
     return featureLine.toString();
@@ -322,8 +444,8 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    */
   private double[] getValues() {
     double[] values = new double[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      values[i] = getValue(i + 1);
+    for(int i = 0; i < indexes.length; i++) {
+      values[this.indexes[i]] = this.values[i];
     }
     return values;
   }
@@ -342,18 +464,22 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
     float result = 0.0f;
-    if(fv.values.keySet().size() <= this.values.keySet().size()) {
-      for(Integer fvkey : fv.values.keySet()) {
-        if(this.values.containsKey(fvkey)) {
-          result += this.values.get(fvkey) * fv.values.get(fvkey);
-        }
+    int po = 0;
+    int pt = 0;
+    while(po < fv.indexes.length && pt < this.indexes.length) {
+      final int delta = fv.indexes[po] - this.indexes[pt];
+      if(delta == 0) {
+        result += fv.values[po] * this.values[pt];
+        po++;
+        pt++;
       }
-    }
-    else {
-      for(Integer key : this.values.keySet()) {
-        if(fv.values.containsKey(key)) {
-          result += this.values.get(key) * fv.values.get(key);
-        }
+      else if(delta < 0) {
+        // next index in this bigger than in fv
+        po++;
+      }
+      else {
+        // next index in fv bigger than in this
+        pt++;
       }
     }
     return result;
@@ -383,7 +509,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   @Override
   public BitSet getNotNullMask() {
     BitSet b = new BitSet();
-    for (Integer key : values.keySet()) {
+    for(int key : indexes) {
       b.set(key);
     }
     return b;
