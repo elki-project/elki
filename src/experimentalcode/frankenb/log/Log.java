@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
 /**
  * No description given.
  * 
@@ -17,7 +19,7 @@ import java.util.Map;
 public class Log {
 
   private static ILogFormatter logFormatter = null;
-  private static List<ILogWriter> logWriters = new ArrayList<ILogWriter>();
+  private static List<Pair<LogLevel, ILogWriter>> logWriters = new ArrayList<Pair<LogLevel, ILogWriter>>();
 
   private static Map<String, Integer> defaultDepths = new HashMap<String, Integer>();
   
@@ -125,8 +127,11 @@ public class Log {
     
     String formattedMessage = logFormatter.format(isMainThread, depth - defaultDepth, getElapsedTime(), callee, level, message, t);
     
-    for (ILogWriter logWriter : logWriters) {
-      logWriter.putLogLine(level, formattedMessage);
+    for (Pair<LogLevel, ILogWriter> pair : logWriters) {
+      ILogWriter logWriter = pair.getSecond();
+      if (level.ordinal() >= pair.getFirst().ordinal()) {
+        logWriter.putLogLine(level, formattedMessage);
+      }
     }
   }
   
@@ -135,7 +140,24 @@ public class Log {
   }
   
   public static void addLogWriter(ILogWriter logWriter) {
-    Log.logWriters.add(logWriter);
+    addLogWriter(logWriter, LogLevel.VERBOSE);
+  }
+  
+  public static void addLogWriter(ILogWriter logWriter, LogLevel filterLevel) {
+    Log.logWriters.add(new Pair<LogLevel, ILogWriter>(filterLevel, logWriter));
+  }
+  
+  public static void removeLogWriter(ILogWriter logWriter) {
+    int positionToRemove = -1;
+    for (int i = 0; i < logWriters.size(); ++i) {
+      ILogWriter aLogWriter = logWriters.get(i).getSecond();
+      if (aLogWriter.equals(logWriter)) {
+        positionToRemove = i;
+      }
+    }
+    if (positionToRemove != -1) {
+      logWriters.remove(positionToRemove);
+    }
   }
 
   public static long getElapsedTime() {

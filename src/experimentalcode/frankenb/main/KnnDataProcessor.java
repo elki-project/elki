@@ -172,7 +172,7 @@ public class KnnDataProcessor extends AbstractApplication {
               int maxKeysPerBucket = (int) Math.max(5, Math.floor(Math.pow(pairing.getEstimatedUniqueIdsAmount(), 1f / 20f)));
               Log.info(String.format("maxKeysPerBucket in tree are: %,d for %,d items", maxKeysPerBucket, pairing.getEstimatedUniqueIdsAmount()));
               
-              File tmpDirFile = File.createTempFile("pairing" + taskId, ".dat");
+              File tmpDirFile = File.createTempFile("pairing" + taskId, ".dir");
               File tmpDataFile = File.createTempFile("pairing" + taskId, ".dat");
               tmpDirFile.deleteOnExit();
               tmpDataFile.deleteOnExit();

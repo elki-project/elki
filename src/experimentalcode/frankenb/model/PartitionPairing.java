@@ -82,7 +82,7 @@ public class PartitionPairing {
   @Override
   public String toString() {
     if (partitionOne == null || partitionTwo == null) return super.toString();
-    return String.format("[ %05d <=> %05d ]", partitionOne.getId(), partitionTwo.getId());
+    return String.format("[ %05d (%,d) <=> %05d (%,d) ]", partitionOne.getId(), partitionTwo.getId(), partitionOne.getSize(), partitionTwo.getSize());
   }
   
 }

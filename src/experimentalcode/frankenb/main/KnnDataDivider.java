@@ -3,17 +3,14 @@
  */
 package experimentalcode.frankenb.main;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -25,6 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import experimentalcode.frankenb.log.FileLogWriter;
 import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.log.LogLevel;
 import experimentalcode.frankenb.log.StdOutLogWriter;
@@ -103,13 +101,8 @@ public class KnnDataDivider extends StandAloneApplication {
    */
   @Override
   public void run() throws UnableToComplyException {
-    PrintWriter statisticsWriter = null;
+    FileLogWriter logWriter = null;
     try {
-      Log.info("knn data divider started");
-      Log.info("reading database ...");
-      final Database<NumberVector<?, ?>> dataBase = databaseConnection.getDatabase(null);
-      long totalCalculationsWithoutApproximation = Utils.sumFormular(dataBase.size() - 1);
-      
       File outputDir = this.getOutput();
       
       if (outputDir.isFile()) 
@@ -118,143 +111,136 @@ public class KnnDataDivider extends StandAloneApplication {
         if (!outputDir.mkdirs()) throw new UnableToComplyException("Could not create output directory");
       }
       
-      Log.info(String.format("%d items in db (%d dimensions)", dataBase.size(), dataBase.dimensionality()));
-      
       Log.info();
       Log.info("cleaning output directory...");
       clearDirectory(outputDir);
       Log.info();
-
-      statisticsWriter = createStatisticsWriter(outputDir);
-      writeStatisticsHeader(statisticsWriter);
-      statisticsWriter.println(String.format("DB Size: %,d", dataBase.size()));
-      statisticsWriter.println(String.format("Packages to create: %,8d", packageQuantity));
-      statisticsWriter.println(String.format("Algorithm used: %s", algorithm.getClass().getSimpleName()));
-
+      
+      logWriter = appendStatisticsWriter(outputDir);
+      Log.info("knn data divider started @ " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
+      
+      Log.info("reading database ...");
+      final Database<NumberVector<?, ?>> dataBase = databaseConnection.getDatabase(null);
+      long totalCalculationsWithoutApproximation = Utils.sumFormular(dataBase.size() - 1);
+      
+      Log.info(String.format("DB Size: %,d (%d dimensions)", dataBase.size(), dataBase.dimensionality()));
       Log.info(String.format("Packages to create: %,8d", packageQuantity));
+      Log.info(String.format("Algorithm used: %s", algorithm.getClass().getSimpleName()));
+      Log.info();
+      
       Log.info(String.format("Creating partitions (algorithm used: %s) ...", algorithm.getClass().getSimpleName()));
       
       List<PartitionPairing> pairings = this.algorithm.divide(dataBase, packageQuantity);
       
-      int pairingsPerPackage = pairings.size() / packageQuantity;
-      int addPairingsToPackageUntil = pairings.size() % packageQuantity;
-      
       Log.info(String.format("Total partition pairings: %,d", pairings.size()));
-      statisticsWriter.println(String.format("Total partition pairings: %,d", pairings.size()));
       
-      Log.info("Pairings per package: " + String.format("%,d", pairingsPerPackage) + (addPairingsToPackageUntil > 0 ? "-" + String.format("%,d", pairingsPerPackage + 1) : ""));
-      statisticsWriter.println("Pairings per package: " + String.format("%,d", pairingsPerPackage) + (addPairingsToPackageUntil > 0 ? "-" + String.format("%,d", pairingsPerPackage + 1) : ""));
-      statisticsWriter.println("------------------------------------------------");
-      
-      Log.info("Storing packages ...");
 
+      Log.info("Counting calculations ...");
       long totalCalculations = 0;
-      int persistedPairings = 0;
-      int packageCounter = -1;
-      PackageDescriptor packageDescriptor = null;
-      for (PartitionPairing pairing : pairings) {
-        if (pairing.getPartitionOne().getSize() < 1 || pairing.getPartitionTwo().getSize() < 1) {
-          Log.warn(String.format("Pairing %s has a partition with 0 items (partition one: %d, partition two: %d)", pairing.toString(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getSize()));
-          throw new UnableToComplyException("One partition of pairing " + pairing + " has 0 items!");
-        }
-        
-        int maxPairingsForCurrentPackage = pairingsPerPackage + (packageCounter < addPairingsToPackageUntil ? 1 : 0);
-        if (packageDescriptor == null || persistedPairings >= maxPairingsForCurrentPackage) {
-          if (packageDescriptor != null) {
-            packageDescriptor.close();
-          }
-          
-          packageCounter++;
-          File targetDirectory = new File(outputDir, String.format("package%05d", packageCounter));
-          targetDirectory.mkdirs();
-          File packageDescriptorFile = new File(targetDirectory, String.format("package%05d_descriptor.dat", packageCounter));
-          int bufferSize = maxPairingsForCurrentPackage * PackageDescriptor.PAIRING_DATA_SIZE + PackageDescriptor.HEADER_SIZE; 
-          packageDescriptor = new PackageDescriptor(packageCounter + 1, dataBase.dimensionality(), new BufferedDiskBackedDataStorage(packageDescriptorFile, bufferSize));
-          
-          persistedPairings = 0;
-          Log.info(String.format("Creating package %08d of %08d", packageCounter + 1, packageQuantity));
-          
-          statisticsWriter.println(String.format("Package %08d of %08d (%s)", 
-              packageCounter + 1, packageQuantity, packageDescriptorFile.toString()));
-        }
-        
-        statisticsWriter.println(String.format("\t%s: partition%d (%,d items) vs partition%d (%,d items)", 
-            pairing.toString(), pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
-        
-        packageDescriptor.addPartitionPairing(pairing);
+      for (PartitionPairing pairing: pairings) {
         totalCalculations += pairing.getCalculations();
-        persistedPairings++;
-        
-        if (persistedPairings % 100 == 0 || persistedPairings == maxPairingsForCurrentPackage) {
-          Log.info(String.format("\t%6.2f%% partition pairings persisted (%,10d partition pairings of %,10d) ...", 
-              (persistedPairings / (float)maxPairingsForCurrentPackage) * 100, 
-              persistedPairings, 
-              maxPairingsForCurrentPackage
-              ));            
-        }        
-        
       }
       
-      if (packageDescriptor != null) {
+      long calculationsPerPackage = (long) Math.ceil(totalCalculations / (double) packageQuantity);
+      int expectedPairingsPerPackage = pairings.size() / packageQuantity;
+
+      Log.info(String.format("Total calculations necessary: %,d (%.2f%% of cal. w/ apprx.)", totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f));
+      Log.info(String.format("Calculations per package: about %,d", calculationsPerPackage));
+      
+      Log.info("Sorting pairings ...");
+      Collections.sort(pairings, new Comparator<PartitionPairing>() {
+
+        @Override
+        public int compare(PartitionPairing o1, PartitionPairing o2) {
+          return Long.valueOf(o1.getCalculations()).compareTo(o2.getCalculations());
+        }
+
+        
+      });
+      
+      Random random = new Random(System.currentTimeMillis()); 
+      Log.info("Storing packages ...");
+      for (int i = 0; i < packageQuantity && !pairings.isEmpty(); ++i) {
+        long calculations = 0L;
+        
+        File targetDirectory = new File(outputDir, String.format("package%05d", i));
+        targetDirectory.mkdirs();
+        
+        File packageDescriptorFile = new File(targetDirectory, String.format("package%05d_descriptor.dat", i));
+        int bufferSize = expectedPairingsPerPackage * PackageDescriptor.PAIRING_DATA_SIZE + PackageDescriptor.HEADER_SIZE; 
+        PackageDescriptor packageDescriptor = new PackageDescriptor(i + 1, dataBase.dimensionality(), new BufferedDiskBackedDataStorage(packageDescriptorFile, bufferSize));
+        
+        Log.info(String.format("Creating package %08d of max. %08d (%s)", i + 1, packageQuantity, packageDescriptorFile.toString()));
+        
+        while (!pairings.isEmpty() && calculations < calculationsPerPackage) {
+          long calculationsToAdd = calculationsPerPackage - calculations;
+          PartitionPairing pairingWithMostCalculations = pairings.get(pairings.size() - 1);
+          PartitionPairing pairingToAdd = null;
+
+          //if the necessary calculations for this package exceeds the biggest partition pairing
+          //we choose one randomly - otherwise we choose the one that fits best
+          if (calculationsToAdd > pairingWithMostCalculations.getCalculations()) {
+            int index = random.nextInt(pairings.size());
+            pairingToAdd = pairings.get(index);
+          } else {
+            for (int j = 1; j < pairings.size(); ++j) {
+              PartitionPairing pairing = pairings.get(j);
+              if (pairing.getCalculations() > calculationsToAdd) {
+                pairingToAdd = pairings.get(j - 1);
+                break;
+              }
+            }
+            
+            if (pairingToAdd == null) {
+              pairingToAdd = pairings.get(pairings.size() - 1);
+            }
+          }
+          pairings.remove(pairingToAdd);
+          calculations += pairingToAdd.getCalculations();
+          
+          packageDescriptor.addPartitionPairing(pairingToAdd);
+          Log.info(String.format("\tAdding %s\t%,16d calculations of at least %,16d", pairingToAdd.toString(), calculations, calculationsPerPackage));
+        }
+        
+        Log.info(String.format("\tPackage %08d has now %,d calculations in %,d partitionPairings", i, calculations, packageDescriptor.getPairings()));
         packageDescriptor.close();
       }
       
-      writeStatisticsFooter(statisticsWriter, totalCalculations, totalCalculationsWithoutApproximation);
+      if (!pairings.isEmpty()) {
+        throw new UnableToComplyException("Pairings was not empty - it contined " + pairings.size() + " pairings that have not been put into a package");
+      }
       
-      Log.info(String.format("Created %,d packages containing %,d calculations (%.2f%% of cal. w/ apprx.) in %,d partition pairings", 
-          packageQuantity, totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f, pairings.size()));
+      Log.info(String.format("Created %,d packages - done.", packageQuantity));
       
+      if (logWriter != null) {
+        logWriter.close();
+      }
     } catch (RuntimeException e) {
       throw e;
     } catch (UnableToComplyException e) {
       throw e;
     } catch (Exception e) {
       throw new UnableToComplyException(e);
-    } finally {
-      if (statisticsWriter != null) {
-        statisticsWriter.close();
-      }
     }
   }
 
-  private PrintWriter createStatisticsWriter(File outputDir) throws FileNotFoundException {
-    PrintWriter statisticsWriter;
+  private FileLogWriter appendStatisticsWriter(File outputDir) throws IOException {
     File resultsFolder = new File(outputDir, "results");
     if (!resultsFolder.exists()) {
       resultsFolder.mkdirs();
     }
     File statisticsFile = new File(resultsFolder, "statistics.txt");
     Log.info("Storing statistics in file " + statisticsFile);
-    statisticsWriter = new PrintWriter(
-        new OutputStreamWriter(
-            new BufferedOutputStream(
-                new FileOutputStream(statisticsFile)
-                )
-            , Charset.forName("UTF-8")
-            )
-        );
-    return statisticsWriter;
+    FileLogWriter fileLogWriter = new FileLogWriter(statisticsFile);
+    Log.addLogWriter(fileLogWriter);
+    return fileLogWriter;
   }
   
   public static void main(String[] args) {
     StandAloneApplication.runCLIApplication(KnnDataDivider.class, args);
   }
 
-  private void writeStatisticsHeader(PrintWriter writer) {
-    writer.println("KnnDataDivider");
-    writer.println();
-    writer.println("Started: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
-  }
   
-  private void writeStatisticsFooter(PrintWriter writer, long totalCalculations, long totalCalculationsWithoutApproximation) throws IOException {
-    writer.println("------------------------------------------------");
-    writer.println();
-    writer.println("Ran for: " + Utils.formatRunTime(Log.getElapsedTime()));
-    writer.println(String.format("Total calculations (estimated): %,d (%.2f %% of %,d calculations without approximation and distribution)", 
-        totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f, totalCalculationsWithoutApproximation));
-    
-  }
-
   private static void clearDirectory(File directory) throws UnableToComplyException {
     for (File file : directory.listFiles()) {
       if (file.equals(directory) || file.equals(directory.getParentFile())) continue;
