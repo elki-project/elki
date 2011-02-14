@@ -69,7 +69,7 @@ public class TestDiSHResults implements JUnit4Test {
     ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
     Clustering<Model> rbl = bylabel.run(db);
 
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
+    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0, false, true);
     assertTrue("DiSH score on test dataset too low: " + score, score >= 0.999);
     System.out.println("DiSH score: " + score + " >= " + 0.999);
   }

@@ -189,7 +189,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
       if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
         logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
         ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
-        OPTICS.extractClusters(distanceClusterOrder, database, ixi, minpts);
+        OPTICSXi.extractClusters(distanceClusterOrder, database, ixi, minpts);
       }
       else {
         logger.verbose("Xi cluster extraction only supported for number distances!");

@@ -108,8 +108,8 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
     }
     Clustering<?> refc = refcrs.get(0);
     for(Clustering<?> c : crs) {
-      PairSortedGeneratorInterface first = PairCountingFMeasure.getPairGenerator(c, noiseSpecialHandling);
-      PairSortedGeneratorInterface second = PairCountingFMeasure.getPairGenerator(refc, noiseSpecialHandling);
+      PairSortedGeneratorInterface first = PairCountingFMeasure.getPairGenerator(c, noiseSpecialHandling, false);
+      PairSortedGeneratorInterface second = PairCountingFMeasure.getPairGenerator(refc, noiseSpecialHandling, false);
       Triple<Integer, Integer, Integer> countedPairs = PairCountingFMeasure.countPairs(first, second);
       // Use double, since we want double results at the end!
       double sum = countedPairs.first + countedPairs.second + countedPairs.third;

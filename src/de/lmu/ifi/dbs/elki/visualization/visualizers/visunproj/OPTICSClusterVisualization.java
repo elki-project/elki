@@ -26,13 +26,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
- * Visualize the clusters and cluster hierarchy found by OPTICS on the OPTICS Plot.
+ * Visualize the clusters and cluster hierarchy found by OPTICS on the OPTICS
+ * Plot.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.uses ClusterOrderResult
  * @apiviz.uses OPTICSPlot
  */
@@ -134,7 +134,7 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
       try {
         OPTICSModel model = cluster.getModel();
         final double x1 = sizex * ((model.getStartIndex() + .25) / this.co.getClusterOrder().size());
-        final double x2 = sizex * ((model.getEndIndex() +.75) / this.co.getClusterOrder().size());
+        final double x2 = sizex * ((model.getEndIndex() + .75) / this.co.getClusterOrder().size());
         final double y = sizey + depth * scale * 0.01;
         Element e = svgp.svgLine(x1, y, x2, y);
         SVGUtil.addCSSClass(e, CSS_BRACKET);
@@ -210,8 +210,9 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
     }
 
     @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization<DatabaseObject>(this, task, ThumbnailVisualization.ON_SELECTION);
+    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+      // Don't use thumbnails
+      return false;
     }
 
     @Override

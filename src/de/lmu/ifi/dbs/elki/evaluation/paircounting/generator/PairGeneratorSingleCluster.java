@@ -39,11 +39,12 @@ public class PairGeneratorSingleCluster extends PairSortedGenerator {
    * Generate pairs for a hierarchical cluster.
    * 
    * @param cluster Cluster
+   * @param useHierarchical Use hierarchical mode
    */
-  public PairGeneratorSingleCluster(Cluster<?> cluster) {
+  public PairGeneratorSingleCluster(Cluster<?> cluster, boolean useHierarchical) {
     // collect all parent clusters into a flat list.
     java.util.Vector<Cluster<?>> allparents = new java.util.Vector<Cluster<?>>();
-    if(cluster.isHierarchical()) {
+    if(useHierarchical && cluster.isHierarchical()) {
       allparents.addAll(cluster.getParents());
       for(int i = 0; i < allparents.size(); i++) {
         for(Cluster<?> newc : allparents.get(i).getParents()) {

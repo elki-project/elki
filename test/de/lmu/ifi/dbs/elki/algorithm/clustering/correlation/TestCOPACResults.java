@@ -75,7 +75,7 @@ public class TestCOPACResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("COPAC score on test dataset too low: " + score, score > 0.834);
-    System.out.println("COPAC score: " + score + " > " + 0.834);
+    assertTrue("COPAC score on test dataset too low: " + score, score > 0.842);
+    System.out.println("COPAC score: " + score + " > " + 0.842);
   }
 }

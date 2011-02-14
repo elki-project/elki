@@ -43,7 +43,7 @@ public class TestCASHResults implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testERiCResults() throws ParameterException {
+  public void testCASHResults() throws ParameterException {
     ListParameterization params = new ListParameterization();
     // Input
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
@@ -83,7 +83,7 @@ public class TestCASHResults implements JUnit4Test {
     // Even with not optimized parameters, we easily achieved 0.62
     // So any loss of quality means something isn't quite right with our
     // algorithms.
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
+    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0, false, true);
     assertTrue("CASH score on test dataset too low: " + score, score > 0.638);
     System.out.println("CASH score: " + score + " > " + 0.638);
   }
