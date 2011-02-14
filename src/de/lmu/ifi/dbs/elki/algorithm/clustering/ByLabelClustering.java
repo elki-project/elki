@@ -38,8 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * 
  * TODO: handling of data sets with no labels?
  * 
- * TODO: Noise handling (e.g. allow the user to specify a noise label pattern?)
- * 
  * @author Erich Schubert
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.data.ClassLabel
