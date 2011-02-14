@@ -6,7 +6,8 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -25,7 +26,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualize the steep areas found in an OPTICS plot
@@ -58,7 +58,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
   /**
    * Our clustering
    */
-  OPTICS.SteepAreaResult areas;
+  OPTICSXi.SteepAreaResult areas;
 
   /**
    * The plot
@@ -85,10 +85,10 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
    * @param co Cluster order
    * @return OPTICS clustering
    */
-  protected static OPTICS.SteepAreaResult findSteepAreaResult(ClusterOrderResult<?> co) {
+  protected static OPTICSXi.SteepAreaResult findSteepAreaResult(ClusterOrderResult<?> co) {
     for(Result r : co.getHierarchy().getChildren(co)) {
-      if(OPTICS.SteepAreaResult.class.isInstance(r)) {
-        return (OPTICS.SteepAreaResult) r;
+      if(OPTICSXi.SteepAreaResult.class.isInstance(r)) {
+        return (OPTICSXi.SteepAreaResult) r;
       }
     }
     return null;
@@ -110,7 +110,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
     final double plotheight = scale / opticsplot.getRatio();
 
     OPTICSDistanceAdapter<D> adapter = opticsplot.getDistanceAdapter();
-    for(OPTICS.SteepArea area : areas) {
+    for(OPTICSXi.SteepArea area : areas) {
       final int st = area.getStartIndex();
       final int en = area.getEndIndex();
       // Note: make sure we are using doubles!
@@ -121,7 +121,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
       final double y1 = (!Double.isInfinite(d1) && !Double.isNaN(d1)) ? (1. - opticsplot.getScale().getScaled(d1)) : 0.;
       final double y2 = (!Double.isInfinite(d2) && !Double.isNaN(d2)) ? (1. - opticsplot.getScale().getScaled(d2)) : 0.;
       Element e = svgp.svgLine(plotwidth * x1, plotheight * y1, plotwidth * x2, plotheight * y2);
-      if(area instanceof OPTICS.SteepDownArea) {
+      if(area instanceof OPTICSXi.SteepDownArea) {
         SVGUtil.addCSSClass(e, CSS_STEEP_DOWN);
       }
       else {
@@ -192,11 +192,14 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
-        if(plot != null && findSteepAreaResult(co) != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          context.addVisualizer(plot, task);
+        if(plot != null) {
+          final SteepAreaResult steep = findSteepAreaResult(co);
+          if(steep != null) {
+            final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
+            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+            context.addVisualizer(steep, task);
+          }
         }
       }
     }
@@ -207,11 +210,12 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
     }
 
     @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization<DatabaseObject>(this, task, ThumbnailVisualization.ON_SELECTION);
+    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+      // Don't use thumbnails
+      return false;
     }
 
-    @Override
+   @Override
     public Class<? extends Projection> getProjectionType() {
       return null;
     }

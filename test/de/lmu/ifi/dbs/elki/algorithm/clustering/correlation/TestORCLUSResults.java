@@ -70,7 +70,7 @@ public class TestORCLUSResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("ORCLUS score on test dataset too low: " + score, score > 0.6323);
-    System.out.println("ORCLUS score: " + score + " > " + 0.6323);
+    assertTrue("ORCLUS score on test dataset too low: " + score, score > 0.6335);
+    System.out.println("ORCLUS score: " + score + " > " + 0.6335);
   }
 }

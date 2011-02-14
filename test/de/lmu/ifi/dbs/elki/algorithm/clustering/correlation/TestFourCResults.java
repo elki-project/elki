@@ -73,7 +73,7 @@ public class TestFourCResults implements JUnit4Test {
     ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
     Clustering<Model> rbl = bylabel.run(db);
 
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
+    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0, false, true);
     assertTrue("FourC score on test dataset too low: " + score, score > 0.79467);
     System.out.println("FourC score: " + score + " > " + 0.79467);
   }

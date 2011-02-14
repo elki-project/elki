@@ -66,8 +66,8 @@ public class TestPairCountingFMeasure implements JUnit4Test {
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(ran, ran), Double.MIN_VALUE);
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(rbl, rbl), Double.MIN_VALUE);
 
-    assertEquals(0.009950248756218905, PairCountingFMeasure.compareClusterings(ran, rbl, true), Double.MIN_VALUE);
-    assertEquals(0.0033277870216306157, PairCountingFMeasure.compareClusterings(rai, ran, true), Double.MIN_VALUE);
+    assertEquals(0.009950248756218905, PairCountingFMeasure.compareClusterings(ran, rbl, true, false), Double.MIN_VALUE);
+    assertEquals(0.0033277870216306157, PairCountingFMeasure.compareClusterings(rai, ran, true, false), Double.MIN_VALUE);
 
     assertEquals(0.5 /* 0.3834296724470135 */, PairCountingFMeasure.compareClusterings(rai, rbl), Double.MIN_VALUE);
   }

@@ -70,8 +70,8 @@ public class TestDBSCANResults implements JUnit4Test {
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
     Clustering<Model> rbl = bylabel.run(db);
 
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 0.98);
-    assertTrue("DBSACN score on test dataset too low: " + score, score > 0.98);
-    System.out.println("DBSACN score: " + score + " > " + 0.98);
+    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
+    assertTrue("DBSACN score on test dataset too low: " + score, score > 0.996);
+    System.out.println("DBSCAN score: " + score + " > " + 0.996);
   }
 }
