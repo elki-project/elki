@@ -365,7 +365,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
         if(plot != null) {
           final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-          context.addVisualizer(co, task);
+          context.addVisualizer(plot, task);
         }
       }
     }
