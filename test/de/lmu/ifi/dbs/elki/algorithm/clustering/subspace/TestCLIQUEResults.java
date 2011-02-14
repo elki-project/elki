@@ -67,7 +67,7 @@ public class TestCLIQUEResults implements JUnit4Test {
     Clustering<SubspaceModel<DoubleVector>> result = clique.run(db);
 
     // run by-label as reference
-    ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>(true);
+    ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>(true, null);
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
