@@ -38,9 +38,10 @@ public class PairCountingFMeasure {
    * @param <R> Clustering result class
    * @param <M> Model type
    * @param clusters Clustering result
+   * @param noiseSpecial Special handling for "noise clusters"
    * @return Sorted pair generator
    */
-  public static <R extends Clustering<M>, M extends Model> PairSortedGeneratorInterface getPairGenerator(R clusters) {
+  public static <R extends Clustering<M>, M extends Model> PairSortedGeneratorInterface getPairGenerator(R clusters, boolean noiseSpecial) {
     // collect all clusters into a flat list.
     Collection<Cluster<M>> allclusters = clusters.getAllClusters();
 
@@ -48,7 +49,7 @@ public class PairCountingFMeasure {
     PairSortedGeneratorInterface[] gens = new PairSortedGeneratorInterface[allclusters.size()];
     int i = 0;
     for(Cluster<?> c : allclusters) {
-      if(c.isNoise()) {
+      if(noiseSpecial && c.isNoise()) {
         gens[i] = new PairGeneratorNoise(c);
       }
       else {
@@ -56,8 +57,27 @@ public class PairCountingFMeasure {
       }
       i++;
     }
-    // TODO: noise?
     return new PairGeneratorMerge(gens);
+  }
+
+  /**
+   * Compare two clustering results.
+   * 
+   * @param <R> Result type
+   * @param <M> Model type
+   * @param <S> Result type
+   * @param <N> Model type
+   * @param result1 first result
+   * @param result2 second result
+   * @param beta Beta value for the F-Measure
+   * @param noiseSpecial Noise receives special treatment
+   * @return Pair counting F-Measure result.
+   */
+  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2, double beta, boolean noiseSpecial) {
+    PairSortedGeneratorInterface first = getPairGenerator(result1, noiseSpecial);
+    PairSortedGeneratorInterface second = getPairGenerator(result2, noiseSpecial);
+    Triple<Integer, Integer, Integer> countedPairs = countPairs(first, second);
+    return fMeasure(countedPairs.first, countedPairs.second, countedPairs.third, beta);
   }
 
   /**
@@ -73,10 +93,23 @@ public class PairCountingFMeasure {
    * @return Pair counting F-Measure result.
    */
   public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2, double beta) {
-    PairSortedGeneratorInterface first = getPairGenerator(result1);
-    PairSortedGeneratorInterface second = getPairGenerator(result2);
-    Triple<Integer, Integer, Integer> countedPairs = countPairs(first, second);
-    return fMeasure(countedPairs.first, countedPairs.second, countedPairs.third, beta);
+    return compareClusterings(result1, result2, beta, false);
+  }
+
+  /**
+   * Compare two clustering results.
+   * 
+   * @param <R> Result type
+   * @param <M> Model type
+   * @param <S> Result type
+   * @param <N> Model type
+   * @param result1 first result
+   * @param result2 second result
+   * @param noiseSpecial Noise receives special treatment
+   * @return Pair counting F-1-Measure result.
+   */
+  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2, boolean noiseSpecial) {
+    return compareClusterings(result1, result2, 1.0, noiseSpecial);
   }
 
   /**
@@ -91,7 +124,7 @@ public class PairCountingFMeasure {
    * @return Pair counting F-1-Measure result.
    */
   public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2) {
-    return compareClusterings(result1, result2, 1.0);
+    return compareClusterings(result1, result2, 1.0, false);
   }
 
   /**
@@ -113,8 +146,8 @@ public class PairCountingFMeasure {
    * 
    */
   public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> Triple<Integer, Integer, Integer> countPairs(R result1, S result2) {
-    PairSortedGeneratorInterface first = getPairGenerator(result1);
-    PairSortedGeneratorInterface second = getPairGenerator(result2);
+    PairSortedGeneratorInterface first = getPairGenerator(result1, false);
+    PairSortedGeneratorInterface second = getPairGenerator(result2, false);
     return countPairs(first, second);
   }
 

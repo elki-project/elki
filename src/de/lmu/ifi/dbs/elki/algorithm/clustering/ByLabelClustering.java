@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -21,6 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Pseudo clustering using labels.
@@ -51,7 +53,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(ByLabelClustering.class);
-  
+
   /**
    * Flag to indicate that multiple cluster assignment is possible. If an
    * assignment to multiple clusters is desired, the labels indicating the
@@ -60,25 +62,39 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
   public static final OptionID MULTIPLE_ID = OptionID.getOrCreateOptionID("bylabelclustering.multiple", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
   /**
+   * Flag to indicate that multiple cluster assignment is possible. If an
+   * assignment to multiple clusters is desired, the labels indicating the
+   * clusters need to be separated by blanks.
+   */
+  public static final OptionID NOISE_ID = OptionID.getOrCreateOptionID("bylabelclustering.noise", "Pattern to recognize noise classes by their label.");
+
+  /**
    * Holds the value of {@link #MULTIPLE_ID}.
    */
   private boolean multiple;
 
   /**
+   * Holds the value of {@link #NOISE_ID}.
+   */
+  private Pattern noisepattern = null;
+
+  /**
    * Constructor.
    * 
    * @param multiple Allow multiple cluster assignments
+   * @param noisepattern Noise pattern
    */
-  public ByLabelClustering(boolean multiple) {
+  public ByLabelClustering(boolean multiple, Pattern noisepattern) {
     super();
     this.multiple = multiple;
+    this.noisepattern = noisepattern;
   }
 
   /**
    * Constructor without parameters
    */
   public ByLabelClustering() {
-    this(false);
+    this(false, null);
   }
 
   /**
@@ -94,6 +110,9 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
     for(Entry<String, ModifiableDBIDs> entry : labelMap.entrySet()) {
       ModifiableDBIDs ids = labelMap.get(entry.getKey());
       Cluster<Model> c = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER);
+      if(noisepattern != null && noisepattern.matcher(entry.getKey()).find()) {
+        c.setNoise(true);
+      }
       result.addCluster(c);
     }
     return result;
@@ -165,10 +184,15 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
     if(config.grab(multipleflag)) {
       multiple = multipleflag.getValue();
     }
+    Pattern noisepat = null;
+    final PatternParameter noiseparam = new PatternParameter(NOISE_ID, true);
+    if(config.grab(noiseparam)) {
+      noisepat = noiseparam.getValue();
+    }
     if(config.hasErrors()) {
       return null;
     }
-    return new ByLabelClustering<O>(multiple);
+    return new ByLabelClustering<O>(multiple, noisepat);
   }
 
   @Override

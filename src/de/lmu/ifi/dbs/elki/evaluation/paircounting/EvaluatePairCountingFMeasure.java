@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
@@ -53,9 +54,24 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
   private final ObjectParameter<Algorithm<O, ?>> REFERENCE_PARAM = new ObjectParameter<Algorithm<O, ?>>(REFERENCE_ID, Algorithm.class, ByLabelClustering.class);
 
   /**
+   * OptionID for {@link #NOISE_FLAG}
+   */
+  public static final OptionID NOISE_ID = OptionID.getOrCreateOptionID("paircounting.noisespecial", "Use special handling for noise clusters.");
+
+  /**
+   * Parameter flag for special noise handling.
+   */
+  private final Flag NOISE_FLAG = new Flag(NOISE_ID);
+
+  /**
    * Reference algorithm.
    */
   private Algorithm<O, ?> referencealg;
+
+  /**
+   * Apply special handling to noise "clusters".
+   */
+  private boolean noiseSpecialHandling;
 
   /**
    * Constructor.
@@ -67,6 +83,9 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
     config = config.descend(this);
     if(config.grab(REFERENCE_PARAM)) {
       referencealg = REFERENCE_PARAM.instantiateClass(config);
+    }
+    if(config.grab(NOISE_FLAG)) {
+      noiseSpecialHandling = NOISE_FLAG.getValue();
     }
   }
 
@@ -89,8 +108,8 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
     }
     Clustering<?> refc = refcrs.get(0);
     for(Clustering<?> c : crs) {
-      PairSortedGeneratorInterface first = PairCountingFMeasure.getPairGenerator(c);
-      PairSortedGeneratorInterface second = PairCountingFMeasure.getPairGenerator(refc);
+      PairSortedGeneratorInterface first = PairCountingFMeasure.getPairGenerator(c, noiseSpecialHandling);
+      PairSortedGeneratorInterface second = PairCountingFMeasure.getPairGenerator(refc, noiseSpecialHandling);
       Triple<Integer, Integer, Integer> countedPairs = PairCountingFMeasure.countPairs(first, second);
       // Use double, since we want double results at the end!
       double sum = countedPairs.first + countedPairs.second + countedPairs.third;
