@@ -453,6 +453,16 @@ public final class SVGUtil {
   }
 
   /**
+   * Convert a color name from an AWT color object to CSS syntax
+   * 
+   * @param col Color value
+   * @return Color string
+   */
+  public static String colorToString(Color col) {
+    return String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
+  }
+
+  /**
    * Make a transform string to add margins
    * 
    * @param owidth Width of outer (embedding) canvas
@@ -504,7 +514,8 @@ public final class SVGUtil {
   }
 
   /**
-   * Convert the coordinates of an DOM Event from screen into element coordinates.
+   * Convert the coordinates of an DOM Event from screen into element
+   * coordinates.
    * 
    * @param doc Document context
    * @param tag Element containing the coordinate system
@@ -526,7 +537,7 @@ public final class SVGUtil {
       return null;
     }
   }
-  
+
   /**
    * Remove last child of an element, when present
    * 

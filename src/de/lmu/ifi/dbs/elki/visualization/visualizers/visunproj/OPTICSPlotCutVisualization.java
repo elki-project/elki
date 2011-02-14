@@ -293,7 +293,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
         if(plot != null) {
           final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-          context.addVisualizer(co, task);
+          context.addVisualizer(plot, task);
         }
       }
     }

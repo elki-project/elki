@@ -1,22 +1,21 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
+import java.awt.Color;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSDistanceAdapter;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -29,53 +28,52 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
- * Visualize the clusters and cluster hierarchy found by OPTICS on the OPTICS Plot.
+ * Visualize the steep areas found in an OPTICS plot
  * 
  * @author Erich Schubert
- *
- * @apiviz.uses ClusterOrderResult
- * @apiviz.uses OPTICSPlot
+ * 
+ * @apiviz.uses OPTICS.SteepAreaResult
  */
-public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseObject> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging logger = Logging.getLogger(OPTICSClusterVisualization.class);
-
+public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends AbstractVisualization<DatabaseObject> {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "OPTICS Cluster Range";
+  private static final String NAME = "OPTICS Steep Areas";
 
   /**
    * CSS class for markers
    */
-  protected static final String CSS_BRACKET = "opticsBracket";
+  protected static final String CSS_STEEP_UP = "opticsSteepUp";
+
+  /**
+   * CSS class for markers
+   */
+  protected static final String CSS_STEEP_DOWN = "opticsSteepDown";
 
   /**
    * Our cluster order
    */
-  private ClusterOrderResult<?> co;
+  private ClusterOrderResult<D> co;
 
   /**
    * Our clustering
    */
-  Clustering<OPTICSModel> clus;
+  OPTICS.SteepAreaResult areas;
 
   /**
    * The plot
    */
-  private OPTICSPlot<?> opticsplot;
+  private OPTICSPlot<D> opticsplot;
 
   /**
    * Constructor.
    * 
    * @param task Visualization task
    */
-  public OPTICSClusterVisualization(VisualizationTask task) {
+  public OPTICSSteepAreaVisualization(VisualizationTask task) {
     super(task);
     this.co = task.getResult();
-    this.clus = findOPTICSClustering(this.co);
+    this.areas = findSteepAreaResult(this.co);
     this.opticsplot = OPTICSPlot.plotForClusterOrder(this.co, context);
     context.addResultListener(this);
     incrementalRedraw();
@@ -87,19 +85,10 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
    * @param co Cluster order
    * @return OPTICS clustering
    */
-  @SuppressWarnings("unchecked")
-  protected static Clustering<OPTICSModel> findOPTICSClustering(ClusterOrderResult<?> co) {
+  protected static OPTICS.SteepAreaResult findSteepAreaResult(ClusterOrderResult<?> co) {
     for(Result r : co.getHierarchy().getChildren(co)) {
-      if(!Clustering.class.isInstance(r)) {
-        continue;
-      }
-      Clustering<?> clus = (Clustering<?>) r;
-      if(clus.getToplevelClusters().size() == 0) {
-        continue;
-      }
-      Cluster<?> firstcluster = clus.getToplevelClusters().iterator().next();
-      if(firstcluster.getModel() instanceof OPTICSModel) {
-        return (Clustering<OPTICSModel>) clus;
+      if(OPTICS.SteepAreaResult.class.isInstance(r)) {
+        return (OPTICS.SteepAreaResult) r;
       }
     }
     return null;
@@ -117,37 +106,28 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
 
     addCSSClasses();
 
-    drawClusters(scale, scale / opticsplot.getRatio(), clus.getToplevelClusters(), 1);
-  }
+    final double plotwidth = scale;
+    final double plotheight = scale / opticsplot.getRatio();
 
-  /**
-   * Recursively draw clusters
-   * 
-   * @param sizex Width
-   * @param sizey Height of optics plot
-   * @param clusters Current set of clusters
-   * @param depth Recursion depth
-   */
-  private void drawClusters(double sizex, double sizey, List<Cluster<OPTICSModel>> clusters, int depth) {
-    final double scale = StyleLibrary.SCALE;
-    for(Cluster<OPTICSModel> cluster : clusters) {
-      try {
-        OPTICSModel model = cluster.getModel();
-        final double x1 = sizex * ((model.getStartIndex() + .25) / this.co.getClusterOrder().size());
-        final double x2 = sizex * ((model.getEndIndex() +.75) / this.co.getClusterOrder().size());
-        final double y = sizey + depth * scale * 0.01;
-        Element e = svgp.svgLine(x1, y, x2, y);
-        SVGUtil.addCSSClass(e, CSS_BRACKET);
-        layer.appendChild(e);
+    OPTICSDistanceAdapter<D> adapter = opticsplot.getDistanceAdapter();
+    for(OPTICS.SteepArea area : areas) {
+      final int st = area.getStartIndex();
+      final int en = area.getEndIndex();
+      // Note: make sure we are using doubles!
+      final double x1 = (st + .25) / this.co.getClusterOrder().size();
+      final double x2 = (en + .75) / this.co.getClusterOrder().size();
+      final double d1 = adapter.getDoubleForEntry(this.co.getClusterOrder().get(st));
+      final double d2 = adapter.getDoubleForEntry(this.co.getClusterOrder().get(en));
+      final double y1 = (!Double.isInfinite(d1) && !Double.isNaN(d1)) ? (1. - opticsplot.getScale().getScaled(d1)) : 0.;
+      final double y2 = (!Double.isInfinite(d2) && !Double.isNaN(d2)) ? (1. - opticsplot.getScale().getScaled(d2)) : 0.;
+      Element e = svgp.svgLine(plotwidth * x1, plotheight * y1, plotwidth * x2, plotheight * y2);
+      if(area instanceof OPTICS.SteepDownArea) {
+        SVGUtil.addCSSClass(e, CSS_STEEP_DOWN);
       }
-      catch(ClassCastException e) {
-        logger.warning("Expected OPTICSModel, got: " + cluster.getModel().getClass().getSimpleName());
+      else {
+        SVGUtil.addCSSClass(e, CSS_STEEP_UP);
       }
-      // Descend
-      final List<Cluster<OPTICSModel>> children = cluster.getChildren();
-      if(children != null) {
-        drawClusters(sizex, sizey, children, depth + 1);
-      }
+      layer.appendChild(e);
     }
   }
 
@@ -156,9 +136,25 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
    */
   private void addCSSClasses() {
     // Class for the markers
-    if(!svgp.getCSSClassManager().contains(CSS_BRACKET)) {
-      final CSSClass cls = new CSSClass(this, CSS_BRACKET);
-      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+    if(!svgp.getCSSClassManager().contains(CSS_STEEP_DOWN)) {
+      final CSSClass cls = new CSSClass(this, CSS_STEEP_DOWN);
+      Color color = SVGUtil.stringToColor(context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+      if(color == null) {
+        color = Color.BLACK;
+      }
+      color = new Color((int) (color.getRed() * 0.8), (int) (color.getGreen() * 0.8 + 0.2 * 256), (int) (color.getBlue() * 0.8));
+      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      svgp.addCSSClassOrLogError(cls);
+    }
+    if(!svgp.getCSSClassManager().contains(CSS_STEEP_UP)) {
+      final CSSClass cls = new CSSClass(this, CSS_STEEP_UP);
+      Color color = SVGUtil.stringToColor(context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+      if(color == null) {
+        color = Color.BLACK;
+      }
+      color = new Color((int) (color.getRed() * 0.8 + 0.2 * 256), (int) (color.getGreen() * 0.8), (int) (color.getBlue() * 0.8));
+      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
       cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       svgp.addCSSClassOrLogError(cls);
     }
@@ -196,9 +192,10 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
-        if(plot != null && findOPTICSClustering(co) != null) {
+        if(plot != null && findSteepAreaResult(co) != null) {
           final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           context.addVisualizer(plot, task);
         }
       }
@@ -206,7 +203,7 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new OPTICSClusterVisualization(task);
+      return new OPTICSSteepAreaVisualization<DoubleDistance>(task);
     }
 
     @Override
