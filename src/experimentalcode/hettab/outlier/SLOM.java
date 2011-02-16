@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.hettab.textwriter.KMLTextWriter;
+import experimentalcode.hettab.textwriter.KMLWriter;
 
 /**
  * SLOM Algorithm
@@ -208,8 +209,10 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
 
     //
     KMLTextWriter<V> resu = new KMLTextWriter<V>(outputKmlFile,neighborhood);
+    KMLWriter<V> res = new KMLWriter<V>(outputKmlFile);
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
     resu.processResult(database, sloms);
+    res.processResult(database, sloms);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
 
