@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 
@@ -44,9 +44,9 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
   }
 
   @Override
-  public void prepare(Database<?> db, OutlierResult or) {
+  public void prepare(DBIDs ids, OutlierResult or) {
     MinMax<Double> mm = new MinMax<Double>();
-    for(DBID id : db) {
+    for(DBID id : ids) {
       double val = or.getScores().getValueFor(id);
       mm.put(val);
     }

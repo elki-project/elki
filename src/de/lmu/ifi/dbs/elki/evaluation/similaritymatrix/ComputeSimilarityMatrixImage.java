@@ -110,6 +110,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
         if(ddist > 0.0) {
           ddist = scale.getScaled(ddist);
         }
+        ddist = ddist * ddist;
         int dist = 0xFF & (int) (255 * ddist);
         int col = 0xff000000 | (dist << 16) | (dist << 8) | dist;
         img.setRGB(x, y, col);

@@ -1,9 +1,9 @@
 package experimentalcode.shared.outlier.scaling;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -92,10 +92,10 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
   }
 
   @Override
-  public void prepare(Database<?> db, OutlierResult or) {
+  public void prepare(DBIDs dbids, OutlierResult or) {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
-    for(DBID id : db) {
+    for(DBID id : dbids) {
       double val = or.getScores().getValueFor(id);
       mv.put(val);
     }
@@ -107,7 +107,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
     double curLambda = Math.min(1.0 / curMu, Double.MAX_VALUE);
     double curAlpha = 0.05;
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(db.getIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(dbids);
     // TODO: stop condition!
     int iter = 0;
     // logger.debugFine("iter #-1 mu = " + curMu + " sigma = " + curSigma +

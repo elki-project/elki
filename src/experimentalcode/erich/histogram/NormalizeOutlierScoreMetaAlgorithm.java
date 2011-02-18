@@ -98,7 +98,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
 
     OutlierResult or = getOutlierResult(database, innerresult);
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(database, or);
+      ((OutlierScalingFunction) scaling).prepare(database.getIDs(), or);
     }
 
     WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);

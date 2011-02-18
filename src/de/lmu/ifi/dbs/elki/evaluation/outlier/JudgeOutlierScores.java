@@ -119,7 +119,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
   protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, Database<O> database, OutlierResult or) throws IllegalStateException {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
-      oscaling.prepare(database, or);
+      oscaling.prepare(database.getIDs(), or);
     }
 
     final ScalingFunction innerScaling;

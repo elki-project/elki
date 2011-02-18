@@ -164,7 +164,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
   public HistogramResult<DoubleVector> evaluateOutlierResult(Database<O> database, OutlierResult or) {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
-      oscaling.prepare(database, or);
+      oscaling.prepare(database.getIDs(), or);
     }
 
     ModifiableDBIDs ids = DBIDUtil.newHashSet(database.getIDs());

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 
 /**
@@ -41,20 +41,20 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   }
 
   @Override
-  public void prepare(Database<?> db, OutlierResult or) {
-    scaleval = getScaleValue(db, or);
+  public void prepare(DBIDs ids, OutlierResult or) {
+    scaleval = getScaleValue(ids, or);
   }
 
   /**
    * Compute the scaling value in a linear scan over the annotation.
    * 
-   * @param db Database
+   * @param ids Database ids
    * @param or Outlier result
    * @return Scaling value.
    */
-  private static double getScaleValue(Database<?> db, OutlierResult or) {
+  private static double getScaleValue(DBIDs ids, OutlierResult or) {
     double max = Double.MIN_VALUE;
-    for(DBID id : db) {
+    for(DBID id : ids) {
       double val = or.getScores().getValueFor(id);
       double inv = Math.abs(1.0 / val);
       if(!Double.isInfinite(inv) && !Double.isNaN(inv)) {

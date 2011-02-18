@@ -249,7 +249,7 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
 
     // Apply scaling
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(database, or);
+      ((OutlierScalingFunction) scaling).prepare(database.getIDs(), or);
     }
     MinMax<Double> mm = new MinMax<Double>();
     for(DBID id : database) {
