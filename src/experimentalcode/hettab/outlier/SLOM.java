@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -208,11 +209,13 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     }
 
     //
-    KMLTextWriter<V> resu = new KMLTextWriter<V>(outputKmlFile,neighborhood);
-    KMLWriter<V> res = new KMLWriter<V>(outputKmlFile);
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
-    resu.processResult(database, sloms);
-    res.processResult(database, sloms);
+    if (outputKmlFile != null) {
+      KMLTextWriter<V> resu = new KMLTextWriter<V>(outputKmlFile,neighborhood);
+      KMLWriter<V> res = new KMLWriter<V>(outputKmlFile);
+      resu.processResult(database, sloms);
+      res.processResult(database, sloms);
+    }
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
 
@@ -281,7 +284,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * 
    */
   protected static File getKMLOutputPath(Parameterization config) {
-    final FileParameter param = new FileParameter(KML_OUTPUT_FILE_ID, FileParameter.FileType.OUTPUT_FILE);
+    final FileParameter param = new FileParameter(KML_OUTPUT_FILE_ID, FileParameter.FileType.OUTPUT_FILE, true);
     if(config.grab(param)) {
       return param.getValue();
     }
@@ -295,7 +298,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @return
    */
   protected static <F extends PrimitiveDistanceFunction<?, ?>> F getNonSpatialDistanceFunction(Parameterization config) {
-    final ObjectParameter<F> param = new ObjectParameter<F>(NON_SPATIAL_DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, true);
+    final ObjectParameter<F> param = new ObjectParameter<F>(NON_SPATIAL_DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
