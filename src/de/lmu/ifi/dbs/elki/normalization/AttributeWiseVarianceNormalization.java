@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -26,6 +27,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
 public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> extends AbstractNormalization<V> {
+  /**
+   * Class logger.
+   */
+  public static final Logging logger = Logging.getLogger(AttributeWiseVarianceNormalization.class);
+  
   /**
    * OptionID for {@link #MEAN_PARAM}
    */
@@ -116,17 +122,27 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
 
   @Override
   protected void initComplete() {
+    StringBuffer buf = logger.isVerbose() ? new StringBuffer() : null;
     final int dimensionality = mvs.length;
     mean = new double[dimensionality];
     stddev = new double[dimensionality];
+    if (buf != null) {
+      buf.append("Normalization parameters: ");
+    }
     for(int d = 0; d < dimensionality; d++) {
       mean[d] = mvs[d].getMean();
       stddev[d] = mvs[d].getStddev();
-      if(stddev[d] == 0) {
+      if(stddev[d] == 0 || Double.isNaN(stddev[d])) {
         stddev[d] = 1.0;
+      }
+      if (buf != null) {
+        buf.append(" m: ").append(mean[d]).append(" v: ").append(stddev[d]);
       }
     }
     mvs = null;
+    if (buf != null) {
+      logger.debugFine(buf.toString());
+    }
   }
 
   @Override

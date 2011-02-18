@@ -124,7 +124,7 @@ public abstract class AbstractNormalization<O extends DatabaseObject> implements
 
   @Override
   public List<O> restore(List<O> objs) throws NonNumericFeaturesException {
-    List<O> restored = new ArrayList<O>();
+    List<O> restored = new ArrayList<O>(objs.size());
     for(O obj : objs) {
       final O restObj = restore(obj);
       // Keep the ID

@@ -2,8 +2,8 @@ package experimentalcode.shared.outlier.scaling;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 /**
  * This is a pseudo outlier scoring obtained by only considering the ranks of
- * the objects.
+ * the objects. However, the ranks are not mapped linarly to scores, but using
+ * a normal distribution.
  * 
  * @author Erich Schubert
  */
@@ -24,18 +25,18 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
   private boolean inverted = false;
 
   @Override
-  public void prepare(Database<?> db, OutlierResult or) {
+  public void prepare(DBIDs ids, OutlierResult or) {
     // collect all outlier scores
-    scores = new double[db.size()];
+    scores = new double[ids.size()];
     int pos = 0;
     if (or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
       inverted = true;
     }
-    for(DBID id : db) {
+    for(DBID id : ids) {
       scores[pos] = or.getScores().getValueFor(id);
       pos++;
     }
-    if(pos != db.size()) {
+    if(pos != ids.size()) {
       throw new AbortException("Database size is incorrect!");
     }
     // sort them

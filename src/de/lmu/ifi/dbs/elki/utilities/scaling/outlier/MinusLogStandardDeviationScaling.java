@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -41,10 +41,10 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   }
 
   @Override
-  public void prepare(Database<?> db, OutlierResult or) {
+  public void prepare(DBIDs ids, OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
-      for(DBID id : db) {
+      for(DBID id : ids) {
         double val = -Math.log(or.getScores().getValueFor(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
@@ -57,7 +57,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
       mean = fixedmean;
       double sqsum = 0;
       int cnt = 0;
-      for(DBID id : db) {
+      for(DBID id : ids) {
         double val = -Math.log(or.getScores().getValueFor(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum += (val - mean) * (val - mean);
