@@ -22,7 +22,8 @@ import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
  * the partitions with a distance of n around each partition. This implementation assumes that all
  * partitions are from a one dimensional space (e.g. {@link ZCurvePartitioning}).
  * <p/>
- * Consider this simple example with a window size of 1. In this example partition 2 would be paired with partition 1 and partition 3. 
+ * Consider this simple example with a window size of 1. In this example partition 2 would be paired 
+ * with partition 1 and partition 3 and of course with itself. 
  * 
  * <pre>
  * -----------------------------
