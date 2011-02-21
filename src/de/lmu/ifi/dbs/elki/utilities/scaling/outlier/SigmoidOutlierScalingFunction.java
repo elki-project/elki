@@ -1,4 +1,4 @@
-package experimentalcode.shared.outlier.scaling;
+package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import java.util.BitSet;
 
@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 /**
  * Tries to fit a sigmoid to the outlier scores and use it to convert the values
