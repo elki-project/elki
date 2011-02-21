@@ -32,9 +32,19 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
+import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 
+/**
+ * Compute a similarity matrix for a distance function.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Object class
+ */
 public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements Evaluator<O> {
   /**
    * The logger.
@@ -42,9 +52,19 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
   static final Logging logger = Logging.getLogger(ComputeSimilarityMatrixImage.class);
 
   /**
+   * OptionID for {@link #SCALING_PARAM}
+   */
+  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("simmatrix.scaling", "Class to use as scaling function.");
+
+  /**
    * The distance function to use
    */
   private DistanceFunction<O, ? extends NumberDistance<?, ?>> distanceFunction;
+
+  /**
+   * Scaling function to use
+   */
+  private ScalingFunction scaling;
 
   /**
    * Constructor
@@ -55,9 +75,32 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     super();
     config = config.descend(this);
     distanceFunction = AbstractAlgorithm.getParameterDistanceFunction(config);
+    scaling = getScalingFunction(config);
   }
 
-  private Result computeSimilarityMatrixImage(Database<O> database, Iterator<DBID> iter) {
+  /**
+   * Get the scaling function parameter.
+   * 
+   * @param config Parameterization
+   * @return Scaling function or null
+   */
+  private static ScalingFunction getScalingFunction(Parameterization config) {
+    final ObjectParameter<ScalingFunction> param = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, true);
+    if(config.grab(param)) {
+      return param.instantiateClass(config);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Compute the actual similarity image.
+   * 
+   * @param database Database
+   * @param iter DBID iterator
+   * @return result object
+   */
+  private SimilarityMatrix computeSimilarityMatrixImage(Database<O> database, Iterator<DBID> iter) {
     ArrayModifiableDBIDs order = DBIDUtil.newArray(database.size());
     while(iter.hasNext()) {
       Object o = iter.next();
@@ -110,7 +153,10 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
         if(ddist > 0.0) {
           ddist = scale.getScaled(ddist);
         }
-        ddist = ddist * ddist;
+        // Apply extra scaling
+        if (scaling != null) {
+          ddist = scaling.getScaled(ddist);
+        }
         int dist = 0xFF & (int) (255 * ddist);
         int col = 0xff000000 | (dist << 16) | (dist << 8) | dist;
         img.setRGB(x, y, col);
