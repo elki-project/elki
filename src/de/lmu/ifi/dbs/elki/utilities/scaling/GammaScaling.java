@@ -1,5 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Non-linear scaling function using a Gamma curve.
  * 
@@ -8,6 +12,11 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  */
 public class GammaScaling implements StaticScalingFunction {
   /**
+   * OptionID for {@link #GAMMA_PARAM}.
+   */
+  public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("scaling.gamma", "Gamma value for scaling.");
+
+  /**
    * Gamma value.
    */
 	private double gamma;
@@ -15,11 +24,25 @@ public class GammaScaling implements StaticScalingFunction {
 	/**
 	 * Default constructor.
 	 */
-	public GammaScaling(){
-		this(1.0);
+	public GammaScaling(Parameterization config){
+		this(getGammaParameter(config));
 	}
-	
+
 	/**
+	 * Parameterization method.
+	 * 
+	 * @param config Configuration
+	 * @return Gamma value
+	 */
+	private static double getGammaParameter(Parameterization config) {
+	  DoubleParameter param = new DoubleParameter(GAMMA_ID);
+	  if (config.grab(param)) {
+	    return param.getValue();
+	  }
+    return 1.0;
+  }
+
+  /**
 	 * Constructor with Gamma value.
 	 * 
 	 * @param gamma Gamma value.
