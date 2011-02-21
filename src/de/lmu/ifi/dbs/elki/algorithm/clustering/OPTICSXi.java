@@ -35,6 +35,15 @@ public class OPTICSXi {
    */
   private static final Logging logger = Logging.getLogger(OPTICS.class);
 
+  /**
+   * Extract clusters from a cluster order result.
+   * 
+   * @param <N> distance type
+   * @param clusterOrderResult cluster order result
+   * @param database Database
+   * @param ixi Parameter 1 - Xi
+   * @param minpts Parameter minPts
+   */
   // TODO: resolve handling of the last point in the cluster order
   public static <N extends NumberDistance<N, ?>> void extractClusters(ClusterOrderResult<N> clusterOrderResult, Database<?> database, double ixi, int minpts) {
     // TODO: add progress?
@@ -320,7 +329,7 @@ public class OPTICSXi {
      * @return end of cluster order
      */
     public boolean hasNext() {
-      return index + 1 < co.size();
+      return index < co.size();
     }
 
     /**
