@@ -1,4 +1,4 @@
-package experimentalcode.shared.outlier.scaling;
+package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import java.util.Arrays;
 
@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 /**
  * This is a pseudo outlier scoring obtained by only considering the ranks of
