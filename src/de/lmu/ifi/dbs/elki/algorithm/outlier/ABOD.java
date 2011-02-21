@@ -193,7 +193,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
         }
       }
-      pq.add(new FCPair<Double, DBID>(s.getVariance(), objKey));
+      // Sample variance probably would be correct, however the numerical
+      // instabilities can actually break ABOD here.
+      pq.add(new FCPair<Double, DBID>(s.getExactVariance(), objKey));
     }
 
     MinMax<Double> minmaxabod = new MinMax<Double>();
