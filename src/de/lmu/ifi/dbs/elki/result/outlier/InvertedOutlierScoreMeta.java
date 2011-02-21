@@ -62,8 +62,8 @@ public class InvertedOutlierScoreMeta extends BasicOutlierScoreMeta {
       min = actualMinimum;
     }
     if (!Double.isNaN(min) && !Double.isInfinite(min) && min != center) {
-      return (value - center) / (min - center);
+      return (center - value) / (center - min);
     }
-    return - (value - center);
+    return center - value;
   }  
 }

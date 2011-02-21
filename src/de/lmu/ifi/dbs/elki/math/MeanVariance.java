@@ -3,29 +3,32 @@ package de.lmu.ifi.dbs.elki.math;
 /**
  * Do some simple statistics (mean, average).
  * 
- * This class can repeatedly be fed with data using the add() methods,
- * The resulting values for mean and average can be queried at any time using
+ * This class can repeatedly be fed with data using the add() methods, The
+ * resulting values for mean and average can be queried at any time using
  * getMean() and getVariance().
  * 
- * Trivial code, but replicated a lot. The class is final so it should come at low cost.
+ * Trivial code, but replicated a lot. The class is final so it should come at
+ * low cost.
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public final class MeanVariance {
   /**
    * Sum of values
    */
   public double sum = 0.0;
+
   /**
    * Sum of Squares
    */
   public double sqrSum = 0.0;
+
   /**
    * Number of Samples.
    */
   public double count = 0.0;
-  
+
   /**
    * Empty constructor
    */
@@ -54,7 +57,7 @@ public final class MeanVariance {
   public MeanVariance(MeanVariance other) {
     this.sum = other.sum;
     this.sqrSum = other.sqrSum;
-    this.count = other.count;   
+    this.count = other.count;
   }
 
   /**
@@ -64,11 +67,11 @@ public final class MeanVariance {
    * @param weight weight
    */
   public void put(double val, double weight) {
-    sum    += weight * val;
+    sum += weight * val;
     sqrSum += weight * val * val;
-    count  += weight;
+    count += weight;
   }
-  
+
   /**
    * Add a single value with weight 1.0
    * 
@@ -91,6 +94,7 @@ public final class MeanVariance {
 
   /**
    * Get the number of points the average is based on.
+   * 
    * @return number of data points
    */
   public double getCount() {
@@ -99,6 +103,7 @@ public final class MeanVariance {
 
   /**
    * Return mean
+   * 
    * @return mean
    */
   public double getMean() {
@@ -106,25 +111,36 @@ public final class MeanVariance {
   }
 
   /**
-   * Return variance
+   * Return exact variance (non-sample variance)
+   * 
    * @return variance
    */
-  public double getVariance() {
+  public double getExactVariance() {
     double mu = sum / count;
-    return (sqrSum / (count-1)) - (mu * mu);
+    return (sqrSum / count) - (mu * mu);
   }
-  
+
+  /**
+   * Return sample variance
+   * 
+   * @return sample variance
+   */
+  public double getVariance() {
+    return (sqrSum - (sum * sum) / count) / (count - 1);
+  }
+
   /**
    * Return standard deviation
+   * 
    * @return stddev
    */
   public double getStddev() {
     return Math.sqrt(getVariance());
   }
-  
+
   /**
-   * Return the normalized value
-   * (centered at the mean, distance normalized by standard deviation)
+   * Return the normalized value (centered at the mean, distance normalized by
+   * standard deviation)
    * 
    * @param val original value
    * @return normalized value
@@ -132,10 +148,10 @@ public final class MeanVariance {
   public double normalizeValue(double val) {
     return (val - getMean()) / getStddev();
   }
-  
+
   /**
-   * Return the unnormalized value
-   * (centered at the mean, distance normalized by standard deviation)
+   * Return the unnormalized value (centered at the mean, distance normalized by
+   * standard deviation)
    * 
    * @param val normalized value
    * @return de-normalized value
@@ -146,12 +162,13 @@ public final class MeanVariance {
 
   /**
    * Create and initialize a new array of MeanVariance
+   * 
    * @param dimensionality Dimensionality
    * @return New and initialized Array
    */
   public static MeanVariance[] newArray(int dimensionality) {
     MeanVariance[] arr = new MeanVariance[dimensionality];
-    for (int i = 0; i < dimensionality; i++) {
+    for(int i = 0; i < dimensionality; i++) {
       arr[i] = new MeanVariance();
     }
     return arr;
@@ -159,6 +176,6 @@ public final class MeanVariance {
 
   @Override
   public String toString() {
-    return "MeanVariance(mean="+getMean()+",var="+getVariance()+")";
+    return "MeanVariance(mean=" + getMean() + ",var=" + getVariance() + ")";
   }
 }
