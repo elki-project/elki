@@ -20,10 +20,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.scaling.GammaScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -73,21 +71,19 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
   protected ScalingFunction scaling;
 
   /**
-   * Used for Gamma-Correction.
-   * 
-   * TODO: Make the gamma-function exchangeable (inc. Parameter etc.).
-   */
-  protected GammaScaling gammaScaling;
-
-  /**
    * The outlier result to visualize
    */
   protected OutlierResult result;
 
-  public BubbleVisualization(VisualizationTask task, double gamma, ScalingFunction scaling) {
+  /**
+   * Constructor.
+   * 
+   * @param task Visualization task
+   * @param scaling Scaling function
+   */
+  public BubbleVisualization(VisualizationTask task, ScalingFunction scaling) {
     super(task);
     this.result = task.getResult();
-    this.gammaScaling = new GammaScaling(gamma);
     this.scaling = scaling;
     context.addDataStoreListener(this);
     incrementalRedraw();
@@ -185,10 +181,10 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
       return 0.0;
     }
     if(scaling == null) {
-      return gammaScaling.getScaled(result.getOutlierMeta().normalizeScore(d));
+      return result.getOutlierMeta().normalizeScore(d);
     }
     else {
-      return gammaScaling.getScaled(scaling.getScaled(d));
+      return scaling.getScaled(d);
     }
   }
 
@@ -203,29 +199,6 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
    * @param <NV> Type of the DatabaseObject being visualized.
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
-    /**
-     * OptionID for {@link #GAMMA_PARAM}.
-     */
-    public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "A gamma-correction.");
-
-    /**
-     * Parameter for the gamma-correction.
-     * 
-     * <p>
-     * Key: {@code -bubble.gamma}
-     * </p>
-     * 
-     * <p>
-     * Default value: 1.0
-     * < /p>
-     */
-    private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID, 1.0);
-
-    /**
-     * Gamma parameter.
-     */
-    private double gamma;
-
     /**
      * OptionID for {@link #FILL_FLAG}.
      */
@@ -279,19 +252,15 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
       if(config.grab(SCALING_PARAM)) {
         scaling = SCALING_PARAM.instantiateClass(config);
       }
-      if(config.grab(GAMMA_PARAM)) {
-        gamma = GAMMA_PARAM.getValue();
-      }
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      // TODO: mvoe into BubbleVisualization
       if(this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
         final OutlierResult outlierResult = task.getResult();
         ((OutlierScalingFunction) this.scaling).prepare(task.getContext().getDatabase().getIDs(), outlierResult);
       }
-      return new BubbleVisualization<NV>(task, gamma, scaling);
+      return new BubbleVisualization<NV>(task, scaling);
     }
 
     @Override
