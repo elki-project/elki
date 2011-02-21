@@ -78,7 +78,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory<DatabaseObje
       i++;
     }
 
-    int cols = Math.max(30, (int) (i * task.getHeight() / task.getWidth()));
+    int cols = Math.max(10, (int) (i * task.getHeight() / task.getWidth()));
     int rows = i;
     final double margin = task.getContext().getStyleLibrary().getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
