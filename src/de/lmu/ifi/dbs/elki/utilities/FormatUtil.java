@@ -28,6 +28,11 @@ public final class FormatUtil {
   public static final NumberFormat NF4 = NumberFormat.getInstance(Locale.US);
 
   /**
+   * Number Formatter (6 digits) for output purposes.
+   */
+  public static final NumberFormat NF6 = NumberFormat.getInstance(Locale.US);
+
+  /**
    * Number Formatter (8 digits) for output purposes.
    */
   public static final NumberFormat NF8 = NumberFormat.getInstance(Locale.US);
@@ -37,6 +42,8 @@ public final class FormatUtil {
     NF2.setMaximumFractionDigits(2);
     NF4.setMinimumFractionDigits(4);
     NF4.setMaximumFractionDigits(4);
+    NF6.setMinimumFractionDigits(6);
+    NF6.setMaximumFractionDigits(6);
     NF8.setMinimumFractionDigits(8);
     NF8.setMaximumFractionDigits(8);
   }

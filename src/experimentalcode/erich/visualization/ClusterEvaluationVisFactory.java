@@ -64,15 +64,29 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory<DatabaseObje
 
     int i = 0;
     {
-      Element object = svgp.svgText(0, i + 0.7, "F-Measure of cluster pair counts:");
+      Element object = svgp.svgText(0, i + 0.7, "Same-cluster object pairs");
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;
-    
-    }
-    
+    }    
+    {
+      Element object = svgp.svgText(0, i + 0.7, "F1-Measure, Precision and Recall:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }    
     for(Vector vec : sr) {
-      Element object = svgp.svgText(0, i + 0.7, FormatUtil.format(vec.get(0), FormatUtil.NF8));
+      StringBuffer buf = new StringBuffer();
+      double fmeasure = vec.get(0);
+      double inboth = vec.get(1);
+      double infirst = vec.get(2);
+      double insecond = vec.get(3);
+      buf.append(FormatUtil.format(fmeasure, FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(inboth / (inboth + infirst), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(inboth / (inboth + insecond), FormatUtil.NF6));
+      Element object = svgp.svgText(0, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
       i++;
