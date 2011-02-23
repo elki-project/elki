@@ -45,6 +45,7 @@ public class TestPROCLUSResults implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     params.addParameter(PROCLUS.L_ID, 1);
     params.addParameter(PROCLUS.K_ID, 4);
+    params.addParameter(PROCLUS.SEED_ID, 1);
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
 
