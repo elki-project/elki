@@ -125,7 +125,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
       progress.ensureCompleted(logger);
     }
     if(logger.isVerbose()) {
-      logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getStddev() + " neighbors returned.");
+      logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
     }
   }
 

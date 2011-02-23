@@ -272,7 +272,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
 
     double nplof = lambda * Math.sqrt(mvplof.getMean());
     if(logger.isDebugging()) {
-      logger.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean() + " " + mvplof.getStddev());
+      logger.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean() + " " + mvplof.getSampleStddev());
     }
 
     // Compute final LoOP values.

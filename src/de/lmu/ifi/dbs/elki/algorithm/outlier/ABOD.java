@@ -195,7 +195,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
       // Sample variance probably would be correct, however the numerical
       // instabilities can actually break ABOD here.
-      pq.add(new FCPair<Double, DBID>(s.getExactVariance(), objKey));
+      pq.add(new FCPair<Double, DBID>(s.getNaiveVariance(), objKey));
     }
 
     MinMax<Double> minmaxabod = new MinMax<Double>();
@@ -291,7 +291,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
       // System.out.println( aKey + "Sum " + sum + " SQRSum " +sqrSum +
       // " Counter " + counter);
-      double var = s.getVariance();
+      double var = s.getSampleVariance();
       // System.out.println(aKey+ " : " + approx +" " + var);
       if(resqueue.size() < k) {
         resqueue.add(new FCPair<Double, DBID>(var, aKey));
@@ -508,11 +508,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
             s2.put(tmp, 1 / sqr);
           }
         }
-        explain.add(new FCPair<Double, DBID>(s2.getVariance(), key1));
+        explain.add(new FCPair<Double, DBID>(s2.getSampleVariance(), key1));
         s.put(s2);
       }
       // build variance of the observed vectors
-      pq.add(new FCPair<Double, DBID>(s.getVariance(), objKey));
+      pq.add(new FCPair<Double, DBID>(s.getSampleVariance(), objKey));
       //
       LinkedList<DBID> expList = new LinkedList<DBID>();
       expList.add(explain.remove().getSecond());

@@ -107,7 +107,7 @@ public class KNNJoinTest implements JUnit4Test {
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Euclidean mean 2NN", mean2nnEuclid, meansize.getMean(), 0.00001);
-      org.junit.Assert.assertEquals("Euclidean variance 2NN", var2nnEuclid, meansize.getVariance(), 0.00001);
+      org.junit.Assert.assertEquals("Euclidean variance 2NN", var2nnEuclid, meansize.getSampleVariance(), 0.00001);
     }
     // Manhattan
     // TODO: Add Manhattan support.

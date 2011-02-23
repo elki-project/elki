@@ -127,8 +127,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       progress.ensureCompleted(getLogger());
     }
     if(getLogger().isVerbose()) {
-      getLogger().verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getStddev());
-      getLogger().verbose("On average, " + ksize.getMean() + " +- " + ksize.getStddev() + " neighbors returned.");
+      getLogger().verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getSampleStddev());
+      getLogger().verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
     }
   }
 

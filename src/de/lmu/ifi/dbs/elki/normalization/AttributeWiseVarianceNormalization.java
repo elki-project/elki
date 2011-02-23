@@ -131,7 +131,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     }
     for(int d = 0; d < dimensionality; d++) {
       mean[d] = mvs[d].getMean();
-      stddev[d] = mvs[d].getStddev();
+      stddev[d] = mvs[d].getSampleStddev();
       if(stddev[d] == 0 || Double.isNaN(stddev[d])) {
         stddev[d] = 1.0;
       }

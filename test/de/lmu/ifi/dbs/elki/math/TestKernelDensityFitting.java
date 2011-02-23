@@ -109,7 +109,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     }
 
     params[0] = mv.getMean();
-    params[1] = mv.getStddev();
+    params[1] = mv.getSampleStddev();
     // guess initial amplitude for an gaussian distribution.
     double c1 = ErrorFunctions.erf(Math.abs(data[0] - params[0]) / (params[1] * Math.sqrt(2)));
     double c2 = ErrorFunctions.erf(Math.abs(data[data.length - 1] - params[0]) / (params[1] * Math.sqrt(2)));

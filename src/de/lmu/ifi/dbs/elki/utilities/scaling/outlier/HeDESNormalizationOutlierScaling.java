@@ -43,7 +43,7 @@ public class HeDESNormalizationOutlierScaling implements OutlierScalingFunction 
     }
     
     mean = mv.getMean();
-    stddev = mv.getStddev();
+    stddev = mv.getSampleStddev();
     scaledmax = getScaled(minmax.getMax());
     scaledmin = getScaled(minmax.getMin());
   }
