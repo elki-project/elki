@@ -10,6 +10,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
@@ -126,9 +127,19 @@ public class DetailView extends SVGPlot implements ResultListener {
     // TODO: center/arrange visualizations?
     for(VisualizationTask task : visi) {
       if(VisualizerUtil.isVisible(task)) {
-        Visualization v = task.getFactory().makeVisualization(task.clone(this, visi.proj, width, height));
-        layers.add(v);
-        layermap.put(task, v);
+        try {
+          Visualization v = task.getFactory().makeVisualization(task.clone(this, visi.proj, width, height));
+          layers.add(v);
+          layermap.put(task, v);
+        }
+        catch(Exception e) {
+          if(Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
+            LoggingUtil.exception("Visualization failed.", e);
+          }
+          else {
+            LoggingUtil.warning("Visualizer " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");
+          }
+        }
       }
     }
     // Arrange
