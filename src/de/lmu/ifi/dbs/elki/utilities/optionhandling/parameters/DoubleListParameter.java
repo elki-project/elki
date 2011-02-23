@@ -101,13 +101,11 @@ public class DoubleListParameter extends ListParameter<Double> {
     super(optionID);
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
-    return FormatUtil.format(getValue().toArray(new Double[0]));
+    return FormatUtil.format(getValue().toArray(new Double[0]), LIST_SEP, FormatUtil.NF);
   }
 
-  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   protected List<Double> parseValue(Object obj) throws ParameterException {

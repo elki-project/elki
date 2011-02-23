@@ -18,6 +18,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  */
 public final class FormatUtil {
   /**
+   * Dynamic number formatter, but with language constraint.
+   */
+  public static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
+  
+  /**
    * Number Formatter (2 digits) for output purposes.
    */
   public static final NumberFormat NF2 = NumberFormat.getInstance(Locale.US);
@@ -38,6 +43,8 @@ public final class FormatUtil {
   public static final NumberFormat NF8 = NumberFormat.getInstance(Locale.US);
 
   static {
+    NF.setMinimumFractionDigits(0);
+    NF.setMaximumFractionDigits(10);
     NF2.setMinimumFractionDigits(2);
     NF2.setMaximumFractionDigits(2);
     NF4.setMinimumFractionDigits(4);
@@ -268,6 +275,40 @@ public final class FormatUtil {
    */
   public static String format(Double[] f) {
     return format(f, ", ", 2);
+  }
+
+  /**
+   * Formats the Double array f with the specified separator and the specified
+   * fraction digits.
+   * 
+   * @param f the Double array to be formatted
+   * @param sep the separator between the single values of the Double array,
+   *        e.g. ','
+   * @param nf the number format
+   * @return a String representing the Double array f
+   */
+  public static String format(Double[] f, String sep, NumberFormat nf) {
+    StringBuffer buffer = new StringBuffer();
+    for(int i = 0; i < f.length; i++) {
+      if(i < f.length - 1) {
+        buffer.append(format(f[i], nf)).append(sep);
+      }
+      else {
+        buffer.append(format(f[i], nf));
+      }
+    }
+    return buffer.toString();
+  }
+
+  /**
+   * Formats the Double array f with ',' as separator and 2 fraction digits.
+   * 
+   * @param f the Double array to be formatted
+   * @param nf the Number format
+   * @return a String representing the Double array f
+   */
+  public static String format(Double[] f, NumberFormat nf) {
+    return format(f, ", ", nf);
   }
 
   /**
