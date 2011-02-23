@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
@@ -200,8 +201,13 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
       synchronizedRedraw();
     }
     catch(Exception e) {
-      // TODO: Replace with error image instead?
-      LoggingUtil.exception("Error rendering thumbnail.", e);
+      if(Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
+        LoggingUtil.exception("Thumbnail failed.", e);
+      }
+      else {
+        LoggingUtil.warning("Thumbnail for " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");
+      }
+      // TODO: hide the failed image?
     }
   }
 
