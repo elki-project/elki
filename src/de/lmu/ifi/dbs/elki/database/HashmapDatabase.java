@@ -566,14 +566,14 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
 
   @Override
   public final DBIDs randomSample(int k, long seed) {
-    if(k < 0 || k > this.size()) {
+    if(k <= 0 || k > this.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
     }
 
     ModifiableDBIDs sample = DBIDUtil.newHashSet(k);
     ArrayModifiableDBIDs aids = DBIDUtil.newArray(this.ids);
     Random random = new Random(seed);
-    // FIXME: Never sample the same two objects?
+    // FIXME: Never sample the same two objects - this is inefficient when k almost is the full size()
     while(sample.size() < k) {
       sample.add(aids.get(random.nextInt(aids.size())));
     }

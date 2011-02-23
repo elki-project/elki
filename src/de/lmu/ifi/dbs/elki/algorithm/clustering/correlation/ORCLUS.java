@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * ORCLUS provides the ORCLUS algorithm, an algorithm to find clusters in high
@@ -59,11 +60,6 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   private static final Logging logger = Logging.getLogger(ORCLUS.class);
 
   /**
-   * OptionID for {@link #ALPHA_PARAM}.
-   */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("orclus.alpha", "The factor for reducing the number of current clusters in each iteration.");
-
-  /**
    * Parameter to specify the factor for reducing the number of current clusters
    * in each iteration, must be an integer greater than 0 and less than 1.
    * <p>
@@ -73,10 +69,10 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
    * Key: {@code -orclus.alpha}
    * </p>
    */
-  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), 0.5);
+  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("orclus.alpha", "The factor for reducing the number of current clusters in each iteration.");
 
   /**
-   * Holds the value of {@link #ALPHA_PARAM}.
+   * Holds the value of {@link #ALPHA_ID}.
    */
   private double alpha;
 
@@ -84,6 +80,16 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
    * The PCA utility object.
    */
   private PCARunner<V, DoubleDistance> pca;
+
+  /**
+   * Parameter to specify the random generator seed.
+   */
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("orclus.seed", "The random number generator seed.");
+
+  /**
+   * Holds the value of {@link #SEED_ID}.
+   */
+  private Long seed;
 
   /**
    * Constructor, adhering to
@@ -95,8 +101,14 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     super(config);
     config = config.descend(this);
     // parameter alpha
-    if(config.grab(ALPHA_PARAM)) {
-      alpha = ALPHA_PARAM.getValue();
+    final DoubleParameter alphaparam = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), 0.5);
+    if(config.grab(alphaparam)) {
+      alpha = alphaparam.getValue();
+    }
+    // Seed parameter
+    final LongParameter seedparam = new LongParameter(SEED_ID, true);
+    if(config.grab(seedparam)) {
+      seed = seedparam.getValue();
     }
     // TODO: make configurable, to allow using stabilized PCA
     pca = new PCARunner<V, DoubleDistance>(config);
@@ -178,7 +190,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
    * @return the initial seed list
    */
   private List<ORCLUSCluster> initialSeeds(Database<V> database, int k) {
-    DBIDs randomSample = database.randomSample(k, 1);
+    DBIDs randomSample = database.randomSample(k, seed);
 
     List<ORCLUSCluster> seeds = new ArrayList<ORCLUSCluster>();
     for(DBID id : randomSample) {

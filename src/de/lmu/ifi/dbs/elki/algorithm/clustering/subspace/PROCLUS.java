@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -68,11 +69,6 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(PROCLUS.class);
-  
-  /**
-   * OptionID for {@link #M_I_PARAM}
-   */
-  public static final OptionID M_I_ID = OptionID.getOrCreateOptionID("proclus.mi", "The multiplier for the initial number of medoids.");
 
   /**
    * Parameter to specify the multiplier for the initial number of medoids, must
@@ -84,12 +80,22 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * Key: {@code -proclus.mi}
    * </p>
    */
-  private final IntParameter M_I_PARAM = new IntParameter(M_I_ID, new GreaterConstraint(0), 10);
+  public static final OptionID M_I_ID = OptionID.getOrCreateOptionID("proclus.mi", "The multiplier for the initial number of medoids.");
 
   /**
-   * Holds the value of {@link #M_I_PARAM}.
+   * Holds the value of {@link #M_I_ID}.
    */
   private int m_i;
+
+  /**
+   * Parameter to specify the random generator seed.
+   */
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("proclus.seed", "The random number generator seed.");
+
+  /**
+   * Holds the value of {@link #SEED_ID}.
+   */
+  private Long seed;
 
   /**
    * Constructor, adhering to
@@ -100,10 +106,14 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   public PROCLUS(Parameterization config) {
     super(config);
     config = config.descend(this);
-    if(config.grab(M_I_PARAM)) {
-      m_i = M_I_PARAM.getValue();
+    final IntParameter m_i_param = new IntParameter(M_I_ID, new GreaterConstraint(0), 10);
+    if(config.grab(m_i_param)) {
+      m_i = m_i_param.getValue();
     }
-    // logger.getWrappedLogger().setLevel(Level.FINE);
+    final LongParameter seedparam = new LongParameter(SEED_ID, true);
+    if(config.grab(seedparam)) {
+      seed = seedparam.getValue();
+    }
   }
 
   /**
@@ -114,10 +124,14 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
     try {
       DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
-      RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);      
+      RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
       final int dim = getL();
       final int k = getK();
       final int k_i = getK_i();
+      final Random random = new Random();
+      if (seed != null) {
+        random.setSeed(seed);
+      }
 
       if(DatabaseUtil.dimensionality(database) < dim) {
         throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + DatabaseUtil.dimensionality(database) + " < " + dim + ")");
@@ -129,10 +143,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
         logger.verbose("1. Initialization phase...");
       }
       int sampleSize = Math.min(database.size(), k_i * k);
-      DBIDs sampleSet = database.randomSample(sampleSize, 1);
+      DBIDs sampleSet = database.randomSample(sampleSize, random.nextLong());
 
       int medoidSize = Math.min(database.size(), m_i * k);
-      DBIDs medoids = greedy(distFunc, sampleSet, medoidSize);
+      DBIDs medoids = greedy(distFunc, sampleSet, medoidSize, random);
 
       if(logger.isDebugging()) {
         StringBuffer msg = new StringBuffer();
@@ -151,7 +165,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       double bestObjective = Double.POSITIVE_INFINITY;
       ModifiableDBIDs m_best = null;
       ModifiableDBIDs m_bad = null;
-      ModifiableDBIDs m_current = initialSet(medoids, k);
+      ModifiableDBIDs m_current = initialSet(medoids, k, random);
 
       if(logger.isDebugging()) {
         StringBuffer msg = new StringBuffer();
@@ -177,7 +191,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
           m_bad = computeBadMedoids(clusters, (int) (database.size() * 0.1 / getK()));
         }
 
-        m_current = computeM_current(medoids, m_best, m_bad);
+        m_current = computeM_current(medoids, m_best, m_bad, random);
         loops++;
         if(cprogress != null) {
           cprogress.setProcessed(clusters.size(), logger);
@@ -220,14 +234,14 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * @param distFunc the distance function
    * @param sampleSet the sample set
    * @param m the number of medoids to be returned
+   * @param random random number generator
    * @return a piercing set of m medoids from the specified sample set
    */
-  private ModifiableDBIDs greedy(DistanceQuery<V, DoubleDistance> distFunc, DBIDs sampleSet, int m) {
+  private ModifiableDBIDs greedy(DistanceQuery<V, DoubleDistance> distFunc, DBIDs sampleSet, int m, Random random) {
     ArrayModifiableDBIDs s = DBIDUtil.newArray(sampleSet);
     ModifiableDBIDs medoids = DBIDUtil.newHashSet();
 
     // m_1 is random point of S
-    Random random = new Random(1);
     DBID m_i = s.remove(random.nextInt(s.size()));
     medoids.add(m_i);
     if(logger.isDebugging()) {
@@ -273,10 +287,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * 
    * @param sampleSet the sample set
    * @param k the number of samples to be returned
+   * @param random random number generator
    * @return a set of k elements from the specified sample set
    */
-  private ModifiableDBIDs initialSet(DBIDs sampleSet, int k) {
-    Random random = new Random(1);
+  private ModifiableDBIDs initialSet(DBIDs sampleSet, int k, Random random) {
     ArrayModifiableDBIDs s = DBIDUtil.newArray(sampleSet);
     ModifiableDBIDs initialSet = DBIDUtil.newHashSet();
     while(initialSet.size() < k) {
@@ -292,10 +306,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * @param m the medoids
    * @param m_best the best set of medoids found so far
    * @param m_bad the bad medoids
+   * @param random random number generator
    * @return m_current, the set of medoids in current iteration
    */
-  private ModifiableDBIDs computeM_current(DBIDs m, DBIDs m_best, DBIDs m_bad) {
-    Random random = new Random(1);
+  private ModifiableDBIDs computeM_current(DBIDs m, DBIDs m_best, DBIDs m_bad, Random random) {
     ArrayModifiableDBIDs m_list = DBIDUtil.newArray(m);
     for(DBID m_i : m_best) {
       m_list.remove(m_i);
