@@ -46,6 +46,7 @@ public class TestORCLUSResults implements JUnit4Test {
     // these parameters are not picked too smartly - room for improvement.
     params.addParameter(ORCLUS.K_ID, 3);
     params.addParameter(ORCLUS.L_ID, 1);
+    params.addParameter(ORCLUS.SEED_ID, 1);
     
     FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
 

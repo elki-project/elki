@@ -34,7 +34,7 @@ public class KNNJoinTest implements JUnit4Test {
   double mean2nnEuclid = 2.85;
 
   // variance
-  double var2nnEuclid = 1.2985526315;
+  double var2nnEuclid = 0.87105;
 
   /**
    * Test {@link RStarTree} using a file based database connection.
