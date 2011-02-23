@@ -102,7 +102,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
         mv.put(val);
       }
       mean = mv.getMean();
-      factor = lambda * mv.getStddev() * Math.sqrt(2);
+      factor = lambda * mv.getSampleStddev() * Math.sqrt(2);
     }
     else {
       mean = fixedmean;

@@ -1,11 +1,15 @@
 package de.lmu.ifi.dbs.elki.math;
 
 /**
- * Do some simple statistics (mean, average).
+ * Do some simple statistics (mean, variance).
  * 
  * This class can repeatedly be fed with data using the add() methods, The
  * resulting values for mean and average can be queried at any time using
- * getMean() and getVariance().
+ * getMean() and getSampleVariance().
+ * 
+ * Make sure you have understood variance correctly when using
+ * getNaiveVariance() - since this class is fed with samples and estimates the
+ * mean from the samples, getSampleVariance() is the proper formula.
  * 
  * Trivial code, but replicated a lot. The class is final so it should come at
  * low cost.
@@ -111,22 +115,35 @@ public final class MeanVariance {
   }
 
   /**
-   * Return exact variance (non-sample variance)
+   * Return the naive variance (not taking sampling into account)
+   * 
+   * Note: usually, you should be using {@link #getSampleVariance} instead!
    * 
    * @return variance
    */
-  public double getExactVariance() {
+  public double getNaiveVariance() {
     double mu = sum / count;
     return (sqrSum / count) - (mu * mu);
   }
 
   /**
-   * Return sample variance
+   * Return sample variance.
    * 
    * @return sample variance
    */
-  public double getVariance() {
+  public double getSampleVariance() {
     return (sqrSum - (sum * sum) / count) / (count - 1);
+  }
+
+  /**
+   * Return standard deviation using the non-sample variance
+   * 
+   * Note: usually, you should be using {@link #getSampleStddev} instead!
+   * 
+   * @return stddev
+   */
+  public double getNaiveStddev() {
+    return Math.sqrt(getNaiveVariance());
   }
 
   /**
@@ -134,8 +151,8 @@ public final class MeanVariance {
    * 
    * @return stddev
    */
-  public double getStddev() {
-    return Math.sqrt(getVariance());
+  public double getSampleStddev() {
+    return Math.sqrt(getSampleVariance());
   }
 
   /**
@@ -146,7 +163,7 @@ public final class MeanVariance {
    * @return normalized value
    */
   public double normalizeValue(double val) {
-    return (val - getMean()) / getStddev();
+    return (val - getMean()) / getSampleStddev();
   }
 
   /**
@@ -157,7 +174,7 @@ public final class MeanVariance {
    * @return de-normalized value
    */
   public double denormalizeValue(double val) {
-    return (val * getStddev()) + getMean();
+    return (val * getSampleStddev()) + getMean();
   }
 
   /**
@@ -176,6 +193,6 @@ public final class MeanVariance {
 
   @Override
   public String toString() {
-    return "MeanVariance(mean=" + getMean() + ",var=" + getVariance() + ")";
+    return "MeanVariance(mean=" + getMean() + ",var=" + getSampleVariance() + ")";
   }
 }

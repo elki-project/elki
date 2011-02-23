@@ -66,7 +66,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
       }
     }
     final double mean = mv.getMean();
-    final double var = mv.getVariance();
+    final double var = mv.getSampleVariance();
     k = (mean*mean) / var;
     theta = var / mean;
     try {

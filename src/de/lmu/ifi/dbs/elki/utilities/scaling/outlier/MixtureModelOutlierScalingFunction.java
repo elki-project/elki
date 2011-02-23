@@ -102,7 +102,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
     if(curMu == 0) {
       curMu = Double.MIN_NORMAL;
     }
-    double curSigma = Math.max(mv.getStddev(), Double.MIN_NORMAL);
+    double curSigma = Math.max(mv.getSampleStddev(), Double.MIN_NORMAL);
     double curLambda = Math.min(1.0 / curMu, Double.MAX_VALUE);
     double curAlpha = 0.05;
 
