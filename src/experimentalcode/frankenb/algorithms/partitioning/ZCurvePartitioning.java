@@ -13,6 +13,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.BufferedDiskBackedPartition;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IPartition;
@@ -53,6 +54,8 @@ public class ZCurvePartitioning extends AbstractFixedAmountPartitioning {
       int itemsPerPartition = dataSet.getSize() / partitionQuantity;
       int addItemsUntilPartition = dataSet.getSize() % partitionQuantity;
       
+      Log.info(String.format("Items per partition about: %d", itemsPerPartition));
+      
       Iterator<Pair<Integer, BigInteger>> projectionIterator = projection.iterator();
       List<IPartition> partitions = new ArrayList<IPartition>();
       for (int i = 0; i < partitionQuantity; ++i) {
@@ -61,6 +64,7 @@ public class ZCurvePartitioning extends AbstractFixedAmountPartitioning {
           int id = projectionIterator.next().first;
           partition.addVector(id, dataSet.getOriginal().get(id));
         }
+        Log.info(String.format("\tCreated partition %d with %d items.", partition.getId(), partition.getSize()));
         partitions.add(partition);
       }
       
