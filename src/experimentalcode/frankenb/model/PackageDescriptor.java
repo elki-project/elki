@@ -82,9 +82,12 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
     return this.dimensionality;
   }
   
-  public void addPartitionPairing(PartitionPairing pairing) throws IOException {
+  public synchronized void addPartitionPairing(PartitionPairing pairing) throws IOException {
     dataStorage.setLength(HEADER_SIZE + (this.pairingsQuantity + 1) * PAIRING_DATA_SIZE); 
-    //dataStorage.seek(HEADER_SIZE + this.pairingsQuantity * PAIRING_DATA_SIZE);
+    long newPosition = HEADER_SIZE + this.pairingsQuantity * PAIRING_DATA_SIZE;
+    if (dataStorage.getFilePointer() != newPosition) {
+      dataStorage.seek(newPosition);
+    }
     
     if (!partitions.contains(pairing.getPartitionOne())) {
       File partitionOneFile = new File(parentDirectory, String.format(PARTITION_DAT_FILE_FORMAT, pairing.getPartitionOne().getId()));
@@ -106,7 +109,7 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
     writeHeader();
   }
   
-  private void writePartitionPairingData(PartitionPairing pairing) throws IOException {
+  private synchronized void writePartitionPairingData(PartitionPairing pairing) throws IOException {
     long position = dataStorage.getFilePointer();
     dataStorage.seek(HEADER_SIZE + pairing.getStorageId() * PAIRING_DATA_SIZE);
     
@@ -152,6 +155,27 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
         new DistanceListSerializer(),
         maxKeysPerBucket
     );
+  }
+  
+  /**
+   * Tries to verify this package descriptor an throws an IllegalStateException
+   * if the package is corrupted.
+   */
+  public synchronized void verify() throws IOException {
+    this.dataStorage.seek(HEADER_SIZE);
+    
+    for (int i = 0; i < pairingsQuantity; ++i) {
+      File partitionOneFile = new File(parentDirectory, String.format(PARTITION_DAT_FILE_FORMAT, dataStorage.readInt()));
+      File partitionTwoFile = new File(parentDirectory, String.format(PARTITION_DAT_FILE_FORMAT, dataStorage.readInt()));
+      dataStorage.readInt();
+      dataStorage.readBoolean();
+      if (!partitionOneFile.exists()) {
+        throw new IllegalStateException("File corrupt - partition file \"" + partitionOneFile + "\" does not exist");
+      }
+      if (!partitionTwoFile.exists()) {
+        throw new IllegalStateException("File corrupt - partition file \"" + partitionOneFile + "\" does not exist");
+      }      
+    }
   }
     
   public void setResultFor(PartitionPairing pairing, DynamicBPlusTree<Integer, DistanceList> resultTree) throws IOException {

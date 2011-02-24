@@ -143,6 +143,9 @@ public class KnnDataProcessor extends AbstractApplication {
       Log.info(String.format("opening package %s ...", input));
       final PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new DiskBackedDataStorage(input));
       
+      Log.info("Verifying package ...");
+      packageDescriptor.verify();
+      
       totalTasks = 0;
       totalItems = 0;
 
@@ -150,6 +153,8 @@ public class KnnDataProcessor extends AbstractApplication {
       
       List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
      
+      Log.info("Creating tasks ...");
+      List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
       for (final PartitionPairing pairing : packageDescriptor) {
         if (pairing.getPartitionOne().getSize() < 1 || pairing.getPartitionTwo().getSize() < 1) {
           throw new UnableToComplyException("Pairing " + pairing + " has 0 items");
@@ -159,6 +164,7 @@ public class KnnDataProcessor extends AbstractApplication {
           Log.info(String.format("Skipping pairing of partition%05d with partition%05d - as it already contains a result", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId()));
           continue;
         }
+        
         final int taskId = ++totalTasks;
        
         Callable<Boolean> task = new Callable<Boolean>() {
@@ -174,8 +180,6 @@ public class KnnDataProcessor extends AbstractApplication {
               
               File tmpDirFile = File.createTempFile("pairing" + taskId, ".dir");
               File tmpDataFile = File.createTempFile("pairing" + taskId, ".dat");
-              tmpDirFile.deleteOnExit();
-              tmpDataFile.deleteOnExit();
               
               DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
                   new BufferedDiskBackedDataStorage(tmpDirFile),
@@ -212,25 +216,13 @@ public class KnnDataProcessor extends AbstractApplication {
                 }
               }
               
-//              int counter = 0;
-//              for (Pair<Integer, NumberVector<?, ?>> pointOne : pairing.getPartitionOne()) {
-//                if (counter++ % 50 == 0) {
-//                  Log.info(String.format("\t\tPairing %010d: Processed %,d of %,d items ...", taskId, counter, pairing.getPartitionOne().getSize()));
-//                }
-//                
-//                for (Pair<Integer, NumberVector<?, ?>> pointTwo : pairing.getPartitionTwo()) {
-//                  double distance = distanceAlgorithm.doubleDistance(pointOne.getSecond(), pointTwo.getSecond());
-//
-//                  //persist distance for both items
-//                  persistDistance(resultTree, processedIds, pointOne, pointTwo, distance);
-//                  persistDistance(resultTree, processedIds, pointTwo, pointOne, distance);
-//                }
-//              }
-              
               packageDescriptor.setResultFor(pairing, resultTree);
               
               addToTotalItems(pairing.getEstimatedUniqueIdsAmount());
 
+              tmpDirFile.delete();
+              tmpDataFile.delete();
+              
               resultTree.close();
             } catch (Exception e) {
               Log.error(String.format("Problem in pairing %s: %s", pairing, e.getMessage()), e);
@@ -243,10 +235,17 @@ public class KnnDataProcessor extends AbstractApplication {
           
         };
         
+        tasks.add(task);
+      }
+
+      //add all tasks
+      Log.info("Adding all tasks ...");
+      for (Callable<Boolean> task : tasks) {
         futures.add(threadPool.submit(task));
       }
       
       //wait for all tasks to finish
+      Log.info("Waiting for all tasks to finish ...");
       for (Future<Boolean> future : futures) {
         future.get();
       }
@@ -261,8 +260,10 @@ public class KnnDataProcessor extends AbstractApplication {
       
       
     } catch (RuntimeException e) {
+      Log.error("Runtime Exception: " + e.getMessage(), e);
       throw e;
     } catch (Exception e) {
+      Log.error("Exception: " + e.getMessage(), e);
       throw new UnableToComplyException(e);
     } finally {
       Log.info("Shutting down thread pool ...");

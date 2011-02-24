@@ -130,7 +130,7 @@ public class KnnDataMerger extends StandAloneInputApplication {
           (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)),
           new ConstantSizeIntegerSerializer(),
           new DistanceListSerializer(),
-          100
+          8
       );      
       
       //open all result files
