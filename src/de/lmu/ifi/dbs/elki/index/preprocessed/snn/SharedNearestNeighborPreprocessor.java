@@ -108,6 +108,10 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
         if(!id.equals(nid)) {
           neighbors.add(nid);
         }
+        // Size limitation to exaclty numberOfNeighbors
+        if (neighbors.size() >= numberOfNeighbors) {
+          break;
+        }
       }
       storage.put(id, neighbors);
       if(progress != null) {
