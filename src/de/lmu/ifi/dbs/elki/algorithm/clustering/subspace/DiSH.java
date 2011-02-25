@@ -159,6 +159,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       ListParameterization opticsParameters = new ListParameterization();
       opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
       opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
+      opticsParameters.addParameter(OPTICS.XI_ID, 0.0);
       // Configure OPTICS. Untracked parameters
       ListParameterization opticsUntrackedParameters = new ListParameterization();
       opticsUntrackedParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, dishDistance);
