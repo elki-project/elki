@@ -94,7 +94,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
     storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, SetDBIDs.class);
-    KNNQuery<O, D> knnquery = database.getKNNQuery(distanceFunction, numberOfNeighbors + 1);
+    KNNQuery<O, D> knnquery = database.getKNNQuery(distanceFunction, numberOfNeighbors);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), getLogger()) : null;
     int count = 0;
@@ -102,14 +102,14 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
       count++;
       DBID id = iter.next();
       TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
-      List<DistanceResultPair<D>> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors + 1);
+      List<DistanceResultPair<D>> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors);
       for(int i = 0; i < kNN.size(); i++) {
         final DBID nid = kNN.get(i).getID();
-        if(!id.equals(nid)) {
-          neighbors.add(nid);
-        }
+        // if(!id.equals(nid)) {
+        neighbors.add(nid);
+        // }
         // Size limitation to exaclty numberOfNeighbors
-        if (neighbors.size() >= numberOfNeighbors) {
+        if(neighbors.size() >= numberOfNeighbors) {
           break;
         }
       }
