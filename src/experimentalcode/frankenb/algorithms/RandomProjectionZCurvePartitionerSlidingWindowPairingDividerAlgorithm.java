@@ -13,9 +13,9 @@ import experimentalcode.frankenb.algorithms.projection.RandomProjection;
  * 
  * @author Florian Frankenberger
  */
-public class RandomProjectionZCurvePartitionerSlidingPairingWindowDividerAlgorithm extends AbstractDividerAlgorithm {
+public class RandomProjectionZCurvePartitionerSlidingWindowPairingDividerAlgorithm extends AbstractDividerAlgorithm {
 
-  public RandomProjectionZCurvePartitionerSlidingPairingWindowDividerAlgorithm(Parameterization config) {
+  public RandomProjectionZCurvePartitionerSlidingWindowPairingDividerAlgorithm(Parameterization config) {
     this.addProjection(new RandomProjection(config));
     this.setPartitioning(new ZCurvePartitioning(config));
     this.setPairing(new SlidingWindowPartitionPairing(config));
