@@ -38,8 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import experimentalcode.hettab.textwriter.KMLTextWriter;
-import experimentalcode.hettab.textwriter.KMLWriter;
 
 /**
  * SLOM Algorithm
@@ -69,11 +67,6 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("slom.nonspatialdistancefunction", "The distance function to use for non spatial attributes");
 
   /**
-   * Parameter to specify the neighborhood distance function to use ;
-   */
-  public static final OptionID KML_OUTPUT_FILE_ID = OptionID.getOrCreateOptionID("slom.kmloutputpath", "The kml output File for google earth");
-
-  /**
    * Holds the value of {@link #PATH_NEIGHBORHOOD_ID}
    */
   private File neighborhoodFile;
@@ -89,11 +82,6 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   private HashMap<DBID, List<DBID>> neighborhood;
 
   /**
-   * the kml output file
-   */
-  private File outputKmlFile;
-
-  /**
    * The association id to associate the SLOM_SCORE of an object for the SLOM
    * algorithm.
    */
@@ -103,11 +91,10 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * 
    * @param config
    */
-  protected SLOM(File neighborhoodFile, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction, File outputKmlFile) {
+  protected SLOM(File neighborhoodFile, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
     super(new EmptyParameterization());
     this.neighborhoodFile = neighborhoodFile;
     this.nonSpatialDistanceFunction = nonSpatialDistanceFunction;
-    this.outputKmlFile = outputKmlFile;
     neighborhood = new HashMap<DBID, List<DBID>>();
 
   }
@@ -210,12 +197,6 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
 
     //
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
-    if (outputKmlFile != null) {
-      KMLTextWriter<V> resu = new KMLTextWriter<V>(outputKmlFile,neighborhood);
-      KMLWriter<V> res = new KMLWriter<V>(outputKmlFile);
-      resu.processResult(database, sloms);
-      res.processResult(database, sloms);
-    }
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
 
@@ -258,12 +239,11 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    */
   public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> SLOM<V, D> parameterize(Parameterization config) {
     File neighborhoodFile = getExternalNeighborhood(config);
-    File kmlFile = getKMLOutputPath(config);
     PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction = getNonSpatialDistanceFunction(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new SLOM<V, D>(neighborhoodFile, nonSpatialDistanceFunction, kmlFile);
+    return new SLOM<V, D>(neighborhoodFile, nonSpatialDistanceFunction);
   }
 
   /**
@@ -274,17 +254,6 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    */
   protected static File getExternalNeighborhood(Parameterization config) {
     final FileParameter param = new FileParameter(NEIGHBORHOOD_FILE_ID, FileParameter.FileType.INPUT_FILE);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
-  }
-
-  /**
-   * 
-   */
-  protected static File getKMLOutputPath(Parameterization config) {
-    final FileParameter param = new FileParameter(KML_OUTPUT_FILE_ID, FileParameter.FileType.OUTPUT_FILE, true);
     if(config.grab(param)) {
       return param.getValue();
     }
