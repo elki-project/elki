@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -54,7 +55,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(RankingQualityHistogram.class);
-  
+
   /**
    * Option to configure the number of bins to use.
    */
@@ -87,7 +88,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
     int size = ids.size();
 
     KNNQuery<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
-    
+
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");
     }
@@ -102,12 +103,14 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
     }
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", size, logger) : null;
 
+    MeanVariance mv = new MeanVariance();
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBID i1 : clus.getIDs()) {
         List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, size);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
+        mv.put(result);
         hist.aggregate(result, 1. / size);
 
         if(progress != null) {
@@ -125,7 +128,9 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond() });
       res.add(row);
     }
-    return new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
+    HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
+    result.addHeader("Mean: " + mv.getMean() + " Variance: " + mv.getSampleVariance());
+    return result;
   }
 
   /**
