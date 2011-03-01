@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
@@ -93,22 +94,17 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   /**
    * Map to hold the objects of the database.
    */
-  private WritableDataStore<O> content;
+  protected WritableDataStore<O> content;
 
   /**
    * Map to hold the object labels
    */
-  private WritableDataStore<String> objectlabels = null;
+  protected WritableDataStore<String> objectlabels = null;
 
   /**
    * Map to hold the class labels
    */
-  private WritableDataStore<ClassLabel> classlabels = null;
-
-  /**
-   * Map to hold the external ids
-   */
-  private WritableDataStore<String> externalids = null;
+  protected WritableDataStore<ClassLabel> classlabels = null;
 
   /**
    * IDs of this database
@@ -242,9 +238,6 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
       if(associations.classlabel != null) {
         setClassLabel(id, associations.classlabel);
       }
-      if(associations.externalid != null) {
-        setExternalID(id, associations.externalid);
-      }
     }
 
     return new Pair<O, DBID>(object, id);
@@ -338,9 +331,6 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     if(classlabels != null) {
       classlabels.delete(id);
     }
-    if(externalids != null) {
-      externalids.delete(id);
-    }
     restoreID(id);
   }
 
@@ -403,81 +393,6 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     return getIDs().iterator();
   }
 
-  @Override
-  public ClassLabel getClassLabel(DBID id) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to get class label for 'null' id.");
-      return null;
-    }
-    if(classlabels == null) {
-      return null;
-    }
-    return classlabels.get(id);
-  }
-
-  @Override
-  public String getExternalID(DBID id) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to get external id for 'null' id.");
-      return null;
-    }
-    if(externalids == null) {
-      return null;
-    }
-    return externalids.get(id);
-  }
-
-  @Override
-  public String getObjectLabel(DBID id) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to get object label for 'null' id.");
-      return null;
-    }
-    if(objectlabels == null) {
-      return null;
-    }
-    return objectlabels.get(id);
-  }
-
-  @Override
-  public void setClassLabel(DBID id, ClassLabel label) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to set class label for 'null' id.");
-      return;
-    }
-    if(classlabels == null) {
-      classlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClassLabel.class);
-      this.addChildResult(new AnnotationBuiltins.ClassLabelAnnotation(this));
-    }
-    classlabels.put(id, label);
-  }
-
-  @Override
-  public void setExternalID(DBID id, String externalid) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to set external id for 'null' id.");
-      return;
-    }
-    if(externalids == null) {
-      externalids = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
-      this.addChildResult(new AnnotationBuiltins.ExternalIDAnnotation(this));
-    }
-    externalids.put(id, externalid);
-  }
-
-  @Override
-  public void setObjectLabel(DBID id, String label) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to set object label for 'null' id.");
-      return;
-    }
-    if(objectlabels == null) {
-      objectlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
-      this.addChildResult(new AnnotationBuiltins.ObjectLabelAnnotation(this));
-    }
-    objectlabels.put(id, label);
-  }
-
   /**
    * Provides a new id for the specified database object suitable as key for a
    * new insertion and sets this id in the specified database object.
@@ -536,7 +451,7 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
       DBIDs ids = partitions.get(partitionID);
       for(DBID id : ids) {
         final O object = get(id);
-        DatabaseObjectMetadata associations = new DatabaseObjectMetadata(this, id);
+        DatabaseObjectMetadata associations = new DatabaseObjectMetadata(getObjectLabel(id), getClassLabel(id));
         objectAndAssociationsList.add(new Pair<O, DatabaseObjectMetadata>(object, associations));
       }
 
@@ -573,7 +488,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     ModifiableDBIDs sample = DBIDUtil.newHashSet(k);
     ArrayModifiableDBIDs aids = DBIDUtil.newArray(this.ids);
     Random random = new Random(seed);
-    // FIXME: Never sample the same two objects - this is inefficient when k almost is the full size()
+    // FIXME: Never sample the same two objects - this is inefficient when k
+    // almost is the full size()
     while(sample.size() < k) {
       sample.add(aids.get(random.nextInt(aids.size())));
     }
@@ -610,6 +526,21 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
       objects.add(objectAndAssociations.getFirst());
     }
     return objects;
+  }
+
+  @Override
+  public DataQuery<String> getObjectLabelQuery() {
+    return new ObjectLabelRepresentation();
+  }
+
+  @Override
+  public DataQuery<ClassLabel> getClassLabelQuery() {
+    return new ClassLabelRepresentation();
+  }
+
+  @Override
+  public DataQuery<DatabaseObjectMetadata> getMetadataQuery() {
+    return new MetadataRepresentation();
   }
 
   @Override
@@ -854,5 +785,143 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   @Override
   public void flushDataStoreEvents() {
     eventManager.flushDataStoreEvents();
+  }
+
+  protected ClassLabel getClassLabel(DBID id) {
+    if(id == null) {
+      LoggingUtil.warning("Trying to get class label for 'null' id.");
+      return null;
+    }
+    if(classlabels == null) {
+      return null;
+    }
+    return classlabels.get(id);
+  }
+
+  protected void setClassLabel(DBID id, ClassLabel label) {
+    if(id == null) {
+      LoggingUtil.warning("Trying to set class label for 'null' id.");
+      return;
+    }
+    if(classlabels == null) {
+      classlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClassLabel.class);
+      addChildResult(new AnnotationBuiltins.ClassLabelAnnotation(HashmapDatabase.this));
+    }
+    classlabels.put(id, label);
+  }
+
+  protected String getObjectLabel(DBID id) {
+    if(id == null) {
+      LoggingUtil.warning("Trying to get object label for 'null' id.");
+      return null;
+    }
+    if(objectlabels == null) {
+      return null;
+    }
+    return objectlabels.get(id);
+  }
+
+  protected void setObjectLabel(DBID id, String label) {
+    if(id == null) {
+      LoggingUtil.warning("Trying to set object label for 'null' id.");
+      return;
+    }
+    if(objectlabels == null) {
+      objectlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
+      addChildResult(new AnnotationBuiltins.ObjectLabelAnnotation(HashmapDatabase.this));
+    }
+    objectlabels.put(id, label);
+  }
+
+  /**
+   * Representation class for class labels.
+   * 
+   * @author Erich Schubert
+   */
+  private class ClassLabelRepresentation implements DataQuery<ClassLabel> {
+    /**
+     * Constructor.
+     */
+    public ClassLabelRepresentation() {
+      super();
+    }
+
+    @Override
+    public ClassLabel get(DBID id) {
+      return getClassLabel(id);
+    }
+
+    @Override
+    public void set(DBID id, ClassLabel val) {
+      setClassLabel(id, val);
+    }
+
+    @Override
+    public Class<? super ClassLabel> getDataClass() {
+      return ClassLabel.class;
+    }
+  }
+
+  /**
+   * Representation for object labels.
+   * 
+   * @author Erich Schubert
+   */
+  private class ObjectLabelRepresentation implements DataQuery<String> {
+    /**
+     * Constructor.
+     */
+    public ObjectLabelRepresentation() {
+      super();
+    }
+
+    @Override
+    public String get(DBID id) {
+      return getObjectLabel(id);
+    }
+
+    @Override
+    public void set(DBID id, String val) {
+      setObjectLabel(id, val);
+    }
+
+    @Override
+    public Class<? super String> getDataClass() {
+      return String.class;
+    }
+  }
+
+  /**
+   * Representation of metadata.
+   * 
+   * @author Erich Schubert
+   */
+  private class MetadataRepresentation implements DataQuery<DatabaseObjectMetadata> {
+    /**
+     * Constructor.
+     */
+    public MetadataRepresentation() {
+      super();
+    }
+
+    @Override
+    public DatabaseObjectMetadata get(DBID id) {
+      return new DatabaseObjectMetadata(getObjectLabel(id), getClassLabel(id));
+    }
+
+    @Override
+    public void set(DBID id, DatabaseObjectMetadata val) {
+      if(val.classlabel != null) {
+        setClassLabel(id, val.classlabel);
+      }
+      if(val.objectlabel != null) {
+        setObjectLabel(id, val.objectlabel);
+      }
+    }
+
+    @Override
+    public Class<? super DatabaseObjectMetadata> getDataClass() {
+      return DatabaseObjectMetadata.class;
+    }
   }
 }

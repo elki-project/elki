@@ -25,7 +25,7 @@ public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractD
    * @param database the instance of the database
    */
   protected EmptyDatabaseConnection(Database<O> database) {
-    super(database, null, null, null);
+    super(database, null, null);
   }
 
   /**
@@ -43,7 +43,7 @@ public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractD
    * @return EmptyDatabaseConnection
    */
   public static <O extends DatabaseObject> AbstractDatabaseConnection<O> parameterize(Parameterization config) {
-    AbstractDatabaseConnection.Parameters<O> p = AbstractDatabaseConnection.getParameters(config, false);
+    AbstractDatabaseConnection.Parameters<O> p = AbstractDatabaseConnection.getParameters(config);
     return new EmptyDatabaseConnection<O>(p.database);
   }
 

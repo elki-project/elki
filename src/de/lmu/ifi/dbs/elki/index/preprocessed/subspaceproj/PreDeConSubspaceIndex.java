@@ -122,8 +122,8 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
     }
 
     if(msg != null) {
-      msg.append("\nprojDim " + database.getObjectLabel(id) + ": " + projDim);
-      msg.append("\nsimMatrix " + database.getObjectLabel(id) + ": " + FormatUtil.format(simMatrix, FormatUtil.NF4));
+      msg.append("\nprojDim " + database.getObjectLabelQuery().get(id) + ": " + projDim);
+      msg.append("\nsimMatrix " + database.getObjectLabelQuery().get(id) + ": " + FormatUtil.format(simMatrix, FormatUtil.NF4));
       getLogger().debugFine(msg.toString());
     }
 

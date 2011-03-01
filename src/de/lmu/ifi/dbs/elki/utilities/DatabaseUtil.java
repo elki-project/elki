@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -42,7 +43,7 @@ public final class DatabaseUtil {
     try {
       return database.dimensionality();
       // soon:
-      //return database.getObjectFactory().getDimensionality();
+      // return database.getObjectFactory().getDimensionality();
     }
     catch(NullPointerException e) {
       throw new UnsupportedOperationException("Empty database has no dimensionality.");
@@ -526,8 +527,9 @@ public final class DatabaseUtil {
     // AssociationID.CLASS.getName() + " is not set.");
     // }
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
+    final DataQuery<ClassLabel> rep = database.getClassLabelQuery();
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
-      labels.add(database.getClassLabel(iter.next()));
+      labels.add(rep.get(iter.next()));
     }
     return labels;
   }
@@ -646,11 +648,11 @@ public final class DatabaseUtil {
    * @return String representation of label or object label
    */
   public static String getClassOrObjectLabel(Database<?> database, DBID objid) {
-    ClassLabel lbl = database.getClassLabel(objid);
+    ClassLabel lbl = database.getClassLabelQuery().get(objid);
     if(lbl != null) {
       return lbl.toString();
     }
-    return database.getObjectLabel(objid);
+    return database.getObjectLabelQuery().get(objid);
   }
 
   /**

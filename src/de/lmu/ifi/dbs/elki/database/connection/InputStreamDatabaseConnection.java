@@ -107,14 +107,12 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * @param classLabelIndex the index of the label to be used as class label,
    *        can be null
    * @param classLabelClass the association of occurring class labels
-   * @param externalIDIndex the index of the label to be used as an external id,
-   *        can be null
    * @param parser the parser to provide a database
    * @param startid the first object ID to use, can be null
    * @param seed a seed for randomly shuffling the rows of the database
    */
-  public InputStreamDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, Parser<O> parser, Integer startid, Long seed) {
-    super(database, classLabelIndex, classLabelClass, externalIDIndex);
+  public InputStreamDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Parser<O> parser, Integer startid, Long seed) {
+    super(database, classLabelIndex, classLabelClass);
     this.parser = parser;
     this.startid = startid;
     this.seed = seed;
@@ -175,7 +173,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     if(config.hasErrors()) {
       return null;
     }
-    return new InputStreamDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, p.parser, p.startid, p.seed);
+    return new InputStreamDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.parser, p.startid, p.seed);
   }
 
   /**
@@ -188,7 +186,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * @return parameter values
    */
   public static <O extends DatabaseObject> Parameters<O> getParameters(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
-    AbstractDatabaseConnection.Parameters<O> p = AbstractDatabaseConnection.getParameters(config, false);
+    AbstractDatabaseConnection.Parameters<O> p = AbstractDatabaseConnection.getParameters(config);
 
     // parameter parser
     final ObjectParameter<Parser<O>> parserParam = new ObjectParameter<Parser<O>>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
@@ -202,7 +200,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     final LongParameter seedParam = new LongParameter(SEED_ID, true);
     Long seed = config.grab(seedParam) ? seedParam.getValue() : null;
 
-    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, parser, startid, seed);
+    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, parser, startid, seed);
   }
 
   /**
@@ -219,8 +217,8 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
     Long seed;
 
-    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, Parser<O> parser, Integer startid, Long seed) {
-      super(database, classLabelIndex, classLabelClass, externalIDIndex);
+    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Parser<O> parser, Integer startid, Long seed) {
+      super(database, classLabelIndex, classLabelClass);
       this.parser = parser;
       this.startid = startid;
       this.seed = seed;

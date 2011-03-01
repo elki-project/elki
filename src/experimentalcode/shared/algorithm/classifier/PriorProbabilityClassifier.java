@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -64,8 +65,9 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
     this.database = database;
     distribution = new double[getLabels().size()];
     int[] occurences = new int[getLabels().size()];
+    DataQuery<ClassLabel> crep = database.getClassLabelQuery();
     for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
-      ClassLabel label = database.getClassLabel(iter.next());
+      ClassLabel label = crep.get(iter.next());
       int index = Collections.binarySearch(getLabels(), label);
       if(index > -1) {
         occurences[index]++;

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -277,6 +278,16 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * Holds the associated kNN query
      */
     private KNNQuery<O, D> knnQuery;
+    
+    /**
+     * The label representation
+     */
+    protected DataQuery<String> labelRep;
+
+    /**
+     * The class representation
+     */
+    protected DataQuery<ClassLabel> classRep;
 
     /**
      * Constructor.
@@ -380,6 +391,8 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      */
     public void run(Database<O> db, DistanceQuery<O, D> distanceQuery) {
       this.db = db;
+      this.classRep = db.getClassLabelQuery();
+      this.labelRep = db.getObjectLabelQuery();
       this.dim = DatabaseUtil.dimensionality(db);
       this.distanceQuery = distanceQuery;
       this.updateK(k);
@@ -533,10 +546,10 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         String label = null;
         if(label == null || label == "") {
-          label = db.getObjectLabel((DBID) value);
+          label = labelRep.get((DBID) value);
         }
         if(label == null || label == "") {
-          ClassLabel cls = db.getClassLabel((DBID) value);
+          ClassLabel cls = classRep.get((DBID) value);
           if(cls != null) {
             label = cls.toString();
           }

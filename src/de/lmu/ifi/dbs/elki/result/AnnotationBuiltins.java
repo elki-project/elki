@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 
 /**
  * This is a temporary solution to handling class labels, object labels and
@@ -30,7 +31,7 @@ public class AnnotationBuiltins {
     /**
      * Database to wrap
      */
-    private final Database<?> database;
+    private final DataQuery<ClassLabel> rep;
 
     /**
      * Constructor.
@@ -39,7 +40,7 @@ public class AnnotationBuiltins {
      */
     public ClassLabelAnnotation(Database<?> database) {
       super("Class Label", AssociationID.CLASS.getName());
-      this.database = database;
+      this.rep = database.getClassLabelQuery();
     }
 
     @Override
@@ -49,7 +50,7 @@ public class AnnotationBuiltins {
 
     @Override
     public ClassLabel getValueFor(DBID objID) {
-      return database.getClassLabel(objID);
+      return rep.get(objID);
     }
   }
 
@@ -62,7 +63,7 @@ public class AnnotationBuiltins {
     /**
      * Database to wrap
      */
-    private final Database<?> database;
+    private final DataQuery<String> rep;
 
     /**
      * Constructor.
@@ -71,7 +72,7 @@ public class AnnotationBuiltins {
      */
     public ObjectLabelAnnotation(Database<?> database) {
       super("Object Label", AssociationID.LABEL.getName());
-      this.database = database;
+      this.rep = database.getObjectLabelQuery();
     }
 
     @Override
@@ -81,39 +82,7 @@ public class AnnotationBuiltins {
 
     @Override
     public String getValueFor(DBID objID) {
-      return database.getObjectLabel(objID);
-    }
-  }
-
-  /**
-   * External ID "result" view
-   * 
-   * @author Erich Schubert
-   */
-  public static class ExternalIDAnnotation extends BasicResult implements AnnotationResult<String> {
-    /**
-     * Database to wrap
-     */
-    private final Database<?> database;
-    
-    /**
-     * Constructor.
-     * 
-     * @param database Database to access
-     */
-    public ExternalIDAnnotation(Database<?> database) {
-      super("ExternalID", AssociationID.EXTERNAL_ID.getName());
-      this.database = database;
-    }
-
-    @Override
-    public AssociationID<String> getAssociationID() {
-      return AssociationID.EXTERNAL_ID;
-    }
-
-    @Override
-    public String getValueFor(DBID objID) {
-      return database.getExternalID(objID);
+      return rep.get(objID);
     }
   }
 }

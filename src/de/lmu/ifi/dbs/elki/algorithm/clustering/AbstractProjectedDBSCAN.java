@@ -279,10 +279,10 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    * @param objprog the progress object for logging the current status
    */
   protected void expandCluster(Database<V> database, LocallyWeightedDistanceFunction.Instance<V> distFunc, RangeQuery<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    String label = database.getObjectLabel(startObjectID);
     Integer corrDim = distFunc.getIndex().getLocalProjection(startObjectID).getCorrelationDimension();
 
     if(getLogger().isDebugging()) {
+      String label = database.getObjectLabelQuery().get(startObjectID);
       getLogger().debugFine("EXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
     }
 

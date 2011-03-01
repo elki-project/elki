@@ -71,8 +71,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    */
   private List<InputStream> inputStreams;
 
-  public MultipleFileBasedDatabaseConnection(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, List<InputStream> inputStreams, List<Parser<O>> parsers) {
-    super(database, classLabelIndex, classLabelClass, externalIDIndex);
+  public MultipleFileBasedDatabaseConnection(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, List<InputStream> inputStreams, List<Parser<O>> parsers) {
+    super(database, classLabelIndex, classLabelClass);
     this.inputStreams = inputStreams;
     this.parsers = parsers;
   }
@@ -146,12 +146,12 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    * @param config Parameterization
    * @return Clustering Algorithm
    */
-  public static <O extends DatabaseObject> MultipleFileBasedDatabaseConnection<MultiRepresentedObject<O>> parameterize(Parameterization config) {
-    Parameters<MultiRepresentedObject<O>> p = getParameters(config);
+  public static <O extends DatabaseObject> MultipleFileBasedDatabaseConnection<O> parameterize(Parameterization config) {
+    Parameters<O> p = getMFParameters(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new MultipleFileBasedDatabaseConnection<MultiRepresentedObject<O>>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, p.inputStreams, p.parsers);
+    return new MultipleFileBasedDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.inputStreams, p.parsers);
   }
 
   /**
@@ -163,8 +163,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    * @param parserDefaultValue the default value for the parser
    * @return parameter values
    */
-  public static <O extends DatabaseObject> Parameters<O> getParameters(Parameterization config) {
-    AbstractDatabaseConnection.Parameters<MultiRepresentedObject<O>> p = AbstractDatabaseConnection.getParameters(config, true);
+  public static <O extends DatabaseObject> Parameters<O> getMFParameters(Parameterization config) {
+    AbstractDatabaseConnection.Parameters<MultiRepresentedObject<O>> p = AbstractDatabaseConnection.getParameters(config);
 
     // parameter input streams
     List<InputStream> inputStreams = null;
@@ -205,7 +205,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
         parsers.add(i, parser);
       }
     }
-    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, inputStreams, parsers);
+    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, inputStreams, parsers);
   }
 
   /**
@@ -220,8 +220,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
 
     List<Parser<O>> parsers;
 
-    public Parameters(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, List<InputStream> inputStreams, List<Parser<O>> parsers) {
-      super(database, classLabelIndex, classLabelClass, externalIDIndex);
+    public Parameters(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, List<InputStream> inputStreams, List<Parser<O>> parsers) {
+      super(database, classLabelIndex, classLabelClass);
       this.inputStreams = inputStreams;
       this.parsers = parsers;
     }
