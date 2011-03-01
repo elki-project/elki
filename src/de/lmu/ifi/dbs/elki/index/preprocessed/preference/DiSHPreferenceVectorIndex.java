@@ -145,7 +145,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         if(logger.isDebugging()) {
           msg.append("\nid = ").append(id);
           // msg.append(" ").append(database.get(id));
-          msg.append(" ").append(database.getObjectLabel(id));
+          msg.append(" ").append(database.getObjectLabelQuery().get(id));
         }
 
         // determine neighbors in each dimension

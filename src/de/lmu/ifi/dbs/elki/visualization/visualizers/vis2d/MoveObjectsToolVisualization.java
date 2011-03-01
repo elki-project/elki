@@ -7,12 +7,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -110,10 +110,11 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
   // TODO: move to DatabaseUtil?
   private void updateDB(DBIDs dbids, Vector movingVector) {
     database.accumulateDataStoreEvents();
+    DataQuery<DatabaseObjectMetadata> mrep = database.getMetadataQuery();
     for(DBID dbid : dbids) {
       NV obj = database.get(dbid);
-      String objectLabel = database.getObjectLabel(dbid);
-      ClassLabel classLabel = database.getClassLabel(dbid);
+      // Copy metadata to keep
+      DatabaseObjectMetadata meta = mrep.get(dbid);
 
       Vector v = proj.projectDataToRenderSpace(obj);
       v.set(0, v.get(0) + movingVector.get(0));
@@ -123,10 +124,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
 
       try {
         database.delete(dbid);
-        database.insert(new Pair<NV, DatabaseObjectMetadata>(nv, null));
-        // restore class and object labels
-        database.setClassLabel(dbid, classLabel);
-        database.setObjectLabel(dbid, objectLabel);
+        database.insert(new Pair<NV, DatabaseObjectMetadata>(nv, meta));
       }
       catch(UnableToComplyException e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);

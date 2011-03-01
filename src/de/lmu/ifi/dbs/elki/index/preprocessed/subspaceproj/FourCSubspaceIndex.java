@@ -79,7 +79,7 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
-      msg.append(id).append(" ").append(database.getObjectLabel(id));
+      msg.append(id).append(" ").append(database.getObjectLabelQuery().get(id));
       msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
       logger.debugFine(msg.toString());
     }

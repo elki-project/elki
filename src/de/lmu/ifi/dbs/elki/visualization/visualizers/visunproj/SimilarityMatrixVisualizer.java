@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -83,8 +84,9 @@ public class SimilarityMatrixVisualizer extends AbstractVisualization<DatabaseOb
     final double hlsize = scale * zoom * iratio / size;
     final double vlsize = scale * zoom / size;
     int i = 0;
+    final DataQuery<String> lrep = result.getDatabase().getObjectLabelQuery();
     for(DBID id : result.getIDs()) {
-      String label = result.getDatabase().getObjectLabel(id);
+      String label = lrep.get(id);
       if(label != null) {
         // Label on horizontal axis
         final double hlx = margin * 0.75 + hlsize * (i + .8);

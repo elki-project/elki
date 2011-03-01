@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -58,6 +59,8 @@ public class LabelsFromClustering {
     }
     partitions.put(1, nonnoise);
     Database<O> newdb = olddb.partition(partitions).get(1);
+    
+    DataQuery<ClassLabel> lrep = newdb.getClassLabelQuery();
 
     // assign cluster labels
     int clusterID = 1;
@@ -65,7 +68,7 @@ public class LabelsFromClustering {
       L label = ClassGenericsUtil.instantiate(classLabel, classLabel.getName());
       label.init(label_prefix + Integer.toString(clusterID));
       for(DBID id : c.getIDs()) {
-        newdb.setClassLabel(id, label);
+        lrep.set(id, label);
       }
       clusterID++;
     }

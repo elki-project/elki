@@ -39,15 +39,13 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
    * @param classLabelIndex the index of the label to be used as class label,
    *        can be null
    * @param classLabelClass the association of occurring class labels
-   * @param externalIDIndex the index of the label to be used as an external id,
-   *        can be null
    * @param parser the parser to provide a database
    * @param startid the first object ID to use, can be null
    * @param seed a seed for randomly shuffling the rows of the database
    * @param in the input stream to parse from.
    */
-  public FileBasedDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, Parser<O> parser, Integer startid, Long seed, InputStream in) {
-    super(database, classLabelIndex, classLabelClass, externalIDIndex, parser, startid, seed);
+  public FileBasedDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Parser<O> parser, Integer startid, Long seed, InputStream in) {
+    super(database, classLabelIndex, classLabelClass, parser, startid, seed);
     this.in = in;
   }
 
@@ -59,12 +57,12 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
    */
   public static <O extends DatabaseObject> FileBasedDatabaseConnection<O> parameterize(Parameterization config) {
     Parameters<O> p = getParameters(config, Parser.class, DoubleVectorLabelParser.class);
-    
+
     if(config.hasErrors()) {
       return null;
     }
-    
-    return new FileBasedDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, p.parser, p.startid, p.seed, p.in);
+
+    return new FileBasedDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.parser, p.startid, p.seed, p.in);
   }
 
   /**
@@ -93,9 +91,9 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
       }
     }
 
-    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIDIndex, p.parser, p.startid, p.seed, in);
+    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.parser, p.startid, p.seed, in);
   }
-  
+
   /**
    * Encapsulates the parameter values for an
    * {@link FileBasedDatabaseConnection}. Convenience class for getting
@@ -106,8 +104,8 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
   static class Parameters<O extends DatabaseObject> extends InputStreamDatabaseConnection.Parameters<O> {
     InputStream in;
 
-    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIDIndex, Parser<O> parser, Integer startid, Long seed, InputStream in) {
-      super(database, classLabelIndex, classLabelClass, externalIDIndex, parser, startid, seed);
+    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Parser<O> parser, Integer startid, Long seed, InputStream in) {
+      super(database, classLabelIndex, classLabelClass, parser, startid, seed);
       this.in = in;
     }
   }

@@ -44,11 +44,6 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME_EXTERNAL = "External ID Tooltips";
-
-  /**
-   * A short name characterizing this Visualizer.
-   */
   public static final String NAME_LABEL = "Object Label Tooltips";
 
   /**
@@ -166,13 +161,6 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
         final VisualizationTask task = new VisualizationTask(NAME_ID, context, ir, this, P2DVisualization.class);
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(ir, task);
-      }
-      ArrayList<AnnotationBuiltins.ExternalIDAnnotation> eidlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ExternalIDAnnotation.class);
-      for(AnnotationBuiltins.ExternalIDAnnotation eir : eidlabels) {
-        // evis.init(context, eir, "External ID");
-        final VisualizationTask task = new VisualizationTask(NAME_EXTERNAL, context, eir, this, P2DVisualization.class);
-        task.put(VisualizationTask.META_TOOL, true);
-        context.addVisualizer(eir, task);
       }
       ArrayList<AnnotationBuiltins.ClassLabelAnnotation> classlabels = ResultUtil.filterResults(result, AnnotationBuiltins.ClassLabelAnnotation.class);
       for(AnnotationBuiltins.ClassLabelAnnotation clr : classlabels) {

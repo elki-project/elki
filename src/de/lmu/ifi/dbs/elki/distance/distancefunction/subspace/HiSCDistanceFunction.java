@@ -4,6 +4,7 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -104,11 +105,12 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
       if(Math.max(dist1, dist2) > epsilon) {
         subspaceDim++;
         if(logger.isDebugging()) {
+          DataQuery<String> rep = database.getObjectLabelQuery();
           StringBuffer msg = new StringBuffer();
           msg.append("\ndist1 " + dist1);
           msg.append("\ndist2 " + dist2);
-          msg.append("\nv1 " + database.getObjectLabel(v1.getID()));
-          msg.append("\nv2 " + database.getObjectLabel(v2.getID()));
+          msg.append("\nv1 " + rep.get(v1.getID()));
+          msg.append("\nv2 " + rep.get(v2.getID()));
           msg.append("\nsubspaceDim " + subspaceDim);
           msg.append("\ncommon pv " + FormatUtil.format(dim, commonPreferenceVector));
           logger.debugFine(msg.toString());

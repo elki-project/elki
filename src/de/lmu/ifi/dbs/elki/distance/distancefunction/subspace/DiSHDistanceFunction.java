@@ -4,6 +4,7 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -109,10 +110,11 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
         if(d > 2 * epsilon) {
           subspaceDim++;
           if(logger.isDebugging()) {
+            DataQuery<String> rep = database.getObjectLabelQuery();
             StringBuffer msg = new StringBuffer();
             msg.append("d ").append(d);
-            msg.append("\nv1 ").append(database.getObjectLabel(v1.getID()));
-            msg.append("\nv2 ").append(database.getObjectLabel(v2.getID()));
+            msg.append("\nv1 ").append(rep.get(v1.getID()));
+            msg.append("\nv2 ").append(rep.get(v2.getID()));
             msg.append("\nsubspaceDim ").append(subspaceDim);
             msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
             logger.debugFine(msg.toString());

@@ -13,6 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -24,6 +25,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -90,6 +92,16 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
   Database<NV> database;
 
   /**
+   * Class label representation
+   */
+  DataQuery<ClassLabel> crep;
+
+  /**
+   * Object label representation
+   */
+  DataQuery<String> orep;
+
+  /**
    * Our context
    */
   final protected VisualizerContext<? extends NV> context;
@@ -104,6 +116,8 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
     super(NAME);
     this.context = context;
     this.database = (Database<NV>) context.getDatabase();
+    this.crep = database.getClassLabelQuery();
+    this.orep = database.getObjectLabelQuery();
     updateFromSelection();
 
     JPanel panel = new JPanel(new BorderLayout());
@@ -217,10 +231,10 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
         return id.toString();
       }
       if(columnIndex == 1) {
-        return database.getObjectLabel(id);
+        return orep.get(id);
       }
       if(columnIndex == 2) {
-        return database.getClassLabel(id);
+        return crep.get(id);
       }
       NV obj = database.get(id);
       if(obj == null) {
@@ -259,13 +273,13 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
       }
       final DBID id = dbids.get(rowIndex);
       if(columnIndex == 1 && aValue instanceof String) {
-        database.setObjectLabel(id, (String) aValue);
+        orep.set(id, (String) aValue);
       }
       if(columnIndex == 2 && aValue instanceof String) {
         // FIXME: better class label handling!
         SimpleClassLabel lbl = new SimpleClassLabel();
         lbl.init((String) aValue);
-        database.setClassLabel(id, lbl);
+        crep.set(id, lbl);
       }
       if(!(aValue instanceof String)) {
         logger.warning("Was expecting a String value from the input element, got: " + aValue.getClass());
@@ -288,7 +302,8 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
       }
       NV newobj = obj.newInstance(vals);
       newobj.setID(id);
-      DatabaseObjectMetadata meta = new DatabaseObjectMetadata(database, id);
+      final DataQuery<DatabaseObjectMetadata> mrep = database.getMetadataQuery();
+      DatabaseObjectMetadata meta = mrep.get(id);
       try {
         database.delete(id);
         database.insert(new Pair<NV, DatabaseObjectMetadata>(newobj, meta));

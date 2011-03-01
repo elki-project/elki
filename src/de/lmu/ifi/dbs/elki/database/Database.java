@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.uses KNNQuery oneway - - provides
  * @apiviz.uses RangeQuery oneway - - provides
  * @apiviz.uses RKNNQuery oneway - - provides
+ * @apiviz.uses Representation
  * @apiviz.has Index oneway - - manages
  * @apiviz.has DataStoreListener oneway - - invokes
  * @apiviz.has DatabaseObjectMetadata - - exchanges
@@ -113,6 +115,27 @@ public interface Database<O extends DatabaseObject> extends HierarchicalResult, 
    * @return a list of k ids
    */
   DBIDs randomSample(int k, long seed);
+
+  /**
+   * Get the object label representation.
+   * 
+   * @return Label representation
+   */
+  DataQuery<String> getObjectLabelQuery();
+
+  /**
+   * Get the class label representation.
+   * 
+   * @return Label representation
+   */
+  DataQuery<ClassLabel> getClassLabelQuery();
+
+  /**
+   * Get a metadata representation
+   * 
+   * @return Metadata representation
+   */
+  DataQuery<DatabaseObjectMetadata> getMetadataQuery();
 
   /**
    * Get the distance query for a particular distance function.
@@ -249,66 +272,6 @@ public interface Database<O extends DatabaseObject> extends HierarchicalResult, 
    * @throws ObjectNotFoundException when the DBID was not found.
    */
   O get(DBID id) throws ObjectNotFoundException;
-
-  /**
-   * Get the object label
-   * 
-   * (Temporary function for DB layer migration)
-   * 
-   * @param id Object id
-   * @return Label or {@code null}
-   */
-  String getObjectLabel(DBID id);
-
-  /**
-   * Set the object label
-   * 
-   * (Temporary function for DB layer migration)
-   * 
-   * @param id Object id
-   * @param label new object label
-   */
-  void setObjectLabel(DBID id, String label);
-
-  /**
-   * Get the class label
-   * 
-   * (Temporary function for DB layer migration)
-   * 
-   * @param id Object id
-   * @return Label or {@code null}
-   */
-  ClassLabel getClassLabel(DBID id);
-
-  /**
-   * Set the class label
-   * 
-   * (Temporary function for DB layer migration)
-   * 
-   * @param id Object id
-   * @param label new class label
-   */
-  void setClassLabel(DBID id, ClassLabel label);
-
-  /**
-   * Get the external id
-   * 
-   * (Temporary function for DB layer migration)
-   * 
-   * @param id Object id
-   * @return Label or {@code null}
-   */
-  String getExternalID(DBID id);
-
-  /**
-   * Set the external id
-   * 
-   * (Temporary function for DB layer migration)
-   * 
-   * @param id Object id
-   * @param externalid new external id
-   */
-  void setExternalID(DBID id, String externalid);
 
   /**
    * Returns an iterator iterating over all keys of the database.

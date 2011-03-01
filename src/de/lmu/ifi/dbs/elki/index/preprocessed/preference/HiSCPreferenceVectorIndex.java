@@ -91,7 +91,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
       if(logger.isDebugging()) {
         msg.append("\n\nid = ").append(id);
-        msg.append(" ").append(database.getObjectLabel(id));
+        msg.append(" ").append(database.getObjectLabelQuery().get(id));
         msg.append("\n knns: ");
       }
 
@@ -100,7 +100,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       for(DistanceResultPair<DoubleDistance> knn : knns) {
         knnIDs.add(knn.getID());
         if(logger.isDebugging()) {
-          msg.append(database.getObjectLabel(knn.getID())).append(" ");
+          msg.append(database.getObjectLabelQuery().get(knn.getID())).append(" ");
         }
       }
 
