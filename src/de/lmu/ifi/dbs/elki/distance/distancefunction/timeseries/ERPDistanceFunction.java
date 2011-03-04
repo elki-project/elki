@@ -55,9 +55,9 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
    */
   @Override
   public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
-
-    double[][] matrix = new double[v1.getDimensionality()][v2.getDimensionality()];
-    Step[][] steps = new Step[v1.getDimensionality()][v2.getDimensionality()];
+    // Current and previous columns of the matrix
+    double[] curr = new double[v2.getDimensionality()];
+    double[] prev = new double[v2.getDimensionality()];
 
     // size of edit distance band
     // bandsize is the maximum allowed distance to the diagonal
@@ -67,6 +67,12 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
     double gValue = g;
 
     for(int i = 0; i < v1.getDimensionality(); i++) {
+      // Swap current and prev arrays. We'll just overwrite the new curr.
+      {
+        double[] temp = prev;
+        prev = curr;
+        curr = temp;
+      }
       int l = i - (band + 1);
       if(l < 0) {
         l = 0;
@@ -99,39 +105,34 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
           final double dist12 = d12 * d12;
 
           final double cost;
-          final Step step;
 
           if((i + j) != 0) {
-            if((i == 0) || ((j != 0) && (((matrix[i - 1][j - 1] + dist12) > (matrix[i][j - 1] + dist2)) && ((matrix[i][j - 1] + dist2) < (matrix[i - 1][j] + dist1))))) {
+            if((i == 0) || ((j != 0) && (((prev[j - 1] + dist12) > (curr[j - 1] + dist2)) && ((curr[j - 1] + dist2) < (prev[j] + dist1))))) {
               // del
-              cost = matrix[i][j - 1] + dist2;
-              step = Step.DEL;
+              cost = curr[j - 1] + dist2;
             }
-            else if((j == 0) || ((i != 0) && (((matrix[i - 1][j - 1] + dist12) > (matrix[i - 1][j] + dist1)) && ((matrix[i - 1][j] + dist1) < (matrix[i][j - 1] + dist2))))) {
+            else if((j == 0) || ((i != 0) && (((prev[j - 1] + dist12) > (prev[j] + dist1)) && ((prev[j] + dist1) < (curr[j - 1] + dist2))))) {
               // ins
-              cost = matrix[i - 1][j] + dist1;
-              step = Step.INS;
+              cost = prev[j] + dist1;
             }
             else {
               // match
-              cost = matrix[i - 1][j - 1] + dist12;
-              step = Step.MATCH;
+              cost = prev[j - 1] + dist12;
             }
           }
           else {
             cost = 0;
-            step = Step.MATCH;
           }
 
-          matrix[i][j] = cost;
-          steps[i][j] = step;
+          curr[j] = cost;
+          //steps[i][j] = step;
         }
         else {
-          matrix[i][j] = Double.POSITIVE_INFINITY; // outside band
+          curr[j] = Double.POSITIVE_INFINITY; // outside band
         }
       }
     }
 
-    return new DoubleDistance(Math.sqrt(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]));
+    return new DoubleDistance(Math.sqrt(curr[v2.getDimensionality() - 1]));
   }
 }

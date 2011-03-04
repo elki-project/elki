@@ -33,10 +33,10 @@ public class DTWDistanceFunction extends AbstractEditDistanceFunction {
    */
   @Override
   public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
-
-    double[][] matrix = new double[v1.getDimensionality()][v2.getDimensionality()];
-    Step[][] steps = new Step[v1.getDimensionality()][v2.getDimensionality()];
-
+    // Current and previous columns of the matrix
+    double[] curr = new double[v2.getDimensionality()];
+    double[] prev = new double[v2.getDimensionality()];
+    
     // size of edit distance band
     int band = (int) Math.ceil(v2.getDimensionality() * bandSize);
     // bandsize is the maximum allowed distance to the diagonal
@@ -45,6 +45,12 @@ public class DTWDistanceFunction extends AbstractEditDistanceFunction {
     // features2.length + ", band: " + band);
 
     for(int i = 0; i < v1.getDimensionality(); i++) {
+      // Swap current and prev arrays. We'll just overwrite the new curr.
+      {
+        double[] temp = prev;
+        prev = curr;
+        curr = temp;
+      }
       int l = i - (band + 1);
       if(l < 0) {
         l = 0;
@@ -62,39 +68,30 @@ public class DTWDistanceFunction extends AbstractEditDistanceFunction {
           //Formally: diff = Math.sqrt(diff * diff);
 
           double cost = diff * diff;
-          final Step step;
 
           if((i + j) != 0) {
-            if((i == 0) || ((j != 0) && ((matrix[i - 1][j - 1] > matrix[i][j - 1]) && (matrix[i][j - 1] < matrix[i - 1][j])))) {
+            if((i == 0) || ((j != 0) && ((prev[j - 1] > curr[j - 1]) && (curr[j - 1] < prev[j])))) {
               // del
-              cost += matrix[i][j - 1];
-              step = Step.DEL;
+              cost += curr[j - 1];
             }
-            else if((j == 0) || ((i != 0) && ((matrix[i - 1][j - 1] > matrix[i - 1][j]) && (matrix[i - 1][j] < matrix[i][j - 1])))) {
+            else if((j == 0) || ((i != 0) && ((prev[j - 1] > prev[j]) && (prev[j] < curr[j - 1])))) {
               // ins
-              cost += matrix[i - 1][j];
-              step = Step.INS;
+              cost += prev[j];
             }
             else {
               // match
-              cost += matrix[i - 1][j - 1];
-              step = Step.MATCH;
+              cost += prev[j - 1];
             }
           }
-          else {
-            step = Step.MATCH;
-          }
 
-          matrix[i][j] = cost;
-          steps[i][j] = step;
+          curr[j] = cost;
         }
         else {
-          matrix[i][j] = Double.POSITIVE_INFINITY; // outside band
+          curr[j] = Double.POSITIVE_INFINITY; // outside band
         }
       }
     }
 
-    DoubleDistance result = new DoubleDistance(Math.sqrt(matrix[v1.getDimensionality() - 1][v2.getDimensionality() - 1]));
-    return result;
+    return new DoubleDistance(Math.sqrt(curr[v2.getDimensionality() - 1]));
   }
 }

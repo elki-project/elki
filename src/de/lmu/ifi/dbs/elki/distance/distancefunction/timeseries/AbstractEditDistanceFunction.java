@@ -14,14 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Thomas Bernecker
  */
-public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
-  /**
-   * @apiviz.exclude
-   */
-  protected enum Step {
-    NONE, INS, DEL, MATCH
-  }
-
+public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
    * OptionID for {@link #BANDSIZE_PARAM}
    */
@@ -39,11 +32,12 @@ public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDist
 
   /**
    * Provides a Dynamic Time Warping distance function that can compute the
-   * Dynamic Time Warping distance (that is a DoubleDistance) for FeatureVectors.
+   * Dynamic Time Warping distance (that is a DoubleDistance) for
+   * FeatureVectors.
    */
   protected AbstractEditDistanceFunction(Parameterization config) {
     config = config.descend(this);
-    if (config.grab(BANDSIZE_PARAM)) {
+    if(config.grab(BANDSIZE_PARAM)) {
       bandSize = BANDSIZE_PARAM.getValue();
     }
   }
@@ -54,7 +48,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDist
   }
 
   @Override
-  public Class<? super NumberVector<?,?>> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
 }
