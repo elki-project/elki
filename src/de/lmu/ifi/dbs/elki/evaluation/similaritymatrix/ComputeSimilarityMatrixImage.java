@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
@@ -57,6 +58,11 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
   public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("simmatrix.scaling", "Class to use as scaling function.");
 
   /**
+   * OptionID for {@link #SKIPZERO_PARAM}
+   */
+  public static final OptionID SKIPZERO_ID = OptionID.getOrCreateOptionID("simmatrix.skipzero", "Skip zero values when computing the colors to increase contrast.");
+
+  /**
    * The distance function to use
    */
   private DistanceFunction<O, ? extends NumberDistance<?, ?>> distanceFunction;
@@ -65,6 +71,11 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
    * Scaling function to use
    */
   private ScalingFunction scaling;
+  
+  /**
+   * Skip zero values.
+   */
+  private boolean skipzero = false;
 
   /**
    * Constructor
@@ -76,6 +87,10 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     config = config.descend(this);
     distanceFunction = AbstractAlgorithm.getParameterDistanceFunction(config);
     scaling = getScalingFunction(config);
+    Flag skipzero_param = new Flag(SKIPZERO_ID);
+    if (config.grab(skipzero_param)) {
+      skipzero = skipzero_param.getValue();
+    }
   }
 
   /**
@@ -131,7 +146,9 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
         DBID id2 = order.get(y);
         final double dist = dq.distance(id1, id2).doubleValue();
         if(!Double.isNaN(dist) && !Double.isInfinite(dist) /* && dist > 0.0 */) {
-          minmax.put(dist);
+          if (!skipzero || dist != 0.0) {
+            minmax.put(dist);
+          }
         }
       }
       if(prog != null) {

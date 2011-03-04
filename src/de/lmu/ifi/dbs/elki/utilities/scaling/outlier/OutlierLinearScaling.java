@@ -44,7 +44,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
   public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("linearscale.max", "Fixed maximum to use in linear scaling.");
 
   /**
-   * Parameter to specify the lambda value
+   * Parameter to specify the maximum value
    * <p>
    * Key: {@code -linearscale.max}
    * </p>
@@ -57,12 +57,27 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
   public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("linearscale.usemean", "Use the mean as minimum for scaling.");
 
   /**
-   * Parameter to specify the lambda value
+   * Flag to use the mean as minimum for scaling.
+   * 
    * <p>
-   * Key: {@code -linearscale.max}
+   * Key: {@code -linearscale.usemean}
    * </p>
    */
   private final Flag MEAN_FLAG = new Flag(MEAN_ID);
+
+  /**
+   * OptionID for {@link #NOZEROS_FLAG}
+   */
+  public static final OptionID NOZEROS_ID = OptionID.getOrCreateOptionID("linearscale.ignorezero", "Ignore zero entries when computing the minimum and maximum.");
+
+  /**
+   * Flag to use ignore zeros when computing the min and max.
+   * 
+   * <p>
+   * Key: {@code -linearscale.ignorezero}
+   * </p>
+   */
+  private final Flag NOZEROS_FLAG = new Flag(NOZEROS_ID);
 
   /**
    * Field storing the Minimum to use
@@ -85,6 +100,11 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
   boolean usemean = false;
 
   /**
+   * Ignore zero values
+   */
+  boolean nozeros = false;
+
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -102,9 +122,12 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     if(config.grab(MEAN_FLAG)) {
       usemean = MEAN_FLAG.getValue();
     }
+    if(config.grab(NOZEROS_FLAG)) {
+      nozeros = NOZEROS_FLAG.getValue();
+    }
 
     // Use-Mean and Minimum value must not be set at the same time!
-    ArrayList<Parameter<?,?>> minmean = new ArrayList<Parameter<?,?>>();
+    ArrayList<Parameter<?, ?>> minmean = new ArrayList<Parameter<?, ?>>();
     minmean.add(MIN_PARAM);
     minmean.add(MEAN_FLAG);
     GlobalParameterConstraint gpc = new OnlyOneIsAllowedToBeSetGlobalConstraint(minmean);
@@ -124,12 +147,21 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     if(usemean) {
       MeanVariance mv = new MeanVariance();
       MinMax<Double> mm = (max == null) ? new MinMax<Double>() : null;
+      boolean skippedzeros = false;
       for(DBID id : ids) {
         double val = or.getScores().getValueFor(id);
+        if(nozeros && val == 0.0) {
+          skippedzeros = true;
+          continue;
+        }
         mv.put(val);
         if(max == null) {
           mm.put(val);
         }
+      }
+      if(skippedzeros && mm.getMin() == mm.getMax()) {
+        mm.put(0.0);
+        mv.put(0.0);
       }
       min = mv.getMean();
       if(max == null) {
@@ -138,10 +170,18 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     }
     else {
       if(min == null || max == null) {
+        boolean skippedzeros = false;
         MinMax<Double> mm = new MinMax<Double>();
         for(DBID id : ids) {
           double val = or.getScores().getValueFor(id);
+          if(nozeros && val == 0.0) {
+            skippedzeros = true;
+            continue;
+          }
           mm.put(val);
+        }
+        if(skippedzeros && mm.getMin() == mm.getMax()) {
+          mm.put(0.0);
         }
         if(min == null) {
           min = mm.getMin();
