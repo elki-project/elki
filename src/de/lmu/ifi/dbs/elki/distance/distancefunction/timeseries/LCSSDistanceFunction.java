@@ -52,13 +52,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/956750.956777")
 public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> {
   /**
-   * @apiviz.exclude
-   */
-  protected enum Step {
-    NONE, INS, DEL, MATCH
-  }
-
-  /**
    * OptionID for {@link #PDELTA_PARAM}
    */
   public static final OptionID PDELTA_ID = OptionID.getOrCreateOptionID("lcss.pDelta", "the allowed deviation in x direction for LCSS alignment (positive double value, 0 <= pDelta <= 1)");
@@ -114,11 +107,10 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
    */
   @Override
   public DoubleDistance distance(V v1, V v2) {
-
     final int delta = (int) Math.ceil(v2.getDimensionality() * pDelta);
 
     DoubleMinMax extrema1 = VectorUtil.getRangeDouble(v1);
-    DoubleMinMax extrema2 = VectorUtil.getRangeDouble(v1);
+    DoubleMinMax extrema2 = VectorUtil.getRangeDouble(v2);
     double range = Math.max(extrema1.getMax(), extrema2.getMax()) - Math.min(extrema1.getMin(), extrema2.getMin());
     final double epsilon = range * pEpsilon;
 
@@ -154,46 +146,32 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
       }
     }
 
-    double[][] matrix = new double[m + 1][n + 1];
-    Step[][] steps = new Step[m + 1][n + 1];
-
-    Step step;
+    double[] curr = new double[n + 1];
 
     for(int i = 0; i < m; i++) {
-      for(int j = (i - delta); j <= (i + delta); j++) {
-        if(j < 0 || j >= n) {
-          // do nothing;
+      double[] next = new double[n + 1];
+      for(int j = Math.max(0, i - delta); j <= Math.min(n - 1, i + delta); j++) {
+        if((b[j] + epsilon) >= a[i] & (b[j] - epsilon) <= a[i]) { // match
+          next[j + 1] = curr[j] + 1;
         }
-        else {
-          if((b[j] + epsilon) >= a[i] & (b[j] - epsilon) <= a[i]) // match
-          {
-            matrix[i + 1][j + 1] = matrix[i][j] + 1;
-            step = Step.MATCH;
-          }
-          else if(matrix[i][j + 1] > matrix[i + 1][j]) // ins
-          {
-            matrix[i + 1][j + 1] = matrix[i][j + 1];
-            step = Step.INS;
-          }
-          else // del
-          {
-            matrix[i + 1][j + 1] = matrix[i + 1][j];
-            step = Step.DEL;
-          }
-
-          steps[i][j] = step;
+        else if(curr[j + 1] > next[j]) { // ins
+          next[j + 1] = curr[j + 1];
+        }
+        else { // del
+          next[j + 1] = next[j];
         }
       }
+      curr = next;
     }
 
     // search for maximum in the last line
     double maxEntry = -1;
     for(int i = 1; i < n + 1; i++) {
-      if(matrix[m][i] > maxEntry) {
-        maxEntry = matrix[m][i];
+      if(curr[i] > maxEntry) {
+        maxEntry = curr[i];
       }
     }
-    double sim = maxEntry / Math.max(m, n); // FIXME: min instead of max????
+    double sim = maxEntry / Math.min(m, n);
     return new DoubleDistance(1 - sim);
   }
 
