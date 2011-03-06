@@ -214,8 +214,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     sb.append(algorithmClass.getSimpleName().toLowerCase());
     
     for (Field field : algorithmClass.getDeclaredFields()) {
-      if ((Modifier.isProtected(field.getModifiers()) || Modifier.isPublic(field.getModifiers()) || Modifier.isPrivate(field.getModifiers())) &&
-          field.getDeclaringClass().equals(algorithmClass) &&
+      if (field.getDeclaringClass().equals(algorithmClass) &&
           (field.getType().equals(String.class)
               || field.getType().equals(int.class)
               || Number.class.isAssignableFrom(field.getType()))) {
