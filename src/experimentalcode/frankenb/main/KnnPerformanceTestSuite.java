@@ -4,16 +4,16 @@
 package experimentalcode.frankenb.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
@@ -60,10 +60,30 @@ import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
 public class KnnPerformanceTestSuite extends AbstractApplication {
 
   private static final PerformanceTest[] PERFORMANCE_TESTS = new PerformanceTest[] {
-//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
-//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(20, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
-//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(45, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
-    new PerformanceTest(new LoOP<NumberVector<?, ?>, DoubleDistance>(10, 10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 2)),
+    //LOF
+    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(20, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(45, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+    
+    //LoOP
+    new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(10, 10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
+    new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(20, 20, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
+    new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(45, 45, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
+    
+    //KNN Outlier
+    new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)),
+    new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 20)),
+    new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 45)),
+    
+    //KNN Weighted
+    new PerformanceTest(new KNNWeightOutlier<NumberVector<?,?>, DoubleDistance>(10, EuclideanDistanceFunction.STATIC)),
+    new PerformanceTest(new KNNWeightOutlier<NumberVector<?,?>, DoubleDistance>(20, EuclideanDistanceFunction.STATIC)),
+    new PerformanceTest(new KNNWeightOutlier<NumberVector<?,?>, DoubleDistance>(45, EuclideanDistanceFunction.STATIC)),
+    
+    //LDOF
+    new PerformanceTest(new LDOF<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)),
+    new PerformanceTest(new LDOF<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)),
+    new PerformanceTest(new LDOF<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)),
   };
   
   private static class PerformanceTest {
@@ -123,51 +143,67 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       
       Log.info("Reading database ...");
       Database<NumberVector<?, ?>> database = databaseConnection.getDatabase(null);
-      File outputFolder = new File(this.inputFolder, "results");
-      if (!outputFolder.exists()) {
-        outputFolder.mkdirs();
+      
+      List<File> resultDirectories = findResultDirectories(this.inputFolder);
+      for (File resultDirectory : resultDirectories) {
+        Log.info("Result in " + resultDirectory + " ...");
+        runTestSuiteFor(database, resultDirectory);
       }
       
-      Log.info("Opening result tree ...");
-      File resultDirectory = new File(this.inputFolder, "result.dir");
-      File resultData = new File(this.inputFolder, "result.dat");
-      
-      DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
-          new BufferedDiskBackedDataStorage(resultDirectory),
-          (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)),
-          new ConstantSizeIntegerSerializer(),
-          new DistanceListSerializer()
-      );
-      PrecalculatedKnnIndex<NumberVector<?, ?>> index = new PrecalculatedKnnIndex<NumberVector<?, ?>>(resultTree);
-      database.addIndex(index);
-      
-      Log.info("Processing results ...");
-      for (PerformanceTest performanceTest : PERFORMANCE_TESTS) {
-        AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = performanceTest.getAlgorithm();
-        String resultDirectoryName = createResultDirectoryName(performanceTest);
-        Log.info(String.format("%s (%s) ...", algorithm.getClass().getSimpleName(), resultDirectoryName));
-        BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
-        
-        OutlierResult result = algorithm.run(database);
-        rocComputer.processResult(database, result, totalResult.getHierarchy());
-        
-        File targetDirectory = new File(outputFolder, resultDirectoryName);
-        targetDirectory.mkdirs();
-        ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(targetDirectory);
-
-        for (Result aResult : totalResult.getHierarchy().iterDescendants(result.getOrdering())) {
-          resultWriter.processResult(database, aResult);
-        }
-        
-        new File(targetDirectory, "default.txt").delete();
-      }
-      
-      Log.info("done");
+      Log.info("All done.");
       
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new UnableToComplyException(e);
+    }
+  }
+
+  private void runTestSuiteFor(Database<NumberVector<?, ?>> database, File inputFolder) throws IOException {
+    Log.info("Opening result tree ...");
+    File resultDirectory = new File(inputFolder, "result.dir");
+    File resultData = new File(inputFolder, "result.dat");
+    
+    DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
+        new BufferedDiskBackedDataStorage(resultDirectory),
+        (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)),
+        new ConstantSizeIntegerSerializer(),
+        new DistanceListSerializer()
+    );
+    
+    PrecalculatedKnnIndex<NumberVector<?, ?>> index = new PrecalculatedKnnIndex<NumberVector<?, ?>>(resultTree);
+    database.addIndex(index);
+    
+    File outputFolder = new File(inputFolder, "results");
+    if (!outputFolder.exists()) {
+      outputFolder.mkdirs();
+    }
+    
+    Log.info("Processing results ...");
+    for (PerformanceTest performanceTest : PERFORMANCE_TESTS) {
+      AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = performanceTest.getAlgorithm();
+      String resultDirectoryName = createResultDirectoryName(performanceTest);
+      Log.info(String.format("%s (%s) ...", algorithm.getClass().getSimpleName(), resultDirectoryName));
+
+      File targetDirectory = new File(outputFolder, resultDirectoryName);
+      if (targetDirectory.exists()) {
+        Log.info("\tAlready processed - so skipping.");
+        continue;
+      }
+      
+      BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
+      
+      OutlierResult result = algorithm.run(database);
+      rocComputer.processResult(database, result, totalResult.getHierarchy());
+      
+      targetDirectory.mkdirs();
+      ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(targetDirectory);
+
+      for (Result aResult : totalResult.getHierarchy().iterDescendants(result.getOrdering())) {
+        resultWriter.processResult(database, aResult);
+      }
+      Log.info("Writing results to directory " + targetDirectory);
+      new File(targetDirectory, "default.txt").delete();
     }
   }
   
@@ -206,6 +242,21 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     ListParameterization config = new ListParameterization();
     config.addParameter(OptionID.OUTPUT, targetFile);
     return new ResultWriter<NumberVector<?, ?>>(config);
+  }
+  
+  private static List<File> findResultDirectories(File dir) {
+    List<File> result = new ArrayList<File>();
+    for (File file : dir.listFiles()) {
+      if (file.equals(dir) || file.equals(dir.getParentFile())) continue;
+      if (file.isDirectory()) {
+        result.addAll(findResultDirectories(file));
+      } else {
+        if (file.getName().equalsIgnoreCase("result.dir") && new File(dir, "result.dat").exists()) {
+          result.add(dir);
+        }
+      }
+    }
+    return result;
   }
   
   public static void main(String[] args) {
