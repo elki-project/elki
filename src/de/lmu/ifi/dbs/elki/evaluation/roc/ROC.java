@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -192,6 +194,56 @@ public class ROC {
     public Pair<D, DBID> next() {
       DistanceResultPair<D> d = this.iter.next();
       return new Pair<D, DBID>(d.getDistance(), d.getID());
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
+  }
+
+  /**
+   * This adapter can be used for an arbitrary collection of Integers, and uses
+   * that id1.compareTo(id2) != 0 for id1 != id2 to satisfy the comparability.
+   * 
+   * Note that of course, no id should occur more than once.
+   * 
+   * The ROC values would be incorrect then anyway!
+   * 
+   * @author Erich Schubert
+   * @param <N> Outlier score
+   */
+  public static class OutlierScoreAdapter implements Iterator<Pair<Double, DBID>> {
+    /**
+     * Original Iterator
+     */
+    private Iterator<DBID> iter;
+    
+    /**
+     * Outlier score
+     */
+    private AnnotationResult<Double> scores;
+
+    /**
+     * Constructor
+     * 
+     * @param iter Iterator for distance results
+     */
+    public OutlierScoreAdapter(DBIDs ids, OutlierResult o) {
+      super();
+      this.iter = o.getOrdering().iter(ids);
+      this.scores = o.getScores();
+    }
+
+    @Override
+    public boolean hasNext() {
+      return this.iter.hasNext();
+    }
+
+    @Override
+    public Pair<Double, DBID> next() {
+      DBID id = this.iter.next();
+      return new Pair<Double, DBID>(scores.getValueFor(id), id);
     }
 
     @Override

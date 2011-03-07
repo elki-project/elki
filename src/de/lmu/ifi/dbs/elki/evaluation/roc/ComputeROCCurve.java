@@ -41,11 +41,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * clustering obtained via the given class label.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.landmark
  * @apiviz.has ROC
  * @apiviz.uses ROCResult oneway - - «create»
- *  
+ * 
  * @param <O> Database object type
  */
 // TODO: maybe add a way to process clustering results as well?
@@ -54,7 +54,7 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
    * The logger.
    */
   static final Logging logger = Logging.getLogger(ComputeROCCurve.class);
-  
+
   /**
    * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
    */
@@ -108,14 +108,28 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     }
     List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.SimpleAdapter(order.iterator()));
     double rocauc = ROC.computeAUC(roccurve);
-    if (logger.isVerbose()) {
-      logger.verbose("ROCAUC: "+rocauc);
+    if(logger.isVerbose()) {
+      logger.verbose("ROCAUC: " + rocauc);
     }
 
     List<String> header = new ArrayList<String>(1);
     header.add(ROC_AUC.getLabel() + ": " + rocauc);
     final ROCResult rocresult = new ROCResult(roccurve, header, rocauc);
-    
+
+    return rocresult;
+  }
+
+  private ROCResult computeROCResult(Database<O> database, DBIDs positiveids, OutlierResult or) {
+    List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.OutlierScoreAdapter(database.getIDs(), or));
+    double rocauc = ROC.computeAUC(roccurve);
+    if(logger.isVerbose()) {
+      logger.verbose("ROCAUC: " + rocauc);
+    }
+
+    List<String> header = new ArrayList<String>(1);
+    header.add(ROC_AUC.getLabel() + ": " + rocauc);
+    final ROCResult rocresult = new ROCResult(roccurve, header, rocauc);
+
     return rocresult;
   }
 
@@ -146,10 +160,9 @@ public class ComputeROCCurve<O extends DatabaseObject> implements Evaluator<O> {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for (OutlierResult o : oresults) {
-      final OrderingResult or = o.getOrdering();
-      hierarchy.add(or, computeROCResult(db, positiveids, or.iter(db.getIDs())));
+      hierarchy.add(o, computeROCResult(db, positiveids, o));
       // Process them only once.
-      orderings.remove(or);
+      orderings.remove(o.getOrdering());
       nonefound = false;
     }
     
