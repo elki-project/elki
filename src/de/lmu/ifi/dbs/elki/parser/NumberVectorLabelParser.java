@@ -35,7 +35,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   /**
    * OptionID for {@link #LABEL_INDICES_PARAM}
    */
-  private static final OptionID LABEL_INDICES_ID = OptionID.getOrCreateOptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
+  public static final OptionID LABEL_INDICES_ID = OptionID.getOrCreateOptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
 
   /**
    * A comma separated list of the indices of labels (may be numeric), counting
