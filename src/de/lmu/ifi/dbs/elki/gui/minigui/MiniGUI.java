@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.logging.Level;
@@ -285,7 +286,7 @@ public class MiniGUI extends JPanel {
    * 
    * @param params Parameters
    */
-  protected void doSetParameters(ArrayList<String> params) {
+  protected void doSetParameters(List<String> params) {
     SerializedParameterization config = new SerializedParameterization(params);
     TrackParameters track = new TrackParameters(config);
     new LoggingStep(track);
@@ -386,8 +387,10 @@ public class MiniGUI extends JPanel {
   /**
    * Create the GUI and show it. For thread safety, this method should be
    * invoked from the event-dispatching thread.
+   * 
+   * args Command line arguments
    */
-  protected static void createAndShowGUI() {
+  protected static void createAndShowGUI(String[] args) {
     // Create and set up the window.
     JFrame frame = new JFrame("ELKI MiniGUI");
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -409,6 +412,9 @@ public class MiniGUI extends JPanel {
 
     // Create and set up the content pane.
     MiniGUI newContentPane = new MiniGUI();
+    if (args != null && args.length > 0) {
+      newContentPane.doSetParameters(Arrays.asList(args));
+    }
     newContentPane.setOpaque(true); // content panes must be opaque
     frame.setContentPane(newContentPane);
 
@@ -422,11 +428,11 @@ public class MiniGUI extends JPanel {
    * 
    * @param args command line parameters
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        createAndShowGUI();
+        createAndShowGUI(args);
       }
     });
   }

@@ -56,7 +56,7 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
 
   @Override
   protected synchronized void configureStep(Parameterization config)  {
-    outs  = new OutputStep<DatabaseObject>(config);
+    outs  = OutputStep.parameterize(config, OutputStep.defaultVisualizer());
     if (config.getErrors().size() > 0) {
       outs = null;
     }

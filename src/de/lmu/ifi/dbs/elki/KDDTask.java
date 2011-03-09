@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
@@ -8,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -84,7 +86,8 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
     // We don't include output parameters
     settings = track.getAllParameters();
     // configure output with the original parameterization
-    outputStep = new OutputStep<O>(config);
+    final ArrayList<Class<? extends ResultHandler<O, Result>>> defaultWriter = OutputStep.defaultWriter();
+    outputStep = OutputStep.parameterize(config, defaultWriter);
   }
 
   /**
