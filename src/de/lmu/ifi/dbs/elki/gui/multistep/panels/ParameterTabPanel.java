@@ -79,11 +79,6 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
   private final ConfiguratorPanel parameterTable;
 
   /**
-   * Parameter storage
-   */
-  //private final DynamicParameters parameters;
-
-  /**
    * The "run" button.
    */
   private final JButton runButton;
