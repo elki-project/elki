@@ -6,7 +6,6 @@ package experimentalcode.frankenb.main;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,33 +181,43 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     Log.info("Processing results ...");
     for (PerformanceTest performanceTest : PERFORMANCE_TESTS) {
       AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = performanceTest.getAlgorithm();
-      String resultDirectoryName = createResultDirectoryName(performanceTest);
-      Log.info(String.format("%s (%s) ...", algorithm.getClass().getSimpleName(), resultDirectoryName));
+      String targetFileName = createResultFileName(performanceTest, outputFolder);
+      Log.info(String.format("%s (%s) ...", algorithm.getClass().getSimpleName(), targetFileName));
 
-      File targetDirectory = new File(outputFolder, resultDirectoryName);
-      if (targetDirectory.exists()) {
+      File targetFile = new File(outputFolder, targetFileName);
+      if (targetFile.exists()) {
         Log.info("\tAlready processed - so skipping.");
         continue;
       }
       
+      File tmpDirectory = new File(outputFolder, "tmp");
       BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
       
       OutlierResult result = algorithm.run(database);
       rocComputer.processResult(database, result, totalResult.getHierarchy());
       
-      targetDirectory.mkdirs();
-      ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(targetDirectory);
+      tmpDirectory.mkdirs();
+      ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(tmpDirectory);
 
-      for (Result aResult : totalResult.getHierarchy().iterDescendants(result.getOrdering())) {
+      for (Result aResult : totalResult.getHierarchy().iterDescendants(result)) {
         resultWriter.processResult(database, aResult);
       }
-      Log.info("Writing results to directory " + targetDirectory);
-      new File(targetDirectory, "default.txt").delete();
+      Log.info("Writing results to file " + targetFile);
+      
+      new File(tmpDirectory, "default.txt").delete();
+      File resultFile = new File(tmpDirectory, "roc.txt");
+      resultFile.renameTo(targetFile);
+      
+      tmpDirectory.deleteOnExit();
     }
   }
   
-  private static String createResultDirectoryName(PerformanceTest performanceTest) {
+  private static String createResultFileName(PerformanceTest performanceTest, File outputDirectory) {
     StringBuilder sb = new StringBuilder();
+    sb.append("roc_");
+    
+    sb.append(outputDirectory.getParentFile().getName());
+    sb.append("_");
     
     Class<?> algorithmClass = performanceTest.getAlgorithm().getClass();
     sb.append(algorithmClass.getSimpleName().toLowerCase());
@@ -234,6 +243,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       }
     }
     
+    sb.append(".txt");
     return sb.toString();
   }
   
