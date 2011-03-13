@@ -28,10 +28,12 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
 
   private final Database<NumberVector<?, ?>> dataBase;
   private final KDTree tree;
+  private final int kFactor;
   
-  protected PINNKnnQuery(Database<NumberVector<?, ?>> database, KDTree tree) {
+  protected PINNKnnQuery(Database<NumberVector<?, ?>> database, KDTree tree, int kFactor) {
     this.tree = tree;
     this.dataBase = database;
+    this.kFactor = kFactor;
   }
   
   /* (non-Javadoc)
@@ -42,7 +44,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
     NumberVector<?, ?> vector = dataBase.get(id);
     
-    DistanceList projectedDistanceList = tree.findNearestNeighbors(id.getIntegerID(), 2*k, EuclideanDistanceFunction.STATIC);
+    DistanceList projectedDistanceList = tree.findNearestNeighbors(id.getIntegerID(), this.kFactor*k, EuclideanDistanceFunction.STATIC);
     List<DistanceResultPair<DoubleDistance>> list = new ArrayList<DistanceResultPair<DoubleDistance>>();
     
     DistanceList newDistanceList = new DistanceList(id.getIntegerID(), k);

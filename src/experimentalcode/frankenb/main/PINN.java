@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.frankenb.algorithms.projection.RandomProjection;
 import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.log.LogLevel;
@@ -40,22 +41,37 @@ import experimentalcode.frankenb.model.ifaces.IDataSet;
  */
 public class PINN extends StandAloneApplication {
 
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("k", "k for kNN search");
+  private final IntParameter K_PARAM = new IntParameter(K_FACTOR_ID, false);
+  
+  public static final OptionID K_FACTOR_ID = OptionID.getOrCreateOptionID("kfactor", "factor to multiply with k when searching for the neighborhood in the projected space");
+  private final IntParameter K_FACTOR_PARAM = new IntParameter(K_FACTOR_ID, false);    
+  
   private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
   private final RandomProjection randomProjection;
   
   private final ComputeROCCurve<NumberVector<?,?>> rocComputer;
+  private int k;
+  private int kFactor;
   
   public PINN(Parameterization config) {
     super(config);
     Log.setLogFormatter(new TraceLevelLogFormatter());
     Log.addLogWriter(new StdOutLogWriter());
     Log.setFilter(LogLevel.DEBUG);
+   
+    if (config.grab(K_PARAM)) {
+      this.k = K_PARAM.getValue();
+    }
+    
+    if (config.grab(K_FACTOR_PARAM)) {
+      this.kFactor = K_FACTOR_PARAM.getValue();
+    }
     
     databaseConnection = FileBasedDatabaseConnection.parameterize(config);
     randomProjection = new RandomProjection(config);
     
     rocComputer = new ComputeROCCurve<NumberVector<?,?>>(config);
-    
   }
   
   /* (non-Javadoc)
@@ -72,12 +88,12 @@ public class PINN extends StandAloneApplication {
     Log.info("Creating KD-Tree ...");
     KDTree tree = new KDTree(dataSet);
     
-    PINNKnnIndex index = new PINNKnnIndex(tree);
+    PINNKnnIndex index = new PINNKnnIndex(tree, kFactor);
     dataBase.addIndex(index);
     
     Log.info("Running LOF ...");
     
-    AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = new LOF<NumberVector<?, ?>, DoubleDistance>(10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
+    AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = new LOF<NumberVector<?, ?>, DoubleDistance>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
     OutlierResult result = algorithm.run(dataBase);
     
     Log.info("Calculating ROC ...");

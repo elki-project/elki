@@ -22,9 +22,16 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 public class PINNKnnIndex implements KNNIndex<NumberVector<?, ?>> {
 
   private final KDTree tree;
+  private final int kFactor;
   
-  public PINNKnnIndex(KDTree tree) {
+  /**
+   * Constructor for kdtree and kFactor
+   * @param tree
+   * @param kFactor factor for k to multiply with when searching within the projected space
+   */
+  public PINNKnnIndex(KDTree tree, int kFactor) {
     this.tree = tree;
+    this.kFactor = kFactor;
   }
   
   /* (non-Javadoc)
@@ -96,7 +103,7 @@ public class PINNKnnIndex implements KNNIndex<NumberVector<?, ?>> {
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> KNNQuery<NumberVector<?, ?>, D> getKNNQuery(Database<NumberVector<?, ?>> database, DistanceFunction<? super NumberVector<?, ?>, D> distanceFunction, Object... hints) {
-    return (KNNQuery<NumberVector<?, ?>, D>) new PINNKnnQuery(database, this.tree);
+    return (KNNQuery<NumberVector<?, ?>, D>) new PINNKnnQuery(database, this.tree, this.kFactor);
   }
 
   /* (non-Javadoc)
@@ -105,7 +112,7 @@ public class PINNKnnIndex implements KNNIndex<NumberVector<?, ?>> {
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> KNNQuery<NumberVector<?, ?>, D> getKNNQuery(Database<NumberVector<?, ?>> database, DistanceQuery<NumberVector<?, ?>, D> distanceQuery, Object... hints) {
-    return (KNNQuery<NumberVector<?, ?>, D>) new PINNKnnQuery(database, this.tree);
+    return (KNNQuery<NumberVector<?, ?>, D>) new PINNKnnQuery(database, this.tree, this.kFactor);
   }
 
 }
