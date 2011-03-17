@@ -88,7 +88,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * <p>
  * Main invocation:<br/>
  * 
- * <code>java -cp elki.jar de.lmu.ifi.dbs.elki.visualization.KNNExplorer</code>
+ * <code>java -cp elki.jar de.lmu.ifi.dbs.elki.application.visualization.KNNExplorer</code>
  * </p>
  * 
  * <p>
