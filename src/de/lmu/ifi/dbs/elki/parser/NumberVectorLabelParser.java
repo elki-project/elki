@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -102,31 +103,30 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    */
   @Override
   public Pair<V, List<String>> parseLine(String line) {
-    String[] entries = colSep.split(line);
+    List<String> entries = tokenize(line);
+    
     List<Double> attributes = new ArrayList<Double>();
     List<String> labels = new ArrayList<String>();
-    for(int i = 0; i < entries.length; i++) {
+    
+    Iterator<String> itr = entries.iterator();
+    for(int i = 0; itr.hasNext(); i++) {
+      String ent = itr.next();
       if(!labelIndices.get(i)) {
         try {
-          Double attribute = Double.valueOf(entries[i]);
+          Double attribute = Double.valueOf(ent);
           attributes.add(attribute);
         }
         catch(NumberFormatException e) {
-          labels.add(entries[i]);
+          labels.add(ent);
         }
       }
       else {
-        labels.add(entries[i]);
+        labels.add(ent);
       }
     }
 
     Pair<V, List<String>> objectAndLabels;
     V vec = createDBObject(attributes);
-    /*
-     * if(parseFloat) { vec = (V) new
-     * FloatVector(Util.convertToFloat(attributes)); } else { vec = (V) new
-     * DoubleVector(attributes); }
-     */
     objectAndLabels = new Pair<V, List<String>>(vec, labels);
     return objectAndLabels;
   }

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -28,6 +29,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Term frequency parser")
 @Description("Parse a file containing term frequencies. The expected format is 'label term1 <freq> term2 <freq> ...'. Terms must not contain the separator character!")
 public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVector> {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(TermFrequencyParser.class);
+  
   /**
    * Maximum dimension used
    */
@@ -57,19 +63,19 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
 
   @Override
   public Pair<SparseFloatVector, List<String>> parseLine(String line) {
-    String[] entries = colSep.split(line);
+    List<String> entries = tokenize(line);
 
     Map<Integer, Float> values = new TreeMap<Integer, Float>();
     List<String> labels = new ArrayList<String>();
 
     String curterm = null;
-    for(int i = 0; i < entries.length; i++) {
+    for(int i = 0; i < entries.size(); i++) {
       if(curterm == null) {
-        curterm = entries[i];
+        curterm = entries.get(i);
       }
       else {
         try {
-          Float attribute = Float.valueOf(entries[i]);
+          Float attribute = Float.valueOf(entries.get(i));
           Integer curdim = keymap.get(curterm);
           if(curdim == null) {
             curdim = maxdim + 1;
@@ -83,7 +89,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
           if(curterm != null) {
             labels.add(curterm);
           }
-          curterm = entries[i];
+          curterm = entries.get(i);
         }
       }
     }
@@ -118,5 +124,10 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   @Override
   protected SparseFloatVector getPrototype(int dimensionality) {
     return new SparseFloatVector(new int[] {}, new float[] {}, dimensionality);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

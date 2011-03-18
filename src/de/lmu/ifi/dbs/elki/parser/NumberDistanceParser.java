@@ -41,7 +41,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(NumberDistanceParser.class);
-  
+
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
@@ -86,28 +86,28 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
           // logger.fine("parse " + lineNumber / 10000);
         }
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = colSep.split(line);
-          if(entries.length != 3) {
+          List<String> entries = tokenize(line);
+          if(entries.size() != 3) {
             throw new IllegalArgumentException("Line " + lineNumber + " does not have the " + "required input format: id1 id2 distanceValue! " + line);
           }
 
           DBID id1, id2;
           try {
-            id1 = DBIDUtil.importInteger(Integer.parseInt(entries[0]));
+            id1 = DBIDUtil.importInteger(Integer.parseInt(entries.get(0)));
           }
           catch(NumberFormatException e) {
             throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is no integer!");
           }
 
           try {
-            id2 = DBIDUtil.importInteger(Integer.parseInt(entries[1]));
+            id2 = DBIDUtil.importInteger(Integer.parseInt(entries.get(1)));
           }
           catch(NumberFormatException e) {
             throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is no integer!");
           }
 
           try {
-            D distance = distanceFunction.getDistanceFactory().parseString(entries[2]);
+            D distance = distanceFunction.getDistanceFactory().parseString(entries.get(2));
             put(id1, id2, distance, distanceCache);
             ids.add(id1);
             ids.add(id2);
@@ -186,5 +186,10 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     }
 
     return cache.containsKey(new Pair<DBID, DBID>(id1, id2));
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }
