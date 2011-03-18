@@ -89,19 +89,20 @@
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
 	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
+		<exclude name="experimentalcode/arthur/fractaldimension/**" />
 		<exclude name="experimentalcode/attenberger/**" />
 		<exclude name="experimentalcode/demel/**" />
-		<exclude name="experimentalcode/franz/**" />
 		<exclude name="experimentalcode/frankenb/**" />
-		<exclude name="experimentalcode/irina/**" />
+		<exclude name="experimentalcode/franz/**" />
+		<exclude name="experimentalcode/hettab/**" />
 		<exclude name="experimentalcode/ivascu/**" />
-		<exclude name="experimentalcode/lisa/**" />
 		<exclude name="experimentalcode/marisa/**" />
 		<exclude name="experimentalcode/moennig/**" />
-		<exclude name="experimentalcode/remigius/**" />
-		<exclude name="experimentalcode/simon/**" />
+		<exclude name="experimentalcode/sascha/**" />
+		<exclude name="experimentalcode/shared/kernelbased/**" />
 		<exclude name="experimentalcode/shared/guidraft1/**" />
 		<exclude name="experimentalcode/shared/converter/bibtex/**" />
+		<exclude name="experimentalcode/simon/**" />
 		<exclude name="experimentalcode/thomas/**" />
 		<exclude name="experimentalcode/tobias/**" />
 		<exclude name="experimentalcode/zankl/**" />
@@ -401,16 +402,6 @@
 		<!-- add extra licence file for Apache Commons Math -->
 		<copy file="${build.lib}/commons-math-2.1.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-math-LICENSE.txt" />
 		
-		<!-- Install Apache Commons Collections -->
-		<unjar dest="${build.jardir}" src="${build.lib}/commons-collections-3.2.1.jar" overwrite="false">
-			<patternset>
-				<include name="org/apache/commons/collections/**" />
-				<include name="META-INF/maven/commons-collections/**" />
-			</patternset>
-		</unjar>
-		<!-- add extra licence file for Apache Commons Collections -->
-		<copy file="${build.lib}/commons-collections-3.2.1.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-collections-LICENSE.txt" />
-
 		<!-- Source code -->
 		<mkdir dir="${build.jardir}/src" />
 		<copy todir="${build.jardir}/src">
