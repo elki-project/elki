@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -18,6 +19,11 @@ import java.util.List;
  * @author Arthur Zimek
  */
 public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(DoubleVectorLabelTransposingParser.class);
+  
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -41,13 +47,13 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = colSep.split(line);
+          List<String> entries = tokenize(line);
           if (dimensionality == -1) {
-            dimensionality = entries.length;
+            dimensionality = entries.size();
           }
-          else if (entries.length != dimensionality) {
+          else if (entries.size() != dimensionality) {
             throw new IllegalArgumentException("Differing dimensionality in line " + (lineNumber) + ", " +
-                                               "expected: " + dimensionality + ", read: " + entries.length);
+                                               "expected: " + dimensionality + ", read: " + entries.size());
           }
 
           if (data == null) {
@@ -61,13 +67,13 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
             }
           }
 
-          for (int i = 0; i < entries.length; i++) {
+          for (int i = 0; i < entries.size(); i++) {
             try {
-              Double attribute = Double.valueOf(entries[i]);
+              Double attribute = Double.valueOf(entries.get(i));
               data[i].add(attribute);
             }
             catch (NumberFormatException e) {
-              labels[i].add(entries[i]);
+              labels[i].add(entries.get(i));
             }
           }
         }
@@ -89,5 +95,10 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
     }
 
     return new ParsingResult<DoubleVector>(objectAndLabelList, getPrototype(dimensionality));
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

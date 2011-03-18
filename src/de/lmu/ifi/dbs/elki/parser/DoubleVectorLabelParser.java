@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.parser;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -23,6 +24,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  */
 public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(DoubleVectorLabelParser.class);
+  
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -47,5 +53,10 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
   @Override
   protected DoubleVector getPrototype(int dimensionality) {
     return new DoubleVector(new double[dimensionality]);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

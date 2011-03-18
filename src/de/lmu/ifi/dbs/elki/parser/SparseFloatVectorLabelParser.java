@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -43,6 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored. Having the file parsed completely, the maximum occuring dimensionality is set as dimensionality to all created SparseFloatvectors.")
 public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<SparseFloatVector> {
   /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(SparseFloatVectorLabelParser.class);
+  
+  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    * 
@@ -70,32 +76,32 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    */
   @Override
   public Pair<SparseFloatVector, List<String>> parseLine(String line) {
-    String[] entries = colSep.split(line);
-    int cardinality = Integer.parseInt(entries[0]);
+    List<String> entries = tokenize(line);
+    int cardinality = Integer.parseInt(entries.get(0));
 
     Map<Integer, Float> values = new HashMap<Integer, Float>(cardinality, 1);
     List<String> labels = new ArrayList<String>();
 
-    for(int i = 1; i < entries.length - 1; i++) {
+    for(int i = 1; i < entries.size() - 1; i++) {
       if(!labelIndices.get(i)) {
         Integer index;
         Float attribute;
         try {
-          index = Integer.valueOf(entries[i]);
+          index = Integer.valueOf(entries.get(i));
           if(index > dimensionality) {
             dimensionality = index;
           }
           i++;
         }
         catch(NumberFormatException e) {
-          labels.add(entries[i]);
+          labels.add(entries.get(i));
           continue;
         }
-        attribute = Float.valueOf(entries[i]);
+        attribute = Float.valueOf(entries.get(i));
         values.put(index, attribute);
       }
       else {
-        labels.add(entries[i]);
+        labels.add(entries.get(i));
       }
     }
     return new Pair<SparseFloatVector, List<String>>(new SparseFloatVector(values, dimensionality), labels);
@@ -131,5 +137,10 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   protected SparseFloatVector getPrototype(int dimensionality) {
     final Map<Integer, Float> emptyMap = Collections.emptyMap();
     return new SparseFloatVector(emptyMap, dimensionality);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }

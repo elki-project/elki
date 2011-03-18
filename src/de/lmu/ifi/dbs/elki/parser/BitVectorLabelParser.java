@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -27,6 +28,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Bit Vector Label Parser")
 @Description("Parses the following format of lines:\n" + "A single line provides a single BitVector. Bits are separated by whitespace. Any substring not containing whitespace is tried to be read as Bit. If this fails, it will be appended to a label. (Thus, any label must not be parseable as Bit.) Empty lines and lines beginning with \"#\" will be ignored. If any BitVector differs in its dimensionality from other BitVectors, the parse method will fail with an Exception.")
 public class BitVectorLabelParser extends AbstractParser<BitVector> {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(BitVectorLabelParser.class);
+  
   /**
    * Provides a parser for parsing one BitVector per line, bits separated by
    * whitespace.
@@ -49,7 +55,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = colSep.split(line);
+          List<String> entries = tokenize(line);
           // TODO: use more efficient storage right away?
           List<Bit> attributes = new ArrayList<Bit>();
           List<String> labels = new ArrayList<String>();
@@ -80,5 +86,10 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     }
 
     return new ParsingResult<BitVector>(objectAndLabelsList, new BitVector(new BitSet(), dimensionality));
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 }
