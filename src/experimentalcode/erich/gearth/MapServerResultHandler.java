@@ -10,6 +10,9 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
@@ -73,6 +76,27 @@ public class MapServerResultHandler implements ResultHandler<DatabaseObject, Res
 
   @Override
   public void processResult(Database<DatabaseObject> db, Result result) {
+    // Build a map for the main database, using external IDs
+    Map<String, DBID> lblmap = new HashMap<String, DBID>(db.size() * 2);
+    {
+      DataQuery<String> olq = db.getObjectLabelQuery();
+      DataQuery<String> eidq = db.getExternalIdQuery();
+      for(DBID id : db) {
+        if(olq != null) {
+          String label = olq.get(id);
+          if(label != null) {
+            lblmap.put(label, id);
+          }
+        }
+        if(eidq != null) {
+          String eid = eidq.get(id);
+          if(eid != null) {
+            lblmap.put(eid, id);
+          }
+        }
+      }
+    }
+    // Build the polygon map
     Map<String, PolygonsObject> polymap = new HashMap<String, PolygonsObject>(db.size());
     {
       InputStream in = null;
@@ -85,17 +109,18 @@ public class MapServerResultHandler implements ResultHandler<DatabaseObject, Res
       }
       ParsingResult<PolygonsObject> polys = polygonParser.parse(in);
       // Build reverse map
-      for (Pair<PolygonsObject, List<String>> pair : polys.getObjectAndLabelList()) {
-        for (String lbl : pair.getSecond()) {
+      for(Pair<PolygonsObject, List<String>> pair : polys.getObjectAndLabelList()) {
+        for(String lbl : pair.getSecond()) {
           polymap.put(lbl, pair.first);
         }
       }
     }
 
     // FIXME: Make port configurable.
-    MapWebServer serv = new MapWebServer(8080, polymap);
+    MapWebServer serv = new MapWebServer(8080, lblmap, polymap, db);
 
     // TODO: stop somehow. UI with stop button?
+    // watch for restarts due to result changes.
   }
 
   @SuppressWarnings("unused")

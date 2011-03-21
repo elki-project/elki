@@ -71,8 +71,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    */
   private List<InputStream> inputStreams;
 
-  public MultipleFileBasedDatabaseConnection(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, List<InputStream> inputStreams, List<Parser<O>> parsers) {
-    super(database, classLabelIndex, classLabelClass);
+  public MultipleFileBasedDatabaseConnection(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<InputStream> inputStreams, List<Parser<O>> parsers) {
+    super(database, classLabelIndex, classLabelClass, externalIdIndex);
     this.inputStreams = inputStreams;
     this.parsers = parsers;
   }
@@ -151,7 +151,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     if(config.hasErrors()) {
       return null;
     }
-    return new MultipleFileBasedDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.inputStreams, p.parsers);
+    return new MultipleFileBasedDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, p.inputStreams, p.parsers);
   }
 
   /**

@@ -125,11 +125,14 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * @param classLabelIndex the index of the label to be used as class label,
    *        can be null
    * @param classLabelClass the association of occurring class labels
+   * @param externalIdIndex the index of the label to be used as external id,
+   *        can be null
    */
-  protected AbstractDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass) {
+  protected AbstractDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex) {
     this.database = database;
     this.classLabelIndex = classLabelIndex;
     this.classLabelClass = classLabelClass;
+    this.externalIdIndex = externalIdIndex;
   }
 
   /**

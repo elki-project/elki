@@ -107,12 +107,14 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * @param classLabelIndex the index of the label to be used as class label,
    *        can be null
    * @param classLabelClass the association of occurring class labels
+   * @param externalIdIndex the index of the label to be used as external id,
+   *        can be null
    * @param parser the parser to provide a database
    * @param startid the first object ID to use, can be null
    * @param seed a seed for randomly shuffling the rows of the database
    */
-  public InputStreamDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Parser<O> parser, Integer startid, Long seed) {
-    super(database, classLabelIndex, classLabelClass);
+  public InputStreamDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, Parser<O> parser, Integer startid, Long seed) {
+    super(database, classLabelIndex, classLabelClass, externalIdIndex);
     this.parser = parser;
     this.startid = startid;
     this.seed = seed;
@@ -173,7 +175,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     if(config.hasErrors()) {
       return null;
     }
-    return new InputStreamDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.parser, p.startid, p.seed);
+    return new InputStreamDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, p.parser, p.startid, p.seed);
   }
 
   /**

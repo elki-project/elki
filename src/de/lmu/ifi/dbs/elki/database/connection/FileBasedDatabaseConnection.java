@@ -39,13 +39,15 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
    * @param classLabelIndex the index of the label to be used as class label,
    *        can be null
    * @param classLabelClass the association of occurring class labels
+   * @param externalIdIndex the index of the label to be used as external id,
+   *        can be null
    * @param parser the parser to provide a database
    * @param startid the first object ID to use, can be null
    * @param seed a seed for randomly shuffling the rows of the database
    * @param in the input stream to parse from.
    */
-  public FileBasedDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Parser<O> parser, Integer startid, Long seed, InputStream in) {
-    super(database, classLabelIndex, classLabelClass, parser, startid, seed);
+  public FileBasedDatabaseConnection(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, Parser<O> parser, Integer startid, Long seed, InputStream in) {
+    super(database, classLabelIndex, classLabelClass, externalIdIndex, parser, startid, seed);
     this.in = in;
   }
 
@@ -62,7 +64,7 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
       return null;
     }
 
-    return new FileBasedDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.parser, p.startid, p.seed, p.in);
+    return new FileBasedDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, p.parser, p.startid, p.seed, p.in);
   }
 
   /**
