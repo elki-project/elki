@@ -102,6 +102,11 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   protected WritableDataStore<String> objectlabels = null;
 
   /**
+   * Map to hold the object labels
+   */
+  protected WritableDataStore<String> externalids = null;
+
+  /**
    * Map to hold the class labels
    */
   protected WritableDataStore<ClassLabel> classlabels = null;
@@ -451,7 +456,7 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
       DBIDs ids = partitions.get(partitionID);
       for(DBID id : ids) {
         final O object = get(id);
-        DatabaseObjectMetadata associations = new DatabaseObjectMetadata(getObjectLabel(id), getClassLabel(id));
+        DatabaseObjectMetadata associations = new DatabaseObjectMetadata(getObjectLabel(id), getClassLabel(id), getExternalId(id));
         objectAndAssociationsList.add(new Pair<O, DatabaseObjectMetadata>(object, associations));
       }
 
@@ -536,6 +541,11 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   @Override
   public DataQuery<ClassLabel> getClassLabelQuery() {
     return new ClassLabelRepresentation();
+  }
+
+  @Override
+  public DataQuery<String> getExternalIdQuery() {
+    return new ExternalIdRepresentation();
   }
 
   @Override
@@ -833,6 +843,29 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     objectlabels.put(id, label);
   }
 
+  protected String getExternalId(DBID id) {
+    if(id == null) {
+      LoggingUtil.warning("Trying to get class label for 'null' id.");
+      return null;
+    }
+    if(externalids == null) {
+      return null;
+    }
+    return externalids.get(id);
+  }
+
+  protected void setExternalId(DBID id, String externalid) {
+    if(id == null) {
+      LoggingUtil.warning("Trying to set class label for 'null' id.");
+      return;
+    }
+    if(externalids == null) {
+      externalids = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
+      addChildResult(new AnnotationBuiltins.ExternalIdAnnotation(HashmapDatabase.this));
+    }
+    externalids.put(id, externalid);
+  }
+
   /**
    * Representation class for class labels.
    * 
@@ -892,6 +925,35 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   }
 
   /**
+   * Representation for external IDs.
+   * 
+   * @author Erich Schubert
+   */
+  private class ExternalIdRepresentation implements DataQuery<String> {
+    /**
+     * Constructor.
+     */
+    public ExternalIdRepresentation() {
+      super();
+    }
+
+    @Override
+    public String get(DBID id) {
+      return getExternalId(id);
+    }
+
+    @Override
+    public void set(DBID id, String val) {
+      setExternalId(id, val);
+    }
+
+    @Override
+    public Class<? super String> getDataClass() {
+      return String.class;
+    }
+  }
+
+  /**
    * Representation of metadata.
    * 
    * @author Erich Schubert
@@ -906,7 +968,7 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
 
     @Override
     public DatabaseObjectMetadata get(DBID id) {
-      return new DatabaseObjectMetadata(getObjectLabel(id), getClassLabel(id));
+      return new DatabaseObjectMetadata(getObjectLabel(id), getClassLabel(id), getExternalId(id));
     }
 
     @Override

@@ -205,7 +205,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
         parsers.add(i, parser);
       }
     }
-    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, inputStreams, parsers);
+    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, inputStreams, parsers);
   }
 
   /**
@@ -220,8 +220,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
 
     List<Parser<O>> parsers;
 
-    public Parameters(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, List<InputStream> inputStreams, List<Parser<O>> parsers) {
-      super(database, classLabelIndex, classLabelClass);
+    public Parameters(Database<MultiRepresentedObject<O>> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<InputStream> inputStreams, List<Parser<O>> parsers) {
+      super(database, classLabelIndex, classLabelClass, externalIdIndex);
       this.inputStreams = inputStreams;
       this.parsers = parsers;
     }

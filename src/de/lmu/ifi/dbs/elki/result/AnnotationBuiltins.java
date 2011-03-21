@@ -85,4 +85,36 @@ public class AnnotationBuiltins {
       return rep.get(objID);
     }
   }
+
+  /**
+   * External Id label "result" view
+   * 
+   * @author Erich Schubert
+   */
+  public static class ExternalIdAnnotation extends BasicResult implements AnnotationResult<String> {
+    /**
+     * Database to wrap
+     */
+    private final DataQuery<String> rep;
+
+    /**
+     * Constructor.
+     * 
+     * @param database Database to access
+     */
+    public ExternalIdAnnotation(Database<?> database) {
+      super("ExternalId", AssociationID.EXTERNAL_ID.getName());
+      this.rep = database.getExternalIdQuery();
+    }
+
+    @Override
+    public AssociationID<String> getAssociationID() {
+      return AssociationID.LABEL;
+    }
+
+    @Override
+    public String getValueFor(DBID objID) {
+      return rep.get(objID);
+    }
+  }
 }
