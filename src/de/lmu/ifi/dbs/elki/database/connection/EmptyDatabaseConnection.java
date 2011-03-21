@@ -25,7 +25,7 @@ public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractD
    * @param database the instance of the database
    */
   protected EmptyDatabaseConnection(Database<O> database) {
-    super(database, null, null);
+    super(database, null, null, null);
   }
 
   /**

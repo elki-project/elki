@@ -13,6 +13,11 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -25,9 +30,18 @@ public class MapWebServer {
 
   protected Map<String, PolygonsObject> polymap;
 
-  public MapWebServer(int port, Map<String, PolygonsObject> polymap) {
+  private Map<String, DBID> lblmap;
+
+  private DataQuery<DatabaseObjectMetadata> metaq;
+
+  private Database<? extends DatabaseObject> db;
+
+  public MapWebServer(int port, Map<String, DBID> lblmap, Map<String, PolygonsObject> polymap, Database<? extends DatabaseObject> db) {
     super();
+    this.lblmap = lblmap;
     this.polymap = polymap;
+    this.db = db;
+    this.metaq = db.getMetadataQuery();
 
     try {
       InetSocketAddress addr = new InetSocketAddress(port);
@@ -156,10 +170,26 @@ public class MapWebServer {
         }
         responseBody.append("],");
       }
+      DBID id = lblmap.get(name);
+      if(id != null) {
+        // Add metadata.
+        DatabaseObjectMetadata meta = metaq.get(id);
+        if(meta.objectlabel != null) {
+          responseBody.append("\"label\":\"" + jsonEscapeString(meta.objectlabel) + "\",");
+        }
+        if(meta.classlabel != null) {
+          responseBody.append("\"class\":\"" + jsonEscapeString(meta.classlabel.toString()) + "\",");
+        }
+        // Add attributes
+        DatabaseObject obj = db.get(id);
+        if (obj != null) {
+          responseBody.append("\"data\":\"" + jsonEscapeString(obj.toString()) + "\",");
+        }
+      }
 
       responseBody.append("\"query\":\"" + jsonEscapeString(name) + "\"");
     }
-    
+
     private String jsonEscapeString(String orig) {
       return orig.replace("\\", "\\\\").replace("\"", "\\\"");
     }
