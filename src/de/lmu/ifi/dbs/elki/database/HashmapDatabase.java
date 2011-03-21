@@ -243,6 +243,9 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
       if(associations.classlabel != null) {
         setClassLabel(id, associations.classlabel);
       }
+      if(associations.externalId != null) {
+        setExternalId(id, associations.externalId);
+      }
     }
 
     return new Pair<O, DBID>(object, id);
@@ -335,6 +338,9 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     }
     if(classlabels != null) {
       classlabels.delete(id);
+    }
+    if(externalids != null) {
+      externalids.delete(id);
     }
     restoreID(id);
   }
