@@ -34,8 +34,8 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   /**
    * A pattern catching most numbers that can be parsed using Double.valueOf:
    * 
-   * Some examples: <code>1</code> <code>1.</code> <code>1.2</code> <code>.2</code>
-   * <code>-.2e-03</code>
+   * Some examples: <code>1</code> <code>1.</code> <code>1.2</code>
+   * <code>.2</code> <code>-.2e-03</code>
    */
   public static final String NUMBER_PATTERN = "[+-]?(?:\\d+\\.?|\\d*\\.\\d+)?(?:[eE][-]?\\d+)?";
 
@@ -115,7 +115,7 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
       // Quoted code path vs. regular code path
       if(inquote && m.start() > 0) {
         // Closing quote found?
-        if(input.charAt(m.start() - 1) == quoteChar) {
+        if(m.start() > index + 1 && input.charAt(m.start() - 1) == quoteChar) {
           // Strip quote characters
           matchList.add(input.subSequence(index + 1, m.start() - 1).toString());
           // Seek past
