@@ -131,6 +131,13 @@ public interface Database<O extends DatabaseObject> extends HierarchicalResult, 
   DataQuery<ClassLabel> getClassLabelQuery();
 
   /**
+   * Get the external Id representation.
+   * 
+   * @return External Id representation
+   */
+  DataQuery<String> getExternalIdQuery();
+
+  /**
    * Get a metadata representation
    * 
    * @return Metadata representation

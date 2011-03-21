@@ -91,7 +91,7 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
       }
     }
 
-    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.parser, p.startid, p.seed, in);
+    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, p.parser, p.startid, p.seed, in);
   }
 
   /**
@@ -104,8 +104,8 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
   static class Parameters<O extends DatabaseObject> extends InputStreamDatabaseConnection.Parameters<O> {
     InputStream in;
 
-    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Parser<O> parser, Integer startid, Long seed, InputStream in) {
-      super(database, classLabelIndex, classLabelClass, parser, startid, seed);
+    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, Parser<O> parser, Integer startid, Long seed, InputStream in) {
+      super(database, classLabelIndex, classLabelClass, externalIdIndex, parser, startid, seed);
       this.in = in;
     }
   }

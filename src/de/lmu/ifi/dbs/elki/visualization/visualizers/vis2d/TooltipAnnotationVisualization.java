@@ -52,6 +52,11 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
   public static final String NAME_CLASS = "Class Label Tooltips";
 
   /**
+   * A short name characterizing this Visualizer.
+   */
+  public static final String NAME_EID = "External ID Tooltips";
+
+  /**
    * Number value to visualize
    */
   private AnnotationResult<?> result;
@@ -173,6 +178,13 @@ public class TooltipAnnotationVisualization<NV extends NumberVector<NV, ?>> exte
       for(AnnotationBuiltins.ObjectLabelAnnotation olr : objlabels) {
         // ovis.init(context, olr, "Object Label");
         final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, olr, this, P2DVisualization.class);
+        task.put(VisualizationTask.META_TOOL, true);
+        context.addVisualizer(olr, task);
+      }
+      ArrayList<AnnotationBuiltins.ExternalIdAnnotation> objeids = ResultUtil.filterResults(result, AnnotationBuiltins.ExternalIdAnnotation.class);
+      for(AnnotationBuiltins.ExternalIdAnnotation olr : objeids) {
+        // ovis.init(context, olr, "Object Label");
+        final VisualizationTask task = new VisualizationTask(NAME_EID, context, olr, this, P2DVisualization.class);
         task.put(VisualizationTask.META_TOOL, true);
         context.addVisualizer(olr, task);
       }

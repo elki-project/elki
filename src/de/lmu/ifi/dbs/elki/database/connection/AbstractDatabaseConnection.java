@@ -74,6 +74,21 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
   private Class<? extends ClassLabel> classLabelClass;
 
   /**
+   * Optional parameter that specifies the index of the label to be used as
+   * external Id, must be an integer equal to or greater than 0.
+   * <p>
+   * Key: {@code -dbc.externalIdIndex}
+   * </p>
+   */
+  public static final OptionID EXTERNALID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIdIndex", "The index of the label to be used as external Id.");
+
+  /**
+   * The index of the label to be used as external Id, null if no external id
+   * index is specified.
+   */
+  protected Integer externalIdIndex;
+
+  /**
    * Factory method for getting parameters.
    * 
    * @param config Parameterization
@@ -87,7 +102,6 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
     // parameter class label index
     final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0), true);
     final ObjectParameter<ClassLabel> classlabelClassParam = new ObjectParameter<ClassLabel>(CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class);
-
     Integer classLabelIndex = null;
     Class<? extends ClassLabel> classLabelClass = null;
 
@@ -98,7 +112,10 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
       classLabelClass = classlabelClassParam.getValue();
     }
 
-    return new Parameters<O>(database, classLabelIndex, classLabelClass);
+    final IntParameter externalIdIndexParam = new IntParameter(EXTERNALID_INDEX_ID, new GreaterEqualConstraint(0), true);
+    Integer externalIdIndex = (config.grab(externalIdIndexParam)) ? externalIdIndexParam.getValue() : null;
+
+    return new Parameters<O>(database, classLabelIndex, classLabelClass, externalIdIndex);
   }
 
   /**
@@ -154,8 +171,9 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
         throw new IllegalArgumentException("No class label at index " + (classLabelIndex) + " specified!");
       }
 
-      String classLabel = null;
       StringBuffer label = new StringBuffer();
+      String classLabel = null;
+      String externalId = null;
       for(int i = 0; i < labels.size(); i++) {
         String l = labels.get(i).trim();
         if(l.length() == 0) {
@@ -164,6 +182,9 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
 
         if(classLabelIndex != null && i == classLabelIndex) {
           classLabel = l;
+        }
+        else if(externalIdIndex != null && i == externalIdIndex) {
+          externalId = l;
         }
         else {
           if(label.length() == 0) {
@@ -176,16 +197,16 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
         }
       }
 
-      DatabaseObjectMetadata associationMap = new DatabaseObjectMetadata();
+      DatabaseObjectMetadata objectMetadata = new DatabaseObjectMetadata();
       if(label.length() != 0) {
-        associationMap.objectlabel = label.toString();
+        objectMetadata.objectlabel = label.toString();
       }
 
       if(classLabel != null) {
         try {
           ClassLabel classLabelAssociation = classLabelClass.newInstance();
           classLabelAssociation.init(classLabel);
-          associationMap.classlabel = classLabelAssociation;
+          objectMetadata.classlabel = classLabelAssociation;
         }
         catch(InstantiationException e) {
           IllegalStateException ise = new IllegalStateException(e);
@@ -196,8 +217,11 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
           throw ise;
         }
       }
+      if(externalId != null) {
+        objectMetadata.externalId = externalId;
+      }
 
-      result.add(new Pair<O, DatabaseObjectMetadata>(objectAndLabels.getFirst(), associationMap));
+      result.add(new Pair<O, DatabaseObjectMetadata>(objectAndLabels.getFirst(), objectMetadata));
     }
     return result;
   }
@@ -209,12 +233,14 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
 
     Class<? extends ClassLabel> classLabelClass;
 
-    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass) {
+    Integer externalIdIndex;
+
+    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex) {
       super();
       this.database = database;
       this.classLabelIndex = classLabelIndex;
       this.classLabelClass = classLabelClass;
+      this.externalIdIndex = externalIdIndex;
     }
-
   }
 }

@@ -82,6 +82,9 @@ public class MapWebServer {
             if(frag.startsWith("jsonp=")) {
               callback = URLDecoder.decode(frag.substring("jsonp=".length()), "UTF-8");
             }
+            if(frag.startsWith("callback=")) {
+              callback = URLDecoder.decode(frag.substring("callback=".length()), "UTF-8");
+            }
           }
         }
         if(logger.isDebuggingFinest() && callback != null) {
@@ -151,7 +154,7 @@ public class MapWebServer {
             responseBody.append(",");
           }
         }
-        responseBody.append("'],");
+        responseBody.append("],");
       }
 
       responseBody.append("\"query\":\"" + jsonEscapeString(name) + "\"");

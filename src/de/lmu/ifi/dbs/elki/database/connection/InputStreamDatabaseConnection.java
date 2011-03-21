@@ -200,7 +200,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     final LongParameter seedParam = new LongParameter(SEED_ID, true);
     Long seed = config.grab(seedParam) ? seedParam.getValue() : null;
 
-    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, parser, startid, seed);
+    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, parser, startid, seed);
   }
 
   /**
@@ -217,8 +217,8 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
     Long seed;
 
-    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Parser<O> parser, Integer startid, Long seed) {
-      super(database, classLabelIndex, classLabelClass);
+    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, Parser<O> parser, Integer startid, Long seed) {
+      super(database, classLabelIndex, classLabelClass, externalIdIndex);
       this.parser = parser;
       this.startid = startid;
       this.seed = seed;

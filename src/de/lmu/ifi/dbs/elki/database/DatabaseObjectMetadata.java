@@ -12,13 +12,16 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
  */
 public class DatabaseObjectMetadata {
   public String objectlabel = null;
+  
+  public String externalId = null;
 
   public ClassLabel classlabel = null;
 
-  public DatabaseObjectMetadata(String objectlabel, ClassLabel classlabel) {
+  public DatabaseObjectMetadata(String objectlabel, ClassLabel classlabel, String externalId) {
     super();
     this.objectlabel = objectlabel;
     this.classlabel = classlabel;
+    this.externalId = externalId;
   }
 
   public DatabaseObjectMetadata() {
