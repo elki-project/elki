@@ -54,7 +54,8 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
     for(int i = 0; i < depth; i++) {
       buf.append(" ");
     }
-    buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName()).append("\n");
+    buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName());
+    buf.append(" (").append(result.getShortName()).append(")\n");
     if(hier.getChildren(result).size() > 0) {
       for(Result r : hier.getChildren(result)) {
         recursiveLogResult(buf, hier, r, depth + 1);

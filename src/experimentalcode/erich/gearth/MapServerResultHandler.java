@@ -12,10 +12,10 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DataQuery;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
@@ -117,7 +117,8 @@ public class MapServerResultHandler implements ResultHandler<DatabaseObject, Res
     }
 
     // FIXME: Make port configurable.
-    MapWebServer serv = new MapWebServer(8080, lblmap, polymap, db);
+    HierarchicalResult hresult = (result instanceof HierarchicalResult) ?  ((HierarchicalResult) result) : null;
+    MapWebServer serv = new MapWebServer(8080, lblmap, polymap, db, hresult);
 
     // TODO: stop somehow. UI with stop button?
     // watch for restarts due to result changes.
