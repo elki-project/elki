@@ -62,7 +62,16 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
 
   @Override
   public DBIDs getNeighborDBIDs(DBID reference) {
-    return store.get(reference);
+    DBIDs neighbors = store.get(reference);
+    if (neighbors != null) {
+      return neighbors;
+    } else {
+      // Use just the object itself.
+      if (logger.isDebugging()) {
+        logger.warning("No neighbors for object "+reference);
+      }
+      return reference;
+    }
   }
 
   /**
