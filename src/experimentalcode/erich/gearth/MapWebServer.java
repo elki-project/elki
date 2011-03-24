@@ -19,9 +19,11 @@ import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 public class MapWebServer {
@@ -135,26 +137,81 @@ public class MapWebServer {
     String[] parts = name.split("/");
     ResultHierarchy hier = result.getHierarchy();
     Result cur = result;
-    for (int i = 0; i < parts.length; i++) {
+    for(int i = 0; i < parts.length - 1; i++) {
       // TODO: handle name collisions. E.g. type_123?
       boolean found = false;
-      for (Result child : hier.getChildren(cur)) {
-        logger.debug("Testing result: "+child.getShortName()+" <-> "+parts[i]);
-        if (child.getShortName().equals(parts[i])) {
+      for(Result child : hier.getChildren(cur)) {
+        logger.debug("Testing result: " + child.getShortName() + " <-> " + parts[i]);
+        if(child.getShortName().equals(parts[i])) {
           cur = child;
           found = true;
           break;
         }
       }
-      if (!found) {
+      if(!found) {
         cur = null;
         break;
       }
     }
-    if (cur == null) {
+    if(cur == null) {
       re.append("\"error\":\"result not found.\",");
       return;
     }
+    if(parts.length >= 1) {
+      if("children".equals(parts[parts.length - 1])) {
+        re.append("\"children\":[");
+        Iterator<Result> iter = hier.getChildren(cur).iterator();
+        while(iter.hasNext()) {
+          Result child = iter.next();
+          re.append("\"").append(child.getShortName()).append("\"");
+          if(iter.hasNext()) {
+            re.append(",");
+          }
+        }
+        re.append("],");
+        return;
+      }
+      if(cur instanceof Database) {
+        // TODO: list functions?
+        objectToJSON(re, parts[parts.length - 1]);
+        return;
+      }
+    }
+    if(cur instanceof OutlierResult) {
+      re.append("\"scores\":[");
+      DataQuery<DatabaseObjectMetadata> mq = db.getMetadataQuery();
+      OutlierResult or = (OutlierResult) cur;
+      AnnotationResult<Double> scores = or.getScores();
+      Iterator<DBID> iter = or.getOrdering().iter(db.getIDs()).iterator();
+      while(iter.hasNext()) {
+        DBID id = iter.next();
+        re.append("{");
+        re.append("\"dbid\":\"").append(id.toString()).append("\",");
+        DatabaseObjectMetadata meta = mq.get(id);
+        if(mq != null) {
+          if(meta.externalId != null) {
+            re.append("\"eid\":\"").append(meta.externalId).append("\",");
+          }
+          if(meta.objectlabel != null) {
+            re.append("\"label\":\"").append(meta.objectlabel).append("\",");
+          }
+          if(meta.classlabel != null) {
+            re.append("\"class\":\"").append(meta.classlabel.toString()).append("\",");
+          }
+        }
+        final Double val = scores.getValueFor(id);
+        if(val != null) {
+          re.append("\"score\":\"").append(val).append("\"");
+        }
+        re.append("}");
+        if(iter.hasNext()) {
+          re.append(",");
+        }
+      }
+      re.append("],");
+      return;
+    }
+    re.append("\"error\":\"unknown id\",");
   }
 
   private static String jsonEscapeString(String orig) {
@@ -215,7 +272,7 @@ public class MapWebServer {
         objectToJSON(response, path);
       }
       catch(Exception e) {
-        logger.warning("Exception occurred in embedded web server:", e);
+        logger.exception("Exception occurred in embedded web server:", e);
         throw (new IOException(e));
       }
       // wrap up
@@ -289,7 +346,11 @@ public class MapWebServer {
         resultToJSON(response, path);
       }
       catch(Exception e) {
-        logger.warning("Exception occurred in embedded web server:", e);
+        logger.exception("Exception occurred in embedded web server:", e);
+        throw (new IOException(e));
+      }
+      catch(Throwable e) {
+        logger.exception("Exception occurred in embedded web server:", e);
         throw (new IOException(e));
       }
       // wrap up
@@ -299,12 +360,13 @@ public class MapWebServer {
       else {
         response.append("}");
       }
+      byte[] rbuf = response.toString().getBytes("UTF-8");
       // Send
       Headers responseHeaders = exchange.getResponseHeaders();
       responseHeaders.set("Content-Type", "text/javascript");
-      exchange.sendResponseHeaders(200, response.length());
+      exchange.sendResponseHeaders(200, rbuf.length);
       OutputStream responseBody = exchange.getResponseBody();
-      responseBody.write(response.toString().getBytes());
+      responseBody.write(rbuf);
       responseBody.close();
     }
   }
