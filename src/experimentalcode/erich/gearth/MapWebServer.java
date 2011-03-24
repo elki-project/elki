@@ -76,9 +76,9 @@ public class MapWebServer {
     server.stop(0);
   }
 
-  protected void objectToJSON(StringBuffer re, String name) {
+  protected void objectToJSON(StringBuffer re, String query) {
     // Add actual response.
-    PolygonsObject polys = polymap.get(name);
+    PolygonsObject polys = polymap.get(query);
     if(polys != null) {
       // logger.debugFinest("Polygon is: "+polys.toString());
       re.append("\"polys\":[");
@@ -108,10 +108,13 @@ public class MapWebServer {
       }
       re.append("],");
     }
-    DBID id = lblmap.get(name);
+    DBID id = lblmap.get(query);
     if(id != null) {
       // Add metadata.
       DatabaseObjectMetadata meta = metaq.get(id);
+      if(meta.externalId != null) {
+        re.append("\"eid\":\"" + jsonEscapeString(meta.externalId) + "\",");
+      }
       if(meta.objectlabel != null) {
         re.append("\"label\":\"" + jsonEscapeString(meta.objectlabel) + "\",");
       }
@@ -125,7 +128,7 @@ public class MapWebServer {
       }
     }
 
-    re.append("\"query\":\"" + jsonEscapeString(name) + "\"");
+    re.append("\"query\":\"" + jsonEscapeString(query) + "\"");
   }
 
   protected void resultToJSON(StringBuffer re, String name) {
