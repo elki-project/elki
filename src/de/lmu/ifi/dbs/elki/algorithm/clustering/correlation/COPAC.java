@@ -209,7 +209,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       TrackParameters trackpar = new TrackParameters(config);
       Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
       partitionDatabaseParameters = trackpar.getGivenParameters();
-      partitionDatabase = ClassGenericsUtil.uglyCrossCast(tmpDB.getClass(), Database.class);
+      partitionDatabase = ClassGenericsUtil.uglyCrossCast(tmpDB.getClass(), Database.class);      
     }
   }
 
