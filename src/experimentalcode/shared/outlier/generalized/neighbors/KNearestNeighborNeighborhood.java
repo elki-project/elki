@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -28,10 +29,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <D> Distance to use
  */
-public class KNearestNeighborNeighborhood<D extends Distance<D>> implements NeighborSetPredicate{
+public class KNearestNeighborNeighborhood<D extends Distance<D>> implements NeighborSetPredicate , Result{
   
   /**
-   * Parameter to specify the number of neighbors
+   * Parameter k
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("neighborhood.k","the number of neighbors");
   
@@ -43,73 +44,95 @@ public class KNearestNeighborNeighborhood<D extends Distance<D>> implements Neig
   /**
    * Data store for result.
    */
-  DataStore<DBIDs> store;
+  DataStore<List<DistanceResultPair<D>>> store;
   
+  /**
+   * Data store for result.
+   */
+  DataStore<DBIDs> dbIDsStore ;
+    
   /**
    * Constructor.
    * 
    * @param store Store to access
    */
-  public KNearestNeighborNeighborhood(DataStore<DBIDs> store) {
+  public KNearestNeighborNeighborhood(DataStore<List<DistanceResultPair<D>>> store, DataStore<DBIDs> dbIDsStore ) {
     this.store = store;
-  }
+    this.dbIDsStore = dbIDsStore ;
+   }
   
   
+  /**
+   * 
+   */
   @Override
   public DBIDs getNeighborDBIDs(DBID reference) {
-    return store.get(reference);
+    return dbIDsStore.get(reference);
   }
-  
+    
    /**
     * 
     */
   public static class Factory<D extends Distance<D>> implements NeighborSetPredicate.Factory<DatabaseObject>{
     
     /**
-     * 
+     * parameter k
      */
     private int k ;
     
     /**
-     * 
+     * distance function to use
      */
     private DistanceFunction<DatabaseObject,D> distFunc ;
     
     /**
-     * 
+     * Factory Constructor
      */
      public Factory(int k , DistanceFunction<DatabaseObject,D> distFunc){
        super();
        this.k = k ;
        this.distFunc = distFunc ;
      }
+     
     /**
-     * 
+     * instantiate Neighbor Predicate
      */
     public NeighborSetPredicate instantiate(Database< ? extends DatabaseObject> database) {
-      DataStore<DBIDs> store = getKNNNeighbors(database);
-      return new KNearestNeighborNeighborhood<D>(store);
+      DataStore<List<DistanceResultPair<D>>> store = getKNNNeighbors(database);
+      DataStore<DBIDs> s = getNeighbors(database) ;
+      return new KNearestNeighborNeighborhood<D>(store,s);
+    }
+    
+    /**
+     * method to get the K-Neighborhood
+     * 
+     */ 
+    private DataStore<List<DistanceResultPair<D>>> getKNNNeighbors(Database< ? extends DatabaseObject> database){
+      WritableDataStore<List<DistanceResultPair<D>>> store = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, List.class);   
+      KNNQuery<?,D> knnQuery = database.getKNNQuery(distFunc, KNNQuery.HINT_EXACT);
+      for(DBID id : database){
+         List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);       
+         store.put(id, neighbors);
+      }
+      return store ;
     }
     
     /**
      * method to get the K-Neighborhood
      */
-    //TODO DistanceResultPair 
-    private DataStore<DBIDs> getKNNNeighbors(Database< ? extends DatabaseObject> database){
-      WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
+    private DataStore<DBIDs> getNeighbors(Database< ? extends DatabaseObject> database){
+      WritableDataStore<DBIDs> s = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
       KNNQuery<?,D> knnQuery = database.getKNNQuery(distFunc, KNNQuery.HINT_EXACT);
-      
       for(DBID id : database){
          List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
          ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
-         for(DistanceResultPair<D> drp : neighbors){
-           neighbours.add(drp.second);
+         for(DistanceResultPair<D> dpair : neighbors){
+           neighbours.add(dpair.second);
          }
-         store.put(id,neighbours);
-         System.out.println(neighbours);
-      }
-      
-      return store ;
+         s.put(id, neighbours);
+         
+      }  
+      return s ;
     }
     
     /**
@@ -156,6 +179,18 @@ public class KNearestNeighborNeighborhood<D extends Distance<D>> implements Neig
       return param.instantiateClass(config);
     }
     return null;
+  }
+
+
+  @Override
+  public String getLongName() {   
+    return "K Nearest Neighbors Neighborhood";
+  }
+
+
+  @Override
+  public String getShortName() {
+    return "k-neighbors-neighborhood";
   }
     
   }
