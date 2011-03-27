@@ -1,15 +1,8 @@
 package experimentalcode.hettab.outlier;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -17,7 +10,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -36,8 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
 
 /**
  * SLOM Algorithm
@@ -55,33 +48,25 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SLOM.class);
+  /**
+   * Parameter to specify the neighborhood predicate to use.
+   */
+  public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("compare.neighborhood", "The neighborhood predicate to use in comparison step.");
 
   /**
-   * Parameter to specify the neighborhood distance function to use ;
+   * Our predicate to obtain the neighbors
    */
-  public static final OptionID NEIGHBORHOOD_FILE_ID = OptionID.getOrCreateOptionID("slom.neighborhoodfile", "The external neighborhood File");
-
+  NeighborSetPredicate.Factory<DatabaseObject> npredf = null;
   /**
    * Parameter to specify the non spatial distance function to use
    */
   public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("slom.nonspatialdistancefunction", "The distance function to use for non spatial attributes");
-
-  /**
-   * Holds the value of {@link #PATH_NEIGHBORHOOD_ID}
-   */
-  private File neighborhoodFile;
-
   /**
    * Holds the value of {@link #NON_SPATIAL_DISTANCE_FUNCTION_ID}
    */
   protected PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction;
 
-  /**
-   * Holds the neighborhood for each DBID
-   */
-  private HashMap<DBID, List<DBID>> neighborhood;
-
-  /**
+   /**
    * The association id to associate the SLOM_SCORE of an object for the SLOM
    * algorithm.
    */
@@ -91,12 +76,10 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * 
    * @param config
    */
-  protected SLOM(File neighborhoodFile, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
+  protected SLOM(NeighborSetPredicate.Factory<DatabaseObject> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
     super(new EmptyParameterization());
-    this.neighborhoodFile = neighborhoodFile;
+    this.npredf = npred ;
     this.nonSpatialDistanceFunction = nonSpatialDistanceFunction;
-    neighborhood = new HashMap<DBID, List<DBID>>();
-
   }
 
   /**
@@ -109,28 +92,15 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-
-    // get the neighborhood
-    try {
-      getExternalNeighborhood();
-    }
-    catch(IOException e) {
-      e.printStackTrace();
-    }
-
-    double startTime = System.currentTimeMillis();
-    if(logger.isVerbose()) {
-      logger.verbose("----------------------------------SLOM----------------------------------");
-      logger.verbose("----------------------------------Time start:" + startTime + "----------------------------------");
-    }
+  
+    final NeighborSetPredicate npred = npredf.instantiate(database);
 
     // calculate D-Tilde
     for(DBID id : database) {
       double sum = 0;
       double maxDist = 0;
 
-      List<DBID> neighbors = neighborhood.get(id);
-      System.out.println(id);
+     final DBIDs  neighbors= npred.getNeighborDBIDs(id);
       for(DBID neighbor : neighbors) {
         if(id.getIntegerID() == neighbor.getIntegerID()) {
           continue;
@@ -152,7 +122,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
       double avgPlus = 0;
       double avg = 0;
 
-      List<DBID> neighbors = neighborhood.get(id);
+      final DBIDs  neighbors= npred.getNeighborDBIDs(id);
       // compute avg
       for(DBID neighbor : neighbors) {
         if(neighbor.getIntegerID() == id.getIntegerID()) {
@@ -172,7 +142,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     // compute beta
     for(DBID id : database) {
       double beta = 0;
-      List<DBID> neighbors = neighborhood.get(id);
+      final DBIDs  neighbors= npred.getNeighborDBIDs(id);
       for(DBID neighbor : neighbors) {
         if(modifiedDistance.get(neighbor).doubleValue() > avgModifiedDistancePlus.get(id)) {
           beta++;
@@ -203,27 +173,6 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   }
 
   /**
-   * get the external neighborhood
-   * 
-   * @param path
-   */
-
-  public void getExternalNeighborhood() throws IOException {
-    FileReader reader = new FileReader(neighborhoodFile);
-    BufferedReader br = new BufferedReader(reader);
-    int lineNumber = 0;
-    for(String line; (line = br.readLine()) != null; lineNumber++) {
-      List<DBID> neighboors = new ArrayList<DBID>();
-      String[] entries = line.split(" ");
-      DBID ID = DBIDUtil.importInteger(Integer.valueOf(entries[0]));
-      for(int i = 0; i < entries.length; i++) {
-        neighboors.add(DBIDUtil.importInteger(Integer.valueOf(entries[i])));
-      }
-      neighborhood.put(ID, neighboors);
-    }
-  }
-
-  /**
    * 
    */
   @Override
@@ -238,24 +187,24 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @return SLOM Outlier Algorithm
    */
   public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> SLOM<V, D> parameterize(Parameterization config) {
-    File neighborhoodFile = getExternalNeighborhood(config);
+    NeighborSetPredicate.Factory<DatabaseObject> npred = getNeighborPredicate(config);
     PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction = getNonSpatialDistanceFunction(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new SLOM<V, D>(neighborhoodFile, nonSpatialDistanceFunction);
+    return new SLOM<V, D>(npred, nonSpatialDistanceFunction);
   }
 
+  
   /**
    * 
-   * @param <F>
    * @param config
    * @return
    */
-  protected static File getExternalNeighborhood(Parameterization config) {
-    final FileParameter param = new FileParameter(NEIGHBORHOOD_FILE_ID, FileParameter.FileType.INPUT_FILE);
+  public static NeighborSetPredicate.Factory<DatabaseObject> getNeighborPredicate(Parameterization config) {
+    final ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>> param = new ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
     if(config.grab(param)) {
-      return param.getValue();
+      return param.instantiateClass(config);
     }
     return null;
   }
