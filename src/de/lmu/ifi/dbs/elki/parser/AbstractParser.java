@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.StringLengthConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
@@ -29,7 +29,7 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   /**
    * A quote pattern
    */
-  public static final String QUOTE_PATTERN = "\"";
+  public static final String QUOTE_CHAR = "\"";
 
   /**
    * A pattern catching most numbers that can be parsed using Double.valueOf:
@@ -47,7 +47,7 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
 
   /**
    * OptionID for the quote character parameter (defaults to a double quotation
-   * mark as in {@link #QUOTE_PATTERN}.
+   * mark as in {@link #QUOTE_CHAR}.
    */
   private static final OptionID QUOTE_ID = OptionID.getOrCreateOptionID("parser.quote", "Quotation character. The default is to use a double quote.");
 
@@ -83,18 +83,9 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
     if(config.grab(colParam)) {
       colSep = colParam.getValue();
     }
-    // TODO: length restriction!
-    StringParameter quoteParam = new StringParameter(QUOTE_ID, QUOTE_PATTERN);
+    StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), QUOTE_CHAR);
     if(config.grab(quoteParam)) {
-      if(quoteParam.getValue().length() > 1) {
-        config.reportError(new WrongParameterValueException(quoteParam, quoteParam.getValue(), "Quote charater may only be a single character."));
-      }
-      else if(quoteParam.getValue().length() == 1) {
-        quoteChar = quoteParam.getValue().charAt(0);
-      }
-      else {
-        quoteChar = 0;
-      }
+      quoteChar = quoteParam.getValue().charAt(0);
     }
   }
 
