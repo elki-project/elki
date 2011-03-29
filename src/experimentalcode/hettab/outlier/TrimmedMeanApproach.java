@@ -28,6 +28,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
 
+/**
+ * 
+ * @author Ahmed Hettab
+ *
+ * @param <V>
+ */
 public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
   /**
    * The logger for this class.
@@ -89,6 +95,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
     
     WritableDataStore<Double> trimmedMeans = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> error_tilde = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> mad = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
 
     // calculate Trimmed mean   
       final NeighborSetPredicate npred = npredf.instantiate(database);
@@ -109,7 +116,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
           trimmedMeans.put(id, tmean/count);
        }
        
-       
+      ArrayList<Double> me = new ArrayList<Double>();
       //calculate error by removing spatial trend and dependence
       for(DBID id : database){
         double i_w = database.get(id).doubleValue(y)-trimmedMeans.get(id);
@@ -119,20 +126,48 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
            i_w -= (1/size)*(database.get(n).doubleValue(y)-trimmedMeans.get(n));
          }
          error_tilde.put(id, i_w);
-         System.out.println(i_w);
+         me.add(i_w);
       }
-     
-      //TODO MAD
+      Collections.sort(me);
+      
+      double m = 0 ;
+      if(me.size()%2 == 0){
+        int k1 = ((database.size())/2) ;
+        m = (me.get(k1) + me.get(k1+1))/2 ;
+      }
+      if(me.size()%2 !=0){
+        int k = database.size()/2;
+        m = me.get(k);
+      }
+      
+      double MAD = 0 ;
+      ArrayList<Double> median_i = new ArrayList<Double>();
+      for(DBID id : database){
+        mad.put(id,Math.abs(error_tilde.get(id) - m)); 
+        median_i.add(Math.abs(error_tilde.get(id) - m));
+      }
+      Collections.sort(median_i);
+      
+      if(median_i.size()%2 == 0){
+        int k1 = ((database.size())/2) ;
+        MAD = (median_i.get(k1) + median_i.get(k1+1))/2 ;
+      }
+      if(median_i.size()%2 !=0){
+        int k = database.size()/2;
+        MAD = median_i.get(k);
+      }
+      //calaculate median_i(e_i)
+      
        MinMax<Double> minmax = new MinMax<Double>();
        WritableDataStore<Double> error = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
        for(DBID id : database) {
-         
-         error.put(id, trimmedMeans.get(id));
-         minmax.put(trimmedMeans.get(id));
+         error.put(id,(0.6754*Math.abs(error_tilde.get(id)-mad.get(id))/MAD));
+         System.out.println(0.6754*Math.abs(error_tilde.get(id)-mad.get(id))/MAD);
+         minmax.put(0.6754*Math.abs(error_tilde.get(id)-mad.get(id))/MAD);
        }
-
-       //TODO Outlier Factor
-       AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", TR_SCORE, error);
+      
+      
+       AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("OTR", "Trimmedmean-outlier", TR_SCORE, error);
        OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
        return new OutlierResult(scoreMeta, scoreResult);
     
