@@ -41,13 +41,23 @@ import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 
 /**
- * This class calculates the distances between the given packages and creates
- * a result file that can be used to aggregate a list of precalculated knn
- * values
+ * This class calculates the distances given in denoted package and creates
+ * a result file containing the <code>maxk</code> neighbors of each point. This file
+ * can in turn be merged to one index file using the KnnDataMerger. 
+ * <p />
+ * This class has to be executed for all packages - normally this is done by distributing the packages to different cluster nodes
+ * and then executing this class on each of them.
+ * <p />
+ * Note that this implementation
+ * does not need access to the original data set because all data has been stored in the same
+ * folder as the package.
+ * <p />
+ * Also note that this implementation supports multithreading with the optional switch <code>-multithreading</code>.
+ * 
  * <p />
  * Example usage:
  * <br />
- * <code>-app.in D:/temp/knnparts/packagep00000/package00000_descriptor.xml -knn.reachdistfunction  EuclideanDistanceFunction</code>
+ * <code>-app.in /tmp/divided/package00004/package00004_descriptor.dat -knn.reachdistfunction  EuclideanDistanceFunction -maxk 100</code>
  * 
  * @author Florian Frankenberger
  */

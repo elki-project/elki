@@ -36,11 +36,11 @@ import experimentalcode.frankenb.utils.Utils;
 /**
  * This application divides a given database into
  * a given numbers of packages to calculate knn
- * on a distributed system like the sun cluster
+ * on a distributed system like the sun grid engine
  * <p />
  * Example usage:
  * <br />
- * <code>-dbc.parser DoubleVectorLabelParser -dbc.in /ELKI/data/synthetic/outlier-scenarios/3-gaussian-2d.csv -app.out D:/tmp/knnparts -packages 3 -partitioner xxx</code>
+ * <code>-dbc.parser DoubleVectorLabelParser -dbc.in dataset.csv -app.out /tmp/divided -packages 10 -algorithm experimentalcode.frankenb.algorithms.RandomProjectionVectorApproximationCrossPairingDividerAlgorithm -partitions 100 -crosspairings 0.0</code>
  * 
  * @author Florian Frankenberger
  */

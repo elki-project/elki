@@ -23,6 +23,20 @@ import experimentalcode.frankenb.utils.DataSetUtils;
  */
 public class KDTree {
 
+  public static class Measure {
+    
+    private int calculations = 0;
+    
+    private Measure() {
+      
+    }
+    
+    public int getCalculations() {
+      return this.calculations;
+    }
+    
+  }
+  
   private static class Node {
     
     final int dimension;
@@ -50,6 +64,8 @@ public class KDTree {
   private final IDataSet dataSet;
   private final Node root;
   private int totalNodes = 0;
+  
+  private Measure measure = null;
   
   public KDTree(IDataSet dataSet) {
     this.dataSet = dataSet;
@@ -107,15 +123,22 @@ public class KDTree {
     DistanceList distanceList = new DistanceList(id, k);
     Set<Node> alreadyVisited = new HashSet<Node>();
 
-    findNeighbors(k, distanceFunction, vector, node, distanceList, alreadyVisited);
+    this.measure = new Measure();
+    findNeighbors(k, distanceFunction, vector, node, distanceList, alreadyVisited, measure);
 //    Log.debug("Visited: " + alreadyVisited.size() + " of " + totalNodes);
     return distanceList;
   }
   
-  private void findNeighbors(int k, RawDoubleDistance<NumberVector<?, ?>> distanceFunction, NumberVector<?, ?> queryVector, Node currentNode, DistanceList distanceList, Set<Node> alreadyVisited) {
+  public Measure getLastMeasure() {
+    return this.measure;
+  }
+  
+  private void findNeighbors(int k, RawDoubleDistance<NumberVector<?, ?>> distanceFunction, NumberVector<?, ?> queryVector, Node currentNode, DistanceList distanceList, Set<Node> alreadyVisited, Measure measure) {
     for (int id : currentNode.ids) {
       double maxDistance = (distanceList.getSize() >= k ? distanceList.getLast().second : Double.POSITIVE_INFINITY);
       double distanceToId = distanceFunction.doubleDistance(queryVector, dataSet.get(id));
+      measure.calculations += 1;
+      
       if (distanceToId <= maxDistance) {
         distanceList.addDistance(id, distanceToId);
       }
@@ -128,18 +151,18 @@ public class KDTree {
       
       if (splitDistance <= (distanceList.getSize() >= k ? distanceList.getLast().second : Double.POSITIVE_INFINITY)) {
         if (currentNode.leftChild != null && !alreadyVisited.contains(currentNode.leftChild)) {
-          findNeighbors(k, distanceFunction, queryVector, currentNode.leftChild, distanceList, alreadyVisited);
+          findNeighbors(k, distanceFunction, queryVector, currentNode.leftChild, distanceList, alreadyVisited, measure);
         }
       }
       if (splitDistance <= (distanceList.getSize() >= k ? distanceList.getLast().second : Double.POSITIVE_INFINITY)) {
         if (currentNode.rightChild != null && !alreadyVisited.contains(currentNode.rightChild)) {
-          findNeighbors(k, distanceFunction, queryVector, currentNode.rightChild, distanceList, alreadyVisited);
+          findNeighbors(k, distanceFunction, queryVector, currentNode.rightChild, distanceList, alreadyVisited, measure);
         }
       }
     }    
     
     if (!currentNode.isRoot() && !alreadyVisited.contains(currentNode.parent)) {
-      findNeighbors(k, distanceFunction, queryVector, currentNode.parent, distanceList, alreadyVisited);
+      findNeighbors(k, distanceFunction, queryVector, currentNode.parent, distanceList, alreadyVisited, measure);
     }
     
   }

@@ -31,11 +31,16 @@ import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
 
 /**
  * This class merges the results precalculated on the cluster network
- * to a single precalculated knn file with a given max k neighbors.
+ * to a single precalculated knn file with a given k neighbors for each point.
+ * The result files are written to <code>app.out</code> and can be used as an kNN index using
+ * the {@link PrecalculatedKnnIndex} class in ELKI.
+ * <p/>
+ * Note that there is an optional <code>-inmemory</code> switch which forces the algorithm to hold the resulting b-plus-tree in memory while merging - this speeds
+ * up the merging significantly but it also can consume all memory when having huge data sets with a high amount of k leading to an OutOfMemoryException.
  * <p/>
  * Usage:
  * <br/>
- * <code>-dbc.parser DoubleVectorLabelParser -dbc.in D:\Coding\Projects\ELKI\data\synthetic\outlier-scenarios\3-gaussian-2d.csv -app.out D:/temp/knnparts -app.in D:/temp/knnparts -k 10</code>
+ * <code>-dbc.parser DoubleVectorLabelParser -dbc.in dataset.csv -app.out /tmp/index -app.in /tmp/divided -k 10</code>
  * @author Florian Frankenberger
  */
 public class KnnDataMerger extends StandAloneInputApplication {

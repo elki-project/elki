@@ -35,14 +35,14 @@ import experimentalcode.frankenb.model.PINNKnnIndex;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 
 /**
- * No description given.
+ * A simple PINN implementation used as a comparison.
  * 
  * @author Florian Frankenberger
  */
 public class PINN extends StandAloneApplication {
 
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("k", "k for kNN search");
-  private final IntParameter K_PARAM = new IntParameter(K_FACTOR_ID, false);
+  private final IntParameter K_PARAM = new IntParameter(K_ID, false);
   
   public static final OptionID K_FACTOR_ID = OptionID.getOrCreateOptionID("kfactor", "factor to multiply with k when searching for the neighborhood in the projected space");
   private final IntParameter K_FACTOR_PARAM = new IntParameter(K_FACTOR_ID, false);    
@@ -100,7 +100,6 @@ public class PINN extends StandAloneApplication {
     
     BasicResult totalResult = new BasicResult("ROC Result", "rocresult");    
     rocComputer.processResult(dataBase, result, totalResult.getHierarchy());
-    //tree.findNearestNeighbors(7, 10, EuclideanDistanceFunction.STATIC);
     
     this.getOutput().mkdirs();
     ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(this.getOutput());

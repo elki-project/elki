@@ -64,16 +64,31 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(20, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
     new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(45, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
     
+//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(5, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(15, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(30, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+//    new PerformanceTest(new LOF<NumberVector<?, ?>, DoubleDistance>(60, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC)),
+    
     //LoOP
     new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(10, 10, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
     new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(20, 20, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
     new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(45, 45, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
+
+//    new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(5, 5, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
+//    new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(15, 15, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
+//    new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(30, 30, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
+//    new PerformanceTest(new LoOP<NumberVector<?,?>, DoubleDistance>(60, 60, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC, 3)),
     
     //KNN Outlier
     new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)),
     new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 20)),
     new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 45)),
     
+//    new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 5)),
+//    new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 15)),
+//    new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 30)),
+//    new PerformanceTest(new KNNOutlier<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 60)),
+//    
     //KNN Weighted
     new PerformanceTest(new KNNWeightOutlier<NumberVector<?,?>, DoubleDistance>(10, EuclideanDistanceFunction.STATIC)),
     new PerformanceTest(new KNNWeightOutlier<NumberVector<?,?>, DoubleDistance>(20, EuclideanDistanceFunction.STATIC)),
@@ -81,8 +96,8 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     
     //LDOF
     new PerformanceTest(new LDOF<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)),
-    new PerformanceTest(new LDOF<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)),
-    new PerformanceTest(new LDOF<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)),
+    new PerformanceTest(new LDOF<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 20)),
+    new PerformanceTest(new LDOF<NumberVector<?,?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 45)),
   };
   
   private static class PerformanceTest {

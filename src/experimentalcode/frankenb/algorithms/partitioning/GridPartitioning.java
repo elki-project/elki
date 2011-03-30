@@ -29,12 +29,11 @@ import experimentalcode.frankenb.model.ifaces.IPartitioning;
  * the partitions. If a grid cell remains empty it will not be returned by this
  * algorithm.
  * <p/>
- * Note: This implementation returns {@link PositionedPartition} which provide additional
+ * Note: This implementation returns {@link PositionedPartition}s which provide additional
  * information to the pairing algorithm if needed.
  * 
  * @author Florian Frankenberger
  */
-@Reference(authors = "S. Blott and Roger Weber", title = "A Simple Vector-Approximation File for Similarity Search in High-Dimensional Vector Spaces", booktitle = "?")
 public class GridPartitioning implements IPartitioning {
 
   public static final OptionID SECTORS_ID = OptionID.getOrCreateOptionID("sectorsperdimension", "Amount of sectors per dimension");

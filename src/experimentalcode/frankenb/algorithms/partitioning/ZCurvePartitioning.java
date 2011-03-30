@@ -20,7 +20,8 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.utils.ZCurve;
 
 /**
- * No description given.
+ * This class orders the items of the data set according to their z-curve value
+ * and splits them in ascending order to their z-curve value into a given amount of partitions. 
  * 
  * @author Florian Frankenberger
  */

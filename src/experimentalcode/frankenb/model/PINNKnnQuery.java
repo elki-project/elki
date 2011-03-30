@@ -4,7 +4,9 @@
 package experimentalcode.frankenb.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -40,12 +42,23 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
    * @see de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery#getKNNForDBID(de.lmu.ifi.dbs.elki.database.ids.DBID, int)
    */
   private int requested = 0;
+  private long calculations = 0;
+  private Set<Integer> alreadyRequestedIDs = new HashSet<Integer>();
+  
   @Override
   public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
     NumberVector<?, ?> vector = dataBase.get(id);
     
     DistanceList projectedDistanceList = tree.findNearestNeighbors(id.getIntegerID(), this.kFactor*k, EuclideanDistanceFunction.STATIC);
     List<DistanceResultPair<DoubleDistance>> list = new ArrayList<DistanceResultPair<DoubleDistance>>();
+    
+    if (!alreadyRequestedIDs.contains(id.getIntegerID())) {
+      calculations += tree.getLastMeasure().getCalculations();
+      alreadyRequestedIDs.add(id.getIntegerID());
+      if (alreadyRequestedIDs.size() == dataBase.size()) {
+        Log.info(String.format("Calculations used: %,d", calculations));
+      }
+    }
     
     DistanceList newDistanceList = new DistanceList(id.getIntegerID(), k);
     for (Pair<Integer, Double> distance : projectedDistanceList) {

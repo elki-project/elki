@@ -15,7 +15,8 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitioning;
 
 /**
- * No description given.
+ * This abstract class represents a partitioning algorithm with a fixed amount of
+ * partitions.
  * 
  * @author Florian Frankenberger
  */

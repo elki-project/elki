@@ -24,12 +24,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 
 /**
- * No description given.
+ * This class can be used as an index in combination with a precalculated kNN result that
+ * {@link KnnDataMerger} provides. The result normally consists of two files - one directory file (.dir)
+ * and one data file (.dat)
  * 
  * @author Florian Frankenberger
  */
 @Title("Precalculated kNN Neighborhood index")
-@Description("Uses a precalculated kNN Neighborhood as index for a given database. Be aware that the index must fit the database.")
+@Description("Uses a precalculated kNN Neighborhood as index for a given database. Be aware that the index must be generated from the database.")
 public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex<O> {
 
   private DynamicBPlusTree<Integer, DistanceList> resultTree;
