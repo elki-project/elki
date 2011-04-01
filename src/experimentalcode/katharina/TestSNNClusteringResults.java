@@ -7,6 +7,8 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -74,7 +76,7 @@ public class TestSNNClusteringResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("SNNClustering score on test dataset too low: " + score, score > 0.82);
-    System.out.println("SNNClustering score: " + score + " > " + 0.82);
+    assertTrue("SNNClustering score on test dataset too low: " + score, score > 0.83);
+    System.out.println("SNNClustering score: " + score + " > " + 0.83);
   }
 }
