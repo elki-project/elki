@@ -7,6 +7,8 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
