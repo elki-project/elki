@@ -1,0 +1,24 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="3">
+  <cluster name="Cluster1" size="300">
+    <normal mean="0.7" stddev="0.15" />
+    <normal mean="0.8" stddev="0.15" />
+  </cluster>
+  <cluster name="Cluster2" size="100">
+    <normal mean="0.6" stddev="0.02" />
+    <normal mean="0.7" stddev="0.02" />
+  </cluster>
+  <cluster name="Cluster3" size="100">
+    <normal mean="0.7" stddev="0.02" />
+    <normal mean="0.9" stddev="0.02" />
+  </cluster>
+  <cluster name="Cluster4" size="200">
+    <normal mean="0.6" stddev="0.01" />
+    <normal mean="0.9" stddev="0.01" />
+	<clip min="0 0" max="4.0 4.0" />
+  </cluster>
+   <cluster name="Noise" size="10" density-correction="20">
+    <uniform min="0" max="1.3" />
+    <uniform min="0" max="1.3" />
+  </cluster>
+</dataset>

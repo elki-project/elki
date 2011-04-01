@@ -1,0 +1,46 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset>
+  <cluster name="Cluster1" size="200">
+	<uniform min="-2" max="3" />
+	<normal mean="0" stddev="0.005" />
+	<normal mean="0" stddev="0.005" />
+    <normal mean="0" stddev="0.008" />
+	<uniform min="-2" max="3" />
+	<rotate axis1="1" axis2="2" angle="40" />
+	<rotate axis1="1" axis2="4" angle="110" />
+	<rotate axis1="1" axis2="3" angle="60" />
+	<translate vector=".5 1.0 2.5 0.8 .5" />
+	<clip min="-2 -2 -2 -2 -2" max="3 3 3 3 3" />
+  </cluster>
+  <cluster name="Cluster2" size="200">
+    <uniform min="-2" max="3" />
+    <normal mean="0" stddev="0.05" />
+    <normal mean="0" stddev="0.06" />
+	<normal mean="0" stddev="0.04" />
+	<uniform min="-2" max="3" />
+	<rotate axis1="1" axis2="2" angle="60" />
+	<rotate axis1="1" axis2="3" angle="40" />
+	<rotate axis1="3" axis2="4" angle="110" />
+	<translate vector=".5 0.6 2.0 -1.2 .5" />
+	<clip min="-2 -2 -2 -2 -2" max="3 3 3 3 3" />
+  </cluster>
+  <cluster name="Cluster3" size="200">
+    <uniform min="-2" max="3" />
+    <normal mean="0" stddev="0.5" />
+    <normal mean="0" stddev="0.5" />
+    <normal mean="0" stddev="0.5" />
+	<normal mean="0" stddev="0.9" />
+	<rotate axis1="1" axis2="3" angle="30" />
+	<rotate axis1="2" axis2="4" angle="60" />
+	<rotate axis1="3" axis2="4" angle="110" />
+	<translate vector=".5 0.1 -0.5 0.2 .5" />
+	<clip min="-2 -2 -2 -2 -2" max="3 3 3 3 3" />
+  </cluster>
+  <cluster name="Noise" size="1">
+    <uniform min="-2" max="3" />
+	<uniform min="-2" max="3" />
+    <uniform min="-2" max="3" />
+	<uniform min="-2" max="3" />
+	<uniform min="-2" max="3" />
+  </cluster>
+</dataset>

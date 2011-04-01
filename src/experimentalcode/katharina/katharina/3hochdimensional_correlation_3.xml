@@ -1,0 +1,28 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset>
+  <cluster name="Cluster1" size="300">
+	<normal mean="0" stddev="0.2" />
+	<uniform min="-.7" max=".5" />
+	<normal mean="0" stddev="0.2" />
+    <uniform min="-.7" max=".5" />
+	<rotate axis1="1" axis2="2" angle="40" />
+	<clip min="-.7 -.7 -.7 -.7" max="0.5 .5 0.6 .5" />
+  </cluster>
+  <cluster name="Cluster2" size="200">
+	<normal mean="0" stddev="0.01" />
+    <uniform min="0" max="1" />
+	<uniform min="0" max="1" />
+	<uniform min="0" max="1" />
+	<rotate axis1="1" axis2="2" angle="40" />
+	<rotate axis1="3" axis2="4" angle="40" />
+	<clip min="-.2 -1 -1 -1" max="0.2 1 1 1" />
+  </cluster>
+  <cluster name="Noise" size="100">
+    <uniform min="-1" max="1" />
+	<uniform min="-1" max="1" />
+    <uniform min="-1" max="1" />
+	<uniform min="-1" max="1" />
+	<translate vector=".2 .2 .2 .2 .2" />
+	<clip min="-1 -1 -1 -1" max="1 1 1 1" />
+  </cluster>
+</dataset>
