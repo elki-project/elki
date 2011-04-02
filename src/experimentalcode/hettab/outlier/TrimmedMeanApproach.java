@@ -3,6 +3,9 @@ package experimentalcode.hettab.outlier;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.rank.Median;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -16,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -31,7 +35,8 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
 /**
  * 
  * @author Ahmed Hettab
- *
+ * A Trimmed Mean Approach to finding Spatial Outliers
+ *  
  * @param <V>
  */
 public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
@@ -60,16 +65,17 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * 
    */
   private double p;
+
   /**
    * 
-   * Holds the p value
+   * Holds the Z value
    */
-  private static final OptionID Y_ID = OptionID.getOrCreateOptionID("position.y", "the position of y attribut");
+  private static final OptionID Z_ID = OptionID.getOrCreateOptionID("position.y", "the position of y attribut");
 
   /**
    * Holds the position of y attribute
    */
-  private int y;
+  private int z;
 
   /**
    * The association id to associate the TR_SCORE of an object for the TR
@@ -81,10 +87,10 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * 
    * @param distanceFunction
    */
-  protected TrimmedMeanApproach(double p,int y , NeighborSetPredicate.Factory<DatabaseObject> npred) {
+  protected TrimmedMeanApproach(double p, int z, NeighborSetPredicate.Factory<DatabaseObject> npredf) {
     this.p = p;
-    this.y = y ;
-    this.npredf = npred;
+    this.z = z;
+    this.npredf = npredf;
   }
 
   /**
@@ -92,85 +98,92 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    */
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    
-    WritableDataStore<Double> trimmedMeans = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> error_tilde = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> mad = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
 
-    // calculate Trimmed mean   
-      final NeighborSetPredicate npred = npredf.instantiate(database);
-       for(DBID id : database){
-         final DBIDs neighbors = npred.getNeighborDBIDs(id);
-         ArrayList<Double> ys = new ArrayList<Double>();
-          double tmean = 0  ;
-          for(DBID n : neighbors){
-            ys.add(database.get(n).doubleValue(y));
-          }
-          int count = 0 ;
-          Collections.sort(ys);
-          int j = (int) (p*ys.size()) ;
-          for(int i = j ; i<(ys.size()-j) ; i++){
-            tmean +=tmean + ys.get(i);
-            count ++ ;
-          }
-          trimmedMeans.put(id, tmean/count);
-       }
-       
-      ArrayList<Double> me = new ArrayList<Double>();
-      //calculate error by removing spatial trend and dependence
-      for(DBID id : database){
-        double i_w = database.get(id).doubleValue(y)-trimmedMeans.get(id);
-        DBIDs neighbors = npred.getNeighborDBIDs(id);
-        int size = neighbors.size();
-         for(DBID n : neighbors){
-           i_w -= (1/size)*(database.get(n).doubleValue(y)-trimmedMeans.get(n));
-         }
-         error_tilde.put(id, i_w);
-         me.add(i_w);
-      }
-      Collections.sort(me);
-      
-      double m = 0 ;
-      if(me.size()%2 == 0){
-        int k1 = ((database.size())/2) ;
-        m = (me.get(k1) + me.get(k1+1))/2 ;
-      }
-      if(me.size()%2 !=0){
-        int k = database.size()/2;
-        m = me.get(k);
-      }
-      
-      double MAD = 0 ;
-      ArrayList<Double> median_i = new ArrayList<Double>();
-      for(DBID id : database){
-        mad.put(id,Math.abs(error_tilde.get(id) - m)); 
-        median_i.add(Math.abs(error_tilde.get(id) - m));
-      }
-      Collections.sort(median_i);
-      
-      if(median_i.size()%2 == 0){
-        int k1 = ((database.size())/2) ;
-        MAD = (median_i.get(k1) + median_i.get(k1+1))/2 ;
-      }
-      if(median_i.size()%2 !=0){
-        int k = database.size()/2;
-        MAD = median_i.get(k);
-      }
-      //calaculate median_i(e_i)
-      
-       MinMax<Double> minmax = new MinMax<Double>();
-       WritableDataStore<Double> error = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-       for(DBID id : database) {
-         error.put(id,(0.6754*Math.abs(error_tilde.get(id)-mad.get(id))/MAD));
-         System.out.println(0.6754*Math.abs(error_tilde.get(id)-mad.get(id))/MAD);
-         minmax.put(0.6754*Math.abs(error_tilde.get(id)-mad.get(id))/MAD);
-       }
-      
-      
-       AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("OTR", "Trimmedmean-outlier", TR_SCORE, error);
-       OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
-       return new OutlierResult(scoreMeta, scoreResult);
+    WritableDataStore<Double> tMeans = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> error = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
     
+    // calculate Trimmed mean
+    final NeighborSetPredicate npred = npredf.instantiate(database);
+    Matrix tMeanMatrix = new Matrix(1, database.size());
+    Matrix Y = new Matrix(1,database.size());
+    for(DBID id : database) {
+      final DBIDs neighbors = npred.getNeighborDBIDs(id);
+      int size = neighbors.size();
+      double[] zi = new double[size];
+      ArrayList<Double> ziList = new ArrayList<Double>();
+      int i = 0;
+      double tmean = 0;
+      for(DBID n : neighbors) {
+        ziList.add(database.get(n).doubleValue(z));
+        i++;
+      }
+      Collections.sort(ziList);
+      for(int j = 0; j < size; j++) {
+        zi[j] = ziList.get(j);
+      }
+      tmean = StatUtils.mean(zi, (int) (p * size), (int) (size - 2 * p * size));
+      tMeans.put(id, tmean);
+      tMeanMatrix.set(0, i, tmean);
+      Y.set(0, i, database.get(id).doubleValue(z));
+    }
+
+    // Estimate error by removing spatial trend and dependence
+    Matrix E = new Matrix(1, database.size());
+    Matrix I = Matrix.unitMatrix(database.size());
+    Matrix W = new Matrix(database.size(),database.size());
+    int k = 0 ;
+    for(DBID id : database){
+      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      int l = 0 ;
+      for(DBID n : database){
+        if(neighbors.contains(n)){
+          W.set(k, l, (double) 1/neighbors.size());
+        }
+        else{
+          W.set(k, l, 0.0);
+        }
+        l++;
+      }
+      k++;
+    }
+    Matrix A = I.minus(W);
+    Matrix B = Y.minus(tMeanMatrix);
+    E = A.times(B);
+    
+    //calculate median_i
+    int m = 0 ;
+    double[] ei = new double[database.size()];
+    Median median = new Median();
+    for(DBID id : database){
+      error.put(id, E.get(0, m));
+      ei[m] = E.get(0, m);  
+      m++;
+    }
+    double median_i = median.evaluate(ei);
+    
+    //calculate MAD
+    double MAD ;
+    m = 0 ;
+    double[] temp = new double[database.size()];
+    for(DBID id : database){
+      temp[m] = Math.abs(error.get(id)-median_i);
+      m++ ;
+    }
+    MAD = median.evaluate(temp);
+    
+    //calculate score
+    MinMax<Double> minmax = new MinMax<Double>();
+    m= 0 ;
+    for(DBID id : database){
+      double score = temp[m]*0.6745/MAD;
+      scores.put(id, score);
+      minmax.put(score);
+    }
+    //
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("OTR", "Trimmedmean-outlier", TR_SCORE, scores);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
+    return new OutlierResult(scoreMeta, scoreResult);
 
   }
 
@@ -183,11 +196,11 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
   public static <V extends NumberVector<V, ?>> TrimmedMeanApproach<V> parameterize(Parameterization config) {
     final NeighborSetPredicate.Factory<DatabaseObject> npred = getNeighborPredicate(config);
     final double p = getParameterP(config);
-    final int y = getParameterY(config);
+    final int z = getParameterZ(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new TrimmedMeanApproach<V>(p,y, npred);
+    return new TrimmedMeanApproach<V>(p, z, npred);
   }
 
   /**
@@ -203,15 +216,15 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
     }
     return 0;
   }
-  
+
   /**
    * Get the y parameter
    * 
    * @param config Parameterization
-   * @return p parameter
+   * @return z parameter
    */
-  protected static int getParameterY(Parameterization config) {
-    final IntParameter param = new IntParameter(Y_ID);
+  protected static int getParameterZ(Parameterization config) {
+    final IntParameter param = new IntParameter(Z_ID);
     if(config.grab(param)) {
       return param.getValue();
     }
