@@ -1,0 +1,17 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="1">
+
+  <cluster name="Holz" size="75">
+	<uniform min="0.85" max="1.1" />
+	<uniform min="0" max="0.2" />
+  </cluster>
+  <cluster name="Feuer" size="900">
+	<normal mean="1" stddev="0.1" />
+	<gamma k="2" theta="11"/>
+	<translate vector="0 0.3" />
+  </cluster>
+  <cluster name="Noise" size="50">
+	<uniform min="0" max="2" />
+	<uniform min="0" max="1.5" />
+  </cluster>
+</dataset>

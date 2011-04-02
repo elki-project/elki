@@ -8,11 +8,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -22,19 +21,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Tests the LOF algorithm. 
+ * Tests the ABOD algorithm. 
  * @author lucia
  * 
  */
-public class TestLOF extends OutlierTest implements JUnit4Test{
+public class TestABOD extends OutlierTest implements JUnit4Test{
   // the following values depend on the data set used!
-  static String dataset = "src/experimentalcode/lucia/datensaetze/hochdimensional.csv";
+  static String dataset = "src/experimentalcode/lucia/datensaetze/gauss3D.csv";
 
-  static int k = 10;
+  static int k = 5;
 
 
   @Test
-  public void testLOF() throws UnableToComplyException {
+  public void testABOD() throws UnableToComplyException {
     ArrayList<Pair<Double, DBID>> pair_scoresIds = new ArrayList<Pair<Double, DBID>>();
 
     Database<DoubleVector> db = getDatabase(dataset);
@@ -42,12 +41,12 @@ public class TestLOF extends OutlierTest implements JUnit4Test{
 
     //Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, k);
+    params.addParameter(ABOD.K_ID, k);
     params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, "Noise");
 
 
-    // run LOF
-    OutlierResult result = runLOF(db, params);
+    // run ABOD
+    OutlierResult result = runABOD(db, params);
     AnnotationResult<Double> scores = result.getScores();
 
     for(DBID id : db.getIDs()) {
@@ -60,21 +59,21 @@ public class TestLOF extends OutlierTest implements JUnit4Test{
     double actual;
     while(iter.hasNext()){
       actual = iter.next();
-      System.out.println("LOF(k="+ k + ") ROC AUC: " + actual);
-      Assert.assertEquals("ROC AUC not right.", 0.89216807, actual, 0.00001);
+      System.out.println("ABOD(k="+ k + ") ROC AUC: " + actual);
+      Assert.assertEquals("ROC AUC not right.", 0.96381481, actual, 0.00001);
     }
   }
 
 
-  private static OutlierResult runLOF(Database<DoubleVector> db, ListParameterization params) {
+  private static OutlierResult runABOD(Database<DoubleVector> db, ListParameterization params) {
     // setup algorithm
-    LOF<DoubleVector, DoubleDistance> lof = null;
-    Class<LOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
-    lof = params.tryInstantiate(lofcls, lofcls);
+    ABOD<DoubleVector> abod = null;
+    Class<ABOD<DoubleVector>> abodcls = ClassGenericsUtil.uglyCastIntoSubclass(ABOD.class);
+    abod = params.tryInstantiate(abodcls, abodcls);
     params.failOnErrors();
 
-    // run LOF on database
-    return lof.run(db);
+    // run ABOD on database
+    return abod.run(db);
   }
 
 }
