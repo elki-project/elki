@@ -1,0 +1,50 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="1">
+
+  <cluster name="Cluster1" size="200">
+	<normal mean="14" stddev="8" />
+	<normal mean="9.5" stddev="0.01" />
+	<uniform min="0" max="20"/>
+	<uniform min="0" max="20"/>
+	<uniform min="0" max="20"/>
+	<uniform min="0" max="20"/>
+	<clip min="0.0" max="20" />
+
+	<!--
+	-->
+  </cluster>
+
+  <cluster name="Cluster2" size="275">
+	<normal mean="2.5" stddev="0.1" />
+	<uniform min="0" max="20"/>
+	<normal mean="8.5" stddev="0.09" />
+	<uniform min="12" max="20"/>
+	<normal mean="7" stddev="5"/>
+	<uniform min="0" max="20"/>
+	<clip min="0.0" max="20"/>
+<!--
+	<rotate axis1="1" axis2="2" angle="-15" />
+-->
+  </cluster>
+  
+  <cluster name="Cluster3" size="800">
+	<normal mean="4.8" stddev="0.32" />
+	<uniform min="0" max="20"/>
+	<uniform min="0" max="20"/>
+	<normal mean="9" stddev="0.2" />
+	<normal mean="6" stddev="0.13" />
+	<uniform min="0" max="20"/>
+	<clip min="0.0" max="20" />
+	<!--
+	-->
+  </cluster>
+  
+  <cluster name="Noise" size="70">
+	<uniform min="0" max="20" />
+	<uniform min="0" max="20" />
+	<uniform min="0" max="20" />
+	<uniform min="0" max="20" />
+	<uniform min="0" max="20" />
+	<uniform min="0" max="20" />
+  </cluster>
+</dataset>

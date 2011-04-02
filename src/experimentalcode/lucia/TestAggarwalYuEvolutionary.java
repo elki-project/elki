@@ -8,13 +8,11 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.SOD;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
-import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -23,21 +21,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Tests the SOD algorithm. 
+ * Tests the AggarwalYuEvolutionary algorithm. 
  * @author lucia
  * 
  */
-public class TestSOD extends OutlierTest implements JUnit4Test{
+public class TestAggarwalYuEvolutionary extends OutlierTest implements JUnit4Test{
 	// the following values depend on the data set used!
-  static String dataset = "src/experimentalcode/lucia/datensaetze/hochdimensional.csv";
-
-	static int knn = 25;
-	static int snn = 19;
+	  static String dataset = "src/experimentalcode/lucia/datensaetze/gauss3D.csv";
 	
+	static int k = 2;
+	static int phi = 8;
+	static int m = 5;
 
 
 	@Test
-	public void testSOD() throws UnableToComplyException {
+	public void testAggarwalYuEvolutionary() throws UnableToComplyException {
 		ArrayList<Pair<Double, DBID>> pair_scoresIds = new ArrayList<Pair<Double, DBID>>();
 
 		Database<DoubleVector> db = getDatabase(dataset);
@@ -45,13 +43,14 @@ public class TestSOD extends OutlierTest implements JUnit4Test{
 		
 		//Parameterization
 		ListParameterization params = new ListParameterization();
-		params.addParameter(SOD.KNN_ID, knn);
-		params.addParameter(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, snn);
+		params.addParameter(AggarwalYuEvolutionary.K_ID, k);
+		params.addParameter(AggarwalYuEvolutionary.PHI_ID, phi);
+		params.addParameter(AggarwalYuEvolutionary.M_ID, m);
 		params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, "Noise");
 
 		
-		// run SOD
-		OutlierResult result = runSOD(db, params);
+		// run AggarwalYuEvolutionary
+		OutlierResult result = runAggarwalYuEvolutionary(db, params);
 		AnnotationResult<Double> scores = result.getScores();
 
 		for(DBID id : db.getIDs()) {
@@ -64,19 +63,19 @@ public class TestSOD extends OutlierTest implements JUnit4Test{
 		double actual;
 		while(iter.hasNext()){
 			actual = iter.next();
-			System.out.println("SOD(knn="+ knn + " und snn="+ snn +") ROC AUC: " + actual);
-			Assert.assertEquals("ROC AUC not right.", 0.95171989, actual, 0.00001);
+			System.out.println("AggarwalYuEvolutionary(k="+ k + " und phi="+phi+" und m="+m+") ROC AUC: " + actual);
+			Assert.assertEquals("ROC AUC not right.", 0.53457407, actual, 0.1);
 		}
 	}
 	
-	private static OutlierResult runSOD(Database<DoubleVector> db, ListParameterization params) {
+	private static OutlierResult runAggarwalYuEvolutionary(Database<DoubleVector> db, ListParameterization params) {
 		// setup algorithm
-		SOD<DoubleVector, DoubleDistance> sod = null;
-		Class<SOD<DoubleVector, DoubleDistance>> sodcls = ClassGenericsUtil.uglyCastIntoSubclass(SOD.class);
-		sod = params.tryInstantiate(sodcls, sodcls);
+		AggarwalYuEvolutionary<DoubleVector> aggarwalYuEvolutionary = null;
+		Class<AggarwalYuEvolutionary<DoubleVector>> aggarwalYuEvolutionarycls = ClassGenericsUtil.uglyCastIntoSubclass(AggarwalYuEvolutionary.class);
+		aggarwalYuEvolutionary = params.tryInstantiate(aggarwalYuEvolutionarycls, aggarwalYuEvolutionarycls);
 		params.failOnErrors();
 
-		// run SOD on database
-		return sod.run(db);
+		// run AggarwalYuEvolutionary on database
+		return aggarwalYuEvolutionary.run(db);
 	}
 }

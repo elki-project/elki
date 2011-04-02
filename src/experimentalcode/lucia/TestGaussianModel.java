@@ -8,11 +8,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.GaussianModel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -22,32 +21,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Tests the LOF algorithm. 
+ * Tests the GaussianModel algorithm. 
  * @author lucia
  * 
  */
-public class TestLOF extends OutlierTest implements JUnit4Test{
+public class TestGaussianModel extends OutlierTest implements JUnit4Test{
   // the following values depend on the data set used!
-  static String dataset = "src/experimentalcode/lucia/datensaetze/hochdimensional.csv";
-
-  static int k = 10;
+  static String dataset = "src/experimentalcode/lucia/datensaetze/holzFeuerWasser.csv";
 
 
   @Test
-  public void testLOF() throws UnableToComplyException {
+  public void testGaussianModel() throws UnableToComplyException {
     ArrayList<Pair<Double, DBID>> pair_scoresIds = new ArrayList<Pair<Double, DBID>>();
 
     Database<DoubleVector> db = getDatabase(dataset);
 
-
     //Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, k);
     params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, "Noise");
 
 
-    // run LOF
-    OutlierResult result = runLOF(db, params);
+    // run GaussianModel
+    OutlierResult result = runGaussianModel(db, params);
     AnnotationResult<Double> scores = result.getScores();
 
     for(DBID id : db.getIDs()) {
@@ -60,21 +55,23 @@ public class TestLOF extends OutlierTest implements JUnit4Test{
     double actual;
     while(iter.hasNext()){
       actual = iter.next();
-      System.out.println("LOF(k="+ k + ") ROC AUC: " + actual);
-      Assert.assertEquals("ROC AUC not right.", 0.89216807, actual, 0.00001);
+      System.out.println("GaussianModel ROC AUC: " + actual);
+      Assert.assertEquals("ROC AUC not right.", 0.99376410, actual, 0.00001);
     }
   }
 
 
-  private static OutlierResult runLOF(Database<DoubleVector> db, ListParameterization params) {
+
+  private static OutlierResult runGaussianModel(Database<DoubleVector> db, ListParameterization params) {
     // setup algorithm
-    LOF<DoubleVector, DoubleDistance> lof = null;
-    Class<LOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
-    lof = params.tryInstantiate(lofcls, lofcls);
+    GaussianModel<DoubleVector> gaussianModel = null;
+    Class<GaussianModel<DoubleVector>> gaussianModelcls = ClassGenericsUtil.uglyCastIntoSubclass(GaussianModel.class);
+    gaussianModel = params.tryInstantiate(gaussianModelcls, gaussianModelcls);
     params.failOnErrors();
 
-    // run LOF on database
-    return lof.run(db);
+    // run GaussianModel on database
+    return gaussianModel.run(db);
   }
+
 
 }

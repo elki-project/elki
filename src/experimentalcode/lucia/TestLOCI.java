@@ -1,14 +1,16 @@
 package experimentalcode.lucia;
 
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -22,19 +24,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Tests the LOF algorithm. 
+ * Tests the LOCI algorithm. 
  * @author lucia
  * 
  */
-public class TestLOF extends OutlierTest implements JUnit4Test{
+public class TestLOCI extends OutlierTest implements JUnit4Test{
   // the following values depend on the data set used!
-  static String dataset = "src/experimentalcode/lucia/datensaetze/hochdimensional.csv";
-
-  static int k = 10;
+  static String dataset = "data/testdata/unittests/3clusters-and-noise-2d.csv";
+  static double rmax = 0.5;
 
 
   @Test
-  public void testLOF() throws UnableToComplyException {
+  public void testLOCI() throws UnableToComplyException {
     ArrayList<Pair<Double, DBID>> pair_scoresIds = new ArrayList<Pair<Double, DBID>>();
 
     Database<DoubleVector> db = getDatabase(dataset);
@@ -42,12 +43,12 @@ public class TestLOF extends OutlierTest implements JUnit4Test{
 
     //Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, k);
+    params.addParameter(LOCI.RMAX_ID, rmax);
     params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, "Noise");
 
 
-    // run LOF
-    OutlierResult result = runLOF(db, params);
+    // run LoOP
+    OutlierResult result = runLOCI(db, params);
     AnnotationResult<Double> scores = result.getScores();
 
     for(DBID id : db.getIDs()) {
@@ -60,21 +61,21 @@ public class TestLOF extends OutlierTest implements JUnit4Test{
     double actual;
     while(iter.hasNext()){
       actual = iter.next();
-      System.out.println("LOF(k="+ k + ") ROC AUC: " + actual);
-      Assert.assertEquals("ROC AUC not right.", 0.89216807, actual, 0.00001);
+      System.out.println("LOCI(rmax="+ rmax + ") ROC AUC: " + actual);
+      Assert.assertEquals("ROC AUC not right.", 0.98844444, actual, 0.00001);
     }
   }
 
 
-  private static OutlierResult runLOF(Database<DoubleVector> db, ListParameterization params) {
+  private static OutlierResult runLOCI(Database<DoubleVector> db, ListParameterization params) {
     // setup algorithm
-    LOF<DoubleVector, DoubleDistance> lof = null;
-    Class<LOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
-    lof = params.tryInstantiate(lofcls, lofcls);
+    LOCI<DoubleVector, DoubleDistance> loci = null;
+    Class<LOCI<DoubleVector, DoubleDistance>> locicls = ClassGenericsUtil.uglyCastIntoSubclass(LOCI.class);
+    loci = params.tryInstantiate(locicls, locicls);
     params.failOnErrors();
 
-    // run LOF on database
-    return lof.run(db);
+    // run LOCI on database
+    return loci.run(db);
   }
 
 }

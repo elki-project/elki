@@ -8,7 +8,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -22,19 +22,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Tests the LOF algorithm. 
+ * Tests the LDOF algorithm. 
  * @author lucia
  * 
  */
-public class TestLOF extends OutlierTest implements JUnit4Test{
+public class TestLDOF extends OutlierTest implements JUnit4Test{
   // the following values depend on the data set used!
-  static String dataset = "src/experimentalcode/lucia/datensaetze/hochdimensional.csv";
-
-  static int k = 10;
-
+  static String dataset = "src/experimentalcode/lucia/datensaetze/holzFeuerWasser.csv";
+  static int k = 25;
+  static int interesstingPoint_id141 = 141;
 
   @Test
-  public void testLOF() throws UnableToComplyException {
+  public void testLDOF() throws UnableToComplyException {
     ArrayList<Pair<Double, DBID>> pair_scoresIds = new ArrayList<Pair<Double, DBID>>();
 
     Database<DoubleVector> db = getDatabase(dataset);
@@ -42,16 +41,25 @@ public class TestLOF extends OutlierTest implements JUnit4Test{
 
     //Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, k);
+    params.addParameter(LDOF.K_ID, k);
     params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, "Noise");
 
 
-    // run LOF
-    OutlierResult result = runLOF(db, params);
+    // run LDOF
+    OutlierResult result = runLDOF(db, params);
     AnnotationResult<Double> scores = result.getScores();
 
+    double outlierScore_p141;
+    int intId;
     for(DBID id : db.getIDs()) {
       pair_scoresIds.add(new Pair<Double, DBID>(scores.getValueFor(id),id));
+      intId = id.getID().getIntegerID();
+      if(intId == interesstingPoint_id141){
+        outlierScore_p141 = scores.getValueFor(id.getID());
+        System.out.println("Outlier Score of the Point with id " + intId + ": " + outlierScore_p141);
+        Assert.assertEquals("Outlier Score of Point with id " + intId + " not right.", 0.8976, outlierScore_p141, 0.0001);
+
+      }
     }
 
     //get ROC AUC
@@ -60,21 +68,20 @@ public class TestLOF extends OutlierTest implements JUnit4Test{
     double actual;
     while(iter.hasNext()){
       actual = iter.next();
-      System.out.println("LOF(k="+ k + ") ROC AUC: " + actual);
-      Assert.assertEquals("ROC AUC not right.", 0.89216807, actual, 0.00001);
+      System.out.println("LDOF(k="+ k + ") ROC AUC: " + actual);
+      Assert.assertEquals("ROC AUC not right.", 0.96379487, actual, 0.00001);
     }
   }
 
 
-  private static OutlierResult runLOF(Database<DoubleVector> db, ListParameterization params) {
+  private static OutlierResult runLDOF(Database<DoubleVector> db, ListParameterization params) {
     // setup algorithm
-    LOF<DoubleVector, DoubleDistance> lof = null;
-    Class<LOF<DoubleVector, DoubleDistance>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
-    lof = params.tryInstantiate(lofcls, lofcls);
+    LDOF<DoubleVector, DoubleDistance> ldof = null;
+    Class<LDOF<DoubleVector, DoubleDistance>> ldofcls = ClassGenericsUtil.uglyCastIntoSubclass(LDOF.class);
+    ldof = params.tryInstantiate(ldofcls, ldofcls);
     params.failOnErrors();
 
-    // run LOF on database
-    return lof.run(db);
+    // run LDOF on database
+    return ldof.run(db);
   }
-
 }
