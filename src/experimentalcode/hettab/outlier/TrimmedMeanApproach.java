@@ -34,9 +34,8 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
 
 /**
  * 
- * @author Ahmed Hettab
- * A Trimmed Mean Approach to finding Spatial Outliers
- *  
+ * @author Ahmed Hettab A Trimmed Mean Approach to finding Spatial Outliers
+ * 
  * @param <V>
  */
 public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
@@ -73,7 +72,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
   private static final OptionID Z_ID = OptionID.getOrCreateOptionID("position.y", "the position of y attribut");
 
   /**
-   * Holds the position of y attribute
+   * Holds the position of z attribute
    */
   private int z;
 
@@ -102,11 +101,12 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
     WritableDataStore<Double> tMeans = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    
-    // calculate Trimmed mean
+
     final NeighborSetPredicate npred = npredf.instantiate(database);
-    Matrix tMeanMatrix = new Matrix(1, database.size());
-    Matrix Y = new Matrix(1,database.size());
+
+    // calculate Trimmed mean
+    Matrix tMeanMatrix = new Matrix(database.size(), 1);
+    Matrix Y = new Matrix(database.size(), 1);
     for(DBID id : database) {
       final DBIDs neighbors = npred.getNeighborDBIDs(id);
       int size = neighbors.size();
@@ -124,23 +124,26 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
       }
       tmean = StatUtils.mean(zi, (int) (p * size), (int) (size - 2 * p * size));
       tMeans.put(id, tmean);
-      tMeanMatrix.set(0, i, tmean);
-      Y.set(0, i, database.get(id).doubleValue(z));
+      tMeanMatrix.set(i, 0, tmean);
+      Y.set(i, 0, database.get(id).doubleValue(z));
     }
 
     // Estimate error by removing spatial trend and dependence
     Matrix E = new Matrix(1, database.size());
     Matrix I = Matrix.unitMatrix(database.size());
-    Matrix W = new Matrix(database.size(),database.size());
-    int k = 0 ;
-    for(DBID id : database){
+    Matrix W = new Matrix(database.size(), database.size());
+    int k = 0;
+    for(DBID id : database) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      int l = 0 ;
-      for(DBID n : database){
-        if(neighbors.contains(n)){
-          W.set(k, l, (double) 1/neighbors.size());
+      int l = 0;
+      for(DBID n : database) {
+        if(neighbors.contains(n) && n.getIntegerID() != id.getIntegerID()) {
+          W.set(k, l, (double) 1 / neighbors.size());
         }
-        else{
+        if(n.getIntegerID() == id.getIntegerID()) {
+          W.set(k, l, 1.0);
+        }
+        else {
           W.set(k, l, 0.0);
         }
         l++;
@@ -149,34 +152,36 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
     }
     Matrix A = I.minus(W);
     Matrix B = Y.minus(tMeanMatrix);
+    System.out.println(A.dimensionInfo());
+    System.out.println(B.dimensionInfo());
     E = A.times(B);
-    
-    //calculate median_i
-    int m = 0 ;
+
+    // calculate median_i
+    int m = 0;
     double[] ei = new double[database.size()];
     Median median = new Median();
-    for(DBID id : database){
-      error.put(id, E.get(0, m));
-      ei[m] = E.get(0, m);  
+    for(DBID id : database) {
+      error.put(id, E.get(m, 0));
+      ei[m] = E.get(m, 0);
       m++;
     }
     double median_i = median.evaluate(ei);
-    
-    //calculate MAD
-    double MAD ;
-    m = 0 ;
+
+    // calculate MAD
+    double MAD;
+    m = 0;
     double[] temp = new double[database.size()];
-    for(DBID id : database){
-      temp[m] = Math.abs(error.get(id)-median_i);
-      m++ ;
+    for(DBID id : database) {
+      temp[m] = Math.abs(error.get(id) - median_i);
+      m++;
     }
     MAD = median.evaluate(temp);
-    
-    //calculate score
+
+    // calculate score
     MinMax<Double> minmax = new MinMax<Double>();
-    m= 0 ;
-    for(DBID id : database){
-      double score = temp[m]*0.6745/MAD;
+    m = 0;
+    for(DBID id : database) {
+      double score = temp[m] * 0.6745 / MAD;
       scores.put(id, score);
       minmax.put(score);
     }
