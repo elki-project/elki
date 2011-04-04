@@ -1,17 +1,15 @@
 package experimentalcode.lucia;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.SOD;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
@@ -20,14 +18,14 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
 
 /**
  * Tests the SOD algorithm. 
  * @author lucia
  * 
  */
-public class TestSOD extends OutlierTest implements JUnit4Test{
+public class TestSOD extends OutlierTest{
 	// the following values depend on the data set used!
   static String dataset = "src/experimentalcode/lucia/datensaetze/hochdimensional.csv";
 
@@ -38,36 +36,41 @@ public class TestSOD extends OutlierTest implements JUnit4Test{
 
 	@Test
 	public void testSOD() throws UnableToComplyException {
-		ArrayList<Pair<Double, DBID>> pair_scoresIds = new ArrayList<Pair<Double, DBID>>();
 
+	  //get database
 		Database<DoubleVector> db = getDatabase(dataset);
 
-		
 		//Parameterization
 		ListParameterization params = new ListParameterization();
 		params.addParameter(SOD.KNN_ID, knn);
 		params.addParameter(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, snn);
 		params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, "Noise");
 
-		
 		// run SOD
 		OutlierResult result = runSOD(db, params);
 		AnnotationResult<Double> scores = result.getScores();
 
-		for(DBID id : db.getIDs()) {
-			pair_scoresIds.add(new Pair<Double, DBID>(scores.getValueFor(id),id));
-		}
+    
+    //check Outlier Score of Point 1280
+    int id = 1280;
+    double score = scores.getValueFor(DBIDUtil.importInteger(id));
+//    System.out.println("Outlier Score of the Point with id " + id + ": " + score);
+    Assert.assertEquals("Outlier Score of Point with id " + id + " not right.", 1.5167500678141732, score, 0.0001);
 
+		
 		//get ROC AUC
 		List<Double> auc = getROCAUC(db, result, params);
 		Iterator<Double> iter = auc.listIterator();
 		double actual;
 		while(iter.hasNext()){
 			actual = iter.next();
-			System.out.println("SOD(knn="+ knn + " und snn="+ snn +") ROC AUC: " + actual);
+//			System.out.println("SOD(knn="+ knn + " und snn="+ snn +") ROC AUC: " + actual);
 			Assert.assertEquals("ROC AUC not right.", 0.95171989, actual, 0.00001);
 		}
+		
 	}
+	
+	
 	
 	private static OutlierResult runSOD(Database<DoubleVector> db, ListParameterization params) {
 		// setup algorithm
