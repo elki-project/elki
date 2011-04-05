@@ -84,7 +84,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
   /**
    * Parameter to specify the random generator seed.
    */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("em.seed", "The random number generator seed.");
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("ay.seed", "The random number generator seed.");
 
   /**
    * Holds the value of {@link #SEED_ID}.
