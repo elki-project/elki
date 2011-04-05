@@ -4,14 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -20,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -47,7 +47,7 @@ public class TestOPTICSResults implements JUnit4Test {
    * @throws ParameterException
    */
   @Test
-  public void testDeLiCluResults() throws ParameterException {
+  public void testOPTICSResults() throws ParameterException {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
@@ -70,17 +70,19 @@ public class TestOPTICSResults implements JUnit4Test {
       fail("Unused parameters: " + params.getRemainingParameters());
     }
     // run OPTICS on database
-    //TODO: type mismatch for result
     ClusterOrderResult<DoubleDistance> result = optics.run(db);
-    //TODO: parameters need to become dynamic
-    OPTICSXi.extractClusters(result, db, 0.038, 18);
-
+    
+    //filter in order to gain a clustering result
+    List<Clustering<? extends Model>> clusterresults = ResultUtil.getClusteringResults(result);
+    assertTrue(clusterresults.size() == 1);
+    System.out.println("Clustering result available: " + (clusterresults.size() == 1));
+   
     // run by-label as reference
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
     Clustering<Model> rbl = bylabel.run(db);
 
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("OPTICS score on test dataset too low: " + score, score > 0.950);
-    System.out.println("OPTICS score: " + score + " > " + 0.950);
+    double score = PairCountingFMeasure.compareClusterings(clusterresults.get(0), rbl, 1.0);
+    assertTrue("OPTICS score on test dataset too low: " + score, score > 0.87);
+    System.out.println("OPTICS score: " + score + " > " + 0.87);
   }
 }
