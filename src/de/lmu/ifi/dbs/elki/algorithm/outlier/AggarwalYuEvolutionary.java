@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -81,6 +82,16 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
   private final IntParameter M_PARAM = new IntParameter(M_ID, new GreaterEqualConstraint(2));
 
   /**
+   * Parameter to specify the random generator seed.
+   */
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("em.seed", "The random number generator seed.");
+
+  /**
+   * Holds the value of {@link #SEED_ID}.
+   */
+  private Long seed;
+
+  /**
    * Maximum iteration count for evolutionary search.
    */
   protected final int MAX_ITERATIONS = 1000;
@@ -101,6 +112,10 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     if(config.grab(M_PARAM)) {
       m = M_PARAM.getValue();
     }
+    final LongParameter seedP = new LongParameter(SEED_ID, true);
+    if(config.grab(seedP)) {
+      seed = seedP.getValue();
+    }
   }
 
   /**
@@ -111,7 +126,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     final int dbsize = database.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(database);
 
-    Collection<Individuum> individuums = (new EvolutionarySearch(database, ranges, m)).run();
+    Collection<Individuum> individuums = (new EvolutionarySearch(database, ranges, m, seed)).run();
 
     WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     for(Individuum ind : individuums) {
@@ -175,20 +190,26 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     /**
      * random generator
      */
-    final private Random random = new Random();
+    final private Random random;
 
     /**
      * Constructor.
      * 
      * @param database Database to use
      * @param m Population size
+     * @param seed Random generator seed
      */
-    public EvolutionarySearch(Database<V> database, ArrayList<ArrayList<DBIDs>> ranges, int m) {
+    public EvolutionarySearch(Database<V> database, ArrayList<ArrayList<DBIDs>> ranges, int m, Long seed) {
       super();
       this.ranges = ranges;
       this.m = m;
       this.dbsize = database.size();
       this.dim = DatabaseUtil.dimensionality(database);
+      if (seed != null) {
+        this.random = new Random(seed);
+      } else {
+        this.random = new Random();
+      }
     }
 
     public Collection<Individuum> run() {
