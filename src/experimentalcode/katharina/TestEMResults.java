@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Performs a full EM run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that EM performance doesn't
+ * from the data set labels. This test ensures that EM's performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
  * 

@@ -4,21 +4,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -50,6 +53,8 @@ public class TestDeLiCluResults implements JUnit4Test {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
+    params.addParameter(HashmapDatabase.INDEX_ID, "tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory");
+    params.addParameter(DeLiCluTreeFactory.PAGE_SIZE_ID, 1000);
     params.addParameter(DeLiClu.XI_ID, "0.038");
     params.addParameter(DeLiClu.MINPTS_ID, 18);
 
@@ -69,17 +74,19 @@ public class TestDeLiCluResults implements JUnit4Test {
       fail("Unused parameters: " + params.getRemainingParameters());
     }
     // run DeLiClu on database
-    //TODO: type mismatch for result
     ClusterOrderResult<DoubleDistance> result = deliclu.run(db);
-    //TODO: parameters need to become dynamic
-    OPTICSXi.extractClusters(result, db, 0.038, 18);
+    
+    // filter in order to gain a clustering result
+    List<Clustering<? extends Model>> clusterresults = ResultUtil.getClusteringResults(result);
+    assertTrue(clusterresults.size() == 1);
+    System.out.println("Clustering result available: " + (clusterresults.size() == 1));
 
     // run by-label as reference
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
     Clustering<Model> rbl = bylabel.run(db);
 
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("DBSCAN score on test dataset too low: " + score, score > 0.950);
-    System.out.println("DBSCAN score: " + score + " > " + 0.950);
+    double score = PairCountingFMeasure.compareClusterings(clusterresults.get(0), rbl, 1.0);
+    assertTrue("DeLiClu score on test dataset too low: " + score, score > 0.87);
+    System.out.println("DeLiClu score: " + score + " > " + 0.87);
   }
 }
