@@ -4,13 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK;
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
@@ -66,6 +70,15 @@ public class TestSLINKResults implements JUnit4Test {
     }
     // run EM on database
     Clustering<Model> result = (Clustering<Model>) slink.run(db);
+    List<Cluster<Model>> resultList = result.getAllClusters();
+    
+    //retrieve and sort cluster sizes of result
+    int[] clusterResultSizes = new int[resultList.size()];
+    for(int i = 0; i < resultList.size(); i++){
+      clusterResultSizes[i] = resultList.get(i).size();
+    }  
+    java.util.Arrays.sort(clusterResultSizes);
+
 
     // run by-label as reference
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
@@ -74,5 +87,7 @@ public class TestSLINKResults implements JUnit4Test {
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
     assertTrue("SLINK score on test dataset too low: " + score, score > 0.682);
     System.out.println("SLINK score: " + score + " > " + 0.682);
+    int[] expectedClusterSizes = { 0, 0, 9, 200, 429}; 
+    org.junit.Assert.assertArrayEquals("Expected cluster sizes do not match.", expectedClusterSizes, clusterResultSizes);
   }
 }

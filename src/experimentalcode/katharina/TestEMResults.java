@@ -4,11 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
@@ -67,6 +70,14 @@ public class TestEMResults implements JUnit4Test {
     }
     // run EM on database
     Clustering<EMModel<DoubleVector>> result = em.run(db);
+    List<Cluster<EMModel<DoubleVector>>> resultList = result.getAllClusters();
+    
+    //retrieve and sort cluster sizes of result
+    int[] clusterResultSizes = new int[resultList.size()];
+    for(int i = 0; i < resultList.size(); i++){
+      clusterResultSizes[i] = resultList.get(i).size();
+    }  
+    java.util.Arrays.sort(clusterResultSizes);
 
     // run by-label as reference
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
@@ -75,5 +86,8 @@ public class TestEMResults implements JUnit4Test {
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
     assertTrue("EM score on test dataset too low: " + score, score > 0.96);
     System.out.println("EM score: " + score + " > " + 0.96);
+    
+    int[] expectedClusterSizes = { 5, 91, 98, 200, 316 }; 
+    org.junit.Assert.assertArrayEquals("Expected cluster sizes do not match.", expectedClusterSizes, clusterResultSizes);
   }
 }
