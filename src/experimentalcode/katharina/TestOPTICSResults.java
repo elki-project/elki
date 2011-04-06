@@ -11,6 +11,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -77,6 +78,15 @@ public class TestOPTICSResults implements JUnit4Test {
     assertTrue(clusterresults.size() == 1);
     System.out.println("Clustering result available: " + (clusterresults.size() == 1));
    
+    List<Cluster<Model>> resultList = ((Clustering<Model>)clusterresults.get(0)).getAllClusters();
+    
+    //retrieve and sort cluster sizes of result
+    int[] clusterResultSizes = new int[resultList.size()];
+    for(int i = 0; i < resultList.size(); i++){
+      clusterResultSizes[i] = resultList.get(i).size();
+    }  
+    java.util.Arrays.sort(clusterResultSizes);
+    
     // run by-label as reference
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
     Clustering<Model> rbl = bylabel.run(db);
@@ -84,5 +94,7 @@ public class TestOPTICSResults implements JUnit4Test {
     double score = PairCountingFMeasure.compareClusterings(clusterresults.get(0), rbl, 1.0);
     assertTrue("OPTICS score on test dataset too low: " + score, score > 0.87);
     System.out.println("OPTICS score: " + score + " > " + 0.87);
+    int[] expectedClusterSizes = { 109, 121, 210, 270 }; 
+    org.junit.Assert.assertArrayEquals("Expected cluster sizes do not match.", expectedClusterSizes, clusterResultSizes);
   }
 }

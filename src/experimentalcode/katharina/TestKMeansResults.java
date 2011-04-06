@@ -4,11 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans;
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
@@ -68,6 +71,14 @@ public class TestKMeansResults implements JUnit4Test {
     }
     // run KMeans on database
     Clustering<MeanModel<DoubleVector>> result = kmeans.run(db);
+    List<Cluster<MeanModel<DoubleVector>>> resultList = result.getAllClusters();
+    
+    //retrieve and sort cluster sizes of result
+    int[] clusterResultSizes = new int[resultList.size()];
+    for(int i = 0; i < resultList.size(); i++){
+      clusterResultSizes[i] = resultList.get(i).size();
+    }  
+    java.util.Arrays.sort(clusterResultSizes);
 
     // run by-label as reference
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
@@ -76,5 +87,8 @@ public class TestKMeansResults implements JUnit4Test {
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
     assertTrue("KMeans score on test dataset too low: " + score, score > 0.997);
     System.out.println("KMeans score: " + score + " > " + 0.997);
+    
+    int[] expectedClusterSizes = { 199, 200, 200, 200, 201 }; 
+    org.junit.Assert.assertArrayEquals("Expected cluster sizes do not match.", expectedClusterSizes, clusterResultSizes);
   }
 }
