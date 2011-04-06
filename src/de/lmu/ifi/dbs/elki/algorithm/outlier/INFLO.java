@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * <p>
  * Reference: <br>
  * <p>
- * Jin, W., Tung, A., Han, J., and Wang, W. 2006<br />
- * Ranking outliers using symmetric neighborhood relationship< br/>
+ * Jin, W., Tung, A., Han, J., and Wang, W. 2006<br/>
+ * Ranking outliers using symmetric neighborhood relationship<br/>
  * In Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD),
  * Singapore
  * </p>
