@@ -136,7 +136,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
 
   /**
    * Encapsulates a listener for changes of kNNs used in the online LOF
-   * algorithm..
+   * algorithm.
    */
   private class LOFKNNListener implements KNNListener {
     /**
