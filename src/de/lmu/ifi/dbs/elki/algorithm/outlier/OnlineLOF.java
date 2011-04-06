@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @apiviz.has LOF.LOFResult oneway - - updates
  */
+// TODO: related to publication?
 public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
    * The logger for this class.
