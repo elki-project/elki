@@ -1,25 +1,15 @@
 package experimentalcode.katharina;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK;
-import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -31,9 +21,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Katharina Rausch
- * 
+ * @author Erich Schubert
  */
-public class TestSLINKResults implements JUnit4Test {
+public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "src/experimentalcode/katharina/katharina/1slink.ascii";
 
@@ -48,46 +38,18 @@ public class TestSLINKResults implements JUnit4Test {
    */
   @Test
   public void testSLINKResults() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(dataset, shoulds);
+
+    // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
     params.addParameter(SLINK.SLINK_MINCLUSTERS_ID, "3");
-
-    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
-
-    // get database
-    Database<DoubleVector> db = dbconn.getDatabase(null);
-
-    // verify data set size.
-    assertEquals("Database size doesn't match expected size.", shoulds, db.size());
-
-    // setup algorithm
     SLINK<DoubleVector, DoubleDistance> slink = ClassGenericsUtil.parameterizeOrAbort(SLINK.class, params);
+    testParameterizationOk(params);
 
-    params.failOnErrors();
-    if(params.hasUnusedParameters()) {
-      fail("Unused parameters: " + params.getRemainingParameters());
-    }
-    // run EM on database
-    Clustering<Model> result = (Clustering<Model>) slink.run(db);
-    List<Cluster<Model>> resultList = result.getAllClusters();
-    
-    //retrieve and sort cluster sizes of result
-    int[] clusterResultSizes = new int[resultList.size()];
-    for(int i = 0; i < resultList.size(); i++){
-      clusterResultSizes[i] = resultList.get(i).size();
-    }  
-    java.util.Arrays.sort(clusterResultSizes);
-
-
-    // run by-label as reference
-    ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
-    Clustering<Model> rbl = bylabel.run(db);
-
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("SLINK score on test dataset too low: " + score, score > 0.682);
-    System.out.println("SLINK score: " + score + " > " + 0.682);
-    int[] expectedClusterSizes = { 0, 0, 9, 200, 429}; 
-    org.junit.Assert.assertArrayEquals("Expected cluster sizes do not match.", expectedClusterSizes, clusterResultSizes);
+    // run SLINK on database
+    Result result = slink.run(db);
+    Clustering<?> clustering = findSingleClustering(result);
+    testFMeasure(db, clustering, 0.6829722);
+    testClusterSizes(clustering, new int[] { 0, 0, 9, 200, 429 });
   }
 }
