@@ -1,4 +1,4 @@
-package experimentalcode.katharina;
+package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
@@ -24,12 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  */
 public class TestOPTICSResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
-  // the following values depend on the data set used!
-  String dataset = "src/experimentalcode/katharina/katharina/generiert/1hierarchischesCluster.csv";
-
-  // size of the data set
-  int shoulds = 710;
-
   /**
    * Run OPTICS with fixed parameters and compare the result to a golden
    * standard.
@@ -38,7 +32,7 @@ public class TestOPTICSResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testOPTICSResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(dataset, shoulds);
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();

@@ -1,4 +1,4 @@
-package experimentalcode.katharina;
+package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
@@ -16,21 +16,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Performs a full SNNClustering run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that SNNClustering's performance doesn't
- * unexpectedly drop on this data set (and also ensures that the algorithms
- * work, as a side effect).
+ * Performs a full SNNClustering run, and compares the result with a clustering
+ * derived from the data set labels. This test ensures that SNNClustering's
+ * performance doesn't unexpectedly drop on this data set (and also ensures that
+ * the algorithms work, as a side effect).
  * 
  * @author Katharina Rausch
  * @author Erich Schubert
  */
 public class TestSNNClusteringResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
-  // the following values depend on the data set used!
-  String dataset = "src/experimentalcode/katharina/katharina/1dbscan_failure.ascii";
-
-  // size of the data set
-  int shoulds = 1200;
-
   /**
    * Run SNNClustering with fixed parameters and compare the result to a golden
    * standard.
@@ -39,7 +33,7 @@ public class TestSNNClusteringResults extends AbstractSimpleAlgorithmTest implem
    */
   @Test
   public void testSNNClusteringResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(dataset, shoulds);
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "different-densities-2d.ascii", 1200);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
