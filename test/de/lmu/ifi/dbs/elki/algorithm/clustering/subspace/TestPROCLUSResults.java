@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * algorithms work, as a side effect).
  * 
  * @author Elke Achtert
+ * @author Katharina Rausch
+ * @author Erich Schubert
  */
 public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -45,5 +47,29 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
 
     testFMeasure(db, result, 0.68932);
     testClusterSizes(result, new int[] { 78, 93, 203, 226 });
+  }
+
+  /**
+   * Run PROCLUS with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testPROCLUSSubspaceOverlapping() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
+  
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(PROCLUS.L_ID, 2);
+    params.addParameter(PROCLUS.K_ID, 3);
+    params.addParameter(PROCLUS.SEED_ID, 2);
+    PROCLUS<DoubleVector> proclus = ClassGenericsUtil.parameterizeOrAbort(PROCLUS.class, params);
+    testParameterizationOk(params);
+  
+    // run PROCLUS on database
+    Clustering<Model> result = proclus.run(db);
+    testFMeasure(db, result, 0.9673718);
+    testClusterSizes(result, new int[] { 150, 289, 411 });
   }
 }

@@ -22,6 +22,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Elke Achtert
+ * @author Katharina Rausch
+ * @author Erich Schubert
  */
 public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -51,5 +53,28 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
     org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match.", 0.9882, score, 0.0001);
     testClusterSizes(result, new int[] { 200, 200, 216, 400 });
+  }
+
+  /**
+   * Run CLIQUE with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testCLIQUESubspaceOverlapping() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
+  
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(CLIQUE.TAU_ID, 0.2);
+    params.addParameter(CLIQUE.XSI_ID, 6);
+    CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
+    testParameterizationOk(params);
+  
+    // run CLIQUE on database
+    Clustering<SubspaceModel<DoubleVector>> result = clique.run(db);
+    testFMeasure(db, result, 0.433661);
+    testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
   }
 }
