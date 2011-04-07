@@ -5,8 +5,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Provides the Euclidean distance for FeatureVectors.
@@ -14,6 +13,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  */
 public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance>, RawDoubleDistance<NumberVector<?, ?>> {
+  /**
+   * Static instance. Use this!
+   */
+  public static final EuclideanDistanceFunction STATIC = new EuclideanDistanceFunction();
+
   /**
    * Provides a Euclidean distance function that can compute the Euclidean
    * distance (that is a DoubleDistance) for FeatureVectors.
@@ -23,23 +27,6 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
   @Deprecated
   public EuclideanDistanceFunction() {
     super(2.0);
-  }
-
-  /**
-   * Static instance
-   */
-  public static final EuclideanDistanceFunction STATIC = new EuclideanDistanceFunction();
-
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * Note: we need this method, to override the parent class' method.
-   * 
-   * @param config Parameterization
-   * @return Distance function
-   */
-  public static EuclideanDistanceFunction parameterize(Parameterization config) {
-    return EuclideanDistanceFunction.STATIC;
   }
 
   /**
@@ -150,5 +137,19 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
   @Override
   public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected EuclideanDistanceFunction makeInstance() {
+      return EuclideanDistanceFunction.STATIC;
+    }
   }
 }

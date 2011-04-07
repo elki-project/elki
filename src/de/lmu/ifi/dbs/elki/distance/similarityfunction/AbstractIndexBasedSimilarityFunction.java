@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.AbstractDBIDSimilarityQuery
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses Preprocessor
+ * @apiviz.uses IndexFactory
  * @apiviz.has Instance oneway - - «create»
  * 
  * @param <O> object type
@@ -24,7 +25,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObject, I extends Index<O>, R, D extends Distance<D>> implements IndexBasedSimilarityFunction<O, D> {
   /**
-   * OptionID for {@link #INDEX_PARAM}
+   * Parameter to specify the preprocessor to be used.
+   * <p>
+   * Key: {@code -similarityfunction.preprocessor}
+   * </p>
    */
   public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("similarityfunction.preprocessor", "Preprocessor to use.");
 
@@ -34,52 +38,37 @@ public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObj
    * Key: {@code -similarityfunction.preprocessor}
    * </p>
    */
-  private final ObjectParameter<IndexFactory<O, I>> INDEX_PARAM;
+  protected IndexFactory<O, I> indexFactory;
 
   /**
-   * Parameter to specify the preprocessor to be used.
-   * <p>
-   * Key: {@code -similarityfunction.preprocessor}
-   * </p>
-   */
-  protected IndexFactory<O, I> index;
-
-  /**
-   * Constructor, supporting
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param indexFactory
    */
-  public AbstractIndexBasedSimilarityFunction(Parameterization config) {
+  public AbstractIndexBasedSimilarityFunction(IndexFactory<O, I> indexFactory) {
     super();
-    config = config.descend(this);
-    INDEX_PARAM = new ObjectParameter<IndexFactory<O, I>>(INDEX_ID, getIndexFactoryRestriction(), getIndexFactoryDefaultClass());
-    if(config.grab(INDEX_PARAM)) {
-      index = INDEX_PARAM.instantiateClass(config);
-    }
+    this.indexFactory = indexFactory;
   }
-
-  /**
-   * Get the index factory restriction
-   * 
-   * @return Factory class restriction
-   */
-  abstract protected Class<?> getIndexFactoryRestriction();
-
-  /**
-   * Get the default index factory class.
-   * 
-   * @return Index factory
-   */
-  abstract protected Class<?> getIndexFactoryDefaultClass();
 
   @Override
   abstract public <T extends O> Instance<T, ?, R, D> instantiate(Database<T> database);
+
+  @Override
+  public boolean isSymmetric() {
+    return true;
+  }
+
+  @Override
+  public Class<? super O> getInputDatatype() {
+    return DatabaseObject.class;
+  }
 
   /**
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.uses Index
    * 
    * @param <O> Object type
    * @param <I> Index type
@@ -108,8 +97,31 @@ public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObj
     }
   }
 
-  @Override
-  public boolean isSymmetric() {
-    return true;
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractParameterizer {
+    /**
+     * The index factory we use.
+     */
+    protected F factory = null;
+
+    /**
+     * Get the index factory parameter.
+     * 
+     * @param config Parameterization
+     * @param restrictionClass Restriction class
+     * @param defaultClass Default class
+     */
+    protected void configIndexFactory(Parameterization config, final Class<?> restrictionClass, final Class<?> defaultClass) {
+      final ObjectParameter<F> param = new ObjectParameter<F>(INDEX_ID, restrictionClass, defaultClass);
+      if(config.grab(param)) {
+        factory = param.instantiateClass(config);
+      }
+    }
   }
 }

@@ -79,17 +79,32 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
   protected abstract DataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D d);
 
   /**
-   * Grab the 'd' configuration option.
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return d Parameter
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  protected static <D extends Distance<D>> D getParameterD(Parameterization config, DistanceFunction<?, D> distanceFunction) {
-    final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
-    final DistanceParameter<D> param = new DistanceParameter<D>(D_ID, distanceFactory);
-    if(config.grab(param)) {
-      return param.getValue();
+  public static abstract class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected D d = null;
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configD(config, distanceFunction);
     }
-    return null;
+
+    /**
+     * Grab the 'd' configuration option.
+     * 
+     * @param config Parameterization
+     */
+    protected void configD(Parameterization config, DistanceFunction<?, D> distanceFunction) {
+      final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
+      final DistanceParameter<D> param = new DistanceParameter<D>(D_ID, distanceFactory);
+      if(config.grab(param)) {
+        d = param.getValue();
+      }
+    }
   }
 }

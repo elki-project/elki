@@ -52,8 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Ahmed Hettab
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary.EvolutionarySearch oneway - - runs
- * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary.Individuum oneway - - obtains
+ * @apiviz.has EvolutionarySearch oneway - - runs
+ * @apiviz.has Individuum oneway - - obtains
  * 
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
@@ -68,18 +68,13 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
   protected static final Logging logger = Logging.getLogger(AggarwalYuEvolutionary.class);
 
   /**
-   * OptionID for {@link #M_PARAM}
-   */
-  public static final OptionID M_ID = OptionID.getOrCreateOptionID("ay.m", "Population size for evolutionary algorithm.");
-
-  /**
    * Parameter to specify the number of solutions must be an integer greater
    * than 1.
    * <p>
    * Key: {@code -eafod.m}
    * </p>
    */
-  private final IntParameter M_PARAM = new IntParameter(M_ID, new GreaterEqualConstraint(2));
+  public static final OptionID M_ID = OptionID.getOrCreateOptionID("ay.m", "Population size for evolutionary algorithm.");
 
   /**
    * Parameter to specify the random generator seed.
@@ -87,35 +82,32 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
   public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("ay.seed", "The random number generator seed.");
 
   /**
-   * Holds the value of {@link #SEED_ID}.
-   */
-  private Long seed;
-
-  /**
    * Maximum iteration count for evolutionary search.
    */
   protected final int MAX_ITERATIONS = 1000;
 
   /**
-   * Holds the value of {@link #M_PARAM}.
+   * Holds the value of {@link #M_ID}.
    */
   private int m;
 
   /**
-   * Constructor, Parameterizable style.
-   * 
-   * @param config Parameterization
+   * Holds the value of {@link #SEED_ID}.
    */
-  public AggarwalYuEvolutionary(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(M_PARAM)) {
-      m = M_PARAM.getValue();
-    }
-    final LongParameter seedP = new LongParameter(SEED_ID, true);
-    if(config.grab(seedP)) {
-      seed = seedP.getValue();
-    }
+  private Long seed;
+
+  /**
+   * Constructor.
+   * 
+   * @param k K
+   * @param phi Phi
+   * @param m M
+   * @param seed Seed
+   */
+  public AggarwalYuEvolutionary(int k, int phi, int m, Long seed) {
+    super(k, phi);
+    this.m = m;
+    this.seed = seed;
   }
 
   /**
@@ -164,7 +156,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary.Individuum oneway - - evolves
+   * @apiviz.has Individuum oneway - - evolves
    */
   private class EvolutionarySearch {
     /**
@@ -660,6 +652,37 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
         }
       }
       return true;
+    }
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier.Parameterizer {
+    protected int m = 0;
+    
+    protected Long seed = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter mP = new IntParameter(M_ID, new GreaterEqualConstraint(2));
+      if(config.grab(mP)) {
+        m = mP.getValue();
+      }
+      final LongParameter seedP = new LongParameter(SEED_ID, true);
+      if(config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
+    }
+
+    @Override
+    protected AggarwalYuEvolutionary<V> makeInstance() {
+      return new AggarwalYuEvolutionary<V>(k, phi, m, seed);
     }
   }
 }

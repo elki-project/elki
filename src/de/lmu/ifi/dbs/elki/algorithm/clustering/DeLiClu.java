@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -102,13 +101,12 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * Constructor.
    * 
    * @param distanceFunction Distance function
-   * @param knnJoin KNN join
    * @param minpts MinPts
    * @param xi Xi parameter
    */
-  public DeLiClu(DistanceFunction<? super NV, D> distanceFunction, KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin, int minpts, double xi) {
+  public DeLiClu(DistanceFunction<? super NV, D> distanceFunction, int minpts, double xi) {
     super(distanceFunction);
-    this.knnJoin = knnJoin;
+    this.knnJoin = new KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry>(distanceFunction, minpts);
     this.minpts = minpts;
     this.ixi = 1.0 - xi;
   }
@@ -350,6 +348,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     }
   }
 
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
+
   /**
    * Encapsulates an entry in the cluster order.
    * 
@@ -461,34 +464,36 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   }
 
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public static <NV extends NumberVector<NV, ?>, D extends Distance<D>> DeLiClu<NV, D> parameterize(Parameterization config) {
-    DistanceFunction<NV, D> distanceFunction = getParameterDistanceFunction(config);
-    final IntParameter minptsparam = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
-    KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin = null;
-    int minpts = 1;
-    if(config.grab(minptsparam)) {
-      minpts = minptsparam.getValue();
-      knnJoin = new KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry>(distanceFunction, minpts);
-    }
-    double xi = 0.0;
-    final DoubleParameter xiparam = new DoubleParameter(XI_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN), true);
-    if(config.grab(xiparam)) {
-      xi = xiparam.getValue();
+  public static class Parameterizer<NV extends NumberVector<NV, ?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<NV, D> {
+    protected int minpts = 0;
+
+    protected double xi = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter minptsP = new IntParameter(MINPTS_ID);
+      minptsP.addConstraint(new GreaterConstraint(0));
+      if(config.grab(minptsP)) {
+        minpts = minptsP.getValue();
+      }
+
+      DoubleParameter xiP = new DoubleParameter(XI_ID, true);
+      xiP.addConstraint(new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
+      if(config.grab(xiP)) {
+        xi = xiP.getValue();
+      }
     }
 
-    if(config.hasErrors()) {
-      return null;
+    @Override
+    protected DeLiClu<NV, D> makeInstance() {
+      return new DeLiClu<NV, D>(distanceFunction, minpts, xi);
     }
-    return new DeLiClu<NV, D>(distanceFunction, knnJoin, minpts, xi);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return logger;
   }
 }

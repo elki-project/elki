@@ -30,5 +30,7 @@
  * 
  * <p>If you need a triple comparable in just particular components, either define a comparator for sorting
  * or subclass Triple appropriately.</p>
+ * 
+ * @apiviz.exclude java.lang.
  */
 package de.lmu.ifi.dbs.elki.utilities.pairs;

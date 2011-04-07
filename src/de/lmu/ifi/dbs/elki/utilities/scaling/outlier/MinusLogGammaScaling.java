@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1],
@@ -30,14 +30,10 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
   double mlogmax;
   
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public MinusLogGammaScaling() {
-    super(new EmptyParameterization());
-    // We don't support the normalize flag of OutlierGammaScaling.
-    // By using EmptyParameterization, it will not be found.
-    // We should be handling errors, but this isn't worth the effort.
+    super(false);
   }
 
   @Override
@@ -76,5 +72,19 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
       LoggingUtil.exception(e);
     }
     //logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected MinusLogGammaScaling makeInstance() {
+      return new MinusLogGammaScaling();
+    }
   }
 }

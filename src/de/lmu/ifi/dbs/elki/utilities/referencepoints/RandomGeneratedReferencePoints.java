@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -23,22 +24,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 // TODO: Erich: use reproducible random
 public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
   /**
-   * OptionID for {@link #N_PARAM}
-   */
-  public static final OptionID N_ID = OptionID.getOrCreateOptionID("generate.n", "The number of reference points to be generated.");
-
-  /**
    * Parameter to specify the number of requested reference points.
    * <p>
    * Key: {@code -generate.n}
    * </p>
    */
-  private final IntParameter N_PARAM = new IntParameter(N_ID, new GreaterConstraint(0));
-
-  /**
-   * OptionID for {@link #SCALE_PARAM}
-   */
-  public static final OptionID SCALE_ID = OptionID.getOrCreateOptionID("generate.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
+  public static final OptionID N_ID = OptionID.getOrCreateOptionID("generate.n", "The number of reference points to be generated.");
 
   /**
    * Parameter for additional scaling of the space, to allow out-of-space
@@ -47,33 +38,28 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
    * Key: {@code -generate.scale}
    * </p>
    */
-  private final DoubleParameter SCALE_PARAM = new DoubleParameter(SCALE_ID, new GreaterConstraint(0.0), 1.0);
+  public static final OptionID SCALE_ID = OptionID.getOrCreateOptionID("generate.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
 
   /**
-   * Holds the value of {@link #N_PARAM}.
+   * Holds the value of {@link #N_ID}.
    */
   protected int samplesize;
 
   /**
-   * Holds the value of {@link #SCALE_PARAM}.
+   * Holds the value of {@link #SCALE_ID}.
    */
-  protected double scale;
+  protected double scale = 1.0;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param samplesize
+   * @param scale
    */
-  public RandomGeneratedReferencePoints(Parameterization config) {
+  public RandomGeneratedReferencePoints(int samplesize, double scale) {
     super();
-    config = config.descend(this);
-    if(config.grab(N_PARAM)) {
-      samplesize = N_PARAM.getValue();
-    }
-    if(config.grab(SCALE_PARAM)) {
-      scale = SCALE_PARAM.getValue();
-    }
+    this.samplesize = samplesize;
+    this.scale = scale;
   }
 
   @Override
@@ -104,5 +90,44 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
     }
 
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    /**
+     * Holds the value of {@link #N_ID}.
+     */
+    protected int samplesize;
+
+    /**
+     * Holds the value of {@link #SCALE_ID}.
+     */
+    protected double scale = 1.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      IntParameter samplesizeP = new IntParameter(N_ID, new GreaterConstraint(0));
+      if(config.grab(samplesizeP)) {
+        samplesize = samplesizeP.getValue();
+      }
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, new GreaterConstraint(0.0), 1.0);
+      if(config.grab(scaleP)) {
+        scale = scaleP.getValue();
+      }
+    }
+
+    @Override
+    protected RandomGeneratedReferencePoints<V> makeInstance() {
+      return new RandomGeneratedReferencePoints<V>(samplesize, scale);
+    }
   }
 }

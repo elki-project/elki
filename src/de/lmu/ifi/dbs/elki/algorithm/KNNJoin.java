@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -225,33 +224,30 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   protected Logging getLogger() {
     return logger;
   }
-
+  
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public static <V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> KNNJoin<V, D, N, E> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    DistanceFunction<V, D> distanceFunction = getParameterDistanceFunction(config);
-    if(config.hasErrors()) {
-      return null;
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+    protected int k;
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter kP = new IntParameter(K_ID, 1);
+      kP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(kP)) {
+        k = kP.getValue();
+      }
     }
-    return new KNNJoin<V, D, N, E>(distanceFunction, k);
-  }
 
-  /**
-   * Get the k parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return k parameter
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(0), 1);
-    if(config.grab(param)) {
-      return param.getValue();
+    @Override
+    protected KNNJoin<V, D, N, E> makeInstance() {
+      return new KNNJoin<V, D, N, E>(distanceFunction, k);
     }
-    return -1;
   }
 }

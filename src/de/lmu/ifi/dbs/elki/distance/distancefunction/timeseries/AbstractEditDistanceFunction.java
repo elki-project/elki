@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
@@ -16,14 +17,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
-   * OptionID for {@link #BANDSIZE_PARAM}
-   */
-  public static final OptionID BANDSIZE_ID = OptionID.getOrCreateOptionID("edit.bandSize", "the band size for Edit Distance alignment (positive double value, 0 <= bandSize <= 1)");
-
-  /**
    * BANDSIZE parameter
    */
-  protected final DoubleParameter BANDSIZE_PARAM = new DoubleParameter(BANDSIZE_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
+  public static final OptionID BANDSIZE_ID = OptionID.getOrCreateOptionID("edit.bandSize", "the band size for Edit Distance alignment (positive double value, 0 <= bandSize <= 1)");
 
   /**
    * Keeps the currently set bandSize.
@@ -31,15 +27,13 @@ public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDist
   protected double bandSize;
 
   /**
-   * Provides a Dynamic Time Warping distance function that can compute the
-   * Dynamic Time Warping distance (that is a DoubleDistance) for
-   * FeatureVectors.
+   * Constructor.
+   * 
+   * @param bandSize Band size
    */
-  protected AbstractEditDistanceFunction(Parameterization config) {
-    config = config.descend(this);
-    if(config.grab(BANDSIZE_PARAM)) {
-      bandSize = BANDSIZE_PARAM.getValue();
-    }
+  public AbstractEditDistanceFunction(double bandSize) {
+    super();
+    this.bandSize = bandSize;
   }
 
   @Override
@@ -50,5 +44,25 @@ public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDist
   @Override
   public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer extends AbstractParameterizer {
+    protected double bandSize = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
+      if(config.grab(bandSizeP)) {
+        bandSize = bandSizeP.getValue();
+      }
+    }
   }
 }

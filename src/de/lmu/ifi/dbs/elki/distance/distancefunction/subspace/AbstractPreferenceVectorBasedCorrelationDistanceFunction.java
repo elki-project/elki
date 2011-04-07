@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.PreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -23,11 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<?, ?>, P extends PreferenceVectorIndex<V>> extends AbstractIndexBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
   /**
-   * OptionID for {@link #EPSILON_PARAM}
-   */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("distancefunction.epsilon", "The maximum distance between two vectors with equal preference vectors before considering them as parallel.");
-
-  /**
    * Parameter to specify the maximum distance between two vectors with equal
    * preference vectors before considering them as parallel, must be a double
    * equal to or greater than 0.
@@ -38,27 +34,22 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * Key: {@code -pvbasedcorrelationdf.epsilon}
    * </p>
    */
-  private final DoubleParameter EPSILON_PARAM = new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
+  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("distancefunction.epsilon", "The maximum distance between two vectors with equal preference vectors before considering them as parallel.");
 
   /**
-   * Holds the value of {@link #EPSILON_PARAM}.
+   * Holds the value of {@link #EPSILON_ID}.
    */
   private double epsilon;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param indexFactory Index factory
+   * @param epsilon Epsilon value
    */
-  public AbstractPreferenceVectorBasedCorrelationDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-
-    // parameter epsilon
-    if(config.grab(EPSILON_PARAM)) {
-      epsilon = EPSILON_PARAM.getValue();
-    }
+  public AbstractPreferenceVectorBasedCorrelationDistanceFunction(IndexFactory<V, P> indexFactory, double epsilon) {
+    super(indexFactory);
+    this.epsilon = epsilon;
   }
 
   @Override
@@ -73,11 +64,6 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    */
   public double getEpsilon() {
     return epsilon;
-  }
-  
-  @Override
-  protected Class<?> getIndexFactoryRestriction() {
-    return PreferenceVectorIndex.Factory.class;
   }
 
   /**
@@ -191,6 +177,30 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      */
     public double weightedPrefereneceVectorDistance(DBID id1, DBID id2) {
       return weightedPrefereneceVectorDistance(database.get(id1), database.get(id2));
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractIndexBasedDistanceFunction.Parameterizer<F> {
+    protected double epsilon = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configEpsilon(config);
+    }
+
+    protected void configEpsilon(Parameterization config) {
+      final DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
+      if(config.grab(epsilonP)) {
+        epsilon = epsilonP.getValue();
+      }
     }
   }
 }

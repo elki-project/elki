@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -24,28 +25,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("projectedclustering.k", "The number of clusters to find.");
-
-  /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.
    * <p>
    * Key: {@code -projectedclustering.k}
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #K_PARAM}.
-   */
-  private int k;
-
-  /**
-   * OptionID for {@link #K_I_PARAM}
-   */
-  public static final OptionID K_I_ID = OptionID.getOrCreateOptionID("projectedclustering.k_i", "The multiplier for the initial number of seeds.");
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("projectedclustering.k", "The number of clusters to find.");
 
   /**
    * Parameter to specify the multiplier for the initial number of seeds, must
@@ -57,17 +43,7 @@ public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> 
    * Key: {@code -projectedclustering.k_i}
    * </p>
    */
-  private final IntParameter K_I_PARAM = new IntParameter(K_I_ID, new GreaterConstraint(0), 30);
-
-  /**
-   * Holds the value of {@link #K_I_PARAM}.
-   */
-  private int k_i;
-
-  /**
-   * OptionID for {@link #L_PARAM}
-   */
-  public static final OptionID L_ID = OptionID.getOrCreateOptionID("projectedclustering.l", "The dimensionality of the clusters to find.");
+  public static final OptionID K_I_ID = OptionID.getOrCreateOptionID("projectedclustering.k_i", "The multiplier for the initial number of seeds.");
 
   /**
    * Parameter to specify the dimensionality of the clusters to find, must be an
@@ -76,12 +52,22 @@ public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> 
    * Key: {@code -projectedclustering.l}
    * </p>
    */
-  private final IntParameter L_PARAM = new IntParameter(L_ID, new GreaterConstraint(0));
+  public static final OptionID L_ID = OptionID.getOrCreateOptionID("projectedclustering.l", "The dimensionality of the clusters to find.");
 
   /**
-   * Holds the value of {@link #L_PARAM}.
+   * Holds the value of {@link #K_ID}.
    */
-  private int l;
+  protected int k;
+
+  /**
+   * Holds the value of {@link #K_I_ID}.
+   */
+  protected int k_i;
+
+  /**
+   * Holds the value of {@link #L_ID}.
+   */
+  protected int l;
 
   /**
    * The euclidean distance function.
@@ -89,25 +75,17 @@ public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> 
   private DistanceFunction<? super V, DoubleDistance> distanceFunction = EuclideanDistanceFunction.STATIC;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Internal constructor.
    * 
-   * @param config Parameterization
+   * @param k K parameter
+   * @param k_i K_i parameter
+   * @param l L parameter
    */
-  public AbstractProjectedClustering(Parameterization config) {
+  public AbstractProjectedClustering(int k, int k_i, int l) {
     super();
-    config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-
-    if(config.grab(K_I_PARAM)) {
-      k_i = K_I_PARAM.getValue();
-    }
-
-    if(config.grab(L_PARAM)) {
-      l = L_PARAM.getValue();
-    }
+    this.k = k;
+    this.k_i = k_i;
+    this.l = l;
   }
 
   /**
@@ -129,29 +107,53 @@ public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> 
   }
 
   /**
-   * Returns the value of {@link #K_PARAM}.
+   * Parameterization class.
    * 
-   * @return the number of clusters to be found
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  protected int getK() {
-    return k;
-  }
+  public static abstract class Parameterizer extends AbstractParameterizer {
+    protected int k;
 
-  /**
-   * Returns the value of {@link #K_I_PARAM}.
-   * 
-   * @return the initial number of clusters
-   */
-  protected int getK_i() {
-    return k_i;
-  }
+    protected int k_i;
 
-  /**
-   * Returns the value of {@link #L_PARAM}..
-   * 
-   * @return the average dimensionality of the clusters to be found
-   */
-  protected int getL() {
-    return l;
+    protected int l;
+
+    /**
+     * Get the parameter k, see {@link #K_ID}
+     * 
+     * @param config Parameterization
+     */
+    protected void configK(Parameterization config) {
+      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+    }
+
+    /**
+     * Get the parameter k_i, see {@link #K_I_ID}
+     * 
+     * @param config Parameterization
+     */
+    protected void configKI(Parameterization config) {
+      IntParameter k_iP = new IntParameter(K_I_ID, new GreaterConstraint(0), 30);
+      if(config.grab(k_iP)) {
+        k_i = k_iP.getValue();
+      }
+    }
+
+    /**
+     * Get the parameter l, see {@link #L_ID}
+     * 
+     * @param config Parameterization
+     */
+    protected void configL(Parameterization config) {
+      IntParameter lP = new IntParameter(L_ID, new GreaterConstraint(0));
+      if(config.grab(lP)) {
+        l = lP.getValue();
+      }
+    }
   }
 }

@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
+import java.util.BitSet;
+
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Provides a distance function that computes the Euclidean distance between
@@ -16,14 +17,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?, ?>> implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param dimensions Selected dimensions
    */
-  public DimensionsSelectingEuclideanDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public DimensionsSelectingEuclideanDistanceFunction(BitSet dimensions) {
+    super(dimensions);
   }
 
   /**
@@ -151,5 +150,19 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
   @Override
   public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDimensionsSelectingDoubleDistanceFunction.Parameterizer {
+    @Override
+    protected DimensionsSelectingEuclideanDistanceFunction makeInstance() {
+      return new DimensionsSelectingEuclideanDistanceFunction(dimensions);
+    }
   }
 }

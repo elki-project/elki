@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.elki.data.images;
 
-import java.awt.Color;
-
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -13,66 +10,47 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  */
-public class ComputeNaiveHSBColorHistogram extends AbstractComputeColorHistogram {
-  /**
-   * OptionID for {@link #BINSPERPLANE_PARAM}
-   */
-  public static final OptionID BINSPERPLANE_ID = OptionID.getOrCreateOptionID("hsbhist.bpp", "Bins per plane for HSV/HSB histogram. This will result in bpp ** 3 bins.");
-
+public class ComputeNaiveHSBColorHistogram extends ComputeHSBColorHistogram {
   /**
    * Parameter that specifies the number of bins (per plane) to use.
    * 
    * <p>
-   * Key: {@code -rgbhist.bpp}
+   * Key: {@code -hsbhist.bpp}
    * </p>
    */
-  private final IntParameter BINSPERPLANE_PARAM = new IntParameter(BINSPERPLANE_ID, new IntervalConstraint(2, IntervalBoundary.CLOSE, 256, IntervalBoundary.CLOSE));
+  public static final OptionID BINSPERPLANE_ID = OptionID.getOrCreateOptionID("hsbhist.bpp", "Bins per plane for HSV/HSB histogram. This will result in bpp ** 3 bins.");
 
   /**
-   * Number of bins in each dimension to use.
-   */
-  int quant;
-
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param quant Number of bins to use.
    */
-  public ComputeNaiveHSBColorHistogram(Parameterization config) {
-    super();
-    config = config.descend(this);
-    if (config.grab(BINSPERPLANE_PARAM)) {
-      quant = BINSPERPLANE_PARAM.getValue();
-    }
+  public ComputeNaiveHSBColorHistogram(int quant) {
+    super(quant, quant, quant);
   }
 
-  @Override
-  protected int getBinForColor(int rgb) {
-    int r = (rgb & 0xFF0000) >> 16;
-    int g = (rgb & 0x00FF00) >> 8;
-    int b = (rgb & 0x0000FF);
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected int quant = 0;
 
-    float[] hsbvals = Color.RGBtoHSB(r, g, b, null);
-    // The values returned by RGBtoHSB are all in [0:1]
-    int h = (int) Math.floor(quant * hsbvals[0]);
-    int s = (int) Math.floor(quant * hsbvals[1]);
-    int v = (int) Math.floor(quant * hsbvals[2]);
-    // Guard against the value of 1.0
-    if(h >= quant) {
-      h = quant - 1;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter param = new IntParameter(BINSPERPLANE_ID);
+      if(config.grab(param)) {
+        quant = param.getValue();
+      }
     }
-    if(s >= quant) {
-      s = quant - 1;
-    }
-    if(v >= quant) {
-      v = quant - 1;
-    }
-    return h * quant * quant + s * quant + v;
-  }
 
-  @Override
-  protected int getNumBins() {
-    return quant * quant * quant;
+    @Override
+    protected ComputeNaiveHSBColorHistogram makeInstance() {
+      return new ComputeNaiveHSBColorHistogram(quant);
+    }
   }
 }

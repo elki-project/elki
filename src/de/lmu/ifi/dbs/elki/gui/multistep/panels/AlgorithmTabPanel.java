@@ -46,9 +46,10 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
     input.addObserver(this);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected synchronized void configureStep(Parameterization config) {
-    algorithms = new AlgorithmStep<DatabaseObject>(config);
+    algorithms = config.tryInstantiate(AlgorithmStep.class);
     if(config.getErrors().size() > 0) {
       algorithms = null;
     }

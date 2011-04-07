@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -133,37 +132,33 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
     return result;
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> RankingQualityHistogram<O, D> parameterize(Parameterization config) {
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    int numbins = getParameterBins(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new RankingQualityHistogram<O, D>(distanceFunction, numbins);
-  }
-
-  /**
-   * Get the number of bins parameter
-   * 
-   * @param config Parameterization
-   * @return bins parameter
-   */
-  protected static int getParameterBins(Parameterization config) {
-    final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 100);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected int numbins = 20;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 100);
+      if(config.grab(param)) {
+        numbins = param.getValue();
+      }
+    }
+
+    @Override
+    protected RankingQualityHistogram<O, D> makeInstance() {
+      return new RankingQualityHistogram<O, D>(distanceFunction, numbins);
+    }
   }
 }

@@ -229,7 +229,13 @@ public class DocumentParameters {
         logger.debugFiner("Null: " + pp.first + " " + pp.second);
         continue;
       }
-      Class<?> c = pp.first.getClass();
+      Class<?> c;
+      if(pp.first instanceof Class) {
+        c = (Class<?>) pp.first;
+      }
+      else {
+        c = pp.first.getClass();
+      }
       Parameter<?, ?> o = pp.second;
 
       // just collect unique occurrences
@@ -558,7 +564,7 @@ public class DocumentParameters {
 
   private static void appendClassRestriction(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
     if(opt.getRestrictionClass() == null) {
-      logger.warning("No restriction class for Parameter "+opt.getName());
+      logger.warning("No restriction class for Parameter " + opt.getName());
       return;
     }
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
@@ -654,7 +660,7 @@ public class DocumentParameters {
    * Sort parameters by their option
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   protected static class SortByOption implements Comparator<OptionID> {

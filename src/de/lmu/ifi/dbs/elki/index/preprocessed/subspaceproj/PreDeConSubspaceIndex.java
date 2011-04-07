@@ -163,38 +163,59 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
     public static final double DEFAULT_DELTA = 0.01;
 
     /**
-     * OptionID for {@link #DELTA_PARAM}
-     */
-    public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("predecon.delta", "a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = " + DEFAULT_DELTA + ").");
-
-    /**
      * Parameter for Delta
      */
-    private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.OPEN), DEFAULT_DELTA);
+    public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("predecon.delta", "a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = " + DEFAULT_DELTA + ").");
 
     /**
      * The threshold for small eigenvalues.
      */
     protected double delta;
-
+    
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param epsilon
+     * @param rangeQueryDistanceFunction
+     * @param minpts
+     * @param delta
      */
-    public Factory(Parameterization config) {
-      super(config);
-      config = config.descend(this);
-
-      if(config.grab(DELTA_PARAM)) {
-        delta = DELTA_PARAM.getValue();
-      }
+    public Factory(D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, double delta) {
+      super(epsilon, rangeQueryDistanceFunction, minpts);
+      this.delta = delta;
     }
 
     @Override
     public PreDeConSubspaceIndex<V, D> instantiate(Database<V> database) {
       return new PreDeConSubspaceIndex<V, D>(database, epsilon, rangeQueryDistanceFunction, minpts, delta);
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<V extends NumberVector<? extends V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
+      /**
+       * The threshold for small eigenvalues.
+       */
+      protected double delta;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.OPEN), DEFAULT_DELTA);
+        if(config.grab(deltaP)) {
+          delta = deltaP.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<V, D> makeInstance() {
+        return new Factory<V, D>(epsilon, rangeQueryDistanceFunction, minpts, delta);
+      }
     }
   }
 }

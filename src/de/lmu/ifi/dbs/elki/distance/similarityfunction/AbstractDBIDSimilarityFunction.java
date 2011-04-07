@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * Abstract super class for distance functions needing a preprocessor.
  * 
  * @author Elke Achtert
+ * 
  * @param <D> distance type
  */
 public abstract class AbstractDBIDSimilarityFunction<D extends Distance<D>> extends AbstractPrimitiveSimilarityFunction<DatabaseObject, D> implements DBIDSimilarityFunction<D> {

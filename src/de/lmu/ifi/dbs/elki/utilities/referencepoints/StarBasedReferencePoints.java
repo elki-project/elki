@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -22,22 +23,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
   /**
-   * OptionID for {@link #NOCENTER_FLAG}
-   */
-  public static final OptionID NOCENTER_ID = OptionID.getOrCreateOptionID("star.nocenter", "Do not use the center as extra reference point.");
-
-  /**
    * Parameter to specify the grid resolution.
    * <p>
    * Key: {@code -star.nocenter}
    * </p>
    */
-  private final Flag NOCENTER_FLAG = new Flag(NOCENTER_ID);
-
-  /**
-   * OptionID for {@link #SCALE_PARAM}
-   */
-  public static final OptionID SCALE_ID = OptionID.getOrCreateOptionID("star.scale", "Scale the reference points by the given factor. This can be used to obtain reference points outside the used data space.");
+  public static final OptionID NOCENTER_ID = OptionID.getOrCreateOptionID("star.nocenter", "Do not use the center as extra reference point.");
 
   /**
    * Parameter to specify the extra scaling of the space, to allow
@@ -46,33 +37,28 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
    * Key: {@code -star.scale}
    * </p>
    */
-  private final DoubleParameter SCALE_PARAM = new DoubleParameter(SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
+  public static final OptionID SCALE_ID = OptionID.getOrCreateOptionID("star.scale", "Scale the reference points by the given factor. This can be used to obtain reference points outside the used data space.");
 
   /**
-   * Holds the value of {@link #NOCENTER_FLAG}.
+   * Holds the value of {@link #NOCENTER_ID}.
    */
   protected boolean nocenter;
 
   /**
-   * Holds the value of {@link #SCALE_PARAM}.
+   * Holds the value of {@link #SCALE_ID}.
    */
   protected double scale;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param nocenter
+   * @param scale
    */
-  public StarBasedReferencePoints(Parameterization config) {
+  public StarBasedReferencePoints(boolean nocenter, double scale) {
     super();
-    config = config.descend(this);
-    if(config.grab(NOCENTER_FLAG)) {
-      nocenter = NOCENTER_FLAG.getValue();
-    }
-    if(config.grab(SCALE_PARAM)) {
-      scale = SCALE_PARAM.getValue();
-    }
+    this.nocenter = nocenter;
+    this.scale = scale;
   }
 
   @Override
@@ -126,5 +112,43 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
     }
 
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    /**
+     * Holds the value of {@link #NOCENTER_ID}.
+     */
+    protected boolean nocenter;
+
+    /**
+     * Holds the value of {@link #SCALE_ID}.
+     */
+    protected double scale;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Flag nocenterF = new Flag(NOCENTER_ID);
+      if(config.grab(nocenterF)) {
+        nocenter = nocenterF.getValue();
+      }
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
+      if(config.grab(scaleP)) {
+        scale = scaleP.getValue();
+      }
+    }
+
+    @Override
+    protected StarBasedReferencePoints<V> makeInstance() {
+      return new StarBasedReferencePoints<V>(nocenter, scale);
+    }
   }
 }

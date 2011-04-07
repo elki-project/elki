@@ -24,11 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.uses MatrixLike oneway - - reads
  * @apiviz.uses Vector
- * @apiviz.uses LUDecomposition - - transforms
- * @apiviz.uses QRDecomposition - - transforms
- * @apiviz.uses CholeskyDecomposition - - transforms
- * @apiviz.uses SingularValueDecomposition - - transforms
- * @apiviz.uses EigenvalueDecomposition - - transforms
  */
 public final class Matrix implements MatrixLike<Matrix> {
   /**

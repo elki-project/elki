@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -52,7 +51,7 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(KNNWeightOutlier.class);
-  
+
   /**
    * Parameter to specify the k nearest neighbor
    */
@@ -76,10 +75,10 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
   /**
    * Constructor with parameters.
    * 
+   * @param distanceFunction Distance function
    * @param k k Parameter
-   * @param distanceFunction Distance function 
    */
-  public KNNWeightOutlier(int k, DistanceFunction<O, D> distanceFunction) {
+  public KNNWeightOutlier(DistanceFunction<O, D> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -89,13 +88,13 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    KNNQuery<O, D> knnQuery= database.getKNNQuery(getDistanceFunction(), k);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k);
 
     if(logger.isVerbose()) {
       logger.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
     FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger) : null;
-    
+
     double maxweight = 0;
 
     // compute distance to the k nearest neighbor. n objects with the highest
@@ -128,37 +127,33 @@ public class KNNWeightOutlier<O extends DatabaseObject, D extends NumberDistance
     return new OutlierResult(meta, res);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> KNNWeightOutlier<O, D> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new KNNWeightOutlier<O, D>(k, distanceFunction);
-  }
-
-  /**
-   * Get the k parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return k parameter
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected int k = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter kP = new IntParameter(K_ID);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+    }
+
+    @Override
+    protected KNNWeightOutlier<O, D> makeInstance() {
+      return new KNNWeightOutlier<O, D>(distanceFunction, k);
+    }
   }
 }

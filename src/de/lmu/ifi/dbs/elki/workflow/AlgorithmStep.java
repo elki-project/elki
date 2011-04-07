@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -35,19 +36,13 @@ public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
   private BasicResult result = null;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param algorithms
    */
-  public AlgorithmStep(Parameterization config) {
+  public AlgorithmStep(List<Algorithm<O, Result>> algorithms) {
     super();
-    config = config.descend(this);
-    // parameter algorithm
-    final ObjectListParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectListParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
-    if(config.grab(ALGORITHM_PARAM)) {
-      algorithms = ALGORITHM_PARAM.instantiateClasses(config);
-    }
+    this.algorithms = algorithms;
   }
 
   /**
@@ -75,5 +70,34 @@ public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
    */
   public HierarchicalResult getResult() {
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Holds the algorithm to run.
+     */
+    protected List<Algorithm<O, Result>> algorithms;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      // parameter algorithm
+      final ObjectListParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectListParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+      if(config.grab(ALGORITHM_PARAM)) {
+        algorithms = ALGORITHM_PARAM.instantiateClasses(config);
+      }
+    }
+
+    @Override
+    protected AlgorithmStep<O> makeInstance() {
+      return new AlgorithmStep<O>(algorithms);
+    }
   }
 }

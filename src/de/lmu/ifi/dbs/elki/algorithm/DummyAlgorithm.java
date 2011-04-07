@@ -10,8 +10,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Dummy Algorithm, which just iterates over all points once, doing a 10NN query
@@ -55,18 +53,5 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
   @Override
   protected Logging getLogger() {
     return logger;
-  }
-
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <V extends NumberVector<V, ?>> DummyAlgorithm<V> parameterize(Parameterization config) {
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new DummyAlgorithm<V>();
   }
 }

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -16,6 +17,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Distance function used in the HiSC algorithm.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has Instance
  * 
  * @param <V> the type of NumberVector to compute the distances in between
  */
@@ -28,21 +31,11 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
   /**
    * Constructor.
    * 
-   * @param config Configuration
+   * @param indexFactory
+   * @param epsilon
    */
-  public HiSCDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryRestriction() {
-    return HiSCPreferenceVectorIndex.Factory.class;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryDefaultClass() {
-    return HiSCPreferenceVectorIndex.Factory.class;
+  public HiSCDistanceFunction(HiSCPreferenceVectorIndex.Factory<V> indexFactory, double epsilon) {
+    super(indexFactory, epsilon);
   }
 
   @Override
@@ -55,7 +48,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    HiSCPreferenceVectorIndex<T> indexinst = (HiSCPreferenceVectorIndex<T>) index.instantiate((Database<V>) database);
+    HiSCPreferenceVectorIndex<T> indexinst = (HiSCPreferenceVectorIndex<T>) indexFactory.instantiate((Database<V>) database);
     return new Instance<T>(database, indexinst, getEpsilon(), this);
   }
 
@@ -122,6 +115,27 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
       inverseCommonPreferenceVector.flip(0, dim);
 
       return new PreferenceVectorBasedCorrelationDistance(DatabaseUtil.dimensionality(database), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Parameterizer<HiSCPreferenceVectorIndex.Factory<V>> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Class<HiSCPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(HiSCPreferenceVectorIndex.Factory.class);
+      factory = config.tryInstantiate(cls);
+    }
+
+    @Override
+    protected HiSCDistanceFunction<V> makeInstance() {
+      return new HiSCDistanceFunction<V>(factory, epsilon);
     }
   }
 }

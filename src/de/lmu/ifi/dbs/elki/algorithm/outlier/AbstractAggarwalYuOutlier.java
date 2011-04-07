@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -43,16 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
 public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
   /**
-   * The number of partitions for each dimension
-   */
-  protected int phi;
-
-  /**
-   * The target dimensionality.
-   */
-  protected int k;
-
-  /**
    * OptionID for the grid size
    */
   public static final OptionID PHI_ID = OptionID.getOrCreateOptionID("ay.phi", "The number of equi-depth grid ranges to use in each dimension.");
@@ -65,7 +56,8 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
   /**
    * Symbolic value for subspaces not in use.
    * 
-   * Note: in some places, the implementations may rely on this having the value 0 currently!
+   * Note: in some places, the implementations may rely on this having the value
+   * 0 currently!
    */
   public static final int DONT_CARE = 0;
 
@@ -76,21 +68,25 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
   public static final AssociationID<Double> AGGARWAL_YU_SCORE = AssociationID.getOrCreateAssociationID("aggarwal-yu", Double.class);
 
   /**
-   * Constructor, Parameterizable style.
-   * 
-   * @param config Parameterization
+   * The number of partitions for each dimension
    */
-  public AbstractAggarwalYuOutlier(Parameterization config) {
+  protected int phi;
+
+  /**
+   * The target dimensionality.
+   */
+  protected int k;
+
+  /**
+   * Constructor.
+   * 
+   * @param k K parameter
+   * @param phi Phi parameter
+   */
+  public AbstractAggarwalYuOutlier(int k, int phi) {
     super();
-    config = config.descend(this);
-    final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterEqualConstraint(2));
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    final IntParameter PHI_PARAM = new IntParameter(PHI_ID, new GreaterEqualConstraint(2));
-    if(config.grab(PHI_PARAM)) {
-      phi = PHI_PARAM.getValue();
-    }
+    this.k = k;
+    this.phi = phi;
   }
 
   /**
@@ -200,4 +196,29 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
     return m;
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer extends AbstractParameterizer {
+    protected Integer phi;
+
+    protected Integer k;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter kP = new IntParameter(K_ID, new GreaterEqualConstraint(2));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+      final IntParameter phiP = new IntParameter(PHI_ID, new GreaterEqualConstraint(2));
+      if(config.grab(phiP)) {
+        phi = phiP.getValue();
+      }
+    }
+  }
 }

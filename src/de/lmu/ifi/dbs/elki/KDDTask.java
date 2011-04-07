@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
@@ -9,9 +8,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -69,25 +68,21 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   private HierarchicalResult result;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param inputStep
+   * @param algorithmStep
+   * @param evaluationStep
+   * @param outputStep
+   * @param settings
    */
-  public KDDTask(Parameterization config) {
+  public KDDTask(InputStep<O> inputStep, AlgorithmStep<O> algorithmStep, EvaluationStep<O> evaluationStep, OutputStep<O> outputStep, Collection<Pair<Object, Parameter<?, ?>>> settings) {
     super();
-    //config = config.descend(this);
-    TrackParameters track = new TrackParameters(config);
-
-    inputStep = new InputStep<O>(track);
-    algorithmStep = new AlgorithmStep<O>(track);
-    evaluationStep = new EvaluationStep<O>(track);
-
-    // We don't include output parameters
-    settings = track.getAllParameters();
-    // configure output with the original parameterization
-    final ArrayList<Class<? extends ResultHandler<O, Result>>> defaultWriter = OutputStep.defaultWriter();
-    outputStep = OutputStep.parameterize(config, defaultWriter);
+    this.inputStep = inputStep;
+    this.algorithmStep = algorithmStep;
+    this.evaluationStep = evaluationStep;
+    this.outputStep = outputStep;
+    this.settings = settings;
   }
 
   /**
@@ -99,14 +94,14 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   public void run() throws IllegalStateException {
     // Input step
     Database<O> db = inputStep.getDatabase();
-    
+
     // Algorithms - Data Mining Step
     result = algorithmStep.runAlgorithms(db);
     ResultHierarchy hierarchy = result.getHierarchy();
-    
+
     // TODO: this could be nicer
     hierarchy.add(result, new SettingsResult(settings));
-    
+
     // Evaluation
     evaluationStep.runEvaluators(result, db, inputStep.getNormalizationUndo(), inputStep.getNormalization());
 
@@ -121,6 +116,47 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
    */
   public Result getResult() {
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    InputStep<O> inputStep = null;
+
+    AlgorithmStep<O> algorithmStep = null;
+
+    EvaluationStep<O> evaluationStep = null;
+
+    Collection<Pair<Object, Parameter<?, ?>>> settings = null;
+
+    OutputStep<O> outputStep = null;
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      // Track the key parameters for reporting the settings.
+      TrackParameters track = new TrackParameters(config);
+
+      inputStep = track.tryInstantiate(InputStep.class);
+      algorithmStep = track.tryInstantiate(AlgorithmStep.class);
+      evaluationStep = track.tryInstantiate(EvaluationStep.class);
+
+      // We don't include output parameters
+      settings = track.getAllParameters();
+      // configure output with the original parameterization
+      outputStep = config.tryInstantiate(OutputStep.class);
+    }
+
+    @Override
+    protected KDDTask<O> makeInstance() {
+      return new KDDTask<O>(inputStep, algorithmStep, evaluationStep, outputStep, settings);
+    }
   }
 
   /**

@@ -10,8 +10,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Trivial pseudo-clustering that just considers all points to be noise.
@@ -49,19 +47,6 @@ public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm
     Cluster<Model> c = new Cluster<Model>(database.getIDs(), true, ClusterModel.CLUSTER);
     result.addCluster(c);
     return result;
-  }
-
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
-   */
-  public static <O extends DatabaseObject> TrivialAllNoise<O> parameterize(Parameterization config) {
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new TrivialAllNoise<O>();
   }
 
   @Override

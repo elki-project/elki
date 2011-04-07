@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -41,11 +42,6 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
   public static final OptionID DATABASE_ID = OptionID.getOrCreateOptionID("dbc.database", "Database class to be provided by the parse method.");
 
   /**
-   * The database provided by the parse method.
-   */
-  Database<O> database;
-
-  /**
    * Optional parameter that specifies the index of the label to be used as
    * class label, must be an integer equal to or greater than 0.
    * <p>
@@ -55,23 +51,12 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
   public static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("dbc.classLabelIndex", "The index of the label to be used as class label.");
 
   /**
-   * The index of the label to be used as class label, null if no class label is
-   * specified.
-   */
-  protected Integer classLabelIndex;
-
-  /**
    * Parameter to specify the class of occurring class labels.
    * <p>
    * Key: {@code -dbc.classLabelClass}
    * </p>
    */
   public static final OptionID CLASS_LABEL_CLASS_ID = OptionID.getOrCreateOptionID("dbc.classLabelClass", "Class label class to use.");
-
-  /**
-   * The class label class to use.
-   */
-  private Class<? extends ClassLabel> classLabelClass;
 
   /**
    * Optional parameter that specifies the index of the label to be used as
@@ -83,40 +68,26 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
   public static final OptionID EXTERNALID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIdIndex", "The index of the label to be used as external Id.");
 
   /**
+   * The database provided by the parse method.
+   */
+  Database<O> database;
+
+  /**
+   * The index of the label to be used as class label, null if no class label is
+   * specified.
+   */
+  protected Integer classLabelIndex;
+
+  /**
+   * The class label class to use.
+   */
+  private Class<? extends ClassLabel> classLabelClass;
+
+  /**
    * The index of the label to be used as external Id, null if no external id
    * index is specified.
    */
   protected Integer externalIdIndex;
-
-  /**
-   * Factory method for getting parameters.
-   * 
-   * @param config Parameterization
-   * @return parameters
-   */
-  public static <O extends DatabaseObject> Parameters<O> getParameters(Parameterization config) {
-    // parameter database
-    final ObjectParameter<Database<O>> dbParam = new ObjectParameter<Database<O>>(DATABASE_ID, Database.class, HashmapDatabase.class);
-    Database<O> database = config.grab(dbParam) ? dbParam.instantiateClass(config) : null;
-
-    // parameter class label index
-    final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0), true);
-    final ObjectParameter<ClassLabel> classlabelClassParam = new ObjectParameter<ClassLabel>(CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class);
-    Integer classLabelIndex = null;
-    Class<? extends ClassLabel> classLabelClass = null;
-
-    config.grab(classLabelIndexParam);
-    config.grab(classlabelClassParam);
-    if(classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
-      classLabelIndex = classLabelIndexParam.getValue();
-      classLabelClass = classlabelClassParam.getValue();
-    }
-
-    final IntParameter externalIdIndexParam = new IntParameter(EXTERNALID_INDEX_ID, new GreaterEqualConstraint(0), true);
-    Integer externalIdIndex = (config.grab(externalIdIndexParam)) ? externalIdIndexParam.getValue() : null;
-
-    return new Parameters<O>(database, classLabelIndex, classLabelClass, externalIdIndex);
-  }
 
   /**
    * Constructor.
@@ -229,21 +200,53 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
     return result;
   }
 
-  static class Parameters<O extends DatabaseObject> {
-    Database<O> database;
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    Database<O> database = null;
 
-    Integer classLabelIndex;
+    Integer classLabelIndex = null;
 
-    Class<? extends ClassLabel> classLabelClass;
+    Class<? extends ClassLabel> classLabelClass = null;
 
-    Integer externalIdIndex;
+    Integer externalIdIndex = null;
 
-    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex) {
-      super();
-      this.database = database;
-      this.classLabelIndex = classLabelIndex;
-      this.classLabelClass = classLabelClass;
-      this.externalIdIndex = externalIdIndex;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+
+    protected void configExternalId(Parameterization config) {
+      final IntParameter externalIdIndexParam = new IntParameter(EXTERNALID_INDEX_ID, new GreaterEqualConstraint(0), true);
+      if(config.grab(externalIdIndexParam)) {
+        externalIdIndex = externalIdIndexParam.getValue();
+      }
+    }
+
+    protected void configClassLabel(Parameterization config) {
+      // parameter class label index
+      final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0), true);
+      final ObjectParameter<ClassLabel> classlabelClassParam = new ObjectParameter<ClassLabel>(CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class);
+
+      config.grab(classLabelIndexParam);
+      config.grab(classlabelClassParam);
+      if(classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
+        classLabelIndex = classLabelIndexParam.getValue();
+        classLabelClass = classlabelClassParam.getValue();
+      }
+    }
+
+    protected void configDatabase(Parameterization config) {
+      // parameter database
+      final ObjectParameter<Database<O>> dbParam = new ObjectParameter<Database<O>>(DATABASE_ID, Database.class, HashmapDatabase.class);
+      if(config.grab(dbParam)) {
+        database = dbParam.instantiateClass(config);
+      }
     }
   }
 }

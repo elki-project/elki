@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyReference
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -80,11 +81,6 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   private static final Logging logger = Logging.getLogger(DiSH.class);
 
   /**
-   * OptionID for {@link #EPSILON_PARAM}
-   */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dish.epsilon", "The maximum radius of the neighborhood " + "to be considered in each dimension for determination of " + "the preference vector.");
-
-  /**
    * Parameter that specifies the maximum radius of the neighborhood to be
    * considered in each dimension for determination of the preference vector,
    * must be a double equal to or greater than 0.
@@ -95,18 +91,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Key: {@code -dish.epsilon}
    * </p>
    */
-  private final DoubleParameter EPSILON_PARAM = new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
-
-  /**
-   * Holds the value of {@link #EPSILON_PARAM}.
-   */
-  private double epsilon;
-
-  /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH#MU_PARAM}
-   */
-  public static final OptionID MU_ID = OptionID.getOrCreateOptionID("dish.mu", "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
+  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dish.epsilon", "The maximum radius of the neighborhood " + "to be considered in each dimension for determination of " + "the preference vector.");
 
   /**
    * Parameter that specifies the a minimum number of points as a smoothing
@@ -118,68 +103,39 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Key: {@code -dish.mu}
    * </p>
    */
-  private final IntParameter MU_PARAM = new IntParameter(MU_ID, new GreaterConstraint(0), 1);
+  public static final OptionID MU_ID = OptionID.getOrCreateOptionID("dish.mu", "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
+
+  /**
+   * Holds the value of {@link #EPSILON_ID}.
+   */
+  private double epsilon;
 
   /**
    * The distance function we use
    */
   private DiSHDistanceFunction dishDistance;
 
+  /**
+   * Parameters that were given to OPTICS
+   */
   private Collection<Pair<OptionID, Object>> opticsAlgorithmParameters;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param epsilon Epsilon value
+   * @param dishDistance Distance function
+   * @param opticsAlgorithmParameters OPTICS parameters
    */
-  public DiSH(Parameterization config) {
+  public DiSH(double epsilon, DiSHDistanceFunction dishDistance, Collection<Pair<OptionID, Object>> opticsAlgorithmParameters) {
     super();
-    config = config.descend(this);
-    if(config.grab(EPSILON_PARAM)) {
-      epsilon = EPSILON_PARAM.getValue();
-    }
-
-    if(config.grab(MU_PARAM)) {
-      int minpts = MU_PARAM.getValue();
-
-      // DiSH distance
-      ListParameterization dishParameters = new ListParameterization();
-      dishParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
-      dishParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, DiSHPreferenceVectorIndex.Factory.class);
-      dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.EPSILON_ID, Double.toString(epsilon));
-      dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.MINPTS_ID, minpts);
-      ChainedParameterization dishchain = new ChainedParameterization(dishParameters, config);
-      dishchain.errorsTo(config);
-
-      dishDistance = new DiSHDistanceFunction(dishchain);
-
-      // TODO: use TrackParameters!
-      // Configure OPTICS. Tracked parameters
-      ListParameterization opticsParameters = new ListParameterization();
-      opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
-      opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
-      opticsParameters.addParameter(OPTICS.XI_ID, 0.0);
-      // Configure OPTICS. Untracked parameters
-      ListParameterization opticsUntrackedParameters = new ListParameterization();
-      opticsUntrackedParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, dishDistance);
-      // TODO: verbose, time?
-      ChainedParameterization optchain = new ChainedParameterization(opticsParameters, config);
-      TrackParameters trackpar = new TrackParameters(optchain);
-
-      ChainedParameterization optchain2 = new ChainedParameterization(opticsUntrackedParameters, trackpar);
-      optchain2.errorsTo(config);
-
-      // Instantiate OPTICS for parameterization
-      optchain2.tryInstantiate(OPTICS.class, OPTICS.class);
-      // store parameters
-      opticsAlgorithmParameters = trackpar.getGivenParameters();
-    }
+    this.epsilon = epsilon;
+    this.dishDistance = dishDistance;
+    this.opticsAlgorithmParameters = opticsAlgorithmParameters;
   }
 
   /**
    * Performs the DiSH algorithm on the given database.
-   * 
    */
   @Override
   protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
@@ -197,7 +153,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
     Class<OPTICS<V, PreferenceVectorBasedCorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
     OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = null;
-    optics = opticsconfig.tryInstantiate(cls, cls);
+    optics = opticsconfig.tryInstantiate(cls);
     ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database);
 
     if(logger.isVerbose()) {
@@ -398,11 +354,11 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         cluster.setHierarchy(new HierarchyReferenceLists<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
         // cluster.setName("Cluster_" + num++);
         String subspace = FormatUtil.format(cluster.getModel().getSubspace().getDimensions(), db_dim, "");
-        if (parallelClusters.size() > 1) {
-          cluster.setName("Cluster_" +subspace+"_"+i);
+        if(parallelClusters.size() > 1) {
+          cluster.setName("Cluster_" + subspace + "_" + i);
         }
         else {
-          cluster.setName("Cluster_" +subspace);
+          cluster.setName("Cluster_" + subspace);
         }
         clusters.add(cluster);
       }
@@ -634,5 +590,86 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    protected double epsilon = 0.0;
+
+    protected int mu = 1;
+
+    protected DiSHDistanceFunction dishDistance;
+
+    protected Collection<Pair<OptionID, Object>> opticsO;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
+      if(config.grab(epsilonP)) {
+        epsilon = epsilonP.getValue();
+      }
+
+      IntParameter muP = new IntParameter(MU_ID, new GreaterConstraint(0), 1);
+      if(config.grab(muP)) {
+        mu = muP.getValue();
+      }
+
+      configDiSHDistance(config, epsilon, mu);
+
+      configOPTICS(config, muP.getValue(), dishDistance);
+    }
+
+    public void configDiSHDistance(Parameterization config, double epsilon, int minpts) {
+      ListParameterization dishParameters = new ListParameterization();
+      dishParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, epsilon);
+      dishParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, DiSHPreferenceVectorIndex.Factory.class);
+      dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.EPSILON_ID, Double.toString(epsilon));
+      dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.MINPTS_ID, minpts);
+      ChainedParameterization dishchain = new ChainedParameterization(dishParameters, config);
+      dishchain.errorsTo(config);
+
+      dishDistance = dishchain.tryInstantiate(DiSHDistanceFunction.class);
+    }
+
+    /**
+     * Get the parameters for embedded OPTICS.
+     * 
+     * @param config Parameterization
+     * @param minpts MinPts value
+     * @param dishDistance DiSH distance function
+     */
+    public void configOPTICS(Parameterization config, final int minpts, final DiSHDistanceFunction dishDistance) {
+      // Configure OPTICS. Tracked parameters
+      ListParameterization opticsParameters = new ListParameterization();
+      opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
+      opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
+      opticsParameters.addParameter(OPTICS.XI_ID, 0.0);
+      // Configure OPTICS. Untracked parameters
+      ListParameterization opticsUntrackedParameters = new ListParameterization();
+      opticsUntrackedParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, dishDistance);
+      ChainedParameterization optchain = new ChainedParameterization(opticsParameters, config);
+      TrackParameters trackpar = new TrackParameters(optchain);
+
+      ChainedParameterization optchain2 = new ChainedParameterization(opticsUntrackedParameters, trackpar);
+      optchain2.errorsTo(config);
+
+      // Instantiate OPTICS for parameterization
+      optchain2.tryInstantiate(OPTICS.class);
+      // store parameters
+      opticsO = trackpar.getGivenParameters();
+    }
+
+    @Override
+    protected DiSH<V> makeInstance() {
+      return new DiSH<V>(epsilon, dishDistance, opticsO);
+    }
   }
 }

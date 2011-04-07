@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -240,35 +240,18 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
-     * OptionID for {@link #FILL_FLAG}.
-     */
-    public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("index.fill", "Partially transparent filling of index pages.");
-
-    /**
-     * Flag for half-transparent filling of bubbles.
-     * 
-     * <p>
-     * Key: {@code -index.fill}
-     * </p>
-     */
-    private final Flag FILL_FLAG = new Flag(FILL_ID);
-
-    /**
      * Fill parameter.
      */
     protected boolean fill = false;
-
+    
     /**
-     * The default constructor only registers parameters.
-     * 
-     * @param config Parameters
+     * Constructor.
+     *
+     * @param fill
      */
-    public Factory(Parameterization config) {
+    public Factory(boolean fill) {
       super();
-      config = config.descend(this);
-      if(config.grab(FILL_FLAG)) {
-        fill = FILL_FLAG.getValue();
-      }
+      this.fill = fill;
     }
 
     @Override
@@ -293,5 +276,30 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
     public Class<? extends Projection> getProjectionType() {
       return Projection2D.class;
     }
-  }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      protected boolean fill = false;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        Flag fillF = new Flag(TreeMBRVisualization.Factory.FILL_ID);
+        if(config.grab(fillF)) {
+          fill = fillF.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(fill);
+      }
+    }
+}
 }

@@ -10,7 +10,9 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
  * Interface for local PCA based preprocessors.
  * 
  * @author Erich Schubert
- *
+ * 
+ * @apiviz.has Instance
+ * 
  * @param <O> Database object type
  * @param <D> Distance type
  */
@@ -23,12 +25,12 @@ public interface FilteredLocalPCABasedDistanceFunction<O extends NumberVector<?,
    */
   @Override
   public <T extends O> Instance<T, ?, D> instantiate(Database<T> database);
-  
+
   /**
    * Instance produced by the distance function.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @param <T> Database object type
    * @param <I> Index type
    * @param <D> Distance type

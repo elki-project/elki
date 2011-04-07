@@ -18,14 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "L. Chen and R. Ng", title = "On the marriage of Lp-norms and edit distance", booktitle = "VLDB '04: Proceedings of the Thirtieth international conference on Very large data bases", url = "http://www.vldb.org/conf/2004/RS21P2.PDF")
 public class ERPDistanceFunction extends AbstractEditDistanceFunction {
   /**
-   * OptionID for {@link #G_PARAM}
-   */
-  public static final OptionID G_ID = OptionID.getOrCreateOptionID("erp.g", "the g parameter ERP (positive number)");
-
-  /**
    * G parameter
    */
-  private final DoubleParameter G_PARAM = new DoubleParameter(G_ID, new GreaterEqualConstraint(0), 0.0);
+  public static final OptionID G_ID = OptionID.getOrCreateOptionID("erp.g", "the g parameter ERP (positive number)");
 
   /**
    * Keeps the currently set g.
@@ -33,17 +28,14 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
   private double g;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param bandSize Band size
+   * @param g G parameter
    */
-  public ERPDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(G_PARAM)) {
-      g = G_PARAM.getValue();
-    }
+  public ERPDistanceFunction(double bandSize, double g) {
+    super(bandSize);
+    this.g = g;
   }
 
   /**
@@ -54,7 +46,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
    *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
    */
   @Override
-  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
+  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     // Current and previous columns of the matrix
     double[] curr = new double[v2.getDimensionality()];
     double[] prev = new double[v2.getDimensionality()];
@@ -125,7 +117,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
           }
 
           curr[j] = cost;
-          //steps[i][j] = step;
+          // steps[i][j] = step;
         }
         else {
           curr[j] = Double.POSITIVE_INFINITY; // outside band
@@ -134,5 +126,30 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
     }
 
     return new DoubleDistance(Math.sqrt(curr[v2.getDimensionality() - 1]));
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractEditDistanceFunction.Parameterizer {
+    protected double g = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter gP = new DoubleParameter(G_ID, new GreaterEqualConstraint(0), 0.0);
+      if(config.grab(gP)) {
+        g = gP.getValue();
+      }
+    }
+
+    @Override
+    protected ERPDistanceFunction makeInstance() {
+      return new ERPDistanceFunction(bandSize, g);
+    }
   }
 }

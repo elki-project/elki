@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -23,26 +24,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * against this mean.
  * 
  * @author Erich Schubert
- * 
  */
 public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
-  /**
-   * OptionID for {@link #MIN_PARAM}
-   */
-  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.min", "Fixed minimum to use in sqrt scaling.");
-
   /**
    * Parameter to specify the fixed minimum to use.
    * <p>
    * Key: {@code -sqrtstddevscale.min}
    * </p>
    */
-  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, true);
-
-  /**
-   * OptionID for {@link #MEAN_PARAM}
-   */
-  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.mean", "Fixed mean to use in standard deviation scaling.");
+  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.min", "Fixed minimum to use in sqrt scaling.");
 
   /**
    * Parameter to specify a fixed mean to use.
@@ -50,12 +40,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
    * Key: {@code -sqrtstddevscale.mean}
    * </p>
    */
-  private final DoubleParameter MEAN_PARAM = new DoubleParameter(MEAN_ID, true);
-
-  /**
-   * OptionID for {@link #LAMBDA_PARAM}
-   */
-  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.lambda", "Significance level to use for error function.");
+  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.mean", "Fixed mean to use in standard deviation scaling.");
 
   /**
    * Parameter to specify the lambda value
@@ -63,7 +48,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
    * Key: {@code -sqrtstddevscale.lambda}
    * </p>
    */
-  private final DoubleParameter LAMBDA_PARAM = new DoubleParameter(LAMBDA_ID, 3.0);
+  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.lambda", "Significance level to use for error function.");
 
   /**
    * Field storing the lambda value
@@ -86,23 +71,17 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   double factor;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param min
+   * @param mean
+   * @param lambda
    */
-  public SqrtStandardDeviationScaling(Parameterization config) {
+  public SqrtStandardDeviationScaling(Double min, Double mean, Double lambda) {
     super();
-    config = config.descend(this);
-    if(config.grab(MIN_PARAM)) {
-      min = MIN_PARAM.getValue();
-    }
-    if(config.grab(MEAN_PARAM)) {
-      mean = MEAN_PARAM.getValue();
-    }
-    if(config.grab(LAMBDA_PARAM)) {
-      lambda = LAMBDA_PARAM.getValue();
-    }
+    this.min = min;
+    this.mean = mean;
+    this.lambda = lambda;
   }
 
   @Override
@@ -158,5 +137,44 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   @Override
   public double getMax() {
     return 1.0;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected Double min = null;
+
+    protected Double mean = null;
+
+    protected Double lambda = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter minP = new DoubleParameter(MIN_ID, true);
+      if(config.grab(minP)) {
+        min = minP.getValue();
+      }
+
+      DoubleParameter meanP = new DoubleParameter(MEAN_ID, true);
+      if(config.grab(meanP)) {
+        mean = meanP.getValue();
+      }
+
+      DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, 3.0);
+      if(config.grab(lambdaP)) {
+        lambda = lambdaP.getValue();
+      }
+    }
+
+    @Override
+    protected SqrtStandardDeviationScaling makeInstance() {
+      return new SqrtStandardDeviationScaling(min, mean, lambda);
+    }
   }
 }

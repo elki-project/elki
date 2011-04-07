@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -179,18 +180,13 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
-     * OptionID for {@link #NOFILL_FLAG}.
-     */
-    public static final OptionID NOFILL_ID = OptionID.getOrCreateOptionID("selectionrange.nofill", "Use wireframe style for selection ranges.");
-
-    /**
      * Flag for half-transparent filling of selection cubes.
      * 
      * <p>
      * Key: {@code -selectionrange.nofill}
      * </p>
      */
-    private final Flag NOFILL_FLAG = new Flag(NOFILL_ID);
+    public static final OptionID NOFILL_ID = OptionID.getOrCreateOptionID("selectionrange.nofill", "Use wireframe style for selection ranges.");
 
     /**
      * Fill parameter.
@@ -198,14 +194,13 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     protected boolean nofill = false;
 
     /**
-     * Constructor, Parameterizable style
+     * Constructor.
+     *
+     * @param nofill
      */
-    public Factory(Parameterization config) {
+    public Factory(boolean nofill) {
       super();
-      config = config.descend(this);
-      if(config.grab(NOFILL_FLAG)) {
-        nofill = NOFILL_FLAG.getValue();
-      }
+      this.nofill = nofill;
     }
 
     @Override
@@ -222,7 +217,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
         context.addVisualizer(selres, task);
       }
     }
-    
+
     @Override
     public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
       return new ThumbnailVisualization<DatabaseObject>(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
@@ -231,6 +226,31 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     @Override
     public Class<? extends Projection> getProjectionType() {
       return Projection2D.class;
+    }
+
+    /**
+     * Parameterization class.
+     *
+     * @author Erich Schubert
+     *
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      protected boolean nofill;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        Flag nofillF = new Flag(NOFILL_ID);
+        if(config.grab(nofillF)) {
+          nofill = nofillF.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(nofill);
+      }
     }
   }
 }

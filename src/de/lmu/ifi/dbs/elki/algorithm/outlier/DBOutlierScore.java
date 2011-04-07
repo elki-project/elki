@@ -15,8 +15,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Compute percentage of neighbors in the given neighborhood with size d.
@@ -65,26 +63,21 @@ public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ext
     return scores;
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return ABOD Algorithm
-   */
-  public static <O extends DatabaseObject, D extends Distance<D>> DBOutlierScore<O, D> parameterize(Parameterization config) {
-    // distance used in preprocessor
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    // d parameter
-    D d = getParameterD(config, distanceFunction);
-
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new DBOutlierScore<O, D>(distanceFunction, d);
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
+    @Override
+    protected DBOutlierScore<O, D> makeInstance() {
+      return new DBOutlierScore<O, D>(distanceFunction, d);
+    }
   }
 }

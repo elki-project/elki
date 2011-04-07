@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Maximum distance function to compute the Minimum distance for a pair of
@@ -11,9 +12,17 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  */
 public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?,?>> {
   /**
+   * Static instance. Use this.
+   */
+  public static final MinimumDistanceFunction STATIC = new MinimumDistanceFunction();
+
+  /**
    * Provides a Minimum distance function that can compute the Minimum
    * distance (that is a DoubleDistance) for FeatureVectors.
+   * 
+   * @deprecated Use static instance!
    */
+  @Deprecated
   public MinimumDistanceFunction() {
     super();
   }
@@ -52,5 +61,19 @@ public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<N
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected MinimumDistanceFunction makeInstance() {
+      return MinimumDistanceFunction.STATIC;
+    }
   }
 }

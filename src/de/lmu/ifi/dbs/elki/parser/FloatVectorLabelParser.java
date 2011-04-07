@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.elki.parser;
 
+import java.util.BitSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.FloatVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * <p>
@@ -32,14 +33,14 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
   private static final Logging logger = Logging.getLogger(FloatVectorLabelParser.class);
   
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param colSep
+   * @param quoteChar
+   * @param labelIndices
    */
-  public FloatVectorLabelParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public FloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
+    super(colSep, quoteChar, labelIndices);
   }
 
   /**
@@ -60,5 +61,19 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<FloatVector> {
+    @Override
+    protected FloatVectorLabelParser makeInstance() {
+      return new FloatVectorLabelParser(colSep, quoteChar, labelIndices);
+    }
   }
 }

@@ -72,7 +72,8 @@
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.integer.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.Generic*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.data.cluster.Cluster
- * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.datastructures.KNNList.DBIDView
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.datastructures.heap.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.persistent.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
  * @apiviz.exclude java.*
  */

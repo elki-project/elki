@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -24,23 +25,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  */
 public abstract class TreeIndexFactory<O extends DatabaseObject, I extends TreeIndex<O, ?, ?>> implements IndexFactory<O, I> {
   /**
-   * OptionID for {@link #FILE_PARAM}
-   */
-  public static final OptionID FILE_ID = OptionID.getOrCreateOptionID("treeindex.file", "The name of the file storing the index. " + "If this parameter is not set the index is hold in the main memory.");
-
-  /**
    * Optional parameter that specifies the name of the file storing the index.
    * If this parameter is not set the index is hold in the main memory.
    * <p>
    * Key: {@code -treeindex.file}
    * </p>
    */
-  private final FileParameter FILE_PARAM = new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE, true);
-
-  /**
-   * OptionID for {@link #PAGE_SIZE_PARAM}
-   */
-  public static final OptionID PAGE_SIZE_ID = OptionID.getOrCreateOptionID("treeindex.pagesize", "The size of a page in bytes.");
+  public static final OptionID FILE_ID = OptionID.getOrCreateOptionID("treeindex.file", "The name of the file storing the index. " + "If this parameter is not set the index is hold in the main memory.");
 
   /**
    * Parameter to specify the size of a page in bytes, must be an integer
@@ -52,12 +43,7 @@ public abstract class TreeIndexFactory<O extends DatabaseObject, I extends TreeI
    * Key: {@code -treeindex.pagesize}
    * </p>
    */
-  private final IntParameter PAGE_SIZE_PARAM = new IntParameter(PAGE_SIZE_ID, new GreaterConstraint(0), 4000);
-
-  /**
-   * OptionID for {@link #CACHE_SIZE_PARAM}
-   */
-  public static final OptionID CACHE_SIZE_ID = OptionID.getOrCreateOptionID("treeindex.cachesize", "The size of the cache in bytes.");
+  public static final OptionID PAGE_SIZE_ID = OptionID.getOrCreateOptionID("treeindex.pagesize", "The size of a page in bytes.");
 
   /**
    * Parameter to specify the size of the cache in bytes, must be an integer
@@ -69,51 +55,78 @@ public abstract class TreeIndexFactory<O extends DatabaseObject, I extends TreeI
    * Key: {@code -treeindex.cachesize}
    * </p>
    */
-  private final LongParameter CACHE_SIZE_PARAM = new LongParameter(CACHE_SIZE_ID, new GreaterEqualConstraint(0), Integer.MAX_VALUE);
+  public static final OptionID CACHE_SIZE_ID = OptionID.getOrCreateOptionID("treeindex.cachesize", "The size of the cache in bytes.");
 
   /**
-   * Holds the name of the file storing the index specified by
-   * {@link #FILE_PARAM}, null if {@link #FILE_PARAM} is not specified.
+   * Holds the name of the file storing the index specified by {@link #FILE_ID},
+   * null if {@link #FILE_ID} is not specified.
    */
   protected String fileName = null;
 
   /**
-   * Holds the value of {@link #PAGE_SIZE_PARAM}.
+   * Holds the value of {@link #PAGE_SIZE_ID}.
    */
   protected int pageSize;
 
   /**
-   * Holds the value of {@link #CACHE_SIZE_PARAM}.
+   * Holds the value of {@link #CACHE_SIZE_ID}.
    */
   protected long cacheSize;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param fileName
+   * @param pageSize
+   * @param cacheSize
    */
-  public TreeIndexFactory(Parameterization config) {
+  public TreeIndexFactory(String fileName, int pageSize, long cacheSize) {
     super();
-    config = config.descend(this);
-
-    // file
-    if(config.grab(FILE_PARAM)) {
-      fileName = FILE_PARAM.getValue().getPath();
-    }
-    else {
-      fileName = null;
-    }
-    // page size
-    if(config.grab(PAGE_SIZE_PARAM)) {
-      pageSize = PAGE_SIZE_PARAM.getValue();
-    }
-    // cache size
-    if(config.grab(CACHE_SIZE_PARAM)) {
-      cacheSize = CACHE_SIZE_PARAM.getValue();
-    }
+    this.fileName = fileName;
+    this.pageSize = pageSize;
+    this.cacheSize = cacheSize;
   }
 
   @Override
   abstract public I instantiate(Database<O> database);
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    protected String fileName = null;
+
+    protected int pageSize;
+
+    protected long cacheSize;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      FileParameter FILE_PARAM = new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE, true);
+      if(config.grab(FILE_PARAM)) {
+        fileName = FILE_PARAM.getValue().getPath();
+      }
+      else {
+        fileName = null;
+      }
+
+      final IntParameter PAGE_SIZE_PARAM = new IntParameter(PAGE_SIZE_ID, new GreaterConstraint(0), 4000);
+      if(config.grab(PAGE_SIZE_PARAM)) {
+        pageSize = PAGE_SIZE_PARAM.getValue();
+      }
+
+      LongParameter CACHE_SIZE_PARAM = new LongParameter(CACHE_SIZE_ID, new GreaterEqualConstraint(0), Integer.MAX_VALUE);
+      if(config.grab(CACHE_SIZE_PARAM)) {
+        cacheSize = CACHE_SIZE_PARAM.getValue();
+      }
+    }
+
+    @Override
+    protected abstract TreeIndexFactory<O, ?> makeInstance();
+  }
 }

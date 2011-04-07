@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
@@ -26,22 +27,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  */
 public class OutlierLinearScaling implements OutlierScalingFunction {
   /**
-   * OptionID for {@link #MIN_PARAM}
-   */
-  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("linearscale.min", "Fixed minimum to use in lienar scaling.");
-
-  /**
    * Parameter to specify a fixed minimum to use.
    * <p>
    * Key: {@code -linearscale.min}
    * </p>
    */
-  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, true);
-
-  /**
-   * OptionID for {@link #MAX_PARAM}
-   */
-  public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("linearscale.max", "Fixed maximum to use in linear scaling.");
+  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("linearscale.min", "Fixed minimum to use in lienar scaling.");
 
   /**
    * Parameter to specify the maximum value
@@ -49,12 +40,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
    * Key: {@code -linearscale.max}
    * </p>
    */
-  private final DoubleParameter MAX_PARAM = new DoubleParameter(MAX_ID, true);
-
-  /**
-   * OptionID for {@link #MEAN_FLAG}
-   */
-  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("linearscale.usemean", "Use the mean as minimum for scaling.");
+  public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("linearscale.max", "Fixed maximum to use in linear scaling.");
 
   /**
    * Flag to use the mean as minimum for scaling.
@@ -63,12 +49,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
    * Key: {@code -linearscale.usemean}
    * </p>
    */
-  private final Flag MEAN_FLAG = new Flag(MEAN_ID);
-
-  /**
-   * OptionID for {@link #NOZEROS_FLAG}
-   */
-  public static final OptionID NOZEROS_ID = OptionID.getOrCreateOptionID("linearscale.ignorezero", "Ignore zero entries when computing the minimum and maximum.");
+  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("linearscale.usemean", "Use the mean as minimum for scaling.");
 
   /**
    * Flag to use ignore zeros when computing the min and max.
@@ -77,7 +58,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
    * Key: {@code -linearscale.ignorezero}
    * </p>
    */
-  private final Flag NOZEROS_FLAG = new Flag(NOZEROS_ID);
+  public static final OptionID NOZEROS_ID = OptionID.getOrCreateOptionID("linearscale.ignorezero", "Ignore zero entries when computing the minimum and maximum.");
 
   /**
    * Field storing the Minimum to use
@@ -105,33 +86,19 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
   boolean nozeros = false;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param min
+   * @param max
+   * @param usemean
+   * @param nozeros
    */
-  public OutlierLinearScaling(Parameterization config) {
+  public OutlierLinearScaling(Double min, Double max, boolean usemean, boolean nozeros) {
     super();
-    config = config.descend(this);
-    if(config.grab(MIN_PARAM)) {
-      min = MIN_PARAM.getValue();
-    }
-    if(config.grab(MAX_PARAM)) {
-      max = MAX_PARAM.getValue();
-    }
-    if(config.grab(MEAN_FLAG)) {
-      usemean = MEAN_FLAG.getValue();
-    }
-    if(config.grab(NOZEROS_FLAG)) {
-      nozeros = NOZEROS_FLAG.getValue();
-    }
-
-    // Use-Mean and Minimum value must not be set at the same time!
-    ArrayList<Parameter<?, ?>> minmean = new ArrayList<Parameter<?, ?>>();
-    minmean.add(MIN_PARAM);
-    minmean.add(MEAN_FLAG);
-    GlobalParameterConstraint gpc = new OnlyOneIsAllowedToBeSetGlobalConstraint(minmean);
-    config.checkConstraint(gpc);
+    this.min = min;
+    this.max = max;
+    this.usemean = usemean;
+    this.nozeros = nozeros;
   }
 
   @Override
@@ -202,5 +169,70 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
   @Override
   public double getMax() {
     return 1.0;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Field storing the Minimum to use
+     */
+    protected Double min = null;
+
+    /**
+     * Field storing the Maximum value
+     */
+    protected Double max = null;
+
+    /**
+     * Use the mean for scaling
+     */
+    boolean usemean = false;
+
+    /**
+     * Ignore zero values
+     */
+    boolean nozeros = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter minP = new DoubleParameter(MIN_ID, true);
+      if(config.grab(minP)) {
+        min = minP.getValue();
+      }
+
+      DoubleParameter maxP = new DoubleParameter(MAX_ID, true);
+      if(config.grab(maxP)) {
+        max = maxP.getValue();
+      }
+
+      Flag meanF = new Flag(MEAN_ID);
+      if(config.grab(meanF)) {
+        usemean = meanF.getValue();
+      }
+
+      Flag nozerosF = new Flag(NOZEROS_ID);
+      if(config.grab(nozerosF)) {
+        nozeros = nozerosF.getValue();
+      }
+
+      // Use-Mean and Minimum value must not be set at the same time!
+      ArrayList<Parameter<?, ?>> minmean = new ArrayList<Parameter<?, ?>>();
+      minmean.add(minP);
+      minmean.add(meanF);
+      GlobalParameterConstraint gpc = new OnlyOneIsAllowedToBeSetGlobalConstraint(minmean);
+      config.checkConstraint(gpc);
+    }
+
+    @Override
+    protected OutlierLinearScaling makeInstance() {
+      return new OutlierLinearScaling(min, max, usemean, nozeros);
+    }
   }
 }

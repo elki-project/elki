@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.ExternalObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -43,14 +45,9 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   private static final Logging logger = Logging.getLogger(NumberDistanceParser.class);
 
   /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("parser.distancefunction", "Distance function used for parsing values.");
-
-  /**
    * Parameter for distance function.
    */
-  private ObjectParameter<DistanceFunction<?, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<?, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
+  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("parser.distancefunction", "Distance function used for parsing values.");
 
   /**
    * The distance function.
@@ -58,17 +55,15 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   private DistanceFunction<?, D> distanceFunction;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param colSep
+   * @param quoteChar
+   * @param distanceFunction
    */
-  public NumberDistanceParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
-      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
+  public NumberDistanceParser(Pattern colSep, char quoteChar, DistanceFunction<?, D> distanceFunction) {
+    super(colSep, quoteChar);
+    this.distanceFunction = distanceFunction;
   }
 
   @Override
@@ -78,7 +73,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     List<Pair<ExternalObject, List<String>>> objectAndLabelsList = new ArrayList<Pair<ExternalObject, List<String>>>();
 
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
-    Map<Pair<DBID, DBID>, D> distanceCache = new HashMap<Pair<DBID, DBID>, D>();
+    Map<DBIDPair, D> distanceCache = new HashMap<DBIDPair, D>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(lineNumber % 10000 == 0 && logger.isDebugging()) {
@@ -156,14 +151,14 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * @param distance the distance value
    * @param cache the distance cache
    */
-  private void put(DBID id1, DBID id2, D distance, Map<Pair<DBID, DBID>, D> cache) {
+  private void put(DBID id1, DBID id2, D distance, Map<DBIDPair, D> cache) {
     // the smaller id is the first key
     if(id1.getIntegerID() > id2.getIntegerID()) {
       put(id2, id1, distance, cache);
       return;
     }
 
-    D oldDistance = cache.put(new Pair<DBID, DBID>(id1, id2), distance);
+    D oldDistance = cache.put(DBIDUtil.newPair(id1, id2), distance);
 
     if(oldDistance != null) {
       throw new IllegalArgumentException("Distance value for specified ids is already assigned!");
@@ -180,16 +175,44 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * @return <tt>true</tt> if this cache contains a distance value for the
    *         specified ids, false otherwise
    */
-  public boolean containsKey(DBID id1, DBID id2, Map<Pair<DBID, DBID>, D> cache) {
+  public boolean containsKey(DBID id1, DBID id2, Map<DBIDPair, D> cache) {
     if(id1.getIntegerID() > id2.getIntegerID()) {
       return containsKey(id2, id1, cache);
     }
 
-    return cache.containsKey(new Pair<DBID, DBID>(id1, id2));
+    return cache.containsKey(DBIDUtil.newPair(id1, id2));
   }
 
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<D extends NumberDistance<D, N>, N extends Number> extends AbstractParser.Parameterizer<ExternalObject> {
+    /**
+     * The distance function.
+     */
+    protected DistanceFunction<?, D> distanceFunction;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<DistanceFunction<?, D>> distFuncP = new ObjectParameter<DistanceFunction<?, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
+      if(config.grab(distFuncP)) {
+        distanceFunction = distFuncP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected NumberDistanceParser<D,N> makeInstance() {
+      return new NumberDistanceParser<D,N>(colSep, quoteChar, distanceFunction);
+    }
   }
 }

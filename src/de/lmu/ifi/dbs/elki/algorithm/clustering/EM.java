@@ -21,13 +21,14 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
@@ -351,7 +352,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       // XXX perhaps this can be done more conveniently?
       V randomBase = database.get(database.iterator().next());
       EmptyParameterization parameters = new EmptyParameterization();
-      AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>(parameters);
+      Class<AttributeWiseMinMaxNormalization<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(AttributeWiseMinMaxNormalization.class);
+      AttributeWiseMinMaxNormalization<V> normalization = parameters.tryInstantiate(cls);
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
@@ -396,66 +398,47 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     return probClusterIGivenX.get(index);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
-   */
-  public static <V extends NumberVector<V, ?>> EM<V> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    double delta = getParameterDelta(config);
-    Long seed = getParameterSeed(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new EM<V>(k, delta, seed);
-  }
-
-  /**
-   * Get the k parameter
-   * 
-   * @param config Parameterization
-   * @return k parameter value
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(0));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
-  /**
-   * Get the delta parameter.
-   * 
-   * @param config Parameterization
-   * @return delta parameter value
-   */
-  protected static double getParameterDelta(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0.0), 0.0);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return Double.NaN;
-  }
-
-  /**
-   * Get the seed parameter
-   * 
-   * @param config Parameterization
-   * @return seed parameter value
-   */
-  protected static Long getParameterSeed(Parameterization config) {
-    final LongParameter param = new LongParameter(SEED_ID, true);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    protected int k;
+
+    protected double delta;
+
+    protected Long seed;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+
+      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0.0), 0.0);
+      if(config.grab(deltaP)) {
+        delta = deltaP.getValue();
+      }
+
+      LongParameter seedP = new LongParameter(SEED_ID, true);
+      if(config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
+    }
+
+    @Override
+    protected EM<V> makeInstance() {
+      return new EM<V>(k, delta, seed);
+    }
   }
 }

@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -24,7 +23,9 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -46,35 +47,13 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @apiviz.landmark
  * @apiviz.has ScalingFunction
- * @apiviz.uses HistogramResult oneway - - «create»
- * 
- * @param <O> Database object type
+ * @apiviz.has HistogramResult oneway - - «create»
  */
-public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evaluator<O> {
+public class ComputeOutlierHistogram implements Evaluator {
   /**
    * Logger for debugging.
    */
   protected static final Logging logger = Logging.getLogger(ComputeOutlierHistogram.class);
-  
-  /**
-   * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("comphist.positive", "Class label for the 'positive' class.");
-
-  /**
-   * OptionID for {@link #BINS_ID}
-   */
-  public static final OptionID BINS_ID = OptionID.getOrCreateOptionID("comphist.bins", "number of bins");
-
-  /**
-   * OptionID for {@link #SCALING_PARAM}
-   */
-  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("comphist.scaling", "Class to use as scaling function.");
-
-  /**
-   * OptionID for {@link #SPLITFREQ_PARAM}
-   */
-  public static final OptionID SPLITFREQ_ID = OptionID.getOrCreateOptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
 
   /**
    * The object pattern to identify positive classes
@@ -82,7 +61,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
    * Key: {@code -comphist.positive}
    * </p>
    */
-  private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID, true);
+  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("comphist.positive", "Class label for the 'positive' class.");
 
   /**
    * number of bins for the histogram
@@ -93,7 +72,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
    * Key: {@code -comphist.bins}
    * </p>
    */
-  private final IntParameter BINS_PARAM = new IntParameter(BINS_ID);
+  public static final OptionID BINS_ID = OptionID.getOrCreateOptionID("comphist.bins", "number of bins");
 
   /**
    * Parameter to specify a scaling function to use.
@@ -101,7 +80,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("comphist.scaling", "Class to use as scaling function.");
 
   /**
    * Flag to count frequencies of outliers and non-outliers separately
@@ -109,12 +88,12 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
    * Key: {@code -histogram.splitfreq}
    * </p>
    */
-  private final Flag SPLITFREQ_PARAM = new Flag(SPLITFREQ_ID);
+  public static final OptionID SPLITFREQ_ID = OptionID.getOrCreateOptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
 
   /**
    * Stores the "positive" class.
    */
-  private Pattern positive_class_name = null;
+  private Pattern positiveClassName = null;
 
   /**
    * Number of bins
@@ -132,26 +111,19 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
   private boolean splitfreq = false;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param positive_class_name Class name
+   * @param bins Bins
+   * @param scaling Scaling
+   * @param splitfreq Scale inlier and outlier frequencies independently
    */
-  public ComputeOutlierHistogram(Parameterization config) {
+  public ComputeOutlierHistogram(Pattern positive_class_name, int bins, ScalingFunction scaling, boolean splitfreq) {
     super();
-    config = config.descend(this);
-    if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
-      positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
-    }
-    if(config.grab(BINS_PARAM)) {
-      bins = BINS_PARAM.getValue();
-    }
-    if(config.grab(SCALING_PARAM)) {
-      scaling = SCALING_PARAM.instantiateClass(config);
-    }
-    if(config.grab(SPLITFREQ_PARAM)) {
-      splitfreq = SPLITFREQ_PARAM.getValue();
-    }
+    this.positiveClassName = positive_class_name;
+    this.bins = bins;
+    this.scaling = scaling;
+    this.splitfreq = splitfreq;
   }
 
   /**
@@ -161,14 +133,14 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
    * @param or Outlier result
    * @return Result
    */
-  public HistogramResult<DoubleVector> evaluateOutlierResult(Database<O> database, OutlierResult or) {
+  public HistogramResult<DoubleVector> evaluateOutlierResult(Database<?> database, OutlierResult or) {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(database.getIDs(), or);
     }
 
     ModifiableDBIDs ids = DBIDUtil.newHashSet(database.getIDs());
-    DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positive_class_name);
+    DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positiveClassName);
     // first value for outliers, second for each object
     final AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> hist;
     // If we have useful (finite) min/max, use these for binning.
@@ -215,20 +187,79 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> implements Evalua
   }
 
   @Override
-  public void processResult(Database<O> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    if (ors == null || ors.size() <= 0) {
-      //logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
+    if(ors == null || ors.size() <= 0) {
+      // logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
       return;
     }
-    
-    for (OutlierResult or : ors) {
+
+    for(OutlierResult or : ors) {
       hierarchy.add(or, evaluateOutlierResult(db, or));
     }
   }
 
   @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
     // Ignore normalizations.
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Stores the "positive" class.
+     */
+    protected Pattern positiveClassName = null;
+
+    /**
+     * Number of bins
+     */
+    protected int bins;
+
+    /**
+     * Scaling function to use
+     */
+    protected ScalingFunction scaling;
+
+    /**
+     * Flag to make split frequencies
+     */
+    protected boolean splitfreq = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID, true);
+      if(config.grab(positiveClassNameP)) {
+        positiveClassName = positiveClassNameP.getValue();
+      }
+
+      IntParameter binsP = new IntParameter(BINS_ID, new GreaterConstraint(1));
+      if(config.grab(binsP)) {
+        bins = binsP.getValue();
+      }
+
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+      if(config.grab(scalingP)) {
+        scaling = scalingP.instantiateClass(config);
+      }
+
+      Flag splitfreqF = new Flag(SPLITFREQ_ID);
+      if(config.grab(splitfreqF)) {
+        splitfreq = splitfreqF.getValue();
+      }
+
+    }
+
+    @Override
+    protected ComputeOutlierHistogram makeInstance() {
+      return new ComputeOutlierHistogram(positiveClassName, bins, scaling, splitfreq);
+    }
   }
 }

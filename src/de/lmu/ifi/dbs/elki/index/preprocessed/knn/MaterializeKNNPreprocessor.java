@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -499,28 +500,18 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    */
   public static class Factory<O extends DatabaseObject, D extends Distance<D>> implements IndexFactory<O, KNNIndex<O>> {
     /**
-     * OptionID for {@link #K_PARAM}
-     */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("materialize.k", "The number of nearest neighbors of an object to be materialized.");
-
-    /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * materialized. must be an integer greater than 1.
      * <p>
      * Key: {@code -materialize.k}
      * </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("materialize.k", "The number of nearest neighbors of an object to be materialized.");
 
     /**
-     * Holds the value of {@link #K_PARAM}.
+     * Holds the value of {@link #K_ID}.
      */
     protected int k;
-
-    /**
-     * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
-     */
-    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("materialize.distance", "the distance function to materialize the nearest neighbors");
 
     /**
      * Parameter to indicate the distance function to be used to ascertain the
@@ -533,7 +524,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * Key: {@code materialize.distance}
      * </p>
      */
-    public final ObjectParameter<DistanceFunction<? super O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("materialize.distance", "the distance function to materialize the nearest neighbors");
 
     /**
      * Hold the distance function to be used.
@@ -541,23 +532,15 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     protected DistanceFunction<? super O, D> distanceFunction;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Index factory.
      * 
-     * @param config Parameterization
+     * @param k k parameter
+     * @param distanceFunction distance function
      */
-    public Factory(Parameterization config) {
+    public Factory(int k, DistanceFunction<? super O, D> distanceFunction) {
       super();
-      config = config.descend(this);
-      // number of neighbors
-      if(config.grab(K_PARAM)) {
-        k = K_PARAM.getValue();
-      }
-
-      // distance function
-      if(config.grab(DISTANCE_FUNCTION_PARAM)) {
-        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-      }
+      this.k = k;
+      this.distanceFunction = distanceFunction;
     }
 
     @Override
@@ -583,6 +566,46 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      */
     public D getDistanceFactory() {
       return distanceFunction.getDistanceFactory();
+    }
+  
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+      /**
+       * Holds the value of {@link #K_ID}.
+       */
+      protected int k;
+
+      /**
+       * Hold the distance function to be used.
+       */
+      protected DistanceFunction<? super O, D> distanceFunction;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        // number of neighbors
+        final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
+        if(config.grab(kP)) {
+          k = kP.getValue();
+        }
+
+        // distance function
+        final ObjectParameter<DistanceFunction<? super O, D>> distanceFunctionP = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        if(config.grab(distanceFunctionP)) {
+          distanceFunction = distanceFunctionP.instantiateClass(config);
+        }
+      }
+
+      @Override
+      protected Factory<O,D> makeInstance() {
+        return new Factory<O,D>(k, distanceFunction);
+      }
     }
   }
 }

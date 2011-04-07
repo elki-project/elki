@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -22,12 +23,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 public class SparseFloatVectorRandomProjectionParser extends RandomProjectionParser<SparseFloatVector> {
   /**
    * Constructor.
-   * 
-   * @param config Configuration
+   *
+   * @param baseparser
+   * @param dim
    */
-  public SparseFloatVectorRandomProjectionParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public SparseFloatVectorRandomProjectionParser(Parser<SparseFloatVector> baseparser, int dim) {
+    super(baseparser, dim);
   }
 
   /**
@@ -51,5 +52,24 @@ public class SparseFloatVectorRandomProjectionParser extends RandomProjectionPar
     }
     final Map<Integer, Float> emptyMap = Collections.emptyMap();
     return new ParsingResult<SparseFloatVector>(projectedResult, new SparseFloatVector(emptyMap, k));
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends RandomProjectionParser.Parameterizer<SparseFloatVector> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+
+    @Override
+    protected SparseFloatVectorRandomProjectionParser makeInstance() {
+      return new SparseFloatVectorRandomProjectionParser(baseparser, k);
+    }
   }
 }

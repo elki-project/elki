@@ -104,4 +104,14 @@ public interface Parameterization {
    * @return class instance or null
    */
   public <C> C tryInstantiate(Class<C> r, Class<?> c);
+
+
+  /**
+   * Try to instantiate a particular class.
+   * 
+   * @param <C> return type
+   * @param c Base class
+   * @return class instance or null
+   */
+  public <C> C tryInstantiate(Class<C> c);
 }

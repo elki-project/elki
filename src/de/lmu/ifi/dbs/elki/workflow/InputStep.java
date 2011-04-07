@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
@@ -44,32 +45,19 @@ public class InputStep<O extends DatabaseObject> implements WorkflowStep {
   private Database<O> db = null;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param databaseConnection
+   * @param normalization
+   * @param normalizationUndo
    */
-  public InputStep(Parameterization config) {
+  public InputStep(DatabaseConnection<O> databaseConnection, Normalization<O> normalization, boolean normalizationUndo) {
     super();
-    config = config.descend(this);
-    final ObjectParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-    final ObjectParameter<Normalization<O>> NORMALIZATION_PARAM = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
-    final Flag NORMALIZATION_UNDO_FLAG = new Flag(OptionID.NORMALIZATION_UNDO);
-    if(config.grab(DATABASE_CONNECTION_PARAM)) {
-      databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
-    }
-    // parameter normalization
-    config.grab(NORMALIZATION_PARAM);
-    config.grab(NORMALIZATION_UNDO_FLAG);
-    // normalization-undo depends on a defined normalization.
-    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
-    config.checkConstraint(gpc);
-    if(NORMALIZATION_PARAM.isDefined()) {
-      normalization = NORMALIZATION_PARAM.instantiateClass(config);
-      normalizationUndo = NORMALIZATION_UNDO_FLAG.getValue();
-    }
+    this.databaseConnection = databaseConnection;
+    this.normalization = normalization;
+    this.normalizationUndo = normalizationUndo;
   }
-  
+
   /**
    * Get the database to use.
    * 
@@ -98,5 +86,56 @@ public class InputStep<O extends DatabaseObject> implements WorkflowStep {
    */
   public boolean getNormalizationUndo() {
     return normalizationUndo;
+  }
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Holds the database connection to have the algorithm run with.
+     */
+    protected DatabaseConnection<O> databaseConnection = null;
+
+    /**
+     * A normalization - per default no normalization is used.
+     */
+    protected Normalization<O> normalization = null;
+
+    /**
+     * Whether to undo normalization for result.
+     */
+    protected boolean normalizationUndo = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final ObjectParameter<DatabaseConnection<O>> dbcP = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      if(config.grab(dbcP)) {
+        databaseConnection = dbcP.instantiateClass(config);
+      }
+      
+      // parameter normalization
+      final ObjectParameter<Normalization<O>> normP = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
+      final Flag normUndoF = new Flag(OptionID.NORMALIZATION_UNDO);
+      config.grab(normP);
+      config.grab(normUndoF);
+      // normalization-undo depends on a defined normalization.
+      GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Class<?>, Class<? extends Normalization<O>>>(normP, null, normUndoF, true);
+      config.checkConstraint(gpc);
+      if(normP.isDefined()) {
+        normalization = normP.instantiateClass(config);
+        normalizationUndo = normUndoF.getValue();
+      }
+    }
+
+    @Override
+    protected InputStep<O> makeInstance() {
+      return new InputStep<O>(databaseConnection, normalization, normalizationUndo);
+    }
   }
 }

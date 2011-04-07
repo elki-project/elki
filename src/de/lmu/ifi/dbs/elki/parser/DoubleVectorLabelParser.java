@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.elki.parser;
 
+import java.util.BitSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * <p>
@@ -28,16 +29,16 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
    * Class logger
    */
   private static final Logging logger = Logging.getLogger(DoubleVectorLabelParser.class);
-  
+
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param colSep
+   * @param quoteChar
+   * @param labelIndices
    */
-  public DoubleVectorLabelParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public DoubleVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
+    super(colSep, quoteChar, labelIndices);
   }
 
   /**
@@ -58,5 +59,19 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<DoubleVector> {
+    @Override
+    protected DoubleVectorLabelParser makeInstance() {
+      return new DoubleVectorLabelParser(colSep, quoteChar, labelIndices);
+    }
   }
 }

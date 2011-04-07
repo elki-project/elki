@@ -83,14 +83,14 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   public static final OptionID M_I_ID = OptionID.getOrCreateOptionID("proclus.mi", "The multiplier for the initial number of medoids.");
 
   /**
-   * Holds the value of {@link #M_I_ID}.
-   */
-  private int m_i;
-
-  /**
    * Parameter to specify the random generator seed.
    */
   public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("proclus.seed", "The random number generator seed.");
+
+  /**
+   * Holds the value of {@link #M_I_ID}.
+   */
+  private int m_i;
 
   /**
    * Holds the value of {@link #SEED_ID}.
@@ -98,22 +98,18 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   private Long seed;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Java constructor.
    * 
-   * @param config Parameterization
+   * @param k k Parameter
+   * @param k_i k_i Parameter
+   * @param l l Parameter
+   * @param m_i m_i Parameter
+   * @param seed Random generator seed
    */
-  public PROCLUS(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    final IntParameter m_i_param = new IntParameter(M_I_ID, new GreaterConstraint(0), 10);
-    if(config.grab(m_i_param)) {
-      m_i = m_i_param.getValue();
-    }
-    final LongParameter seedparam = new LongParameter(SEED_ID, true);
-    if(config.grab(seedparam)) {
-      seed = seedparam.getValue();
-    }
+  public PROCLUS(int k, int k_i, int l, int m_i, Long seed) {
+    super(k, k_i, l);
+    this.m_i = m_i;
+    this.seed = seed;
   }
 
   /**
@@ -125,16 +121,13 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     try {
       DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
       RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
-      final int dim = getL();
-      final int k = getK();
-      final int k_i = getK_i();
       final Random random = new Random();
-      if (seed != null) {
+      if(seed != null) {
         random.setSeed(seed);
       }
 
-      if(DatabaseUtil.dimensionality(database) < dim) {
-        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + DatabaseUtil.dimensionality(database) + " < " + dim + ")");
+      if(DatabaseUtil.dimensionality(database) < l) {
+        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + DatabaseUtil.dimensionality(database) + " < " + l + ")");
       }
 
       // TODO: use a StepProgress!
@@ -188,7 +181,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
           loops = 0;
           bestObjective = objectiveFunction;
           m_best = m_current;
-          m_bad = computeBadMedoids(clusters, (int) (database.size() * 0.1 / getK()));
+          m_bad = computeBadMedoids(clusters, (int) (database.size() * 0.1 / k));
         }
 
         m_current = computeM_current(medoids, m_best, m_bad, random);
@@ -432,7 +425,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     }
     Collections.sort(z_ijs);
 
-    int max = Math.max(getK() * getL(), 2);
+    int max = Math.max(k * l, 2);
     for(int m = 0; m < max; m++) {
       CTriple<Double, DBID, Integer> z_ij = z_ijs.get(m);
       Set<Integer> dims_i = dimensionMap.get(z_ij.getSecond());
@@ -505,7 +498,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
     // mapping cluster index -> dimensions
     Map<Integer, Set<Integer>> dimensionMap = new HashMap<Integer, Set<Integer>>();
-    int max = Math.max(getK() * getL(), 2);
+    int max = Math.max(k * l, 2);
     for(int m = 0; m < max; m++) {
       CTriple<Double, Integer, Integer> z_ij = z_ijs.get(m);
       Set<Integer> dims_i = dimensionMap.get(z_ij.getSecond());
@@ -792,5 +785,43 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractProjectedClustering.Parameterizer {
+    protected int m_i = -1;
+
+    protected Long seed = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      configK(config);
+      configKI(config);
+      configL(config);
+
+      IntParameter m_iP = new IntParameter(M_I_ID, 10);
+      m_iP.addConstraint(new GreaterConstraint(0));
+      if(config.grab(m_iP)) {
+        m_i = m_iP.getValue();
+      }
+
+      LongParameter seedP = new LongParameter(SEED_ID, true);
+      if(config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
+    }
+
+    @Override
+    protected PROCLUS<V> makeInstance() {
+      return new PROCLUS<V>(k, k_i, l, m_i, seed);
+    }
   }
 }

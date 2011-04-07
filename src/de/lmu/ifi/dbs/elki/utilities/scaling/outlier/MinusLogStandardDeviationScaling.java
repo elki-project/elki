@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -21,20 +20,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fixedmean
+   * @param lambda
    */
-  public MinusLogStandardDeviationScaling(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public MinusLogStandardDeviationScaling(Double fixedmean, Double lambda) {
+    super(fixedmean, lambda);
   }
 
   @Override
   public double getScaled(double value) {
     final double mlogv = -Math.log(value);
-    if (mlogv < mean || Double.isNaN(mlogv)) {
+    if(mlogv < mean || Double.isNaN(mlogv)) {
       return 0.0;
     }
     return Math.max(0.0, ErrorFunctions.erf((mlogv - mean) / factor));
@@ -65,6 +63,20 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
         }
       }
       factor = lambda * Math.sqrt(sqsum / cnt) * Math.sqrt(2);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends StandardDeviationScaling.Parameterizer {
+    @Override
+    protected MinusLogStandardDeviationScaling makeInstance() {
+      return new MinusLogStandardDeviationScaling(fixedmean, lambda);
     }
   }
 }

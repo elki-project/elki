@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -20,18 +21,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Provides the correlation distance for real valued vectors.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has Instance
  */
-// TODO: can we spec D differently so we don't get the unchecked warnings below?
 public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, PCACorrelationDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, PCACorrelationDistance> {
   /**
    * Logger for debug.
    */
   static Logging logger = Logging.getLogger(PCABasedCorrelationDistanceFunction.class);
-
-  /**
-   * OptionID for {@link #DELTA_PARAM}
-   */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("pcabasedcorrelationdf.delta", "Threshold of a distance between a vector q and a given space that indicates that " + "q adds a new dimension to the space.");
 
   /**
    * Parameter to specify the threshold of a distance between a vector q and a
@@ -44,40 +41,27 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
    * Key: {@code -pcabasedcorrelationdf.delta}
    * </p>
    */
-  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.25);
+  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("pcabasedcorrelationdf.delta", "Threshold of a distance between a vector q and a given space that indicates that " + "q adds a new dimension to the space.");
 
   /**
-   * Holds the value of {@link #DELTA_PARAM}.
+   * Holds the value of {@link #DELTA_ID}.
    */
   private double delta;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    * 
-   * @param config Parameterization
+   * @param indexFactory index factory
+   * @param delta Delta parameter
    */
-  public PCABasedCorrelationDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(DELTA_PARAM)) {
-      delta = DELTA_PARAM.getValue();
-    }
+  public PCABasedCorrelationDistanceFunction(IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>> indexFactory, double delta) {
+    super(indexFactory);
+    this.delta = delta;
   }
 
   @Override
   public PCACorrelationDistance getDistanceFactory() {
     return PCACorrelationDistance.FACTORY;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryRestriction() {
-    return FilteredLocalPCAIndex.Factory.class;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryDefaultClass() {
-    return KNNQueryFilteredPCAIndex.Factory.class;
   }
 
   @Override
@@ -87,9 +71,10 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
 
   @Override
   public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
-    // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
+    // We can't really avoid these warnings, due to a limitation in Java
+    // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) index.instantiate((Database<NumberVector<?, ?>>)database);
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Database<NumberVector<?, ?>>) database);
     return new Instance<T>(database, indexinst, delta, this);
   }
 
@@ -248,6 +233,33 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
         sqrDist += manhattanI * manhattanI;
       }
       return Math.sqrt(sqrDist);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<FilteredLocalPCAIndex.Factory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>>> {
+    protected double delta = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configIndexFactory(config, FilteredLocalPCAIndex.Factory.class, KNNQueryFilteredPCAIndex.Factory.class);
+
+      final DoubleParameter param = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.25);
+      if(config.grab(param)) {
+        delta = param.getValue();
+      }
+    }
+
+    @Override
+    protected PCABasedCorrelationDistanceFunction makeInstance() {
+      return new PCABasedCorrelationDistanceFunction(factory, delta);
     }
   }
 }

@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -22,13 +21,13 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -215,13 +214,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
         logger.debugFine(log.toString());
       }
 
-      Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + /*
-                                                                                                                                                 * B
-                                                                                                                                                 * .
-                                                                                                                                                 * getColumnDimensionality
-                                                                                                                                                 * (
-                                                                                                                                                 * )
-                                                                                                                                                 */1);
+      // +1 == + B.getColumnDimensionality()
+      Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + 1);
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
       gaussJordan.setColumnVector(transposedWeakEigenvectors.getColumnDimensionality(), B);
 
@@ -256,55 +250,61 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   }
 
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <V extends NumberVector<V, ?>, D extends Distance<D>> DependencyDerivator<V, D> parameterize(Parameterization config) {
-    // Get the distance function
-    final PrimitiveDistanceFunction<V, D> distanceFunction = getParameterDistanceFunction(config, EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
-    // Get the number format
-    final NumberFormat NF = getParameterNumberFormat(config);
-
-    // parameter sample size
-    int sampleSize = 0;
-    final IntParameter SAMPLE_SIZE_PARAM = new IntParameter(SAMPLE_SIZE_ID, new GreaterConstraint(0), true);
-    if(config.grab(SAMPLE_SIZE_PARAM)) {
-      sampleSize = SAMPLE_SIZE_PARAM.getValue();
-    }
-
-    // random sample
-    final Flag RANDOM_SAMPLE_FLAG = new Flag(DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
-    boolean randomsample = false;
-    if(config.grab(RANDOM_SAMPLE_FLAG)) {
-      randomsample = RANDOM_SAMPLE_FLAG.getValue();
-    }
-
-    // Configure PCA
-    PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>(config);
-
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new DependencyDerivator<V, D>(distanceFunction, NF, pca, sampleSize, randomsample);
-  }
-
-  /**
-   * Get the number format parameter.
+   * @author Erich Schubert
    * 
-   * @param config Parameterization
-   * @return Number format
+   * @apiviz.exclude
    */
-  protected static NumberFormat getParameterNumberFormat(Parameterization config) {
-    final NumberFormat NF = NumberFormat.getInstance(Locale.US);
-    final IntParameter OUTPUT_ACCURACY_PARAM = new IntParameter(OUTPUT_ACCURACY_ID, new GreaterEqualConstraint(0), 4);
-    // parameter output accuracy
-    if(config.grab(OUTPUT_ACCURACY_PARAM)) {
-      int accuracy = OUTPUT_ACCURACY_PARAM.getValue();
-      NF.setMaximumFractionDigits(accuracy);
-      NF.setMinimumFractionDigits(accuracy);
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+    protected int outputAccuracy = 0;
+
+    protected int sampleSize = 0;
+
+    protected boolean randomSample = false;
+
+    protected PCAFilteredRunner<V, DoubleDistance> pca = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configAccuracy(config);
+      configSampleSize(config);
+      configRandomSampleFlag(config);
+      Class<PCAFilteredRunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+      pca = config.tryInstantiate(cls);
     }
-    return NF;
+
+    public void configRandomSampleFlag(Parameterization config) {
+      Flag randomSampleF = new Flag(DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
+      if(config.grab(randomSampleF)) {
+        randomSample = randomSampleF.getValue();
+      }
+    }
+
+    public void configSampleSize(Parameterization config) {
+      IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID, true);
+      sampleSizeP.addConstraint(new GreaterConstraint(0));
+      if(config.grab(sampleSizeP)) {
+        sampleSize = sampleSizeP.getValue();
+      }
+    }
+
+    public void configAccuracy(Parameterization config) {
+      IntParameter outputAccuracyP = new IntParameter(OUTPUT_ACCURACY_ID, 4);
+      outputAccuracyP.addConstraint(new GreaterEqualConstraint(0));
+      if(config.grab(outputAccuracyP)) {
+        outputAccuracy = outputAccuracyP.getValue();
+      }
+    }
+
+    @Override
+    protected DependencyDerivator<V, D> makeInstance() {
+      NumberFormat NF = NumberFormat.getInstance(Locale.US);
+      NF.setMaximumFractionDigits(outputAccuracy);
+      NF.setMinimumFractionDigits(outputAccuracy);
+
+      return new DependencyDerivator<V, D>(distanceFunction, NF, pca, sampleSize, randomSample);
+    }
   }
 }

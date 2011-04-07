@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -134,28 +135,34 @@ public final class ClassGenericsUtil {
     }
     return instance;
   }
-  
+
   /**
-   * Inspect the class for a static "parameterize" method that satisfies certain constraints.
+   * Inspect the class for a static "parameterize" method that satisfies certain
+   * constraints.
    * 
    * @param <C> Return class type
    * @param c Class to inspect.
    * @param ret Expected return type
-   * @return factory method that can be called with {@code factory(null, Parameterization)}.
-   * @throws NoSuchMethodException When no factory method was found, or it doesn't fit the constraints.
+   * @return factory method that can be called with
+   *         {@code factory(null, Parameterization)}.
+   * @throws NoSuchMethodException When no factory method was found, or it
+   *         doesn't fit the constraints.
    * @throws Exception On other errors such as security exceptions
    */
   public static <C> Method getParameterizationFactoryMethod(Class<C> c, Class<?> ret) throws NoSuchMethodException, Exception {
     Method m = c.getMethod(FACTORY_METHOD_NAME, Parameterization.class);
-    if (!ret.isAssignableFrom(m.getReturnType())) {
-      throw new NoSuchMethodException("Return type doesn't match: "+m.getReturnType().getName()+", expected: "+ret.getName());
+    if(m == null) {
+      throw new NoSuchMethodException("No parameterization method found.");
     }
-    if (!java.lang.reflect.Modifier.isStatic(m.getModifiers())) {
+    if(!ret.isAssignableFrom(m.getReturnType())) {
+      throw new NoSuchMethodException("Return type doesn't match: " + m.getReturnType().getName() + ", expected: " + ret.getName());
+    }
+    if(!java.lang.reflect.Modifier.isStatic(m.getModifiers())) {
       throw new NoSuchMethodException("Factory method is not static.");
     }
     return m;
   }
-  
+
   /**
    * Instantiate a parameterizable class. When using this, consider using
    * {@link Parameterization#descend}!
@@ -171,6 +178,24 @@ public final class ClassGenericsUtil {
    * @throws Exception when other instantiation errors occurred
    */
   public static <C> C tryInstantiate(Class<C> r, Class<?> c, Parameterization config) throws InvocationTargetException, NoSuchMethodException, Exception {
+    if(c == null) {
+      // TODO: better class? AbortException maybe?
+      throw new UnsupportedOperationException("Trying to instantiate 'null' class!");
+    }
+    // Try a V3 parameterization class
+    for(Class<?> inner : c.getDeclaredClasses()) {
+      if(AbstractParameterizer.class.isAssignableFrom(inner)) {
+        try {
+          AbstractParameterizer par = inner.asSubclass(AbstractParameterizer.class).newInstance();
+          final Object instance = par.make(config);
+          return r.cast(instance);
+        }
+        catch(InstantiationException e) {
+          // continue. Probably non-public
+        }
+      }
+    }
+    // Try a V2 static parameterization method
     try {
       final Method factory = getParameterizationFactoryMethod(c, r);
       final Object instance = factory.invoke(null, config);
@@ -179,22 +204,25 @@ public final class ClassGenericsUtil {
     catch(NoSuchMethodException e) {
       // continue.
     }
+    // Try a regular "parameterization" constructor
     try {
       final Constructor<?> constructor = c.getConstructor(Parameterization.class);
       final Object instance = constructor.newInstance(config);
       return r.cast(instance);
     }
     catch(NoSuchMethodException e) {
-      final Object instance = c.getConstructor().newInstance();
-      return r.cast(instance);
+      // continue
     }
+    // Try a default constructor.
+    final Object instance = c.getConstructor().newInstance();
+    return r.cast(instance);
   }
-  
+
   /**
    * Force parameterization method.
    * 
-   * Please use this only in "runner" classes such as unit tests, since the error handling
-   * is not very flexible.
+   * Please use this only in "runner" classes such as unit tests, since the
+   * error handling is not very flexible.
    * 
    * @param <C> Type
    * @param c Class to instantiate
@@ -204,7 +232,7 @@ public final class ClassGenericsUtil {
   @SuppressWarnings("unchecked")
   public static <C> C parameterizeOrAbort(Class<?> c, Parameterization config) {
     try {
-      return tryInstantiate((Class<C>)c, c, config);
+      return tryInstantiate((Class<C>) c, c, config);
     }
     catch(Exception e) {
       throw new AbortException("Instantiation failed", e);
@@ -230,7 +258,7 @@ public final class ClassGenericsUtil {
   /**
    * Convert a collection to an array.
    * 
-   * @param <B> Base type 
+   * @param <B> Base type
    * @param <T> Type the array elements have
    * @param coll collection to convert.
    * @param base Template class for array creation.

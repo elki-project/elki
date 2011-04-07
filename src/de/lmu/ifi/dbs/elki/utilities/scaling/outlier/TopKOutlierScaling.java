@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -18,27 +19,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public class TopKOutlierScaling implements OutlierScalingFunction {
   /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("topk.k", "Number of outliers to keep.");
-
-  /**
    * Parameter to specify the number of outliers to keep
    * <p>
    * Key: {@code -topk.k}
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
-  
-  /**
-   * Number of outliers to keep.
-   */
-  private int k = -1;
-  
-  /**
-   * OptionID for {@link #BINARY_FLAG}
-   */
-  public static final OptionID BINARY_ID = OptionID.getOrCreateOptionID("topk.binary", "Make the top k a binary scaling.");
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("topk.k", "Number of outliers to keep.");
 
   /**
    * Parameter to specify the lambda value
@@ -46,54 +32,54 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
    * Key: {@code -topk.binary}
    * </p>
    */
-  private final Flag BINARY_FLAG = new Flag(BINARY_ID);
-  
+  public static final OptionID BINARY_ID = OptionID.getOrCreateOptionID("topk.binary", "Make the top k a binary scaling.");
+
+  /**
+   * Number of outliers to keep.
+   */
+  private int k = -1;
+
   /**
    * Do a binary decision
    */
   private boolean binary = false;
-  
+
   /**
    * The value we cut off at.
    */
   private double cutoff;
-  
+
   /**
    * The "ground" value
    */
   private double ground;
-  
+
   /**
    * The maximum value
    */
   private double max;
-  
+
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param k
+   * @param binary
    */
-  public TopKOutlierScaling(Parameterization config) {
+  public TopKOutlierScaling(int k, boolean binary) {
     super();
-    config = config.descend(this);
-    if (config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    if (config.grab(BINARY_FLAG)) {
-      binary = BINARY_FLAG.getValue();
-    }
+    this.k = k;
+    this.binary = binary;
   }
 
   @Override
   public void prepare(DBIDs ids, OutlierResult or) {
-    if (k <= 0) {
+    if(k <= 0) {
       LoggingUtil.warning("No k configured for Top-k outlier scaling!");
     }
     IterableIterator<DBID> order = or.getOrdering().iter(ids);
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       // stop if no more results.
-      if (!order.hasNext()) {
+      if(!order.hasNext()) {
         return;
       }
       DBID cur = order.next();
@@ -101,20 +87,20 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
     }
     max = or.getOutlierMeta().getActualMaximum();
     ground = or.getOutlierMeta().getTheoreticalBaseline();
-    if (Double.isInfinite(ground) || Double.isNaN(ground)) {
+    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
       ground = or.getOutlierMeta().getTheoreticalMinimum();
     }
-    if (Double.isInfinite(ground) || Double.isNaN(ground)) {
+    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
       ground = or.getOutlierMeta().getActualMinimum();
     }
-    if (Double.isInfinite(ground) || Double.isNaN(ground)) {
+    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
       ground = Math.min(0.0, cutoff);
     }
   }
 
   @Override
   public double getMax() {
-    if (binary) {
+    if(binary) {
       return 1.0;
     }
     return max;
@@ -122,7 +108,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
 
   @Override
   public double getMin() {
-    if (binary) {
+    if(binary) {
       return 0.0;
     }
     return ground;
@@ -130,18 +116,53 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
-    if (binary) {
-      if (value >= cutoff) {
+    if(binary) {
+      if(value >= cutoff) {
         return 1;
-      } else {
+      }
+      else {
         return 0;
       }
-    } else {
-      if (value >= cutoff) {
+    }
+    else {
+      if(value >= cutoff) {
         return (value - ground) / (max - ground);
-      } else {
+      }
+      else {
         return 0.0;
       }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected int k = 0;
+
+    protected boolean binary = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+
+      Flag binaryF = new Flag(BINARY_ID);
+      if(config.grab(binaryF)) {
+        binary = binaryF.getValue();
+      }
+    }
+
+    @Override
+    protected TopKOutlierScaling makeInstance() {
+      return new TopKOutlierScaling(k, binary);
     }
   }
 }

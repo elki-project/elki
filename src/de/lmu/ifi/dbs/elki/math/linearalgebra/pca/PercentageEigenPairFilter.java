@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -28,9 +29,16 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(PercentageEigenPairFilter.class);
-  
+
   /**
-   * OptionID for {@link #ALPHA_PARAM}
+   * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain
+   * a portion of at least alpha of the total variance.
+   * <p>
+   * Default value: {@link #DEFAULT_ALPHA}
+   * </p>
+   * <p>
+   * Key: {@code -pca.filter.alpha}
+   * </p>
    */
   public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
 
@@ -40,35 +48,19 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
   public static final double DEFAULT_ALPHA = 0.85;
 
   /**
-   * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain a
-   * portion of at least alpha of the total variance.
-   * <p>
-   * Default value: {@link #DEFAULT_ALPHA}
-   * </p>
-   * <p>
-   * Key: {@code -pca.filter.alpha}
-   * </p>
-   */
-  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
-
-  /**
    * The threshold for strong eigenvectors: the strong eigenvectors explain a
    * portion of at least alpha of the total variance.
    */
   private double alpha;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param alpha
    */
-  public PercentageEigenPairFilter(Parameterization config) {
+  public PercentageEigenPairFilter(double alpha) {
     super();
-    config = config.descend(this);
-    if(config.grab(ALPHA_PARAM)) {
-      alpha = ALPHA_PARAM.getValue();
-    }
+    this.alpha = alpha;
   }
 
   @Override
@@ -119,5 +111,34 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The threshold for strong eigenvectors: the strong eigenvectors explain a
+     * portion of at least alpha of the total variance.
+     */
+    private double alpha;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
+      if(config.grab(alphaP)) {
+        alpha = alphaP.getValue();
+      }
+    }
+
+    @Override
+    protected PercentageEigenPairFilter makeInstance() {
+      return new PercentageEigenPairFilter(alpha);
+    }
   }
 }

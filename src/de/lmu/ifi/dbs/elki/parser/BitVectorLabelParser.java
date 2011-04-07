@@ -7,13 +7,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -34,16 +34,13 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
   private static final Logging logger = Logging.getLogger(BitVectorLabelParser.class);
   
   /**
-   * Provides a parser for parsing one BitVector per line, bits separated by
-   * whitespace.
-   * <p/>
-   * Several labels may be given per BitVector. A label must not be parseable as
-   * Bit. Lines starting with &quot;#&quot; will be ignored.
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param colSep
+   * @param quoteChar
    */
-  public BitVectorLabelParser(Parameterization config) {
-    super(config);
+  public BitVectorLabelParser(Pattern colSep, char quoteChar) {
+    super(colSep, quoteChar);
   }
 
   @Override
@@ -91,5 +88,19 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParser.Parameterizer<BitVector> {
+    @Override
+    protected BitVectorLabelParser makeInstance() {
+      return new BitVectorLabelParser(colSep, quoteChar);
+    }
   }
 }

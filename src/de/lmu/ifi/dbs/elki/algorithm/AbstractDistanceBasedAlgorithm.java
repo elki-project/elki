@@ -5,8 +5,10 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides an abstract algorithm already setting the distance function.
@@ -34,18 +36,6 @@ public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D
   private DistanceFunction<? super O, D> distanceFunction;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
-   */
-  protected AbstractDistanceBasedAlgorithm(Parameterization config) {
-    super();
-    config = config.descend(this);
-    distanceFunction = getParameterDistanceFunction(config, EuclideanDistanceFunction.class, DistanceFunction.class);
-  }
-
-  /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
@@ -62,5 +52,25 @@ public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D
    */
   public DistanceFunction<? super O, D> getDistanceFunction() {
     return distanceFunction;
+  }
+
+  /**
+   * Parameterization helper class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public abstract static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+    protected DistanceFunction<O, D> distanceFunction;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      if(config.grab(distanceFunctionP)) {
+        distanceFunction = distanceFunctionP.instantiateClass(config);
+      }
+    }
   }
 }

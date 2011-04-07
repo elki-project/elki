@@ -21,8 +21,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
@@ -41,7 +41,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(GaussianModel.class);
-  
+
   /**
    * OptionID for inversion flag.
    */
@@ -116,36 +116,33 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     return new OutlierResult(meta, res);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Gaussian Model Outlier Algorithm
-   */
-  public static <V extends NumberVector<V, ?>> GaussianModel<V> parameterize(Parameterization config) {
-    boolean invert = getParameterInvert(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new GaussianModel<V>(invert);
-  }
-
-  /**
-   * Get the inversion flag parameter.
-   * 
-   * @param config Parameterization
-   * @return flag status
-   */
-  protected static boolean getParameterInvert(Parameterization config) {
-    final Flag flag = new Flag(INVERT_ID);
-    if(config.grab(flag)) {
-      return flag.getValue();
-    }
-    return false;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    protected boolean invert = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final Flag flag = new Flag(INVERT_ID);
+      if(config.grab(flag)) {
+        invert = flag.getValue();
+      }
+    }
+
+    @Override
+    protected GaussianModel<V> makeInstance() {
+      return new GaussianModel<V>(invert);
+    }
   }
 }

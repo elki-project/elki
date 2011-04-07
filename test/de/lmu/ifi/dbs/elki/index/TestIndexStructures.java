@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -140,7 +141,7 @@ public class TestIndexStructures implements JUnit4Test {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(inputparams);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);
     Database<DoubleVector> db = dbconn.getDatabase(null);
     DistanceQuery<DoubleVector, DoubleDistance> dist = db.getDistanceQuery(EuclideanDistanceFunction.STATIC);
 

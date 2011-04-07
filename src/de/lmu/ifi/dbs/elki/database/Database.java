@@ -39,14 +39,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @apiviz.landmark
  * @apiviz.has DatabaseObject oneway - - contains
- * @apiviz.uses DistanceQuery oneway - - provides
- * @apiviz.uses KNNQuery oneway - - provides
- * @apiviz.uses RangeQuery oneway - - provides
- * @apiviz.uses RKNNQuery oneway - - provides
- * @apiviz.uses Representation
+ * @apiviz.has DistanceQuery oneway - - provides
+ * @apiviz.has KNNQuery oneway - - provides
+ * @apiviz.has RangeQuery oneway - - provides
+ * @apiviz.has RKNNQuery oneway - - provides
+ * @apiviz.has Representation
  * @apiviz.has Index oneway - - manages
- * @apiviz.has DataStoreListener oneway - - invokes
  * @apiviz.has DatabaseObjectMetadata - - exchanges
+ * @apiviz.uses DataStoreListener oneway - - invokes
  */
 public interface Database<O extends DatabaseObject> extends HierarchicalResult, Iterable<DBID>, Parameterizable {
   /**

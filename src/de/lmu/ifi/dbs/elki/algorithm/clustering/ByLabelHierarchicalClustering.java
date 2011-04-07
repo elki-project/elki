@@ -18,8 +18,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Pseudo clustering using labels.
@@ -106,19 +104,6 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
     assert (rootclusters.size() > 0);
 
     return new Clustering<Model>("By Label Hierarchical Clustering", "bylabel-clustering", rootclusters);
-  }
-
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
-   */
-  public static <O extends DatabaseObject> ByLabelHierarchicalClustering<O> parameterize(Parameterization config) {
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new ByLabelHierarchicalClustering<O>();
   }
 
   @Override

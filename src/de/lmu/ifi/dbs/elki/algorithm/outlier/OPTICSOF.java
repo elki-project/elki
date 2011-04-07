@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -60,7 +59,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(OPTICSOF.class);
-  
+
   /**
    * Parameter to specify the threshold MinPts.
    */
@@ -74,6 +73,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
 
   /**
    * Constructor with parameters.
+   * 
    * @param distanceFunction distance function
    * @param minpts minPts parameter
    */
@@ -145,34 +145,33 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> OPTICSOF<O, D> parameterize(Parameterization config) {
-    int minpts = getParameterMinPts(config);
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    return new OPTICSOF<O, D>(distanceFunction, minpts);
-  }
-
-  /**
-   * Get the minPts parameter for the algorithm
-   * 
-   * @param config Parameterization
-   * @return minPts parameter
-   */
-  protected static int getParameterMinPts(Parameterization config) {
-    final IntParameter param = new IntParameter(OPTICS.MINPTS_ID, new GreaterConstraint(1));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected int minpts = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter param = new IntParameter(OPTICS.MINPTS_ID, new GreaterConstraint(1));
+      if(config.grab(param)) {
+        minpts = param.getValue();
+      }
+    }
+
+    @Override
+    protected OPTICSOF<O, D> makeInstance() {
+      return new OPTICSOF<O, D>(distanceFunction, minpts);
+    }
   }
 }

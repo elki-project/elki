@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -34,11 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> extends AbstractParser<V> implements LinebasedParser<V> {
   /**
-   * OptionID for {@link #LABEL_INDICES_PARAM}
-   */
-  public static final OptionID LABEL_INDICES_ID = OptionID.getOrCreateOptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
-
-  /**
    * A comma separated list of the indices of labels (may be numeric), counting
    * whitespace separated entries in a line starting with 0. The corresponding
    * entries will be treated as a label.
@@ -46,29 +42,23 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * Key: {@code -parser.labelIndices}
    * </p>
    */
-  private final IntListParameter LABEL_INDICES_PARAM = new IntListParameter(LABEL_INDICES_ID, true);
+  public static final OptionID LABEL_INDICES_ID = OptionID.getOrCreateOptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
 
   /**
-   * Keeps the indices of the  attributes to be treated as a string label.
+   * Keeps the indices of the attributes to be treated as a string label.
    */
   protected BitSet labelIndices;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    * 
-   * @param config Parameterization
+   * @param colSep
+   * @param quoteChar
+   * @param labelIndices
    */
-  public NumberVectorLabelParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    labelIndices = new BitSet();
-    if(config.grab(LABEL_INDICES_PARAM)) {
-      List<Integer> labelcols = LABEL_INDICES_PARAM.getValue();
-      for(Integer idx : labelcols) {
-        labelIndices.set(idx);
-      }
-    }
+  public NumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
+    super(colSep, quoteChar);
+    this.labelIndices = labelIndices;
   }
 
   @Override
@@ -104,10 +94,10 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   @Override
   public Pair<V, List<String>> parseLine(String line) {
     List<String> entries = tokenize(line);
-    
+
     List<Double> attributes = new ArrayList<Double>();
     List<String> labels = new ArrayList<String>();
-    
+
     Iterator<String> itr = entries.iterator();
     for(int i = 0; itr.hasNext(); i++) {
       String ent = itr.next();
@@ -148,4 +138,35 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * @return Prototype object
    */
   abstract protected V getPrototype(int dimensionality);
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<V extends NumberVector<?, ?>> extends AbstractParser.Parameterizer<V> {
+    /**
+     * Keeps the indices of the attributes to be treated as a string label.
+     */
+    protected BitSet labelIndices = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID, true);
+
+      labelIndices = new BitSet();
+      if(config.grab(labelIndicesP)) {
+        List<Integer> labelcols = labelIndicesP.getValue();
+        for(Integer idx : labelcols) {
+          labelIndices.set(idx);
+        }
+      }
+    }
+
+    @Override
+    protected abstract NumberVectorLabelParser<V> makeInstance();
+  }
 }

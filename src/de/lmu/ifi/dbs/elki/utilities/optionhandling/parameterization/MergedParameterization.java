@@ -154,4 +154,15 @@ public class MergedParameterization implements Parameterization {
       return null;
     }
   }
+
+  @Override
+  public <C> C tryInstantiate(Class<C> c) {
+    try {
+      return ClassGenericsUtil.tryInstantiate(c, c, this);
+    }
+    catch(Exception e) {
+      reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
+      return null;
+    }
+  }
 }

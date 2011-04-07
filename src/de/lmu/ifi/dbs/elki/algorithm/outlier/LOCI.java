@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -65,7 +64,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(LOCI.class);
-  
+
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to the distance function specified.
@@ -129,7 +128,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
-    
+
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", database.size(), logger) : null;
     // LOCI preprocessing step
     WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
@@ -263,73 +262,48 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     return result;
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LOCI<O, D> parameterize(Parameterization config) {
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-
-    // maximum query range
-    D rmax = getParameterRmax(config, distanceFunction);
-    // minimum neighborhood size
-    int nmin = getParameterNmin(config);
-    // scaling factor for averaging range
-    double alpha = getParameterAlpha(config);
-
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new LOCI<O, D>(distanceFunction, rmax, nmin, alpha);
-  }
-
-  /**
-   * Get the Rmax parameter for the range query
-   * 
-   * @param config Parameterization
-   * @return Rmax distance
-   */
-  protected static <O extends DatabaseObject, D extends NumberDistance<D, ?>> D getParameterRmax(Parameterization config, DistanceFunction<O, D> distanceFunction) {
-    final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
-    final DistanceParameter<D> param = new DistanceParameter<D>(RMAX_ID, distanceFactory);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
-  }
-
-  /**
-   * Get the Nmin parameter
-   * 
-   * @param config Parameterization
-   * @return nmin parameter
-   */
-  protected static int getParameterNmin(Parameterization config) {
-    final IntParameter param = new IntParameter(NMIN_ID, 20);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 0;
-  }
-
-  /**
-   * Get the alpha parameter
-   * 
-   * @param config Parameterization
-   * @return alpha parameter
-   */
-  protected static double getParameterAlpha(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.5);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return Double.NaN;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected D rmax = null;
+
+    protected int nmin = 0;
+
+    protected double alpha = 0.5;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
+      final DistanceParameter<D> rmaxP = new DistanceParameter<D>(RMAX_ID, distanceFactory);
+      if(config.grab(rmaxP)) {
+        rmax = rmaxP.getValue();
+      }
+
+      final IntParameter nminP = new IntParameter(NMIN_ID, 20);
+      if(config.grab(nminP)) {
+        nmin = nminP.getValue();
+      }
+
+      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5);
+      if(config.grab(alphaP)) {
+        alpha = alphaP.getValue();
+      }
+    }
+
+    @Override
+    protected LOCI<O, D> makeInstance() {
+      return new LOCI<O, D>(distanceFunction, rmax, nmin, alpha);
+    }
   }
 }

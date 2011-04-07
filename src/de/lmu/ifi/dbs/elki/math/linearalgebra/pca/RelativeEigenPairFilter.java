@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -31,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue of the remaining eigenvectors.")
 public class RelativeEigenPairFilter implements EigenPairFilter {
   /**
-   * OptionID for {@link #RALPHA_PARAM}
+   * Parameter relative alpha.
    */
   public static final OptionID EIGENPAIR_FILTER_RALPHA = OptionID.getOrCreateOptionID("pca.filter.relativealpha", "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + "the given share of the statistical average variance is considered weak.");
 
@@ -41,27 +42,18 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
   public static final double DEFAULT_RALPHA = 1.1;
 
   /**
-   * Parameter relative alpha.
-   */
-  private final DoubleParameter RALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, new GreaterEqualConstraint(0.0), DEFAULT_RALPHA);
-
-  /**
    * The noise tolerance level for weak eigenvectors
    */
   private double ralpha;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param ralpha
    */
-  public RelativeEigenPairFilter(Parameterization config) {
+  public RelativeEigenPairFilter(double ralpha) {
     super();
-    config = config.descend(this);
-    if(config.grab(RALPHA_PARAM)) {
-      ralpha = RALPHA_PARAM.getValue();
-    }
+    this.ralpha = ralpha;
   }
 
   /**
@@ -98,5 +90,30 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected double ralpha;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter ralphaP = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, new GreaterEqualConstraint(0.0), DEFAULT_RALPHA);
+      if(config.grab(ralphaP)) {
+        ralpha = ralphaP.getValue();
+      }
+    }
+
+    @Override
+    protected RelativeEigenPairFilter makeInstance() {
+      return new RelativeEigenPairFilter(ralpha);
+    }
   }
 }

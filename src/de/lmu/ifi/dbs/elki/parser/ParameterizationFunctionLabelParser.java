@@ -6,13 +6,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -32,16 +32,13 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
   private static final Logging logger = Logging.getLogger(ParameterizationFunctionLabelParser.class);
   
   /**
-   * Provides a parser for parsing one point per line, attributes separated by
-   * whitespace. The parser transforms each point into a parametrization
-   * function. Several labels may be given per point. A label must not be
-   * parseable as double (or float). Lines starting with &quot;#&quot; will be
-   * ignored.
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param colSep
+   * @param quoteChar
    */
-  public ParameterizationFunctionLabelParser(Parameterization config) {
-    super(config);
+  public ParameterizationFunctionLabelParser(Pattern colSep, char quoteChar) {
+    super(colSep, quoteChar);
   }
 
   @Override
@@ -89,5 +86,19 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParser.Parameterizer<ParameterizationFunction> {
+   @Override
+    protected ParameterizationFunctionLabelParser makeInstance() {
+      return new ParameterizationFunctionLabelParser(colSep, quoteChar);
+    }
   }
 }

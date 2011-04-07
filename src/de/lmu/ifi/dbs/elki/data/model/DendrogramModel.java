@@ -7,9 +7,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 /**
  * Model for dendrograms, provides the distance to the child cluster.
  * 
- * @author @author Elke Achtert
- * 
+ * @author Elke Achtert
  */
+// TODO: comments
 public class DendrogramModel<D extends Distance<D>> extends BaseModel {
 
   private D distance;
@@ -35,8 +35,8 @@ public class DendrogramModel<D extends Distance<D>> extends BaseModel {
     out.commentPrintLn("Distance to children: " + (distance != null ? distance.toString() : "null"));
   }
 
+  @Override
   public String toString() {
     return "Distance to children: " + (distance != null ? distance.toString() : "null");
   }
-
 }

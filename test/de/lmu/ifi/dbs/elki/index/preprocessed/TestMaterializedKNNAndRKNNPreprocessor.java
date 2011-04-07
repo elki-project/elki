@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -70,7 +71,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
     Database<DoubleVector> db = dbconn.getDatabase(null);
     DistanceQuery<DoubleVector, DoubleDistance> distanceQuery = db.getDistanceQuery(EuclideanDistanceFunction.STATIC);
 

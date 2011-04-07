@@ -13,13 +13,11 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -91,7 +89,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
       DBID id = iter.next();
       if(random.nextDouble() < percentage) {
         final List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
-        final int last = Math.min(k-1, neighbors.size() - 1);
+        final int last = Math.min(k - 1, neighbors.size() - 1);
         knnDistances.add(neighbors.get(last).getDistance());
       }
     }
@@ -105,48 +103,40 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
   }
 
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> KNNDistanceOrder<O, D> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-
-    double percentage = getParameterPercentage(config);
-
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new KNNDistanceOrder<O, D>(distanceFunction, k, percentage);
-  }
-
-  /**
-   * Get the percentage parameter.
+   * @author Erich Schubert
    * 
-   * @param config Parameterization
-   * @return percentage parameter
+   * @apiviz.exclude
    */
-  private static double getParameterPercentage(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(PERCENTAGE_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), 1.0);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return Double.NaN;
-  }
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected int k;
 
-  /**
-   * Get the k parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return k parameter
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(0), 1);
-    if(config.grab(param)) {
-      return param.getValue();
+    protected double percentage;
+
+    public Parameterizer() {
+      super();
     }
-    return -1;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter kP = new IntParameter(K_ID, 1);
+      kP.addConstraint(new GreaterConstraint(0));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+
+      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, 1.0);
+      percentageP.addConstraint(new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE));
+      if(config.grab(percentageP)) {
+        percentage = percentageP.getValue();
+      }
+    }
+
+    @Override
+    protected KNNDistanceOrder<O, D> makeInstance() {
+      return new KNNDistanceOrder<O, D>(distanceFunction, k, percentage);
+    }
   }
 }

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -27,36 +28,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // todo arthur comment class
 public class FractionalSharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param indexFactory Index factory.
    */
-  public FractionalSharedNearestNeighborSimilarityFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-  }
-
-  @Override
-  public Class<? super O> getInputDatatype() {
-    return DatabaseObject.class;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryRestriction() {
-    return SharedNearestNeighborIndex.Factory.class;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryDefaultClass() {
-    return SharedNearestNeighborPreprocessor.Factory.class;
+  public FractionalSharedNearestNeighborSimilarityFunction(IndexFactory<O, SharedNearestNeighborIndex<O>> indexFactory) {
+    super(indexFactory);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    SharedNearestNeighborIndex<O> indexi = index.instantiate((Database<O>)database);
-    return (Instance<T, D>) new Instance<O, D>((Database<O>)database, indexi, indexi.getNumberOfNeighbors());
+    SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Database<O>) database);
+    return (Instance<T, D>) new Instance<O, D>((Database<O>) database, indexi, indexi.getNumberOfNeighbors());
   }
 
   /**
@@ -64,7 +48,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor.Instance
+   * @apiviz.uses SharedNearestNeighborIndex
    * 
    * @param <O>
    * @param <D>
@@ -153,5 +137,25 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configIndexFactory(config, SharedNearestNeighborIndex.Factory.class, SharedNearestNeighborPreprocessor.Factory.class);
+    }
+
+    @Override
+    protected FractionalSharedNearestNeighborSimilarityFunction<O, D> makeInstance() {
+      return new FractionalSharedNearestNeighborSimilarityFunction<O, D>(factory);
+    }
   }
 }

@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -46,13 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Weighted Covariance Matrix / PCA")
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle="Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url="http://dx.doi.org/10.1007/978-3-540-69497-7_27")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
 public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends AbstractCovarianceMatrixBuilder<V, D> {
-  /**
-   * OptionID for {@link #WEIGHT_PARAM}
-   */
-  public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", "Weight function to use in weighted PCA.");
-
   /**
    * Parameter to specify the weight function to use in weighted PCA, must
    * implement
@@ -62,31 +58,27 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * Key: {@code -pca.weight}
    * </p>
    */
-  private final ObjectParameter<WeightFunction> WEIGHT_PARAM = new ObjectParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class);
+  public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", "Weight function to use in weighted PCA.");
 
   /**
    * Holds the weight function.
    */
-  public WeightFunction weightfunction;
+  protected WeightFunction weightfunction;
 
   /**
    * Holds the distance function used for weight calculation
    */
-  // TODO: make configureable
+  // TODO: make configurable?
   private PrimitiveDistanceFunction<? super V, DoubleDistance> weightDistance = EuclideanDistanceFunction.STATIC;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param weightfunction
    */
-  public WeightedCovarianceMatrixBuilder(Parameterization config) {
+  public WeightedCovarianceMatrixBuilder(WeightFunction weightfunction) {
     super();
-    config = config.descend(this);
-    if (config.grab(WEIGHT_PARAM)) {
-      weightfunction = WEIGHT_PARAM.instantiateClass(config);
-    }
+    this.weightfunction = weightfunction;
   }
 
   /**
@@ -242,5 +234,30 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
       }
     }
     return squares;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+    protected WeightFunction weightfunction = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<WeightFunction> weightfunctionP = new ObjectParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class);
+      if(config.grab(weightfunctionP)) {
+        weightfunction = weightfunctionP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected WeightedCovarianceMatrixBuilder<V, D> makeInstance() {
+      return new WeightedCovarianceMatrixBuilder<V, D>(weightfunction);
+    }
   }
 }

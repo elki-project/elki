@@ -34,30 +34,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  * @param <D> Distance type
- * @param <N> Number type
  */
-public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractApplication {
+public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractApplication {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(CacheFloatDistanceInOnDiskMatrix.class);
-
-  /**
-   * Parameter to specify the database connection to be used, must extend
-   * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
-   * <p>
-   * Key: {@code -dbc}
-   * </p>
-   * <p>
-   * Default value: {@link FileBasedDatabaseConnection}
-   * </p>
-   */
-  private final ObjectParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-
-  /**
-   * OptionID for {@link #CACHE_PARAM}
-   */
-  public static final OptionID CACHE_ID = OptionID.getOrCreateOptionID("loader.diskcache", "File name of the disk cache to create.");
 
   /**
    * Parameter that specifies the name of the directory to be re-parsed.
@@ -65,22 +47,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    * Key: {@code -loader.diskcache}
    * </p>
    */
-  private final FileParameter CACHE_PARAM = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
-
-  /**
-   * Debug flag, to double-check all write operations.
-   */
-  private static final boolean debugExtraCheckSymmetry = false;
-
-  /**
-   * OptionID for {@link #DISTANCE_PARAM}
-   */
-  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("loader.distance", "Distance function to cache.");
-
-  /**
-   * Storage size: 4 bytes floats
-   */
-  private static final int FLOAT_SIZE = 4;
+  public static final OptionID CACHE_ID = OptionID.getOrCreateOptionID("loader.diskcache", "File name of the disk cache to create.");
 
   /**
    * Parameter that specifies the name of the directory to be re-parsed.
@@ -88,12 +55,17 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    * Key: {@code -loader.distance}
    * </p>
    */
-  private final ObjectParameter<DistanceFunction<O, D>> DISTANCE_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
+  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("loader.distance", "Distance function to cache.");
 
   /**
-   * Database normalization
+   * Debug flag, to double-check all write operations.
    */
-  final ObjectParameter<Normalization<O>> NORMALIZATION_PARAM = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
+  private static final boolean debugExtraCheckSymmetry = false;
+
+  /**
+   * Storage size: 4 bytes floats
+   */
+  private static final int FLOAT_SIZE = 4;
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -116,26 +88,20 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
   private File out;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param verbose Verbose flag
+   * @param databaseConnection Database connection
+   * @param normalization Normalization
+   * @param distance Distance function
+   * @param out Matrix output file
    */
-  public CacheFloatDistanceInOnDiskMatrix(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(DATABASE_CONNECTION_PARAM)) {
-      databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass(config);
-    }
-    if(config.grab(NORMALIZATION_PARAM)) {
-      normalization = NORMALIZATION_PARAM.instantiateClass(config);
-    }
-    if(config.grab(DISTANCE_PARAM)) {
-      distance = DISTANCE_PARAM.instantiateClass(config);
-    }
-    if(config.grab(CACHE_PARAM)) {
-      out = CACHE_PARAM.getValue();
-    }
+  public CacheFloatDistanceInOnDiskMatrix(boolean verbose, DatabaseConnection<O> databaseConnection, Normalization<O> normalization, DistanceFunction<O, D> distance, File out) {
+    super(verbose);
+    this.databaseConnection = databaseConnection;
+    this.normalization = normalization;
+    this.distance = distance;
+    this.out = out;
   }
 
   @Override
@@ -178,6 +144,66 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
           }
         }
       }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
+    /**
+     * Holds the database connection to have the algorithm run with.
+     */
+    private DatabaseConnection<O> databaseConnection = null;
+
+    /**
+     * A normalization - per default no normalization is used.
+     */
+    private Normalization<O> normalization = null;
+
+    /**
+     * Distance function that is to be cached.
+     */
+    private DistanceFunction<O, D> distance = null;
+
+    /**
+     * Output file.
+     */
+    private File out = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      // Database connection parameter
+      final ObjectParameter<DatabaseConnection<O>> dcpar = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      if(config.grab(dcpar)) {
+        databaseConnection = dcpar.instantiateClass(config);
+      }
+      // Normalization parameter
+      final ObjectParameter<Normalization<O>> npar = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
+      if(config.grab(npar)) {
+        normalization = npar.instantiateClass(config);
+      }
+      // Distance function parameter
+      final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
+      if(config.grab(dpar)) {
+        distance = dpar.instantiateClass(config);
+      }
+      // Output file parameter
+      final FileParameter cpar = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
+      if(config.grab(cpar)) {
+        out = cpar.getValue();
+      }
+
+    }
+
+    @Override
+    protected CacheFloatDistanceInOnDiskMatrix<O, D> makeInstance() {
+      return new CacheFloatDistanceInOnDiskMatrix<O, D>(verbose, databaseConnection, normalization, distance, out);
     }
   }
 

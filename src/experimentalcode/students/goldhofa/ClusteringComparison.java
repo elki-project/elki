@@ -8,7 +8,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
@@ -33,7 +32,7 @@ import experimentalcode.students.goldhofa.evaluation.paircounting.PairCounting;
  * 
  * @param <O> Database
  */
-public class ClusteringComparison<O extends DatabaseObject> implements Evaluator<O> {
+public class ClusteringComparison implements Evaluator {
   /**
    * Logger for debug output.
    */
@@ -97,7 +96,7 @@ public class ClusteringComparison<O extends DatabaseObject> implements Evaluator
    * Perform clusterings evaluation
    */
   @Override
-  public void processResult(Database<O> db, Result result, ResultHierarchy hier) {
+  public void processResult(Database<?> db, Result result, ResultHierarchy hier) {
 
     // get all clustering
     List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
@@ -249,7 +248,7 @@ public class ClusteringComparison<O extends DatabaseObject> implements Evaluator
   }
 
   @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
     // Nothing to do.
   }
 }

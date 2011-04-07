@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
@@ -16,8 +17,9 @@ import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -33,22 +35,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Loads float distance values from an external text file.")
 public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction<FloatDistance> {
   /**
-   * OptionID for {@link #MATRIX_PARAM}
-   */
-  public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
-
-  /**
-   * Parameter that specifies the name of the directory to be re-parsed.
+   * Parameter that specifies the name of the distance matrix file.
    * <p>
    * Key: {@code -distance.matrix}
    * </p>
    */
-  private final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
-
-  /**
-   * OptionID for {@link #PARSER_PARAM}
-   */
-  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("distance.parser", "Parser used to load the distance matrix.");
+  public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
 
   /**
    * Optional parameter to specify the parsers to provide a database, must
@@ -58,32 +50,26 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
    * Key: {@code -distance.parser}
    * </p>
    */
-  private final ObjectParameter<DistanceParser<DatabaseObject, FloatDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DatabaseObject, FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("distance.parser", "Parser used to load the distance matrix.");
 
-  private DistanceParser<?, FloatDistance> parser = null;
-
-  private Map<Pair<DBID, DBID>, FloatDistance> cache = null;
-  
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * The distance cache
    */
-  public FileBasedFloatDistanceFunction(Parameterization config) {
+  private Map<DBIDPair, FloatDistance> cache;
+
+  /**
+   * Constructor.
+   * 
+   * @param parser Parser
+   * @param matrixfile input file
+   */
+  public FileBasedFloatDistanceFunction(DistanceParser<?, FloatDistance> parser, File matrixfile) {
     super();
-    config = config.descend(this);
-    if(config.grab(MATRIX_PARAM)) {
-      File matrixfile = MATRIX_PARAM.getValue();
-      try {
-        loadCache(matrixfile);
-      }
-      catch(IOException e) {
-        config.reportError(new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e));
-      }
+    try {
+      loadCache(parser, matrixfile);
     }
-    if(config.grab(PARSER_PARAM)) {
-      parser = PARSER_PARAM.instantiateClass(config);
+    catch(IOException e) {
+      throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
     }
   }
 
@@ -99,21 +85,21 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
    */
   @Override
   public FloatDistance distance(DBID id1, DBID id2) {
-    if (id1 == null) {
+    if(id1 == null) {
       return getDistanceFactory().undefinedDistance();
     }
-    if (id2 == null) {
+    if(id2 == null) {
       return getDistanceFactory().undefinedDistance();
     }
     // the smaller id is the first key
-    if (id1.getIntegerID() > id2.getIntegerID()) {
+    if(id1.getIntegerID() > id2.getIntegerID()) {
       return distance(id2, id1);
     }
 
     return cache.get(new Pair<DBID, DBID>(id1, id2));
   }
-  
-  private void loadCache(File matrixfile) throws IOException {
+
+  private void loadCache(DistanceParser<?, FloatDistance> parser, File matrixfile) throws IOException {
     InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
     DistanceParsingResult<?, FloatDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
@@ -122,5 +108,36 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
   @Override
   public FloatDistance getDistanceFactory() {
     return FloatDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected File matrixfile = null;
+
+    protected DistanceParser<?, FloatDistance> parser = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      if(config.grab(MATRIX_PARAM)) {
+        matrixfile = MATRIX_PARAM.getValue();
+      }
+      final ObjectParameter<DistanceParser<DatabaseObject, FloatDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DatabaseObject, FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+      if(config.grab(PARSER_PARAM)) {
+        parser = PARSER_PARAM.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected FileBasedFloatDistanceFunction makeInstance() {
+      return new FileBasedFloatDistanceFunction(parser, matrixfile);
+    }
   }
 }

@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -14,22 +16,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has Instance
+ * 
  * @param <O> Object class to process.
  */
 public class SimilarityAdapterLinear<O extends DatabaseObject> extends AbstractSimilarityAdapter<O> {
   /**
    * Constructor.
    * 
-   * @param config Configuration
+   * @param similarityFunction Similarity function
    */
-  public SimilarityAdapterLinear(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public SimilarityAdapterLinear(NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction) {
+    super(similarityFunction);
   }
 
   @Override
   public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
-    SimilarityQuery<T, DoubleDistance> similarityQuery = similarityFunction.instantiate(database);
+    SimilarityQuery<T, ? extends NumberDistance<?, ?>> similarityQuery = similarityFunction.instantiate(database);
     return new Instance<T>(database, this, similarityQuery);
   }
 
@@ -39,7 +42,6 @@ public class SimilarityAdapterLinear<O extends DatabaseObject> extends AbstractS
    * @author Erich Schubert
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
   public static class Instance<O extends DatabaseObject> extends AbstractSimilarityAdapter.Instance<O> {
     /**
@@ -49,13 +51,32 @@ public class SimilarityAdapterLinear<O extends DatabaseObject> extends AbstractS
      * @param parent Parent distance
      * @param similarityQuery similarity Query to use
      */
-    public Instance(Database<O> database, DistanceFunction<? super O, DoubleDistance> parent, SimilarityQuery<O, DoubleDistance> similarityQuery) {
+    public Instance(Database<O> database, DistanceFunction<? super O, DoubleDistance> parent, SimilarityQuery<? super O, ? extends NumberDistance<?, ?>> similarityQuery) {
       super(database, parent, similarityQuery);
     }
 
     @Override
     public double transform(double similarity) {
       return 1.0 - similarity;
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractSimilarityAdapter.Parameterizer<O> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+
+    @Override
+    protected SimilarityAdapterLinear<O> makeInstance() {
+      return new SimilarityAdapterLinear<O>(similarityFunction);
     }
   }
 }

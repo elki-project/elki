@@ -19,11 +19,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
-public class KNNJoinTest implements JUnit4Test {
+public class TestKNNJoin implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/uebungsblatt-2d-mini.csv";
 
@@ -89,7 +90,7 @@ public class KNNJoinTest implements JUnit4Test {
     inputparams.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(inputparams);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);
     Database<DoubleVector> db = dbconn.getDatabase(null);
     inputparams.failOnErrors();
 

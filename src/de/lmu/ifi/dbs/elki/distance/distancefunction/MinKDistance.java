@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -77,7 +77,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   static boolean objectIsInKNN = false;
 
   /**
-   * Full constructor. See {@link #parameterize} for factory.
+   * Full constructor. See {@link Parameterizer} for factory.
    * 
    * @param parentDistance distance function to use
    * @param k K parameter
@@ -86,28 +86,6 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
     super();
     this.parentDistance = parentDistance;
     this.k = k;
-  }
-
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param <O> Object type
-   * @param config Parameterization
-   * @return Distance function
-   */
-  public static <O extends DatabaseObject, D extends Distance<D>> MinKDistance<O, D> parameterize(Parameterization config) {
-    // parameter k
-    final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
-    int k = 2;
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    final ObjectParameter<DistanceFunction<? super O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-    DistanceFunction<? super O, D> distanceFunction = null;
-    if (config.grab(DISTANCE_FUNCTION_PARAM)) {
-      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
-    return new MinKDistance<O, D>(distanceFunction, k + (objectIsInKNN ? 0 : 1));
   }
 
   @Override
@@ -190,5 +168,43 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   @Override
   public Class<? super O> getInputDatatype() {
     return DatabaseObject.class;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+    /**
+     * The distance function to determine the exact distance.
+     */
+    protected DistanceFunction<? super O, D> parentDistance = null;
+
+    /**
+     * The value of k
+     */
+    private int k = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+      
+      final ObjectParameter<DistanceFunction<? super O, D>> parentDistanceP = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      if (config.grab(parentDistanceP)) {
+        parentDistance = parentDistanceP.instantiateClass(config);
+      }
+   }
+
+    @Override
+    protected MinKDistance<O, D> makeInstance() {
+      return new MinKDistance<O, D>(parentDistance, k + (objectIsInKNN ? 0 : 1));
+    }
   }
 }

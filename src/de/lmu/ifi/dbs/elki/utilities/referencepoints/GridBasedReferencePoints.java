@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -21,10 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Object type
  */
 public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
-  /**
-   * OptionID for {@link #GRID_PARAM}
-   */
-  public static final OptionID GRID_ID = OptionID.getOrCreateOptionID("grid.size", "The number of partitions in each dimension. Points will be placed on the edges of the grid, except for a grid size of 0, where only the mean is generated as reference point.");
+  // TODO: add "grid sampling" option.
 
   /**
    * Parameter to specify the grid resolution.
@@ -32,12 +30,7 @@ public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements R
    * Key: {@code -grid.size}
    * </p>
    */
-  private final IntParameter GRID_PARAM = new IntParameter(GRID_ID, new GreaterEqualConstraint(0), 1);
-
-  /**
-   * OptionID for {@link #GRID_SCALE_PARAM}
-   */
-  public static final OptionID GRID_SCALE_ID = OptionID.getOrCreateOptionID("grid.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
+  public static final OptionID GRID_ID = OptionID.getOrCreateOptionID("grid.size", "The number of partitions in each dimension. Points will be placed on the edges of the grid, except for a grid size of 0, where only the mean is generated as reference point.");
 
   /**
    * Parameter to specify the extra scaling of the space, to allow
@@ -46,33 +39,28 @@ public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements R
    * Key: {@code -grid.oversize}
    * </p>
    */
-  private final DoubleParameter GRID_SCALE_PARAM = new DoubleParameter(GRID_SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
+  public static final OptionID GRID_SCALE_ID = OptionID.getOrCreateOptionID("grid.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
 
   /**
-   * Holds the value of {@link #GRID_PARAM}.
+   * Holds the value of {@link #GRID_ID}.
    */
   protected int gridres;
 
   /**
-   * Holds the value of {@link #GRID_SCALE_PARAM}.
+   * Holds the value of {@link #GRID_SCALE_ID}.
    */
   protected double gridscale;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param gridres
+   * @param gridscale
    */
-  public GridBasedReferencePoints(Parameterization config) {
+  public GridBasedReferencePoints(int gridres, double gridscale) {
     super();
-    config = config.descend(this);
-    if(config.grab(GRID_PARAM)) {
-      gridres = GRID_PARAM.getValue();
-    }
-    if(config.grab(GRID_SCALE_PARAM)) {
-      gridscale = GRID_SCALE_PARAM.getValue();
-    }
+    this.gridres = gridres;
+    this.gridscale = gridscale;
   }
 
   @Override
@@ -117,5 +105,43 @@ public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements R
     }
 
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    /**
+     * Holds the value of {@link #GRID_ID}.
+     */
+    protected int gridres;
+
+    /**
+     * Holds the value of {@link #GRID_SCALE_ID}.
+     */
+    protected double gridscale;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter GRID_PARAM = new IntParameter(GRID_ID, new GreaterEqualConstraint(0), 1);
+      if(config.grab(GRID_PARAM)) {
+        gridres = GRID_PARAM.getValue();
+      }
+
+      DoubleParameter GRID_SCALE_PARAM = new DoubleParameter(GRID_SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
+      if(config.grab(GRID_SCALE_PARAM)) {
+        gridscale = GRID_SCALE_PARAM.getValue();
+      }
+    }
+
+    @Override
+    protected GridBasedReferencePoints<V> makeInstance() {
+      return new GridBasedReferencePoints<V>(gridres, gridscale);
+    }
   }
 }

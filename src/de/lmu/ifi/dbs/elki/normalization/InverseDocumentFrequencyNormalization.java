@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Normalization for text frequency vectors, using the inverse document
@@ -26,15 +25,10 @@ public class InverseDocumentFrequencyNormalization extends AbstractNormalization
   int objcnt = 0;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
    */
-  public InverseDocumentFrequencyNormalization(Parameterization config) {
+  public InverseDocumentFrequencyNormalization() {
     super();
-    config = config.descend(this);
-    // TODO: add an option to also do TF normalization?
   }
 
   @Override

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.StringLengthConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -43,13 +44,13 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
    * OptionID for the column separator parameter (defaults to whitespace as in
    * {@link #WHITESPACE_PATTERN}.
    */
-  private static final OptionID COLUMN_SEPARATOR_ID = OptionID.getOrCreateOptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
+  public static final OptionID COLUMN_SEPARATOR_ID = OptionID.getOrCreateOptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
 
   /**
    * OptionID for the quote character parameter (defaults to a double quotation
    * mark as in {@link #QUOTE_CHAR}.
    */
-  private static final OptionID QUOTE_ID = OptionID.getOrCreateOptionID("parser.quote", "Quotation character. The default is to use a double quote.");
+  public static final OptionID QUOTE_ID = OptionID.getOrCreateOptionID("parser.quote", "Quotation character. The default is to use a double quote.");
 
   /**
    * Stores the column separator pattern
@@ -59,7 +60,7 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   /**
    * Stores the quotation character
    */
-  protected char quoteChar = 0;
+  protected char quoteChar = QUOTE_CHAR.charAt(0);
 
   /**
    * The comment character.
@@ -72,28 +73,22 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   public static final String ATTRIBUTE_CONCATENATION = " ";
 
   /**
-   * AbstractParser already provides the option handler.
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param colSep Column separator
+   * @param quoteChar Quote character
    */
-  protected AbstractParser(Parameterization config) {
+  public AbstractParser(Pattern colSep, char quoteChar) {
     super();
-    config = config.descend(this);
-    PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, WHITESPACE_PATTERN);
-    if(config.grab(colParam)) {
-      colSep = colParam.getValue();
-    }
-    StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), QUOTE_CHAR);
-    if(config.grab(quoteParam)) {
-      quoteChar = quoteParam.getValue().charAt(0);
-    }
+    this.colSep = colSep;
+    this.quoteChar = quoteChar;
   }
 
   /**
    * Tokenize a string. Works much like colSep.split() except it honors
    * quotation characters.
    * 
-   * @param s
+   * @param input Input string
    * @return Tokenized string
    */
   protected List<String> tokenize(String input) {
@@ -161,5 +156,40 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   @Override
   public String toString() {
     return getClass().getName();
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Stores the column separator pattern
+     */
+    protected Pattern colSep = null;
+
+    /**
+     * Stores the quotation character
+     */
+    protected char quoteChar = QUOTE_CHAR.charAt(0);
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, WHITESPACE_PATTERN);
+      if(config.grab(colParam)) {
+        colSep = colParam.getValue();
+      }
+      StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), QUOTE_CHAR);
+      if(config.grab(quoteParam)) {
+        quoteChar = quoteParam.getValue().charAt(0);
+      }
+    }
+
+    @Override
+    protected abstract Parser<O> makeInstance();
   }
 }

@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param O Input object type
  * @param D Distance result type
  */
-public interface SimilarityQuery<O extends DatabaseObject, D extends Distance<D>> extends DatabaseQuery {
+public interface SimilarityQuery<O extends DatabaseObject, D extends Distance<?>> extends DatabaseQuery {
   /**
    * Returns the similarity between the two objects specified by their object
    * ids.

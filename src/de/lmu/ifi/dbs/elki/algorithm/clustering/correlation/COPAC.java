@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
+import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex.Factory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -33,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -55,9 +57,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.uses AbstractLocalPCAPreprocessor
- * @apiviz.uses LocalProjectionPreprocessorBasedDistanceFunction
- * @apiviz.uses LocallyWeightedDistanceFunction
+ * @apiviz.uses LocalProjectionIndex
+ * @apiviz.uses FilteredLocalPCABasedDistanceFunction
  * @apiviz.has DimensionModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
@@ -72,37 +73,18 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   private static final Logging logger = Logging.getLogger(COPAC.class);
 
   /**
-   * OptionID for {@link #PREPROCESSOR_PARAM}
+   * Parameter to specify the local PCA preprocessor to derive partition
+   * criterion, must extend
+   * {@link de.lmu.ifi.dbs.elki.index.preprocessed.localpca.AbstractFilteredPCAIndex}.
+   * <p>
+   * Key: {@code -copac.preprocessor}
+   * </p>
    */
   public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("copac.preprocessor", "Local PCA Preprocessor to derive partition criterion.");
 
   /**
-   * Parameter to specify the local PCA preprocessor to derive partition
-   * criterion, must extend
-   * {@link de.lmu.ifi.dbs.elki.preprocessing.AbstractLocalPCAPreprocessor}.
-   * <p>
-   * Key: {@code -copac.preprocessor}
-   * </p>
-   * 
-   */
-  @SuppressWarnings("rawtypes")
-  private final ClassParameter<LocalProjectionIndex.Factory> PREPROCESSOR_PARAM = new ClassParameter<LocalProjectionIndex.Factory>(PREPROCESSOR_ID, LocalProjectionIndex.Factory.class);
-
-  /**
-   * Holds the instance of preprocessor specified by {@link #PREPROCESSOR_PARAM}
-   * .
-   */
-  @SuppressWarnings("rawtypes")
-  private LocalProjectionIndex.Factory indexfactory;
-
-  /**
-   * OptionID for {@link #PARTITION_DISTANCE_PARAM}
-   */
-  public static final OptionID PARTITION_DISTANCE_ID = OptionID.getOrCreateOptionID("copac.partitionDistance", "Distance to use for the inner algorithms.");
-
-  /**
    * Parameter to specify the distance function to use inside the partitions
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction}
+   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction}
    * .
    * <p>
    * Default value:
@@ -112,18 +94,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * Key: {@code -copac.partitionDistance}
    * </p>
    */
-  protected final ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, ?>> PARTITION_DISTANCE_PARAM = new ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, ?>>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
-
-  /**
-   * Holds the instance of the preprocessed distance function
-   * {@link #PARTITION_DISTANCE_PARAM}.
-   */
-  private FilteredLocalPCABasedDistanceFunction<V, ?, ?> partitionDistanceFunction;
-
-  /**
-   * OptionID for {@link #PARTITION_ALGORITHM_PARAM}
-   */
-  public static final OptionID PARTITION_ALGORITHM_ID = OptionID.getOrCreateOptionID("copac.partitionAlgorithm", "Clustering algorithm to apply to each partition.");
+  public static final OptionID PARTITION_DISTANCE_ID = OptionID.getOrCreateOptionID("copac.partitionDistance", "Distance to use for the inner algorithms.");
 
   /**
    * Parameter to specify the clustering algorithm to apply to each partition,
@@ -133,17 +104,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * Key: {@code -copac.partitionAlgorithm}
    * </p>
    */
-  protected final ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>> PARTITION_ALGORITHM_PARAM = new ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
-
-  /**
-   * Holds the parameters of the algorithm to run on each partition.
-   */
-  private Collection<Pair<OptionID, Object>> partitionAlgorithmParameters;
-
-  /**
-   * OptionID for {#PARTITION_DB_PARAM}
-   */
-  public static final OptionID PARTITION_DB_ID = OptionID.getOrCreateOptionID("copac.partitionDB", "Database class for each partition. " + "If this parameter is not set, the databases of the partitions have " + "the same class as the original database.");
+  public static final OptionID PARTITION_ALGORITHM_ID = OptionID.getOrCreateOptionID("copac.partitionAlgorithm", "Clustering algorithm to apply to each partition.");
 
   /**
    * Parameter to specify the database class for each partition, must extend
@@ -152,11 +113,27 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * Key: {@code -copac.partitionDB}
    * </p>
    */
-  private final ClassParameter<Database<V>> PARTITION_DB_PARAM = new ClassParameter<Database<V>>(PARTITION_DB_ID, Database.class, true);
+  public static final OptionID PARTITION_DB_ID = OptionID.getOrCreateOptionID("copac.partitionDB", "Database class for each partition. " + "If this parameter is not set, the databases of the partitions have " + "the same class as the original database.");
+
+  /**
+   * Holds the instance of the preprocessed distance function
+   * {@link #PARTITION_DISTANCE_ID}.
+   */
+  private FilteredLocalPCABasedDistanceFunction<V, ?, ?> partitionDistanceFunction;
+
+  /**
+   * Get the algorithm to run on each partition.
+   */
+  private Class<? extends ClusteringAlgorithm<Clustering<Model>, V>> partitionAlgorithm;
+
+  /**
+   * Holds the parameters of the algorithm to run on each partition.
+   */
+  private Collection<Pair<OptionID, Object>> partitionAlgorithmParameters;
 
   /**
    * Holds the instance of the partition database specified by
-   * {@link #PARTITION_DB_PARAM}.
+   * {@link #PARTITION_DB_ID}.
    */
   private Class<? extends Database<V>> partitionDatabase;
 
@@ -173,44 +150,22 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   private FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, ?> partitionDistanceQuery;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}.
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param partitionDistanceFunction Distance function
+   * @param partitionAlgorithm Algorithm to use on partitions
+   * @param partitionAlgorithmParameters Parameters for Algorithm to run on
+   *        partitions
+   * @param partitionDatabase Database to use for Partitions
+   * @param partitionDatabaseParameters Parameters for database to use.
    */
-  public COPAC(Parameterization config) {
+  public COPAC(FilteredLocalPCABasedDistanceFunction<V, ?, ?> partitionDistanceFunction, Class<? extends ClusteringAlgorithm<Clustering<Model>, V>> partitionAlgorithm, Collection<Pair<OptionID, Object>> partitionAlgorithmParameters, Class<Database<V>> partitionDatabase, Collection<Pair<OptionID, Object>> partitionDatabaseParameters) {
     super();
-    config = config.descend(this);
-    // parameter preprocessor
-    if(config.grab(PREPROCESSOR_PARAM)) {
-      indexfactory = PREPROCESSOR_PARAM.instantiateClass(config);
-    }
-    if(config.grab(PARTITION_DISTANCE_PARAM)) {
-      ListParameterization predefinedDist = new ListParameterization();
-      predefinedDist.addParameter(IndexBasedDistanceFunction.INDEX_ID, indexfactory);
-      ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
-      chainDist.errorsTo(config);
-      partitionDistanceFunction = PARTITION_DISTANCE_PARAM.instantiateClass(chainDist);
-      predefinedDist.reportInternalParameterizationErrors(config);
-    }
-    // parameter partition algorithm
-    if(config.grab(PARTITION_ALGORITHM_PARAM)) {
-      ListParameterization predefined = new ListParameterization();
-      predefined.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, partitionDistanceFunction);
-      TrackParameters trackpar = new TrackParameters(config);
-      ChainedParameterization chain = new ChainedParameterization(predefined, trackpar);
-      chain.errorsTo(config);
-      PARTITION_ALGORITHM_PARAM.instantiateClass(chain);
-      partitionAlgorithmParameters = trackpar.getGivenParameters();
-      predefined.reportInternalParameterizationErrors(chain);
-    }
-    // parameter partition database class
-    if(config.grab(PARTITION_DB_PARAM)) {
-      TrackParameters trackpar = new TrackParameters(config);
-      Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass(trackpar);
-      partitionDatabaseParameters = trackpar.getGivenParameters();
-      partitionDatabase = ClassGenericsUtil.uglyCrossCast(tmpDB.getClass(), Database.class);      
-    }
+    this.partitionDistanceFunction = partitionDistanceFunction;
+    this.partitionAlgorithm = partitionAlgorithm;
+    this.partitionAlgorithmParameters = partitionAlgorithmParameters;
+    this.partitionDatabase = partitionDatabase;
+    this.partitionDatabaseParameters = partitionDatabaseParameters;
   }
 
   /**
@@ -319,9 +274,9 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
     ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
     ProxyDistanceFunction<V, ?> dist = ProxyDistanceFunction.proxy(query);
     reconfig.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);
-    ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass(reconfig);
+    ClusteringAlgorithm<Clustering<Model>, V> instance = reconfig.tryInstantiate(partitionAlgorithm);
     reconfig.failOnErrors();
-    return partitionAlgorithm;
+    return instance;
   }
 
   /**
@@ -338,5 +293,73 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    protected LocalProjectionIndex.Factory<V, ?> indexI = null;
+
+    protected FilteredLocalPCABasedDistanceFunction<V, ?, ?> pdistI = null;
+
+    protected Class<? extends ClusteringAlgorithm<Clustering<Model>, V>> algC = null;
+
+    protected Collection<Pair<OptionID, Object>> algO = null;
+
+    protected Class<Database<V>> partDBC = null;
+
+    protected Collection<Pair<OptionID, Object>> partDBO = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ClassParameter<Factory<V, ?>> indexP = new ClassParameter<LocalProjectionIndex.Factory<V, ?>>(PREPROCESSOR_ID, LocalProjectionIndex.Factory.class);
+      if(config.grab(indexP)) {
+        indexI = indexP.instantiateClass(config);
+      }
+
+      ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, ?>> pdistP = new ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, ?>>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+      if(config.grab(pdistP)) {
+        ListParameterization predefinedDist = new ListParameterization();
+        predefinedDist.addParameter(IndexBasedDistanceFunction.INDEX_ID, indexI);
+        ChainedParameterization chainDist = new ChainedParameterization(predefinedDist, config);
+        chainDist.errorsTo(config);
+        pdistI = pdistP.instantiateClass(chainDist);
+        predefinedDist.reportInternalParameterizationErrors(config);
+      }
+
+      // Parameterize algorithm:
+      ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>> algP = new ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
+      if(config.grab(algP)) {
+        ListParameterization predefined = new ListParameterization();
+        predefined.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, pdistI);
+        TrackParameters trackpar = new TrackParameters(config);
+        ChainedParameterization chain = new ChainedParameterization(predefined, trackpar);
+        chain.errorsTo(config);
+        algP.instantiateClass(chain);
+        algC = algP.getValue();
+        algO = trackpar.getGivenParameters();
+        predefined.reportInternalParameterizationErrors(chain);
+      }
+
+      // Parameterize database for partitions
+      ClassParameter<Database<V>> partDBP = new ClassParameter<Database<V>>(PARTITION_DB_ID, Database.class, true);
+      if(config.grab(partDBP)) {
+        TrackParameters trackpar = new TrackParameters(config);
+        partDBP.instantiateClass(trackpar);
+        partDBC = ClassGenericsUtil.uglyCrossCast(partDBP.getValue(), Database.class);
+        partDBO = trackpar.getGivenParameters();
+      }
+    }
+
+    @Override
+    protected COPAC<V> makeInstance() {
+      return new COPAC<V>(pdistI, algC, algO, partDBC, partDBO);
+    }
   }
 }

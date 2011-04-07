@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -44,7 +45,7 @@ public class TestPairCountingFMeasure implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
     // verify data set size.

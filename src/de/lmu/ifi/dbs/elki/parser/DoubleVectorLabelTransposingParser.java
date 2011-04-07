@@ -1,17 +1,18 @@
 package de.lmu.ifi.dbs.elki.parser;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Parser reads points transposed. Line n gives the n-th attribute for all points.
@@ -23,16 +24,16 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
    * Class logger
    */
   private static final Logging logger = Logging.getLogger(DoubleVectorLabelTransposingParser.class);
-  
+
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param colSep
+   * @param quoteChar
+   * @param labelIndices
    */
-  public DoubleVectorLabelTransposingParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public DoubleVectorLabelTransposingParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
+    super(colSep, quoteChar, labelIndices);
   }
 
   @Override
@@ -100,5 +101,20 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<DoubleVector> {
+    @Override
+    protected DoubleVectorLabelTransposingParser makeInstance() {
+      return new DoubleVectorLabelTransposingParser(colSep, quoteChar, labelIndices);
+    }
   }
 }

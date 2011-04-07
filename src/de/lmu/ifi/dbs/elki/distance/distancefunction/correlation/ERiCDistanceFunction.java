@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceF
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -22,17 +23,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * algorithm.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has Instance
  */
 public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, BitDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, BitDistance> {
   /**
    * Logger for debug.
    */
   static Logging logger = Logging.getLogger(PCABasedCorrelationDistanceFunction.class);
-
-  /**
-   * OptionID for {@link #DELTA_PARAM}
-   */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("ericdf.delta", "Threshold for approximate linear dependency: " + "the strong eigenvectors of q are approximately linear dependent " + "from the strong eigenvectors p if the following condition " + "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " + "q_i' * M^check_p * q_i <= delta^2.");
 
   /**
    * Parameter to specify the threshold for approximate linear dependency: the
@@ -47,12 +45,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * Key: {@code -ericdf.delta}
    * </p>
    */
-  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.1);
-
-  /**
-   * OptionID for {@link #TAU_PARAM}
-   */
-  public static final OptionID TAU_ID = OptionID.getOrCreateOptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
+  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("ericdf.delta", "Threshold for approximate linear dependency: " + "the strong eigenvectors of q are approximately linear dependent " + "from the strong eigenvectors p if the following condition " + "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " + "q_i' * M^check_p * q_i <= delta^2.");
 
   /**
    * Parameter to specify the threshold for the maximum distance between two
@@ -66,37 +59,29 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * Key: {@code -ericdf.tau}
    * </p>
    */
-  private final DoubleParameter TAU_PARAM = new DoubleParameter(TAU_ID, new GreaterEqualConstraint(0), 0.1);
+  public static final OptionID TAU_ID = OptionID.getOrCreateOptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
 
   /**
-   * Holds the value of {@link #DELTA_PARAM}.
+   * Holds the value of {@link #DELTA_ID}.
    */
   private double delta;
 
   /**
-   * Holds the value of {@link #TAU_PARAM}.
+   * Holds the value of {@link #TAU_ID}.
    */
   private double tau;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param indexFactory Index factory.
+   * @param delta Delta parameter
+   * @param tau Tau parameter
    */
-  public ERiCDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-
-    // delta
-    if(config.grab(DELTA_PARAM)) {
-      delta = DELTA_PARAM.getValue();
-    }
-
-    // tau
-    if(config.grab(TAU_PARAM)) {
-      tau = TAU_PARAM.getValue();
-    }
+  public ERiCDistanceFunction(IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>> indexFactory, double delta, double tau) {
+    super(indexFactory);
+    this.delta = delta;
+    this.tau = tau;
   }
 
   @Override
@@ -111,9 +96,10 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
 
   @Override
   public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
-    // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
+    // We can't really avoid these warnings, due to a limitation in Java
+    // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) index.instantiate((Database<NumberVector<?, ?>>)database);
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Database<NumberVector<?, ?>>) database);
     return new Instance<T>(database, indexinst, this, delta, tau);
   }
 
@@ -135,24 +121,14 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
       // check, if distance of v2_i to the space of pca_1 > delta
       // (i.e., if v2_i spans up a new dimension)
       double dist = Math.sqrt(v2_i.transposeTimes(v2_i).get(0, 0) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0, 0));
-  
+
       // if so, return false
       if(dist > delta) {
         return false;
       }
     }
-  
-    return true;
-  }
-  
-  @Override
-  protected Class<?> getIndexFactoryRestriction() {
-    return FilteredLocalPCAIndex.Factory.class;
-  }
 
-  @Override
-  protected Class<?> getIndexFactoryDefaultClass() {
-    return KNNQueryFilteredPCAIndex.Factory.class;
+    return true;
   }
 
   /**
@@ -171,7 +147,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
-  
+
     boolean approximatelyLinearDependent;
     if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
@@ -179,14 +155,14 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     else {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
     }
-  
+
     if(!approximatelyLinearDependent) {
       return new BitDistance(true);
     }
-  
+
     else {
       double affineDistance;
-  
+
       if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
         WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
         WeightedDistanceFunction df2 = new WeightedDistanceFunction(pca2.similarityMatrix());
@@ -196,11 +172,11 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
         WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
         affineDistance = df1.distance(v1, v2).doubleValue();
       }
-  
+
       if(affineDistance > tau) {
         return new BitDistance(true);
       }
-  
+
       return new BitDistance(false);
     }
   }
@@ -212,12 +188,12 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    */
   public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, BitDistance, ERiCDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, BitDistance> {
     /**
-     * Holds the value of {@link #DELTA_PARAM}.
+     * Holds the value of {@link #DELTA_ID}.
      */
     private final double delta;
-    
+
     /**
-     * Holds the value of {@link #TAU_PARAM}.
+     * Holds the value of {@link #TAU_ID}.
      */
     private final double tau;
 
@@ -247,6 +223,40 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
       V v1 = database.get(id1);
       V v2 = database.get(id2);
       return parent.distance(v1, v2, pca1, pca2);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>>> {
+    double delta = 0.0;
+
+    double tau = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configIndexFactory(config, FilteredLocalPCAIndex.Factory.class, KNNQueryFilteredPCAIndex.Factory.class);
+
+      final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.1);
+      if(config.grab(deltaP)) {
+        delta = deltaP.getValue();
+      }
+
+      final DoubleParameter tauP = new DoubleParameter(TAU_ID, new GreaterEqualConstraint(0), 0.1);
+      if(config.grab(tauP)) {
+        tau = tauP.getValue();
+      }
+    }
+
+    @Override
+    protected ERiCDistanceFunction makeInstance() {
+      return new ERiCDistanceFunction(factory, delta, tau);
     }
   }
 }

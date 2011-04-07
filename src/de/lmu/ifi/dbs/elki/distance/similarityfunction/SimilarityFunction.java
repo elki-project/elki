@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <O> object type
  * @param <D> distance type
  */
-public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
+public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<?>> extends Parameterizable {
   /**
    * Is this function symmetric?
    * 

@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -556,25 +555,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
     return clustering;
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
-   */
-  public static <O extends DatabaseObject, D extends Distance<D>> SLINK<O, D> parameterize(Parameterization config) {
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    final IntParameter minclustersparam = new IntParameter(SLINK_MINCLUSTERS_ID, new GreaterEqualConstraint(1), true);
-    Integer maxclusters = null;
-    if(config.grab(minclustersparam)) {
-      maxclusters = minclustersparam.getValue();
-    }
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new SLINK<O, D>(distanceFunction, maxclusters);
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
@@ -611,6 +591,31 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
       assert (k1 != null);
       assert (k2 != null);
       return k1.compareTo(k2);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected int minclusters = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter minclustersP = new IntParameter(SLINK_MINCLUSTERS_ID, new GreaterEqualConstraint(1), true);
+      if(config.grab(minclustersP)) {
+        minclusters = minclustersP.getValue();
+      }
+    }
+
+    @Override
+    protected SLINK<O, D> makeInstance() {
+      return new SLINK<O, D>(distanceFunction, minclusters);
     }
   }
 }

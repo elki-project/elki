@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * Abstract super class for distance functions needing a database context.
  * 
  * @author Elke Achtert
+ * 
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <D> the type of Distance used
  */

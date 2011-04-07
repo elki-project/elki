@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * Index with support for kNN queries.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Database Object type
  */
 public interface KNNIndex<O extends DatabaseObject> extends Index<O> {

@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -65,11 +66,6 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SUBCLU.class);
-  
-  /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("subclu.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * The distance function to determine the distance between database objects.
@@ -80,18 +76,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Key: {@code -subclu.distancefunction}
    * </p>
    */
-  private final ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(DISTANCE_FUNCTION_ID, AbstractDimensionsSelectingDoubleDistanceFunction.class, DimensionsSelectingEuclideanDistanceFunction.class);
-
-  /**
-   * Holds the instance of the distance function specified by
-   * {@link #DISTANCE_FUNCTION_PARAM}.
-   */
-  private AbstractDimensionsSelectingDoubleDistanceFunction<V> distanceFunction;
-
-  /**
-   * OptionID for {@link #EPSILON_PARAM}
-   */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("subclu.epsilon", "The maximum radius of the neighborhood to be considered.");
+  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("subclu.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
@@ -101,17 +86,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Key: {@code -subclu.epsilon}
    * </p>
    */
-  private final DistanceParameter<DoubleDistance> EPSILON_PARAM;
-
-  /**
-   * Holds the value of {@link #EPSILON_PARAM}.
-   */
-  private DoubleDistance epsilon;
-
-  /**
-   * OptionID for {@link #MINPTS_PARAM}
-   */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("subclu.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
+  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("subclu.epsilon", "The maximum radius of the neighborhood to be considered.");
 
   /**
    * Parameter to specify the threshold for minimum number of points in the
@@ -120,10 +95,21 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Key: {@code -subclu.minpts}
    * </p>
    */
-  private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("subclu.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
   /**
-   * Holds the value of {@link #MINPTS_PARAM}.
+   * Holds the instance of the distance function specified by
+   * {@link #DISTANCE_FUNCTION_ID}.
+   */
+  private AbstractDimensionsSelectingDoubleDistanceFunction<V> distanceFunction;
+
+  /**
+   * Holds the value of {@link #EPSILON_ID}.
+   */
+  private DoubleDistance epsilon;
+
+  /**
+   * Holds the value of {@link #MINPTS_ID}.
    */
   private int minpts;
 
@@ -133,35 +119,21 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   private Clustering<SubspaceModel<V>> result;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param distanceFunction Distance function
+   * @param epsilon Epsilon value
+   * @param minpts Minpts value
    */
-  public SUBCLU(Parameterization config) {
+  public SUBCLU(AbstractDimensionsSelectingDoubleDistanceFunction<V> distanceFunction, DoubleDistance epsilon, int minpts) {
     super();
-    config = config.descend(this);
-
-    // distance function
-    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
-      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
-
-    // parameter epsilon
-    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, distanceFunction);
-    if(config.grab(EPSILON_PARAM)) {
-      epsilon = EPSILON_PARAM.getValue();
-    }
-
-    // parameter minpts
-    if(config.grab(MINPTS_PARAM)) {
-      minpts = MINPTS_PARAM.getValue();
-    }
+    this.distanceFunction = distanceFunction;
+    this.epsilon = epsilon;
+    this.minpts = minpts;
   }
 
   /**
    * Performs the SUBCLU algorithm on the given database.
-   * 
    */
   @Override
   protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
@@ -464,5 +436,44 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    protected int minpts = 0;
+    
+    protected DoubleDistance epsilon = null;
+
+    protected AbstractDimensionsSelectingDoubleDistanceFunction<V> distance = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> param = new ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(DISTANCE_FUNCTION_ID, AbstractDimensionsSelectingDoubleDistanceFunction.class, DimensionsSelectingEuclideanDistanceFunction.class);
+      if(config.grab(param)) {
+        distance = param.instantiateClass(config);
+      }
+
+      DistanceParameter<DoubleDistance> epsilonP = new DistanceParameter<DoubleDistance>(EPSILON_ID, distance);
+      if(config.grab(epsilonP)) {
+        epsilon = epsilonP.getValue();
+      }
+      
+      IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+      if(config.grab(minptsP)) {
+        minpts = minptsP.getValue();
+      }      
+    }
+
+    @Override
+    protected SUBCLU<V> makeInstance() {
+      return new SUBCLU<V>(distance, epsilon, minpts);
+    }
   }
 }

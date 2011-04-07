@@ -14,10 +14,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CovarianceMatrixBuilder;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Performs a self-tuning local PCA based on the covariance matrices of given
@@ -32,11 +33,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends PCAFilteredRunner<V, D> {
   /**
-   * Default constructor
+   * Constructor.
+   *
+   * @param covarianceMatrixBuilder
+   * @param eigenPairFilter
+   * @param big
+   * @param small
    */
-  public PCAFilteredAutotuningRunner(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public PCAFilteredAutotuningRunner(CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
+    super(covarianceMatrixBuilder, eigenPairFilter, big, small);
   }
 
   /**
@@ -190,6 +195,20 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>,
         System.err.println("WARNING: results not sorted by distance!");
       }
       dist = qr.getDistance().doubleValue();
+    }
+  }
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends PCAFilteredRunner.Parameterizer<V, D> {
+    @Override
+    protected PCAFilteredAutotuningRunner<V, D> makeInstance() {
+      return new PCAFilteredAutotuningRunner<V, D>(covarianceMatrixBuilder, eigenPairFilter, big, small);
     }
   }
 }

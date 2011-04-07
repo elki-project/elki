@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.evaluation.index;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
@@ -12,7 +11,6 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -23,29 +21,23 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @apiviz.landmark
  * @apiviz.has IndexMetaResult oneway - - «create»
- * 
- * @param <O> Database object type
  */
-public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
+public class IndexStatistics implements Evaluator {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
    */
-  public IndexStatistics(Parameterization config) {
+  public IndexStatistics() {
     super();
-    config = config.descend(this);
   }
 
   @Override
-  public void processResult(Database<O> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
     Collection<String> header = null;
-    final ArrayList<TreeIndex<O, ?, ?>> indexes = ResultUtil.filterResults(result, TreeIndex.class);
+    final ArrayList<TreeIndex<?, ?, ?>> indexes = ResultUtil.filterResults(result, TreeIndex.class);
     if (indexes == null || indexes.size() <= 0) {
       return;
     }
-    for(TreeIndex<O, ?, ?> index : indexes) {
+    for(TreeIndex<?, ?, ?> index : indexes) {
       header = new java.util.Vector<String>();
       header.add(index.toString());
     }
@@ -55,7 +47,7 @@ public class IndexStatistics<O extends DatabaseObject> implements Evaluator<O> {
   }
 
   @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
     // unused
   }
 

@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -12,10 +12,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Provides a LP-Norm for FeatureVectors.
  * 
  * @author Arthur Zimek
- * 
- * TODO: implement SpatialDistanceFunction
  */
 public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?, ?>> {
+  // TODO: implement SpatialDistanceFunction
+
   /**
    * OptionID for the "p" parameter
    */
@@ -25,30 +25,6 @@ public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
    * Keeps the currently set p.
    */
   private double p;
-
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Distance function
-   */
-  public static LPNormDistanceFunction parameterize(Parameterization config) {
-    final DoubleParameter P_PARAM = new DoubleParameter(P_ID, new GreaterConstraint(0));
-    if(config.grab(P_PARAM)) {
-      final double p = P_PARAM.getValue();
-      if(p == 1.0) {
-        return ManhattanDistanceFunction.STATIC;
-      }
-      if(p == 2.0) {
-        return EuclideanDistanceFunction.STATIC;
-      }
-      if(p == Double.POSITIVE_INFINITY) {
-        return MaximumDistanceFunction.STATIC;
-      }
-      return new LPNormDistanceFunction(p);
-    }
-    return null;
-  }
 
   /**
    * Constructor, internal version.
@@ -119,5 +95,42 @@ public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The value of p.
+     */
+    protected double p = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter paramP = new DoubleParameter(P_ID, new GreaterConstraint(0));
+      if(config.grab(paramP)) {
+        p = paramP.getValue();
+      }
+    }
+
+    @Override
+    protected LPNormDistanceFunction makeInstance() {
+      if(p == 1.0) {
+        return ManhattanDistanceFunction.STATIC;
+      }
+      if(p == 2.0) {
+        return EuclideanDistanceFunction.STATIC;
+      }
+      if(p == Double.POSITIVE_INFINITY) {
+        return MaximumDistanceFunction.STATIC;
+      }
+      return new LPNormDistanceFunction(p);
+    }
   }
 }

@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
  * 
- * In contrast to {@link #RankingQualityHistogram}, this method uses a binning
+ * In contrast to {@link RankingQualityHistogram}, this method uses a binning
  * based on the centrality of objects. This allows analyzing whether or not a
  * particular distance degrades for the outer parts of a cluster.
  * 
@@ -162,38 +161,33 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     return new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> EvaluateRankingQuality<V, D> parameterize(Parameterization config) {
-    int bins = getParameterBins(config);
-
-    DistanceFunction<V, D> distanceFunction = getParameterDistanceFunction(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new EvaluateRankingQuality<V, D>(distanceFunction, bins);
-  }
-
-  /**
-   * Get the number of bins parameter
-   * 
-   * @param config Parameterization
-   * @return bins parameter
-   */
-  protected static int getParameterBins(Parameterization config) {
-    final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+    protected int numbins = 20;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
+      if(config.grab(param)) {
+        numbins = param.getValue();
+      }
+    }
+
+    @Override
+    protected EvaluateRankingQuality<V, D> makeInstance() {
+      return new EvaluateRankingQuality<V, D>(distanceFunction, numbins);
+    }
   }
 }

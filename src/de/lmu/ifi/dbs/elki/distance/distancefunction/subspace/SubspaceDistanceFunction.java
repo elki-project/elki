@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceF
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.SubspaceDistance;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
@@ -21,27 +22,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * affine distance between the two subspaces.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has Instance
  */
 public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    * 
-   * @param config Parameterization
+   * @param indexFactory Index factory
    */
-  public SubspaceDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryRestriction() {
-    return LocalProjectionIndex.Factory.class;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryDefaultClass() {
-    return KNNQueryFilteredPCAIndex.Factory.class;
+  public SubspaceDistanceFunction(IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>> indexFactory) {
+    super(indexFactory);
   }
 
   @Override
@@ -58,7 +49,7 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
   public <V extends NumberVector<?, ?>> Instance<V> instantiate(Database<V> database) {
     // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) index.instantiate((Database<NumberVector<?, ?>>)database);
+    FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) indexFactory.instantiate((Database<NumberVector<?, ?>>)database);
     return new Instance<V>(database, indexinst, this);
   }
 
@@ -118,6 +109,26 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
       double affineDistance = Math.max(df1.distance(o1, o2).doubleValue(), df2.distance(o1, o2).doubleValue());
 
       return new SubspaceDistance(d1, affineDistance);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<LocalProjectionIndex.Factory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>>> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configIndexFactory(config, LocalProjectionIndex.Factory.class, KNNQueryFilteredPCAIndex.Factory.class);
+   }
+
+    @Override
+    protected SubspaceDistanceFunction makeInstance() {
+      return new SubspaceDistanceFunction(factory);
     }
   }
 }

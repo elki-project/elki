@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -55,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * <p>
  * Reference: <br>
- * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan:: Automatic Subspace
+ * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan: Automatic Subspace
  * Clustering of High Dimensional Data for Data Mining Applications. <br>
  * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Seattle, WA, 1998.
  * </p>
@@ -76,11 +77,6 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(CLIQUE.class);
-  
-  /**
-   * OptionID for {@link #XSI_PARAM}
-   */
-  public static final OptionID XSI_ID = OptionID.getOrCreateOptionID("clique.xsi", "The number of intervals (units) in each dimension.");
 
   /**
    * Parameter to specify the number of intervals (units) in each dimension,
@@ -89,17 +85,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Key: {@code -clique.xsi}
    * </p>
    */
-  private final IntParameter XSI_PARAM = new IntParameter(XSI_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #XSI_PARAM}.
-   */
-  private int xsi;
-
-  /**
-   * OptionID for {@link #TAU_PARAM}
-   */
-  public static final OptionID TAU_ID = OptionID.getOrCreateOptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is" + "the fraction of total feature vectors contained in this unit.");
+  public static final OptionID XSI_ID = OptionID.getOrCreateOptionID("clique.xsi", "The number of intervals (units) in each dimension.");
 
   /**
    * Parameter to specify the density threshold for the selectivity of a unit,
@@ -109,17 +95,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Key: {@code -clique.tau}
    * </p>
    */
-  private final DoubleParameter TAU_PARAM = new DoubleParameter(TAU_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
-
-  /**
-   * Holds the value of {@link #TAU_PARAM}.
-   */
-  private double tau;
-
-  /**
-   * OptionID for {@link #PRUNE_FLAG}
-   */
-  public static final OptionID PRUNE_ID = OptionID.getOrCreateOptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
+  public static final OptionID TAU_ID = OptionID.getOrCreateOptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is" + "the fraction of total feature vectors contained in this unit.");
 
   /**
    * Flag to indicate that only subspaces with large coverage (i.e. the fraction
@@ -129,42 +105,44 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Key: {@code -clique.prune}
    * </p>
    */
-  private final Flag PRUNE_FLAG = new Flag(PRUNE_ID);
+  public static final OptionID PRUNE_ID = OptionID.getOrCreateOptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
   /**
-   * Holds the value of {@link #PRUNE_FLAG}.
+   * Holds the value of {@link #XSI_ID}.
+   */
+  private int xsi;
+
+  /**
+   * Holds the value of {@link #TAU_ID}.
+   */
+  private double tau;
+
+  /**
+   * Holds the value of {@link #PRUNE_ID}.
    */
   private boolean prune;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param xsi Xsi value
+   * @param tau Tau value
+   * @param prune Prune flag
    */
-  public CLIQUE(Parameterization config) {
+  public CLIQUE(int xsi, double tau, boolean prune) {
     super();
-    config = config.descend(this);
-    if(config.grab(XSI_PARAM)) {
-      xsi = XSI_PARAM.getValue();
-    }
-
-    if(config.grab(TAU_PARAM)) {
-      tau = TAU_PARAM.getValue();
-    }
-    if(config.grab(PRUNE_FLAG)) {
-      prune = PRUNE_FLAG.getValue();
-    }
-    // logger.getWrappedLogger().setLevel(Level.FINE);
+    this.xsi = xsi;
+    this.tau = tau;
+    this.prune = prune;
   }
 
   /**
    * Performs the CLIQUE algorithm on the given database.
-   * 
    */
   @Override
   protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
     // 1. Identification of subspaces that contain clusters
+    // TODO: use step logging.
     if(logger.isVerbose()) {
       logger.verbose("*** 1. Identification of subspaces that contain clusters ***");
     }
@@ -563,5 +541,44 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    protected int xsi;
+
+    protected double tau;
+
+    protected boolean prune;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter xsiP = new IntParameter(XSI_ID, new GreaterConstraint(0));
+      if(config.grab(xsiP)) {
+        xsi = xsiP.getValue();
+      }
+
+      DoubleParameter tauP = new DoubleParameter(TAU_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
+      if(config.grab(tauP)) {
+        tau = tauP.getValue();
+      }
+
+      Flag pruneF = new Flag(PRUNE_ID);
+      if(config.grab(pruneF)) {
+        prune = pruneF.getValue();
+      }
+    }
+
+    @Override
+    protected CLIQUE<V> makeInstance() {
+      return new CLIQUE<V>(xsi, tau, prune);
+    }
   }
 }

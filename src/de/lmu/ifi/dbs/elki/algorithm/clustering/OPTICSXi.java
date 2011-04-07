@@ -27,6 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarch
  * Class to handle OPTICS Xi extraction.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has SteepAreaResult
  */
 // TODO: make non-static
 public class OPTICSXi {

@@ -66,8 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.exclude
  * @apiviz.excludeSubtypes
- * @apiviz.landmark
  * @apiviz.has de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter oneway - n
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization
  *              .Parameterization oneway

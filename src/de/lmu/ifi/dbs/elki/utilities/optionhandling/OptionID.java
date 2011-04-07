@@ -11,14 +11,18 @@ import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
  */
 public final class OptionID extends ConstantObject<OptionID> {
   /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.application.AbstractApplication#HELP_FLAG}
+   * Flag to obtain help-message.
+   * <p>
+   * Key: {@code -h}
+   * </p>
    */
   public static final OptionID HELP = new OptionID("h", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
 
   /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.application.AbstractApplication#HELP_LONG_FLAG}
+   * Flag to obtain help-message.
+   * <p>
+   * Key: {@code -help}
+   * </p>
    */
   public static final OptionID HELP_LONG = new OptionID("help", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
 
@@ -28,14 +32,18 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID ALGORITHM = new OptionID("algorithm", "Algorithm to run.");
 
   /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.application.AbstractApplication#DESCRIPTION_PARAM}
+   * Optional Parameter to specify a class to obtain a description for.
+   * <p>
+   * Key: {@code -description}
+   * </p>
    */
   public static final OptionID DESCRIPTION = new OptionID("description", "Class to obtain a description of. " + "Causes immediate stop of the program.");
 
   /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.application.AbstractApplication#DEBUG_PARAM}
+   * Optional Parameter to specify a class to enable debugging for.
+   * <p>
+   * Key: {@code -enableDebug}
+   * </p>
    */
   public static final OptionID DEBUG = new OptionID("enableDebug", "Parameter to enable debugging for particular packages.");
 
@@ -45,8 +53,7 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID DATABASE_CONNECTION = new OptionID("dbc", "Database connection class.");
 
   /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.workflow.EvaluationStep}
+   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.EvaluationStep}
    */
   public static final OptionID EVALUATOR = new OptionID("evaluator", "Class to evaluate the results with.");
 
@@ -56,7 +63,7 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID RESULT_HANDLER = new OptionID("resulthandler", "Result handler class.");
 
   /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.result.ResultWriter#OUTPUT_PARAM}
+   * OptionID for the application output file/folder 
    */
   public static final OptionID OUTPUT = new OptionID("out", "Directory name (or name of an existing file) to write the obtained results in. " + "If this parameter is omitted, per default the output will sequentially be given to STDOUT.");
 
@@ -71,8 +78,10 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo", "Revert normalization result to original values - " + "invalid option if no normalization has been performed.");
 
   /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.application.AbstractApplication#VERBOSE_FLAG}
+   * Flag to allow verbose messages while running the application.
+   * <p>
+   * Key: {@code -verbose}
+   * </p>
    */
   public static final OptionID ALGORITHM_VERBOSE = new OptionID("verbose", "Enable verbose messages while performing the algorithm.");
 
@@ -147,8 +156,9 @@ public final class OptionID extends ConstantObject<OptionID> {
     return OptionID.lookup(OptionID.class, name);
   }
 
-  /** 
+  /**
    * Returns the name of this OptionID.
+   * 
    * @return the name
    * @see java.lang.Object#toString()
    */
@@ -156,6 +166,5 @@ public final class OptionID extends ConstantObject<OptionID> {
   public String toString() {
     return getName();
   }
-  
-  
+
 }

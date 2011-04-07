@@ -22,11 +22,12 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimi
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
@@ -44,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.uses SharedNearestNeighborSimilarityFunction 
+ * @apiviz.uses SharedNearestNeighborSimilarityFunction
  * 
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used for the preprocessing of the shared
@@ -58,7 +59,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SNNClustering.class);
-  
+
   /**
    * Parameter to specify the minimum SNN density, must be an integer greater
    * than 0.
@@ -268,52 +269,45 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     }
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
-   */
-  public static <O extends DatabaseObject, D extends Distance<D>> SNNClustering<O, D> parameterize(Parameterization config) {
-    IntegerDistance epsilon = getParameterEpsilon(config);
-    int minpts = getParameterMinpts(config);
-    SharedNearestNeighborSimilarityFunction<O, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<O, D>(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new SNNClustering<O, D>(similarityFunction, epsilon, minpts);
-  }
-
-  /**
-   * Get parameter epsilon
-   * 
-   * @param config Parameterization
-   * @return Epsilon
-   */
-  protected static IntegerDistance getParameterEpsilon(Parameterization config) {
-    final DistanceParameter<IntegerDistance> param = new DistanceParameter<IntegerDistance>(EPSILON_ID, IntegerDistance.FACTORY);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
-  }
-
-  /**
-   * Get parameter minpts
-   * 
-   * @param config Parameterization
-   * @return minpts parameter
-   */
-  protected static int getParameterMinpts(Parameterization config) {
-    final IntParameter param = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+    protected IntegerDistance epsilon;
+
+    protected int minpts;
+
+    private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Class<SharedNearestNeighborSimilarityFunction<O, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
+      similarityFunction = config.tryInstantiate(cls);
+
+      DistanceParameter<IntegerDistance> epsilonP = new DistanceParameter<IntegerDistance>(EPSILON_ID, IntegerDistance.FACTORY);
+      if(config.grab(epsilonP)) {
+        epsilon = epsilonP.getValue();
+      }
+
+      IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+      if(config.grab(minptsP)) {
+        minpts = minptsP.getValue();
+      }
+    }
+
+    @Override
+    protected SNNClustering<O, D> makeInstance() {
+      return new SNNClustering<O, D>(similarityFunction, epsilon, minpts);
+    }
   }
 }

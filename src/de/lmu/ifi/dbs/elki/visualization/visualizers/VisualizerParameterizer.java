@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -47,11 +48,6 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   protected final static Logging logger = Logging.getLogger(VisualizerParameterizer.class);
 
   /**
-   * Option ID for the style properties to use, {@link #STYLELIB_PARAM}
-   */
-  public final static OptionID STYLELIB_ID = OptionID.getOrCreateOptionID("visualizer.stylesheet", "Style properties file to use");
-
-  /**
    * Parameter to get the style properties file.
    * 
    * <p>
@@ -60,17 +56,12 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * Default: default properties file
    * </p>
    */
-  private StringParameter STYLELIB_PARAM = new StringParameter(STYLELIB_ID, PropertiesBasedStyleLibrary.DEFAULT_SCHEME_FILENAME);
+  public final static OptionID STYLELIB_ID = OptionID.getOrCreateOptionID("visualizer.stylesheet", "Style properties file to use");
 
   /**
    * Default pattern for visualizer disabling.
    */
   public final static String DEFAULT_HIDEVIS = "^experimentalcode\\..*";
-
-  /**
-   * Option ID for the visualizers to disable
-   */
-  public final static OptionID HIDEVIS_ID = OptionID.getOrCreateOptionID("vis.hide", "Visualizers to not show by default. Use 'none' to not hide any by default.");
 
   /**
    * Parameter to disable visualizers
@@ -81,7 +72,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * Default: default properties file
    * </p>
    */
-  private PatternParameter HIDEVIS_PARAM = new PatternParameter(HIDEVIS_ID, DEFAULT_HIDEVIS);
+  public final static OptionID HIDEVIS_ID = OptionID.getOrCreateOptionID("vis.hide", "Visualizers to not show by default. Use 'none' to not hide any by default.");
 
   /**
    * Style library to use.
@@ -99,30 +90,17 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   private Pattern hideVisualizers = null;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param stylelib Style library
+   * @param factories Factories to use
+   * @param hideVisualizers Visualizer hiding pattern
    */
-  public VisualizerParameterizer(Parameterization config) {
+  public VisualizerParameterizer(StyleLibrary stylelib, Collection<VisFactory<O>> factories, Pattern hideVisualizers) {
     super();
-    config = config.descend(this);
-    if(config.grab(STYLELIB_PARAM)) {
-      String filename = STYLELIB_PARAM.getValue();
-      try {
-        stylelib = new PropertiesBasedStyleLibrary(filename, "Command line style");
-      }
-      catch(AbortException e) {
-        config.reportError(new WrongParameterValueException(STYLELIB_PARAM, filename, e));
-      }
-    }
-    if(config.grab(HIDEVIS_PARAM)) {
-      if(!"none".equals(HIDEVIS_PARAM.getValueAsString())) {
-        hideVisualizers = HIDEVIS_PARAM.getValue();
-      }
-    }
-    MergedParameterization merged = new MergedParameterization(config);
-    this.factories = collectAlgorithmAdapters(merged);
+    this.stylelib = stylelib;
+    this.factories = factories;
+    this.hideVisualizers = hideVisualizers;
   }
 
   /**
@@ -135,27 +113,6 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   public VisualizerContext<O> newContext(Database<O> db, HierarchicalResult result) {
     VisualizerContext<O> context = new VisualizerContext<O>(db, result, stylelib, factories, hideVisualizers);
     return context;
-  }
-
-  /**
-   * Collect and instantiate all adapters.
-   * 
-   * @param config Parameterization
-   * @return List of all adapters found.
-   */
-  @SuppressWarnings("unchecked")
-  private static <O extends DatabaseObject> Collection<VisFactory<O>> collectAlgorithmAdapters(Parameterization config) {
-    ArrayList<VisFactory<O>> algorithmAdapters = new ArrayList<VisFactory<O>>();
-    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
-      try {
-        VisFactory<O> a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
-        algorithmAdapters.add(a);
-      }
-      catch(Throwable e) {
-        logger.exception("Error instantiating visualization factory " + c.getName(), e);
-      }
-    }
-    return algorithmAdapters;
   }
 
   /**
@@ -217,5 +174,69 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
       return buf.toString();
     }
     return null;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    protected StyleLibrary stylelib = null;
+
+    protected Pattern hideVisualizers = null;
+
+    protected Collection<VisFactory<O>> factories = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      StringParameter stylelibP = new StringParameter(STYLELIB_ID, PropertiesBasedStyleLibrary.DEFAULT_SCHEME_FILENAME);
+      if(config.grab(stylelibP)) {
+        String filename = stylelibP.getValue();
+        try {
+          stylelib = new PropertiesBasedStyleLibrary(filename, "Command line style");
+        }
+        catch(AbortException e) {
+          config.reportError(new WrongParameterValueException(stylelibP, filename, e));
+        }
+      }
+      PatternParameter hidevisP = new PatternParameter(HIDEVIS_ID, DEFAULT_HIDEVIS);
+      if(config.grab(hidevisP)) {
+        if(!"none".equals(hidevisP.getValueAsString())) {
+          hideVisualizers = hidevisP.getValue();
+        }
+      }
+      MergedParameterization merged = new MergedParameterization(config);
+      factories = collectAlgorithmAdapters(merged);
+    }
+
+    /**
+     * Collect and instantiate all adapters.
+     * 
+     * @param config Parameterization
+     * @return List of all adapters found.
+     */
+    @SuppressWarnings("unchecked")
+    private static <O extends DatabaseObject> Collection<VisFactory<O>> collectAlgorithmAdapters(Parameterization config) {
+      ArrayList<VisFactory<O>> algorithmAdapters = new ArrayList<VisFactory<O>>();
+      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
+        try {
+          VisFactory<O> a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
+          algorithmAdapters.add(a);
+        }
+        catch(Throwable e) {
+          logger.exception("Error instantiating visualization factory " + c.getName(), e);
+        }
+      }
+      return algorithmAdapters;
+    }
+
+    @Override
+    protected VisualizerParameterizer<O> makeInstance() {
+      return new VisualizerParameterizer<O>(stylelib, factories, hideVisualizers);
+    }
   }
 }

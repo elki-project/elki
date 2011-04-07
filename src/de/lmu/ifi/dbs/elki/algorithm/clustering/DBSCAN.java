@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
@@ -47,13 +46,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
+@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(DBSCAN.class);
-  
+
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to the distance function specified.
@@ -110,7 +109,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
   @Override
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
-    
+
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", database.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
@@ -140,7 +139,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
       }
     }
     // Finish progress logging
-    if (objprog != null) {
+    if(objprog != null) {
       objprog.ensureCompleted(logger);
     }
     if(clusprog != null) {
@@ -242,55 +241,41 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Abs
     }
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
-   */
-  public static <O extends DatabaseObject, D extends Distance<D>> DBSCAN<O, D> parameterize(Parameterization config) {
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    D epsilon = getParameterEpsilon(config, distanceFunction);
-    int minpts = getParameterMinpts(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new DBSCAN<O, D>(distanceFunction, epsilon, minpts);
-  }
-
-  /**
-   * Get the epsilon parameter value.
-   * 
-   * @param <O> Object type
-   * @param <D> Distance type
-   * @param config Parameterization
-   * @param distanceFunction distance function (for factory)
-   * @return Epsilon value
-   */
-  protected static <O extends DatabaseObject, D extends Distance<D>> D getParameterEpsilon(Parameterization config, DistanceFunction<O, D> distanceFunction) {
-    final DistanceParameter<D> param = new DistanceParameter<D>(EPSILON_ID, distanceFunction);
-    if (config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
-  }
-
-  /**
-   * Get the minPts parameter value.
-   * 
-   * @param config Parameterization
-   * @return minpts parameter value
-   */
-  protected static int getParameterMinpts(Parameterization config) {
-    final IntParameter param = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
-    if (config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected D epsilon = null;
+
+    protected int minpts = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DistanceParameter<D> epsilonP = new DistanceParameter<D>(EPSILON_ID, distanceFunction);
+      if(config.grab(epsilonP)) {
+        epsilon = epsilonP.getValue();
+      }
+
+      IntParameter minptsP = new IntParameter(MINPTS_ID);
+      minptsP.addConstraint(new GreaterConstraint(0));
+      if(config.grab(minptsP)) {
+        minpts = minptsP.getValue();
+      }
+    }
+
+    @Override
+    protected DBSCAN<O, D> makeInstance() {
+      return new DBSCAN<O, D>(distanceFunction, epsilon, minpts);
+    }
   }
 }

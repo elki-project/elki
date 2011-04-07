@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -19,12 +20,12 @@ import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a DistanceFunction that is based on double distances given by a
@@ -36,22 +37,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Loads double distance values from an external text file.")
 public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> {
   /**
-   * OptionID for {@link #MATRIX_PARAM}
-   */
-  public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
-
-  /**
-   * Parameter that specifies the name of the directory to be re-parsed.
+   * Parameter that specifies the name of the distance matrix file.
    * <p>
    * Key: {@code -distance.matrix}
    * </p>
    */
-  private final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
-
-  /**
-   * OptionID for {@link #PARSER_PARAM}
-   */
-  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("distance.parser", "Parser used to load the distance matrix.");
+  public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
 
   /**
    * Optional parameter to specify the parsers to provide a database, must
@@ -61,32 +52,26 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    * Key: {@code -distance.parser}
    * </p>
    */
-  private final ObjectParameter<DistanceParser<DatabaseObject, DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DatabaseObject, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
-
-  private DistanceParser<?, DoubleDistance> parser = null;
-
-  private Map<Pair<DBID, DBID>, DoubleDistance> cache = null;
+  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("distance.parser", "Parser used to load the distance matrix.");
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * The distance cache
    */
-  public FileBasedDoubleDistanceFunction(Parameterization config) {
+  private Map<DBIDPair, DoubleDistance> cache;
+
+  /**
+   * Constructor.
+   * 
+   * @param parser Parser
+   * @param matrixfile input file
+   */
+  public FileBasedDoubleDistanceFunction(DistanceParser<?, DoubleDistance> parser, File matrixfile) {
     super();
-    config = config.descend(this);
-    if(config.grab(MATRIX_PARAM)) {
-      File matrixfile = MATRIX_PARAM.getValue();
-      try {
-        loadCache(matrixfile);
-      }
-      catch(IOException e) {
-        config.reportError(new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e));
-      }
+    try {
+      loadCache(parser, matrixfile);
     }
-    if(config.grab(PARSER_PARAM)) {
-      parser = PARSER_PARAM.instantiateClass(config);
+    catch(IOException e) {
+      throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
     }
   }
 
@@ -113,10 +98,10 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
       return distance(id2, id1);
     }
 
-    return cache.get(new Pair<DBID, DBID>(id1, id2));
+    return cache.get(DBIDUtil.newPair(id1, id2));
   }
 
-  private void loadCache(File matrixfile) throws IOException {
+  private void loadCache(DistanceParser<?, DoubleDistance> parser, File matrixfile) throws IOException {
     InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
     DistanceParsingResult<?, DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
@@ -129,9 +114,9 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    */
   public DBIDs getIDs() {
     ModifiableDBIDs ids = DBIDUtil.newTreeSet();
-    for(Pair<DBID, DBID> pair : cache.keySet()) {
-      ids.add(pair.first);
-      ids.add(pair.second);
+    for(DBIDPair pair : cache.keySet()) {
+      ids.add(pair.getFirst());
+      ids.add(pair.getSecond());
     }
     return ids;
   }
@@ -139,5 +124,36 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected File matrixfile = null;
+
+    protected DistanceParser<?, DoubleDistance> parser = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      if(config.grab(MATRIX_PARAM)) {
+        matrixfile = MATRIX_PARAM.getValue();
+      }
+      final ObjectParameter<DistanceParser<DatabaseObject, DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DatabaseObject, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+      if(config.grab(PARSER_PARAM)) {
+        parser = PARSER_PARAM.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected FileBasedDoubleDistanceFunction makeInstance() {
+      return new FileBasedDoubleDistanceFunction(parser, matrixfile);
+    }
   }
 }

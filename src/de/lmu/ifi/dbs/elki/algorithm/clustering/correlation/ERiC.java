@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -70,31 +70,20 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(ERiC.class);
-  
+
   /**
    * The COPAC clustering algorithm.
    */
   private COPAC<V> copacAlgorithm;
 
   /**
-   * Performs the COPAC algorithm on the data and builds a hierarchy of
-   * correlation clusters that allows multiple inheritance from the clustering
-   * result.
+   * Constructor.
    * 
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * @param copacAlgorithm COPAC to use
    */
-  public ERiC(Parameterization config) {
+  public ERiC(COPAC<V> copacAlgorithm) {
     super();
-    config = config.descend(this);
-    // Parameterize COPAC:
-    ListParameterization predefined = new ListParameterization();
-    ChainedParameterization chain = new ChainedParameterization(predefined, config);
-    chain.errorsTo(config);
-    copacAlgorithm = new COPAC<V>(chain);
-    predefined.reportInternalParameterizationErrors(config);
+    this.copacAlgorithm = copacAlgorithm;
   }
 
   /**
@@ -201,7 +190,8 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         int correlationDimension = ((DimensionModel) clus.getModel()).getDimension();
 
         ListParameterization parameters = pcaParameters(correlationDimension);
-        PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>(parameters);
+        Class<PCAFilteredRunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+        PCAFilteredRunner<V, DoubleDistance> pca = parameters.tryInstantiate(cls);
         for(ParameterException e : parameters.getErrors()) {
           logger.warning("Error in internal parameterization: " + e.getMessage());
         }
@@ -235,7 +225,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       }
     }
 
-    if(noise != null) {
+    if(noise != null && noise.size() > 0) {
       // get cluster list for this dimension.
       List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(dimensionality);
       if(correlationClusters == null) {
@@ -243,7 +233,8 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
         clusterMap.put(dimensionality, correlationClusters);
       }
       ListParameterization parameters = pcaParameters(dimensionality);
-      PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>(parameters);
+      Class<PCAFilteredRunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+      PCAFilteredRunner<V, DoubleDistance> pca = parameters.tryInstantiate(cls);
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
@@ -369,5 +360,31 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    /**
+     * The COPAC instance to use
+     */
+    protected COPAC<V> copac;
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      copac = config.tryInstantiate(COPAC.class);
+    }
+
+    @Override
+    protected ERiC<V> makeInstance() {
+      return new ERiC<V>(copac);
+    }
   }
 }

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.parser.meta;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -12,8 +13,10 @@ import java.util.BitSet;
 import java.util.List;
 
 /**
- * <p>Parser to project the ParsingResult obtained by a suitable base parser
- * onto a randomly selected subset of attributes.</p>
+ * <p>
+ * Parser to project the ParsingResult obtained by a suitable base parser onto a
+ * randomly selected subset of attributes.
+ * </p>
  * 
  * @author Arthur Zimek
  */
@@ -21,18 +24,21 @@ public class DoubleVectorRandomProjectionParser extends RandomProjectionParser<D
   /**
    * Constructor.
    * 
-   * @param config Configuration
+   * @param baseparser
+   * @param dim
    */
-  public DoubleVectorRandomProjectionParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public DoubleVectorRandomProjectionParser(Parser<DoubleVector> baseparser, int dim) {
+    super(baseparser, dim);
   }
 
   /**
-   * <p>Returns as ParsingResult a projection on a randomly selected subset of attributes.</p>
+   * <p>
+   * Returns as ParsingResult a projection on a randomly selected subset of
+   * attributes.
+   * </p>
    * 
-   * The specified InputStream is parsed by a base parser, the resulting ParsingResult is projected
-   * on a randomly selected subset of attributes.
+   * The specified InputStream is parsed by a base parser, the resulting
+   * ParsingResult is projected on a randomly selected subset of attributes.
    * 
    * @see de.lmu.ifi.dbs.elki.parser.Parser#parse(java.io.InputStream)
    */
@@ -41,12 +47,31 @@ public class DoubleVectorRandomProjectionParser extends RandomProjectionParser<D
     ParsingResult<DoubleVector> baseparsingresult = this.retrieveBaseParsingresult(in);
     int d = baseparsingresult.getObjectAndLabelList().get(0).getFirst().getDimensionality();
     BitSet selectedAttributes = Util.randomBitSet(k, d, random);
-    List<Pair<DoubleVector,List<String>>> projectedResult = new ArrayList<Pair<DoubleVector,List<String>>>(baseparsingresult.size());
+    List<Pair<DoubleVector, List<String>>> projectedResult = new ArrayList<Pair<DoubleVector, List<String>>>(baseparsingresult.size());
     int index = 0;
-    for(Pair<DoubleVector,List<String>> pair : baseparsingresult.getObjectAndLabelList()){
-      Pair<DoubleVector,List<String>> newPair = new Pair<DoubleVector,List<String>>(Util.project(pair.getFirst(),selectedAttributes),pair.getSecond());
+    for(Pair<DoubleVector, List<String>> pair : baseparsingresult.getObjectAndLabelList()) {
+      Pair<DoubleVector, List<String>> newPair = new Pair<DoubleVector, List<String>>(Util.project(pair.getFirst(), selectedAttributes), pair.getSecond());
       projectedResult.add(index, newPair);
     }
     return new ParsingResult<DoubleVector>(projectedResult, new DoubleVector(new double[k]));
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends RandomProjectionParser.Parameterizer<DoubleVector> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+
+    @Override
+    protected DoubleVectorRandomProjectionParser makeInstance() {
+      return new DoubleVectorRandomProjectionParser(baseparser, k);
+    }
   }
 }
