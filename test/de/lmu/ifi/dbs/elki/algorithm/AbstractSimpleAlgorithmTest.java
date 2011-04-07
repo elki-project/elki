@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -37,7 +38,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * Base path for unit test files.
    */
   public final static String UNITTEST = "data/testdata/unittests/";
-  
+
   /**
    * Notice: this is okay for tests - don't use this for frequently used
    * objects, use a static instance instead!
@@ -65,20 +66,31 @@ public abstract class AbstractSimpleAlgorithmTest {
    * 
    * @param filename File to load
    * @param expectedSize Expected size in records
+   * @param params Extra parameters
    * @return Database
    */
-  protected Database<DoubleVector> makeSimpleDatabase(String filename, int expectedSize) {
+  protected <T extends DatabaseObject> Database<T> makeSimpleDatabase(String filename, int expectedSize, ListParameterization params) {
     org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
-    ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
     params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
-    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
+    FileBasedDatabaseConnection<T> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
 
     testParameterizationOk(params);
 
-    Database<DoubleVector> db = dbconn.getDatabase(null);
+    Database<T> db = dbconn.getDatabase(null);
     org.junit.Assert.assertEquals("Database size does not match.", expectedSize, db.size());
     return db;
+  }
+
+  /**
+   * Generate a simple DoubleVector database from a file.
+   * 
+   * @param filename File to load
+   * @param expectedSize Expected size in records
+   * @return Database
+   */
+  protected<T extends DatabaseObject> Database<T> makeSimpleDatabase(String filename, int expectedSize) {
+    return makeSimpleDatabase(filename, expectedSize, new ListParameterization());
   }
 
   /**
@@ -110,7 +122,26 @@ public abstract class AbstractSimpleAlgorithmTest {
     if(logger.isVerbose()) {
       logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
     }
-    org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match. " + score, expected, score, 0.0001);
+    org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match.", expected, score, 0.0001);
+  }
+
+  /**
+   * Test the clustering result by comparing the score with an expected value.
+   * 
+   * @param database Database to test
+   * @param clustering Clustering result
+   * @param expected Expected score
+   */
+  protected <O extends DatabaseObject> void testFMeasureHierarchical(Database<O> database, Clustering<?> clustering, double expected) {
+    // Run by-label as reference
+    ByLabelHierarchicalClustering<O> bylabel = new ByLabelHierarchicalClustering<O>();
+    Clustering<Model> rbl = bylabel.run(database);
+
+    double score = PairCountingFMeasure.compareClusterings(clustering, rbl, 1.0, false, true);
+    if(logger.isVerbose()) {
+      logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
+    }
+    org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match.", expected, score, 0.0001);
   }
 
   /**
@@ -128,19 +159,19 @@ public abstract class AbstractSimpleAlgorithmTest {
     Collections.sort(sizes);
     Arrays.sort(expected);
     // Report
-    if(logger.isVerbose()) {
-      StringBuffer buf = new StringBuffer();
-      buf.append("Cluster sizes: [");
-      for(int i = 0; i < sizes.size(); i++) {
-        if(i > 0) {
-          buf.append(", ");
-        }
-        buf.append(sizes.get(i));
+    // if(logger.isVerbose()) {
+    StringBuffer buf = new StringBuffer();
+    buf.append("Cluster sizes: [");
+    for(int i = 0; i < sizes.size(); i++) {
+      if(i > 0) {
+        buf.append(", ");
       }
-      buf.append("]");
+      buf.append(sizes.get(i));
     }
+    buf.append("]");
+    // }
     // Test
-    org.junit.Assert.assertEquals("Number of clusters does not match expectations.", expected.length, sizes.size());
+    org.junit.Assert.assertEquals("Number of clusters does not match expectations." + buf.toString(), expected.length, sizes.size());
     for(int i = 0; i < expected.length; i++) {
       org.junit.Assert.assertEquals("Cluster size does not match at position " + i, expected[i], (int) sizes.get(i));
     }

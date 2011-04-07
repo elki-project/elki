@@ -23,12 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  */
 public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
-  // the following values depend on the data set used!
-  String dataset = "data/testdata/unittests/3clusters-and-noise-2d.csv";
-
-  // size of the data set
-  int shoulds = 330;
-
   /**
    * Run DBSCAN with fixed parameters and compare the result to a golden
    * standard.
@@ -37,18 +31,19 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testDBSCANResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(dataset, shoulds);
-    
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+
     // setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(DBSCAN.EPSILON_ID, 0.04);
     params.addParameter(DBSCAN.MINPTS_ID, 20);
     DBSCAN<DoubleVector, DoubleDistance> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
     testParameterizationOk(params);
-    
+
     // run DBSCAN on database
     Clustering<Model> result = dbscan.run(db);
 
     testFMeasure(db, result, 0.996413);
+    testClusterSizes(result, new int[] { 29, 50, 101, 150 });
   }
 }

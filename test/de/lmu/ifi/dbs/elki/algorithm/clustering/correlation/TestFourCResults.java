@@ -1,80 +1,49 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Perform a full 4C run, and compare the result with a clustering derived
- * from the data set labels. This test ensures that 4C performance doesn't
+ * Perform a full 4C run, and compare the result with a clustering derived from
+ * the data set labels. This test ensures that 4C performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
  * 
  * @author Erich Schubert
- * 
  */
-public class TestFourCResults implements JUnit4Test {
-  // the following values depend on the data set used!
-  String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
-
-  // size of the data set
-  int shoulds = 600;
-
+public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
-   * Run ERiC with fixed parameters and compare the result to a golden standard.
+   * Run 4F with fixed parameters and compare the result to a golden standard.
    * 
    * @throws ParameterException on errors.
    */
   @Test
   public void testFourCResults() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
+
+    // Setup 4C
     ListParameterization params = new ListParameterization();
-    // Input
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
-    // 4C
-    // these parameters are not picked too smartly - 5d in 3d - but it seems to work okay.
-    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, Double.toString(0.30));
-    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, Integer.toString(20));
-    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, Integer.toString(5));
-    
-    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
-    // get database
-    Database<DoubleVector> db = dbconn.getDatabase(null);
+    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 0.30);
+    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 20);
+    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 5);
 
-    // verify data set size.
-    assertEquals("Database size doesn't match expected size.", shoulds, db.size());
+    FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);
+    testParameterizationOk(params);
 
-    // setup algorithm
-    FourC<DoubleVector> fourc = new FourC<DoubleVector>(params);
-    
-    params.failOnErrors();
-    if (params.hasUnusedParameters()) {
-      fail("Unused parameters: "+params.getRemainingParameters());
-    }
-    
     // run 4C on database
     Clustering<Model> result = fourc.run(db);
 
-    // run by-label as reference
-    ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
-    Clustering<Model> rbl = bylabel.run(db);
-
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0, false, true);
-    assertTrue("FourC score on test dataset too low: " + score, score > 0.79467);
-    System.out.println("FourC score: " + score + " > " + 0.79467);
+    testFMeasureHierarchical(db, result, 0.79467);
+    testClusterSizes(result, new int[] { 5, 595 });
   }
 }

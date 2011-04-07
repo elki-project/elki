@@ -1,21 +1,16 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -26,58 +21,37 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Erich Schubert
- * 
  */
-public class TestPreDeConResults implements JUnit4Test {
-  // the following values depend on the data set used!
-  String dataset = "data/testdata/unittests/axis-parallel-subspace-clusters-6d.csv.gz";
-
-  // size of the data set
-  int shoulds = 2500;
-
+public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
-   * Run PreDeCon with fixed parameters and compare the result to a golden standard.
+   * Run PreDeCon with fixed parameters and compare the result to a golden
+   * standard.
    * 
    * @throws ParameterException
    */
   @Test
   public void testPreDeConResults() throws ParameterException {
+    // Additional input parameters
+    ListParameterization inp = new ListParameterization();
+    inp.addParameter(FileBasedDatabaseConnection.CLASS_LABEL_INDEX_ID, 1);
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp);
+
     ListParameterization params = new ListParameterization();
-    // Input
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
-    params.addParameter(FileBasedDatabaseConnection.CLASS_LABEL_INDEX_ID, 1);
     // PreDeCon
     // FIXME: These parameters do NOT work...
     params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 50);
     params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 50);
     params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 2);
-    
-    
-    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(params);
-    // get database
-    Database<DoubleVector> db = dbconn.getDatabase(null);
-
-    // verify data set size.
-    assertEquals("Database size doesn't match expected size.", shoulds, db.size());
 
     // setup algorithm
-    PreDeCon<DoubleVector> predecon = new PreDeCon<DoubleVector>(params);
-    
-    params.failOnErrors();
-    if (params.hasUnusedParameters()) {
-      fail("Unused parameters: "+params.getRemainingParameters());
-    }
-    
+    PreDeCon<DoubleVector> predecon = ClassGenericsUtil.parameterizeOrAbort(PreDeCon.class, params);
+    testParameterizationOk(params);
+
     // run PredeCon on database
     Clustering<Model> result = predecon.run(db);
 
-    // run by-label as reference
-    ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
-    Clustering<Model> rbl = bylabel.run(db);
-
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("PreDeCon score on test dataset too low: " + score, score > 0.00);
-    System.out.println("PreDeCon score: " + score + " > " + 0.00);
+    // FIXME: find working parameters...
+    testFMeasure(db, result, 0.40153);
+    testClusterSizes(result, new int[] { 2500 });
   }
 }
