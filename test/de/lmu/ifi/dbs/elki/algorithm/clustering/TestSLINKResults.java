@@ -1,4 +1,4 @@
-package experimentalcode.katharina;
+package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
@@ -24,12 +24,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  */
 public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
-  // the following values depend on the data set used!
-  String dataset = "src/experimentalcode/katharina/katharina/1slink.ascii";
-
-  // size of the data set
-  int shoulds = 638;
-
+  // TODO: add a test for a non-single-link dataset?
+  
   /**
    * Run SLINK with fixed parameters and compare the result to a golden
    * standard.
@@ -38,11 +34,11 @@ public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUn
    */
   @Test
   public void testSLINKResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(dataset, shoulds);
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(SLINK.SLINK_MINCLUSTERS_ID, "3");
+    params.addParameter(SLINK.SLINK_MINCLUSTERS_ID, 3);
     SLINK<DoubleVector, DoubleDistance> slink = ClassGenericsUtil.parameterizeOrAbort(SLINK.class, params);
     testParameterizationOk(params);
 

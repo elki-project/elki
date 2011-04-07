@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * 
  * @author Elke Achtert
  * @author Erich Schubert
+ * @author Katharina Rausch
  */
 public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -45,5 +46,28 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
 
     testFMeasure(db, result, 0.996413);
     testClusterSizes(result, new int[] { 29, 50, 101, 150 });
+  }
+
+  /**
+   * Run DBSCAN with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testDBSCANOnSingleLinkDataset() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(DBSCAN.EPSILON_ID, 11.5);
+    params.addParameter(DBSCAN.MINPTS_ID, 120);
+    DBSCAN<DoubleVector, DoubleDistance> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
+    testParameterizationOk(params);
+
+    // run DBSCAN on database
+    Clustering<Model> result = dbscan.run(db);
+    testFMeasure(db, result, 0.954382);
+    testClusterSizes(result, new int[] { 11, 200, 203, 224 });
   }
 }

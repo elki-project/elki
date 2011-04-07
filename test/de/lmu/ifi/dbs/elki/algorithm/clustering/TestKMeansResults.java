@@ -1,4 +1,4 @@
-package experimentalcode.katharina;
+package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
@@ -24,12 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  */
 public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
-  // the following values depend on the data set used!
-  String dataset = "src/experimentalcode/katharina/katharina/1dbscan_failure_without_noise.ascii";
-
-  // size of the data set
-  int shoulds = 1000;
-
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
@@ -38,12 +32,12 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testKMeansResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(dataset, shoulds);
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, "5");
-    params.addParameter(KMeans.SEED_ID, "3");
+    params.addParameter(KMeans.K_ID, 5);
+    params.addParameter(KMeans.SEED_ID, 3);
     KMeans<DoubleVector, DoubleDistance> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeans.class, params);
     testParameterizationOk(params);
 
