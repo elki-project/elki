@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Elke Achtert
+ * @author Katharina Rausch
+ * @author Erich Schubert
  */
 public class TestSUBCLUResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -44,5 +46,28 @@ public class TestSUBCLUResults extends AbstractSimpleAlgorithmTest implements JU
 
     testFMeasure(db, result, 0.9090);
     testClusterSizes(result, new int[] { 191, 194, 395 });
+  }
+
+  /**
+   * Run SUBCLU with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testSUBCLUSubspaceOverlapping() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
+  
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(SUBCLU.EPSILON_ID, 0.04);
+    params.addParameter(SUBCLU.MINPTS_ID, 70);
+    SUBCLU<DoubleVector> subclu = ClassGenericsUtil.parameterizeOrAbort(SUBCLU.class, params);
+    testParameterizationOk(params);
+  
+    // run SUBCLU on database
+    Clustering<SubspaceModel<DoubleVector>> result = subclu.run(db);
+    testFMeasure(db, result, 0.49279033);
+    testClusterSizes(result, new int[] { 99, 247, 303, 323, 437, 459 });
   }
 }

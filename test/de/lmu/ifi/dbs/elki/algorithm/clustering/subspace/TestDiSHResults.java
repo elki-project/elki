@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Elke Achtert
+ * @author Katharina Rausch
+ * @author Erich Schubert
  */
 public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -43,5 +45,27 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
 
     testFMeasureHierarchical(db, result, 0.9991258);
     testClusterSizes(result, new int[] { 51, 199, 200 });
+  }
+
+  /**
+   * Run DiSH with fixed parameters and compare the result to a golden standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testDiSHSubspaceOverlapping() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
+  
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(DiSH.EPSILON_ID, 0.1);
+    params.addParameter(DiSH.MU_ID, 30);
+    DiSH<DoubleVector> dish = ClassGenericsUtil.parameterizeOrAbort(DiSH.class, params);
+    testParameterizationOk(params);
+  
+    // run DiSH on database
+    Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
+    testFMeasure(db, result, 0.6376870);
+    testClusterSizes(result, new int[] { 33, 52, 72, 109, 172, 314, 348 });
   }
 }
