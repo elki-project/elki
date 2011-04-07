@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Elke Achtert
+ * @author Katharina Rausch
  */
 public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -46,5 +47,30 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
 
     testFMeasureHierarchical(db, result, 0.77989);
     testClusterSizes(result, new int[] { 22, 32, 396 });
+  }
+
+  /**
+   * Run ORCLUS with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException on errors.
+   */
+  @Test
+  public void testORCLUSSkewedDisjoint() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
+  
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ORCLUS.K_ID, 3);
+    params.addParameter(ORCLUS.L_ID, 4);
+    params.addParameter(ORCLUS.SEED_ID, 2);
+  
+    ORCLUS<DoubleVector> orclus = ClassGenericsUtil.parameterizeOrAbort(ORCLUS.class, params);
+    testParameterizationOk(params);
+  
+    // run ORCLUS on database
+    Clustering<Model> result = orclus.run(db);
+    testFMeasure(db, result, 0.8276336);
+    testClusterSizes(result, new int[] { 167, 200, 234 });
   }
 }

@@ -10,6 +10,11 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -21,6 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Erich Schubert
+ * @author Katharina Rausch
  */
 public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -49,5 +55,36 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
 
     testFMeasure(db, result, 0.842521);
     testClusterSizes(result, new int[] { 6, 16, 32, 196, 200 });
+  }
+
+  /**
+   * Run COPAC with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException on errors.
+   */
+  @Test
+  public void testCOPACOverlap() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
+  
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
+    params.addParameter(DBSCAN.EPSILON_ID, 0.5);
+    params.addParameter(DBSCAN.MINPTS_ID, 20);
+    params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
+    params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 45);
+    // PCA
+    params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
+    params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
+    params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
+    params.addParameter(PercentageEigenPairFilter.ALPHA_ID, 0.8);
+  
+    COPAC<DoubleVector> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
+    testParameterizationOk(params);
+  
+    Clustering<Model> result = copac.run(db);
+    testFMeasure(db, result, 0.84687864);
+    testClusterSizes(result, new int[] { 1, 22, 22, 29, 34, 158, 182, 202 });
   }
 }

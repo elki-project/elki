@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Erich Schubert
+ * @author Katharina Rausch
  */
 public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -45,5 +46,30 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
 
     testFMeasureHierarchical(db, result, 0.79467);
     testClusterSizes(result, new int[] { 5, 595 });
+  }
+
+  /**
+   * Run ERiC with fixed parameters and compare the result to a golden standard.
+   * 
+   * @throws ParameterException on errors.
+   */
+  @Test
+  public void testFourCOverlap() throws ParameterException {
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
+  
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    // 4C
+    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 1.2);
+    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 5);
+    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 3);
+  
+    FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);
+    testParameterizationOk(params);
+  
+    // run 4C on database
+    Clustering<Model> result = fourc.run(db);
+    testFMeasure(db, result, 0.48305405);
+    testClusterSizes(result, new int[] { 65, 70, 515 });
   }
 }

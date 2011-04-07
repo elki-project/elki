@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  * 
  * @author Erich Schubert
+ * @author Katharina Rausch
  */
 public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
@@ -52,5 +53,33 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
 
     testFMeasureHierarchical(db, result, 0.638727);
     testClusterSizes(result, new int[] { 13, 65, 74, 75, 442 });
+  }
+
+  /**
+   * Run CASH with fixed parameters and compare the result to a golden standard.
+   * 
+   * @throws ParameterException on errors.
+   */
+  @Test
+  public void testCASHEmbedded() throws ParameterException {
+    // CASH input
+    ListParameterization inp = new ListParameterization();
+    inp.addParameter(FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class);
+    Database<ParameterizationFunction> db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600, inp);
+  
+    // CASH parameters
+    ListParameterization params = new ListParameterization();
+    params.addParameter(CASH.JITTER_ID, 0.7);
+    params.addParameter(CASH.MINPTS_ID, 160);
+    params.addParameter(CASH.MAXLEVEL_ID, 40);
+  
+    // setup algorithm
+    CASH cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
+    testParameterizationOk(params);
+  
+    // run CASH on database
+    Clustering<Model> result = cash.run(db);
+    testFMeasure(db, result, 0.443246);
+    testClusterSizes(result, new int[] { 169, 196, 235 });
   }
 }
