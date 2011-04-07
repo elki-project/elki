@@ -12,11 +12,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -44,13 +45,9 @@ import experimentalcode.frankenb.utils.Utils;
  * 
  * @author Florian Frankenberger
  */
-public class KnnDataDivider extends StandAloneApplication {
+public class KnnDataDivider extends AbstractApplication {
 
   public static final OptionID DIVIDER_ALGORITHM_ID = OptionID.getOrCreateOptionID("algorithm", "A divider algorithm to use");
-  /**
-   * OptionID for {@link #PACKAGES_PARAM}
-   */
-  public static final OptionID PACKAGES_ID = OptionID.getOrCreateOptionID("packages", "");
   
   /**
    * Parameter that specifies the number of segments to create (= # of computers)
@@ -58,53 +55,39 @@ public class KnnDataDivider extends StandAloneApplication {
    * Key: {@code -packages}
    * </p>
    */
-  private final IntParameter PACKAGES_PARAM = new IntParameter(PACKAGES_ID, false);
+  public static final OptionID PACKAGES_ID = OptionID.getOrCreateOptionID("packages", "");
+  
   private int packageQuantity = 0;
   
   
   private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
   private IDividerAlgorithm algorithm;
-
+  
+  File outputDir;
+  
   /**
-   * @param config
+   * @param verbose
+   * @param outputDir
+   * @param packageQuantity
+   * @param databaseConnection
+   * @param algorithm
    */
-  public KnnDataDivider(Parameterization config) {
-    super(config);
+  public KnnDataDivider(boolean verbose, File outputDir, int packageQuantity, DatabaseConnection<NumberVector<?, ?>> databaseConnection, IDividerAlgorithm algorithm) {
+    super(verbose);
+    this.outputDir = outputDir;
+    this.packageQuantity = packageQuantity;
+    this.databaseConnection = databaseConnection;
+    this.algorithm = algorithm;
+    
     Log.setLogFormatter(new TraceLevelLogFormatter());
     Log.addLogWriter(new StdOutLogWriter());
     Log.setFilter(LogLevel.DEBUG);
-    
-    config = config.descend(this);
-    if (config.grab(PACKAGES_PARAM)) {
-      packageQuantity = PACKAGES_PARAM.getValue();      
-    }
-        
-    final ObjectParameter<IDividerAlgorithm> paramPartitioner = new ObjectParameter<IDividerAlgorithm>(DIVIDER_ALGORITHM_ID, IDividerAlgorithm.class, false);
-    if(config.grab(paramPartitioner)) {
-      this.algorithm = paramPartitioner.instantiateClass(config);
-    }
-    
-    databaseConnection = FileBasedDatabaseConnection.parameterize(config);
   }
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.application.StandAloneApplication#getOutputDescription()
-   */
-  @Override
-  public String getOutputDescription() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.application.AbstractApplication#run()
-   */
   @Override
   public void run() throws UnableToComplyException {
     FileLogWriter logWriter = null;
     try {
-      File outputDir = this.getOutput();
-      
       if (outputDir.isFile()) 
         throw new UnableToComplyException("You need to specify an output directory not a file!");
       if (!outputDir.exists()) {
@@ -236,11 +219,6 @@ public class KnnDataDivider extends StandAloneApplication {
     return fileLogWriter;
   }
   
-  public static void main(String[] args) {
-    StandAloneApplication.runCLIApplication(KnnDataDivider.class, args);
-  }
-
-  
   private static void clearDirectory(File directory) throws UnableToComplyException {
     for (File file : directory.listFiles()) {
       if (file.equals(directory) || file.equals(directory.getParentFile())) continue;
@@ -251,4 +229,46 @@ public class KnnDataDivider extends StandAloneApplication {
     }
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractApplication.Parameterizer {
+    private int packageQuantity = 0;
+    
+    private DatabaseConnection<NumberVector<?, ?>> databaseConnection = null;
+    private IDividerAlgorithm algorithm = null;
+    
+    File outputDir;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      outputDir = getParameterOutputFile(config, "Output directory.");
+      
+      final IntParameter PACKAGES_PARAM = new IntParameter(PACKAGES_ID, false);
+      if (config.grab(PACKAGES_PARAM)) {
+        packageQuantity = PACKAGES_PARAM.getValue();      
+      }
+          
+      final ObjectParameter<IDividerAlgorithm> paramPartitioner = new ObjectParameter<IDividerAlgorithm>(DIVIDER_ALGORITHM_ID, IDividerAlgorithm.class, false);
+      if(config.grab(paramPartitioner)) {
+        algorithm = paramPartitioner.instantiateClass(config);
+      }
+      
+      Class<FileBasedDatabaseConnection<NumberVector<?, ?>>> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
+      databaseConnection = config.tryInstantiate(dbcls );
+    }
+
+    @Override
+    protected KnnDataDivider makeInstance() {
+      return new KnnDataDivider(verbose, outputDir, packageQuantity, databaseConnection, algorithm);
+   }
+  }
+
+  public static void main(String[] args) {
+    AbstractApplication.runCLIApplication(KnnDataDivider.class, args);
+  }
 }

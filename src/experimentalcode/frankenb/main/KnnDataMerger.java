@@ -8,8 +8,7 @@ import java.io.FilenameFilter;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
-import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -26,85 +25,75 @@ import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
+import experimentalcode.frankenb.model.PrecalculatedKnnIndex;
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
 
 /**
- * This class merges the results precalculated on the cluster network
- * to a single precalculated knn file with a given k neighbors for each point.
- * The result files are written to <code>app.out</code> and can be used as an kNN index using
- * the {@link PrecalculatedKnnIndex} class in ELKI.
+ * This class merges the results precalculated on the cluster network to a
+ * single precalculated knn file with a given k neighbors for each point. The
+ * result files are written to <code>app.out</code> and can be used as an kNN
+ * index using the {@link PrecalculatedKnnIndex} class in ELKI.
  * <p/>
- * Note that there is an optional <code>-inmemory</code> switch which forces the algorithm to hold the resulting b-plus-tree in memory while merging - this speeds
- * up the merging significantly but it also can consume all memory when having huge data sets with a high amount of k leading to an OutOfMemoryException.
+ * Note that there is an optional <code>-inmemory</code> switch which forces the
+ * algorithm to hold the resulting b-plus-tree in memory while merging - this
+ * speeds up the merging significantly but it also can consume all memory when
+ * having huge data sets with a high amount of k leading to an
+ * OutOfMemoryException.
  * <p/>
- * Usage:
- * <br/>
+ * Usage: <br/>
  * <code>-dbc.parser DoubleVectorLabelParser -dbc.in dataset.csv -app.out /tmp/index -app.in /tmp/divided -k 10</code>
+ * 
  * @author Florian Frankenberger
  */
-public class KnnDataMerger extends StandAloneInputApplication {
+public class KnnDataMerger extends AbstractApplication {
 
   /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("k", "");
-  public static final OptionID IN_MEMORY_ID = OptionID.getOrCreateOptionID("inmemory", "tells wether the resulting tree data should be buffered in memory or not. This can increase performance but can also lead to OutOfMemoryExceptions!");
-  
-  /**
-   * Parameter that specifies the number of neighbors to keep with respect
-   * to the definition of a k-nearest neighbor.
+   * Parameter that specifies the number of neighbors to keep with respect to
+   * the definition of a k-nearest neighbor.
    * <p>
    * Key: {@code -k}
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, false);
-  private final Flag IN_MEMORY_PARAM = new Flag(IN_MEMORY_ID);
-  
-  
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("k", "");
+
+  public static final OptionID IN_MEMORY_ID = OptionID.getOrCreateOptionID("inmemory", "tells wether the resulting tree data should be buffered in memory or not. This can increase performance but can also lead to OutOfMemoryExceptions!");
+
   private int k;
+
   private boolean inMemory = false;
-  
+
   /**
-   * @param config
+   * The input directory
    */
-  public KnnDataMerger(Parameterization config) {
-    super(config);
-    
+  private File indir;
+
+  /**
+   * The output directory
+   */
+  private File outdir;
+
+  /**
+   * Constructor.
+   * 
+   * @param verbose
+   * @param indir
+   * @param outdir
+   * @param k
+   * @param inMemory
+   */
+  public KnnDataMerger(boolean verbose, File indir, File outdir, int k, boolean inMemory) {
+    super(verbose);
+    this.indir = indir;
+    this.outdir = outdir;
+    this.k = k;
+    this.inMemory = inMemory;
+
     Log.setLogFormatter(new TraceLevelLogFormatter());
     Log.addLogWriter(new StdOutLogWriter());
     Log.setFilter(LogLevel.INFO);
-    
-    if (config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    
-    if (config.grab(IN_MEMORY_PARAM)) {
-      inMemory = IN_MEMORY_PARAM.getValue();
-    }
   }
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.application.StandAloneInputApplication#getInputDescription()
-   */
-  @Override
-  public String getInputDescription() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.application.StandAloneApplication#getOutputDescription()
-   */
-  @Override
-  public String getOutputDescription() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.application.AbstractApplication#run()
-   */
   @Override
   public void run() throws UnableToComplyException {
     try {
@@ -114,33 +103,27 @@ public class KnnDataMerger extends StandAloneInputApplication {
       Log.info("maximum k to calculate: " + k);
       Log.info();
 
-      File[] packageDirectories = getInput().listFiles(new FilenameFilter() {
-  
+      File[] packageDirectories = indir.listFiles(new FilenameFilter() {
+
         @Override
         public boolean accept(File dir, String name) {
           return name.matches("^package[0-9]{5}$");
         }
-        
+
       });
-      
-      File resultDirectory = new File(this.getOutput(), "result.dir");
-      if (resultDirectory.exists())
+
+      File resultDirectory = new File(outdir, "result.dir");
+      if(resultDirectory.exists())
         resultDirectory.delete();
-      File resultData = new File(this.getOutput(), "result.dat");
-      if (resultData.exists())
+      File resultData = new File(outdir, "result.dat");
+      if(resultData.exists())
         resultData.delete();
-      
-      DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(
-          new BufferedDiskBackedDataStorage(resultDirectory),
-          (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)),
-          new ConstantSizeIntegerSerializer(),
-          new DistanceListSerializer(),
-          8
-      );      
-      
-      //open all result files
+
+      DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(new BufferedDiskBackedDataStorage(resultDirectory), (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)), new ConstantSizeIntegerSerializer(), new DistanceListSerializer(), 8);
+
+      // open all result files
       Set<Integer> testSet = new HashSet<Integer>();
-      for (File packageDirectory : packageDirectories) {
+      for(File packageDirectory : packageDirectories) {
         File[] packageDescriptorCandidates = packageDirectory.listFiles(new FilenameFilter() {
 
           @Override
@@ -150,20 +133,21 @@ public class KnnDataMerger extends StandAloneInputApplication {
 
         });
 
-        if (packageDescriptorCandidates.length > 0) {
+        if(packageDescriptorCandidates.length > 0) {
           Log.info("Opening result of " + packageDirectory.getName() + " ...");
           File packageDescriptorFile = packageDescriptorCandidates[0];
           PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new BufferedDiskBackedDataStorage(packageDescriptorFile));
-          
+
           int counter = 0;
-          for (PartitionPairing pairing : packageDescriptor) {
-            if (!pairing.hasResult()) throw new UnableToComplyException("Package " + packageDescriptorFile + "/pairing " + pairing + " has no results!");
+          for(PartitionPairing pairing : packageDescriptor) {
+            if(!pairing.hasResult())
+              throw new UnableToComplyException("Package " + packageDescriptorFile + "/pairing " + pairing + " has no results!");
             DynamicBPlusTree<Integer, DistanceList> result = packageDescriptor.getResultTreeFor(pairing);
             Log.info(String.format("\tprocessing result of pairing %05d of %05d (%s) - %6.2f%% ...", ++counter, packageDescriptor.getPairings(), pairing, (counter / (float) packageDescriptor.getPairings()) * 100f));
-            
-            for (Pair<Integer, DistanceList> resultEntry : result) {
+
+            for(Pair<Integer, DistanceList> resultEntry : result) {
               DistanceList distanceList = resultTree.get(resultEntry.first);
-              if (distanceList == null) {
+              if(distanceList == null) {
                 distanceList = new DistanceList(resultEntry.first, k);
               }
               testSet.add(resultEntry.first);
@@ -171,26 +155,66 @@ public class KnnDataMerger extends StandAloneInputApplication {
               resultTree.put(resultEntry.first, distanceList);
             }
           }
-        } else {
+        }
+        else {
           Log.warn("Skipping directory " + packageDirectory + " because the package descriptor could not be found.");
         }
       }
-      
+
       Log.info("result tree items: " + resultTree.getSize());
       resultTree.close();
       Log.info("TestSet has " + testSet.size() + " items");
       Log.info("Created result tree with " + resultTree.getSize() + " entries.");
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       Log.error("Could not merge data", e);
     }
-    
+
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractApplication.Parameterizer {
+    private File indir = null;
+
+    private File outdir = null;
+
+    private int k = 0;
+
+    private boolean inMemory = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      indir = getParameterInputFile(config, "Input directory.");
+      outdir = getParameterOutputFile(config, "Output directory.");
+
+      final IntParameter K_PARAM = new IntParameter(K_ID, false);
+      if(config.grab(K_PARAM)) {
+        k = K_PARAM.getValue();
+      }
+
+      final Flag IN_MEMORY_PARAM = new Flag(IN_MEMORY_ID);
+      if(config.grab(IN_MEMORY_PARAM)) {
+        inMemory = IN_MEMORY_PARAM.getValue();
+      }
+    }
+
+    @Override
+    protected KnnDataMerger makeInstance() {
+      return new KnnDataMerger(verbose, indir, outdir, k, inMemory);
+    }
   }
 
   /**
    * @param args
    */
   public static void main(String[] args) {
-    StandAloneApplication.runCLIApplication(KnnDataMerger.class, args);
+    AbstractApplication.runCLIApplication(KnnDataMerger.class, args);
   }
-
 }
