@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -13,22 +14,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 public class ClipScaling implements StaticScalingFunction {
   /**
-   * OptionID for {@link #MIN_PARAM}
-   */
-  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("clipscale.min", "Minimum value to allow.");
-
-  /**
    * Parameter to specify a fixed minimum to use.
    * <p>
    * Key: {@code -clipscale.min}
    * </p>
    */
-  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, true);
-
-  /**
-   * OptionID for {@link #MAX_PARAM}
-   */
-  public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("clipscale.max", "Maximum value to allow.");
+  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("clipscale.min", "Minimum value to allow.");
 
   /**
    * Parameter to specify the maximum value
@@ -36,7 +27,7 @@ public class ClipScaling implements StaticScalingFunction {
    * Key: {@code -clipscale.max}
    * </p>
    */
-  private final DoubleParameter MAX_PARAM = new DoubleParameter(MAX_ID, true);
+  public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("clipscale.max", "Maximum value to allow.");
 
   /**
    * Field storing the minimum to use
@@ -49,20 +40,15 @@ public class ClipScaling implements StaticScalingFunction {
   private Double max = null;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param min Minimum, may be null
+   * @param max Maximum, may be null
    */
-  public ClipScaling(Parameterization config) {
+  public ClipScaling(Double min, Double max) {
     super();
-    config = config.descend(this);
-    if(config.grab(MIN_PARAM)) {
-      min = MIN_PARAM.getValue();
-    }
-    if (config.grab(MAX_PARAM)) {
-      max = MAX_PARAM.getValue();
-    }
+    this.min = min;
+    this.max = max;
   }
 
   @Override
@@ -84,5 +70,35 @@ public class ClipScaling implements StaticScalingFunction {
   @Override
   public double getMax() {
     return (max != null) ? max : Double.POSITIVE_INFINITY;
+  }
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected Double min = null;
+    protected Double max = null;
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter minP = new DoubleParameter(MIN_ID, true);
+      if(config.grab(minP)) {
+        min = minP.getValue();
+      }
+      DoubleParameter maxP = new DoubleParameter(MAX_ID, true);
+      if (config.grab(maxP)) {
+        max = maxP.getValue();
+      }
+    }
+
+    @Override
+    protected ClipScaling makeInstance() {
+      return new ClipScaling(min, max);
+    }
   }
 }

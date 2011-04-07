@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -61,25 +60,25 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("optics.epsilon", "The maximum radius of the neighborhood to be considered.");
 
   /**
-   * Hold the value of {@link #EPSILON_ID}.
-   */
-  private D epsilon;
-
-  /**
    * Parameter to specify the threshold for minimum number of points in the
    * epsilon-neighborhood of a point, must be an integer greater than 0.
    */
   public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("optics.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
   /**
-   * Holds the value of {@link #MINPTS_ID}.
-   */
-  private int minpts;
-
-  /**
    * Parameter to specify the steepness threshold.
    */
   public static final OptionID XI_ID = OptionID.getOrCreateOptionID("optics.xi", "Threshold for the steepness requirement.");
+
+  /**
+   * Hold the value of {@link #EPSILON_ID}.
+   */
+  private D epsilon;
+
+  /**
+   * Holds the value of {@link #MINPTS_ID}.
+   */
+  private int minpts;
 
   /**
    * Holds the value of {@link #XI_ID}.
@@ -196,64 +195,42 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   }
 
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public static <O extends DatabaseObject, D extends Distance<D>> OPTICS<O, D> parameterize(Parameterization config) {
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    D epsilon = getParameterEpsilon(config, distanceFunction);
-    int minpts = getParameterMinpts(config);
-    double xi = getParameterXi(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new OPTICS<O, D>(distanceFunction, epsilon, minpts, xi);
-  }
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected D epsilon = null;
 
-  /**
-   * Get the epsilon parameter value.
-   * 
-   * @param <O> Object type
-   * @param <D> Distance type
-   * @param config Parameterization
-   * @param distanceFunction distance function (for factory)
-   * @return Epsilon value
-   */
-  protected static <O extends DatabaseObject, D extends Distance<D>> D getParameterEpsilon(Parameterization config, DistanceFunction<O, D> distanceFunction) {
-    final DistanceParameter<D> param = new DistanceParameter<D>(EPSILON_ID, distanceFunction, true);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
-  }
+    protected int minpts = 0;
 
-  /**
-   * Get the minPts parameter value.
-   * 
-   * @param config Parameterization
-   * @return minpts parameter value
-   */
-  protected static int getParameterMinpts(Parameterization config) {
-    final IntParameter param = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
+    protected double xi = 0.0;
 
-  /**
-   * Get the xi parameter value.
-   * 
-   * @param config Parameterization
-   * @return xi parameter value
-   */
-  protected static double getParameterXi(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(XI_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN), true);
-    if(config.grab(param)) {
-      return param.getValue();
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DistanceParameter<D> epsilonP = new DistanceParameter<D>(EPSILON_ID, distanceFunction, true);
+      if(config.grab(epsilonP)) {
+        epsilon = epsilonP.getValue();
+      }
+
+      IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+      if(config.grab(minptsP)) {
+        minpts = minptsP.getValue();
+      }
+
+      DoubleParameter xiP = new DoubleParameter(XI_ID, true);
+      xiP.addConstraint(new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
+      if(config.grab(xiP)) {
+        xi = xiP.getValue();
+      }
     }
-    return 0.0;
+
+    @Override
+    protected OPTICS<O, D> makeInstance() {
+      return new OPTICS<O, D>(distanceFunction, epsilon, minpts, xi);
+    }
   }
 }

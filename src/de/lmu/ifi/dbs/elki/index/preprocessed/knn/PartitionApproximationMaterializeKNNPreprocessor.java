@@ -33,8 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOF}.
  * 
- * TODO correct handling of datastore events
- * 
  * @author Erich Schubert
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
@@ -43,6 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
 public class PartitionApproximationMaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> {
+  // TODO: randomize/shuffle?
+
   /**
    * Logger to use
    */
@@ -147,17 +147,13 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses PartitionApproximationMaterializeKNNPreprocessor oneway - - «create»
+   * @apiviz.uses PartitionApproximationMaterializeKNNPreprocessor oneway - -
+   *              «create»
    * 
    * @param <O> The object type
    * @param <D> The distance type
    */
   public static class Factory<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory<O, D> {
-    /**
-     * OptionID for {@link #PARTITIONS_PARAM}
-     */
-    public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("partknn.p", "The number of partitions to use for approximate kNN.");
-
     /**
      * Parameter to specify the number of partitions to use for materializing
      * the kNN. Must be an integer greater than 1.
@@ -165,7 +161,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
      * Key: {@code -partknn.p}
      * </p>
      */
-    private final IntParameter PARTITIONS_PARAM = new IntParameter(PARTITIONS_ID, new GreaterConstraint(1));
+    public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("partknn.p", "The number of partitions to use for approximate kNN.");
 
     /**
      * The number of partitions to use
@@ -173,23 +169,46 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     int partitions;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param k k
+     * @param distanceFunction distance function
+     * @param partitions number of partitions
      */
-    public Factory(Parameterization config) {
-      super(config);
-      config = config.descend(this);
-      if(config.grab(PARTITIONS_PARAM)) {
-        partitions = PARTITIONS_PARAM.getValue();
-      }
+    public Factory(int k, DistanceFunction<? super O, D> distanceFunction, int partitions) {
+      super(k, distanceFunction);
+      this.partitions = partitions;
     }
 
     @Override
     public PartitionApproximationMaterializeKNNPreprocessor<O, D> instantiate(Database<O> database) {
       PartitionApproximationMaterializeKNNPreprocessor<O, D> instance = new PartitionApproximationMaterializeKNNPreprocessor<O, D>(database, distanceFunction, k, partitions);
       return instance;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+      protected int partitions = 0;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        final IntParameter partitionsP = new IntParameter(PARTITIONS_ID, new GreaterConstraint(1));
+        if(config.grab(partitionsP)) {
+          partitions = partitionsP.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<O, D> makeInstance() {
+        return new Factory<O, D>(k, distanceFunction, partitions);
+      }
     }
   }
 }

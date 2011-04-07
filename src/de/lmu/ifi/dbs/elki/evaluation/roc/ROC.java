@@ -34,8 +34,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.roc.ROC.SimpleAdapter
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.roc.ROC.DistanceResultAdapter
+ * @apiviz.uses SimpleAdapter
+ * @apiviz.uses DistanceResultAdapter
+ * @apiviz.uses OutlierScoreAdapter
  */
 // TODO: add lazy Iterator<> based results that do not require full
 // materialization
@@ -211,7 +212,6 @@ public class ROC {
    * The ROC values would be incorrect then anyway!
    * 
    * @author Erich Schubert
-   * @param <N> Outlier score
    */
   public static class OutlierScoreAdapter implements Iterator<Pair<Double, DBID>> {
     /**
@@ -225,9 +225,10 @@ public class ROC {
     private AnnotationResult<Double> scores;
 
     /**
-     * Constructor
-     * 
-     * @param iter Iterator for distance results
+     * Constructor.
+     *
+     * @param ids Object IDs
+     * @param o Result
      */
     public OutlierScoreAdapter(DBIDs ids, OutlierResult o) {
       super();

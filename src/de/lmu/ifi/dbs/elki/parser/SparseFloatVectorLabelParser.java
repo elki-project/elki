@@ -5,16 +5,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -49,14 +50,14 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   private static final Logging logger = Logging.getLogger(SparseFloatVectorLabelParser.class);
   
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param colSep
+   * @param quoteChar
+   * @param labelIndices
    */
-  public SparseFloatVectorLabelParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public SparseFloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
+    super(colSep, quoteChar, labelIndices);
   }
 
   /**
@@ -142,5 +143,19 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<SparseFloatVector> {
+    @Override
+    protected SparseFloatVectorLabelParser makeInstance() {
+      return new SparseFloatVectorLabelParser(colSep, quoteChar, labelIndices);
+    }
   }
 }

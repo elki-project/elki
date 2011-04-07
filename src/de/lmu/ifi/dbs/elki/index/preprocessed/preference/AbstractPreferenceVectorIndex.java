@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Abstract base class for preference vector based algorithms.
@@ -54,17 +53,6 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
    * @apiviz.uses AbstractPreferenceVectorIndex oneway - - «create»
    */
   public static abstract class Factory<V extends NumberVector<?, ?>, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I>, Parameterizable {
-    /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-     * 
-     * @param config Parameterization
-     */
-    public Factory(Parameterization config) {
-      super();
-      config = config.descend(this);
-    }
-
     @Override
     public abstract I instantiate(Database<V> database);
   }

@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -23,22 +24,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 public class StandardDeviationScaling implements OutlierScalingFunction {
   /**
-   * OptionID for {@link #MEAN_PARAM}
-   */
-  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("stddevscale.mean", "Fixed mean to use in standard deviation scaling.");
-
-  /**
    * Parameter to specify a fixed mean to use.
    * <p>
    * Key: {@code -stddevscale.mean}
    * </p>
    */
-  private final DoubleParameter MEAN_PARAM = new DoubleParameter(MEAN_ID, true);
-
-  /**
-   * OptionID for {@link #LAMBDA_PARAM}
-   */
-  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("stddevscale.lambda", "Significance level to use for error function.");
+  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("stddevscale.mean", "Fixed mean to use in standard deviation scaling.");
 
   /**
    * Parameter to specify the lambda value
@@ -46,7 +37,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
    * Key: {@code -stddevscale.lambda}
    * </p>
    */
-  private final DoubleParameter LAMBDA_PARAM = new DoubleParameter(LAMBDA_ID, 3.0);
+  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("stddevscale.lambda", "Significance level to use for error function.");
 
   /**
    * Field storing the fixed mean to use
@@ -69,20 +60,15 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
   double factor;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fixedmean
+   * @param lambda
    */
-  public StandardDeviationScaling(Parameterization config) {
+  public StandardDeviationScaling(Double fixedmean, Double lambda) {
     super();
-    config = config.descend(this);
-    if(config.grab(MEAN_PARAM)) {
-      fixedmean = MEAN_PARAM.getValue();
-    }
-    if(config.grab(LAMBDA_PARAM)) {
-      lambda = LAMBDA_PARAM.getValue();
-    }
+    this.fixedmean = fixedmean;
+    this.lambda = lambda;
   }
 
   @Override
@@ -125,5 +111,36 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
   @Override
   public double getMax() {
     return 1.0;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected Double fixedmean = null;
+
+    protected Double lambda = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter meanP = new DoubleParameter(MEAN_ID, true);
+      if(config.grab(meanP)) {
+        fixedmean = meanP.getValue();
+      }
+      DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, 3.0);
+      if(config.grab(lambdaP)) {
+        lambda = lambdaP.getValue();
+      }
+    }
+
+    @Override
+    protected StandardDeviationScaling makeInstance() {
+      return new StandardDeviationScaling(fixedmean, lambda);
+    }
   }
 }

@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -166,11 +167,6 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
    */
   public static class Factory<O extends DatabaseObject, D extends Distance<D>> implements SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborPreprocessor<O, D>>, Parameterizable {
     /**
-     * OptionID for {@link #NUMBER_OF_NEIGHBORS_PARAM}
-     */
-    public static final OptionID NUMBER_OF_NEIGHBORS_ID = OptionID.getOrCreateOptionID("sharedNearestNeighbors", "number of nearest neighbors to consider (at least 1)");
-
-    /**
      * Parameter to indicate the number of neighbors to be taken into account
      * for the shared-nearest-neighbor similarity.
      * <p/>
@@ -181,12 +177,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
      * Key: {@code sharedNearestNeighbors}
      * </p>
      */
-    private final IntParameter NUMBER_OF_NEIGHBORS_PARAM = new IntParameter(NUMBER_OF_NEIGHBORS_ID, new GreaterEqualConstraint(1), 1);
-
-    /**
-     * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
-     */
-    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("SNNDistanceFunction", "the distance function to asses the nearest neighbors");
+    public static final OptionID NUMBER_OF_NEIGHBORS_ID = OptionID.getOrCreateOptionID("sharedNearestNeighbors", "number of nearest neighbors to consider (at least 1)");
 
     /**
      * Parameter to indicate the distance function to be used to ascertain the
@@ -199,7 +190,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
      * Key: {@code SNNDistanceFunction}
      * </p>
      */
-    private final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("SNNDistanceFunction", "the distance function to asses the nearest neighbors");
 
     /**
      * Holds the number of nearest neighbors to be used.
@@ -212,23 +203,15 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
     protected DistanceFunction<O, D> distanceFunction;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param numberOfNeighbors Number of neighbors
+     * @param distanceFunction Distance function
      */
-    public Factory(Parameterization config) {
+    public Factory(int numberOfNeighbors, DistanceFunction<O, D> distanceFunction) {
       super();
-      config = config.descend(this);
-      // number of neighbors
-      if(config.grab(NUMBER_OF_NEIGHBORS_PARAM)) {
-        numberOfNeighbors = NUMBER_OF_NEIGHBORS_PARAM.getValue();
-      }
-
-      // distance function
-      if(config.grab(DISTANCE_FUNCTION_PARAM)) {
-        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-      }
+      this.numberOfNeighbors = numberOfNeighbors;
+      this.distanceFunction = distanceFunction;
     }
 
     @Override
@@ -244,6 +227,44 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
     @Override
     public int getNumberOfNeighbors() {
       return numberOfNeighbors;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+      /**
+       * Holds the number of nearest neighbors to be used.
+       */
+      protected int numberOfNeighbors;
+
+      /**
+       * Hold the distance function to be used.
+       */
+      protected DistanceFunction<O, D> distanceFunction;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        final IntParameter numberOfNeighborsP = new IntParameter(NUMBER_OF_NEIGHBORS_ID, new GreaterEqualConstraint(1), 1);
+        if(config.grab(numberOfNeighborsP)) {
+          numberOfNeighbors = numberOfNeighborsP.getValue();
+        }
+
+        final ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        if(config.grab(distanceFunctionP)) {
+          distanceFunction = distanceFunctionP.instantiateClass(config);
+        }
+      }
+
+      @Override
+      protected Factory<O, D> makeInstance() {
+        return new Factory<O, D>(numberOfNeighbors, distanceFunction);
+      }
     }
   }
 }

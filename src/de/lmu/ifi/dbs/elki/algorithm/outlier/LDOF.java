@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -60,7 +59,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(LDOF.class);
-  
+
   /**
    * The association id to associate the LDOF_SCORE of an object for the LDOF
    * algorithm.
@@ -151,37 +150,33 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LDOF<O, D> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new LDOF<O, D>(distanceFunction, k);
-  }
-
-  /**
-   * Get the k Parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return k parameter
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(1));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected int k = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+    }
+
+    @Override
+    protected LDOF<O, D> makeInstance() {
+      return new LDOF<O, D>(distanceFunction, k);
+    }
   }
 }

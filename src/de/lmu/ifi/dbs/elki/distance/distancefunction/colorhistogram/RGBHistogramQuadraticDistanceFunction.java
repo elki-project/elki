@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -25,54 +26,73 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "J. Hafner, H. S.Sawhney, W. Equits, M. Flickner, W. Niblack", title = "Efficient Color Histogram Indexing for Quadratic Form Distance Functions", booktitle = "IEEE Trans. on Pattern Analysis and Machine Intelligence, Vol. 17, No. 7, July 1995", url = "http://dx.doi.org/10.1109/34.391417")
 public class RGBHistogramQuadraticDistanceFunction extends WeightedDistanceFunction {
   /**
-   * OptionID for {@link #BPP_PARAM}
+   * Parameter for the kernel dimensionality.
    */
   public static final OptionID BPP_ID = OptionID.getOrCreateOptionID("rgbhist.bpp", "The dimensionality of the histogram in each color");
 
   /**
-   * Parameter for the kernel dimensionality.
-   */
-  IntParameter BPP_PARAM = new IntParameter(BPP_ID);
-
-  /**
-   * Stores the (full = to the power of three) dimensionality
-   */
-  int dim;
-
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param bpp bins per plane.
    */
-  public RGBHistogramQuadraticDistanceFunction(Parameterization config) {
-    super(null);
-    config = config.descend(this);
-    if(config.grab(BPP_PARAM)) {
-      int bpp = BPP_PARAM.getValue();
-      dim = bpp * bpp * bpp;
+  public RGBHistogramQuadraticDistanceFunction(int bpp) {
+    super(computeWeightMatrix(bpp));
+  }
 
-      Matrix m = new Matrix(dim, dim);
-      // maximum occurring distance in manhattan between bins:
-      final double max = 3. * (bpp - 1.);
-      for(int x = 0; x < dim; x++) {
-        final int rx = (x / bpp) / bpp;
-        final int gx = (x / bpp) % bpp;
-        final int bx = x % bpp;
-        for(int y = 0; y < dim; y++) {
-          final int ry = (y / bpp) / bpp;
-          final int gy = (y / bpp) % bpp;
-          final int by = y % bpp;
+  /**
+   * Compute weight matrix for a RGB color histogram
+   * 
+   * @param bpp bins per plane
+   * @return Weight matrix
+   */
+  public static Matrix computeWeightMatrix(int bpp) {
+    final int dim = bpp * bpp * bpp;
 
-          final double dr = Math.abs(rx - ry);
-          final double dg = Math.abs(gx - gy);
-          final double db = Math.abs(bx - by);
+    Matrix m = new Matrix(dim, dim);
+    // maximum occurring distance in manhattan between bins:
+    final double max = 3. * (bpp - 1.);
+    for(int x = 0; x < dim; x++) {
+      final int rx = (x / bpp) / bpp;
+      final int gx = (x / bpp) % bpp;
+      final int bx = x % bpp;
+      for(int y = 0; y < dim; y++) {
+        final int ry = (y / bpp) / bpp;
+        final int gy = (y / bpp) % bpp;
+        final int by = y % bpp;
 
-          final double val = 1 - (dr + dg + db) / max;
-          m.set(x, y, val);
-        }
+        final double dr = Math.abs(rx - ry);
+        final double dg = Math.abs(gx - gy);
+        final double db = Math.abs(bx - by);
+
+        final double val = 1 - (dr + dg + db) / max;
+        m.set(x, y, val);
       }
-      weightMatrix = m;
+    }
+    return m;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    int bpp = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter param = new IntParameter(BPP_ID);
+      if(config.grab(param)) {
+        bpp = param.getValue();
+      }
+    }
+
+    @Override
+    protected RGBHistogramQuadraticDistanceFunction makeInstance() {
+      return new RGBHistogramQuadraticDistanceFunction(bpp);
     }
   }
 }

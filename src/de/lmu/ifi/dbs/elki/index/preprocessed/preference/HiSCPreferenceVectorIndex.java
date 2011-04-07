@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -192,11 +193,6 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     public static final double DEFAULT_ALPHA = 0.01;
 
     /**
-     * OptionID for {@link #ALPHA_PARAM}
-     */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hisc.alpha", "The maximum absolute variance along a coordinate axis.");
-
-    /**
      * The maximum absolute variance along a coordinate axis. Must be in the
      * range of [0.0, 1.0).
      * <p>
@@ -206,17 +202,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
      * Key: {@code -hisc.alpha}
      * </p>
      */
-    private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
-
-    /**
-     * Holds the value of parameter {@link #ALPHA_PARAM}.
-     */
-    protected double alpha;
-
-    /**
-     * OptionID for {@link #K_PARAM}.
-     */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
+    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hisc.alpha", "The maximum absolute variance along a coordinate axis.");
 
     /**
      * The number of nearest neighbors considered to determine the preference
@@ -229,32 +215,28 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
      * Default value: three times of the dimensionality of the database objects
      * </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0), true);
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
 
     /**
-     * Holds the value of parameter {@link #K_PARAM}.
+     * Holds the value of parameter {@link #ALPHA_ID}.
+     */
+    protected double alpha;
+
+    /**
+     * Holds the value of parameter {@link #K_ID}.
      */
     protected Integer k;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param alpha Alpha
+     * @param k k
      */
-    public Factory(Parameterization config) {
-      super(config);
-      config = config.descend(this);
-
-      // parameter alpha
-      if(config.grab(ALPHA_PARAM)) {
-        alpha = ALPHA_PARAM.getValue();
-      }
-
-      // parameter k
-      if(config.grab(K_PARAM)) {
-        k = K_PARAM.getValue();
-      }
+    public Factory(double alpha, Integer k) {
+      super();
+      this.alpha = alpha;
+      this.k = k;
     }
 
     @Override
@@ -267,6 +249,44 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         usek = k;
       }
       return new HiSCPreferenceVectorIndex<V>(database, alpha, usek);
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractParameterizer {
+      /**
+       * Holds the value of parameter {@link #ALPHA_ID}.
+       */
+      protected double alpha;
+
+      /**
+       * Holds the value of parameter {@link #K_ID}.
+       */
+      protected Integer k;
+
+     @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
+        if(config.grab(ALPHA_PARAM)) {
+          alpha = ALPHA_PARAM.getValue();
+        }
+
+        final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0), true);
+        if(config.grab(K_PARAM)) {
+          k = K_PARAM.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<V> makeInstance() {
+        return new Factory<V>(alpha, k);
+      }
     }
   }
 }

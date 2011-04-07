@@ -3,10 +3,8 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -79,35 +77,14 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
   abstract protected Logging getLogger();
 
   /**
-   * Grab the distance configuration option.
+   * Make a default distance function configuration option
    * 
    * @param <F> Distance function type
-   * @param config Parameterization
-   * @return Parameter value or null.
-   */
-  public static <F extends DistanceFunction<?, ?>> F getParameterDistanceFunction(Parameterization config) {
-    // Do NOT call the full getParameterDistanceFunctions, since this leads to JavaDoc compiler errors!
-    final ObjectParameter<F> param = new ObjectParameter<F>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
-  }
-
-  /**
-   * Grab the distance function configuration option
-   * 
-   * @param <F> Distance function type
-   * @param config Parameterization
    * @param defaultDistanceFunction Default value
    * @param restriction Restriction class
-   * @return distance function
+   * @return Parameter object
    */
-  public static <F extends DistanceFunction<?, ?>> F getParameterDistanceFunction(Parameterization config, Class<?> defaultDistanceFunction, Class<?> restriction) {
-    final ObjectParameter<F> param = new ObjectParameter<F>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
+  public static <F extends DistanceFunction<?, ?>> ObjectParameter<F> makeParameterDistanceFunction(Class<?> defaultDistanceFunction, Class<?> restriction) {
+    return new ObjectParameter<F>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
   }
 }

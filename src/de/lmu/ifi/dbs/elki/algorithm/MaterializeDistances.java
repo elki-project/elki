@@ -13,8 +13,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 
 /**
@@ -42,7 +40,7 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(MaterializeDistances.class);
-  
+
   /**
    * Constructor.
    * 
@@ -75,22 +73,22 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
     return new CollectionResult<CTriple<DBID, DBID, Double>>("Distance Matrix", "distance-matrix", r);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> MaterializeDistances<O, D> parameterize(Parameterization config) {
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new MaterializeDistances<O, D>(distanceFunction);
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    @Override
+    protected MaterializeDistances<O, D> makeInstance() {
+      return new MaterializeDistances<O, D>(distanceFunction);
+    }
   }
 }

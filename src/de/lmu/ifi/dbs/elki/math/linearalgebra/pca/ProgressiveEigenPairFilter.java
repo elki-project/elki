@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -60,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of eigenvalues explains more than the a certain percentage of the unexpected variance, where the percentage increases with subspace dimensionality.")
 public class ProgressiveEigenPairFilter implements EigenPairFilter {
   /**
-   * OptionID for {@link #PALPHA_PARAM}
+   * Parameter progressive alpha.
    */
   public static final OptionID EIGENPAIR_FILTER_PALPHA = OptionID.getOrCreateOptionID("pca.filter.progressivealpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
 
@@ -70,9 +71,9 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
   public static final double DEFAULT_PALPHA = 0.5;
 
   /**
-   * Parameter progressive alpha.
+   * The default value for alpha.
    */
-  private final DoubleParameter PALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_PALPHA, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_PALPHA);
+  public static final double DEFAULT_WALPHA = 0.95;
 
   /**
    * The threshold for strong eigenvectors: the strong eigenvectors explain a
@@ -81,36 +82,20 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
   private double palpha;
 
   /**
-   * The default value for alpha.
-   */
-  public static final double DEFAULT_WALPHA = 0.95;
-
-  /**
-   * Parameter weak alpha.
-   */
-  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
-
-  /**
    * The noise tolerance level for weak eigenvectors
    */
   private double walpha;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param palpha palpha
+   * @param walpha walpha
    */
-  public ProgressiveEigenPairFilter(Parameterization config) {
+  public ProgressiveEigenPairFilter(double palpha, double walpha) {
     super();
-    config = config.descend(this);
-
-    if(config.grab(PALPHA_PARAM)) {
-      palpha = PALPHA_PARAM.getValue();
-    }
-    if(config.grab(WALPHA_PARAM)) {
-      walpha = WALPHA_PARAM.getValue();
-    }
+    this.palpha = palpha;
+    this.walpha = walpha;
   }
 
   /**
@@ -166,5 +151,44 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
       return new FilteredEigenPairs(new ArrayList<EigenPair>(), weakEigenPairs);
     }
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The threshold for strong eigenvectors: the strong eigenvectors explain a
+     * portion of at least alpha of the total variance.
+     */
+    private double palpha;
+
+    /**
+     * The noise tolerance level for weak eigenvectors
+     */
+    private double walpha;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter palphaP = new DoubleParameter(EIGENPAIR_FILTER_PALPHA, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_PALPHA);
+      if(config.grab(palphaP)) {
+        palpha = palphaP.getValue();
+      }
+
+      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
+      if(config.grab(walphaP)) {
+        walpha = walphaP.getValue();
+      }
+    }
+
+    @Override
+    protected ProgressiveEigenPairFilter makeInstance() {
+      return new ProgressiveEigenPairFilter(palpha, walpha);
+    }
   }
 }

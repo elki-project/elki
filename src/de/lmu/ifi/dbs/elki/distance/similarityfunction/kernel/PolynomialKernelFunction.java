@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQu
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -16,23 +17,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * two feature vectors V1 and V2 defined by (V1^T*V2)^degree.
  * 
  * @author Simon Paradies
- * @param <O> vector type
  */
-public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends AbstractPrimitiveDistanceFunction<O, DoubleDistance> implements PrimitiveSimilarityFunction<O, DoubleDistance> {
+public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveSimilarityFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
    * The default degree.
    */
   public static final double DEFAULT_DEGREE = 2.0;
 
   /**
-   * OptionID for {@link #DEGREE_PARAM}
+   * Degree parameter
    */
   public static final OptionID DEGREE_ID = OptionID.getOrCreateOptionID("kernel.degree", "The degree of the polynomial kernel function. Default: " + DEFAULT_DEGREE);
-
-  /**
-   * 
-   */
-  private final DoubleParameter DEGREE_PARAM = new DoubleParameter(DEGREE_ID, DEFAULT_DEGREE);
 
   /**
    * Degree of the polynomial kernel function
@@ -40,18 +35,13 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
   private double degree = 0.0;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param degree Kernel degree
    */
-  public PolynomialKernelFunction(Parameterization config) {
+  public PolynomialKernelFunction(double degree) {
     super();
-    config = config.descend(this);
-    // parameter degree
-    if (config.grab(DEGREE_PARAM)) {
-      degree = DEGREE_PARAM.getValue();
-    }
+    this.degree = degree;
   }
 
   /**
@@ -63,7 +53,7 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
    *         instance of {@link DoubleDistance DoubleDistance}.
    */
   @Override
-  public DoubleDistance similarity(O o1, O o2) {
+  public DoubleDistance similarity(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
     if(o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of Feature-Vectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }
@@ -76,12 +66,12 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
   }
 
   @Override
-  public DoubleDistance distance(final O fv1, final O fv2) {
+  public DoubleDistance distance(final NumberVector<?, ?> fv1, final NumberVector<?, ?> fv2) {
     return new DoubleDistance(Math.sqrt(similarity(fv1, fv1).doubleValue() + similarity(fv2, fv2).doubleValue() - 2 * similarity(fv1, fv2).doubleValue()));
   }
 
   @Override
-  public Class<? super O> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
 
@@ -91,7 +81,32 @@ public class PolynomialKernelFunction<O extends NumberVector<O, ?>> extends Abst
   }
 
   @Override
-  public <T extends O> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Database<T> database) {
+  public <T extends NumberVector<?, ?>> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Database<T> database) {
     return new PrimitiveDistanceSimilarityQuery<T, DoubleDistance>(database, this, this);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected double degree = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter degreeP = new DoubleParameter(DEGREE_ID, DEFAULT_DEGREE);
+      if(config.grab(degreeP)) {
+        degree = degreeP.getValue();
+      }
+    }
+
+    @Override
+    protected PolynomialKernelFunction makeInstance() {
+      return new PolynomialKernelFunction(degree);
+    }
   }
 }

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * AbstractDistanceFunction provides some methods valid for any extending class.
  * 
  * @author Arthur Zimek
+ * 
  * @param <D> the type of Distance used
  */
 public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implements DBIDDistanceFunction<D> {

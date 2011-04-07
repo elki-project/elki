@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
 import de.lmu.ifi.dbs.elki.math.statistics.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityEstimator;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -52,7 +53,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // This data was generated with a mean of 0.0 and stddev 1.23,
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = FileBasedDatabaseConnection.parameterize(config);
+    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, config);
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
     // verify data set size.

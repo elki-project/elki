@@ -54,9 +54,10 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
     evals.addObserver(this);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected synchronized void configureStep(Parameterization config)  {
-    outs  = OutputStep.parameterize(config, OutputStep.defaultVisualizer());
+    outs = config.tryInstantiate(OutputStep.class);
     if (config.getErrors().size() > 0) {
       outs = null;
     }

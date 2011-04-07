@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -27,36 +28,26 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(FirstNEigenPairFilter.class);
-  
-  /**
-   * OptionID for {@link #N_PARAM}
-   */
-  public static final OptionID EIGENPAIR_FILTER_N = OptionID.getOrCreateOptionID("pca.filter.n", "The number of strong eigenvectors: n eigenvectors with the n highest" + "eigenvalues are marked as strong eigenvectors.");
 
   /**
-   * Parameter n.
+   * Paremeter n
    */
-  private final IntParameter N_PARAM = new IntParameter(EIGENPAIR_FILTER_N, new GreaterEqualConstraint(0));
+  public static final OptionID EIGENPAIR_FILTER_N = OptionID.getOrCreateOptionID("pca.filter.n", "The number of strong eigenvectors: n eigenvectors with the n highest" + "eigenvalues are marked as strong eigenvectors.");
 
   /**
    * The threshold for strong eigenvectors: n eigenvectors with the n highest
    * eigenvalues are marked as strong eigenvectors.
    */
-  private double n;
+  private int n;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param n
    */
-  public FirstNEigenPairFilter(Parameterization config) {
+  public FirstNEigenPairFilter(int n) {
     super();
-    config = config.descend(this);
-    // this.debug = true;
-    if (config.grab(N_PARAM)) {
-      n = N_PARAM.getValue();
-    }
+    this.n = n;
   }
 
   @Override
@@ -89,5 +80,33 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The number of eigenpairs to keep.
+     */
+    protected int n = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter nP = new IntParameter(EIGENPAIR_FILTER_N, new GreaterEqualConstraint(0));
+      if(config.grab(nP)) {
+        n = nP.getValue();
+      }
+    }
+
+    @Override
+    protected FirstNEigenPairFilter makeInstance() {
+      return new FirstNEigenPairFilter(n);
+    }
   }
 }

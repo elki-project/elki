@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -57,7 +56,7 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(DistanceStatisticsWithClasses.class);
-  
+
   /**
    * Flag to compute exact value range for binning.
    */
@@ -338,53 +337,61 @@ public class DistanceStatisticsWithClasses<O extends DatabaseObject, D extends N
     }
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> DistanceStatisticsWithClasses<O, D> parameterize(Parameterization config) {
-    int bins = getParameterBins(config);
-    boolean exact = false;
-    final Flag EXACT_FLAG = new Flag(EXACT_ID);
-    if(config.grab(EXACT_FLAG)) {
-      exact = EXACT_FLAG.getValue();
-    }
-    boolean sampling = true;
-    final Flag SAMPLING_FLAG = new Flag(SAMPLING_ID);
-    if(config.grab(SAMPLING_FLAG)) {
-      sampling = SAMPLING_FLAG.getValue();
-    }
-
-    ArrayList<Parameter<?, ?>> exclusive = new ArrayList<Parameter<?, ?>>();
-    exclusive.add(EXACT_FLAG);
-    exclusive.add(SAMPLING_FLAG);
-    config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
-
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new DistanceStatisticsWithClasses<O, D>(distanceFunction, bins, exact, sampling);
-  }
-
-  /**
-   * Get the number of bins parameter
-   * 
-   * @param config Parameterization
-   * @return bins parameter
-   */
-  protected static int getParameterBins(Parameterization config) {
-    final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    /**
+     * Number of bins to use in sampling.
+     */
+    private int numbin = 20;
+
+    /**
+     * Sampling
+     */
+    private boolean sampling = false;
+
+    /**
+     * Sampling
+     */
+    private boolean exact = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter numbinP = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
+      if(config.grab(numbinP)) {
+        numbin = numbinP.getValue();
+      }
+
+      final Flag EXACT_FLAG = new Flag(EXACT_ID);
+      if(config.grab(EXACT_FLAG)) {
+        exact = EXACT_FLAG.getValue();
+      }
+
+      final Flag SAMPLING_FLAG = new Flag(SAMPLING_ID);
+      if(config.grab(SAMPLING_FLAG)) {
+        sampling = SAMPLING_FLAG.getValue();
+      }
+
+      ArrayList<Parameter<?, ?>> exclusive = new ArrayList<Parameter<?, ?>>();
+      exclusive.add(EXACT_FLAG);
+      exclusive.add(SAMPLING_FLAG);
+      config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
+    }
+
+    @Override
+    protected DistanceStatisticsWithClasses<O, D> makeInstance() {
+      return new DistanceStatisticsWithClasses<O, D>(distanceFunction, numbin, exact, sampling);
+    }
   }
 }

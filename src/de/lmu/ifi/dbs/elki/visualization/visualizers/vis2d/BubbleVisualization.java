@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -200,28 +201,13 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
-     * OptionID for {@link #FILL_FLAG}.
-     */
-    public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("bubble.fill", "Half-transparent filling of bubbles.");
-
-    /**
      * Flag for half-transparent filling of bubbles.
      * 
      * <p>
      * Key: {@code -bubble.fill}
      * </p>
      */
-    private final Flag FILL_FLAG = new Flag(FILL_ID);
-
-    /**
-     * Fill parameter.
-     */
-    protected boolean fill;
-
-    /**
-     * OptionID for {@link #SCALING_PARAM}
-     */
-    public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("bubble.scaling", "Additional scaling function for bubbles.");
+    public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("bubble.fill", "Half-transparent filling of bubbles.");
 
     /**
      * Parameter for scaling functions
@@ -230,7 +216,12 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
      * Key: {@code -bubble.scaling}
      * </p>
      */
-    private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, OutlierScalingFunction.class, true);
+    public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("bubble.scaling", "Additional scaling function for bubbles.");
+
+    /**
+     * Fill parameter.
+     */
+    protected boolean fill;
 
     /**
      * Scaling function to use for Bubbles
@@ -238,20 +229,15 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     protected ScalingFunction scaling;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-     * 
-     * @param config Parameterization
+     * Constructor.
+     *
+     * @param fill
+     * @param scaling
      */
-    public Factory(Parameterization config) {
+    public Factory(boolean fill, ScalingFunction scaling) {
       super();
-      config = config.descend(this);
-      if(config.grab(FILL_FLAG)) {
-        fill = FILL_FLAG.getValue();
-      }
-      if(config.grab(SCALING_PARAM)) {
-        scaling = SCALING_PARAM.instantiateClass(config);
-      }
+      this.fill = fill;
+      this.scaling = scaling;
     }
 
     @Override
@@ -276,6 +262,44 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     @Override
     public Class<? extends Projection> getProjectionType() {
       return Projection2D.class;
+    }
+    
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      /**
+       * Fill parameter.
+       */
+      protected boolean fill = false;
+
+      /**
+       * Scaling function to use for Bubbles
+       */
+      protected ScalingFunction scaling = null;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        Flag fillF = new Flag(FILL_ID);
+        if(config.grab(fillF)) {
+          fill = fillF.getValue();
+        }
+
+        ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, OutlierScalingFunction.class, true);
+        if(config.grab(scalingP)) {
+          scaling = scalingP.instantiateClass(config);
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(fill, scaling);
+      }
     }
   }
 }

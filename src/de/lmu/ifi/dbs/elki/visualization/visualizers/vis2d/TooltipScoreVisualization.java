@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -125,11 +126,6 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
-     * OptionID for {@link #DIGITS_PARAM}.
-     */
-    public static final OptionID DIGITS_ID = OptionID.getOrCreateOptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
-
-    /**
      * Parameter for the gamma-correction.
      * 
      * <p>
@@ -140,29 +136,25 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
      * Default value: 4
      * </p>
      */
-    private final IntParameter DIGITS_PARAM = new IntParameter(DIGITS_ID, new GreaterEqualConstraint(0), 4);
+    public static final OptionID DIGITS_ID = OptionID.getOrCreateOptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
 
     /**
      * Number formatter used for visualization
      */
-    NumberFormat nf = NumberFormat.getInstance(Locale.ROOT);
+    NumberFormat nf = null;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param digits number of digits
      */
-    public Factory(Parameterization config) {
+    public Factory(int digits) {
       super();
-      config = config.descend(this);
-      if(config.grab(DIGITS_PARAM)) {
-        int digits = DIGITS_PARAM.getValue();
-        nf.setGroupingUsed(false);
-        nf.setMaximumFractionDigits(digits);
-      }
+      nf = NumberFormat.getInstance(Locale.ROOT);
+      nf.setGroupingUsed(false);
+      nf.setMaximumFractionDigits(digits);
     }
-    
+
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new TooltipScoreVisualization<NV>(task, nf);
@@ -185,6 +177,32 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
     @Override
     public Class<? extends Projection> getProjectionType() {
       return Projection2D.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      protected int digits = 4;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        IntParameter DIGITS_PARAM = new IntParameter(DIGITS_ID, new GreaterEqualConstraint(0), 4);
+
+        if(config.grab(DIGITS_PARAM)) {
+          digits = DIGITS_PARAM.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(digits);
+      }
     }
   }
 }

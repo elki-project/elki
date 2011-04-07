@@ -2,8 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Manhattan distance function to compute the Manhattan distance for a pair of
@@ -13,6 +12,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class ManhattanDistanceFunction extends LPNormDistanceFunction implements RawDoubleDistance<NumberVector<?,?>> {
   /**
+   * The static instance to use.
+   */
+  public static final ManhattanDistanceFunction STATIC = new ManhattanDistanceFunction();
+
+  /**
    * Provides a Manhattan distance function that can compute the Manhattan
    * distance (that is a DoubleDistance) for FeatureVectors.
    * 
@@ -21,20 +25,6 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
   @Deprecated
   public ManhattanDistanceFunction() {
     super(1.0);
-  }
-  
-  public static final ManhattanDistanceFunction STATIC = new ManhattanDistanceFunction();
-
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * Note: we need this method, to override the parent class' method.
-   * 
-   * @param config Parameterization
-   * @return Distance function
-   */
-  public static ManhattanDistanceFunction parameterize(Parameterization config) {
-    return ManhattanDistanceFunction.STATIC;
   }
 
   @Override
@@ -64,5 +54,19 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
   @Override
   public boolean isMetric() {
     return true;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected ManhattanDistanceFunction makeInstance() {
+      return ManhattanDistanceFunction.STATIC;
+    }
   }
 }

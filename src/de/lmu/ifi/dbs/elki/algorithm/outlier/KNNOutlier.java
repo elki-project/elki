@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -57,7 +56,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(KNNOutlier.class);
-  
+
   /**
    * The association id to associate the KNNO_KNNDISTANCE of an object for the
    * KNN outlier detection algorithm.
@@ -90,7 +89,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
    */
   @Override
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    KNNQuery<O, D> knnQuery= database.getKNNQuery(getDistanceFunction(), k);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k);
 
     if(logger.isVerbose()) {
       logger.verbose("Computing the kNN outlier degree (distance to the k nearest neighbor)");
@@ -104,7 +103,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
       // distance to the kth nearest neighbor
       final List<DistanceResultPair<D>> knns = knnQuery.getKNNForDBID(id, k);
       final int last = Math.min(k - 1, knns.size() - 1);
-      
+
       double dkn = knns.get(last).getDistance().doubleValue();
       knno_score.put(id, dkn);
 
@@ -122,37 +121,33 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
     return new OutlierResult(meta, scoreres);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> KNNOutlier<O, D> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new KNNOutlier<O, D>(distanceFunction, k);
-  }
-
-  /**
-   * Get the k parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return k parameter
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected int k = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter kP = new IntParameter(K_ID);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+    }
+
+    @Override
+    protected KNNOutlier<O, D> makeInstance() {
+      return new KNNOutlier<O, D>(distanceFunction, k);
+    }
   }
 }

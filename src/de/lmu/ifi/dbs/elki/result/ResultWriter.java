@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -31,38 +32,16 @@ public class ResultWriter<O extends DatabaseObject> implements ResultHandler<O, 
   private static final Logging logger = Logging.getLogger(ResultWriter.class);
   
   /**
-   * Optional Parameter to specify the file to write the obtained results in. If
-   * this parameter is omitted, per default the output will sequentially be
-   * given to STDOUT.
-   * <p>
-   * Key: {@code -out}
-   * </p>
-   */
-  private final FileParameter OUTPUT_PARAM = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE, true);
-
-  /**
-   * GZIP compression flag.
-   * 
-   */
-  private final OptionID GZIP_OUTPUT = OptionID.getOrCreateOptionID("out.gzip", "Enable gzip compression of output files.");
-  
-  /**
    * Flag to control GZIP compression.
    * <p>Key: {@code -out.gzip}</p>
    */
-  private final Flag GZIP_FLAG = new Flag(GZIP_OUTPUT);
-  
-  /**
-   * Suppress overwrite warning.
-   * 
-   */
-  private final OptionID OVERWRITE_OPTION = OptionID.getOrCreateOptionID("out.silentoverwrite", "Silently overwrite output files.");
+  public static final OptionID GZIP_OUTPUT_ID = OptionID.getOrCreateOptionID("out.gzip", "Enable gzip compression of output files.");
   
   /**
    * Flag to suppress overwrite warning.
    * <p>Key: {@code -out.silentoverwrite}</p>
    */
-  private final Flag OVERWRITE_FLAG = new Flag(OVERWRITE_OPTION);
+  public static final OptionID OVERWRITE_OPTION_ID = OptionID.getOrCreateOptionID("out.silentoverwrite", "Silently overwrite output files.");
   
   /**
    * Holds the file to print results to.
@@ -85,26 +64,17 @@ public class ResultWriter<O extends DatabaseObject> implements ResultHandler<O, 
   private boolean warnoverwrite = true;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param out
+   * @param gzip
+   * @param warnoverwrite
    */
-  public ResultWriter(Parameterization config) {
+  public ResultWriter(File out, boolean gzip, boolean warnoverwrite) {
     super();
-    config = config.descend(this);
-    // parameter output file
-    if (config.grab(OUTPUT_PARAM)) {
-      out = OUTPUT_PARAM.getValue();
-    }
-    // Compress output flag
-    if (config.grab(GZIP_FLAG)) {
-      gzip = GZIP_FLAG.getValue();
-    }
-    // Overwrite flag
-    if (config.grab(OVERWRITE_FLAG)) {
-      warnoverwrite = !OVERWRITE_FLAG.getValue(); // inversed flag
-    }
+    this.out = out;
+    this.gzip = gzip;
+    this.warnoverwrite = warnoverwrite;
   }
 
   /**
@@ -175,5 +145,54 @@ public class ResultWriter<O extends DatabaseObject> implements ResultHandler<O, 
    */
   public Normalization<O> getNormalization() {
     return normalization;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Holds the file to print results to.
+     */
+    private File out = null;
+
+    /**
+     * Whether or not to do gzip compression on output.
+     */
+    private boolean gzip = false;
+    
+    /**
+     * Whether or not to warn on overwrite
+     */
+    private boolean warnoverwrite = true;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      FileParameter outputP = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE, true);
+      if (config.grab(outputP)) {
+        out = outputP.getValue();
+      }
+
+      Flag gzipF = new Flag(GZIP_OUTPUT_ID);
+      if (config.grab(gzipF)) {
+        gzip = gzipF.getValue();
+      }
+
+      Flag overwriteF = new Flag(OVERWRITE_OPTION_ID);
+      if (config.grab(overwriteF)) {
+        // note: inversed meaning
+        warnoverwrite = !overwriteF.getValue();
+      }
+    }
+
+    @Override
+    protected ResultWriter<O> makeInstance() {
+      return new ResultWriter<O>(out, gzip, warnoverwrite);
+    }
   }
 }

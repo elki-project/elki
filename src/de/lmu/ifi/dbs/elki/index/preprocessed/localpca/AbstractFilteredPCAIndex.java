@@ -15,9 +15,11 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -33,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <NV> Vector type
  */
-//TODO: loosen DoubleDistance restriction.
+// TODO: loosen DoubleDistance restriction.
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
 public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> extends AbstractPreprocessorIndex<NV, PCAFilteredResult> implements FilteredLocalPCAIndex<NV> {
@@ -118,7 +120,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
    *         query object) to be considered within the PCA
    */
   protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id);
-  
+
   /**
    * Factory class
    * 
@@ -129,20 +131,15 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
    */
   public static abstract class Factory<NV extends NumberVector<?, ?>, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
     /**
-     * OptionID for {@link #PCA_DISTANCE_PARAM}
-     */
-    public static final OptionID PCA_DISTANCE_ID = OptionID.getOrCreateOptionID("localpca.distancefunction", "The distance function used to select objects for running PCA.");
-
-    /**
      * Parameter to specify the distance function used for running PCA.
      * 
      * Key: {@code -localpca.distancefunction}
      */
-    protected final ObjectParameter<DistanceFunction<NV, DoubleDistance>> PCA_DISTANCE_PARAM = new ObjectParameter<DistanceFunction<NV, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+    public static final OptionID PCA_DISTANCE_ID = OptionID.getOrCreateOptionID("localpca.distancefunction", "The distance function used to select objects for running PCA.");
 
     /**
      * Holds the instance of the distance function specified by
-     * {@link #PCA_DISTANCE_PARAM}.
+     * {@link #PCA_DISTANCE_ID}.
      */
     protected DistanceFunction<NV, DoubleDistance> pcaDistanceFunction;
 
@@ -150,26 +147,53 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
      * PCA utility object.
      */
     protected PCAFilteredRunner<NV, DoubleDistance> pca;
-    
+
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param pcaDistanceFunction distance Function
+     * @param pca PCA runner
      */
-    public Factory(Parameterization config) {
+    public Factory(DistanceFunction<NV, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<NV, DoubleDistance> pca) {
       super();
-      config = config.descend(this);
-
-      // parameter pca distance function
-      if(config.grab(PCA_DISTANCE_PARAM)) {
-        pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass(config);
-      }
-
-      pca = new PCAFilteredRunner<NV, DoubleDistance>(config);
+      this.pcaDistanceFunction = pcaDistanceFunction;
+      this.pca = pca;
     }
-    
+
     @Override
     public abstract I instantiate(Database<NV> database);
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static abstract class Parameterizer<NV extends NumberVector<?, ?>, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
+      /**
+       * Holds the instance of the distance function specified by
+       * {@link #PCA_DISTANCE_ID}.
+       */
+      protected DistanceFunction<NV, DoubleDistance> pcaDistanceFunction;
+
+      /**
+       * PCA utility object.
+       */
+      protected PCAFilteredRunner<NV, DoubleDistance> pca;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        final ObjectParameter<DistanceFunction<NV, DoubleDistance>> pcaDistanceFunctionP = new ObjectParameter<DistanceFunction<NV, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+
+        if(config.grab(pcaDistanceFunctionP)) {
+          pcaDistanceFunction = pcaDistanceFunctionP.instantiateClass(config);
+        }
+
+        Class<PCAFilteredRunner<NV, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+        pca = config.tryInstantiate(cls);
+      }
+    }
   }
 }

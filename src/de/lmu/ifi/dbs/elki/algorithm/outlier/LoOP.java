@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -60,7 +60,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(LoOP.class);
-  
+
   /**
    * The association id to associate the LOOP_SCORE of an object for the
    * LOOP_SCORE algorithm.
@@ -156,7 +156,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     KNNQuery<O, D> knnComp;
     KNNQuery<O, D> knnReach;
     if(comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
-      // We need each neighborhood twice - use "HEAVY" flag. 
+      // We need each neighborhood twice - use "HEAVY" flag.
       knnComp = database.getKNNQuery(comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
       // No optimized kNN query - use a preprocessor!
       if(knnComp == null) {
@@ -183,7 +183,7 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     }
     return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnComp, knnReach);
   }
-  
+
   /**
    * Performs the LoOP algorithm on the given database.
    */
@@ -302,102 +302,80 @@ public class LoOP<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LoOP<O, D> parameterize(Parameterization config) {
-    int kcomp = getParameterKcomp(config);
-    int kreach = getParameterKreach(config, kcomp);
-    DistanceFunction<O, D> comparisonDistanceFunction = getParameterComparisonDistanceFunction(config);
-    DistanceFunction<O, D> reachabilityDistanceFunction = getParameterReachabilityDistanceFunction(config);
-    if (reachabilityDistanceFunction == null) {
-      reachabilityDistanceFunction = comparisonDistanceFunction;
-    }
-    double lambda = getParameterLambda(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new LoOP<O, D>(kreach, kcomp, reachabilityDistanceFunction, comparisonDistanceFunction, lambda);
-  }
-
-  /**
-   * Get the lambda parameter
-   * 
-   * @param config Parameterization
-   * @return lambda parameter
-   */
-  protected static double getParameterLambda(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(LAMBDA_ID, new GreaterConstraint(0.0), 2.0);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return Double.NaN;
-  }
-
-  /**
-   * Get the k parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return k parameter
-   */
-  protected static int getParameterKcomp(Parameterization config) {
-    final IntParameter param = new IntParameter(KCOMP_ID, new GreaterConstraint(1));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
-  /**
-   * Get the k parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @param kcomp Fallback value
-   * @return k parameter
-   */
-  protected static int getParameterKreach(Parameterization config, int kcomp) {
-    final IntParameter param = new IntParameter(KREACH_ID, new GreaterConstraint(1), true);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return kcomp;
-  }
-
-  /**
-   * Grab the comparison distance configuration option.
-   * 
-   * @param <F> distance function type
-   * @param config Parameterization
-   * @return Parameter value or null.
-   */
-  protected static <F extends DistanceFunction<?, ?>> F getParameterComparisonDistanceFunction(Parameterization config) {
-    final ObjectParameter<F> param = new ObjectParameter<F>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
-  }
-
-  /**
-   * Grab the reference distance configuration option.
-   * 
-   * @param <F> distance function type
-   * @param config Parameterization
-   * @return Parameter value or null.
-   */
-  protected static <F extends DistanceFunction<?, ?>> F getParameterReachabilityDistanceFunction(Parameterization config) {
-    final ObjectParameter<F> param = new ObjectParameter<F>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+    /**
+     * Holds the value of {@link #KREACH_ID}.
+     */
+    int kreach = 0;
+
+    /**
+     * Holds the value of {@link #KCOMP_ID}.
+     */
+    int kcomp = 0;
+
+    /**
+     * Hold the value of {@link #LAMBDA_ID}.
+     */
+    double lambda = 2.0;
+
+    /**
+     * Preprocessor Step 1
+     */
+    protected DistanceFunction<O, D> reachabilityDistanceFunction = null;
+
+    /**
+     * Preprocessor Step 2
+     */
+    protected DistanceFunction<O, D> comparisonDistanceFunction = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter kcompP = new IntParameter(KCOMP_ID, new GreaterConstraint(1));
+      if(config.grab(kcompP)) {
+        kcomp = kcompP.getValue();
+      }
+
+      final ObjectParameter<DistanceFunction<O, D>> compDistP = new ObjectParameter<DistanceFunction<O, D>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      if(config.grab(compDistP)) {
+        comparisonDistanceFunction = compDistP.instantiateClass(config);
+      }
+
+      final IntParameter kreachP = new IntParameter(KREACH_ID, new GreaterConstraint(1), true);
+      if(config.grab(kreachP)) {
+        kreach = kreachP.getValue();
+      } else {
+        kreach = kcomp;
+      }
+
+      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+      if(config.grab(reachDistP)) {
+        reachabilityDistanceFunction = reachDistP.instantiateClass(config);
+      }
+
+      // TODO: make default 1.0?
+      final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, new GreaterConstraint(0.0), 2.0);
+      if(config.grab(lambdaP)) {
+        lambda = lambdaP.getValue();
+      }
+    }
+
+    @Override
+    protected LoOP<O, D> makeInstance() {
+      DistanceFunction<O, D> realreach = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : comparisonDistanceFunction;
+      return new LoOP<O, D>(kreach, kcomp, realreach, comparisonDistanceFunction, lambda);
+    }
   }
 }

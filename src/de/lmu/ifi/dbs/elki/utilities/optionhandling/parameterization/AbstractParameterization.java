@@ -15,11 +15,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Erich Schubert
  */
 public abstract class AbstractParameterization implements Parameterization {
+  // TODO: refactor "tryInstantiate" even in a higher class?
+
   /**
    * Errors
    */
   java.util.Vector<ParameterException> errors = new java.util.Vector<ParameterException>();
-  
+
   /**
    * The logger of the class.
    */
@@ -29,7 +31,7 @@ public abstract class AbstractParameterization implements Parameterization {
   public Collection<ParameterException> getErrors() {
     return errors;
   }
-  
+
   @Override
   public boolean hasErrors() {
     return errors.size() > 0;
@@ -44,20 +46,26 @@ public abstract class AbstractParameterization implements Parameterization {
    * Log any error that has accumulated.
    */
   public synchronized void logAndClearReportedErrors() {
-    for (ParameterException e : getErrors()) {
-      logger.warning(e.getMessage());
+    for(ParameterException e : getErrors()) {
+      if(logger.isDebugging()) {
+        logger.warning(e.getMessage(), e);
+      }
+      else {
+        logger.warning(e.getMessage());
+      }
     }
     clearErrors();
   }
-  
+
   /**
    * Clear errors.
    */
   public synchronized void clearErrors() {
-    // Do NOT use errors.clear(), since we might have an error report referencing the collection!
+    // Do NOT use errors.clear(), since we might have an error report
+    // referencing the collection!
     errors = new java.util.Vector<ParameterException>();
   }
-  
+
   /**
    * Fail on errors, log any error that had occurred.
    * 
@@ -66,12 +74,12 @@ public abstract class AbstractParameterization implements Parameterization {
   // TODO: make a multi-exception class?
   public void failOnErrors() throws RuntimeException {
     final int numerror = getErrors().size();
-    if (numerror > 0) {
+    if(numerror > 0) {
       logAndClearReportedErrors();
       throw new RuntimeException(numerror + " errors occurred during parameterization.");
     }
   }
-  
+
   /**
    * Report the internal parameterization errors to another parameterization
    * 
@@ -79,23 +87,23 @@ public abstract class AbstractParameterization implements Parameterization {
    */
   public synchronized void reportInternalParameterizationErrors(Parameterization config) {
     final int numerror = getErrors().size();
-    if (numerror > 0) {
+    if(numerror > 0) {
       config.reportError(new InternalParameterizationErrors(numerror + " internal (re-) parameterization errors prevented execution.", getErrors()));
       this.clearErrors();
     }
   }
-  
+
   @Override
-  public final boolean grab(Parameter<?,?> opt) {
+  public final boolean grab(Parameter<?, ?> opt) {
     if(opt.isDefined()) {
       logger.warning("Option " + opt.getName() + " is already set!");
     }
     try {
-      if (setValueForOption(opt)) {
+      if(setValueForOption(opt)) {
         return true;
       }
       // Try default value instead.
-      if (opt.tryDefaultValue()) {
+      if(opt.tryDefaultValue()) {
         return true;
       }
       // No value available.
@@ -115,8 +123,8 @@ public abstract class AbstractParameterization implements Parameterization {
    * @throws ParameterException on assignment errors.
    */
   @Override
-  public abstract boolean setValueForOption(Parameter<?,?> opt) throws ParameterException;
-  
+  public abstract boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException;
+
   /** Upon destruction, report any errors that weren't handled yet. */
   @Override
   public void finalize() {
@@ -141,6 +149,19 @@ public abstract class AbstractParameterization implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(r, c, this);
     }
     catch(Exception e) {
+      logger.exception(e);
+      reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
+      return null;
+    }
+  }
+
+  @Override
+  public <C> C tryInstantiate(Class<C> c) {
+    try {
+      return ClassGenericsUtil.tryInstantiate(c, c, this);
+    }
+    catch(Exception e) {
+      logger.exception(e);
       reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
       return null;
     }

@@ -35,13 +35,12 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -238,7 +237,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     APRIORI apriori = new APRIORI(minpts);
 
     // database for apriori
-    Database<BitVector> apriori_db = new HashmapDatabase<BitVector>(new EmptyParameterization());
+    Database<BitVector> apriori_db = new HashmapDatabase<BitVector>(null, null);
     for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
       DBID id = it.next();
       Bit[] bits = new Bit[dimensionality];
@@ -398,12 +397,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     Class<RangeQuery<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
     RangeQuery<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {
-      ListParameterization parameters = new ListParameterization();
-      parameters.addParameter(DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
-      rangeQueries[d] = database.getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(database, new DimensionSelectingDistanceFunction(parameters)));
-      for(ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: " + e.getMessage());
-      }
+      rangeQueries[d] = database.getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(database, new DimensionSelectingDistanceFunction(d + 1)));
     }
     return rangeQueries;
   }
@@ -440,7 +434,18 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     public static final DoubleDistance DEFAULT_EPSILON = new DoubleDistance(0.001);
 
     /**
-     * OptionID for {@link #EPSILON_PARAM}
+     * A comma separated list of positive doubles specifying the maximum radius
+     * of the neighborhood to be considered in each dimension for determination
+     * of the preference vector (default is {@link #DEFAULT_EPSILON} in each
+     * dimension). If only one value is specified, this value will be used for
+     * each dimension.
+     * 
+     * <p>
+     * Key: {@code -dish.epsilon}
+     * </p>
+     * <p>
+     * Default value: {@link #DEFAULT_EPSILON}
+     * </p>
      */
     public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dish.epsilon", "A comma separated list of positive doubles specifying the " + "maximum radius of the neighborhood to be " + "considered in each dimension for determination of " + "the preference vector " + "(default is " + DEFAULT_EPSILON + " in each dimension). " + "If only one value is specified, this value " + "will be used for each dimension.");
 
@@ -455,42 +460,6 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     private static final String CONDITION = "The value of the preference vector in dimension d_i is set to 1 " + "if the epsilon neighborhood contains more than " + MINPTS_P + " points and the following condition holds: " + "for all dimensions d_j: " + "|neighbors(d_i) intersection neighbors(d_j)| >= " + MINPTS_P + ".";
 
     /**
-     * OptionID for {@link #MINPTS_PARAM}
-     */
-    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(MINPTS_P, "Positive threshold for minumum numbers of points in the epsilon-" + "neighborhood of a point. " + CONDITION);
-
-    /**
-     * Default strategy.
-     */
-    public static Strategy DEFAULT_STRATEGY = Strategy.MAX_INTERSECTION;
-
-    /**
-     * OptionID for {@link #STRATEGY_PARAM}
-     */
-    public static final OptionID STRATEGY_ID = OptionID.getOrCreateOptionID("dish.strategy", "The strategy for determination of the preference vector, " + "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
-
-    /**
-     * A comma separated list of positive doubles specifying the maximum radius
-     * of the neighborhood to be considered in each dimension for determination
-     * of the preference vector (default is {@link #DEFAULT_EPSILON} in each
-     * dimension). If only one value is specified, this value will be used for
-     * each dimension.
-     * 
-     * <p>
-     * Key: {@code -dish.epsilon}
-     * </p>
-     * <p>
-     * Default value: {@link #DEFAULT_EPSILON}
-     * </p>
-     */
-    protected final DoubleListParameter EPSILON_PARAM = new DoubleListParameter(EPSILON_ID, true);
-
-    /**
-     * The epsilon value for each dimension;
-     */
-    protected DoubleDistance[] epsilon;
-
-    /**
      * Positive threshold for minimum numbers of points in the
      * epsilon-neighborhood of a point, must satisfy following
      * {@link #CONDITION}.
@@ -499,12 +468,12 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
      * Key: {@code -dish.minpts}
      * </p>
      */
-    protected final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(MINPTS_P, "Positive threshold for minumum numbers of points in the epsilon-" + "neighborhood of a point. " + CONDITION);
 
     /**
-     * Threshold for minimum number of points in the neighborhood.
+     * Default strategy.
      */
-    protected int minpts;
+    public static Strategy DEFAULT_STRATEGY = Strategy.MAX_INTERSECTION;
 
     /**
      * The strategy for determination of the preference vector, available
@@ -518,7 +487,17 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
      * Default value: {@link #DEFAULT_STRATEGY}
      * </p>
      */
-    private final StringParameter STRATEGY_PARAM = new StringParameter(STRATEGY_ID, new EqualStringConstraint(new String[] { Strategy.APRIORI.toString(), Strategy.MAX_INTERSECTION.toString() }), DEFAULT_STRATEGY.toString());
+    public static final OptionID STRATEGY_ID = OptionID.getOrCreateOptionID("dish.strategy", "The strategy for determination of the preference vector, " + "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
+
+    /**
+     * The epsilon value for each dimension;
+     */
+    protected DoubleDistance[] epsilon;
+
+    /**
+     * Threshold for minimum number of points in the neighborhood.
+     */
+    protected int minpts;
 
     /**
      * The strategy to determine the preference vector.
@@ -526,49 +505,17 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     protected Strategy strategy;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param epsilon Epsilon
+     * @param minpts Minpts
+     * @param strategy Strategy
      */
-    public Factory(Parameterization config) {
-      super(config);
-      config = config.descend(this);
-      // parameter min points
-      if(config.grab(MINPTS_PARAM)) {
-        minpts = MINPTS_PARAM.getValue();
-      }
-
-      // parameter epsilon
-      // todo: constraint auf positive werte
-      List<Double> defaultEps = new ArrayList<Double>();
-      defaultEps.add(DEFAULT_EPSILON.doubleValue());
-      EPSILON_PARAM.setDefaultValue(defaultEps);
-      if(config.grab(EPSILON_PARAM)) {
-        List<Double> eps_list = EPSILON_PARAM.getValue();
-        epsilon = new DoubleDistance[eps_list.size()];
-
-        for(int d = 0; d < eps_list.size(); d++) {
-          epsilon[d] = new DoubleDistance(eps_list.get(d));
-          if(epsilon[d].doubleValue() < 0) {
-            config.reportError(new WrongParameterValueException(EPSILON_PARAM, eps_list.toString()));
-          }
-        }
-      }
-
-      // parameter strategy
-      if(config.grab(STRATEGY_PARAM)) {
-        String strategyString = STRATEGY_PARAM.getValue();
-        if(strategyString.equals(Strategy.APRIORI.toString())) {
-          strategy = Strategy.APRIORI;
-        }
-        else if(strategyString.equals(Strategy.MAX_INTERSECTION.toString())) {
-          strategy = Strategy.MAX_INTERSECTION;
-        }
-        else {
-          config.reportError(new WrongParameterValueException(STRATEGY_PARAM, strategyString));
-        }
-      }
+    public Factory(DoubleDistance[] epsilon, int minpts, Strategy strategy) {
+      super();
+      this.epsilon = epsilon;
+      this.minpts = minpts;
+      this.strategy = strategy;
     }
 
     @Override
@@ -583,6 +530,78 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
      */
     public int getMinpts() {
       return minpts;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractParameterizer {
+      /**
+       * The epsilon value for each dimension;
+       */
+      protected DoubleDistance[] epsilon;
+
+      /**
+       * Threshold for minimum number of points in the neighborhood.
+       */
+      protected int minpts;
+
+      /**
+       * The strategy to determine the preference vector.
+       */
+      protected Strategy strategy;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        final IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+        if(config.grab(minptsP)) {
+          minpts = minptsP.getValue();
+        }
+
+        // parameter epsilon
+        // todo: constraint auf positive werte
+        List<Double> defaultEps = new ArrayList<Double>();
+        defaultEps.add(DEFAULT_EPSILON.doubleValue());
+        final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID, true);
+        epsilonP.setDefaultValue(defaultEps);
+        if(config.grab(epsilonP)) {
+          List<Double> eps_list = epsilonP.getValue();
+          epsilon = new DoubleDistance[eps_list.size()];
+
+          for(int d = 0; d < eps_list.size(); d++) {
+            epsilon[d] = new DoubleDistance(eps_list.get(d));
+            if(epsilon[d].doubleValue() < 0) {
+              config.reportError(new WrongParameterValueException(epsilonP, eps_list.toString()));
+            }
+          }
+        }
+
+        // parameter strategy
+        final StringParameter strategyP = new StringParameter(STRATEGY_ID, DEFAULT_STRATEGY.toString());
+        strategyP.addConstraint(new EqualStringConstraint(new String[] { Strategy.APRIORI.toString(), Strategy.MAX_INTERSECTION.toString() }));
+        if(config.grab(strategyP)) {
+          String strategyString = strategyP.getValue();
+          if(strategyString.equals(Strategy.APRIORI.toString())) {
+            strategy = Strategy.APRIORI;
+          }
+          else if(strategyString.equals(Strategy.MAX_INTERSECTION.toString())) {
+            strategy = Strategy.MAX_INTERSECTION;
+          }
+          else {
+            config.reportError(new WrongParameterValueException(strategyP, strategyString));
+          }
+        }
+      }
+
+      @Override
+      protected Factory<V> makeInstance() {
+        return new Factory<V>(epsilon, minpts, strategy);
+      }
     }
   }
 }

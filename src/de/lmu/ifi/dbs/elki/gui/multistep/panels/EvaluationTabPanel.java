@@ -54,9 +54,10 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
     algs.addObserver(this);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected synchronized void configureStep(Parameterization config) {
-    evals = new EvaluationStep<DatabaseObject>(config);
+    evals = config.tryInstantiate(EvaluationStep.class);
     if(config.getErrors().size() > 0) {
       evals = null;
     }

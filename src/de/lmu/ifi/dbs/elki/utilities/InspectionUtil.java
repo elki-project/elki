@@ -40,6 +40,8 @@ public class InspectionUtil {
   "org.junit.", "junit.", "org.hamcrest.",
   // Eclipse
   "org.eclipse.",
+  // ApiViz
+  "org.jboss.apiviz.",
   // JabRef
   "spin.", "osxadapter.", "antlr.", "ca.odell.", "com.jgoodies.", "com.michaelbaranov.", "com.mysql.", "gnu.dtools.", "net.sf.ext.", "net.sf.jabref.", "org.antlr.", "org.gjt.", "org.java.plugin.", "org.jempbox.", "org.pdfbox.", "wsi.ra.",
   // Wrappers don't have important own parameters, they just set some defaults

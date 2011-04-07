@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.parser.meta;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -25,17 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public abstract class RandomProjectionParser<V extends NumberVector<V, ?>> extends MetaParser<V> {
   /**
-   * Holds the desired cardinality of the subset of attributes selected for
-   * projection.
-   */
-  protected int k;
-
-  /**
-   * ID for the parameter {@link #NUMBER_SELECTED_ATTRIBUTES_PARAM}.
-   */
-  public static final OptionID NUMBER_SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("randomprojection.numberselected", "number of selected attributes");
-
-  /**
    * Parameter for the desired cardinality of the subset of attributes selected
    * for projection.
    * 
@@ -49,7 +39,13 @@ public abstract class RandomProjectionParser<V extends NumberVector<V, ?>> exten
    * Constraint: &ge;1
    * </p>
    */
-  private final IntParameter NUMBER_SELECTED_ATTRIBUTES_PARAM = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, new GreaterEqualConstraint(1), 1);
+  public static final OptionID NUMBER_SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("randomprojection.numberselected", "number of selected attributes");
+
+  /**
+   * Holds the desired cardinality of the subset of attributes selected for
+   * projection.
+   */
+  protected int k;
 
   /**
    * Holds a random object.
@@ -57,16 +53,33 @@ public abstract class RandomProjectionParser<V extends NumberVector<V, ?>> exten
   protected final Random random = new Random();
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param baseparser Base parser
+   * @param dim dimensionality
    */
-  public RandomProjectionParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(NUMBER_SELECTED_ATTRIBUTES_PARAM)) {
-      k = NUMBER_SELECTED_ATTRIBUTES_PARAM.getValue();
+  public RandomProjectionParser(Parser<V> baseparser, int dim) {
+    super(baseparser);
+    this.k = dim;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<V extends NumberVector<V, ?>> extends MetaParser.Parameterizer<V> {
+    protected int k = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter kP = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, new GreaterEqualConstraint(1), 1);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
     }
   }
 }

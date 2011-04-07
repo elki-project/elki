@@ -6,7 +6,7 @@
  * <ul>
  * <li>{@link de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction Primitive Distance Function}s that can be computed for any two objects.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction DBID Distance Function}s, that are only defined for object IDs, e.g. an external distance matrix</li>
- * <li>{@link de.lmu.ifi.dbs.elki.distance.distancefunction.PreprocessorBasedDistanceFunction Preprocessor-Based Distance Function}s, that require a preprocessing step, and are then valid for existing database objects.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction Index-Based Distance Function}s, that require an indexing/preprocessing step, and are then valid for existing database objects.</li>
  * </ul>
  * These types differ significantly in both implementation and use.</p>
  * 
@@ -28,6 +28,10 @@
  * DistanceQuery<V, DoubleDistance> distanceQuery = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
  * }</pre>
  * 
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.application.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.index.*
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 

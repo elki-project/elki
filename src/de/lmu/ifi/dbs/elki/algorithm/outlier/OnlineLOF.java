@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -27,13 +28,16 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Incremental version of the {@link LOF} Algorithm, supports insertions and removals.
+ * Incremental version of the {@link LOF} Algorithm, supports insertions and
+ * removals.
  * 
  * @author Elke Achtert
  * 
@@ -71,7 +75,7 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     KNNQuery<O, D> kNNReach = queries.getFirst().getSecond();
     RKNNQuery<O, D> rkNNRefer = queries.getSecond().getFirst();
     RKNNQuery<O, D> rkNNReach = queries.getSecond().getSecond();
-    
+
     LOFResult<O, D> lofResult = super.doRunInTime(database, kNNRefer, kNNReach, stepprog);
     lofResult.setRkNNRefer(rkNNRefer);
     lofResult.setRkNNReach(rkNNReach);
@@ -373,27 +377,54 @@ public class OnlineLOF<O extends DatabaseObject, D extends NumberDistance<D, ?>>
     }
   }
 
-  /**
-   * Factory method for {@link Parameterizable}.
-   * 
-   * @param config Parameterization
-   * @return OnlineLOF algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> OnlineLOF<O, D> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    DistanceFunction<O, D> reachabilityDistanceFunction = getParameterReachabilityDistanceFunction(config);
-    if(reachabilityDistanceFunction == null) {
-      reachabilityDistanceFunction = distanceFunction;
-    }
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new OnlineLOF<O, D>(k + (objectIsInKNN ? 0 : 1), distanceFunction, reachabilityDistanceFunction);
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    /**
+     * The neighborhood size to use
+     */
+    protected int k = 2;
+
+    /**
+     * Neighborhood distance function.
+     */
+    protected DistanceFunction<O, D> neighborhoodDistanceFunction = null;
+
+    /**
+     * Reachability distance function.
+     */
+    protected DistanceFunction<O, D> reachabilityDistanceFunction = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      final IntParameter pK = new IntParameter(K_ID, new GreaterConstraint(1));
+      if(config.grab(pK)) {
+        k = pK.getValue();
+      }
+
+      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+      if(config.grab(reachDistP)) {
+        reachabilityDistanceFunction = reachDistP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected OnlineLOF<O, D> makeInstance() {
+      // Default is to re-use the same distance
+      DistanceFunction<O, D> rdist = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : distanceFunction;
+      return new OnlineLOF<O, D>(k + (objectIsInKNN ? 0 : 1), distanceFunction, rdist);
+    }
   }
 }

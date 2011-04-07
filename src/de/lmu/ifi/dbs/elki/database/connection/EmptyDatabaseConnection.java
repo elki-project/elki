@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -18,7 +17,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("Empty Database")
 @Description("Dummy database implementation that cannot not contain any objects.")
 public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
-
   /**
    * Constructor.
    * 
@@ -37,14 +35,22 @@ public class EmptyDatabaseConnection<O extends DatabaseObject> extends AbstractD
   }
 
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return EmptyDatabaseConnection
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public static <O extends DatabaseObject> AbstractDatabaseConnection<O> parameterize(Parameterization config) {
-    AbstractDatabaseConnection.Parameters<O> p = AbstractDatabaseConnection.getParameters(config);
-    return new EmptyDatabaseConnection<O>(p.database);
-  }
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractDatabaseConnection.Parameterizer<O> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configDatabase(config);
+    }
 
+    @Override
+    protected EmptyDatabaseConnection<O> makeInstance() {
+      return new EmptyDatabaseConnection<O>(database);
+    }
+  }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -19,6 +20,7 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -32,41 +34,29 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * 
  * @apiviz.landmark
  * @apiviz.has PairCountingFMeasure
- * @apiviz.uses EvaluatePairCountingFMeasure.ScoreResult oneway - - «create»
- * 
- * @param <O> Database
+ * @apiviz.has EvaluatePairCountingFMeasure.ScoreResult oneway - - «create»
  */
-public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements Evaluator<O> {
+public class EvaluatePairCountingFMeasure implements Evaluator {
   /**
    * Logger for debug output.
    */
   protected static final Logging logger = Logging.getLogger(JudgeOutlierScores.class);
 
   /**
-   * OptionID for {@link #REFERENCE_PARAM}
+   * Parameter to obtain the reference clustering. Defaults to a flat label
+   * clustering.
    */
   public static final OptionID REFERENCE_ID = OptionID.getOrCreateOptionID("paircounting.reference", "Reference clustering to compare with. Defaults to a by-label clustering.");
 
   /**
-   * Parameter to obtain the reference clustering. Defaults to a flat label
-   * clustering.
-   */
-  private final ObjectParameter<Algorithm<O, ?>> REFERENCE_PARAM = new ObjectParameter<Algorithm<O, ?>>(REFERENCE_ID, Algorithm.class, ByLabelClustering.class);
-
-  /**
-   * OptionID for {@link #NOISE_FLAG}
+   * Parameter flag for special noise handling.
    */
   public static final OptionID NOISE_ID = OptionID.getOrCreateOptionID("paircounting.noisespecial", "Use special handling for noise clusters.");
 
   /**
-   * Parameter flag for special noise handling.
-   */
-  private final Flag NOISE_FLAG = new Flag(NOISE_ID);
-
-  /**
    * Reference algorithm.
    */
-  private Algorithm<O, ?> referencealg;
+  private Algorithm<?, ?> referencealg;
 
   /**
    * Apply special handling to noise "clusters".
@@ -76,28 +66,24 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
   /**
    * Constructor.
    * 
-   * @param config Parameters
+   * @param referencealg Reference clustering
+   * @param noiseSpecialHandling Noise handling flag
    */
-  public EvaluatePairCountingFMeasure(Parameterization config) {
+  public EvaluatePairCountingFMeasure(Algorithm<?, ?> referencealg, boolean noiseSpecialHandling) {
     super();
-    config = config.descend(this);
-    if(config.grab(REFERENCE_PARAM)) {
-      referencealg = REFERENCE_PARAM.instantiateClass(config);
-    }
-    if(config.grab(NOISE_FLAG)) {
-      noiseSpecialHandling = NOISE_FLAG.getValue();
-    }
+    this.referencealg = referencealg;
+    this.noiseSpecialHandling = noiseSpecialHandling;
   }
 
   @Override
-  public void processResult(Database<O> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs == null || crs.size() < 1) {
       // logger.warning("No clustering results found - nothing to evaluate!");
       return;
     }
     // Compute the reference clustering
-    Result refres = referencealg.run(db);
+    Result refres = tryReferenceClustering(db);
     List<Clustering<?>> refcrs = ResultUtil.getClusteringResults(refres);
     if(refcrs.size() == 0) {
       logger.warning("Reference algorithm did not return a clustering result!");
@@ -123,8 +109,20 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
     }
   }
 
+  /**
+   * Try to run the reference clustering algorithm.
+   * 
+   * @param db Database
+   * @return clustering result
+   */
+  private Result tryReferenceClustering(Database<?> db) {
+    @SuppressWarnings("unchecked")
+    Result refres = ((ClusteringAlgorithm<?, DatabaseObject>) referencealg).run((Database<DatabaseObject>) db);
+    return refres;
+  }
+
   @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
     // Nothing to do.
   }
 
@@ -141,6 +139,38 @@ public class EvaluatePairCountingFMeasure<O extends DatabaseObject> implements E
      */
     public ScoreResult(Collection<Vector> col) {
       super("Pair Counting F-Measure", "pair-fmeasure", col);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected Algorithm<?, ?> referencealg = null;
+
+    protected boolean noiseSpecialHandling = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<ClusteringAlgorithm<?, ?>> referencealgP = new ObjectParameter<ClusteringAlgorithm<?, ?>>(REFERENCE_ID, ClusteringAlgorithm.class, ByLabelClustering.class);
+      if(config.grab(referencealgP)) {
+        referencealg = referencealgP.instantiateClass(config);
+      }
+
+      Flag noiseSpecialHandlingF = new Flag(NOISE_ID);
+      if(config.grab(noiseSpecialHandlingF)) {
+        noiseSpecialHandling = noiseSpecialHandlingF.getValue();
+      }
+    }
+
+    @Override
+    protected EvaluatePairCountingFMeasure makeInstance() {
+      return new EvaluatePairCountingFMeasure(referencealg, noiseSpecialHandling);
     }
   }
 }

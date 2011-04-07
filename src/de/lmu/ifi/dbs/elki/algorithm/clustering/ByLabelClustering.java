@@ -18,8 +18,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
@@ -170,31 +170,40 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
     }
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
-   */
-  public static <O extends DatabaseObject> ByLabelClustering<O> parameterize(Parameterization config) {
-    boolean multiple = false;
-    final Flag multipleflag = new Flag(MULTIPLE_ID);
-    if(config.grab(multipleflag)) {
-      multiple = multipleflag.getValue();
-    }
-    Pattern noisepat = null;
-    final PatternParameter noiseparam = new PatternParameter(NOISE_ID, true);
-    if(config.grab(noiseparam)) {
-      noisepat = noiseparam.getValue();
-    }
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new ByLabelClustering<O>(multiple, noisepat);
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    protected boolean multiple;
+
+    protected Pattern noisepat;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Flag multipleF = new Flag(MULTIPLE_ID);
+      if(config.grab(multipleF)) {
+        multiple = multipleF.getValue();
+      }
+
+      PatternParameter noisepatP = new PatternParameter(NOISE_ID, true);
+      if(config.grab(noisepatP)) {
+        noisepat = noisepatP.getValue();
+      }
+    }
+
+    @Override
+    protected ByLabelClustering<O> makeInstance() {
+      return new ByLabelClustering<O>(multiple, noisepat);
+    }
   }
 }

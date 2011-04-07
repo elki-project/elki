@@ -148,7 +148,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
       predef.addParameter(LOF.REACHABILITY_DISTANCE_FUNCTION_ID, d);
       ChainedParameterization chain = new ChainedParameterization(predef, track);
       chain.errorsTo(config);
-      chain.tryInstantiate(LOF.class, LOF.class);
+      chain.tryInstantiate(LOF.class);
       predef.reportInternalParameterizationErrors(config);
       lofparams = track.getGivenParameters();
     }
@@ -184,7 +184,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
         }
         // logger.verbose(config.toString());
         Class<LOF<O, D>> lofcls = ClassGenericsUtil.uglyCastIntoSubclass(LOF.class);
-        LOF<O, D> lof = config.tryInstantiate(lofcls, lofcls);
+        LOF<O, D> lof = config.tryInstantiate(lofcls);
         config.failOnErrors();
 
         // run LOF and collect the result

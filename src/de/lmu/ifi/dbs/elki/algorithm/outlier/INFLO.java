@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -28,9 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -61,7 +60,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(INFLO.class);
-  
+
   /**
    * Parameter to specify if any object is a Core Object must be a double
    * greater than 0.0
@@ -96,11 +95,12 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
   /**
    * Constructor with parameters.
    * 
+   * @param distanceFunction Distance function in use
    * @param m m Parameter
    * @param k k Parameter
    */
-  public INFLO(double m, int k) {
-    super(new EmptyParameterization());
+  public INFLO(DistanceFunction<? super O, D> distanceFunction, double m, int k) {
+    super(distanceFunction);
     this.m = m;
     this.k = k;
   }
@@ -124,14 +124,14 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     }
 
     // TODO: use kNN preprocessor?
-    KNNQuery<O,D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
 
     for(DBID id : database) {
       // if not visited count=0
       int count = rnns.get(id).size();
       ModifiableDBIDs s;
       if(!processedIDs.contains(id)) {
-        // TODO: use exactly k neighbors? 
+        // TODO: use exactly k neighbors?
         List<DistanceResultPair<D>> list = knnQuery.getKNNForDBID(id, k);
         for(DistanceResultPair<D> d : list) {
           knns.get(id).add(d.getID());
@@ -146,7 +146,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
       }
       for(DBID q : s) {
         if(!processedIDs.contains(q)) {
-          // TODO: use exactly k neighbors? 
+          // TODO: use exactly k neighbors?
           List<DistanceResultPair<D>> listQ = knnQuery.getKNNForDBID(q, k);
           for(DistanceResultPair<D> dq : listQ) {
             knns.get(q).add(dq.getID());
@@ -201,51 +201,40 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return INFLO Outlier Algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> INFLO<O, D> parameterize(Parameterization config) {
-    double m = getParameterM(config);
-    int k = getParameterK(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new INFLO<O, D>(m, k);
-  }
-
-  /**
-   * Get parameter k
-   * 
-   * @param config Parameterization
-   * @return k value
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(1));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 0;
-  }
-
-  /**
-   * Get parameter m.
-   * 
-   * @param config Parameterization
-   * @return m value
-   */
-  protected static double getParameterM(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(M_ID, new GreaterConstraint(0.0), 1.0);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 0.0;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    protected double m = 1.0;
+
+    protected int k = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter mP = new DoubleParameter(M_ID, new GreaterConstraint(0.0), 1.0);
+      if(config.grab(mP)) {
+        m = mP.getValue();
+      }
+
+      final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+    }
+
+    @Override
+    protected INFLO<O, D> makeInstance() {
+      return new INFLO<O, D>(distanceFunction, m, k);
+    }
   }
 }

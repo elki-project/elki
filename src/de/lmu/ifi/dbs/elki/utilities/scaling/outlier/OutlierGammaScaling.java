@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -21,18 +22,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 public class OutlierGammaScaling implements OutlierScalingFunction {
   /**
-   * Option to normalize data before fitting the gamma curve.
-   */
-  private static final OptionID NORMALIZE_ID = OptionID.getOrCreateOptionID("gammascale.normalize", "Regularize scores before using Gamma scaling.");
-
-  /**
    * Normalization flag.
    * 
    * <pre>
    * -gammascale.normalize
    * </pre>
    */
-  Flag NORMALIZE_FLAG = new Flag(NORMALIZE_ID);
+  public static final OptionID NORMALIZE_ID = OptionID.getOrCreateOptionID("gammascale.normalize", "Regularize scores before using Gamma scaling.");
 
   /**
    * Gamma parameter k
@@ -60,17 +56,13 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
   OutlierScoreMeta meta = null;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param normalize Normalization flag
    */
-  public OutlierGammaScaling(Parameterization config) {
+  public OutlierGammaScaling(boolean normalize) {
     super();
-    config = config.descend(this);
-    if(config.grab(NORMALIZE_FLAG)) {
-      normalize = NORMALIZE_FLAG.getValue();
-    }
+    this.normalize = normalize;
   }
 
   @Override
@@ -135,5 +127,30 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
   @Override
   public double getMax() {
     return 1.0;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected boolean normalize = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Flag normalizeF = new Flag(NORMALIZE_ID);
+      if(config.grab(normalizeF)) {
+        normalize = normalizeF.getValue();
+      }
+    }
+
+    @Override
+    protected OutlierGammaScaling makeInstance() {
+      return new OutlierGammaScaling(normalize);
+    }
   }
 }

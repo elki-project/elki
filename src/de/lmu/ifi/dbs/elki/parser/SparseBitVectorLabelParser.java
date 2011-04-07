@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -34,16 +35,13 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
   private static final Logging logger = Logging.getLogger(SparseBitVectorLabelParser.class);
   
   /**
-   * Provides a parser for parsing one sparse BitVector per line, where the
-   * indices of the one-bits are separated by whitespace.
-   * <p/>
-   * Several labels may be given per BitVector, a label must not be parseable as
-   * an Integer. Lines starting with &quot;#&quot; will be ignored.
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param colSep
+   * @param quoteChar
    */
-  public SparseBitVectorLabelParser(Parameterization config) {
-    super(config);
+  public SparseBitVectorLabelParser(Pattern colSep, char quoteChar) {
+    super(colSep, quoteChar);
   }
 
   @Override
@@ -95,5 +93,24 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParser.Parameterizer<BitVector> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+
+    @Override
+    protected SparseBitVectorLabelParser makeInstance() {
+      return new SparseBitVectorLabelParser(colSep, quoteChar);
+    }
   }
 }

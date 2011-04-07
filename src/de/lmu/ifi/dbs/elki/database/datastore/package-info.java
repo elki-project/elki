@@ -16,5 +16,7 @@
  * // Storage for the outlier score of each ID. 
  * final WritableDataStore<Double> scores = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
  * }</pre>
+ * 
+ * @apiviz.exclude datastore.memory
  */
 package de.lmu.ifi.dbs.elki.database.datastore;

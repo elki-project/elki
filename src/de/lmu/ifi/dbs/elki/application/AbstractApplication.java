@@ -1,14 +1,16 @@
 package de.lmu.ifi.dbs.elki.application;
 
-import java.lang.reflect.Constructor;
+import java.io.File;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -18,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
@@ -52,44 +55,20 @@ public abstract class AbstractApplication implements Parameterizable {
   public static final String INFORMATION = "ELKI Version 0.3 (2010, March)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "Elke Achtert, Hans-Peter Kriegel, Lisa Reichert, Erich Schubert, Remigius Wojdanowski, Arthur Zimek:" + NEWLINE + "Visual Evaluation of Outlier Detection Models." + NEWLINE + "In Proc. 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010." + NEWLINE;
 
   /**
-   * Flag to obtain help-message.
+   * Parameter that specifies the name of the output file.
    * <p>
-   * Key: {@code -h}
+   * Key: {@code -app.out}
    * </p>
    */
-  private static final Flag HELP_FLAG = new Flag(OptionID.HELP);
+  public static final OptionID OUTPUT_ID = OptionID.getOrCreateOptionID("app.out", "");
 
   /**
-   * Flag to obtain help-message.
+   * Parameter that specifies the name of the input file.
    * <p>
-   * Key: {@code -help}
+   * Key: {@code -app.in}
    * </p>
    */
-  private static final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
-
-  /**
-   * Optional Parameter to specify a class to obtain a description for.
-   * <p>
-   * Key: {@code -description}
-   * </p>
-   */
-  private static final ClassParameter<Object> DESCRIPTION_PARAM = new ClassParameter<Object>(OptionID.DESCRIPTION, Object.class, true);
-
-  /**
-   * Optional Parameter to specify a class to enable debugging for.
-   * <p>
-   * Key: {@code -enableDebug}
-   * </p>
-   */
-  private static final StringParameter DEBUG_PARAM = new StringParameter(OptionID.DEBUG, true);
-
-  /**
-   * Flag to allow verbose messages while running the application.
-   * <p>
-   * Key: {@code -verbose}
-   * </p>
-   */
-  private final Flag VERBOSE_FLAG = new Flag(OptionID.ALGORITHM_VERBOSE);
+  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("app.in", "");
 
   /**
    * Value of verbose flag.
@@ -97,22 +76,11 @@ public abstract class AbstractApplication implements Parameterizable {
   private boolean verbose;
 
   /**
-   * Tracks the parameters.
-   */
-  protected static TrackParameters config;
-
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param verbose Verbose flag.
    */
-  protected AbstractApplication(Parameterization config) {
-    config = config.descend(this);
-    // Verbose flag.
-    if(config.grab(VERBOSE_FLAG)) {
-      verbose = VERBOSE_FLAG.getValue();
-    }
+  public AbstractApplication(boolean verbose) {
     if(verbose) {
       // Note: do not unset verbose if not --verbose - someone else might
       // have set it intentionally. So don't setVerbose(verbose)!
@@ -140,6 +108,11 @@ public abstract class AbstractApplication implements Parameterizable {
    * @param args the arguments to run this application with
    */
   public static void runCLIApplication(Class<?> cls, String[] args) {
+    final Flag HELP_FLAG = new Flag(OptionID.HELP);
+    final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
+    final ClassParameter<Object> DESCRIPTION_PARAM = new ClassParameter<Object>(OptionID.DESCRIPTION, Object.class, true);
+    final StringParameter DEBUG_PARAM = new StringParameter(OptionID.DEBUG, true);
+
     SerializedParameterization params = new SerializedParameterization(args);
     try {
       params.grab(HELP_FLAG);
@@ -165,9 +138,8 @@ public abstract class AbstractApplication implements Parameterizable {
       return;
     }
     try {
-      config = new TrackParameters(params);
-      Constructor<?> constructor = cls.getConstructor(Parameterization.class);
-      AbstractApplication task = (AbstractApplication) (constructor.newInstance(config));
+      TrackParameters config = new TrackParameters(params);
+      AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
       if((HELP_FLAG.isDefined() && HELP_FLAG.getValue()) || (HELP_LONG_FLAG.isDefined() && HELP_LONG_FLAG.getValue())) {
         LoggingConfiguration.setVerbose(true);
@@ -251,4 +223,93 @@ public abstract class AbstractApplication implements Parameterizable {
    *         an error occurs during running the application
    */
   public abstract void run() throws UnableToComplyException;
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer extends AbstractParameterizer {
+    /**
+     * Verbose flag
+     */
+    protected boolean verbose = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configVerbose(config);
+      // Note: we do not run the other methods by default.
+      // Only verbose will always be present!
+    }
+
+    /**
+     * Get the verbose parameter.
+     * 
+     * @param config Parameterization
+     */
+    protected void configVerbose(Parameterization config) {
+      final Flag verboseF = new Flag(OptionID.ALGORITHM_VERBOSE);
+      if(config.grab(verboseF)) {
+        verbose = verboseF.getValue();
+      }
+    }
+
+    /**
+     * Get the output file parameter.
+     * 
+     * @param config Options
+     * @return Output file
+     */
+    protected File getParameterOutputFile(Parameterization config) {
+      return getParameterOutputFile(config, "Output filename.");
+    }
+
+    /**
+     * Get the output file parameter.
+     * 
+     * @param config Options
+     * @param description Short description
+     * @return Output file
+     */
+    protected File getParameterOutputFile(Parameterization config, String description) {
+      final FileParameter outputP = new FileParameter(OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
+      outputP.setShortDescription(description);
+      if(config.grab(outputP)) {
+        return outputP.getValue();
+      }
+      return null;
+    }
+
+    /**
+     * Get the input file parameter.
+     * 
+     * @param config Options
+     * @return Input file
+     */
+    protected File getParameterInputFile(Parameterization config) {
+      return getParameterInputFile(config, "Input filename.");
+    }
+
+    /**
+     * Get the input file parameter
+     * 
+     * @param config Options
+     * @param description Description
+     * @return Input file
+     */
+    protected File getParameterInputFile(Parameterization config, String description) {
+      final FileParameter inputP = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
+      inputP.setShortDescription(description);
+      if(config.grab(inputP)) {
+        return inputP.getValue();
+      }
+      return null;
+    }
+
+    @Override
+    protected abstract AbstractApplication makeInstance();
+  }
 }

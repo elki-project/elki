@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -22,6 +21,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -41,24 +41,12 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @apiviz.landmark
  * @apiviz.has ScoreResult oneway - - «create»
- * 
- * @param <O> Database object type
  */
-public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O> {
+public class JudgeOutlierScores implements Evaluator {
   /**
    * Logger for debug output.
    */
   protected static final Logging logger = Logging.getLogger(JudgeOutlierScores.class);
-  
-  /**
-   * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("comphist.positive", "Class label for the 'positive' class.");
-
-  /**
-   * OptionID for {@link #SCALING_PARAM}
-   */
-  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("comphist.scaling", "Class to use as scaling function.");
 
   /**
    * The distance function to determine the reachability distance between
@@ -70,7 +58,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
    * Key: {@code -comphist.positive}
    * </p>
    */
-  private final PatternParameter POSITIVE_CLASS_NAME_PARAM = new PatternParameter(POSITIVE_CLASS_NAME_ID);
+  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("comphist.positive", "Class label for the 'positive' class.");
 
   /**
    * Parameter to specify a scaling function to use.
@@ -78,12 +66,12 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("comphist.scaling", "Class to use as scaling function.");
 
   /**
    * Stores the "positive" class.
    */
-  private Pattern positive_class_name;
+  private Pattern positiveClassName;
 
   /**
    * Scaling function to use
@@ -93,17 +81,13 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
   /**
    * Constructor.
    * 
-   * @param config Parameters
+   * @param positive_class_name Positive class name
+   * @param scaling Scaling function
    */
-  public JudgeOutlierScores(Parameterization config) {
+  public JudgeOutlierScores(Pattern positive_class_name, ScalingFunction scaling) {
     super();
-    config = config.descend(this);
-    if(config.grab(POSITIVE_CLASS_NAME_PARAM)) {
-      positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
-    }
-    if(config.grab(SCALING_PARAM)) {
-      scaling = SCALING_PARAM.instantiateClass(config);
-    }
+    this.positiveClassName = positive_class_name;
+    this.scaling = scaling;
   }
 
   /**
@@ -116,7 +100,7 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
    * @return Outlier score result
    * @throws IllegalStateException
    */
-  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, Database<O> database, OutlierResult or) throws IllegalStateException {
+  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, Database<?> database, OutlierResult or) throws IllegalStateException {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(database.getIDs(), or);
@@ -164,27 +148,27 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
   }
 
   @Override
-  public void processResult(Database<O> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if(ors == null || ors.size() <= 0) {
       // logger.warning("No results found for "+JudgeOutlierScores.class.getSimpleName());
       return;
     }
-    
+
     ModifiableDBIDs ids = DBIDUtil.newHashSet(db.getIDs());
-    DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positive_class_name);
+    DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
     ids.removeDBIDs(outlierIds);
 
-    for (OutlierResult or : ors) {
+    for(OutlierResult or : ors) {
       hierarchy.add(or, computeScore(ids, outlierIds, db, or));
     }
   }
 
   @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
     // Normalizations are ignored.
   }
-  
+
   /**
    * Result object for outlier score judgements.
    * 
@@ -198,6 +182,44 @@ public class JudgeOutlierScores<O extends DatabaseObject> implements Evaluator<O
      */
     public ScoreResult(Collection<Vector> col) {
       super("Outlier Score", "outlier-score", col);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Stores the "positive" class.
+     */
+    private Pattern positiveClassName;
+
+    /**
+     * Scaling function to use
+     */
+    private ScalingFunction scaling;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
+      if(config.grab(positiveClassNameP)) {
+        positiveClassName = positiveClassNameP.getValue();
+      }
+
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+      if(config.grab(scalingP)) {
+        scaling = scalingP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected JudgeOutlierScores makeInstance() {
+      return new JudgeOutlierScores(positiveClassName, scaling);
     }
   }
 }

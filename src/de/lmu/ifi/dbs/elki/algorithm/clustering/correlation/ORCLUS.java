@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -72,19 +73,14 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("orclus.alpha", "The factor for reducing the number of current clusters in each iteration.");
 
   /**
-   * Holds the value of {@link #ALPHA_ID}.
-   */
-  private double alpha;
-
-  /**
-   * The PCA utility object.
-   */
-  private PCARunner<V, DoubleDistance> pca;
-
-  /**
    * Parameter to specify the random generator seed.
    */
   public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("orclus.seed", "The random number generator seed.");
+
+  /**
+   * Holds the value of {@link #ALPHA_ID}.
+   */
+  private double alpha;
 
   /**
    * Holds the value of {@link #SEED_ID}.
@@ -92,26 +88,25 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   private Long seed;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * The PCA utility object.
    */
-  public ORCLUS(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // parameter alpha
-    final DoubleParameter alphaparam = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), 0.5);
-    if(config.grab(alphaparam)) {
-      alpha = alphaparam.getValue();
-    }
-    // Seed parameter
-    final LongParameter seedparam = new LongParameter(SEED_ID, true);
-    if(config.grab(seedparam)) {
-      seed = seedparam.getValue();
-    }
-    // TODO: make configurable, to allow using stabilized PCA
-    pca = new PCARunner<V, DoubleDistance>(config);
+  private PCARunner<V, DoubleDistance> pca;
+
+  /**
+   * Java constructor.
+   * 
+   * @param k k Parameter
+   * @param k_i k_i Parameter
+   * @param l l Parameter
+   * @param alpha Alpha Parameter
+   * @param seed Seed parameter
+   * @param pca PCA runner
+   */
+  public ORCLUS(int k, int k_i, int l, double alpha, long seed, PCARunner<V, DoubleDistance> pca) {
+    super(k, k_i, l);
+    this.alpha = alpha;
+    this.seed = seed;
+    this.pca = pca;
   }
 
   /**
@@ -121,15 +116,11 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
     try {
       DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
-      final int dim = getL();
-      final int k = getK();
-      final int k_i = getK_i();
-
       // current dimensionality associated with each seed
       int dim_c = DatabaseUtil.dimensionality(database);
 
-      if(dim_c < dim) {
-        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + dim_c + " < " + dim + ")");
+      if(dim_c < l) {
+        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + dim_c + " < " + l + ")");
       }
 
       // current number of seeds
@@ -138,7 +129,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
       // pick k0 > k points from the database
       List<ORCLUSCluster> clusters = initialSeeds(database, k_c);
 
-      double beta = StrictMath.exp(-StrictMath.log((double) dim_c / (double) dim) * StrictMath.log(1 / alpha) / StrictMath.log((double) k_c / (double) k));
+      double beta = StrictMath.exp(-StrictMath.log((double) dim_c / (double) l) * StrictMath.log(1 / alpha) / StrictMath.log((double) k_c / (double) k));
 
       IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Current number of clusters:", logger) : null;
 
@@ -160,7 +151,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
         // reduce number of seeds and dimensionality associated with
         // each seed
         k_c = (int) Math.max(k, k_c * alpha);
-        dim_c = (int) Math.max(dim, dim_c * beta);
+        dim_c = (int) Math.max(l, dim_c * beta);
         merge(database, distFunc, clusters, k_c, dim_c, cprogress);
       }
       assign(database, distFunc, clusters);
@@ -446,6 +437,11 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     return factory.newInstance(values);
   }
 
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
+
   /**
    * Encapsulates the attributes of a cluster.
    * 
@@ -532,8 +528,51 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     }
   }
 
-  @Override
-  protected Logging getLogger() {
-    return logger;
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractProjectedClustering.Parameterizer {
+    protected double alpha = -1;
+
+    protected Long seed = null;
+
+    protected PCARunner<V, DoubleDistance> pca = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configK(config);
+      configKI(config);
+      configL(config);
+      configAlpha(config);
+      configSeed(config);
+
+      // TODO: make configurable, to allow using stabilized PCA
+      Class<PCARunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCARunner.class);
+      pca = config.tryInstantiate(cls);
+    }
+
+    protected void configAlpha(Parameterization config) {
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), 0.5);
+      if(config.grab(alphaP)) {
+        alpha = alphaP.getValue();
+      }
+    }
+
+    protected void configSeed(Parameterization config) {
+      LongParameter seedP = new LongParameter(SEED_ID, true);
+      if(config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
+    }
+
+    @Override
+    protected ORCLUS<V> makeInstance() {
+      return new ORCLUS<V>(k, k_i, l, alpha, seed, pca);
+    }
   }
 }

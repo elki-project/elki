@@ -3,9 +3,10 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 
 /**
  * The <code>CompositeEigenPairFilter</code> can be used to build a chain of
@@ -16,11 +17,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParamete
 // todo parameter comments
 public class CompositeEigenPairFilter implements EigenPairFilter {
   /**
-   * OptionID for {@link #FILTERS_PARAM}
+   * The list of filters to use.
    */
   public static final OptionID EIGENPAIR_FILTER_COMPOSITE_LIST = OptionID.getOrCreateOptionID("pca.filter.composite.list", "A comma separated list of the class names of the filters to be used. " + "The specified filters will be applied sequentially in the given order.");
-
-  private final ClassListParameter<EigenPairFilter> FILTERS_PARAM = new ClassListParameter<EigenPairFilter>(EIGENPAIR_FILTER_COMPOSITE_LIST, EigenPairFilter.class);
 
   /**
    * The filters to be applied.
@@ -28,18 +27,13 @@ public class CompositeEigenPairFilter implements EigenPairFilter {
   private List<EigenPairFilter> filters;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param filters Filters to use.
    */
-  public CompositeEigenPairFilter(Parameterization config) {
+  public CompositeEigenPairFilter(List<EigenPairFilter> filters) {
     super();
-    config = config.descend(this);
-
-    if (config.grab(FILTERS_PARAM)) {
-      filters = FILTERS_PARAM.instantiateClasses(config);
-    }
+    this.filters = filters;
   }
 
   /**
@@ -58,5 +52,34 @@ public class CompositeEigenPairFilter implements EigenPairFilter {
       eigenPairs = new SortedEigenPairs(result.getStrongEigenPairs());
     }
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The filters to be applied.
+     */
+    private List<EigenPairFilter> filters = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectListParameter<EigenPairFilter> filtersP = new ObjectListParameter<EigenPairFilter>(EIGENPAIR_FILTER_COMPOSITE_LIST, EigenPairFilter.class);
+
+      if(config.grab(filtersP)) {
+        filters = filtersP.instantiateClasses(config);
+      }
+    }
+
+    @Override
+    protected CompositeEigenPairFilter makeInstance() {
+      return new CompositeEigenPairFilter(filters);
+    }
   }
 }

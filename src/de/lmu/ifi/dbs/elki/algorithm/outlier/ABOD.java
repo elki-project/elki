@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -580,77 +579,45 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     }
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return ABOD Algorithm
-   */
-  public static <V extends NumberVector<V, ?>> ABOD<V> parameterize(Parameterization config) {
-    // k parameter
-    int k = getParameterK(config);
-    // sample size
-    int sampleSize = getParameterFastSampling(config);
-    // kernel function
-    PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction = getParameterKernelFunction(config);
-    // distance used in preprocessor
-    DistanceFunction<V, DoubleDistance> distanceFunction = getParameterDistanceFunction(config);
-
-    if(config.hasErrors()) {
-      return null;
-    }
-    if(sampleSize > 0) {
-      return new ABOD<V>(k, sampleSize, primitiveKernelFunction, distanceFunction);
-    }
-    else {
-      return new ABOD<V>(k, primitiveKernelFunction, distanceFunction);
-    }
-  }
-
-  /**
-   * Grab the 'k' configuration option.
-   * 
-   * @param config Parameterization
-   * @return k Parameter
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID, new GreaterEqualConstraint(1), 30);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
-  /**
-   * Grab the sampling configuration option.
-   * 
-   * @param config Parameterization
-   * @return sampling value or -1
-   */
-  protected static int getParameterFastSampling(Parameterization config) {
-    final IntParameter param = new IntParameter(FAST_SAMPLE_ID, new GreaterEqualConstraint(1), true);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
-  /**
-   * Grab the kernel function configuration option.
-   * 
-   * @param config Parameterization
-   * @return kernel function
-   */
-  protected static <V extends NumberVector<V, ?>> PrimitiveSimilarityFunction<V, DoubleDistance> getParameterKernelFunction(Parameterization config) {
-    final ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>> param = new ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, PrimitiveSimilarityFunction.class, PolynomialKernelFunction.class);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, DoubleDistance> {
+    protected int k = 0;
+
+    protected int sampleSize = 0;
+
+    protected PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter kP = new IntParameter(K_ID, new GreaterEqualConstraint(1), 30);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+      final IntParameter sampleSizeP = new IntParameter(FAST_SAMPLE_ID, new GreaterEqualConstraint(1), true);
+      if(config.grab(sampleSizeP)) {
+        sampleSize = sampleSizeP.getValue();
+      }
+      final ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>> param = new ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, PrimitiveSimilarityFunction.class, PolynomialKernelFunction.class);
+      if(config.grab(param)) {
+        primitiveKernelFunction = param.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected ABOD<V> makeInstance() {
+      return new ABOD<V>(k, sampleSize, primitiveKernelFunction, distanceFunction);
+    }
   }
 }

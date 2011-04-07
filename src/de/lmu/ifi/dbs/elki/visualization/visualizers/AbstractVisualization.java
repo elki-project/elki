@@ -14,8 +14,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
  * Abstract base class for visualizations.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.excludeSubtypes
  */
 public abstract class AbstractVisualization<O extends DatabaseObject> implements Visualization, ContextChangeListener, ResultListener {
   /**

@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectin
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -30,16 +29,16 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -62,7 +61,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SOD.class);
-  
+
   /**
    * The association id to associate a subspace outlier degree.
    */
@@ -81,15 +80,15 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   public static final OptionID KNN_ID = OptionID.getOrCreateOptionID("sod.knn", "The number of shared nearest neighbors to be considered for learning the subspace properties.");
 
   /**
-   * Holds the value of {@link #KNN_ID}.
-   */
-  private int knn;
-
-  /**
    * Parameter to indicate the multiplier for the discriminance value for
    * discerning small from large variances.
    */
   public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("sod.alpha", "The multiplier for the discriminance value for discerning small from large variances.");
+
+  /**
+   * Holds the value of {@link #KNN_ID}.
+   */
+  private int knn;
 
   /**
    * Holds the value of {@link #ALPHA_ID}.
@@ -248,13 +247,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
      * @return sod value
      */
     private double subspaceOutlierDegree(O queryObject, O center, BitSet weightVector) {
-      ListParameterization params = new ListParameterization();
-      // params.addParameter(AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID,
-      // weightVector);
-      final DimensionsSelectingEuclideanDistanceFunction DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction(params);
-      params.logAndClearReportedErrors();
-      DISTANCE_FUNCTION.setSelectedDimensions(weightVector);
-      double distance = DISTANCE_FUNCTION.distance(queryObject, center).doubleValue();
+      final DimensionsSelectingEuclideanDistanceFunction df = new DimensionsSelectingEuclideanDistanceFunction(weightVector);
+      double distance = df.distance(queryObject, center).doubleValue();
       distance /= weightVector.cardinality();
       return distance;
     }
@@ -329,55 +323,54 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     }
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> SOD<V, D> parameterize(Parameterization config) {
-    int knn = getParameterKNN(config);
-
-    double alpha = getParameterAlpha(config);
-
-    SharedNearestNeighborSimilarityFunction<V, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<V, D>(config);
-
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new SOD<V, D>(knn, alpha, similarityFunction);
-  }
-
-  /**
-   * Get the alpha parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return alpha parameter
-   */
-  protected static double getParameterAlpha(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(ALPHA_ID, new GreaterConstraint(0), 1.1);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return Double.NaN;
-  }
-
-  /**
-   * Get the k parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return k parameter
-   */
-  protected static int getParameterKNN(Parameterization config) {
-    final IntParameter param = new IntParameter(KNN_ID, new GreaterConstraint(0), 1);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractParameterizer {
+    /**
+     * Holds the value of {@link #KNN_ID}.
+     */
+    private int knn = 1;
+
+    /**
+     * Holds the value of {@link #ALPHA_ID}.
+     */
+    private double alpha = 1.1;
+
+    /**
+     * The similarity function.
+     */
+    private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter knnP = new IntParameter(KNN_ID, new GreaterConstraint(0), 1);
+      if(config.grab(knnP)) {
+        knn = knnP.getValue();
+      }
+
+      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new GreaterConstraint(0), 1.1);
+      if(config.grab(alphaP)) {
+        alpha = alphaP.getValue();
+      }
+
+      Class<SharedNearestNeighborSimilarityFunction<V, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
+      similarityFunction = config.tryInstantiate(cls);
+    }
+
+    @Override
+    protected SOD<V, D> makeInstance() {
+      return new SOD<V, D>(knn, alpha, similarityFunction);
+    }
   }
 }

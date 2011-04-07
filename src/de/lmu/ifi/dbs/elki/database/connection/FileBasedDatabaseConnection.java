@@ -7,11 +7,9 @@ import java.io.InputStream;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -52,63 +50,35 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
   }
 
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return FileBasedDatabaseConnection
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public static <O extends DatabaseObject> FileBasedDatabaseConnection<O> parameterize(Parameterization config) {
-    Parameters<O> p = getParameters(config, Parser.class, DoubleVectorLabelParser.class);
+  public static class Parameterizer<O extends DatabaseObject> extends InputStreamDatabaseConnection.Parameterizer<O> {
+    protected InputStream inputStream;
 
-    if(config.hasErrors()) {
-      return null;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      // Add the input file first, for usability reasons.
+      final FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
+      if(config.grab(inputParam)) {
+        try {
+          inputStream = new FileInputStream(inputParam.getValue());
+          inputStream = FileUtil.tryGzipInput(inputStream);
+        }
+        catch(IOException e) {
+          config.reportError(new WrongParameterValueException(inputParam, inputParam.getValue().getPath(), e));
+          inputStream = null;
+        }
+      }
+      super.makeOptions(config);
     }
 
-    return new FileBasedDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, p.parser, p.startid, p.seed, p.in);
-  }
-
-  /**
-   * Convenience method for getting parameter values.
-   * 
-   * @param <O> the type of DatabaseObject to be provided
-   * @param config the parameterization
-   * @param parserRestrictionClass the restriction class for the parser
-   * @param parserDefaultValue the default value for the parser
-   * @return parameter values
-   */
-  public static <O extends DatabaseObject> Parameters<O> getParameters(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
-    InputStreamDatabaseConnection.Parameters<O> p = InputStreamDatabaseConnection.getParameters(config, parserRestrictionClass, parserDefaultValueClass);
-
-    // parameter in
-    final FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
-    InputStream in = null;
-    if(config.grab(inputParam)) {
-      try {
-        in = new FileInputStream(inputParam.getValue());
-        in = FileUtil.tryGzipInput(in);
-      }
-      catch(IOException e) {
-        config.reportError(new WrongParameterValueException(inputParam, inputParam.getValue().getPath(), e));
-        in = null;
-      }
-    }
-
-    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, p.parser, p.startid, p.seed, in);
-  }
-
-  /**
-   * Encapsulates the parameter values for an
-   * {@link FileBasedDatabaseConnection}. Convenience class for getting
-   * parameter values.
-   * 
-   * @param <O> the type of DatabaseObject to be provided
-   */
-  static class Parameters<O extends DatabaseObject> extends InputStreamDatabaseConnection.Parameters<O> {
-    InputStream in;
-
-    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, Parser<O> parser, Integer startid, Long seed, InputStream in) {
-      super(database, classLabelIndex, classLabelClass, externalIdIndex, parser, startid, seed);
-      this.in = in;
+    @Override
+    protected FileBasedDatabaseConnection<O> makeInstance() {
+      return new FileBasedDatabaseConnection<O>(database, classLabelIndex, classLabelClass, externalIdIndex, parser, startid, seed, inputStream);
     }
   }
 }

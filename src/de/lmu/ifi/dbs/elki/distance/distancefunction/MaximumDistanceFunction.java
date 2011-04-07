@@ -2,8 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Maximum distance function to compute the Maximum distance for a pair of
@@ -12,6 +11,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  */
 public class MaximumDistanceFunction extends LPNormDistanceFunction implements RawDoubleDistance<NumberVector<?,?>> {
+  /**
+   * Static instance.
+   */
+  public static final MaximumDistanceFunction STATIC = new MaximumDistanceFunction();
+
   /**
    * Provides a Maximum distance function that can compute the Manhattan
    * distance (that is a DoubleDistance) for FeatureVectors.
@@ -23,23 +27,6 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements R
     super(Double.POSITIVE_INFINITY);
   }
   
-  /**
-   * Static instance.
-   */
-  public static final MaximumDistanceFunction STATIC = new MaximumDistanceFunction();
-
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * Note: we need this method, to override the parent class' method.
-   * 
-   * @param config Parameterization
-   * @return Distance function
-   */
-  public static MaximumDistanceFunction parameterize(Parameterization config) {
-    return new MaximumDistanceFunction();
-  }
-
   @Override
   public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
@@ -69,5 +56,19 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements R
   @Override
   public boolean isMetric() {
     return true;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected MaximumDistanceFunction makeInstance() {
+      return MaximumDistanceFunction.STATIC;
+    }
   }
 }

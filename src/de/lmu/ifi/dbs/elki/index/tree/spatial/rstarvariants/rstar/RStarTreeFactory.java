@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Factory for regular R*-Trees.
@@ -17,17 +17,35 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class RStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory<O, RStarTree<O>> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param fileName
+   * @param pageSize
+   * @param cacheSize
+   * @param bulk
+   * @param bulkLoadStrategy
+   * @param insertionCandidates
    */
-  public RStarTreeFactory(Parameterization config) {
-    super(config);
+  public RStarTreeFactory(String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   @Override
   public RStarTree<O> instantiate(Database<O> database) {
     return new RStarTree<O>(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  }
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
+    @Override
+    protected RStarTreeFactory<O> makeInstance() {
+      return new RStarTreeFactory<O>(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+    }
   }
 }

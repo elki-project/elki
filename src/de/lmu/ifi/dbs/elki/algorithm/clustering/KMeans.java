@@ -17,18 +17,17 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
@@ -127,7 +126,8 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       // XXX perhaps this can be done more conveniently?
       V randomBase = database.get(database.iterator().next());
       EmptyParameterization parameters = new EmptyParameterization();
-      AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>(parameters);
+      Class<AttributeWiseMinMaxNormalization<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(AttributeWiseMinMaxNormalization.class);
+      AttributeWiseMinMaxNormalization<V> normalization = parameters.tryInstantiate(cls);
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
@@ -252,38 +252,47 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     return clusters;
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
-   */
-  public static <D extends Distance<D>, V extends NumberVector<V, ?>> KMeans<V, D> parameterize(Parameterization config) {
-    PrimitiveDistanceFunction<V, D> distanceFunction = getParameterDistanceFunction(config, EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
-    int k = 0;
-    final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    int maxiter = 0;
-    final IntParameter MAXITER_PARAM = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
-    if(config.grab(MAXITER_PARAM)) {
-      maxiter = MAXITER_PARAM.getValue();
-    }
-    final LongParameter SEED_PARAM = new LongParameter(SEED_ID, true);
-    Long seed = null;
-    if(config.grab(SEED_PARAM)) {
-      seed = SEED_PARAM.getValue();
-    }
-
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new KMeans<V, D>(distanceFunction, k, maxiter, seed);
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+    protected int k;
+
+    protected int maxiter;
+
+    protected Long seed;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+
+      IntParameter maxiterP = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
+      if(config.grab(maxiterP)) {
+        maxiter = maxiterP.getValue();
+      }
+
+      LongParameter seedP = new LongParameter(SEED_ID, true);
+      if(config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
+    }
+
+    @Override
+    protected KMeans<V, D> makeInstance() {
+      return new KMeans<V, D>(distanceFunction, k, maxiter, seed);
+    }
   }
 }

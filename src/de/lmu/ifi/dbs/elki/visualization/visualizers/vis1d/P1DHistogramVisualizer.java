@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -301,18 +302,22 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
     /**
-     * OptionID for {@link #STYLE_CURVES_FLAG}.
-     */
-    public static final OptionID STYLE_CURVES_ID = OptionID.getOrCreateOptionID("projhistogram.curves", "Use curves instead of the stacked histogram style.");
-
-    /**
      * Flag to specify the "curves" rendering style.
      * 
      * <p>
      * Key: {@code -histogram.curves}
      * </p>
      */
-    private final Flag STYLE_CURVES_FLAG = new Flag(STYLE_CURVES_ID);
+    public static final OptionID STYLE_CURVES_ID = OptionID.getOrCreateOptionID("projhistogram.curves", "Use curves instead of the stacked histogram style.");
+
+    /**
+     * Parameter to specify the number of bins to use in histogram.
+     * 
+     * <p>
+     * Key: {@code -projhistogram.bins} Default: 20
+     * </p>
+     */
+    public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("projhistogram.bins", "Number of bins in the distribution histogram");
 
     /**
      * Internal storage of the curves flag.
@@ -325,39 +330,20 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     private static final int DEFAULT_BINS = 50;
 
     /**
-     * Option ID for parameter {@link #HISTOGRAM_BINS_PARAM}
-     */
-    public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("projhistogram.bins", "Number of bins in the distribution histogram");
-
-    /**
-     * Parameter to specify the number of bins to use in histogram.
-     * 
-     * <p>
-     * Key: {@code -projhistogram.bins} Default: 20
-     * </p>
-     */
-    private final IntParameter HISTOGRAM_BINS_PARAM = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), DEFAULT_BINS);
-
-    /**
      * Number of bins to use in the histogram.
      */
     private int bins = DEFAULT_BINS;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param curves
+     * @param bins
      */
-    public Factory(Parameterization config) {
+    public Factory(boolean curves, int bins) {
       super();
-      config = config.descend(this);
-      if(config.grab(STYLE_CURVES_FLAG)) {
-        curves = STYLE_CURVES_FLAG.getValue();
-      }
-      if(config.grab(HISTOGRAM_BINS_PARAM)) {
-        bins = HISTOGRAM_BINS_PARAM.getValue();
-      }
+      this.curves = curves;
+      this.bins = bins;
     }
 
     @Override
@@ -396,6 +382,43 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     @Override
     public Class<? extends Projection> getProjectionType() {
       return Projection1D.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      /**
+       * Internal storage of the curves flag.
+       */
+      private boolean curves;
+
+      /**
+       * Number of bins to use in the histogram.
+       */
+      private int bins = DEFAULT_BINS;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        Flag STYLE_CURVES_FLAG = new Flag(STYLE_CURVES_ID);
+        if(config.grab(STYLE_CURVES_FLAG)) {
+          curves = STYLE_CURVES_FLAG.getValue();
+        }
+        IntParameter HISTOGRAM_BINS_PARAM = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), DEFAULT_BINS);
+        if(config.grab(HISTOGRAM_BINS_PARAM)) {
+          bins = HISTOGRAM_BINS_PARAM.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(curves, bins);
+      }
     }
   }
 }

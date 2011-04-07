@@ -26,9 +26,10 @@ public class InputTabPanel extends ParameterTabPanel {
    */
   private boolean executed = false;
 
+  @SuppressWarnings("unchecked")
   @Override
   protected synchronized void configureStep(Parameterization config)  {
-    input  = new InputStep<DatabaseObject>(config);
+    input = config.tryInstantiate(InputStep.class);
     if (config.getErrors().size() > 0) {
       input = null;
     }

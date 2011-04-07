@@ -12,6 +12,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <D> distance type
  * 
  */
-public interface NormalizedSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends SimilarityFunction<O, D> {
+public interface NormalizedSimilarityFunction<O extends DatabaseObject, D extends Distance<?>> extends SimilarityFunction<O, D> {
   // Empty - marker interface.
 }

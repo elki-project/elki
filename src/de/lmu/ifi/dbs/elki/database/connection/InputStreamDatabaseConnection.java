@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
@@ -33,16 +32,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.has Parser oneway - - runs
+ * @apiviz.uses Parser oneway - - runs
  * @apiviz.uses ParsingResult oneway - - processes
  * 
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
- */
-/**
- * @author achtert
- * 
- * @param <O>
  */
 @Title("Input-Stream based database connection")
 @Description("Parse an input stream such as STDIN into a database.")
@@ -165,65 +159,54 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   }
 
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return Clustering Algorithm
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public static <O extends DatabaseObject> InputStreamDatabaseConnection<O> parameterize(Parameterization config) {
-    Parameters<O> p = getParameters(config, Parser.class, DoubleVectorLabelParser.class);
-    if(config.hasErrors()) {
-      return null;
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractDatabaseConnection.Parameterizer<O> {
+    Parser<O> parser = null;
+
+    Integer startid = null;
+
+    Long seed = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configParser(config, Parser.class, DoubleVectorLabelParser.class);
+      configClassLabel(config);
+      configExternalId(config);
+      configSeed(config);
+      configStartid(config);
+      configDatabase(config);
     }
-    return new InputStreamDatabaseConnection<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, p.parser, p.startid, p.seed);
-  }
 
-  /**
-   * Convenience method for getting parameter values.
-   * 
-   * @param <O> the type of DatabaseObject to be provided
-   * @param config the parameterization
-   * @param parserRestrictionClass the restriction class for the parser
-   * @param parserDefaultValue the default value for the parser
-   * @return parameter values
-   */
-  public static <O extends DatabaseObject> Parameters<O> getParameters(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
-    AbstractDatabaseConnection.Parameters<O> p = AbstractDatabaseConnection.getParameters(config);
+    protected void configParser(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
+      ObjectParameter<Parser<O>> parserParam = new ObjectParameter<Parser<O>>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
+      if(config.grab(parserParam)) {
+        parser = parserParam.instantiateClass(config);
+      }
+    }
 
-    // parameter parser
-    final ObjectParameter<Parser<O>> parserParam = new ObjectParameter<Parser<O>>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
-    Parser<O> parser = config.grab(parserParam) ? parserParam.instantiateClass(config) : null;
+    protected void configSeed(Parameterization config) {
+      LongParameter seedParam = new LongParameter(SEED_ID, true);
+      if(config.grab(seedParam)) {
+        seed = seedParam.getValue();
+      }
+    }
 
-    // parameter startid
-    final IntParameter startidParam = new IntParameter(IDSTART_ID, true);
-    Integer startid = config.grab(startidParam) ? startidParam.getValue() : null;
+    protected void configStartid(Parameterization config) {
+      IntParameter startidParam = new IntParameter(IDSTART_ID, true);
+      if(config.grab(startidParam)) {
+        startid = startidParam.getValue();
+      }
+    }
 
-    // parameter seed
-    final LongParameter seedParam = new LongParameter(SEED_ID, true);
-    Long seed = config.grab(seedParam) ? seedParam.getValue() : null;
-
-    return new Parameters<O>(p.database, p.classLabelIndex, p.classLabelClass, p.externalIdIndex, parser, startid, seed);
-  }
-
-  /**
-   * Encapsulates the parameter values for an
-   * {@link InputStreamDatabaseConnection}. Convenience class for getting
-   * parameter values.
-   * 
-   * @param <O> the type of DatabaseObject to be provided
-   */
-  static class Parameters<O extends DatabaseObject> extends AbstractDatabaseConnection.Parameters<O> {
-    Parser<O> parser;
-
-    Integer startid;
-
-    Long seed;
-
-    public Parameters(Database<O> database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, Parser<O> parser, Integer startid, Long seed) {
-      super(database, classLabelIndex, classLabelClass, externalIdIndex);
-      this.parser = parser;
-      this.startid = startid;
-      this.seed = seed;
+    @Override
+    protected InputStreamDatabaseConnection<O> makeInstance() {
+      return new InputStreamDatabaseConnection<O>(database, classLabelIndex, classLabelClass, externalIdIndex, parser, startid, seed);
     }
   }
 }

@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -16,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * 
  * @apiviz.has PrimitiveDistanceFunction
+ * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
@@ -43,18 +45,6 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends Database
   private PrimitiveDistanceFunction<? super O, D> distanceFunction;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
-   */
-  protected AbstractPrimitiveDistanceBasedAlgorithm(Parameterization config) {
-    super();
-    config = config.descend(this);
-    distanceFunction = getParameterDistanceFunction(config, EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
-  }
-
-  /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
@@ -71,5 +61,25 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends Database
    */
   public PrimitiveDistanceFunction<? super O, D> getDistanceFunction() {
     return distanceFunction;
+  }
+
+  /**
+   * Parameterization helper class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public abstract static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+    protected PrimitiveDistanceFunction<O, D> distanceFunction;
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<PrimitiveDistanceFunction<O, D>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+      if(config.grab(distanceFunctionP)) {
+        distanceFunction = distanceFunctionP.instantiateClass(config);
+      }
+    }
   }
 }

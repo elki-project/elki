@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -91,24 +91,31 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
     return result;
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return EM Outlier detection algorithm
-   */
-  public static <V extends NumberVector<V, ?>> EMOutlier<V> parameterize(Parameterization config) {
-    EM<V> emClustering = null;
-    Class<EM<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(EM.class);
-    emClustering = config.tryInstantiate(cls, cls);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new EMOutlier<V>(emClustering);
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    protected EM<V> em = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Class<EM<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(EM.class);
+      em = config.tryInstantiate(cls);
+    }
+
+    @Override
+    protected EMOutlier<V> makeInstance() {
+      return new EMOutlier<V>(em);
+    }
   }
 }

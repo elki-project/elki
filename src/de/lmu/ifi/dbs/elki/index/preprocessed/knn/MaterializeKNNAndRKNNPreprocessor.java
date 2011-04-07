@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors and the reverse k
@@ -340,16 +339,14 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
    * @param <D> The distance type
    */
   public static class Factory<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory<O, D> {
-
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param k k
+     * @param distanceFunction distance function
      */
-    public Factory(Parameterization config) {
-      super(config);
-      config = config.descend(this);
+    public Factory(int k, DistanceFunction<? super O, D> distanceFunction) {
+      super(k, distanceFunction);
     }
 
     @Override
@@ -358,5 +355,18 @@ public class MaterializeKNNAndRKNNPreprocessor<O extends DatabaseObject, D exten
       return instance;
     }
 
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+      @Override
+      protected Factory<O,D> makeInstance() {
+        return new Factory<O,D>(k, distanceFunction);
+      }
+    }
   }
 }

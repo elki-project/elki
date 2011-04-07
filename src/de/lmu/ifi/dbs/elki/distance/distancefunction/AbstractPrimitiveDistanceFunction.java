@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * AbstractDistanceFunction provides some methods valid for any extending class.
  * 
  * @author Arthur Zimek
+ * 
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <D> the type of Distance used
  */

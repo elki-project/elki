@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -29,27 +30,21 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
   /**
    * Evaluators to run
    */
-  private List<Evaluator<O>> evaluators = null;
-  
+  private List<Evaluator> evaluators = null;
+
   /**
    * The result we last processed.
    */
   private HierarchicalResult result;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param evaluators
    */
-  public EvaluationStep(Parameterization config) {
+  public EvaluationStep(List<Evaluator> evaluators) {
     super();
-    config = config.descend(this);
-    // evaluator parameter
-    final ObjectListParameter<Evaluator<O>> EVALUATOR_PARAM = new ObjectListParameter<Evaluator<O>>(OptionID.EVALUATOR, Evaluator.class, true);
-    if(config.grab(EVALUATOR_PARAM)) {
-      evaluators = EVALUATOR_PARAM.instantiateClasses(config);
-    }
+    this.evaluators = evaluators;
   }
 
   public void runEvaluators(HierarchicalResult r, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
@@ -84,7 +79,7 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
     /**
      * Evaluators to run.
      */
-    private List<Evaluator<O>> evaluators;
+    private List<Evaluator> evaluators;
 
     /**
      * Result hierarchy.
@@ -100,13 +95,13 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
      * @param normalization Normalization
      * @param evaluators Evaluators
      */
-    public Evaluation(Database<O> database, ResultHierarchy hierarchy, boolean normalizationUndo, Normalization<O> normalization, List<Evaluator<O>> evaluators) {
+    public Evaluation(Database<O> database, ResultHierarchy hierarchy, boolean normalizationUndo, Normalization<O> normalization, List<Evaluator> evaluators) {
       this.database = database;
       this.hierarchy = hierarchy;
       this.normalizationUndo = normalizationUndo;
       this.normalization = normalization;
       this.evaluators = evaluators;
-      
+
       hierarchy.addResultListener(this);
     }
 
@@ -116,7 +111,7 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
      * @param r Result
      */
     public void update(Result r) {
-      for(Evaluator<O> evaluator : evaluators) {
+      for(Evaluator evaluator : evaluators) {
         if(normalizationUndo) {
           evaluator.setNormalization(normalization);
         }
@@ -145,5 +140,34 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
 
   public Result getResult() {
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Evaluators to run
+     */
+    private List<Evaluator> evaluators = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      // evaluator parameter
+      final ObjectListParameter<Evaluator> ealuatorP = new ObjectListParameter<Evaluator>(OptionID.EVALUATOR, Evaluator.class, true);
+      if(config.grab(ealuatorP)) {
+        evaluators = ealuatorP.instantiateClasses(config);
+      }
+    }
+
+    @Override
+    protected EvaluationStep<O> makeInstance() {
+      return new EvaluationStep<O>(evaluators);
+    }
   }
 }

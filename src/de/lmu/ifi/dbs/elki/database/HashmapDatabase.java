@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -79,17 +80,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
 public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchicalResult implements Database<O> {
   /**
-   * OptionID for {@link #INDEX_PARAM}
-   */
-  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("db.index", "Database indexes to add.");
-
-  /**
    * Parameter to specify the indexes to use.
    * <p>
    * Key: {@code -db.index}
    * </p>
    */
-  private final ObjectListParameter<IndexFactory<O, ?>> INDEX_PARAM = new ObjectListParameter<IndexFactory<O, ?>>(INDEX_ID, IndexFactory.class, true);
+  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("db.index", "Database indexes to add.");
 
   /**
    * Map to hold the objects of the database.
@@ -138,15 +134,14 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   private Collection<Pair<OptionID, Object>> params;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param indexFactories Indexes to add
+   * @param params Parameters to clone the database for partitioning
    */
-  public HashmapDatabase(Parameterization config) {
+  public HashmapDatabase(Collection<IndexFactory<O, ?>> indexFactories, Collection<Pair<OptionID, Object>> params) {
     super();
-    config.descend(this);
-    TrackParameters track = new TrackParameters(config);
+    this.params = params;
 
     this.ids = DBIDUtil.newTreeSet();
     this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
@@ -156,12 +151,18 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     this.indexes = new java.util.Vector<Index<O>>();
 
     // Add indexes.
-    if(track.grab(INDEX_PARAM)) {
-      for(IndexFactory<O, ?> idx : INDEX_PARAM.instantiateClasses(track)) {
+    if(indexFactories != null) {
+      for(IndexFactory<O, ?> idx : indexFactories) {
         addIndex(idx.instantiate(this));
       }
     }
-    params = track.getGivenParameters();
+  }
+
+  /**
+   * Constructor with no indexes.
+   */
+  public HashmapDatabase() {
+    this(null, null);
   }
 
   @Override
@@ -876,6 +877,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * Representation class for class labels.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class ClassLabelRepresentation implements DataQuery<ClassLabel> {
     /**
@@ -905,6 +908,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * Representation for object labels.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class ObjectLabelRepresentation implements DataQuery<String> {
     /**
@@ -934,6 +939,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * Representation for external IDs.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class ExternalIdRepresentation implements DataQuery<String> {
     /**
@@ -963,6 +970,8 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * Representation of metadata.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class MetadataRepresentation implements DataQuery<DatabaseObjectMetadata> {
     /**
@@ -990,6 +999,43 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     @Override
     public Class<? super DatabaseObjectMetadata> getDataClass() {
       return DatabaseObjectMetadata.class;
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Parameters used for creation
+     */
+    private Collection<Pair<OptionID, Object>> params = null;
+
+    /**
+     * Indexes to add.
+     */
+    private Collection<IndexFactory<O, ?>> indexFactories;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      TrackParameters track = new TrackParameters(config);
+
+      // Get indexes.
+      final ObjectListParameter<IndexFactory<O, ?>> indexFactoryP = new ObjectListParameter<IndexFactory<O, ?>>(INDEX_ID, IndexFactory.class, true);
+      if(track.grab(indexFactoryP)) {
+        indexFactories = indexFactoryP.instantiateClasses(track);
+      }
+      params = track.getGivenParameters();
+    }
+
+    @Override
+    protected HashmapDatabase<O> makeInstance() {
+      return new HashmapDatabase<O>(indexFactories, params);
     }
   }
 }

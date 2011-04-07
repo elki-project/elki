@@ -20,9 +20,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -40,11 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
   /**
-   * OptionID for {@link #OUTER_DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID OUTER_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("projdbscan.outerdistancefunction", "Distance function to determine the distance between database objects.");
-
-  /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
@@ -57,28 +54,12 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
    * </p>
    */
-  protected final ObjectParameter<LocallyWeightedDistanceFunction<V>> OUTER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<LocallyWeightedDistanceFunction<V>>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
-
-  /**
-   * OptionID for {@link #INNER_DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID INNER_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("projdbscan.distancefunction", "Distance function to determine the neighbors for variance analysis.");
+  public static final OptionID OUTER_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("projdbscan.outerdistancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Parameter distance function
    */
-  private final ObjectParameter<DistanceFunction<V, DoubleDistance>> INNER_DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<V, DoubleDistance>>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-
-  /**
-   * Holds the instance of the distance function specified by
-   * {@link #INNER_DISTANCE_FUNCTION_PARAM}.
-   */
-  private LocallyWeightedDistanceFunction<V> distanceFunction;
-  
-  /**
-   * OptionID for {@link #EPSILON_PARAM}
-   */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("projdbscan.epsilon", "The maximum radius of the neighborhood to be considered.");
+  public static final OptionID INNER_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("projdbscan.distancefunction", "Distance function to determine the neighbors for variance analysis.");
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
@@ -87,17 +68,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    * Key: {@code -projdbscan.epsilon}
    * </p>
    */
-  private final DistanceParameter<DoubleDistance> EPSILON_PARAM;
-
-  /**
-   * Holds the value of {@link #EPSILON_PARAM}.
-   */
-  protected DoubleDistance epsilon;
-
-  /**
-   * OptionID for {@link #LAMBDA_PARAM}
-   */
-  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("projdbscan.lambda", "The intrinsic dimensionality of the clusters to find.");
+  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("projdbscan.epsilon", "The maximum radius of the neighborhood to be considered.");
 
   /**
    * Parameter to specify the intrinsic dimensionality of the clusters to find,
@@ -106,17 +77,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    * Key: {@code -projdbscan.lambda}
    * </p>
    */
-  private final IntParameter LAMBDA_PARAM = new IntParameter(LAMBDA_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #LAMBDA_PARAM}.
-   */
-  private int lambda;
-
-  /**
-   * OptionID for {@link #MINPTS_PARAM}
-   */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("projdbscan.minpts", "Threshold for minimum number of points in " + "the epsilon-neighborhood of a point.");
+  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("projdbscan.lambda", "The intrinsic dimensionality of the clusters to find.");
 
   /**
    * Parameter to specify the threshold for minimum number of points in the
@@ -125,10 +86,26 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
    * Key: {@code -projdbscan.minpts}
    * </p>
    */
-  private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("projdbscan.minpts", "Threshold for minimum number of points in " + "the epsilon-neighborhood of a point.");
 
   /**
-   * Holds the value of {@link #MINPTS_PARAM}.
+   * Holds the instance of the distance function specified by
+   * {@link #INNER_DISTANCE_FUNCTION_ID}.
+   */
+  private LocallyWeightedDistanceFunction<V> distanceFunction;
+
+  /**
+   * Holds the value of {@link #EPSILON_ID}.
+   */
+  protected DoubleDistance epsilon;
+
+  /**
+   * Holds the value of {@link #LAMBDA_ID}.
+   */
+  private int lambda;
+
+  /**
+   * Holds the value of {@link #MINPTS_ID}.
    */
   protected int minpts = 1;
 
@@ -148,49 +125,19 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
   private ModifiableDBIDs processedIDs;
 
   /**
-   * The inner distance function.
-   */
-  private DistanceFunction<V, DoubleDistance> innerDistanceFunction;
-
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param epsilon Epsilon
+   * @param minpts MinPts parameter
+   * @param distanceFunction Outer distance function
+   * @param lambda Lambda value
    */
-  public AbstractProjectedDBSCAN(Parameterization config) {
+  public AbstractProjectedDBSCAN(DoubleDistance epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
     super();
-    config = config.descend(this);
-
-    if(config.grab(INNER_DISTANCE_FUNCTION_PARAM)) {
-      innerDistanceFunction = INNER_DISTANCE_FUNCTION_PARAM.instantiateClass(config);
-    }
-
-    EPSILON_PARAM = new DistanceParameter<DoubleDistance>(EPSILON_ID, innerDistanceFunction != null ? innerDistanceFunction.getDistanceFactory() : null);
-    if(config.grab(EPSILON_PARAM)) {
-      epsilon = EPSILON_PARAM.getValue();
-    }
-
-    if(config.grab(MINPTS_PARAM)) {
-      minpts = MINPTS_PARAM.getValue();
-    }
-
-    if(config.grab(OUTER_DISTANCE_FUNCTION_PARAM)) {
-      // parameters for the distance function
-      ListParameterization distanceFunctionParameters = new ListParameterization();
-      //distanceFunctionParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
-      distanceFunctionParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, preprocessorClass());
-      distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, innerDistanceFunction);
-      distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, epsilon);
-      distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, minpts);
-      final ChainedParameterization combinedConfig = new ChainedParameterization(distanceFunctionParameters, config);
-      combinedConfig.errorsTo(config);
-      distanceFunction = OUTER_DISTANCE_FUNCTION_PARAM.instantiateClass(combinedConfig);
-    }
-
-    if(config.grab(LAMBDA_PARAM)) {
-      lambda = LAMBDA_PARAM.getValue();
-    }
+    this.epsilon = epsilon;
+    this.minpts = minpts;
+    this.distanceFunction = distanceFunction;
+    this.lambda = lambda;
   }
 
   @Override
@@ -200,7 +147,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(database.size());
-    
+
     LocallyWeightedDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(database);
     RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distanceFunction);
 
@@ -247,7 +194,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
       clusprog.setProcessed(resultList.size(), getLogger());
     }
     // Signal that the progress has completed.
-    if (objprog != null && clusprog != null) {
+    if(objprog != null && clusprog != null) {
       objprog.ensureCompleted(getLogger());
       clusprog.setCompleted(getLogger());
     }
@@ -393,9 +340,66 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
   }
 
   /**
-   * Returns the class used to produce preprocessed indexes.
+   * Parameterization class.
    * 
-   * @return the factory class to produce indexes.
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public abstract Class<?> preprocessorClass();
+  public static abstract class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractParameterizer {
+    protected DistanceFunction<V, D> innerdist;
+
+    protected D epsilon;
+
+    protected LocallyWeightedDistanceFunction<V> outerdist;
+
+    protected Integer minpts;
+
+    protected Integer lambda;
+
+    protected void configInnerDistance(Parameterization config) {
+      ObjectParameter<DistanceFunction<V, D>> innerdistP = new ObjectParameter<DistanceFunction<V, D>>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      if(config.grab(innerdistP)) {
+        innerdist = innerdistP.instantiateClass(config);
+      }
+    }
+
+    protected void configEpsilon(Parameterization config, DistanceFunction<V, D> innerdist) {
+      D distanceParser = innerdist != null ? innerdist.getDistanceFactory() : null;
+      DistanceParameter<D> epsilonP = new DistanceParameter<D>(EPSILON_ID, distanceParser);
+      if(config.grab(epsilonP)) {
+        epsilon = epsilonP.getValue();
+      }
+    }
+
+    protected void configMinPts(Parameterization config) {
+      IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+      if(config.grab(minptsP)) {
+        minpts = minptsP.getValue();
+      }
+    }
+
+    protected void configOuterDistance(Parameterization config, D epsilon, int minpts, Class<?> preprocessorClass, DistanceFunction<V, D> innerdist) {
+      ObjectParameter<LocallyWeightedDistanceFunction<V>> outerdistP = new ObjectParameter<LocallyWeightedDistanceFunction<V>>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+      if(config.grab(outerdistP)) {
+        // parameters for the distance function
+        ListParameterization distanceFunctionParameters = new ListParameterization();
+        // distanceFunctionParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+        distanceFunctionParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, preprocessorClass);
+        distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, innerdist);
+        distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, epsilon);
+        distanceFunctionParameters.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, minpts);
+        ChainedParameterization combinedConfig = new ChainedParameterization(distanceFunctionParameters, config);
+        combinedConfig.errorsTo(config);
+        outerdist = outerdistP.instantiateClass(combinedConfig);
+      }
+    }
+
+    protected void configLambda(Parameterization config) {
+      IntParameter lambdaP = new IntParameter(LAMBDA_ID, new GreaterConstraint(0));
+      if(config.grab(lambdaP)) {
+        lambda = lambdaP.getValue();
+      }
+    }
+  }
 }

@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -60,44 +61,7 @@ public class OutputStep<O extends DatabaseObject> implements WorkflowStep {
   }
 
   /**
-   * Parameterization method.
-   * 
-   * @param <O> Object type
-   * @param config Parameterization
-   * 
-   * @return Output step
-   */
-  public static <O extends DatabaseObject> OutputStep<O> parameterize(Parameterization config) {
-    return parameterize(config, null);
-  }
-
-  /**
-   * Parameterization method with default handlers.
-   * 
-   * @param <O> Object type
-   * @param config Parameterization
-   * @param defaultHandlers Default handlers
-   * 
-   * @return Output step
-   */
-  public static <O extends DatabaseObject> OutputStep<O> parameterize(Parameterization config, ArrayList<Class<? extends ResultHandler<O, Result>>> defaultHandlers) {
-    // result handlers
-    final ObjectListParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ObjectListParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class);
-    if(defaultHandlers != null) {
-      RESULT_HANDLER_PARAM.setDefaultValue(defaultHandlers);
-    }
-    List<ResultHandler<O, Result>> resulthandlers = null;
-    if(config.grab(RESULT_HANDLER_PARAM)) {
-      resulthandlers = RESULT_HANDLER_PARAM.instantiateClasses(config);
-    }
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new OutputStep<O>(resulthandlers);
-  }
-  
-  /**
-   * Get a default handler list containing a {@link #ResultWriter}.
+   * Get a default handler list containing a {@link ResultWriter}.
    * 
    * @param <O> Object type
    * @return Result handler list
@@ -109,9 +73,8 @@ public class OutputStep<O extends DatabaseObject> implements WorkflowStep {
     return defaultHandlers;
   }
 
-  
   /**
-   * Get a default handler list containing a {@link #ResultVisualizer}.
+   * Get a default handler list containing a {@link ResultVisualizer}.
    * 
    * @param <O> Object type
    * @return Result handler list
@@ -121,5 +84,34 @@ public class OutputStep<O extends DatabaseObject> implements WorkflowStep {
     final Class<ResultHandler<O, Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultVisualizer.class, ResultHandler.class);
     defaultHandlers.add(rwcls);
     return defaultHandlers;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Output handlers.
+     */
+    private List<ResultHandler<O, Result>> resulthandlers = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      // result handlers
+      final ObjectListParameter<ResultHandler<O, Result>> resultHandlerParam = new ObjectListParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class);
+      if(config.grab(resultHandlerParam)) {
+        resulthandlers = resultHandlerParam.instantiateClasses(config);
+      }
+    }
+
+    @Override
+    protected OutputStep<O> makeInstance() {
+      return new OutputStep<O>(resulthandlers);
+    }
   }
 }

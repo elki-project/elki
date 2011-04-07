@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
@@ -31,26 +32,16 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
    * Class logger.
    */
   public static final Logging logger = Logging.getLogger(AttributeWiseVarianceNormalization.class);
-  
-  /**
-   * OptionID for {@link #MEAN_PARAM}
-   */
-  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("normalize.mean", "a comma separated concatenation of the mean values in each dimension that are mapped to 0. If no value is specified, the mean value of the attribute range in this dimension will be taken.");
-
-  /**
-   * OptionID for {@link #STDDEV_PARAM}
-   */
-  public static final OptionID STDDEV_ID = OptionID.getOrCreateOptionID("normalize.stddev", "a comma separated concatenation of the standard deviations in each dimension that are scaled to 1. If no value is specified, the standard deviation of the attribute range in this dimension will be taken.");
 
   /**
    * Parameter for means.
    */
-  private final DoubleListParameter MEAN_PARAM = new DoubleListParameter(MEAN_ID, true);
+  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("normalize.mean", "a comma separated concatenation of the mean values in each dimension that are mapped to 0. If no value is specified, the mean value of the attribute range in this dimension will be taken.");
 
   /**
    * Parameter for stddevs.
    */
-  private final DoubleListParameter STDDEV_PARAM = new DoubleListParameter(STDDEV_ID, true);
+  public static final OptionID STDDEV_ID = OptionID.getOrCreateOptionID("normalize.stddev", "a comma separated concatenation of the standard deviations in each dimension that are scaled to 1. If no value is specified, the standard deviation of the attribute range in this dimension will be taken.");
 
   /**
    * Stores the mean in each dimension.
@@ -68,39 +59,15 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
   MeanVariance[] mvs = null;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param mean Mean value
+   * @param stddev Standard deviation
    */
-  public AttributeWiseVarianceNormalization(Parameterization config) {
+  public AttributeWiseVarianceNormalization(double[] mean, double[] stddev) {
     super();
-    config = config.descend(this);
-    config.grab(MEAN_PARAM);
-    config.grab(STDDEV_PARAM);
-    if(MEAN_PARAM.isDefined() && STDDEV_PARAM.isDefined()) {
-      List<Double> mean_list = MEAN_PARAM.getValue();
-      List<Double> stddev_list = STDDEV_PARAM.getValue();
-
-      mean = Util.unbox(mean_list.toArray(new Double[mean_list.size()]));
-      stddev = Util.unbox(stddev_list.toArray(new Double[stddev_list.size()]));
-
-      for(double d : stddev) {
-        if(d == 0) {
-          config.reportError(new WrongParameterValueException("Standard deviations must not be 0."));
-        }
-      }
-    }
-
-    ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
-    global_1.add(MEAN_PARAM);
-    global_1.add(STDDEV_PARAM);
-    config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
-
-    ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
-    global.add(MEAN_PARAM);
-    global.add(STDDEV_PARAM);
-    config.checkConstraint(new EqualSizeGlobalConstraint(global));
+    this.mean = mean;
+    this.stddev = stddev;
   }
 
   @Override
@@ -126,7 +93,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     final int dimensionality = mvs.length;
     mean = new double[dimensionality];
     stddev = new double[dimensionality];
-    if (buf != null) {
+    if(buf != null) {
       buf.append("Normalization parameters: ");
     }
     for(int d = 0; d < dimensionality; d++) {
@@ -135,12 +102,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
       if(stddev[d] == 0 || Double.isNaN(stddev[d])) {
         stddev[d] = 1.0;
       }
-      if (buf != null) {
+      if(buf != null) {
         buf.append(" m: ").append(mean[d]).append(" v: ").append(stddev[d]);
       }
     }
     mvs = null;
-    if (buf != null) {
+    if(buf != null) {
       logger.debugFine(buf.toString());
     }
   }
@@ -217,5 +184,62 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     result.append(pre).append("normalization stddevs: ").append(FormatUtil.format(stddev));
 
     return result.toString();
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    /**
+     * Stores the mean in each dimension.
+     */
+    private double[] mean = new double[0];
+
+    /**
+     * Stores the standard deviation in each dimension.
+     */
+    private double[] stddev = new double[0];
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter meanP = new DoubleListParameter(MEAN_ID, true);
+      DoubleListParameter stddevP = new DoubleListParameter(STDDEV_ID, true);
+      config.grab(meanP);
+      config.grab(stddevP);
+      // Note: grab first, then use isDefined, to ensure the stddev is grabbed.
+      if(meanP.isDefined() && stddevP.isDefined()) {
+        List<Double> mean_list = meanP.getValue();
+        List<Double> stddev_list = stddevP.getValue();
+
+        mean = Util.unbox(mean_list.toArray(new Double[mean_list.size()]));
+        stddev = Util.unbox(stddev_list.toArray(new Double[stddev_list.size()]));
+
+        for(double d : stddev) {
+          if(d == 0) {
+            config.reportError(new WrongParameterValueException("Standard deviations must not be 0."));
+          }
+        }
+      }
+
+      ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
+      global_1.add(meanP);
+      global_1.add(stddevP);
+      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
+
+      ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
+      global.add(meanP);
+      global.add(stddevP);
+      config.checkConstraint(new EqualSizeGlobalConstraint(global));
+    }
+
+    @Override
+    protected AttributeWiseVarianceNormalization<V> makeInstance() {
+      return new AttributeWiseVarianceNormalization<V>(mean, stddev);
+    }
   }
 }

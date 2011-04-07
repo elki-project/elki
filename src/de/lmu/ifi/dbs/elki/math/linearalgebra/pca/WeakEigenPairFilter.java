@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -23,10 +24,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is above the average ('expected') eigenvalue.")
 public class WeakEigenPairFilter implements EigenPairFilter {
   /**
-   * OptionID for {@link #WALPHA_PARAM} and
-   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter#WALPHA_PARAM}
+   * OptionID for the weak alpha value of {@link WeakEigenPairFilter},
+   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter}
    * and
-   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter#WALPHA_PARAM}
+   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter}
    */
   public static final OptionID EIGENPAIR_FILTER_WALPHA = OptionID.getOrCreateOptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
 
@@ -36,27 +37,18 @@ public class WeakEigenPairFilter implements EigenPairFilter {
   public static final double DEFAULT_WALPHA = 0.95;
 
   /**
-   * Parameter weak alpha.
-   */
-  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
-
-  /**
    * The noise tolerance level for weak eigenvectors
    */
   private double walpha;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param walpha
    */
-  public WeakEigenPairFilter(Parameterization config) {
+  public WeakEigenPairFilter(double walpha) {
     super();
-    config = config.descend(this);
-    if(config.grab(WALPHA_PARAM)) {
-      walpha = WALPHA_PARAM.getValue();
-    }
+    this.walpha = walpha;
   }
 
   /**
@@ -93,5 +85,34 @@ public class WeakEigenPairFilter implements EigenPairFilter {
       return new FilteredEigenPairs(new ArrayList<EigenPair>(), weakEigenPairs);
     }
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The threshold for strong eigenvectors: the strong eigenvectors explain a
+     * portion of at least alpha of the total variance.
+     */
+    private double walpha;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter walphaP = new DoubleParameter(EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
+      if(config.grab(walphaP)) {
+        walpha = walphaP.getValue();
+      }
+    }
+
+    @Override
+    protected WeakEigenPairFilter makeInstance() {
+      return new WeakEigenPairFilter(walpha);
+    }
   }
 }

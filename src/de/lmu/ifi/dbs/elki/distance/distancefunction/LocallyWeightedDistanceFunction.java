@@ -26,14 +26,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // FIXME: implements SpatialPrimitiveDistanceFunction<V, DoubleDistance>
 public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> implements FilteredLocalPCABasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    * 
-   * @param config Parameterization
+   * @param indexFactory Index factory
    */
-  public LocallyWeightedDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public LocallyWeightedDistanceFunction(LocalProjectionIndex.Factory<V, FilteredLocalPCAIndex<V>> indexFactory) {
+    super(indexFactory);
   }
 
   @Override
@@ -52,25 +50,16 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
   }
 
   @Override
-  protected Class<?> getIndexFactoryRestriction() {
-    return LocalProjectionIndex.Factory.class;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryDefaultClass() {
-    return KNNQueryFilteredPCAIndex.Factory.class;
-  }
-
-  @Override
   public Class<? super V> getInputDatatype() {
     return NumberVector.class;
   }
 
   @Override
   public <T extends V> Instance<T> instantiate(Database<T> database) {
-    // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
+    // We can't really avoid these warnings, due to a limitation in Java
+    // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    LocalProjectionIndex<T, ?> indexinst = (LocalProjectionIndex<T, ?>) index.instantiate((Database<V>)database);
+    LocalProjectionIndex<T, ?> indexinst = (LocalProjectionIndex<T, ?>) indexFactory.instantiate((Database<V>) database);
     return new Instance<T>(database, indexinst, this);
   }
 
@@ -216,6 +205,26 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
         sqrDist += manhattanI * manhattanI;
       }
       return new DoubleDistance(Math.sqrt(sqrDist));
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Parameterizer<LocalProjectionIndex.Factory<V, FilteredLocalPCAIndex<V>>> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configIndexFactory(config, LocalProjectionIndex.Factory.class, KNNQueryFilteredPCAIndex.Factory.class);
+    }
+
+    @Override
+    protected LocallyWeightedDistanceFunction<V> makeInstance() {
+      return new LocallyWeightedDistanceFunction<V>(factory);
     }
   }
 }

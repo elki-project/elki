@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -36,11 +37,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> implements Parameterizable {
   /**
-   * OptionID for {@link #COVARIANCE_PARAM}
-   */
-  public static final OptionID PCA_COVARIANCE_MATRIX = OptionID.getOrCreateOptionID("pca.covariance", "Class used to compute the covariance matrix.");
-
-  /**
    * Parameter to specify the class to compute the covariance matrix, must be a
    * subclass of {@link CovarianceMatrixBuilder}.
    * <p>
@@ -50,7 +46,7 @@ public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D,
    * Key: {@code -pca.covariance}
    * </p>
    */
-  private ObjectParameter<CovarianceMatrixBuilder<V, D>> COVARIANCE_PARAM = new ObjectParameter<CovarianceMatrixBuilder<V, D>>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class);
+  public static final OptionID PCA_COVARIANCE_MATRIX = OptionID.getOrCreateOptionID("pca.covariance", "Class used to compute the covariance matrix.");
 
   /**
    * The covariance computation class.
@@ -58,17 +54,13 @@ public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D,
   protected CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param covarianceMatrixBuilder Class for computing the covariance matrix
    */
-  public PCARunner(Parameterization config) {
+  public PCARunner(CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder) {
     super();
-    config = config.descend(this);
-    if(config.grab(COVARIANCE_PARAM)) {
-      covarianceMatrixBuilder = COVARIANCE_PARAM.instantiateClass(config);
-    }
+    this.covarianceMatrixBuilder = covarianceMatrixBuilder;
   }
 
   /**
@@ -142,5 +134,33 @@ public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D,
    */
   public void setCovarianceMatrixBuilder(CovarianceMatrixBuilder<V, D> covarianceBuilder) {
     this.covarianceMatrixBuilder = covarianceBuilder;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+    /**
+     * The covariance computation class.
+     */
+    protected CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<CovarianceMatrixBuilder<V, D>> covarianceP = new ObjectParameter<CovarianceMatrixBuilder<V, D>>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class);
+      if(config.grab(covarianceP)) {
+        covarianceMatrixBuilder = covarianceP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected PCARunner<V, D> makeInstance() {
+      return new PCARunner<V, D>(covarianceMatrixBuilder);
+    }
   }
 }

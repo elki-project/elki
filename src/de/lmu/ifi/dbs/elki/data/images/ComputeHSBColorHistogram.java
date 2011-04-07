@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.elki.data.images;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
@@ -19,27 +18,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  */
 public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
   /**
-   * OptionID for {@link #BINSPERPLANE_PARAM}
-   */
-  public static final OptionID BINSPERPLANE_ID = OptionID.getOrCreateOptionID("hsbhist.bpp", "Bins per plane for HSV/HSB histogram. This will result in bpp ** 3 bins.");
-
-  /**
-   * Parameter list constraints.
-   */
-  private static final List<ParameterConstraint<List<Integer>>> bppConstraints = new ArrayList<ParameterConstraint<List<Integer>>>(2);
-  static {
-    bppConstraints.add(new ListSizeConstraint<Integer>(3));
-    bppConstraints.add(new ListGreaterEqualConstraint<Integer>(1));
-  }
-
-  /**
    * Parameter that specifies the number of bins (per plane) to use.
    * 
    * <p>
    * Key: {@code -rgbhist.bpp}
    * </p>
    */
-  private final IntListParameter BINSPERPLANE_PARAM = new IntListParameter(BINSPERPLANE_ID, bppConstraints, false);
+  public static final OptionID BINSPERPLANE_ID = OptionID.getOrCreateOptionID("hsbhist.bpp", "Bins per plane for HSV/HSB histogram. This will result in bpp ** 3 bins.");
 
   /**
    * Number of bins in hue to use.
@@ -57,25 +42,17 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
   int quantb;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param quanth Hue bins
+   * @param quants Saturation bins
+   * @param quantb Brightness bins
    */
-  public ComputeHSBColorHistogram(Parameterization config) {
+  public ComputeHSBColorHistogram(int quanth, int quants, int quantb) {
     super();
-    config = config.descend(this);
-    if(config.grab(BINSPERPLANE_PARAM)) {
-      List<Integer> quant = BINSPERPLANE_PARAM.getValue();
-      if(quant.size() != 3) {
-        config.reportError(new WrongParameterValueException(BINSPERPLANE_PARAM, "I need exactly three values for the bpp parameter."));
-      }
-      else {
-        quanth = quant.get(0);
-        quants = quant.get(1);
-        quantb = quant.get(2);
-      }
-    }
+    this.quanth = quanth;
+    this.quants = quants;
+    this.quantb = quantb;
   }
 
   @Override
@@ -105,5 +82,45 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
   @Override
   protected int getNumBins() {
     return quanth * quants * quantb;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    int quanth = 0;
+
+    int quants = 0;
+
+    int quantb = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntListParameter param = new IntListParameter(BINSPERPLANE_ID, false);
+      param.addConstraint(new ListSizeConstraint<Integer>(3));
+      param.addConstraint(new ListGreaterEqualConstraint<Integer>(1));
+
+      if(config.grab(param)) {
+        List<Integer> quant = param.getValue();
+        if(quant.size() != 3) {
+          config.reportError(new WrongParameterValueException(param, "I need exactly three values for the bpp parameter."));
+        }
+        else {
+          quanth = quant.get(0);
+          quants = quant.get(1);
+          quantb = quant.get(2);
+        }
+      }
+    }
+
+    @Override
+    protected ComputeHSBColorHistogram makeInstance() {
+      return new ComputeHSBColorHistogram(quanth, quants, quantb);
+    }
   }
 }

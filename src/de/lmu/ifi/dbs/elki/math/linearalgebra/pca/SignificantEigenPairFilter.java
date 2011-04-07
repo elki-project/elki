@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -38,27 +39,18 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
   public static final double DEFAULT_WALPHA = 0.0;
 
   /**
-   * Parameter weak alpha.
-   */
-  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
-
-  /**
    * The noise tolerance level for weak eigenvectors
    */
   private double walpha;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param walpha
    */
-  public SignificantEigenPairFilter(Parameterization config) {
+  public SignificantEigenPairFilter(double walpha) {
     super();
-    config = config.descend(this);
-    if(config.grab(WALPHA_PARAM)) {
-      walpha = WALPHA_PARAM.getValue();
-    }
+    this.walpha = walpha;
   }
 
   /**
@@ -106,5 +98,30 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    private double walpha;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
+      if(config.grab(walphaP)) {
+        walpha = walphaP.getValue();
+      }
+    }
+
+    @Override
+    protected SignificantEigenPairFilter makeInstance() {
+      return new SignificantEigenPairFilter(walpha);
+    }
   }
 }

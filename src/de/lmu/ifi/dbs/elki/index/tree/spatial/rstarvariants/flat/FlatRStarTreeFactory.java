@@ -2,14 +2,14 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Factory for flat R*-Trees.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.stereotype factory
  * @apiviz.uses FlatRStarTree oneway - - «create»
  * 
@@ -17,17 +17,36 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory<O, FlatRStarTree<O>> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fileName
+   * @param pageSize
+   * @param cacheSize
+   * @param bulk
+   * @param bulkLoadStrategy
+   * @param insertionCandidates
    */
-  public FlatRStarTreeFactory(Parameterization config) {
-    super(config);
+  public FlatRStarTreeFactory(String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+    // TODO Auto-generated constructor stub
   }
 
   @Override
   public FlatRStarTree<O> instantiate(Database<O> database) {
     return new FlatRStarTree<O>(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
+    @Override
+    protected FlatRStarTreeFactory<O> makeInstance() {
+      return new FlatRStarTreeFactory<O>(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+    }
   }
 }

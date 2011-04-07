@@ -38,13 +38,13 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
   public static final String POLYGON_SEPARATOR = "--";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
+   *
+   * @param colSep
+   * @param quoteChar
    */
-  public SimplePolygonParser(Parameterization config) {
-    super(config);
+  public SimplePolygonParser(Pattern colSep, char quoteChar) {
+    super(colSep, quoteChar);
   }
 
   @Override
@@ -123,5 +123,24 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParser.Parameterizer<PolygonsObject> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+
+    @Override
+    protected SimplePolygonParser makeInstance() {
+      return new SimplePolygonParser(colSep, quoteChar);
+    }
   }
 }

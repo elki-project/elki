@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -21,12 +22,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Vector type
+ * @param <V> Vector type
  */
-// TODO: ERICH: use reproducible Random
-public class RandomSampleReferencePoints<O extends NumberVector<? extends O, ?>> implements ReferencePointsHeuristic<O> {
+public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>> implements ReferencePointsHeuristic<V> {
+  // TODO: use reproducible Random
+
   /**
-   * OptionID for {@link #N_PARAM}
+   * Parameter to specify the sample size.
+   * <p>
+   * Key: {@code -sample.n}
+   * </p>
    */
   public static final OptionID N_ID = OptionID.getOrCreateOptionID("sample.n", "The number of samples to draw.");
 
@@ -36,45 +41,33 @@ public class RandomSampleReferencePoints<O extends NumberVector<? extends O, ?>>
   private static final double log4 = Math.log(4);
 
   /**
-   * Parameter to specify the sample size.
-   * <p>
-   * Key: {@code -sample.n}
-   * </p>
-   */
-  private final IntParameter N_PARAM = new IntParameter(N_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #N_PARAM}.
+   * Holds the value of {@link #N_ID}.
    */
   private int samplesize;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param samplesize
    */
-  public RandomSampleReferencePoints(Parameterization config) {
+  public RandomSampleReferencePoints(int samplesize) {
     super();
-    config = config.descend(this);
-    if(config.grab(N_PARAM)) {
-      samplesize = N_PARAM.getValue();
-    }
+    this.samplesize = samplesize;
   }
 
   @Override
-  public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
+  public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
     if(samplesize >= db.size()) {
       LoggingUtil.warning("Sample size is larger than database size!");
 
-      ArrayList<O> selection = new ArrayList<O>(db.size());
+      ArrayList<V> selection = new ArrayList<V>(db.size());
       for(DBID id : db) {
         selection.add(db.get(id));
       }
       return selection;
     }
 
-    ArrayList<O> result = new ArrayList<O>(samplesize);
+    ArrayList<V> result = new ArrayList<V>(samplesize);
     int dbsize = db.size();
 
     // Guess the memory requirements of a hashmap.
@@ -116,5 +109,33 @@ public class RandomSampleReferencePoints<O extends NumberVector<? extends O, ?>>
     }
     assert (result.size() == samplesize);
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<? extends V, ?>> extends AbstractParameterizer {
+    /**
+     * Holds the value of {@link #N_ID}.
+     */
+    protected int samplesize;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter samplesizeP = new IntParameter(N_ID, new GreaterConstraint(0));
+      if(config.grab(samplesizeP)) {
+        samplesize = samplesizeP.getValue();
+      }
+    }
+
+    @Override
+    protected RandomSampleReferencePoints<V> makeInstance() {
+      return new RandomSampleReferencePoints<V>(samplesize);
+    }
   }
 }

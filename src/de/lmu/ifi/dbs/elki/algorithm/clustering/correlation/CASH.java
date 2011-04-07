@@ -46,10 +46,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -83,28 +83,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
   private static final Logging logger = Logging.getLogger(CASH.class);
 
   /**
-   * OptionID for {@link #MINPTS_PARAM}
-   */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("cash.minpts", "Threshold for minimum number of points in a cluster.");
-
-  /**
    * Parameter to specify the threshold for minimum number of points in a
    * cluster, must be an integer greater than 0.
    * <p>
    * Key: {@code -cash.minpts}
    * </p>
    */
-  private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #MINPTS_PARAM}.
-   */
-  private int minPts;
-
-  /**
-   * OptionID for {@link #MAXLEVEL_PARAM}.
-   */
-  public static final OptionID MAXLEVEL_ID = OptionID.getOrCreateOptionID("cash.maxlevel", "The maximum level for splitting the hypercube.");
+  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("cash.minpts", "Threshold for minimum number of points in a cluster.");
 
   /**
    * Parameter to specify the maximum level for splitting the hypercube, must be
@@ -113,17 +98,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * Key: {@code -cash.maxlevel}
    * </p>
    */
-  private final IntParameter MAXLEVEL_PARAM = new IntParameter(MAXLEVEL_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #MAXLEVEL_PARAM}.
-   */
-  private int maxLevel;
-
-  /**
-   * OptionID for {@link #MINDIM_PARAM}
-   */
-  public static final OptionID MINDIM_ID = OptionID.getOrCreateOptionID("cash.mindim", "The minimum dimensionality of the subspaces to be found.");
+  public static final OptionID MAXLEVEL_ID = OptionID.getOrCreateOptionID("cash.maxlevel", "The maximum level for splitting the hypercube.");
 
   /**
    * Parameter to specify the minimum dimensionality of the subspaces to be
@@ -135,17 +110,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * Key: {@code -cash.mindim}
    * </p>
    */
-  private final IntParameter MINDIM_PARAM = new IntParameter(MINDIM_ID, new GreaterConstraint(0), 1);
-
-  /**
-   * Holds the value of {@link #MINDIM_PARAM}.
-   */
-  private int minDim;
-
-  /**
-   * OptionID for {@link #JITTER_PARAM}
-   */
-  public static final OptionID JITTER_ID = OptionID.getOrCreateOptionID("cash.jitter", "The maximum jitter for distance values.");
+  public static final OptionID MINDIM_ID = OptionID.getOrCreateOptionID("cash.mindim", "The minimum dimensionality of the subspaces to be found.");
 
   /**
    * Parameter to specify the maximum jitter for distance values, must be a
@@ -154,17 +119,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * Key: {@code -cash.jitter}
    * </p>
    */
-  private final DoubleParameter JITTER_PARAM = new DoubleParameter(JITTER_ID, new GreaterConstraint(0));
-
-  /**
-   * Holds the value of {@link #JITTER_PARAM}.
-   */
-  private double jitter;
-
-  /**
-   * OptionID for {@link #ADJUST_FLAG}
-   */
-  public static final OptionID ADJUST_ID = OptionID.getOrCreateOptionID("cash.adjust", "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " + "is performed after an interval is selected.");
+  public static final OptionID JITTER_ID = OptionID.getOrCreateOptionID("cash.jitter", "The maximum jitter for distance values.");
 
   /**
    * Flag to indicate that an adjustment of the applied heuristic for choosing
@@ -173,10 +128,30 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * Key: {@code -cash.adjust}
    * </p>
    */
-  private final Flag ADJUST_FLAG = new Flag(ADJUST_ID);
+  public static final OptionID ADJUST_ID = OptionID.getOrCreateOptionID("cash.adjust", "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " + "is performed after an interval is selected.");
 
   /**
-   * Holds the value of {@link #ADJUST_FLAG}.
+   * Holds the value of {@link #MINPTS_ID}.
+   */
+  private int minPts;
+
+  /**
+   * Holds the value of {@link #MAXLEVEL_ID}.
+   */
+  private int maxLevel;
+
+  /**
+   * Holds the value of {@link #MINDIM_ID}.
+   */
+  private int minDim;
+
+  /**
+   * Holds the value of {@link #JITTER_ID}.
+   */
+  private double jitter;
+
+  /**
+   * Holds the value of {@link #ADJUST_ID}.
    */
   private boolean adjust;
 
@@ -196,45 +171,32 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
   private Database<ParameterizationFunction> database;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param minPts MinPts parameter
+   * @param maxLevel Maximum level
+   * @param minDim Minimum dimensionality
+   * @param jitter Jitter
+   * @param adjust Adjust
    */
-  public CASH(Parameterization config) {
+  public CASH(int minPts, int maxLevel, int minDim, double jitter, boolean adjust) {
     super();
-    config = config.descend(this);
-    if(config.grab(MINPTS_PARAM)) {
-      minPts = MINPTS_PARAM.getValue();
-    }
-
-    if(config.grab(MAXLEVEL_PARAM)) {
-      maxLevel = MAXLEVEL_PARAM.getValue();
-    }
-
-    if(config.grab(MINDIM_PARAM)) {
-      minDim = MINDIM_PARAM.getValue();
-    }
-
-    if(config.grab(JITTER_PARAM)) {
-      jitter = JITTER_PARAM.getValue();
-    }
-
-    if(config.grab(ADJUST_FLAG)) {
-      adjust = ADJUST_FLAG.getValue();
-    }
+    this.minPts = minPts;
+    this.maxLevel = maxLevel;
+    this.minDim = minDim;
+    this.jitter = jitter;
+    this.adjust = adjust;
   }
 
   /**
    * Performs the CASH algorithm on the given database.
-   * 
    */
   @Override
   protected Clustering<Model> runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
     this.database = database;
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nDB size: ").append(database.size());
+      msg.append("DB size: ").append(database.size());
       msg.append("\nmin Dim: ").append(minDim);
       logger.verbose(msg.toString());
     }
@@ -518,7 +480,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     }
 
     // insert into db
-    Database<ParameterizationFunction> result = new HashmapDatabase<ParameterizationFunction>(new EmptyParameterization());
+    Database<ParameterizationFunction> result = new HashmapDatabase<ParameterizationFunction>(null, null);
     result.insert(oaas);
 
     if(logger.isDebugging()) {
@@ -723,7 +685,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
     DependencyDerivator<DoubleVector, DoubleDistance> derivator = null;
     Class<DependencyDerivator<DoubleVector, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-    derivator = parameters.tryInstantiate(cls, cls);
+    derivator = parameters.tryInstantiate(cls);
 
     CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
 
@@ -770,7 +732,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     }
 
     // insert into db
-    Database<DoubleVector> result = new HashmapDatabase<DoubleVector>(new EmptyParameterization());
+    Database<DoubleVector> result = new HashmapDatabase<DoubleVector>(null, null);
     result.setObjectFactory(database.getObjectFactory());
     result.insert(oaas);
 
@@ -801,7 +763,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
       DependencyDerivator<DoubleVector, DoubleDistance> derivator = null;
       Class<DependencyDerivator<DoubleVector, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-      derivator = parameters.tryInstantiate(cls, cls);
+      derivator = parameters.tryInstantiate(cls);
 
       CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
       LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
@@ -839,7 +801,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     }
 
     // insert into db
-    Database<DoubleVector> result = new HashmapDatabase<DoubleVector>(new EmptyParameterization());
+    Database<DoubleVector> result = new HashmapDatabase<DoubleVector>(null, null);
     result.setObjectFactory(database.getObjectFactory());
     result.insert(oaas);
 
@@ -849,5 +811,54 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected int minpts;
+
+    protected int maxlevel;
+
+    protected int mindim;
+
+    protected double jitter;
+
+    protected boolean adjust;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+      if(config.grab(minptsP)) {
+        minpts = minptsP.getValue();
+      }
+      IntParameter maxlevelP = new IntParameter(MAXLEVEL_ID, new GreaterConstraint(0));
+      if(config.grab(maxlevelP)) {
+        maxlevel = maxlevelP.getValue();
+      }
+      IntParameter mindimP = new IntParameter(MINDIM_ID, new GreaterConstraint(0), 1);
+      if(config.grab(mindimP)) {
+        mindim = mindimP.getValue();
+      }
+      DoubleParameter jitterP = new DoubleParameter(JITTER_ID, new GreaterConstraint(0));
+      if(config.grab(jitterP)) {
+        jitter = jitterP.getValue();
+      }
+      Flag adjustF = new Flag(ADJUST_ID);
+      if(config.grab(adjustF)) {
+        adjust = adjustF.getValue();
+      }
+    }
+
+    @Override
+    protected CASH makeInstance() {
+      return new CASH(minpts, maxlevel, mindim, jitter, adjust);
+    }
   }
 }

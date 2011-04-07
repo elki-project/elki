@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -33,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -187,7 +187,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
       database.addIndex(preproc);
       knnReach = preproc.getKNNQuery(database, reachabilityDistanceFunction, k);
     }
-    
+
     // knnReach is only used once
     KNNQuery<O, D> knnRefer;
     if(neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
@@ -472,57 +472,54 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exten
     }
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return KNN outlier detection algorithm
-   */
-  public static <O extends DatabaseObject, D extends NumberDistance<D, ?>> LOF<O, D> parameterize(Parameterization config) {
-    int k = getParameterK(config);
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    DistanceFunction<O, D> reachabilityDistanceFunction = getParameterReachabilityDistanceFunction(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    // Default is to re-use the same distance
-    if(reachabilityDistanceFunction == null) {
-      reachabilityDistanceFunction = distanceFunction;
-    }
-    return new LOF<O, D>(k + (objectIsInKNN ? 0 : 1), distanceFunction, reachabilityDistanceFunction);
-  }
-
-  /**
-   * Get the k Parameter for the knn query
-   * 
-   * @param config Parameterization
-   * @return k parameter
-   */
-  protected static int getParameterK(Parameterization config) {
-    final IntParameter param = new IntParameter(K_ID, new GreaterConstraint(1));
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return -1;
-  }
-
-  /**
-   * Grab the reachability distance configuration option.
-   * 
-   * @param <F> distance function type
-   * @param config Parameterization
-   * @return Parameter value or null.
-   */
-  protected static <F extends DistanceFunction<?, ?>> F getParameterReachabilityDistanceFunction(Parameterization config) {
-    final ObjectParameter<F> param = new ObjectParameter<F>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    /**
+     * The neighborhood size to use
+     */
+    protected int k = 2;
+
+    /**
+     * Neighborhood distance function.
+     */
+    protected DistanceFunction<O, D> neighborhoodDistanceFunction = null;
+
+    /**
+     * Reachability distance function.
+     */
+    protected DistanceFunction<O, D> reachabilityDistanceFunction = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      final IntParameter pK = new IntParameter(K_ID, new GreaterConstraint(1));
+      if(config.grab(pK)) {
+        k = pK.getValue();
+      }
+
+      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+      if(config.grab(reachDistP)) {
+        reachabilityDistanceFunction = reachDistP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected LOF<O, D> makeInstance() {
+      // Default is to re-use the same distance
+      DistanceFunction<O, D> rdist = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : distanceFunction;
+      return new LOF<O, D>(k + (objectIsInKNN ? 0 : 1), distanceFunction, rdist);
+    }
   }
 }

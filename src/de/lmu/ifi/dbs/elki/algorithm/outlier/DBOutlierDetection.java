@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -148,42 +147,33 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     return scores;
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return ABOD Algorithm
-   */
-  public static <O extends DatabaseObject, D extends Distance<D>> DBOutlierDetection<O, D> parameterize(Parameterization config) {
-    // distance used in preprocessor
-    DistanceFunction<O, D> distanceFunction = getParameterDistanceFunction(config);
-    // d parameter
-    D d = getParameterD(config, distanceFunction);
-    // p Parameter
-    double p = getParameterP(config);
-
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new DBOutlierDetection<O, D>(distanceFunction, d, p);
-  }
-
-  /**
-   * Grab the 'p' configuration option.
-   * 
-   * @param config Parameterization
-   * @return p Parameter
-   */
-  protected static double getParameterP(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(P_ID);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return Double.NaN;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
+    protected double p = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter pP = new DoubleParameter(P_ID);
+      if(config.grab(pP)) {
+        p = pP.getValue();
+      }
+    }
+
+    @Override
+    protected DBOutlierDetection<O, D> makeInstance() {
+      return new DBOutlierDetection<O, D>(distanceFunction, d, p);
+    }
   }
 }

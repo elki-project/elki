@@ -27,14 +27,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // todo arthur comment class
 public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param indexFactory Index factory.
    */
-  public SharedNearestNeighborSimilarityFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public SharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>> indexFactory) {
+    super(indexFactory);
   }
 
   @Override
@@ -91,26 +89,11 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     return intersection;
   }
 
-  @Override
-  public Class<? super O> getInputDatatype() {
-    return DatabaseObject.class;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryRestriction() {
-    return SharedNearestNeighborIndex.Factory.class;
-  }
-
-  @Override
-  protected Class<?> getIndexFactoryDefaultClass() {
-    return SharedNearestNeighborPreprocessor.Factory.class;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    SharedNearestNeighborIndex<O> indexi = index.instantiate((Database<O>)database);
-    return (Instance<T, D>) new Instance<O, D>((Database<O>)database, indexi);
+    SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Database<O>) database);
+    return (Instance<T, D>) new Instance<O, D>((Database<O>) database, indexi);
   }
 
   /**
@@ -118,7 +101,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor.Instance
+   * @apiviz.uses SharedNearestNeighborIndex
    * 
    * @param <O>
    * @param <D>
@@ -138,6 +121,26 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     @Override
     public IntegerDistance getDistanceFactory() {
       return IntegerDistance.FACTORY;
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      configIndexFactory(config, SharedNearestNeighborIndex.Factory.class, SharedNearestNeighborPreprocessor.Factory.class);
+    }
+
+    @Override
+    protected SharedNearestNeighborSimilarityFunction<O, D> makeInstance() {
+      return new SharedNearestNeighborSimilarityFunction<O, D>(factory);
     }
   }
 }

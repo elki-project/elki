@@ -52,7 +52,7 @@ public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
     SettingsResult sr = task.getResult();
     VisualizerContext<? extends DatabaseObject> context = task.getContext();
     SVGPlot svgp = task.getPlot();
-    
+
     Collection<Pair<Object, Parameter<?, ?>>> settings = sr.getSettings();
 
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
@@ -65,7 +65,11 @@ public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
       if(setting.first != last && setting.first != null) {
         String name;
         try {
-          name = setting.first.getClass().getName();
+          if(setting.first instanceof Class) {
+            name = ((Class<?>) setting.first).getName();
+          } else {
+            name = setting.first.getClass().getName();
+          }
           if(ClassParameter.class.isInstance(setting.first)) {
             name = ((ClassParameter<?>) setting.first).getValue().getName();
           }

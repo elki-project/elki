@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
@@ -30,21 +31,9 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
   public final static String DEFAULT_NORMALIZATION = AttributeWiseMinMaxNormalization.class.getName();
 
   /**
-   * Keyword for no normalization.
-   */
-  // TODO: support for this was removed below.
-  // Instead the user can just give DummyNormalization.class.getName(), right?
-  // public final static String NO_NORMALIZATION = "noNorm";
-
-  /**
-   * Option ID for normalizations
-   */
-  public final OptionID NORMALIZATION_ID = OptionID.getOrCreateOptionID("normalizations", "A comma separated list of normalizations for each representation. " + "If in one representation no normalization is desired, please use the class '" + DummyNormalization.class.getName() + "' in the list.");
-
-  /**
    * Normalization class parameter
    */
-  private final ClassListParameter<Normalization<O>> NORMALIZATION_PARAM = new ClassListParameter<Normalization<O>>(NORMALIZATION_ID, Normalization.class);
+  public final static OptionID NORMALIZATION_ID = OptionID.getOrCreateOptionID("normalizations", "A comma separated list of normalizations for each representation. " + "If in one representation no normalization is desired, please use the class '" + DummyNormalization.class.getName() + "' in the list.");
 
   /**
    * A pattern defining a comma.
@@ -57,21 +46,13 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
   private List<Normalization<O>> normalizations;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param normalizations
    */
-  public MultiRepresentedObjectNormalization(Parameterization config) {
+  public MultiRepresentedObjectNormalization(List<Normalization<O>> normalizations) {
     super();
-    config = config.descend(this);
-    // The default value will be initialized on-demand, since we don't know
-    // the number of representations beforehand.
-    if(config.grab(NORMALIZATION_PARAM)) {
-      // TODO: add support back for NO_NORMALIZATION keyword?
-      // Right now, the user needs to specify DummyNormalization.class.getName()
-      this.normalizations = NORMALIZATION_PARAM.instantiateClasses(config);
-    }
+    this.normalizations = normalizations;
   }
 
   /**
@@ -181,7 +162,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     // FIXME: can this class be refactored accordingly?
     throw new UnsupportedOperationException("Not implemented yet - but should not be called anyway!");
   }
-  
+
   @Override
   protected boolean initNormalization() {
     // FIXME: can this class be refactored accordingly?
@@ -267,5 +248,36 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     }
 
     return result.toString();
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * The normalizations for each representation.
+     */
+    protected List<Normalization<O>> normalizations = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ClassListParameter<Normalization<O>> normalizationP = new ClassListParameter<Normalization<O>>(NORMALIZATION_ID, Normalization.class);
+
+      // The default value will be initialized on-demand, since we don't know
+      // the number of representations beforehand.
+      if(config.grab(normalizationP)) {
+        normalizations = normalizationP.instantiateClasses(config);
+      }
+    }
+
+    @Override
+    protected MultiRepresentedObjectNormalization<O> makeInstance() {
+      return new MultiRepresentedObjectNormalization<O>(normalizations);
+    }
   }
 }

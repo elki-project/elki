@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -24,36 +25,27 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
   /**
-   * OptionID for {@link #SPACE_SCALE_PARAM}
-   */
-  public static final OptionID SPACE_SCALE_ID = OptionID.getOrCreateOptionID("axisref.scale", "Scale the data space extension by the given factor.");
-
-  /**
    * Parameter to specify the extra scaling of the space, to allow
    * out-of-data-space reference points.
    * <p>
    * Key: {@code -axisref.scale}
    * </p>
    */
-  private final DoubleParameter SPACE_SCALE_PARAM = new DoubleParameter(SPACE_SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
+  public static final OptionID SPACE_SCALE_ID = OptionID.getOrCreateOptionID("axisref.scale", "Scale the data space extension by the given factor.");
 
   /**
-   * Holds the value of {@link #SPACE_SCALE_PARAM}.
+   * Holds the value of {@link #SPACE_SCALE_ID}.
    */
   protected double spacescale;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param spacescale
    */
-  public AxisBasedReferencePoints(Parameterization config) {
+  public AxisBasedReferencePoints(double spacescale) {
     super();
-    config = config.descend(this);
-    if (config.grab(SPACE_SCALE_PARAM)) {
-      spacescale = SPACE_SCALE_PARAM.getValue();
-    }
+    this.spacescale = spacescale;
   }
 
   @Override
@@ -99,5 +91,33 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
     }
 
     return result;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    /**
+     * Holds the value of {@link #SPACE_SCALE_ID}.
+     */
+    protected double spacescale = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter spacescaleP = new DoubleParameter(SPACE_SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
+      if(config.grab(spacescaleP)) {
+        spacescale = spacescaleP.getValue();
+      }
+    }
+
+    @Override
+    protected AxisBasedReferencePoints<V> makeInstance() {
+      return new AxisBasedReferencePoints<V>(spacescale);
+    }
   }
 }

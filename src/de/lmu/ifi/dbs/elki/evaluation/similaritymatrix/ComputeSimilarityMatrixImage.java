@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -32,6 +33,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -43,22 +45,24 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
  * Compute a similarity matrix for a distance function.
  * 
  * @author Erich Schubert
- *
+ * 
+ * @apiviz.has SimilarityMatrix oneway - - «create»
+ * 
  * @param <O> Object class
  */
-public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements Evaluator<O> {
+public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements Evaluator {
   /**
    * The logger.
    */
   static final Logging logger = Logging.getLogger(ComputeSimilarityMatrixImage.class);
 
   /**
-   * OptionID for {@link #SCALING_PARAM}
+   * OptionID for the scaling function to use
    */
   public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("simmatrix.scaling", "Class to use as scaling function.");
 
   /**
-   * OptionID for {@link #SKIPZERO_PARAM}
+   * OptionID to skip zero values when plotting to increase contrast.
    */
   public static final OptionID SKIPZERO_ID = OptionID.getOrCreateOptionID("simmatrix.skipzero", "Skip zero values when computing the colors to increase contrast.");
 
@@ -71,41 +75,24 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
    * Scaling function to use
    */
   private ScalingFunction scaling;
-  
+
   /**
    * Skip zero values.
    */
   private boolean skipzero = false;
 
   /**
-   * Constructor
+   * Constructor.
    * 
-   * @param config Parameters
+   * @param distanceFunction Distance function to use
+   * @param scaling Scaling function to use for contrast
+   * @param skipzero Skip zero values when scaling.
    */
-  public ComputeSimilarityMatrixImage(Parameterization config) {
+  public ComputeSimilarityMatrixImage(DistanceFunction<O, ? extends NumberDistance<?, ?>> distanceFunction, ScalingFunction scaling, boolean skipzero) {
     super();
-    config = config.descend(this);
-    distanceFunction = AbstractAlgorithm.getParameterDistanceFunction(config);
-    scaling = getScalingFunction(config);
-    Flag skipzero_param = new Flag(SKIPZERO_ID);
-    if (config.grab(skipzero_param)) {
-      skipzero = skipzero_param.getValue();
-    }
-  }
-
-  /**
-   * Get the scaling function parameter.
-   * 
-   * @param config Parameterization
-   * @return Scaling function or null
-   */
-  private static ScalingFunction getScalingFunction(Parameterization config) {
-    final ObjectParameter<ScalingFunction> param = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, true);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    } else {
-      return null;
-    }
+    this.distanceFunction = distanceFunction;
+    this.scaling = scaling;
+    this.skipzero = skipzero;
   }
 
   /**
@@ -146,7 +133,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
         DBID id2 = order.get(y);
         final double dist = dq.distance(id1, id2).doubleValue();
         if(!Double.isNaN(dist) && !Double.isInfinite(dist) /* && dist > 0.0 */) {
-          if (!skipzero || dist != 0.0) {
+          if(!skipzero || dist != 0.0) {
             minmax.put(dist);
           }
         }
@@ -171,7 +158,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
           ddist = scale.getScaled(ddist);
         }
         // Apply extra scaling
-        if (scaling != null) {
+        if(scaling != null) {
           ddist = scaling.getScaled(ddist);
         }
         int dist = 0xFF & (int) (255 * ddist);
@@ -207,7 +194,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
   }
 
   @Override
-  public void processResult(Database<O> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
     boolean nonefound = true;
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
@@ -215,7 +202,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
-      hierarchy.add(or, computeSimilarityMatrixImage(db, or.iter(db.getIDs())));
+      hierarchy.add(or, computeSimilarityMatrixImage(castDatabase(db), or.iter(db.getIDs())));
       // Process them only once.
       orderings.remove(or);
       nonefound = false;
@@ -226,7 +213,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     for(IterableResult<?> ir : iterables) {
       Iterator<DBID> iter = getDBIDIterator(ir);
       if(iter != null) {
-        hierarchy.add(ir, computeSimilarityMatrixImage(db, iter));
+        hierarchy.add(ir, computeSimilarityMatrixImage(castDatabase(db), iter));
         nonefound = false;
       }
     }
@@ -234,7 +221,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Iterator<DBID> iter = or.iter(db.getIDs());
-      hierarchy.add(or, computeSimilarityMatrixImage(db, iter));
+      hierarchy.add(or, computeSimilarityMatrixImage(castDatabase(db), iter));
       nonefound = false;
     }
 
@@ -250,8 +237,19 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     }
   }
 
+  /**
+   * Unchecked generics cast.
+   * 
+   * @param db Database to cast
+   * @return database
+   */
+  @SuppressWarnings("unchecked")
+  private Database<O> castDatabase(Database<?> db) {
+    return (Database<O>) db;
+  }
+
   @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
+  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
     // Normalizations are ignored
   }
 
@@ -265,12 +263,12 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
      * Prefix for filenames
      */
     private static final String IMGFILEPREFIX = "elki-pixmap-";
-    
+
     /**
      * The database
      */
     Database<?> database;
-    
+
     /**
      * The database IDs used
      */
@@ -317,7 +315,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
       }
       return imgfile;
     }
-    
+
     /**
      * Get the database
      * 
@@ -344,6 +342,54 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     @Override
     public String getShortName() {
       return "sim-matrix";
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * The distance function to use
+     */
+    private DistanceFunction<O, ? extends NumberDistance<?, ?>> distanceFunction;
+
+    /**
+     * Scaling function to use
+     */
+    private ScalingFunction scaling;
+
+    /**
+     * Skip zero values.
+     */
+    private boolean skipzero = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<DistanceFunction<O, ? extends NumberDistance<?, ?>>> distanceFunctionP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      if(config.grab(distanceFunctionP)) {
+        distanceFunction = distanceFunctionP.instantiateClass(config);
+      }
+
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, true);
+      if(config.grab(scalingP)) {
+        scaling = scalingP.instantiateClass(config);
+      }
+
+      Flag skipzeroP = new Flag(SKIPZERO_ID);
+      if(config.grab(skipzeroP)) {
+        skipzero = skipzeroP.getValue();
+      }
+    }
+
+    @Override
+    protected ComputeSimilarityMatrixImage<O> makeInstance() {
+      return new ComputeSimilarityMatrixImage<O>(distanceFunction, scaling, skipzero);
     }
   }
 }

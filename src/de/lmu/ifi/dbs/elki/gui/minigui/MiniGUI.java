@@ -29,7 +29,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
 import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
@@ -289,8 +288,8 @@ public class MiniGUI extends JPanel {
   protected void doSetParameters(List<String> params) {
     SerializedParameterization config = new SerializedParameterization(params);
     TrackParameters track = new TrackParameters(config);
-    new LoggingStep(track);
-    new KDDTask<DatabaseObject>(track);
+    track.tryInstantiate(LoggingStep.class);
+    track.tryInstantiate(KDDTask.class);
     config.logUnusedParameters();
     // config.logAndClearReportedErrors();
     if(config.getErrors().size() > 0) {
@@ -343,8 +342,8 @@ public class MiniGUI extends JPanel {
       @Override
       public Void doInBackground() {
         SerializedParameterization config = new SerializedParameterization(params);
-        new LoggingStep(config);
-        KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>(config);
+        config.tryInstantiate(LoggingStep.class);
+        KDDTask<?> task = config.tryInstantiate(KDDTask.class);
         try {
           config.logUnusedParameters();
           if(config.getErrors().size() == 0) {

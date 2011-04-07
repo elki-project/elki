@@ -22,30 +22,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public class ComputeSingleColorHistogram extends AbstractApplication {
   /**
-   * Option id to use for computing the histogram. See {@link #COLORHIST_PARAM}
-   */
-  public static OptionID COLORHIST_ID = OptionID.getOrCreateOptionID("colorhist.generator", "Class that is used to generate a color histogram.");
-
-  /**
    * Class parameter for computing the color histogram.
    * <p>
    * Key: {@code -colorhist.generator}
    * </p>
    */
-  private ObjectParameter<ComputeColorHistogram> COLORHIST_PARAM = new ObjectParameter<ComputeColorHistogram>(COLORHIST_ID, ComputeColorHistogram.class, ComputeNaiveRGBColorHistogram.class);
-
-  /**
-   * OptionID for {@link #INPUT_PARAM}
-   */
-  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("colorhist.in", "Input image for color histograms.");
+  public static OptionID COLORHIST_ID = OptionID.getOrCreateOptionID("colorhist.generator", "Class that is used to generate a color histogram.");
 
   /**
    * Parameter that specifies the name of the input file.
    * <p>
-   * Key: {@code -app.in}
+   * Key: {@code -colorhist.in}
    * </p>
    */
-  private final FileParameter INPUT_PARAM = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
+
+  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("colorhist.in", "Input image for color histograms.");
 
   /**
    * Class that will compute the actual histogram
@@ -58,20 +49,16 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
   private File inputFile;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param verbose Verbose flag
+   * @param histogrammaker Class to compute histograms with
+   * @param inputFile Input file
    */
-  public ComputeSingleColorHistogram(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(COLORHIST_PARAM)) {
-      histogrammaker = COLORHIST_PARAM.instantiateClass(config);
-    }
-    if(config.grab(INPUT_PARAM)) {
-      inputFile = INPUT_PARAM.getValue();
-    }
+  public ComputeSingleColorHistogram(boolean verbose, ComputeColorHistogram histogrammaker, File inputFile) {
+    super(verbose);
+    this.histogrammaker = histogrammaker;
+    this.inputFile = inputFile;
   }
 
   @Override
@@ -84,6 +71,43 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
       throw new UnableToComplyException(e);
     }
     System.out.println(FormatUtil.format(hist, " "));
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractApplication.Parameterizer {
+    /**
+     * Class that will compute the actual histogram
+     */
+    private ComputeColorHistogram histogrammaker;
+
+    /**
+     * Input file.
+     */
+    private File inputFile;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final ObjectParameter<ComputeColorHistogram> colorhistP = new ObjectParameter<ComputeColorHistogram>(COLORHIST_ID, ComputeColorHistogram.class, ComputeNaiveRGBColorHistogram.class);
+      if(config.grab(colorhistP)) {
+        histogrammaker = colorhistP.instantiateClass(config);
+      }
+      final FileParameter inputP = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
+      if(config.grab(inputP)) {
+        inputFile = inputP.getValue();
+      }
+    }
+
+    @Override
+    protected ComputeSingleColorHistogram makeInstance() {
+      return new ComputeSingleColorHistogram(verbose, histogrammaker, inputFile);
+    }
   }
 
   /**

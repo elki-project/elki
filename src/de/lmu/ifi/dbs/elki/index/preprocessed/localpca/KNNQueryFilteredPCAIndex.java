@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -93,11 +94,6 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
    */
   public static class Factory<V extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
     /**
-     * OptionID for {@link #K_PARAM}
-     */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("localpca.k", "The number of nearest neighbors considered in the PCA. " + "If this parameter is not set, k ist set to three " + "times of the dimensionality of the database objects.");
-
-    /**
      * Optional parameter to specify the number of nearest neighbors considered
      * in the PCA, must be an integer greater than 0. If this parameter is not
      * set, k is set to three times of the dimensionality of the database
@@ -109,26 +105,23 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
      * Default value: three times of the dimensionality of the database objects
      * </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0), true);
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("localpca.k", "The number of nearest neighbors considered in the PCA. " + "If this parameter is not set, k ist set to three " + "times of the dimensionality of the database objects.");
 
     /**
-     * Holds the value of {@link #K_PARAM}.
+     * Holds the value of {@link #K_ID}.
      */
     private Integer k = null;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param pcaDistanceFunction distance
+     * @param pca PCA class
+     * @param k k
      */
-    public Factory(Parameterization config) {
-      super(config);
-      config = config.descend(this);
-
-      if(config.grab(K_PARAM)) {
-        k = K_PARAM.getValue();
-      }
+    public Factory(DistanceFunction<V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<V, DoubleDistance> pca, Integer k) {
+      super(pcaDistanceFunction, pca);
+      this.k = k;
     }
 
     @Override
@@ -136,6 +129,31 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
       // TODO: set bulk flag, once the parent class supports bulk.
       KNNQuery<V, DoubleDistance> knnquery = database.getKNNQuery(pcaDistanceFunction, k);
       return new KNNQueryFilteredPCAIndex<V>(database, pca, knnquery, k);
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
+      protected int k = 0;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0), true);
+        if(config.grab(kP)) {
+          k = kP.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(pcaDistanceFunction, pca, k);
+      }
     }
   }
 }

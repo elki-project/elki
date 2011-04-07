@@ -49,7 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
  * @apiviz.has GeneratorSingleCluster oneway - - creates
  * @apiviz.has GeneratorStatic oneway - - creates
  */
-public class GeneratorXMLSpec extends StandAloneApplication {
+public class GeneratorXMLSpec extends AbstractApplication {
+  // TODO: move XML parsing into data package.
+  
   /**
    * The logger for this class.
    */
@@ -61,34 +63,19 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   public static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
   /**
-   * OptionID for {@link #CONFIGFILE_PARAM}
+   * Parameter to give the configuration file
    */
   public static final OptionID CONFIGFILE_ID = OptionID.getOrCreateOptionID("bymodel.spec", "The generator specification file.");
 
   /**
    * Parameter to give the configuration file
    */
-  private final FileParameter CONFIGFILE_PARAM = new FileParameter(CONFIGFILE_ID, FileParameter.FileType.INPUT_FILE);
-
-  /**
-   * OptionID for {@link #RANDOMSEED_PARAM}
-   */
   public static final OptionID RANDOMSEED_ID = OptionID.getOrCreateOptionID("bymodel.randomseed", "The random generator seed.");
 
   /**
    * Parameter to give the configuration file
    */
-  private final IntParameter RANDOMSEED_PARAM = new IntParameter(RANDOMSEED_ID, true);
-
-  /**
-   * OptionID for {@link #SIZE_SCALE_PARAM}
-   */
   public static final OptionID SIZE_SCALE_ID = OptionID.getOrCreateOptionID("bymodel.sizescale", "Factor for scaling the specified cluster sizes.");
-
-  /**
-   * Parameter to give the configuration file
-   */
-  private final DoubleParameter SIZE_SCALE_PARAM = new DoubleParameter(SIZE_SCALE_ID, 1.0);
 
   /**
    * File name of the generators XML Schema file.
@@ -113,7 +100,7 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   /**
    * Random generator used for initializing cluster generators.
    */
-  private Random clusterRandom = new Random();
+  private Random clusterRandom = null;
 
   /**
    * Set testAgainstModel flag
@@ -121,22 +108,27 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   private boolean testAgainstModel = true;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Output file.
    */
-  public GeneratorXMLSpec(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(CONFIGFILE_PARAM)) {
-      specfile = CONFIGFILE_PARAM.getValue();
-    }
-    if(config.grab(SIZE_SCALE_PARAM)) {
-      sizescale = SIZE_SCALE_PARAM.getValue();
-    }
-    if(config.grab(RANDOMSEED_PARAM)) {
-      clusterRandom = new Random(RANDOMSEED_PARAM.getValue());
+  private File outputFile;
+
+  /**
+   * Constructor.
+   * 
+   * @param verbose Verbose flag
+   * @param output Output file
+   * @param specfile Specification file
+   * @param sizescale Size scaling
+   * @param clusterRandom Random number generator
+   */
+  public GeneratorXMLSpec(boolean verbose, File output, File specfile, double sizescale, Random clusterRandom) {
+    super(verbose);
+    this.outputFile = output;
+    this.specfile = specfile;
+    this.sizescale = sizescale;
+    this.clusterRandom = clusterRandom;
+    if(this.clusterRandom == null) {
+      clusterRandom = new Random();
     }
   }
 
@@ -582,7 +574,6 @@ public class GeneratorXMLSpec extends StandAloneApplication {
       logger.verbose("Writing output ...");
     }
     try {
-      File outputFile = getOutput();
       if(outputFile.exists()) {
         if(logger.isVerbose()) {
           logger.verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");
@@ -607,11 +598,59 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   }
 
   /**
-   * Describe wrapper output.
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  @Override
-  public String getOutputDescription() {
-    return "the file to write the generated data set into, " + "if the file already exists, the generated points will be appended to this file.";
+  public static class Parameterizer extends AbstractApplication.Parameterizer {
+    /**
+     * The configuration file.
+     */
+    File specfile = null;
+
+    /**
+     * Parameter for scaling the cluster sizes.
+     */
+    double sizescale = 1.0;
+
+    /**
+     * Random generator used for initializing cluster generators.
+     */
+    private Random clusterRandom = null;
+
+    /**
+     * Output file.
+     */
+    private File outputFile = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      // Output file
+      outputFile = getParameterOutputFile(config, "the file to write the generated data set into, if the file already exists, the generated points will be appended to this file.");
+      // Specification file
+      final FileParameter cfgparam = new FileParameter(CONFIGFILE_ID, FileParameter.FileType.INPUT_FILE);
+      if(config.grab(cfgparam)) {
+        specfile = cfgparam.getValue();
+      }
+      // Cluster size scaling
+      final DoubleParameter scalepar = new DoubleParameter(SIZE_SCALE_ID, 1.0);
+      if(config.grab(scalepar)) {
+        sizescale = scalepar.getValue();
+      }
+      // Random generator
+      final IntParameter seedpar = new IntParameter(RANDOMSEED_ID, true);
+      if(config.grab(seedpar)) {
+        clusterRandom = new Random(seedpar.getValue());
+      }
+    }
+
+    @Override
+    protected GeneratorXMLSpec makeInstance() {
+      return new GeneratorXMLSpec(verbose, outputFile, specfile, sizescale, clusterRandom);
+    }
   }
 
   /**

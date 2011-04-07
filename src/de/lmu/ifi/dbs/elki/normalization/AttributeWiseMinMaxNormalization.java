@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
@@ -25,24 +26,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 // TODO: extract superclass AbstractAttributeWiseNormalization
 public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> extends AbstractNormalization<V> {
   /**
-   * OptionID for {@link #MINIMA_PARAM}
+   * Parameter for minimum.
    */
   public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("normalize.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
 
   /**
-   * OptionID for {@link #MAXIMA_PARAM}
-   */
-  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
-
-  /**
-   * Parameter for minimum.
-   */
-  private final DoubleListParameter MINIMA_PARAM = new DoubleListParameter(MINIMA_ID, true);
-
-  /**
    * Parameter for maximum.
    */
-  private final DoubleListParameter MAXIMA_PARAM = new DoubleListParameter(MAXIMA_ID, true);
+  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
 
   /**
    * Stores the maximum in each dimension.
@@ -55,32 +46,15 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
   private double[] minima = new double[0];
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param minima Minimum values
+   * @param maxima Maximum values
    */
-  public AttributeWiseMinMaxNormalization(Parameterization config) {
+  public AttributeWiseMinMaxNormalization(double[] minima, double[] maxima) {
     super();
-    config = config.descend(this);
-    if(config.grab(MINIMA_PARAM)) {
-      List<Double> min_list = MINIMA_PARAM.getValue();
-      minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
-    }
-    if(config.grab(MAXIMA_PARAM)) {
-      List<Double> max_list = MAXIMA_PARAM.getValue();
-      maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
-    }
-
-    ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
-    global_1.add(MINIMA_PARAM);
-    global_1.add(MAXIMA_PARAM);
-    config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
-
-    ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
-    global.add(MINIMA_PARAM);
-    global.add(MAXIMA_PARAM);
-    config.checkConstraint(new EqualSizeGlobalConstraint(global));
+    this.minima = minima;
+    this.maxima = maxima;
   }
 
   @Override
@@ -198,5 +172,54 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     result.append(pre).append("normalization maxima: ").append(FormatUtil.format(maxima));
 
     return result.toString();
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    /**
+     * Stores the maximum in each dimension.
+     */
+    private double[] maxima = new double[0];
+
+    /**
+     * Stores the minimum in each dimension.
+     */
+    private double[] minima = new double[0];
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
+      if(config.grab(minimaP)) {
+        List<Double> min_list = minimaP.getValue();
+        minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
+      }
+      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
+      if(config.grab(maximaP)) {
+        List<Double> max_list = maximaP.getValue();
+        maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
+      }
+
+      ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
+      global_1.add(minimaP);
+      global_1.add(maximaP);
+      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
+
+      ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
+      global.add(minimaP);
+      global.add(maximaP);
+      config.checkConstraint(new EqualSizeGlobalConstraint(global));
+    }
+
+    @Override
+    protected AttributeWiseMinMaxNormalization<V> makeInstance() {
+      return new AttributeWiseMinMaxNormalization<V>(minima, maxima);
+    }
   }
 }

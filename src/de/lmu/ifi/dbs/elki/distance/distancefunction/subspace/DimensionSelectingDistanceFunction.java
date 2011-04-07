@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -20,14 +21,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
-   * OptionID for {@link #DIM_PARAM}
-   */
-  public static final OptionID DIM_ID = OptionID.getOrCreateOptionID("dim", "an integer between 1 and the dimensionality of the " + "feature space 1 specifying the dimension to be considered " + "for distance computation.");
-
-  /**
    * Parameter for dimensionality.
    */
-  private final IntParameter DIM_PARAM = new IntParameter(DIM_ID, new GreaterEqualConstraint(1));
+  public static final OptionID DIM_ID = OptionID.getOrCreateOptionID("dim", "an integer between 1 and the dimensionality of the " + "feature space 1 specifying the dimension to be considered " + "for distance computation.");
 
   /**
    * The dimension to be considered for distance computation.
@@ -35,17 +31,13 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   private int dim;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param dim Dimension
    */
-  public DimensionSelectingDistanceFunction(Parameterization config) {
+  public DimensionSelectingDistanceFunction(int dim) {
     super();
-    config = config.descend(this);
-    if(config.grab(DIM_PARAM)) {
-      dim = DIM_PARAM.getValue();
-    }
+    this.dim = dim;
   }
 
   /**
@@ -155,5 +147,30 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   @Override
   public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected int dim = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter dimP = new IntParameter(DIM_ID, new GreaterEqualConstraint(1));
+      if(config.grab(dimP)) {
+        dim = dimP.getValue();
+      }
+    }
+
+    @Override
+    protected DimensionSelectingDistanceFunction makeInstance() {
+      return new DimensionSelectingDistanceFunction(dim);
+    }
   }
 }

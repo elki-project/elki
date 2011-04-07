@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.parser.meta;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -8,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -19,12 +21,12 @@ import java.util.List;
 public class DoubleVectorProjectionParser extends ProjectionParser<DoubleVector> {
   /**
    * Constructor.
-   * 
-   * @param config Configuration
+   *
+   * @param baseparser
+   * @param selectedAttributes
    */
-  public DoubleVectorProjectionParser(Parameterization config) {
-    super(config);
-    config = config.descend(this);
+  public DoubleVectorProjectionParser(Parser<DoubleVector> baseparser, BitSet selectedAttributes) {
+    super(baseparser, selectedAttributes);
   }
 
   /**
@@ -46,5 +48,24 @@ public class DoubleVectorProjectionParser extends ProjectionParser<DoubleVector>
       index++;
     }
     return new ParsingResult<DoubleVector>(projectedResult, new DoubleVector(new double[getDimensionality()]));
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends ProjectionParser.Parameterizer<DoubleVector> {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+
+    @Override
+    protected DoubleVectorProjectionParser makeInstance() {
+      return new DoubleVectorProjectionParser(baseparser, selectedAttributes);
+    }
   }
 }

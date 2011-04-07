@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -28,15 +29,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
  * @apiviz.uses ResultWindow oneway
  */
 public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler<O, HierarchicalResult> {
+  // TODO: move title/maxdim parameters into a layouter class.
+  
   /**
    * Get a logger for this class.
    */
   protected final static Logging logger = Logging.getLogger(ResultVisualizer.class);
-
-  /**
-   * OptionID for {@link #WINDOW_TITLE_PARAM}
-   */
-  public static final OptionID WINDOW_TITLE_ID = OptionID.getOrCreateOptionID("vis.window.title", "Title to use for visualization window.");
 
   /**
    * Parameter to specify the window title
@@ -47,7 +45,16 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
    * Default value: "ELKI Result Visualization"
    * </p>
    */
-  protected final StringParameter WINDOW_TITLE_PARAM = new StringParameter(WINDOW_TITLE_ID, true);
+  public static final OptionID WINDOW_TITLE_ID = OptionID.getOrCreateOptionID("vis.window.title", "Title to use for visualization window.");
+
+  /**
+   * Parameter for the maximum number of dimensions,
+   * 
+   * <p>
+   * Code: -vis.maxdim
+   * </p>
+   */
+  public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("vis.maxdim", "Maximum number of dimensions to display.");
 
   /**
    * Stores the set title.
@@ -60,20 +67,6 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   protected final static String DEFAULT_TITLE = "ELKI Result Visualization";
 
   /**
-   * OptionID for {@link #MAXDIM_PARAM}.
-   */
-  public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("vis.maxdim", "Maximum number of dimensions to display.");
-
-  /**
-   * Parameter for the maximum number of dimensions,
-   * 
-   * <p>
-   * Code: -vis.maxdim
-   * </p>
-   */
-  private IntParameter MAXDIM_PARAM = new IntParameter(MAXDIM_ID, new GreaterEqualConstraint(1), OverviewPlot.MAX_DIMENSIONS_DEFAULT);
-
-  /**
    * Stores the maximum number of dimensions to show.
    */
   int maxdim = OverviewPlot.MAX_DIMENSIONS_DEFAULT;
@@ -84,21 +77,17 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   VisualizerParameterizer<O> manager;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param title
+   * @param maxdim
+   * @param manager
    */
-  public ResultVisualizer(Parameterization config) {
+  public ResultVisualizer(String title, int maxdim, VisualizerParameterizer<O> manager) {
     super();
-    config = config.descend(this);
-    if(config.grab(WINDOW_TITLE_PARAM)) {
-      title = WINDOW_TITLE_PARAM.getValue();
-    }
-    if(config.grab(MAXDIM_PARAM)) {
-      maxdim = MAXDIM_PARAM.getValue();
-    }
-    manager = new VisualizerParameterizer<O>(config);
+    this.title = title;
+    this.maxdim = maxdim;
+    this.manager = manager;
   }
 
   @Override
@@ -137,5 +126,50 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
     // TODO: handle normalizations
     logger.warning("Normalizations not yet supported in " + ResultVisualizer.class.getName());
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Stores the set title.
+     */
+    String title;
+
+    /**
+     * Stores the maximum number of dimensions to show.
+     */
+    int maxdim = OverviewPlot.MAX_DIMENSIONS_DEFAULT;
+
+    /**
+     * Visualization manager.
+     */
+    VisualizerParameterizer<O> manager;
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      StringParameter titleP = new StringParameter(WINDOW_TITLE_ID, true);
+      if(config.grab(titleP)) {
+        title = titleP.getValue();
+      }
+
+      IntParameter maxdimP = new IntParameter(MAXDIM_ID, new GreaterEqualConstraint(1), OverviewPlot.MAX_DIMENSIONS_DEFAULT);
+      if(config.grab(maxdimP)) {
+        maxdim = maxdimP.getValue();
+      }
+      manager = config.tryInstantiate(VisualizerParameterizer.class);
+    }
+
+    @Override
+    protected ResultVisualizer<O> makeInstance() {
+      return new ResultVisualizer<O>(title, maxdim, manager);
+    }
   }
 }

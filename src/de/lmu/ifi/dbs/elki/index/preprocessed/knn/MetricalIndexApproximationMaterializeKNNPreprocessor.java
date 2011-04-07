@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
@@ -163,7 +162,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   public boolean delete(O object) {
     throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
   }
-  
+
   @Override
   protected Logging getLogger() {
     return logger;
@@ -175,7 +174,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses MetricalIndexApproximationMaterializeKNNPreprocessor oneway - - «create»
+   * @apiviz.uses MetricalIndexApproximationMaterializeKNNPreprocessor oneway -
+   *              - «create»
    * 
    * @param <O> the type of database objects the preprocessor can be applied to
    * @param <D> the type of distance the used distance function will return
@@ -184,20 +184,33 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    */
   public static class Factory<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends MaterializeKNNPreprocessor.Factory<O, D> {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
      * 
-     * @param config Parameterization
+     * @param k k
+     * @param distanceFunction distance function
      */
-    public Factory(Parameterization config) {
-      super(config);
-      config = config.descend(this);
+    public Factory(int k, DistanceFunction<? super O, D> distanceFunction) {
+      super(k, distanceFunction);
     }
 
     @Override
     public MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instantiate(Database<O> database) {
       MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E>(database, distanceFunction, k);
       return instance;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+      @Override
+      protected Factory<O, D, N, E> makeInstance() {
+        return new Factory<O, D, N, E>(k, distanceFunction);
+      }
     }
   }
 }

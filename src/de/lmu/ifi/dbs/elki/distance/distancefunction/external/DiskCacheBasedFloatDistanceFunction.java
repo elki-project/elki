@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -24,15 +25,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external matrix.")
 public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction<FloatDistance> {
+  // TODO: constructor with file.
+  
+  /**
+   * Parameter that specifies the name of the distance matrix file.
+   * <p>
+   * Key: {@code -distance.matrix}
+   * </p>
+   */
+  public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
+
   /**
    * Magic to identify double cache matrices
    */
   public static final int FLOAT_CACHE_MAGIC = 23423411;
-
-  /**
-   * OptionID for {@link #MATRIX_PARAM}
-   */
-  public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
 
   /**
    * Storage required for a float value.
@@ -40,34 +46,18 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
   private static final int FLOAT_SIZE = 4;
 
   /**
-   * Parameter that specifies the name of the directory to be re-parsed.
-   * <p>
-   * Key: {@code -distance.matrix}
-   * </p>
+   * The distance cache
    */
-  private final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+  private OnDiskUpperTriangleMatrix cache;
 
-  private OnDiskUpperTriangleMatrix cache = null;
-  
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param cache Distance matrix
    */
-  public DiskCacheBasedFloatDistanceFunction(Parameterization config) {
+  public DiskCacheBasedFloatDistanceFunction(OnDiskUpperTriangleMatrix cache) {
     super();
-    config = config.descend(this);
-    if (config.grab(MATRIX_PARAM)) {
-      File matrixfile = MATRIX_PARAM.getValue();
-
-      try {
-        cache = new OnDiskUpperTriangleMatrix(matrixfile,FLOAT_CACHE_MAGIC,0,FLOAT_SIZE,false);
-      }
-      catch(IOException e) {
-        config.reportError(new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e));      
-      }      
-    }
+    this.cache = cache;
   }
 
   /**
@@ -82,17 +72,17 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
    */
   @Override
   public FloatDistance distance(DBID id1, DBID id2) {
-    if (id1 == null) {
+    if(id1 == null) {
       return getDistanceFactory().undefinedDistance();
     }
-    if (id2 == null) {
+    if(id2 == null) {
       return getDistanceFactory().undefinedDistance();
     }
-    if (id1.getIntegerID() < 0 || id2.getIntegerID() < 0) {
+    if(id1.getIntegerID() < 0 || id2.getIntegerID() < 0) {
       throw new AbortException("Negative DBIDs not supported in OnDiskCache");
     }
     // the smaller id is the first key
-    if (id1.getIntegerID() > id2.getIntegerID()) {
+    if(id1.getIntegerID() > id2.getIntegerID()) {
       return distance(id2, id1);
     }
 
@@ -101,7 +91,7 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
       distance = cache.getRecordBuffer(id1.getIntegerID(), id2.getIntegerID()).getFloat();
     }
     catch(IOException e) {
-      throw new RuntimeException("Read error when loading distance "+id1+","+id2+" from cache file.", e);
+      throw new RuntimeException("Read error when loading distance " + id1 + "," + id2 + " from cache file.", e);
     }
     return new FloatDistance(distance);
   }
@@ -109,5 +99,36 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
   @Override
   public FloatDistance getDistanceFactory() {
     return FloatDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected OnDiskUpperTriangleMatrix cache = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final FileParameter param = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      if(config.grab(param)) {
+        File matrixfile = param.getValue();
+        try {
+          cache = new OnDiskUpperTriangleMatrix(matrixfile, FLOAT_CACHE_MAGIC, 0, FLOAT_SIZE, false);
+        }
+        catch(IOException e) {
+          config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e));
+        }
+      }
+    }
+
+    @Override
+    protected DiskCacheBasedFloatDistanceFunction makeInstance() {
+      return new DiskCacheBasedFloatDistanceFunction(cache);
+    }
   }
 }

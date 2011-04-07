@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Perform full TF-IDF Normalization as commonly used in text mining.
@@ -20,13 +19,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public class TFIDFNormalization extends InverseDocumentFrequencyNormalization {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * 
-   * @param config Parameterization
+   * Constructor.
    */
-  public TFIDFNormalization(Parameterization config) {
-    super(config);
+  public TFIDFNormalization() {
+    super();
   }
 
   @Override

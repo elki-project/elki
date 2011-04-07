@@ -18,14 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "L. Chen and M. T. Özsu and V. Oria", title = "Robust and fast similarity search for moving object trajectories", booktitle = "SIGMOD '05: Proceedings of the 2005 ACM SIGMOD international conference on Management of data", url = "http://dx.doi.org/10.1145/1066157.1066213")
 public class EDRDistanceFunction extends AbstractEditDistanceFunction {
   /**
-   * OptionID for {@link #DELTA_PARAM}
-   */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("edr.delta", "the delta parameter (similarity threshold) for EDR (positive number)");
-
-  /**
    * DELTA parameter
    */
-  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 1.0);
+  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("edr.delta", "the delta parameter (similarity threshold) for EDR (positive number)");
 
   /**
    * Keeps the currently set delta.
@@ -33,17 +28,14 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
   private double delta;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param bandSize Band size
+   * @param delta Allowed delta
    */
-  public EDRDistanceFunction(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(DELTA_PARAM)) {
-      delta = DELTA_PARAM.getValue();
-    }
+  public EDRDistanceFunction(double bandSize, double delta) {
+    super(bandSize);
+    this.delta = delta;
   }
 
   /**
@@ -54,7 +46,7 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
    *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
    */
   @Override
-  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
+  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     // Current and previous columns of the matrix
     double[] curr = new double[v2.getDimensionality()];
     double[] prev = new double[v2.getDimensionality()];
@@ -122,5 +114,40 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
     }
 
     return new DoubleDistance(curr[v2.getDimensionality() - 1]);
+  }
+
+  /**
+   * Get parameter delta.
+   * 
+   * @param config Parameterization
+   * @return value
+   */
+  public static double getParameterDelta(Parameterization config) {
+    return 0.0;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractEditDistanceFunction.Parameterizer {
+    protected double delta = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 1.0);
+      if(config.grab(deltaP)) {
+        delta = deltaP.getValue();
+      }
+    }
+
+    @Override
+    protected EDRDistanceFunction makeInstance() {
+      return new EDRDistanceFunction(bandSize, delta);
+    }
   }
 }

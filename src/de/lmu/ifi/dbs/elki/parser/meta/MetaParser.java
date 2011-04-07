@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -24,11 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
  */
 public abstract class MetaParser<O extends DatabaseObject> implements Parser<O> {
   /**
-   * OptionID for {@link #BASEPARSER_PARAM}.
-   */
-  public static final OptionID BASEPARSER_ID = OptionID.getOrCreateOptionID("metaparser.baseparser", "Parser to use as base parser");
-
-  /**
    * The parameter for setting the base parser.
    * 
    * <p>
@@ -38,7 +34,7 @@ public abstract class MetaParser<O extends DatabaseObject> implements Parser<O> 
    * Default: {@link DoubleVectorLabelParser}
    * </p>
    */
-  private final ClassParameter<? extends Parser<O>> BASEPARSER_PARAM = new ClassParameter<Parser<O>>(BASEPARSER_ID, Parser.class, DoubleVectorLabelParser.class);
+  public static final OptionID BASEPARSER_ID = OptionID.getOrCreateOptionID("metaparser.baseparser", "Parser to use as base parser");
 
   /**
    * Holds an instance of the current base parser.
@@ -46,16 +42,13 @@ public abstract class MetaParser<O extends DatabaseObject> implements Parser<O> 
   private Parser<O> baseparser;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param baseparser
    */
-  public MetaParser(Parameterization config) {
-    config = config.descend(this);
-    if(config.grab(BASEPARSER_PARAM)) {
-      baseparser = BASEPARSER_PARAM.instantiateClass(config);
-    }
+  public MetaParser(Parser<O> baseparser) {
+    super();
+    this.baseparser = baseparser;
   }
 
   /**
@@ -78,5 +71,31 @@ public abstract class MetaParser<O extends DatabaseObject> implements Parser<O> 
   @Override
   public String toString() {
     return getClass().getName();
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+    /**
+     * Holds an instance of the current base parser.
+     */
+    protected Parser<O> baseparser = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ClassParameter<? extends Parser<O>> BASEPARSER_PARAM = new ClassParameter<Parser<O>>(BASEPARSER_ID, Parser.class, DoubleVectorLabelParser.class);
+      if(config.grab(BASEPARSER_PARAM)) {
+        baseparser = BASEPARSER_PARAM.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected abstract MetaParser<O> makeInstance();
   }
 }

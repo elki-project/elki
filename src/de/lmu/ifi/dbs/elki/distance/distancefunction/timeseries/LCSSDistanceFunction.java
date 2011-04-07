@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
@@ -50,26 +51,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Longest Common Subsequence distance function")
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/956750.956777")
-public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> {
+public class LCSSDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
-   * OptionID for {@link #PDELTA_PARAM}
+   * PDELTA parameter
    */
   public static final OptionID PDELTA_ID = OptionID.getOrCreateOptionID("lcss.pDelta", "the allowed deviation in x direction for LCSS alignment (positive double value, 0 <= pDelta <= 1)");
 
   /**
-   * OptionID for {@link #PEPSILON_PARAM}
-   */
-  public static final OptionID PEPSILON_ID = OptionID.getOrCreateOptionID("lcss.pEpsilon", "the allowed deviation in y directionfor LCSS alignment (positive double value, 0 <= pEpsilon <= 1)");
-
-  /**
-   * PDELTA parameter
-   */
-  private final DoubleParameter PDELTA_PARAM = new DoubleParameter(PDELTA_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
-
-  /**
    * PEPSILON parameter
    */
-  private final DoubleParameter PEPSILON_PARAM = new DoubleParameter(PEPSILON_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.05);
+  public static final OptionID PEPSILON_ID = OptionID.getOrCreateOptionID("lcss.pEpsilon", "the allowed deviation in y directionfor LCSS alignment (positive double value, 0 <= pEpsilon <= 1)");
 
   /**
    * Keeps the currently set pDelta.
@@ -82,20 +73,15 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
   private double pEpsilon;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param pDelta pDelta
+   * @param pEpsilon pEpsilon
    */
-  public LCSSDistanceFunction(Parameterization config) {
+  public LCSSDistanceFunction(double pDelta, double pEpsilon) {
     super();
-    config = config.descend(this);
-    if(config.grab(PDELTA_PARAM)) {
-      pDelta = PDELTA_PARAM.getValue();
-    }
-    if(config.grab(PEPSILON_PARAM)) {
-      pEpsilon = PEPSILON_PARAM.getValue();
-    }
+    this.pDelta = pDelta;
+    this.pEpsilon = pEpsilon;
   }
 
   /**
@@ -106,7 +92,7 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
    *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
    */
   @Override
-  public DoubleDistance distance(V v1, V v2) {
+  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     final int delta = (int) Math.ceil(v2.getDimensionality() * pDelta);
 
     DoubleMinMax extrema1 = VectorUtil.getRangeDouble(v1);
@@ -176,12 +162,44 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
+  public Class<? super NumberVector<?, ?>> getInputDatatype() {
     return NumberVector.class;
   }
 
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    protected Double pDelta = 0.0;
+
+    protected Double pEpsilon = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
+      if(config.grab(pDeltaP)) {
+        pDelta = pDeltaP.getValue();
+      }
+
+      final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.05);
+      if(config.grab(pEpsilonP)) {
+        pEpsilon = pEpsilonP.getValue();
+      }
+    }
+
+    @Override
+    protected LCSSDistanceFunction makeInstance() {
+      return new LCSSDistanceFunction(pDelta, pEpsilon);
+    }
   }
 }

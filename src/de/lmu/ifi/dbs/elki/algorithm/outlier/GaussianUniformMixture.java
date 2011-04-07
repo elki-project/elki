@@ -27,8 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -59,7 +59,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(GaussianUniformMixture.class);
-  
+
   /**
    * The association id to associate the MMOD_OFLAF of an object for the
    * GaussianUniformMixture algorithm.
@@ -209,51 +209,39 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     return prob;
   }
 
-  /**
-   * Factory method for {@link Parameterizable}
-   * 
-   * @param config Parameterization
-   * @return ABOD Algorithm
-   */
-  public static <V extends NumberVector<V, ?>> GaussianUniformMixture<V> parameterize(Parameterization config) {
-    double l = getParameterL(config);
-    double c = getParameterC(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new GaussianUniformMixture<V>(l, c);
-  }
-
-  /**
-   * Get the C parameter.
-   * 
-   * @param config Parameterization
-   * @return c parameter
-   */
-  protected static double getParameterC(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(C_ID, 1E-7);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 1E-7;
-  }
-
-  /**
-   * Get the L parameter.
-   * 
-   * @param config Parameterization
-   * @return l parameter
-   */
-  protected static double getParameterL(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(L_ID);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 0;
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    protected double l = 1E-7;
+
+    protected double c = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final DoubleParameter lP = new DoubleParameter(C_ID, 1E-7);
+      if(config.grab(lP)) {
+        l = lP.getValue();
+      }
+      final DoubleParameter cP = new DoubleParameter(C_ID, 1E-7);
+      if(config.grab(cP)) {
+        c = cP.getValue();
+      }
+    }
+
+    @Override
+    protected GaussianUniformMixture<V> makeInstance() {
+      return new GaussianUniformMixture<V>(l, c);
+    }
   }
 }

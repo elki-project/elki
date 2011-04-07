@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract factory for various MTrees
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.stereotype factory
  * @apiviz.uses AbstractMTree oneway - - «create»
  * 
@@ -22,11 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <I> Index type
  */
 public abstract class AbstractMTreeFactory<O extends DatabaseObject, D extends Distance<D>, I extends AbstractMTree<O, D, ?, ?>> extends TreeIndexFactory<O, I> {
-  /**
-   * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
-   */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
-
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -39,26 +34,46 @@ public abstract class AbstractMTreeFactory<O extends DatabaseObject, D extends D
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  protected final ObjectParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Holds the instance of the distance function specified by
-   * {@link #DISTANCE_FUNCTION_PARAM}.
+   * {@link #DISTANCE_FUNCTION_ID}.
    */
   protected DistanceFunction<O, D> distanceFunction;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param fileName
+   * @param pageSize
+   * @param cacheSize
+   * @param distanceFunction
    */
-  public AbstractMTreeFactory(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // parameter distance function
-    if(config.grab(DISTANCE_FUNCTION_PARAM)) {
-      distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass(config);
+  public AbstractMTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction) {
+    super(fileName, pageSize, cacheSize);
+    this.distanceFunction = distanceFunction;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static abstract class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends TreeIndexFactory.Parameterizer<O> {
+    protected DistanceFunction<O, D> distanceFunction = null;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      if(config.grab(distanceFunctionP)) {
+        distanceFunction = distanceFunctionP.instantiateClass(config);
+      }
     }
+
+    @Override
+    protected abstract AbstractMTreeFactory<O, D, ?> makeInstance();
   }
 }

@@ -16,8 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OneMustBeSetGlobalConstraint;
@@ -56,18 +56,18 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   public static final OptionID MINFREQ_ID = OptionID.getOrCreateOptionID("apriori.minfreq", "Threshold for minimum frequency as percentage value " + "(alternatively to parameter apriori.minsupp).");
 
   /**
-   * Holds the value of {@link #MINFREQ_ID}.
-   */
-  private double minfreq = Double.NaN;
-
-  /**
    * Parameter to specify the threshold for minimum support as minimally
    * required number of transactions, must be an integer equal to or greater
    * than 0. Alternatively to parameter {@link #MINFREQ_ID} - setting
-   * {@link #MINSUPP_ID} is slightly preferable over setting
-   * {@link #MINFREQ_ID} in terms of efficiency.
+   * {@link #MINSUPP_ID} is slightly preferable over setting {@link #MINFREQ_ID}
+   * in terms of efficiency.
    */
   public static final OptionID MINSUPP_ID = OptionID.getOrCreateOptionID("apriori.minsupp", "Threshold for minimum support as minimally required number of transactions " + "(alternatively to parameter apriori.minfreq" + " - setting apriori.minsupp is slightly preferable over setting " + "apriori.minfreq in terms of efficiency).");
+
+  /**
+   * Holds the value of {@link #MINFREQ_ID}.
+   */
+  private double minfreq = Double.NaN;
 
   /**
    * Holds the value of {@link #MINSUPP_ID}.
@@ -273,40 +273,55 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
   }
 
   /**
-   * Factory method for {@link Parameterizable}
+   * Parameterization class.
    * 
-   * @param config Parameterization
-   * @return algorithm
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public static APRIORI parameterize(Parameterization config) {
-    final DoubleParameter MINFREQ_PARAM = new DoubleParameter(MINFREQ_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.CLOSE, 1, IntervalConstraint.IntervalBoundary.CLOSE), true);
-    // minimum frequency parameter
-    double minfreq = Double.NaN;
-    if(config.grab(MINFREQ_PARAM)) {
-      minfreq = MINFREQ_PARAM.getValue();
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter for minFreq
+     */
+    protected Double minfreq = null;
+
+    /**
+     * Parameter for minSupp
+     */
+    protected Integer minsupp = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter minfreqP = new DoubleParameter(MINFREQ_ID, true);
+      minfreqP.addConstraint(new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.CLOSE, 1, IntervalConstraint.IntervalBoundary.CLOSE));
+      if(config.grab(minfreqP)) {
+        minfreq = minfreqP.getValue();
+      }
+
+      IntParameter minsuppP = new IntParameter(MINSUPP_ID, true);
+      minsuppP.addConstraint(new GreaterEqualConstraint(0));
+      if(config.grab(minsuppP)) {
+        minsupp = minsuppP.getValue();
+      }
+
+      // global parameter constraints
+      ArrayList<Parameter<?, ?>> globalConstraints = new ArrayList<Parameter<?, ?>>();
+      globalConstraints.add(minfreqP);
+      globalConstraints.add(minsuppP);
+      config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));
+      config.checkConstraint(new OneMustBeSetGlobalConstraint(globalConstraints));
     }
 
-    // minimum support parameter
-    final IntParameter MINSUPP_PARAM = new IntParameter(MINSUPP_ID, new GreaterEqualConstraint(0), true);
-    int minsupp = Integer.MIN_VALUE;
-    if(config.grab(MINSUPP_PARAM)) {
-      minsupp = MINSUPP_PARAM.getValue();
-    }
-
-    // global parameter constraints
-    ArrayList<Parameter<?, ?>> globalConstraints = new ArrayList<Parameter<?, ?>>();
-    globalConstraints.add(MINFREQ_PARAM);
-    globalConstraints.add(MINSUPP_PARAM);
-    config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));
-    config.checkConstraint(new OneMustBeSetGlobalConstraint(globalConstraints));
-    if(config.hasErrors()) {
+    @Override
+    protected APRIORI makeInstance() {
+      if(minfreq != null) {
+        return new APRIORI(minfreq);
+      }
+      if(minsupp != null) {
+        return new APRIORI(minsupp);
+      }
       return null;
-    }
-    if(minfreq >= 0.0) {
-      return new APRIORI(minfreq);
-    }
-    else {
-      return new APRIORI(minsupp);
     }
   }
 }

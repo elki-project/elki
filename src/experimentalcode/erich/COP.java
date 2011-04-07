@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -53,18 +54,13 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   private static final Logging logger = Logging.getLogger(COP.class);
 
   /**
-   * OptionID for {@link #K_PARAM}
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
-
-  /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its COP_SCORE, must be an integer greater than 0.
    * <p/>
    * Key: {@code -cop.k}
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
 
   /**
    * Number of neighbors to be considered.
@@ -107,23 +103,22 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = AssociationID.getOrCreateAssociationIDGenerics("cop sol", CorrelationAnalysisSolution.class);
 
   /**
-   * Sets minimum points to the optionhandler additionally to the parameters
-   * provided by super-classes.
+   * Constructor.
+   * 
+   * @param distanceFunction
+   * @param k
+   * @param dependencyDerivator
    */
-  public COP(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
-    Class<DependencyDerivator<V, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-    dependencyDerivator = config.tryInstantiate(cls, cls);
+  public COP(DistanceFunction<? super V, D> distanceFunction, int k, DependencyDerivator<V, D> dependencyDerivator) {
+    super(distanceFunction);
+    this.k = k;
+    this.dependencyDerivator = dependencyDerivator;
   }
 
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
     KNNQuery<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k + 1);
-    
+
     DBIDs ids = database.getIDs();
 
     WritableDataStore<Double> cop_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
@@ -194,5 +189,40 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+    /**
+     * Number of neighbors to be considered.
+     */
+    int k;
+
+    /**
+     * Holds the object performing the dependency derivation
+     */
+    protected DependencyDerivator<V, D> dependencyDerivator;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+      Class<DependencyDerivator<V, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
+      dependencyDerivator = config.tryInstantiate(cls);
+    }
+
+    @Override
+    protected COP<V, D> makeInstance() {
+      return new COP<V, D>(distanceFunction, k, dependencyDerivator);
+    }
   }
 }

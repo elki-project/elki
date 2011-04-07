@@ -57,12 +57,12 @@ public class TestDBOutlierDetection extends OutlierTest{
   
   
 
-  private static OutlierResult runDBOutlierDetection(Database<DoubleVector> db, ListParameterization params) {
-    // setup algorithm
-    DBOutlierDetection<DoubleVector, DoubleDistance> dboutlierdetection = null;
-    Class<DBOutlierDetection<DoubleVector, DoubleDistance>>dbOutlierDetectioncls = ClassGenericsUtil.uglyCastIntoSubclass(DBOutlierDetection.class);
-    dboutlierdetection = params.tryInstantiate(dbOutlierDetectioncls, dbOutlierDetectioncls);
-    params.failOnErrors();
+	private static OutlierResult runDBOutlierDetection(Database<DoubleVector> db, ListParameterization params) {
+		// setup algorithm
+		DBOutlierDetection<DoubleVector, DoubleDistance> dboutlierdetection = null;
+		Class<DBOutlierDetection<DoubleVector, DoubleDistance>>dbOutlierDetectioncls = ClassGenericsUtil.uglyCastIntoSubclass(DBOutlierDetection.class);
+		dboutlierdetection = params.tryInstantiate(dbOutlierDetectioncls);
+		params.failOnErrors();
 
     // run DBOutlierDetection on database
     return dboutlierdetection.run(db);
