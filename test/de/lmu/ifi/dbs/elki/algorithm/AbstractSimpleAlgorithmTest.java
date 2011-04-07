@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
@@ -16,10 +17,13 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -29,6 +33,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  */
 public abstract class AbstractSimpleAlgorithmTest {
+  /**
+   * Base path for unit test files.
+   */
+  public final static String UNITTEST = "data/testdata/unittests/";
+  
   /**
    * Notice: this is okay for tests - don't use this for frequently used
    * objects, use a static instance instead!
@@ -135,5 +144,40 @@ public abstract class AbstractSimpleAlgorithmTest {
     for(int i = 0; i < expected.length; i++) {
       org.junit.Assert.assertEquals("Cluster size does not match at position " + i, expected[i], (int) sizes.get(i));
     }
+  }
+
+  /**
+   * Test the AUC value for an outlier result.
+   * 
+   * @param db Database
+   * @param positive Positive class name
+   * @param result Outlier result to process
+   * @param expected Expected AUC value
+   */
+  protected void testAUC(Database<DoubleVector> db, String positive, OutlierResult result, double expected) {
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, positive);
+    ComputeROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(ComputeROCCurve.class, params);
+
+    // Compute ROC and AUC:
+    rocCurve.processResult(db, result, db.getHierarchy());
+    // Find the ROC results
+    Iterator<ComputeROCCurve.ROCResult> iter = ResultUtil.filteredResults(result, ComputeROCCurve.ROCResult.class);
+    org.junit.Assert.assertTrue("No ROC result found.", iter.hasNext());
+    double auc = iter.next().getAUC();
+    org.junit.Assert.assertFalse("More than one ROC result found.", iter.hasNext());
+    org.junit.Assert.assertEquals("ROC value does not match.", expected, auc, 0.0001);
+  }
+
+  /**
+   * Test the outlier score of a single object.
+   * 
+   * @param result Result object to use
+   * @param id Object ID
+   * @param expected expected value
+   */
+  protected void testSingleScore(OutlierResult result, int id, double expected) {
+    double actual = result.getScores().getValueFor(DBIDUtil.importInteger(id));
+    org.junit.Assert.assertEquals("Outlier score of object " + id + " doesn't match.", expected, actual, 0.0001);
   }
 }
