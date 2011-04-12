@@ -1,81 +1,57 @@
 package experimentalcode.lucia;
 
-import java.util.Iterator;
-import java.util.List;
-
-import junit.framework.Assert;
 import org.junit.Test;
-
+import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 
 /**
  * Tests the OPTICS-OF algorithm. 
- * @author lucia
+ * @author Lucia Cichella
  * 
  */
-public class TestOPTICSOF extends OutlierTest{
-  // the following values depend on the data set used!
+public class TestOPTICSOF extends AbstractSimpleAlgorithmTest implements JUnit4Test{
+
   static String dataset = "src/experimentalcode/lucia/datensaetze/parabel.csv";
   static int minPts = 22;
 
 
   @Test
-  public void testOPTICSOF() throws UnableToComplyException {
-
-    //Get Database
-    Database<DoubleVector> db = getDatabase(dataset);
+  public void testOPTICSOF() throws ParameterException {
+    //get Database
+    ListParameterization paramsDB = new ListParameterization();
+    paramsDB.addParameter(FileBasedDatabaseConnection.SEED_ID, 1);
+    Database<DoubleVector> db = makeSimpleDatabase(dataset, 530, paramsDB);
 
     //Parameterization
     ListParameterization params = new ListParameterization();
     params.addParameter(OPTICS.MINPTS_ID, minPts);
-    params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, "Noise");
 
-    // run OPTICS-OF
-    OutlierResult result = runOPTICSOF(db, params);
-    AnnotationResult<Double> scores = result.getScores();
+    //setup Algorithm
+    OPTICSOF<DoubleVector, DoubleDistance> opticsof = ClassGenericsUtil.parameterizeOrAbort(OPTICSOF.class, params);
+    testParameterizationOk(params);
 
+    //run OPTICSOF on database
+    OutlierResult result = opticsof.run(db);
+    db.getHierarchy().add(db, result);
 
+    
     //check Outlier Score of Point 169
     int id = 169;
-    double score = scores.getValueFor(DBIDUtil.importInteger(id));
-//    System.out.println("Outlier Score of the Point with id " + id + ": " + score);
-    Assert.assertEquals("Outlier Score of Point with id " + id + " not right.", 1.6108343626651815, score, 0.0001);
+    testSingleScore(result, id, 1.6108343626651815);
 
-    
-    //get ROC AUC
-    List<Double> auc = getROCAUC(db, result, params);
-    Iterator<Double> iter = auc.listIterator();
-    double actual;
-    while(iter.hasNext()){
-      actual = iter.next();
-//      System.out.println("OPTICS-OF(MinPts="+ minPts + ") ROC AUC: " + actual);
-      Assert.assertEquals("ROC AUC not right.", 0.9058, actual, 0.00001);
-    }
+    //test ROC AUC
+    testAUC(db, "Noise", result, 0.9058);
     
   }
-
-
-  private static OutlierResult runOPTICSOF(Database<DoubleVector> db, ListParameterization params) {
-    // setup algorithm
-    OPTICSOF<DoubleVector, DoubleDistance> opticsof = null;
-    Class<OPTICSOF<DoubleVector, DoubleDistance>> opticsofcls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICSOF.class);
-    opticsof = params.tryInstantiate(opticsofcls, opticsofcls);
-    params.failOnErrors();
-
-    // run OPTICSOF on database
-    return opticsof.run(db);
-  }
-
 }
