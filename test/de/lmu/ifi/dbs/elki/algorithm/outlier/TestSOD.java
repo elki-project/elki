@@ -1,12 +1,12 @@
 package experimentalcode.lucia;
 
 import org.junit.Test;
+
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.SOD;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -20,15 +20,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Lucia Cichella
  */
 public class TestSOD extends AbstractSimpleAlgorithmTest implements JUnit4Test {
-
-  static final String dataset = "src/experimentalcode/lucia/datensaetze/hochdimensional.csv";
-
   @Test
   public void testSOD() throws ParameterException {
-    // get Database
-    ListParameterization paramsDB = new ListParameterization();
-    paramsDB.addParameter(FileBasedDatabaseConnection.SEED_ID, 1);
-    Database<DoubleVector> db = makeSimpleDatabase(dataset, 1345, paramsDB);
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
@@ -42,7 +36,7 @@ public class TestSOD extends AbstractSimpleAlgorithmTest implements JUnit4Test {
     // run SOD on database
     OutlierResult result = sod.run(db);
 
-    testSingleScore(result, 1280, 1.5167500678141732);
-    testAUC(db, "Noise", result, 0.951719887955182);
+    testSingleScore(result, 1293, 1.7277777);
+    testAUC(db, "Noise", result, 0.94956862);
   }
 }
