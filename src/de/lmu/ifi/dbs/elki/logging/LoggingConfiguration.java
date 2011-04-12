@@ -107,17 +107,24 @@ public final class LoggingConfiguration {
    * @param verbose verbose flag
    */
   public static void setVerbose(boolean verbose) {
-    Logger logger = Logger.getLogger(TOPLEVEL_PACKAGE);
+    Logger logger1 = Logger.getLogger("");
+    Logger logger2 = Logger.getLogger(TOPLEVEL_PACKAGE);
     if(verbose) {
       // decrease to INFO if it was higher
-      if(logger.getLevel() == null || logger.getLevel().intValue() > Level.INFO.intValue()) {
-        logger.setLevel(Level.INFO);
+      if(logger1.getLevel() == null || logger1.getLevel().intValue() > Level.INFO.intValue()) {
+        logger1.setLevel(Level.INFO);
+      }
+      if(logger2.getLevel() == null || logger2.getLevel().intValue() > Level.INFO.intValue()) {
+        logger2.setLevel(Level.INFO);
       }
     }
     else {
       // increase to warning level if it was INFO.
-      if(logger.getLevel() != null || logger.getLevel() == Level.INFO) {
-        logger.setLevel(Level.WARNING);
+      if(logger1.getLevel() != null || logger1.getLevel() == Level.INFO) {
+        logger1.setLevel(Level.WARNING);
+      }
+      if(logger2.getLevel() != null || logger2.getLevel() == Level.INFO) {
+        logger2.setLevel(Level.WARNING);
       }
     }
   }
