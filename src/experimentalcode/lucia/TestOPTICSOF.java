@@ -14,44 +14,34 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
-
 /**
- * Tests the OPTICS-OF algorithm. 
- * @author Lucia Cichella
+ * Tests the OPTICS-OF algorithm.
  * 
+ * @author Lucia Cichella
  */
-public class TestOPTICSOF extends AbstractSimpleAlgorithmTest implements JUnit4Test{
+public class TestOPTICSOF extends AbstractSimpleAlgorithmTest implements JUnit4Test {
 
-  static String dataset = "src/experimentalcode/lucia/datensaetze/parabel.csv";
-  static int minPts = 22;
-
+  static final String dataset = "src/experimentalcode/lucia/datensaetze/parabel.csv";
 
   @Test
   public void testOPTICSOF() throws ParameterException {
-    //get Database
+    // get Database
     ListParameterization paramsDB = new ListParameterization();
     paramsDB.addParameter(FileBasedDatabaseConnection.SEED_ID, 1);
     Database<DoubleVector> db = makeSimpleDatabase(dataset, 530, paramsDB);
 
-    //Parameterization
+    // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(OPTICS.MINPTS_ID, minPts);
+    params.addParameter(OPTICS.MINPTS_ID, 22);
 
-    //setup Algorithm
+    // setup Algorithm
     OPTICSOF<DoubleVector, DoubleDistance> opticsof = ClassGenericsUtil.parameterizeOrAbort(OPTICSOF.class, params);
     testParameterizationOk(params);
 
-    //run OPTICSOF on database
+    // run OPTICSOF on database
     OutlierResult result = opticsof.run(db);
-    db.getHierarchy().add(db, result);
 
-    
-    //check Outlier Score of Point 169
-    int id = 169;
-    testSingleScore(result, id, 1.6108343626651815);
-
-    //test ROC AUC
+    testSingleScore(result, 169, 1.6108343626651815);
     testAUC(db, "Noise", result, 0.9058);
-    
   }
 }

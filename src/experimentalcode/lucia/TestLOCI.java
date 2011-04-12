@@ -1,6 +1,5 @@
 package experimentalcode.lucia;
 
-
 import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
@@ -14,44 +13,34 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
-
 /**
- * Tests the LOCI algorithm. 
- * @author Lucia Cichella
+ * Tests the LOCI algorithm.
  * 
+ * @author Lucia Cichella
  */
-public class TestLOCI extends AbstractSimpleAlgorithmTest implements JUnit4Test{
+public class TestLOCI extends AbstractSimpleAlgorithmTest implements JUnit4Test {
 
-  static String dataset = "data/testdata/unittests/3clusters-and-noise-2d.csv";
-  static double rmax = 0.35;
-
+  static final String dataset = "data/testdata/unittests/3clusters-and-noise-2d.csv";
 
   @Test
   public void testLOCI() throws ParameterException {
-    //get Database
+    // get Database
     ListParameterization paramsDB = new ListParameterization();
     paramsDB.addParameter(FileBasedDatabaseConnection.SEED_ID, 1);
     Database<DoubleVector> db = makeSimpleDatabase(dataset, 330, paramsDB);
 
-    //Parameterization
+    // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOCI.RMAX_ID, rmax);
+    params.addParameter(LOCI.RMAX_ID, 0.35);
 
-    //setup Algorithm
+    // setup Algorithm
     LOCI<DoubleVector, DoubleDistance> loci = ClassGenericsUtil.parameterizeOrAbort(LOCI.class, params);
     testParameterizationOk(params);
 
-    //run LOCI on database
+    // run LOCI on database
     OutlierResult result = loci.run(db);
-    db.getHierarchy().add(db, result);
 
-
-    //check Outlier Score of Point 275
-    int id = 275;
-    testSingleScore(result, id, 3.805438242211049);
-
-    //test ROC AUC
+    testSingleScore(result, 275, 3.805438242211049);
     testAUC(db, "Noise", result, 0.9896666666666667);
-    
   }
 }
