@@ -1,79 +1,56 @@
 package experimentalcode.lucia;
 
-import java.util.Iterator;
-import java.util.List;
-
-import junit.framework.Assert;
 import org.junit.Test;
-
+import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 
 /**
  * Tests the LDOF algorithm. 
- * @author lucia
+ * @author Lucia Cichella
  * 
  */
-public class TestLDOF extends OutlierTest{
-  // the following values depend on the data set used!
+public class TestLDOF extends AbstractSimpleAlgorithmTest implements JUnit4Test{
+
   static String dataset = "src/experimentalcode/lucia/datensaetze/holzFeuerWasser.csv";
   static int k = 25;
 
-  
-  @Test
-  public void testLDOF() throws UnableToComplyException {
 
-    //Get Database
-    Database<DoubleVector> db = getDatabase(dataset);
+  @Test
+  public void testLDOF() throws ParameterException {
+    //get Database
+    ListParameterization paramsDB = new ListParameterization();
+    paramsDB.addParameter(FileBasedDatabaseConnection.SEED_ID, 1);
+    Database<DoubleVector> db = makeSimpleDatabase(dataset, 1025, paramsDB);
 
     //Parameterization
     ListParameterization params = new ListParameterization();
     params.addParameter(LDOF.K_ID, k);
-    params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, "Noise");
 
-    // run LDOF
-    OutlierResult result = runLDOF(db, params);
-    AnnotationResult<Double> scores = result.getScores();
+    //setup Algorithm
+    LDOF<DoubleVector, DoubleDistance> ldof = ClassGenericsUtil.parameterizeOrAbort(LDOF.class, params);
+    testParameterizationOk(params);
+
+    //run LDOF on database
+    OutlierResult result = ldof.run(db);
+    db.getHierarchy().add(db, result);
 
 
     //check Outlier Score of Point 141
     int id = 141;
-    double score = scores.getValueFor(DBIDUtil.importInteger(id));
-//    System.out.println("Outlier Score of the Point with id " + id + ": " + score);
-    Assert.assertEquals("Outlier Score of Point with id " + id + " not right.", 0.8976268846182947, score, 0.0001);
-    
-    
-    //get ROC AUC
-    List<Double> auc = getROCAUC(db, result, params);
-    Iterator<Double> iter = auc.listIterator();
-    double actual;
-    while(iter.hasNext()){
-      actual = iter.next();
-//      System.out.println("LDOF(k="+ k + ") ROC AUC: " + actual);
-      Assert.assertEquals("ROC AUC not right.", 0.96379487, actual, 0.00001);
-    }
-    
-  }
+    testSingleScore(result, id, 0.8976268846182947);
 
-
-  private static OutlierResult runLDOF(Database<DoubleVector> db, ListParameterization params) {
-    // setup algorithm
-    LDOF<DoubleVector, DoubleDistance> ldof = null;
-    Class<LDOF<DoubleVector, DoubleDistance>> ldofcls = ClassGenericsUtil.uglyCastIntoSubclass(LDOF.class);
-    ldof = params.tryInstantiate(ldofcls, ldofcls);
-    params.failOnErrors();
-
-    // run LDOF on database
-    return ldof.run(db);
+    //test ROC AUC
+    testAUC(db, "Noise", result, 0.9637948717948718);
+    
   }
 }
