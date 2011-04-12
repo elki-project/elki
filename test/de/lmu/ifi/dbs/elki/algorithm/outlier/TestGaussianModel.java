@@ -1,53 +1,38 @@
-package experimentalcode.lucia;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import org.junit.Test;
+
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.GaussianModel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
-
 /**
- * Tests the GaussianModel algorithm. 
- * @author Lucia Cichella
+ * Tests the GaussianModel algorithm.
  * 
+ * @author Lucia Cichella
  */
-public class TestGaussianModel extends AbstractSimpleAlgorithmTest implements JUnit4Test{
-
-  static String dataset = "src/experimentalcode/lucia/datensaetze/holzFeuerWasser.csv";
-
-
+public class TestGaussianModel extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testGaussianModel() throws ParameterException {
-    //get Database
-    ListParameterization paramsDB = new ListParameterization();
-    paramsDB.addParameter(FileBasedDatabaseConnection.SEED_ID, 1);
-    Database<DoubleVector> db = makeSimpleDatabase(dataset, 1025, paramsDB);
+    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
-    //Parameterization
+    // Parameterization
     ListParameterization params = new ListParameterization();
 
-    //setup Algorithm
+    // setup Algorithm
     GaussianModel<DoubleVector> gaussianModel = ClassGenericsUtil.parameterizeOrAbort(GaussianModel.class, params);
     testParameterizationOk(params);
 
-    //run GaussianModel on database
+    // run GaussianModel on database
     OutlierResult result = gaussianModel.run(db);
-    db.getHierarchy().add(db, result);
 
-
-    //check Outlier Score of Point 141
-    int id = 141;
-    testSingleScore(result, id, 2.8312466458765426);
-
-    //test ROC AUC
+    testSingleScore(result, 1025, 2.8312466458765426);
     testAUC(db, "Noise", result, 0.9937641025641025);
-    
   }
 }

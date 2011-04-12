@@ -191,7 +191,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     ComputeROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(ComputeROCCurve.class, params);
 
     // Compute ROC and AUC:
-    rocCurve.processResult(db, result, db.getHierarchy());
+    rocCurve.processResult(db, result, result.getHierarchy());
     // Find the ROC results
     Iterator<ComputeROCCurve.ROCResult> iter = ResultUtil.filteredResults(result, ComputeROCCurve.ROCResult.class);
     org.junit.Assert.assertTrue("No ROC result found.", iter.hasNext());
