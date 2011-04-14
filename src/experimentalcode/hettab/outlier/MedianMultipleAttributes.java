@@ -2,6 +2,8 @@ package experimentalcode.hettab.outlier;
 
 import java.util.List;
 
+import org.apache.commons.math.stat.descriptive.rank.Median;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -33,13 +35,13 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * 
  * @author Ahmed Hettab
  *
- * @param <V> 
+ * @param <V>
  */
-public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
   /**
    * logger
    */
-  public static final Logging logger = Logging.getLogger(MeanMultipleAttributes.class);
+  public static final Logging logger = Logging.getLogger(MedianMultipleAttributes.class);
 
   /**
    * Parameter to specify the neighborhood predicate to use.
@@ -72,7 +74,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
    * @param npredf
    * @param dims
    */
-  public MeanMultipleAttributes(Factory<DatabaseObject> npredf, List<Integer> dims) {
+  public MedianMultipleAttributes(Factory<DatabaseObject> npredf, List<Integer> dims) {
     super();
     this.npredf = npredf;
     this.dims = dims;
@@ -85,7 +87,6 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
 
   @Override
   protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-
     final NeighborSetPredicate npred = npredf.instantiate(database);
     Matrix hMatrix = new Matrix(dims.size(),database.size());
     Matrix hMeansMatrix = new Matrix(dims.size(),1);
@@ -100,20 +101,22 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
             // f value
             double f = database.get(id).doubleValue(dim);
             DBIDs neighbors = npred.getNeighborDBIDs(id);
-            double nSize = neighbors.size() ;
-            //g  and h value 
-            double h = 0;
-            double g = 0 ;
-            if(nSize <= 1){
-             h = 0 ; 
-            }
-            else{
+            int nSize = neighbors.size()-1 ;
+            //g value 
+            double g[] = new double[nSize] ;
+            Median m = new Median();
+            int k = 0 ;
             for(DBID n : neighbors){
-                 g += database.get(n).doubleValue(dim);           
+               if(n.getIntegerID() == id.getIntegerID()){
+                 continue ;
+               }
+               else{
+                 g[k] = database.get(n).doubleValue(dim);
+               }
             }
-             h = Math.abs(f-g/nSize);
-            }
-                        
+            double gm = m.evaluate(g) ;
+            double h = Math.abs(f/gm);
+            if(Double.valueOf(h).isInfinite() || Double.valueOf(h).isNaN()){h=0;}            
             //add to h Matrix
             hMatrix.set(i, j, h);
             hMeans += h ;
@@ -155,13 +158,13 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
    * @param <V>
    * 
    */
-  public static <V extends NumberVector<?, ?>> MeanMultipleAttributes<V> parameterize(Parameterization config) {
+  public static <V extends NumberVector<?, ?>> MedianMultipleAttributes<V> parameterize(Parameterization config) {
     final NeighborSetPredicate.Factory<DatabaseObject> npredf = getNeighborPredicate(config);
     final List<Integer> dims = getDims(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new MeanMultipleAttributes<V>(npredf, dims);
+    return new MedianMultipleAttributes<V>(npredf, dims);
   }
 
   /**
@@ -189,3 +192,5 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
   }
 
 }
+ 
+
