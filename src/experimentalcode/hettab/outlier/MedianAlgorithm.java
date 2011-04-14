@@ -37,7 +37,7 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(TrimmedMeanApproach.class);
+  private static final Logging logger = Logging.getLogger(MedianAlgorithm.class);
 
   /**
    * Parameter to specify the neighborhood predicate to use.
