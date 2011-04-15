@@ -1,4 +1,4 @@
-package experimentalcode.lucia;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import org.junit.Test;
 
