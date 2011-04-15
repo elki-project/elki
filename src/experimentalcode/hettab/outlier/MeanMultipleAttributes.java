@@ -101,26 +101,18 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
             double f = database.get(id).doubleValue(dim);
             DBIDs neighbors = npred.getNeighborDBIDs(id);
             double nSize = neighbors.size() ;
-            //g  and h value 
-            double h = 0;
             double g = 0 ;
-            if(nSize <= 1){
-             h = 0 ; 
+            for(DBID n : neighbors){              
+                 g += database.get(n).doubleValue(dim)/nSize;     
             }
-            else{
-            for(DBID n : neighbors){
-                 g += database.get(n).doubleValue(dim);           
-            }
-             h = Math.abs(f-g/nSize);
-            }
-                        
+            double h = Math.abs(f-g);                        
             //add to h Matrix
             hMatrix.set(i, j, h);
             hMeans += h ;
             j++ ;
          }
          
-         hMeans = hMeans/dbSize;
+         hMeans = hMeans/database.size() ;
          //add mean to h means hMeansMatrix
          hMeansMatrix.set(i,0 , hMeans);
          i++;
@@ -128,6 +120,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
     
     Matrix sigma = DatabaseUtil.covarianceMatrix(hMatrix);
     Matrix invSigma = sigma.inverse() ;
+    
        
     MinMax<Double> minmax = new MinMax<Double>();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
@@ -135,9 +128,10 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
     for(DBID id : database) {
       Matrix h_i = hMatrix.getColumn(i).minus(hMeansMatrix) ;
       Matrix h_iT = h_i.transpose();
-      Matrix m = invSigma.times(h_i);
-      h_iT.times(m);
-      double score = h_i.get(0, 0);
+      Matrix m = h_iT.times(invSigma);
+      Matrix sM = m.times(h_i);
+      System.out.println(sM);
+      double score = sM.get(0, 0);
       minmax.put(score);
       scores.put(id, score);
       i++;
