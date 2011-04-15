@@ -89,8 +89,6 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
     final NeighborSetPredicate npred = npredf.instantiate(database);
     Matrix hMatrix = new Matrix(dims.size(),database.size());
     Matrix hMeansMatrix = new Matrix(dims.size(),1);
-    double dbSize = database.size();
-     
     int i = 0 ;
     for(Integer dim : dims){
         int j = 0 ;

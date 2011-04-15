@@ -101,22 +101,17 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
             // f value
             double f = database.get(id).doubleValue(dim);
             DBIDs neighbors = npred.getNeighborDBIDs(id);
-            int nSize = neighbors.size()-1 ;
+            int nSize = neighbors.size() ;
             //g value 
             double g[] = new double[nSize] ;
             Median m = new Median();
             int k = 0 ;
             for(DBID n : neighbors){
-               if(n.getIntegerID() == id.getIntegerID()){
-                 continue ;
-               }
-               else{
                  g[k] = database.get(n).doubleValue(dim);
-               }
+                 k++;
             }
             double gm = m.evaluate(g) ;
-            double h = Math.abs(f/gm);
-            if(Double.valueOf(h).isInfinite() || Double.valueOf(h).isNaN()){h=0;}            
+            double h = f-gm;          
             //add to h Matrix
             hMatrix.set(i, j, h);
             hMeans += h ;
@@ -138,9 +133,9 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
     for(DBID id : database) {
       Matrix h_i = hMatrix.getColumn(i).minus(hMeansMatrix) ;
       Matrix h_iT = h_i.transpose();
-      Matrix m = invSigma.times(h_i);
-      h_iT.times(m);
-      double score = h_i.get(0, 0);
+      Matrix m = h_iT.times(invSigma);
+      Matrix sM = m.times(h_i);
+      double score = sM.get(0, 0);
       minmax.put(score);
       scores.put(id, score);
       i++;
