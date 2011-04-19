@@ -119,13 +119,14 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     dimensionality = -1;
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
-    List<Object> folded = new ArrayList<Object>();
+    List<Object> vectors = new ArrayList<Object>();
+    List<Object> lblc = new ArrayList<Object>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           Pair<SparseFloatVector, LabelList> pair = parseLineInternal(line);
-          folded.add(pair.first);
-          folded.add(pair.second);
+          vectors.add(pair.first);
+          lblc.add(pair.second);
         }
       }
     }
@@ -133,14 +134,17 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
     // Set maximum dimensionality
-    for(int i = 0; i < folded.size(); i += 2) {
-      SparseFloatVector vec = (SparseFloatVector) folded.get(i);
+    for(int i = 0; i < vectors.size(); i++) {
+      SparseFloatVector vec = (SparseFloatVector) vectors.get(i);
       vec.setDimensionality(dimensionality);
     }
     BundleMeta meta = new BundleMeta();
+    List<List<Object>> columns = new ArrayList<List<Object>>(2);
     meta.add(getTypeInformation(dimensionality));
+    columns.add(vectors);
     meta.add(TypeUtil.LABELLIST);
-    return new MultipleObjectsBundle(meta, folded);
+    columns.add(lblc);
+    return new MultipleObjectsBundle(meta, columns);
   }
 
   @Override

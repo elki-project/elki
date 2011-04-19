@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
@@ -112,7 +113,9 @@ public class TestOnlineLOF implements JUnit4Test {
     }
     BundleMeta meta = new BundleMeta();
     meta.add(rep.getDataTypeInformation());
-    DBIDs deletions = db.insert(new MultipleObjectsBundle(meta , insertions));
+    List<List<Object>> columns = new ArrayList<List<Object>>(1);
+    columns.add(insertions);
+    DBIDs deletions = db.insert(new MultipleObjectsBundle(meta , columns));
 
     // delete objects
     db.delete(deletions);

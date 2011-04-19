@@ -10,10 +10,11 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -129,7 +130,6 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @param origpkgs the objects to process
    * @return processed objects
    */
-  // TODO: this should be done in the parser!
   protected MultipleObjectsBundle transformLabels(MultipleObjectsBundle origpkgs) {
     if(filters != null) {
       for(ObjectFilter filter : filters) {
@@ -140,109 +140,80 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
       return origpkgs;
     }
 
+    // Prepare bundle for expansion
+    BundleMeta reps = new BundleMeta(origpkgs.metaLength() + 2);
+    List<List<Object>> columns = new ArrayList<List<Object>>(origpkgs.metaLength() + 2);
     // Adjust representations: label transformation
-    int llcol = -1;
     for(int i = 0; i < origpkgs.metaLength(); i++) {
       SimpleTypeInformation<?> meta = origpkgs.meta(i);
-      if(meta.getRestrictionClass() == LabelList.class) {
-        llcol = i;
-        break;
-      }
-    }
-    if(llcol >= 0) {
-      int inc = (classLabelIndex == null ? 0 : 1) + (externalIdIndex == null ? 0 : 1);
-      BundleMeta reps = new BundleMeta(origpkgs.dataLength() + inc);
-      ArrayList<Object> data = new ArrayList<Object>(origpkgs.dataLength() * (origpkgs.metaLength() + inc));
-      // updated type map:
-      for(int i = 0; i < origpkgs.metaLength(); i++) {
-        SimpleTypeInformation<?> meta = origpkgs.meta(i);
-        if(i == llcol && classLabelIndex != null) {
-          reps.add(TypeUtil.CLASSLABEL);
-        }
-        if(i == llcol && externalIdIndex != null) {
-          // TODO: special type for external ID?
-          reps.add(TypeUtil.STRING);
-        }
+      // Skip non-label columns
+      if(meta.getRestrictionClass() != LabelList.class) {
         reps.add(meta);
+        columns.add(origpkgs.getColumn(i));
+        continue;
       }
-      // copy data
-      for(int j = 0; j < origpkgs.dataLength(); j++) {
-        for(int i = 0; i < origpkgs.metaLength(); i++) {
-          Object d = origpkgs.data(j, i);
-          if(i == llcol) {
-            LabelList ll = (LabelList) d;
-            if(classLabelIndex != null) {
-              data.add(ll.get(classLabelIndex));
-            }
-            if(externalIdIndex != null) {
-              data.add(ll.get(externalIdIndex));
-            }
-            // TODO: remove also from ll?
-          }
-          data.add(d);
-        }
+      // We split the label column into up to three parts
+      List<Object> clscol = null;
+      if(classLabelIndex != null) {
+        reps.add(TypeUtil.CLASSLABEL);
+        clscol = new ArrayList<Object>(origpkgs.dataLength());
+        columns.add(clscol);
       }
-      return new MultipleObjectsBundle(reps, data);
-    }
-    else {
-      // TODO: remove? move into a filter? old style, multiple string
-      BundleMeta reps = new BundleMeta(origpkgs.dataLength());
-      ArrayList<Object> data = new ArrayList<Object>(origpkgs.dataLength() * origpkgs.metaLength());
-
-      // representations
-      int ccol = -1;
-      int ecol = -1;
-      {
-        int lcnt = -1;
-        for(int i = 0; i < origpkgs.metaLength(); i++) {
-          SimpleTypeInformation<?> meta = origpkgs.meta(i);
-          if(meta.getRestrictionClass() == String.class) {
-            lcnt += 1;
-            if(classLabelIndex != null && classLabelIndex == lcnt) {
-              ccol = i;
-              // Turn into class label column.
-              reps.add(SimpleTypeInformation.get(classLabelClass));
-              continue;
-            }
-            if(externalIdIndex != null && externalIdIndex == lcnt) {
-              ecol = i;
-              // FIXME: create an "external id" representation
-              reps.add(TypeUtil.STRING);
-              continue;
-            }
-          }
-          // otherwise, just keep the metadata unchanged
-          reps.add(meta);
-        }
-
-        if(classLabelIndex != null && classLabelIndex > lcnt) {
-          throw new IllegalArgumentException("No class label at index " + classLabelIndex + " specified!");
-        }
+      List<Object> eidcol = null;
+      if(externalIdIndex != null) {
+        // TODO: special type for external ID?
+        reps.add(TypeUtil.STRING);
+        eidcol = new ArrayList<Object>(origpkgs.dataLength());
+        columns.add(eidcol);
       }
+      List<Object> lblcol = new ArrayList<Object>(origpkgs.dataLength());
+      reps.add(meta);
+      columns.add(lblcol);
 
-      for(int j = 0; j < origpkgs.dataLength(); j++) {
-        for(int i = 0; i < origpkgs.metaLength(); i++) {
-          Object d = origpkgs.data(j, i);
-          if(i == ccol) {
+      // Split the column
+      for(Object obj : origpkgs.getColumn(i)) {
+        if(obj != null) {
+          LabelList ll = (LabelList) obj;
+          if(classLabelIndex != null) {
             try {
-              ClassLabel classLabelAssociation = classLabelClass.newInstance();
-              classLabelAssociation.init((String) d);
-              data.add(classLabelAssociation);
-              continue;
+              ClassLabel lbl = classLabelClass.newInstance();
+              lbl.init(ll.get(classLabelIndex));
+              clscol.add(lbl);
             }
             catch(Exception e) {
-              getLogger().exception("Cannot instantiate class label", e);
+              throw new AbortException("Cannot initialize class labels.");
             }
           }
-          if(i == ecol) {
-            // FIXME: implement
+          if(externalIdIndex != null) {
+            eidcol.add(ll.get(externalIdIndex));
           }
-          // otherwise just keep the data
-          data.add(d);
+          // Remove in appropriate sequence
+          if(classLabelIndex != null && externalIdIndex != null) {
+            ll.remove(Math.max(classLabelIndex, externalIdIndex));
+            ll.remove(Math.min(classLabelIndex, externalIdIndex));
+          }
+          else {
+            if(classLabelIndex != null) {
+              ll.remove(externalIdIndex);
+            }
+            if(externalIdIndex != null) {
+              ll.remove(externalIdIndex);
+            }
+          }
+          lblcol.add(ll);
+        }
+        else {
+          if(classLabelIndex != null) {
+            clscol.add(null);
+          }
+          if(externalIdIndex != null) {
+            eidcol.add(null);
+          }
+          lblcol.add(null);
         }
       }
-      return new MultipleObjectsBundle(reps, data);
     }
+    return new MultipleObjectsBundle(reps, columns);
   }
 
   /**

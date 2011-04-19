@@ -88,16 +88,20 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<Object> folded = new ArrayList<Object>(data.length * 2);
+    List<Object> vectors = new ArrayList<Object>();
+    List<Object> lblc = new ArrayList<Object>();
     for(int i = 0; i < data.length; i++) {
       DoubleVector featureVector = new DoubleVector(data[i]);
-      folded.add(featureVector);
-      folded.add(labels[i]);
+      vectors.add(featureVector);
+      lblc.add(labels[i]);
     }
     BundleMeta meta = new BundleMeta();
+    List<List<Object>> columns = new ArrayList<List<Object>>(2);
     meta.add(getTypeInformation(dimensionality));
+    columns.add(vectors);
     meta.add(TypeUtil.LABELLIST);
-    return new MultipleObjectsBundle(meta, folded);
+    columns.add(lblc);
+    return new MultipleObjectsBundle(meta, columns);
   }
 
   @Override

@@ -31,24 +31,27 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
       return objects;
     }
 
-    List<Object> folded = new ArrayList<Object>(objects.getFolded());
     BundleMeta meta = new BundleMeta();
+    List<List<Object>> columns = new ArrayList<List<Object>>(objects.metaLength());
     for(int r = 0; r < objects.metaLength(); r++) {
       SimpleTypeInformation<?> type = objects.meta(r);
+      List<Object> column = objects.getColumn(r);
       if(!getInputTypeRestriction().isAssignableFromType(type)) {
         meta.add(type);
+        columns.add(column);
         continue;
       }
       // Get the replacement type information
       @SuppressWarnings("unchecked")
       final SimpleTypeInformation<I> castType = (SimpleTypeInformation<I>) type;
       meta.add(convertedType(castType));
-
+      columns.add(column);
+      
       // When necessary, perform an initialization scan
       if(prepareStart(castType)) {
-        for(int i = 0; i < objects.dataLength(); i++) {
+        for(Object o : column) {
           @SuppressWarnings("unchecked")
-          final I obj = (I) objects.data(i, r);
+          final I obj = (I) o;
           prepareProcessInstance(obj);
         }
         prepareComplete();
@@ -57,12 +60,12 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
       // Normalization scan
       for(int i = 0; i < objects.dataLength(); i++) {
         @SuppressWarnings("unchecked")
-        final I obj = (I) folded.get(i * objects.metaLength() + r);
+        final I obj = (I) column.get(i);
         final O normalizedObj = filterSingleObject(obj);
-        folded.set(i * objects.metaLength() + r, normalizedObj);
+        column.set(i, normalizedObj);
       }
     }
-    return new MultipleObjectsBundle(meta, folded);
+    return new MultipleObjectsBundle(meta, columns);
   }
 
   /**

@@ -138,15 +138,17 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
         for(int j = 0; j < objects.metaLength(); j++) {
           meta.add(objects.meta(j));
         }
-        ArrayList<Object> data = new ArrayList<Object>(objects.dataLength() * meta.size());
+        List<Object> ids = new ArrayList<Object>(objects.dataLength());
         for(int i = 0; i < objects.dataLength(); i++) {
-          data.add(DBIDUtil.importInteger(startid + i));
-          for(int j = 0; j < objects.metaLength(); j++) {
-            data.add(objects.data(i, j));
-          }
+          ids.add(DBIDUtil.importInteger(startid + i));
+        }
+        ArrayList<List<Object>> columns = new ArrayList<List<Object>>(meta.size());
+        columns.add(ids);
+        for(int j = 0; j < objects.metaLength(); j++) {
+          columns.add(objects.getColumn(j));
         }
         // Replace result package
-        objects = new MultipleObjectsBundle(meta, data);
+        objects = new MultipleObjectsBundle(meta, columns);
       }
 
       if(logger.isDebugging()) {

@@ -53,7 +53,8 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<Object> folded = new ArrayList<Object>();
+    List<Object> vectors = new ArrayList<Object>();
+    List<Object> lblc = new ArrayList<Object>();
     try {
       List<BitSet> bitSets = new ArrayList<BitSet>();
       List<LabelList> allLabels = new ArrayList<LabelList>();
@@ -83,17 +84,20 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
       for(int i = 0; i < bitSets.size(); i++) {
         BitSet bitSet = bitSets.get(i);
         List<String> labels = allLabels.get(i);
-        folded.add(new BitVector(bitSet, dimensionality));
-        folded.add(labels);
+        vectors.add(new BitVector(bitSet, dimensionality));
+        lblc.add(labels);
       }
     }
     catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
     BundleMeta meta = new BundleMeta();
+    List<List<Object>> columns = new ArrayList<List<Object>>(2);
     meta.add(getTypeInformation(dimensionality));
+    columns.add(vectors);
     meta.add(TypeUtil.LABELLIST);
-    return new MultipleObjectsBundle(meta, folded);
+    columns.add(lblc);
+    return new MultipleObjectsBundle(meta, columns);
   }
 
   protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {

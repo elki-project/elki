@@ -88,7 +88,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param expectedSize Expected size in records
    * @return Database
    */
-  protected<T> Database makeSimpleDatabase(String filename, int expectedSize) {
+  protected <T> Database makeSimpleDatabase(String filename, int expectedSize) {
     return makeSimpleDatabase(filename, expectedSize, new ListParameterization());
   }
 
@@ -189,8 +189,13 @@ public abstract class AbstractSimpleAlgorithmTest {
     params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, positive);
     ComputeROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(ComputeROCCurve.class, params);
 
+    // Ensure the result has been added to the hierarchy:
+    if(db.getHierarchy().getParents(result).size() < 1) {
+      db.getHierarchy().add(db, result);
+    }
+
     // Compute ROC and AUC:
-    rocCurve.processResult(db, result, result.getHierarchy());
+    rocCurve.processResult(db, result);
     // Find the ROC results
     Iterator<ComputeROCCurve.ROCResult> iter = ResultUtil.filteredResults(result, ComputeROCCurve.ROCResult.class);
     org.junit.Assert.assertTrue("No ROC result found.", iter.hasNext());
@@ -210,7 +215,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     org.junit.Assert.assertNotNull("No outlier result", result);
     org.junit.Assert.assertNotNull("No score result.", result.getScores());
     final DBID dbid = DBIDUtil.importInteger(id);
-    org.junit.Assert.assertNotNull("No result for ID "+id, result.getScores().getValueFor(dbid));
+    org.junit.Assert.assertNotNull("No result for ID " + id, result.getScores().getValueFor(dbid));
     double actual = result.getScores().getValueFor(dbid);
     org.junit.Assert.assertEquals("Outlier score of object " + id + " doesn't match.", expected, actual, 0.0001);
   }

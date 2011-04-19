@@ -51,21 +51,22 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<Object> folded = new ArrayList<Object>();
+    List<Object> vectors = new ArrayList<Object>();
+    List<Object> labels = new ArrayList<Object>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
           // TODO: use more efficient storage right away?
           List<Bit> attributes = new ArrayList<Bit>();
-          List<String> labels = new ArrayList<String>();
+          List<String> ll = new ArrayList<String>();
           for(String entry : entries) {
             try {
               Bit attribute = Bit.valueOf(entry);
               attributes.add(attribute);
             }
             catch(NumberFormatException e) {
-              labels.add(entry);
+              ll.add(entry);
             }
           }
 
@@ -76,8 +77,8 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
           }
 
-          folded.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
-          folded.add(labels);
+          vectors.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
+          labels.add(ll);
         }
       }
     }
@@ -85,12 +86,15 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
     BundleMeta meta = new BundleMeta();
-    meta.add(getPrototype(dimensionality));
+    List<List<Object>> columns = new ArrayList<List<Object>>(2);
+    meta.add(getTypeInformation(dimensionality));
+    columns.add(vectors);
     meta.add(TypeUtil.LABELLIST);
-    return new MultipleObjectsBundle(meta, folded);
+    columns.add(labels);
+    return new MultipleObjectsBundle(meta, columns);
   }
 
-  protected VectorFieldTypeInformation<BitVector> getPrototype(int dimensionality) {
+  protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {
     return new VectorFieldTypeInformation<BitVector>(BitVector.class, dimensionality, new BitVector(new BitSet(), dimensionality));
   }
 

@@ -137,11 +137,12 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
       logger.debugFine("add to objectAndLabelsList");
     }
 
-    List<Object> objects = new ArrayList<Object>(ids.size());
-    objects.addAll(ids);
+    List<Object> objects = new ArrayList<Object>(ids);
     BundleMeta meta = new BundleMeta(1);
     meta.add(TypeUtil.DBID);
-    return new DistanceParsingResult<D>(new MultipleObjectsBundle(meta, objects), distanceCache);
+    List<List<Object>> columns = new ArrayList<List<Object>>(1);
+    columns.add(objects);
+    return new DistanceParsingResult<D>(new MultipleObjectsBundle(meta, columns), distanceCache);
   }
 
   /**
