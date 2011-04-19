@@ -16,12 +16,14 @@ public class ConvexHull2D {
   private static final int X = 0;
   private static final int Y = 1;
   
+  private Vector[] points;
   private VertexList list, top;
   private int ndelete = 0;
   private int i = 0;
   
   public ConvexHull2D (Vector[] points){
     if (points.length < 3) { return; }
+    this.points = points;
     list = new VertexList();
     boolean toSmall = false;
     double maxX, maxY;
@@ -68,7 +70,8 @@ public class ConvexHull2D {
     
     Vector[] resv = new Vector[res.n];
     for (int i = 0; i < resv.length; i++) {
-      resv[i] = it.getVector2D();
+ //     resv[i] = it.getVector2D();
+      resv[i] = points[it.vnum];
       it = it.next;
     }
     return resv;
