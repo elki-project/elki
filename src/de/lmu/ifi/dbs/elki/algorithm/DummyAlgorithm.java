@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -42,11 +43,14 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
    */
   @Override
   protected Result runInTime(Database database) throws IllegalStateException {
-    Relation<O> dataQuery = getRelation(database);
-    KNNQuery<O, DoubleDistance> knnQuery = database.getKNNQuery(dataQuery, EuclideanDistanceFunction.STATIC, 10);
-    for(DBID id : dataQuery.iterDBIDs()) {
+    // Bind to the database
+    Relation<O> relation = getRelation(database);
+    DistanceQuery<O, DoubleDistance> distQuery = database.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
+    KNNQuery<O, DoubleDistance> knnQuery = database.getKNNQuery(distQuery, 10);
+
+    for(DBID id : relation.iterDBIDs()) {
       // Get the actual object from the database (but discard)
-      dataQuery.get(id);
+      relation.get(id);
       // run a 10NN query for each point (but discard)
       knnQuery.getKNNForDBID(id, 10);
     }
