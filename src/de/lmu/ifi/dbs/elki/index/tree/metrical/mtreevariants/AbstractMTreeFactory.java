@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> Distance type
  * @param <I> Index type
  */
-public abstract class AbstractMTreeFactory<O extends DatabaseObject, D extends Distance<D>, I extends AbstractMTree<O, D, ?, ?>> extends TreeIndexFactory<O, I> {
+public abstract class AbstractMTreeFactory<O, D extends Distance<D>, I extends AbstractMTree<O, D, ?, ?>> extends TreeIndexFactory<O, I> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -55,6 +55,11 @@ public abstract class AbstractMTreeFactory<O extends DatabaseObject, D extends D
     this.distanceFunction = distanceFunction;
   }
 
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return distanceFunction.getInputTypeRestriction();
+  }
+
   /**
    * Parameterization class.
    * 
@@ -62,7 +67,7 @@ public abstract class AbstractMTreeFactory<O extends DatabaseObject, D extends D
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends TreeIndexFactory.Parameterizer<O> {
+  public static abstract class Parameterizer<O, D extends Distance<D>> extends TreeIndexFactory.Parameterizer<O> {
     protected DistanceFunction<O, D> distanceFunction = null;
     @Override
     protected void makeOptions(Parameterization config) {

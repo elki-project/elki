@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 // TODO: return unmodifiable collections?
 // TODO: disallow clusters without a DBIDs?
 // TODO: add Model interface and delegations consequently since we have the
-// DBID group and hierarch delegators?
-public class Cluster<M extends Model> extends AbstractDatabaseObject implements Hierarchical<Cluster<M>>, TextWriteable {
+// DBID group and hierarchy delegators?
+public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextWriteable {
   /**
    * Object that the hierarchy management is delegated to.
    */

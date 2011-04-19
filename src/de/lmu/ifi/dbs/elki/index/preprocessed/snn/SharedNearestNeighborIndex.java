@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.snn;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 
@@ -11,10 +10,8 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
  * Interface for an index providing nearest neighbor sets.
  * 
  * @author Erich Schubert
- * 
- * @param <O> Object type
  */
-public interface SharedNearestNeighborIndex<O extends DatabaseObject> extends Index<O> {
+public interface SharedNearestNeighborIndex<O> extends Index<O> {
   /**
    * Get the precomputed nearest neighbors
    * 
@@ -38,10 +35,10 @@ public interface SharedNearestNeighborIndex<O extends DatabaseObject> extends In
    * @apiviz.stereotype factory
    * @apiviz.uses SharedNearestNeighborIndex oneway - - «create»
    * 
-   * @param <O> Object type
+   * @param <O> The input object type
    * @param <I> Index type produced
    */
-  public static interface Factory<O extends DatabaseObject, I extends SharedNearestNeighborIndex<O>> extends IndexFactory<O, I> {
+  public static interface Factory<O, I extends SharedNearestNeighborIndex<O>> extends IndexFactory<O, I> {
     /**
      * Instantiate the index for a given database.
      * 
@@ -50,7 +47,7 @@ public interface SharedNearestNeighborIndex<O extends DatabaseObject> extends In
      * @return Index
      */
     @Override
-    public I instantiate(Database<O> database);
+    public I instantiate(Relation<O> database);
 
     /**
      * Get the number of neighbors

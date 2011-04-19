@@ -10,12 +10,14 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
@@ -40,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
+public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -141,21 +143,23 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
   }
 
   @Override
-  protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
-    FiniteProgress objprog = getLogger().isVerbose() ? new FiniteProgress("Processing objects", database.size(), getLogger()) : null;
+  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
+    
+    FiniteProgress objprog = getLogger().isVerbose() ? new FiniteProgress("Processing objects", dataQuery.size(), getLogger()) : null;
     IndefiniteProgress clusprog = getLogger().isVerbose() ? new IndefiniteProgress("Number of clusters", getLogger()) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
-    processedIDs = DBIDUtil.newHashSet(database.size());
+    processedIDs = DBIDUtil.newHashSet(dataQuery.size());
 
-    LocallyWeightedDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(database);
-    RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distanceFunction);
+    LocallyWeightedDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(dataQuery);
+    RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(dataQuery, distanceFunction);
 
-    if(database.size() >= minpts) {
-      for(DBID id : database) {
+    if(dataQuery.size() >= minpts) {
+      for(DBID id : dataQuery.iterDBIDs()) {
         if(!processedIDs.contains(id)) {
-          expandCluster(database, distFunc, rangeQuery, id, objprog, clusprog);
-          if(processedIDs.size() == database.size() && noise.size() == 0) {
+          expandCluster(distFunc, rangeQuery, id, objprog, clusprog);
+          if(processedIDs.size() == dataQuery.size() && noise.size() == 0) {
             break;
           }
         }
@@ -166,7 +170,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
       }
     }
     else {
-      for(DBID id : database) {
+      for(DBID id : dataQuery.iterDBIDs()) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), getLogger());
@@ -218,19 +222,17 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
   /**
    * ExpandCluster function of DBSCAN.
    * 
-   * @param database the database to run the algorithm on
    * @param distFunc Distance query to use
    * @param rangeQuery Range query
    * @param startObjectID the object id of the database object to start the
    *        expansion with
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database<V> database, LocallyWeightedDistanceFunction.Instance<V> distFunc, RangeQuery<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(LocallyWeightedDistanceFunction.Instance<V> distFunc, RangeQuery<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     Integer corrDim = distFunc.getIndex().getLocalProjection(startObjectID).getCorrelationDimension();
 
     if(getLogger().isDebugging()) {
-      String label = database.getObjectLabelQuery().get(startObjectID);
-      getLogger().debugFine("EXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
+      getLogger().debugFine("EXPAND CLUSTER id = " + startObjectID + " " + corrDim + "\n#clusters: " + resultList.size());
     }
 
     // euclidean epsilon neighborhood < minpts OR local dimensionality >
@@ -317,7 +319,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
         }
       }
 
-      if(processedIDs.size() == database.size() && noise.size() == 0) {
+      if(processedIDs.size() == distFunc.getRepresentation().size() && noise.size() == 0) {
         break;
       }
     }
@@ -339,6 +341,11 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     }
   }
 
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return distanceFunction.getInputTypeRestriction();
+  }
+  
   /**
    * Parameterization class.
    * 

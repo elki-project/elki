@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
@@ -17,7 +17,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends
    * @param database the database used
    * @return Covariance Matrix
    */
-  public Matrix processDatabase(Database<? extends V> database);
+  public Matrix processDatabase(Relation<? extends V> database);
 
   /**
    * Compute Covariance Matrix for a collection of database IDs
@@ -26,7 +26,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends
    * @param database the database used
    * @return Covariance Matrix
    */
-  public Matrix processIds(DBIDs ids, Database<? extends V> database);
+  public Matrix processIds(DBIDs ids, Relation<? extends V> database);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection
@@ -38,7 +38,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends
    * @param k the number of entries to process
    * @return Covariance Matrix
    */
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database, int k);
+  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection
@@ -49,6 +49,6 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends
    * @param database the database used
    * @return Covariance Matrix
    */
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database);
+  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database);
 
 }

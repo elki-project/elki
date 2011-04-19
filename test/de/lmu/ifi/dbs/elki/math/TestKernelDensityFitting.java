@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.math;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
@@ -9,9 +8,11 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
@@ -53,20 +54,21 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // This data was generated with a mean of 0.0 and stddev 1.23,
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, config);
-    Database<DoubleVector> db = dbconn.getDatabase(null);
+    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, config);
+    Database db = dbconn.getDatabase();
+    Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
     // verify data set size.
-    assertTrue("Data set size doesn't match parameters.", db.size() == realsize);
+    assertEquals("Data set size doesn't match parameters.", realsize, rep.size());
 
     double splitval = 0.5;
 
-    double[] fulldata = new double[db.size()];
+    double[] fulldata = new double[rep.size()];
     // transform into double array
     {
       int i = 0;
-      for(DBID id : db.getIDs()) {
-        fulldata[i] = db.get(id).doubleValue(1);
+      for(DBID id : rep.iterDBIDs()) {
+        fulldata[i] = rep.get(id).doubleValue(1);
         i++;
       }
     }

@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -47,8 +49,8 @@ public class HistogramIntersectionDistanceFunction extends AbstractPrimitiveDist
   }
 
   @Override
-  public Class<? super NumberVector<?,?>> getInputDatatype() {
-    return NumberVector.class;
+  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

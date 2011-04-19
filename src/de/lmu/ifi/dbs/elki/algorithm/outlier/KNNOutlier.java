@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -51,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("KNN outlier: Efficient Algorithms for Mining Outliers from Large Data Sets")
 @Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")
 @Reference(authors = "S. Ramaswamy, R. Rastogi, K. Shim", title = "Efficient Algorithms for Mining Outliers from Large Data Sets", booktitle = "Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000", url = "http://dx.doi.org/10.1145/342009.335437")
-public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -88,8 +89,9 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
    * Runs the algorithm in the timed evaluation part.
    */
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k);
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    final DistanceQuery<O, D> distanceQuery = getDistanceQuery(database);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     if(logger.isVerbose()) {
       logger.verbose("Computing the kNN outlier degree (distance to the k nearest neighbor)");
@@ -97,9 +99,9 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
     FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", database.size(), logger) : null;
 
     double maxodegree = 0;
-    WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
-    for(DBID id : database) {
+    for(DBID id : distanceQuery.getRepresentation().iterDBIDs()) {
       // distance to the kth nearest neighbor
       final List<DistanceResultPair<D>> knns = knnQuery.getKNNForDBID(id, k);
       final int last = Math.min(k - 1, knns.size() - 1);
@@ -122,6 +124,11 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -133,7 +140,7 @@ public class KNNOutlier<O extends DatabaseObject, D extends NumberDistance<D, ?>
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected int k = 0;
 
     @Override

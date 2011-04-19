@@ -1,9 +1,9 @@
 package experimentalcode.shared.evaluation.classifier;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
+
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 
 /**
  * Provides a confusion matrix with some prediction performance measures that

@@ -3,7 +3,6 @@ package experimentalcode.shared.evaluation.classifier;
 import java.io.PrintStream;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import experimentalcode.shared.algorithm.classifier.Classifier;
@@ -15,7 +14,7 @@ import experimentalcode.shared.evaluation.classifier.procedure.EvaluationProcedu
  *
  * @author Arthur Zimek
  */
-public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L, Result>> extends AbstractClassifierEvaluation<O, L, C> {
+public class ConfusionMatrixBasedEvaluation<O, L extends ClassLabel, C extends Classifier<O, L, Result>> extends AbstractClassifierEvaluation<O, L, C> {
     /**
      * Holds the confusion matrix.
      */
@@ -32,11 +31,11 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends 
      * @param confusionmatrix     the confusion matrix to provide
      *                            the prediction performance measures for
      * @param classifier          the classifier this evaluation is based on
-     * @param database            the training set this evaluation is based on
+     * @param rep            the training set this evaluation is based on
      * @param testset             the test set this evaluation is based on
      * @param evaluationProcedure the evaluation procedure used
      */
-    public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, C classifier, Database<O> database, Database<O> testset, EvaluationProcedure<O, L, C> evaluationProcedure) {
+    public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, C classifier, Database database, Database testset, EvaluationProcedure<O, L, C> evaluationProcedure) {
         super(database, testset, classifier);
         this.confusionmatrix = confusionmatrix;
         this.evaluationProcedure = evaluationProcedure;

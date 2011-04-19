@@ -14,10 +14,8 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
@@ -25,15 +23,13 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -42,10 +38,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Heidi Kolb
  * @author Erich Schubert
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame implements DataStoreListener<NV>, ResultListener {
+// FIXME: INCOMPLETE TRANSITION TO MULTI-REPRESENTED DATA
+public class SelectionTableWindow extends JFrame implements DataStoreListener, ResultListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -89,22 +84,22 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
   /**
    * The database we use
    */
-  Database<NV> database;
+  Database database;
 
   /**
    * Class label representation
    */
-  DataQuery<ClassLabel> crep;
+  Relation<ClassLabel> crep;
 
   /**
    * Object label representation
    */
-  DataQuery<String> orep;
+  Relation<String> orep;
 
   /**
    * Our context
    */
-  final protected VisualizerContext<? extends NV> context;
+  final protected VisualizerContext context;
 
   /**
    * The actual visualization instance, for a single projection
@@ -112,12 +107,13 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
    * @param context The Context
    */
   @SuppressWarnings("unchecked")
-  public SelectionTableWindow(VisualizerContext<? extends NV> context) {
+  public SelectionTableWindow(VisualizerContext context) {
     super(NAME);
     this.context = context;
-    this.database = (Database<NV>) context.getDatabase();
-    this.crep = database.getClassLabelQuery();
-    this.orep = database.getObjectLabelQuery();
+    this.database = context.getDatabase();
+    // FIXME: re-add labels
+    this.crep = null; //database.getClassLabelQuery();
+    this.orep = null; //database.getObjectLabelQuery();
     updateFromSelection();
 
     JPanel panel = new JPanel(new BorderLayout());
@@ -216,7 +212,7 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
 
     @Override
     public int getColumnCount() {
-      return DatabaseUtil.dimensionality(database) + 3;
+      return 3; //DatabaseUtil.dimensionality(database) + 3;
     }
 
     @Override
@@ -236,11 +232,12 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
       if(columnIndex == 2) {
         return crep.get(id);
       }
-      NV obj = database.get(id);
+      /*NV obj = database.get(id);
       if(obj == null) {
         return null;
       }
-      return obj.getValue(columnIndex - 3 + 1);
+      return obj.getValue(columnIndex - 3 + 1);*/
+      return null;
     }
 
     @Override
@@ -285,7 +282,8 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
         logger.warning("Was expecting a String value from the input element, got: " + aValue.getClass());
         return;
       }
-      NV obj = database.get(id);
+      throw new AbortException("FIXME: INCOMPLETE TRANSITION");
+      /* NV obj = database.get(id);
       if(obj == null) {
         logger.warning("Tried to edit removed object?");
         return;
@@ -302,7 +300,7 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
       }
       NV newobj = obj.newInstance(vals);
       newobj.setID(id);
-      final DataQuery<DatabaseObjectMetadata> mrep = database.getMetadataQuery();
+      final Representation<DatabaseObjectMetadata> mrep = database.getMetadataQuery();
       DatabaseObjectMetadata meta = mrep.get(id);
       try {
         database.delete(id);
@@ -310,13 +308,13 @@ public class SelectionTableWindow<NV extends NumberVector<NV, ?>> extends JFrame
       }
       catch(UnableToComplyException e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-      }
+      } */
       // TODO: refresh wrt. range selection!
     }
   }
 
   @Override
-  public void contentChanged(DataStoreEvent<NV> e) {
+  public void contentChanged(DataStoreEvent e) {
     Set<Type> eventTypes = e.getTypes();
     if(eventTypes.size() == 1 && eventTypes.iterator().next().equals(Type.UPDATE)) {
       dotTableModel.fireTableDataChanged();

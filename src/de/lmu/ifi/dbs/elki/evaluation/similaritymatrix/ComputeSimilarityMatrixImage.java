@@ -10,13 +10,14 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -25,7 +26,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
  * 
  * @param <O> Object class
  */
-public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements Evaluator {
+public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * The logger.
    */
@@ -102,8 +102,9 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
    * @param iter DBID iterator
    * @return result object
    */
-  private SimilarityMatrix computeSimilarityMatrixImage(Database<O> database, Iterator<DBID> iter) {
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(database.size());
+  private SimilarityMatrix computeSimilarityMatrixImage(Database database, Iterator<DBID> iter) {
+    Relation<O> dataQuery = database.getRelation(distanceFunction.getInputTypeRestriction());
+    ArrayModifiableDBIDs order = DBIDUtil.newArray(dataQuery.size());
     while(iter.hasNext()) {
       Object o = iter.next();
       if(!(o instanceof DBID)) {
@@ -116,7 +117,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     if(order.size() != database.size()) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    DistanceQuery<O, ? extends NumberDistance<?, ?>> dq = distanceFunction.instantiate(database);
+    DistanceQuery<O, ? extends NumberDistance<?, ?>> dq = distanceFunction.instantiate(dataQuery);
     final int size = order.size();
 
     // When the logging is in the outer loop, it's just 2*size (providing enough
@@ -194,7 +195,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
   }
 
   @Override
-  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
     boolean nonefound = true;
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
@@ -202,7 +203,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
-      hierarchy.add(or, computeSimilarityMatrixImage(castDatabase(db), or.iter(db.getIDs())));
+      hierarchy.add(or, computeSimilarityMatrixImage(db, or.iter(db.getDBIDs())));
       // Process them only once.
       orderings.remove(or);
       nonefound = false;
@@ -213,44 +214,28 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     for(IterableResult<?> ir : iterables) {
       Iterator<DBID> iter = getDBIDIterator(ir);
       if(iter != null) {
-        hierarchy.add(ir, computeSimilarityMatrixImage(castDatabase(db), iter));
+        hierarchy.add(ir, computeSimilarityMatrixImage(db, iter));
         nonefound = false;
       }
     }
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      Iterator<DBID> iter = or.iter(db.getIDs());
-      hierarchy.add(or, computeSimilarityMatrixImage(castDatabase(db), iter));
+      Iterator<DBID> iter = or.iter(db.getDBIDs());
+      hierarchy.add(or, computeSimilarityMatrixImage(db, iter));
       nonefound = false;
     }
 
     if(nonefound) {
       // Use the database ordering.
       // But be careful to NOT cause a loop, process new databases only.
-      Iterable<Database<?>> iter = ResultUtil.filteredResults(result, Database.class);
-      for(Database<?> d : iter) {
-        @SuppressWarnings("unchecked")
-        Database<O> database = (Database<O>) d;
-        hierarchy.add(db, computeSimilarityMatrixImage(database, database.iterator()));
+      Iterable<Database> iter = ResultUtil.filteredResults(result, Database.class);
+      for(Database database : iter) {
+        // Get an arbitrary representation
+        Relation<Object> rep = database.getRelation(TypeUtil.ANY);
+        hierarchy.add(db, computeSimilarityMatrixImage(database, rep.iterDBIDs()));
       }
     }
-  }
-
-  /**
-   * Unchecked generics cast.
-   * 
-   * @param db Database to cast
-   * @return database
-   */
-  @SuppressWarnings("unchecked")
-  private Database<O> castDatabase(Database<?> db) {
-    return (Database<O>) db;
-  }
-
-  @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
-    // Normalizations are ignored
   }
 
   /**
@@ -267,7 +252,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
     /**
      * The database
      */
-    Database<?> database;
+    Database database;
 
     /**
      * The database IDs used
@@ -289,7 +274,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
      * 
      * @param img Image data
      */
-    public SimilarityMatrix(RenderedImage img, Database<?> database, ArrayDBIDs ids) {
+    public SimilarityMatrix(RenderedImage img, Database database, ArrayDBIDs ids) {
       super();
       this.img = img;
       this.database = database;
@@ -321,7 +306,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
      * 
      * @return the database
      */
-    public Database<?> getDatabase() {
+    public Database getDatabase() {
       return database;
     }
 
@@ -352,7 +337,7 @@ public class ComputeSimilarityMatrixImage<O extends DatabaseObject> implements E
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * The distance function to use
      */

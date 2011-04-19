@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -54,8 +56,8 @@ public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<N
   }
 
   @Override
-  public Class<? super NumberVector<?,?>> getInputDatatype() {
-    return NumberVector.class;
+  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

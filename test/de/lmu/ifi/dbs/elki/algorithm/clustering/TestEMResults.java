@@ -31,7 +31,7 @@ public class TestEMResults extends AbstractSimpleAlgorithmTest implements JUnit4
    */
   @Test
   public void testEMResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();

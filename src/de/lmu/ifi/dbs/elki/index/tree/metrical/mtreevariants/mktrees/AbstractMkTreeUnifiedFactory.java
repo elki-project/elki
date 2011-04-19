@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D> Distance type
  * @param <I> Index type
  */
-public abstract class AbstractMkTreeUnifiedFactory<O extends DatabaseObject, D extends Distance<D>, I extends AbstractMkTreeUnified<O, D, ?, ?>> extends AbstractMTreeFactory<O, D, I> {
+public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, I extends AbstractMkTreeUnified<O, D, ?, ?>> extends AbstractMTreeFactory<O, D, I> {
   /**
    * Parameter specifying the maximal number k of reverse k nearest neighbors to
    * be supported, must be an integer greater than 0.
@@ -56,7 +55,7 @@ public abstract class AbstractMkTreeUnifiedFactory<O extends DatabaseObject, D e
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
+  public static abstract class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
     protected int k_max;
 
     @Override

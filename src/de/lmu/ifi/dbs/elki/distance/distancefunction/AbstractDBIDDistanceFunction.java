@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -24,7 +25,7 @@ public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implem
 
   @Override
   abstract public D distance(DBID o1, DBID o2);
-  
+
   @Override
   abstract public D getDistanceFactory();
 
@@ -41,12 +42,13 @@ public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implem
   }
 
   @Override
-  public Class<? super DatabaseObject> getInputDatatype() {
-    return DatabaseObject.class;
+  public SimpleTypeInformation<DBID> getInputTypeRestriction() {
+    return TypeUtil.DBID;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  final public <O extends DatabaseObject> DistanceQuery<O, D> instantiate(Database<O> database) {
-    return new DBIDDistanceQuery<O, D>(database, this);
+  final public <O extends DBID> DistanceQuery<O, D> instantiate(Relation<O> database) {
+    return (DistanceQuery<O, D>) new DBIDDistanceQuery<D>((Relation<DBID>) database, this);
   }
 }

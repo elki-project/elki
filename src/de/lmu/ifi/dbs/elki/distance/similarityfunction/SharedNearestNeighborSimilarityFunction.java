@@ -2,10 +2,9 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
@@ -25,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> distance type
  */
 // todo arthur comment class
-public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
+public class SharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
   /**
    * Constructor.
    * 
@@ -91,9 +90,9 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Database<O>) database);
-    return (Instance<T, D>) new Instance<O, D>((Database<O>) database, indexi);
+  public <T extends O> Instance<T, D> instantiate(Relation<T> database) {
+    SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Relation<O>) database);
+    return (Instance<T, D>) new Instance<O, D>((Relation<O>) database, indexi);
   }
 
   /**
@@ -103,11 +102,10 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * 
    * @apiviz.uses SharedNearestNeighborIndex
    * 
-   * @param <O>
    * @param <D>
    */
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
-    public Instance(Database<O> database, SharedNearestNeighborIndex<O> preprocessor) {
+  public static class Instance<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
+    public Instance(Relation<O> database, SharedNearestNeighborIndex<O> preprocessor) {
       super(database, preprocessor);
     }
 
@@ -131,7 +129,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -13,8 +13,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  *
  * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction
  * 
- * @param <V>
- * @param <D>
+ * @param <V> Vector type to use
+ * @param <D> Distance result type
  */
 public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?>, D extends Distance<D>> extends PrimitiveDistanceQuery<V, D> implements SpatialDistanceQuery<V, D> {
   /**
@@ -23,11 +23,11 @@ public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?>, D exte
   final protected SpatialPrimitiveDistanceFunction<? super V, D> distanceFunction;
   
   /**
-   * @param database Database to use
+   * @param rep Representation to use
    * @param distanceFunction Distance function to use
    */
-  public SpatialPrimitiveDistanceQuery(Database<? extends V> database, SpatialPrimitiveDistanceFunction<? super V, D> distanceFunction) {
-    super(database, distanceFunction);
+  public SpatialPrimitiveDistanceQuery(Relation<? extends V> rep, SpatialPrimitiveDistanceFunction<? super V, D> distanceFunction) {
+    super(rep, distanceFunction);
     this.distanceFunction = distanceFunction;
   }
 
@@ -48,7 +48,7 @@ public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?>, D exte
 
   @Override
   public D minDist(HyperBoundingBox mbr, DBID id) {
-    return distanceFunction.minDist(mbr, database.get(id));
+    return distanceFunction.minDist(mbr, rep.get(id));
   }
 
   @Override

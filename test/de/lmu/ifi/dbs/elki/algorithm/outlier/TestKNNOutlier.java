@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class TestKNNOutlier extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testKNNOutlier() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();

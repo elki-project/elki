@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.index;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -14,20 +12,18 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <O> Database Object type
  */
-public interface KNNIndex<O extends DatabaseObject> extends Index<O> {
+public interface KNNIndex<O> extends Index<O> {
   /**
    * Get a KNN query object for the given distance function and k.
    * 
    * This function MAY return null, when the given distance is not supported!
    * 
    * @param <D> Distance type
-   * @param database Database
    * @param distanceFunction Distance function
    * @param hints Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  // TODO: Do we really need the database?
-  <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, Object... hints);
+  <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
    * Get a KNN query object for the given distance query and k.
@@ -35,11 +31,9 @@ public interface KNNIndex<O extends DatabaseObject> extends Index<O> {
    * This function MAY return null, when the given distance is not supported!
    * 
    * @param <D> Distance type
-   * @param database Database
    * @param distanceQuery Distance query
    * @param hints Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  // TODO: Do we really need the database?
-  <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, Object... hints);
+  <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
 }

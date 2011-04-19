@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -23,11 +22,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * </p>
  * 
  * @author Arthur Zimek
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of object handled by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  * @see AbstractAlgorithm
  */
-public interface Algorithm<O extends DatabaseObject, R extends Result> extends Parameterizable {
+public interface Algorithm<R extends Result> extends Parameterizable {
   /**
    * Runs the algorithm.
    * 
@@ -37,5 +36,5 @@ public interface Algorithm<O extends DatabaseObject, R extends Result> extends P
    *         properly (e.g. the setParameters(String[]) method has been failed
    *         to be called).
    */
-  R run(Database<O> database) throws IllegalStateException;
+  R run(Database database) throws IllegalStateException;
 }

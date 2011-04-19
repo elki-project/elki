@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -19,11 +21,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has DistanceFunction
  * @apiviz.excludeSubtypes
  * 
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
+public abstract class AbstractDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_ID}
    */
@@ -55,13 +57,23 @@ public abstract class AbstractDistanceBasedAlgorithm<O extends DatabaseObject, D
   }
 
   /**
+   * Get a distance query for the used distance function
+   * 
+   * @param database Database to use
+   * @return distance query
+   */
+  public DistanceQuery<O, D> getDistanceQuery(Database database) {
+    return QueryUtil.getDistanceQuery(database, distanceFunction);
+  }
+
+  /**
    * Parameterization helper class.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
     protected DistanceFunction<O, D> distanceFunction;
 
     @Override

@@ -5,10 +5,12 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -27,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("Prior Probability Classifier")
 @Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")
-public class PriorProbabilityClassifier<O extends DatabaseObject, L extends ClassLabel> extends AbstractClassifier<O, L, Result> {
+public class PriorProbabilityClassifier<O, L extends ClassLabel> extends AbstractClassifier<O, L, Result> {
   /**
    * The logger for this class.
    */
@@ -46,7 +48,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
   /**
    * Holds the database the prior probabilities are based on.
    */
-  protected Database<O> database;
+  protected Database database;
 
   /**
    * Provides a classifier always predicting the prior probabilities.
@@ -60,13 +62,13 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
    * Learns the prior probability for all classes.
    */
   @Override
-  public void buildClassifier(Database<O> database, ArrayList<L> classLabels) throws IllegalStateException {
+  public void buildClassifier(Database database, ArrayList<L> classLabels) throws IllegalStateException {
     this.setLabels(classLabels);
     this.database = database;
     distribution = new double[getLabels().size()];
     int[] occurences = new int[getLabels().size()];
-    DataQuery<ClassLabel> crep = database.getClassLabelQuery();
-    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+    Relation<ClassLabel> crep = database.getRelation(SimpleTypeInformation.get(ClassLabel.class));
+    for(Iterator<DBID> iter = crep.iterDBIDs(); iter.hasNext();) {
       ClassLabel label = crep.get(iter.next());
       int index = Collections.binarySearch(getLabels(), label);
       if(index > -1) {
@@ -76,7 +78,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
         throw new IllegalStateException(ExceptionMessages.INCONSISTENT_STATE_NEW_LABEL + ": " + label);
       }
     }
-    double size = database.size();
+    double size = crep.size();
     for(int i = 0; i < distribution.length; i++) {
       distribution[i] = occurences[i] / size;
     }
@@ -118,11 +120,16 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
   }
 
   @Override
-  protected Result runInTime(@SuppressWarnings("unused") Database<O> database) throws IllegalStateException {
+  protected Result runInTime(@SuppressWarnings("unused") Database database) throws IllegalStateException {
     // TODO Implement sensible default behavior.
     return null;
   }
 
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+  
   @Override
   protected Logging getLogger() {
     return logger;

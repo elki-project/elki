@@ -10,14 +10,15 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -36,6 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Generates a SVG-Element containing bubbles. A Bubble is a circle visualizing
@@ -50,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 @Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", url = "http://dx.doi.org/10.1007%2F978-3-642-12098-5_34")
-public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener<NV> {
+public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -98,8 +100,6 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
 
   @Override
   public void redraw() {
-    // get the Database
-    Database<? extends NV> database = context.getDatabase();
     Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     setupCSS(svgp, clustering);
     // bubble size
@@ -111,7 +111,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
       for(DBID objId : clus.getIDs()) {
         final Double radius = getScaledForId(objId);
         if(radius > 0.01) {
-          final NV vec = database.get(objId);
+          final NV vec = rep.get(objId);
           if(vec != null) {
             double[] v = proj.fastProjectDataToRenderSpace(vec);
             Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
@@ -124,7 +124,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
+  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
     synchronizedRedraw();
   }
 
@@ -199,7 +199,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
    * 
    * @param <NV> Type of the DatabaseObject being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Flag for half-transparent filling of bubbles.
      * 
@@ -230,7 +230,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
 
     /**
      * Constructor.
-     *
+     * 
      * @param fill
      * @param scaling
      */
@@ -244,18 +244,21 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     public Visualization makeVisualization(VisualizationTask task) {
       if(this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
         final OutlierResult outlierResult = task.getResult();
-        ((OutlierScalingFunction) this.scaling).prepare(task.getContext().getDatabase().getIDs(), outlierResult);
+        ((OutlierScalingFunction) this.scaling).prepare(task.getContext().getDatabase().getDBIDs(), outlierResult);
       }
       return new BubbleVisualization<NV>(task, scaling);
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-      for(OutlierResult o : ors) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, o, this, P2DVisualization.class);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-        context.addVisualizer(o, task);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+        for(OutlierResult o : ors) {
+          final VisualizationTask task = new VisualizationTask(NAME, context, o, rep, this, P2DVisualization.class);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+          context.addVisualizer(o, task);
+        }
       }
     }
 
@@ -263,7 +266,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     public Class<? extends Projection> getProjectionType() {
       return Projection2D.class;
     }
-    
+
     /**
      * Parameterization class.
      * 

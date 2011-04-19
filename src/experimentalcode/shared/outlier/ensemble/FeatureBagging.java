@@ -10,12 +10,16 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -28,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -67,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Feature Bagging for Outlier Detection")
 @Reference(title = "Feature Bagging for Outlier Detection", authors = "A. Lazarevic, V. Kumar", booktitle = "Proc. of the 11th ACM SIGKDD international conference on Knowledge discovery in data mining", url = "http://dx.doi.org/10.1145/1081870.1081891")
-public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -155,8 +160,9 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
   }
 
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    int dbdim = database.dimensionality();
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<O> relation = getRelation(database);
+    int dbdim = DatabaseUtil.dimensionality(relation);
     int mindim = dbdim / 2;
     int maxdim = dbdim - 1;
 
@@ -206,11 +212,11 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
     }
     else {
       // Cumulative sum.
-      WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+      WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
       MinMax<Double> minmax = new MinMax<Double>();
       {
-        FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", database.size(), logger) : null;
-        for(DBID id : database) {
+        FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
+        for(DBID id : relation.iterDBIDs()) {
           double sum = 0.0;
           for(OutlierResult r : results) {
             sum += r.getScores().getValueFor(id);
@@ -235,5 +241,10 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 }

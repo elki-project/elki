@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
@@ -41,11 +41,11 @@ public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends Pr
     /**
      * Instantiate the index for a given database.
      * 
-     * @param database Database type
+     * @param rep Representation to use
      * 
      * @return Index
      */
     @Override
-    public I instantiate(Database<V> database);
+    public I instantiate(Relation<V> representaion);
   }
 }

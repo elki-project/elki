@@ -32,7 +32,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testKMeansResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();

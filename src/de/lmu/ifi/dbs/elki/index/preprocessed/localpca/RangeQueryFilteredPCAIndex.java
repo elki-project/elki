@@ -3,10 +3,10 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -55,7 +55,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
    * @param rangeQuery Range Query to use
    * @param epsilon Query range
    */
-  public RangeQueryFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca, RangeQuery<NV, DoubleDistance> rangeQuery, DoubleDistance epsilon) {
+  public RangeQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca, RangeQuery<NV, DoubleDistance> rangeQuery, DoubleDistance epsilon) {
     super(database, pca);
     this.rangeQuery = rangeQuery;
     this.epsilon = epsilon;
@@ -117,10 +117,10 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
     }
 
     @Override
-    public RangeQueryFilteredPCAIndex<V> instantiate(Database<V> database) {
+    public RangeQueryFilteredPCAIndex<V> instantiate(Relation<V> representation) {
       // TODO: set bulk flag, once the parent class supports bulk.
-      RangeQuery<V, DoubleDistance> rangequery = database.getRangeQuery(pcaDistanceFunction);
-      return new RangeQueryFilteredPCAIndex<V>(database, pca, rangequery, epsilon);
+      RangeQuery<V, DoubleDistance> rangequery = representation.getDatabase().getRangeQuery(representation, pcaDistanceFunction);
+      return new RangeQueryFilteredPCAIndex<V>(representation, pca, rangequery, epsilon);
     }
 
     /**

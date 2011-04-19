@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
  * @param <D> the type of NumberDistance used in the metrical index
  * @param <N> the type of Number used in the NumberDistance
  */
-public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMkTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
+public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMkTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
   /**
    * The logger for this class.
    */
@@ -72,8 +73,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param p Parameter p
    * @param log Logspace flag
    */
-  public MkAppTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
-    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public MkAppTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
+    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
     this.k_max = k_max;
     this.p = p;
     this.log = log;
@@ -82,8 +83,9 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * @throws UnsupportedOperationException since this operation is not supported
    */
+  @SuppressWarnings("unused")
   @Override
-  public void insert(@SuppressWarnings("unused") O object) {
+  public void insert(DBID id, O object) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -101,10 +103,12 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param objects the object to be inserted
    */
   @Override
-  public void insert(List<O> objects) {
+  public void insertAll(ArrayDBIDs ids, List<O> objects) {
     if (objects.isEmpty()) {
       return;
     }
+    
+    assert(ids.size() == objects.size());
     
     if(logger.isDebugging()) {
       logger.debugFine("insert " + objects + "\n");
@@ -114,17 +118,15 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       initialize(objects.get(0));
     }
 
-    ModifiableDBIDs ids = DBIDUtil.newArray();
     Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
 
     // insert
-    for(O object : objects) {
+    for(int i = 0; i < ids.size(); i++) {
       // create knnList for the object
-      ids.add(object.getID());
-      knnHeaps.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
+      knnHeaps.put(ids.get(i), new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
 
       // insert the object
-      super.insert(object, false);
+      super.insert(ids.get(i), objects.get(i), false);
     }
 
     // do batch nn
@@ -153,8 +155,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @return a List of the query results
    */
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(O object, int k) {
-    List<DistanceResultPair<D>> result = doReverseKNNQuery(k, object.getID());
+  public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
+    List<DistanceResultPair<D>> result = doReverseKNNQuery(k, id);
     Collections.sort(result);
     return result;
   }
@@ -418,14 +420,13 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
-   * 
    * @param object the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
    */
   @Override
-  protected MkAppEntry<D, N> createNewLeafEntry(O object, D parentDistance) {
-    return new MkAppLeafEntry<D, N>(object.getID(), parentDistance, null);
+  protected MkAppEntry<D, N> createNewLeafEntry(DBID id, O object, D parentDistance) {
+    return new MkAppLeafEntry<D, N>(id, parentDistance, null);
   }
 
   /**

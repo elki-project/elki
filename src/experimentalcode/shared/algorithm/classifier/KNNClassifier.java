@@ -5,12 +5,14 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -32,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
-public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel> extends DistanceBasedClassifier<O, D, L> {
+public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> extends DistanceBasedClassifier<O, D, L> {
   /**
    * The logger for this class.
    */
@@ -64,7 +66,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
   /**
    * Holds the database where the classification is to base on.
    */
-  protected Database<O> database;
+  protected Database database;
 
   /**
    * Provides a KNNClassifier, adding parameter {@link #K_PARAM} to the option
@@ -85,7 +87,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
    * instances later on.
    */
   @Override
-  public void buildClassifier(Database<O> database, ArrayList<L> labels) throws IllegalStateException {
+  public void buildClassifier(Database database, ArrayList<L> labels) throws IllegalStateException {
     this.setLabels(labels);
     this.database = database;
   }
@@ -101,8 +103,9 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
       double[] distribution = new double[getLabels().size()];
       int[] occurences = new int[getLabels().size()];
 
-      List<DistanceResultPair<D>> query = DatabaseQueryUtil.singleKNNQueryByObject(database, getDistanceQuery(), k, instance);
-      DataQuery<ClassLabel> crep = database.getClassLabelQuery();
+      KNNQuery<O, D> knnq = database.getKNNQuery(getDistanceQuery(), k);
+      List<DistanceResultPair<D>> query = knnq.getKNNForObject(instance, k);
+      Relation<ClassLabel> crep = database.getRelation(SimpleTypeInformation.get(ClassLabel.class));
       for(DistanceResultPair<D> neighbor : query) {
         // noinspection unchecked
         int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(crep.get(neighbor.getID()))));
@@ -126,9 +129,14 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
   }
 
   @Override
-  protected Result runInTime(@SuppressWarnings("unused") Database<O> database) throws IllegalStateException {
+  protected Result runInTime(@SuppressWarnings("unused") Database database) throws IllegalStateException {
     // TODO Implement sensible default behavior.
     return null;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

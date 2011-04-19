@@ -1,14 +1,18 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
@@ -37,7 +41,6 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   /**
    * Constructor.
    * 
-   * @param database Database
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -45,8 +48,8 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public FlatRStarTree(Database<O> database, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public FlatRStarTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**
@@ -96,11 +99,16 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
    * @param objects the data objects to be indexed
    */
   @Override
-  protected void bulkLoad(List<O> objects) {
+  protected void bulkLoad(ArrayDBIDs ids, List<O> objects) {
+    assert(ids.size() == objects.size());
+    List<SpatialPair<DBID, O>> spatialObjects = new ArrayList<SpatialPair<DBID, O>>(objects.size());
+    for (int i = 0; i < ids.size(); i++) {
+      spatialObjects.add(new SpatialPair<DBID, O>(ids.get(i), objects.get(i)));
+    }
     // create leaf nodes
     // noinspection PointlessArithmeticExpression
     file.setNextPageID(getRootEntry().getEntryID() + 1);
-    List<FlatRStarTreeNode> nodes = createLeafNodes(objects);
+    List<FlatRStarTreeNode> nodes = createLeafNodes(spatialObjects);
     int numNodes = nodes.size();
     if(logger.isDebugging()) {
       logger.debugFine("  numLeafNodes = " + numNodes);
@@ -202,8 +210,8 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   }
 
   @Override
-  protected SpatialEntry createNewLeafEntry(O o) {
-    return new SpatialLeafEntry(o.getID(), getValues(o));
+  protected SpatialEntry createNewLeafEntry(DBID id, O o) {
+    return new SpatialLeafEntry(id, getValues(o));
   }
 
   @Override
@@ -227,8 +235,9 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   /**
    * Does nothing.
    */
+  @SuppressWarnings("unused")
   @Override
-  protected void postDelete(@SuppressWarnings("unused") O o) {
+  protected void postDelete(DBID id) {
     // do nothing
   }
 

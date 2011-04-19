@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -23,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @param <O> Object type
  * @param <I> Index type
  */
-public abstract class TreeIndexFactory<O extends DatabaseObject, I extends TreeIndex<O, ?, ?>> implements IndexFactory<O, I> {
+public abstract class TreeIndexFactory<O, I extends TreeIndex<O, ?, ?>> implements IndexFactory<O, I> {
   /**
    * Optional parameter that specifies the name of the file storing the index.
    * If this parameter is not set the index is hold in the main memory.
@@ -88,7 +87,7 @@ public abstract class TreeIndexFactory<O extends DatabaseObject, I extends TreeI
   }
 
   @Override
-  abstract public I instantiate(Database<O> database);
+  abstract public I instantiate(Relation<O> representation);
 
   /**
    * Parameterization class.
@@ -97,7 +96,7 @@ public abstract class TreeIndexFactory<O extends DatabaseObject, I extends TreeI
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static abstract class Parameterizer<O> extends AbstractParameterizer {
     protected String fileName = null;
 
     protected int pageSize;

@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
@@ -41,15 +43,15 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
   }
 
   @Override
-  public Class<? super NumberVector<?, ?>> getInputDatatype() {
-    return NumberVector.class;
+  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
-  public <V extends NumberVector<?, ?>> Instance<V> instantiate(Database<V> database) {
+  public <V extends NumberVector<?, ?>> Instance<V> instantiate(Relation<V> database) {
     // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) indexFactory.instantiate((Database<NumberVector<?, ?>>)database);
+    FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) indexFactory.instantiate((Relation<NumberVector<?, ?>>)database);
     return new Instance<V>(database, indexinst, this);
   }
 
@@ -63,7 +65,7 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
      * @param database Database
      * @param index Index
      */
-    public Instance(Database<V> database, FilteredLocalPCAIndex<V> index, SubspaceDistanceFunction distanceFunction) {
+    public Instance(Relation<V> database, FilteredLocalPCAIndex<V> index, SubspaceDistanceFunction distanceFunction) {
       super(database, index, distanceFunction);
     }
 
@@ -76,8 +78,8 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
     public SubspaceDistance distance(DBID id1, DBID id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
-      V o1 = database.get(id1);
-      V o2 = database.get(id2);
+      V o1 = rep.get(id1);
+      V o2 = rep.get(id2);
       return distance(o1, o2, pca1, pca2);
     }
 

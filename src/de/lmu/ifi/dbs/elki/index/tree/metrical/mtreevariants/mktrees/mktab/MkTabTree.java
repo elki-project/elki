@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTreeUnified<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
+public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
   /**
    * The logger for this class.
    */
@@ -46,8 +46,8 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    * @param distanceFunction Distance function
    * @param k_max Maximum value for k
    */
-  public MkTabTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
+  public MkTabTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
   }
 
   /**
@@ -64,18 +64,18 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    *         not supported
    */
   @Override
-  public void insert(@SuppressWarnings("unused") O object) {
+  public void insert(DBID id, @SuppressWarnings("unused") O object) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(O object, int k) {
+  public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
     if(k > this.k_max) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MkTab-Tree!");
     }
 
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    doReverseKNNQuery(k, object.getID(), null, getRoot(), result);
+    doReverseKNNQuery(k, id, null, getRoot(), result);
 
     Collections.sort(result);
     return result;
@@ -158,14 +158,13 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   /**
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
-   * 
    * @param object the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
    */
   @Override
-  protected MkTabEntry<D> createNewLeafEntry(O object, D parentDistance) {
-    return new MkTabLeafEntry<D>(object.getID(), parentDistance, knnDistances(object));
+  protected MkTabEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
+    return new MkTabLeafEntry<D>(id, parentDistance, knnDistances(object));
   }
 
   /**

@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class TestLOCI extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testLOCI() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
     // Parameterization
     ListParameterization params = new ListParameterization();

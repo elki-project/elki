@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -107,7 +107,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processIds(DBIDs ids, Database<? extends V> database) {
+  public PCAFilteredResult processIds(DBIDs ids, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
 
@@ -119,7 +119,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
+  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 

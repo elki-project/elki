@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -15,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -45,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  */
-public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndex<O, D, N, E> {
+public abstract class AbstractMTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndex<O, D, N, E> {
   /**
    * Debugging flag: do extra integrity checks
    */
@@ -70,8 +69,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    */
-  public AbstractMTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
-    super(fileName, pageSize, cacheSize);
+  public AbstractMTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
+    super(representation, fileName, pageSize, cacheSize);
     this.distanceQuery = distanceQuery;
     this.distanceFunction = distanceFunction;
   }
@@ -83,8 +82,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
+  @SuppressWarnings("unused")
   @Override
-  public final boolean delete(@SuppressWarnings("unused") O o) {
+  public final boolean delete(DBID id) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
   
@@ -95,8 +95,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
+  @SuppressWarnings("unused")
   @Override
-  public void delete(@SuppressWarnings("unused") List<O> objects) {
+  public void deleteAll(DBIDs ids) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
@@ -106,8 +107,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    * 
    * @throws UnsupportedOperationException
    */
+  @SuppressWarnings("unused")
   @Override
-  protected final void postDelete(@SuppressWarnings("unused") O o) {
+  protected final void postDelete(DBID id) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
@@ -145,7 +147,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
+  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -159,13 +161,13 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexKNNQuery<O, S>(database, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
+    return new MetricalIndexKNNQuery<O, S>(rep, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
+  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -180,13 +182,13 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexKNNQuery<O, S>(database, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
+    return new MetricalIndexKNNQuery<O, S>(rep, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
+  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -200,13 +202,13 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexRangeQuery<O, S>(database, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
+    return new MetricalIndexRangeQuery<O, S>(rep, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
+  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -221,8 +223,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = database.getDistanceQuery(distanceFunction);
-    return new MetricalIndexRangeQuery<O, S>(database, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
+    return new MetricalIndexRangeQuery<O, S>(rep, idx, dq);
   }
 
   /**
@@ -304,9 +306,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    *        called before inserting the object
    */
   // todo: implement a bulk load for M-Tree and remove this method
-  protected final void insert(O object, boolean withPreInsert) {
+  protected final void insert(DBID id, O object, boolean withPreInsert) {
     if(getLogger().isDebugging()) {
-      getLogger().debugFine("insert " + object.getID() + " " + object + "\n");
+      getLogger().debugFine("insert " + id + " " + object + "\n");
     }
 
     if(!initialized) {
@@ -314,17 +316,17 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     // choose subtree for insertion
-    TreeIndexPath<E> subtree = choosePath(object.getID(), getRootPath());
+    TreeIndexPath<E> subtree = choosePath(id, getRootPath());
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
     }
 
     // determine parent distance
     E parentEntry = subtree.getLastPathComponent().getEntry();
-    D parentDistance = distance(parentEntry.getRoutingObjectID(), object.getID());
+    D parentDistance = distance(parentEntry.getRoutingObjectID(), id);
 
     // create leaf entry and do pre insert
-    E entry = createNewLeafEntry(object, parentDistance);
+    E entry = createNewLeafEntry(id, object, parentDistance);
     if(withPreInsert) {
       preInsert(entry);
     }
@@ -669,13 +671,14 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
   /**
    * Creates a new leaf entry representing the specified data object.
-   * 
+   * @param id TODO
    * @param object the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
+   * 
    * @return the newly created leaf entry
    */
-  abstract protected E createNewLeafEntry(O object, D parentDistance);
+  abstract protected E createNewLeafEntry(DBID id, O object, D parentDistance);
 
   /**
    * Creates a new directory entry representing the specified node.

@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
+public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.
@@ -102,8 +103,8 @@ public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> 
    * 
    * @return the distance function
    */
-  protected DistanceQuery<V, DoubleDistance> getDistanceQuery(Database<V> database) {
-    return database.getDistanceQuery(distanceFunction);
+  protected DistanceQuery<V, DoubleDistance> getDistanceQuery(Database database) {
+    return QueryUtil.getDistanceQuery(database, distanceFunction);
   }
 
   /**

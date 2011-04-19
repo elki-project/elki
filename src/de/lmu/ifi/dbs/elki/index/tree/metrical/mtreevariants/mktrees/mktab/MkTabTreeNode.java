@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -22,7 +21,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <O> object type
  * @param <D> distance type
  */
-class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
+class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
   private static final long serialVersionUID = 1;
 
   /**

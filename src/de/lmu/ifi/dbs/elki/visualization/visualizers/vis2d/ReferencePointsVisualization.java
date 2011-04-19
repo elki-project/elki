@@ -7,9 +7,11 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
@@ -93,7 +95,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
    * 
    * @param <NV> Type of the DatabaseObject being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -103,15 +105,15 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      if(!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
-        return;
-      }
-      Collection<ReferencePointsResult<NV>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
-      for(ReferencePointsResult<NV> rp : rps) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, rp, this, P2DVisualization.class);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-        context.addVisualizer(rp, task);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        Collection<ReferencePointsResult<NV>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
+        for(ReferencePointsResult<NV> rp : rps) {
+          final VisualizationTask task = new VisualizationTask(NAME, context, rp, rep, this, P2DVisualization.class);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+          context.addVisualizer(rp, task);
+        }
       }
     }
 

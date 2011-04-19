@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDBIDDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -13,7 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <D> the type of Distance used
  */
-public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject, D extends Distance<D>> implements DistanceFunction<O, D> {
+public abstract class AbstractDatabaseDistanceFunction<O, D extends Distance<D>> implements DistanceFunction<O, D> {
   /**
    * Constructor, supporting
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style
@@ -36,15 +35,12 @@ public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject,
     return true;
   }
 
-  @Override
-  public abstract Class<? super O> getInputDatatype();
-
   /**
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBIDDistanceQuery<O, D> {
+  abstract public static class Instance<O, D extends Distance<D>> extends AbstractDatabaseDistanceQuery<O, D> {
     /**
      * Parent distance
      */
@@ -56,7 +52,7 @@ public abstract class AbstractDatabaseDistanceFunction<O extends DatabaseObject,
      * @param database Database
      * @param parent Parent distance
      */
-    public Instance(Database<O> database, DistanceFunction<? super O, D> parent) {
+    public Instance(Relation<O> database, DistanceFunction<? super O, D> parent) {
       super(database);
       this.parent = parent;
     }

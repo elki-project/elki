@@ -2,7 +2,8 @@ package de.lmu.ifi.dbs.elki.index.tree;
 
 import java.io.File;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, E extends Entry> extends AbstractIndex<O> {
+public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extends AbstractIndex<O> {
   /**
    * Holds the name of the file storing the index or null
    */
@@ -79,12 +80,13 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
   /**
    * Constructor.
    * 
+   * @param representation Representation
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
    */
-  public TreeIndex(String fileName, int pageSize, long cacheSize) {
-    super();
+  public TreeIndex(Relation<O> representation, String fileName, int pageSize, long cacheSize) {
+    super(representation);
     this.fileName = fileName;
     this.pageSize = pageSize;
     this.cacheSize = cacheSize;
@@ -276,9 +278,9 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
   /**
    * Performs necessary operations after deleting the specified object.
    * 
-   * @param o the object to be deleted
+   * @param id object id
    */
-  abstract protected void postDelete(O o);
+  abstract protected void postDelete(DBID id);
 
   /**
    * Get the node class of this index

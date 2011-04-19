@@ -6,12 +6,12 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.has ComputeSimilarityMatrixImage.SimilarityMatrix oneway - 1
  *             visualizes
  */
-public class SimilarityMatrixVisualizer extends AbstractVisualization<DatabaseObject> {
+public class SimilarityMatrixVisualizer extends AbstractVisualization {
   /**
    * Name for this visualizer.
    */
@@ -84,7 +84,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisualization<DatabaseOb
     final double hlsize = scale * zoom * iratio / size;
     final double vlsize = scale * zoom / size;
     int i = 0;
-    final DataQuery<String> lrep = result.getDatabase().getObjectLabelQuery();
+    final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(result.getDatabase());
     for(DBID id : result.getIDs()) {
       String label = lrep.get(id);
       if(label != null) {
@@ -113,7 +113,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisualization<DatabaseOb
    * @apiviz.stereotype factory
    * @apiviz.uses PixmapVisualizer oneway - - «create»
    */
-  public static class Factory extends AbstractVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -123,11 +123,11 @@ public class SimilarityMatrixVisualizer extends AbstractVisualization<DatabaseOb
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+    public void addVisualizers(VisualizerContext context, Result result) {
       Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
       for(ComputeSimilarityMatrixImage.SimilarityMatrix pr : prs) {
         // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, context, pr, this, null);
+        final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         context.addVisualizer(pr, task);
       }

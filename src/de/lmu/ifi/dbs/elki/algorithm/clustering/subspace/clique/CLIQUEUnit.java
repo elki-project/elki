@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -101,13 +102,14 @@ public class CLIQUEUnit<V extends NumberVector<V, ?>> {
    * Adds the id of the specified feature vector to this unit, if this unit
    * contains the feature vector.
    * 
+   * @param id Vector id
    * @param vector the feature vector to be added
    * @return true, if this unit contains the specified feature vector, false
    *         otherwise
    */
-  public boolean addFeatureVector(V vector) {
+  public boolean addFeatureVector(DBID id, V vector) {
     if(contains(vector)) {
-      ids.add(vector.getID());
+      ids.add(id);
       return true;
     }
     return false;

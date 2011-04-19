@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
  * @author Elke Achtert
  * @param <N> object type
  */
-public class BulkSplit<N extends SpatialObject> {
+public class BulkSplit<N extends SpatialComparable> {
   /**
    * Logger.
    */
@@ -167,7 +167,7 @@ public class BulkSplit<N extends SpatialObject> {
 
     // get z-values
     List<double[]> valuesList = new ArrayList<double[]>();
-    for(SpatialObject o : spatialObjects) {
+    for(SpatialComparable o : spatialObjects) {
       double[] values = new double[o.getDimensionality()];
       for(int d = 0; d < o.getDimensionality(); d++) {
         values[d] = o.getMin(d + 1);
@@ -180,19 +180,19 @@ public class BulkSplit<N extends SpatialObject> {
     List<byte[]> zValuesList = ZCurve.zValues(valuesList);
 
     // map z-values
-    final Map<Integer, byte[]> zValues = new HashMap<Integer, byte[]>();
+    final Map<SpatialComparable, byte[]> zValues = new HashMap<SpatialComparable, byte[]>();
     for(int i = 0; i < spatialObjects.size(); i++) {
-      SpatialObject o = spatialObjects.get(i);
+      SpatialComparable o = spatialObjects.get(i);
       byte[] zValue = zValuesList.get(i);
-      zValues.put(o.getPageID(), zValue);
+      zValues.put(o, zValue);
     }
 
     // create a comparator
-    Comparator<SpatialObject> comparator = new Comparator<SpatialObject>() {
+    Comparator<SpatialComparable> comparator = new Comparator<SpatialComparable>() {
       @Override
-      public int compare(SpatialObject o1, SpatialObject o2) {
-        byte[] z1 = zValues.get(o1.getPageID());
-        byte[] z2 = zValues.get(o2.getPageID());
+      public int compare(SpatialComparable o1, SpatialComparable o2) {
+        byte[] z1 = zValues.get(o1);
+        byte[] z2 = zValues.get(o2);
 
         for(int i = 0; i < z1.length; i++) {
           byte z1_i = z1[i];
@@ -204,7 +204,17 @@ public class BulkSplit<N extends SpatialObject> {
             return +1;
           }
         }
-        return o1.getPageID() - o2.getPageID();
+        if(o1 instanceof Comparable) {
+          try {
+            @SuppressWarnings("unchecked")
+            final Comparable<Object> comparable = (Comparable<Object>) o1;
+            return comparable.compareTo(o2);
+          }
+          catch(ClassCastException e) {
+            // ignore
+          }
+        }
+        return 0;
       }
     };
     Collections.sort(objects, comparator);
@@ -249,7 +259,7 @@ public class BulkSplit<N extends SpatialObject> {
     Arrays.fill(minExtension, Double.MAX_VALUE);
 
     // compute min and max value in each dimension
-    for(SpatialObject object : objects) {
+    for(N object : objects) {
       for(int d = 1; d <= dimension; d++) {
         double min, max;
         min = object.getMin(d);

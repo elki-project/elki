@@ -10,11 +10,11 @@ import java.util.ListIterator;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
@@ -47,7 +47,7 @@ public class OPTICSXi {
    * @param minpts Parameter minPts
    */
   // TODO: resolve handling of the last point in the cluster order
-  public static <N extends NumberDistance<N, ?>> void extractClusters(ClusterOrderResult<N> clusterOrderResult, Database<?> database, double ixi, int minpts) {
+  public static <N extends NumberDistance<N, ?>> void extractClusters(ClusterOrderResult<N> clusterOrderResult, Relation<?> database, double ixi, int minpts) {
     // TODO: add progress?
     List<ClusterOrderEntry<N>> clusterOrder = clusterOrderResult.getClusterOrder();
     double mib = 0.0;
@@ -57,7 +57,7 @@ public class OPTICSXi {
     List<SteepDownArea> sdaset = new java.util.Vector<SteepDownArea>();
     ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<Cluster<OPTICSModel>>();
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<Cluster<OPTICSModel>>();
-    HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(database.getIDs());
+    HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(database.getDBIDs());
   
     SteepScanPosition<N> scan = new SteepScanPosition<N>(clusterOrder);
     while(scan.hasNext()) {

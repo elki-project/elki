@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.GridBasedReferencePoints;
 public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testReferenceBasedOutlierDetection() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();

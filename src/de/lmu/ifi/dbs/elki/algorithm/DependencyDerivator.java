@@ -6,12 +6,15 @@ import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -126,18 +129,20 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    *         DependencyDerivator
    */
   @Override
-  public CorrelationAnalysisSolution<V> runInTime(Database<V> db) throws IllegalStateException {
+  public CorrelationAnalysisSolution<V> runInTime(Database db) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(db);
     if(logger.isVerbose()) {
       logger.verbose("retrieving database objects...");
     }
-    V centroidDV = DatabaseUtil.centroid(db);
+    V centroidDV = DatabaseUtil.centroid(dataQuery);
     DBIDs ids;
     if(this.sampleSize > 0) {
       if(randomsample) {
-        ids = db.randomSample(this.sampleSize, 1);
+        ids = DBIDUtil.randomSample(dataQuery.getDBIDs(), this.sampleSize, 1);
       }
       else {
-        List<DistanceResultPair<D>> queryResults = DatabaseQueryUtil.singleKNNQueryByObject(db, getDistanceFunction(), this.sampleSize, centroidDV);
+        DistanceQuery<V, D> distanceQuery = db.getDistanceQuery(dataQuery, getDistanceFunction());
+        List<DistanceResultPair<D>> queryResults = db.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
         ModifiableDBIDs tids = DBIDUtil.newHashSet(this.sampleSize);
         for(DistanceResultPair<D> qr : queryResults) {
           tids.add(qr.getID());
@@ -147,10 +152,10 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       }
     }
     else {
-      ids = db.getIDs();
+      ids = dataQuery.getDBIDs();
     }
 
-    return generateModel(db, ids, centroidDV);
+    return generateModel(dataQuery, ids, centroidDV);
   }
 
   /**
@@ -161,7 +166,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @param ids the set of ids
    * @return a matrix of equations describing the dependencies
    */
-  public CorrelationAnalysisSolution<V> generateModel(Database<V> db, DBIDs ids) {
+  public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids) {
     V centroidDV = DatabaseUtil.centroid(db, ids);
     return generateModel(db, ids, centroidDV);
   }
@@ -174,7 +179,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @param centroidDV the centroid
    * @return a matrix of equations describing the dependencies
    */
-  public CorrelationAnalysisSolution<V> generateModel(Database<V> db, DBIDs ids, V centroidDV) {
+  public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids, V centroidDV) {
     CorrelationAnalysisSolution<V> sol;
     if(logger.isDebuggingFine()) {
       logger.debugFine("PCA...");
@@ -242,6 +247,11 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       }
     }
     return sol;
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

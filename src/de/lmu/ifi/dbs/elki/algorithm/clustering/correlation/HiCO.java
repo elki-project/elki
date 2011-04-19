@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PCABasedCorrelationDistanceFunction;
@@ -125,8 +127,13 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   }
 
   @Override
-  protected ClusterOrderResult<PCACorrelationDistance> runInTime(Database<V> database) throws IllegalStateException {
+  protected ClusterOrderResult<PCACorrelationDistance> runInTime(Database database) throws IllegalStateException {
     return optics.run(database);
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

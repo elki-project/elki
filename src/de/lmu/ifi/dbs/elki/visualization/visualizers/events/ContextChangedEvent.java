@@ -22,7 +22,7 @@ public abstract class ContextChangedEvent extends EventObject {
    * 
    * @param source context that has changed
    */
-  public ContextChangedEvent(VisualizerContext<?> source) {
+  public ContextChangedEvent(VisualizerContext source) {
     super(source);
   }
 }

@@ -7,15 +7,16 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
@@ -49,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
+public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
@@ -80,20 +81,20 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
    * Run the algorithm.
    */
   @Override
-  protected HistogramResult<DoubleVector> runInTime(Database<O> database) throws IllegalStateException {
+  protected HistogramResult<DoubleVector> runInTime(Database database) throws IllegalStateException {
+    Relation<O> dataQuery = getRelation(database);
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences and stable+efficient array index -> id lookups.
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(database.getIDs());
-    int size = ids.size();
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(dataQuery.getDBIDs());
+    final int size = ids.size();
 
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(dataQuery, getDistanceFunction(), size);
 
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    ByLabelClustering<O> splitter = new ByLabelClustering<O>();
-    Collection<Cluster<Model>> split = splitter.run(database).getAllClusters();
+    Collection<Cluster<Model>> split = (new ByLabelClustering()).run(database).getAllClusters();
 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(numbins, 0.0, 1.0);
 
@@ -133,6 +134,11 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
+  
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -144,7 +150,7 @@ public class RankingQualityHistogram<O extends DatabaseObject, D extends NumberD
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected int numbins = 20;
 
     @Override

@@ -6,9 +6,9 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
@@ -90,8 +90,8 @@ public class TestKNNJoin implements JUnit4Test {
     inputparams.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);
-    Database<DoubleVector> db = dbconn.getDatabase(null);
+    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);
+    Database db = dbconn.getDatabase();
     inputparams.failOnErrors();
 
     // verify data set size.
@@ -103,7 +103,7 @@ public class TestKNNJoin implements JUnit4Test {
       DataStore<KNNList<DoubleDistance>> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
-      for(DBID id : db) {
+      for(DBID id : db.getDBIDs()) {
         KNNList<DoubleDistance> knnlist = result.get(id);
         meansize.put(knnlist.size());
       }

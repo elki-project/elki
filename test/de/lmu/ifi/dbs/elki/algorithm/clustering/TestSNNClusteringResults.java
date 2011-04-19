@@ -33,7 +33,7 @@ public class TestSNNClusteringResults extends AbstractSimpleAlgorithmTest implem
    */
   @Test
   public void testSNNClusteringResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "different-densities-2d.ascii", 1200);
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d.ascii", 1200);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();

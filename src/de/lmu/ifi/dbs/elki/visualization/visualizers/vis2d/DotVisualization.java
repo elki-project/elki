@@ -1,18 +1,20 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -33,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener<NV> {
+public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -45,18 +47,12 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
   public static final String MARKER = "marker";
 
   /**
-   * The data we visualize
-   */
-  private Database<? extends NV> database;
-
-  /**
    * Constructor.
    * 
    * @param task Task to visualize
    */
   public DotVisualization(VisualizationTask task) {
     super(task);
-    this.database = task.getResult();
     context.addDataStoreListener(this);
     incrementalRedraw();
   }
@@ -71,9 +67,9 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
   public void redraw() {
     // draw data
     double dot_size = context.getStyleLibrary().getSize(StyleLibrary.DOTPLOT);
-    for(DBID id : database) {
+    for(DBID id : rep.iterDBIDs()) {
       try {
-        double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
+        double[] v = proj.fastProjectDataToRenderSpace(rep.get(id));
         Element dot = svgp.svgCircle(v[0], v[1], dot_size);
         SVGUtil.addCSSClass(dot, MARKER);
         layer.appendChild(dot);
@@ -86,7 +82,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
+  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
     synchronizedRedraw();
   }
 
@@ -100,7 +96,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -115,21 +111,18 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      ArrayList<Database<?>> cs = ResultUtil.filterResults(result, Clustering.class);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      ArrayList<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
       boolean hasClustering = (cs.size() > 0);
 
-      ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
-      for(Database<?> database : databases) {
-        if(!VisualizerUtil.isNumberVectorDatabase(database)) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, context, database, this, P2DVisualization.class);
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        final VisualizationTask task = new VisualizationTask(NAME, context, rep, rep, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
         if(hasClustering) {
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
         }
-        context.addVisualizer(database, task);
+        context.addVisualizer(rep, task);
       }
     }
 

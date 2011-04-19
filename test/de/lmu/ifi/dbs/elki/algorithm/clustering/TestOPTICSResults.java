@@ -32,7 +32,7 @@ public class TestOPTICSResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testOPTICSResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();

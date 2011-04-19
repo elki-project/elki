@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -19,9 +20,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -50,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @param <O> Database object type
  */
-public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -181,8 +182,8 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
   }
 
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
     Pattern colSep = Pattern.compile(AbstractParser.WHITESPACE_PATTERN);
     MinMax<Double> minmax = new MinMax<Double>();
@@ -249,10 +250,10 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
 
     // Apply scaling
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(database.getIDs(), or);
+      ((OutlierScalingFunction) scaling).prepare(database.getDBIDs(), or);
     }
     MinMax<Double> mm = new MinMax<Double>();
-    for(DBID id : database) {
+    for(DBID id : database.getDBIDs()) {
       double val = scoresult.getValueFor(id); // scores.get(id);
       val = scaling.getScaled(val);
       scores.put(id, val);
@@ -267,5 +268,10 @@ public class ExternalDoubleOutlierScore<O extends DatabaseObject> extends Abstra
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return SimpleTypeInformation.get(Object.class);
   }
 }

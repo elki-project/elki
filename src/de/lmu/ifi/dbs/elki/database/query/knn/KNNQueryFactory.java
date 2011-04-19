@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.database.query.knn;
 
-
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -18,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public interface KNNQueryFactory<O extends DatabaseObject, D extends Distance<D>> {
+public interface KNNQueryFactory<O, D extends Distance<D>> {
   /**
    * OptionID for the 'k' parameter
    */
@@ -34,7 +32,7 @@ public interface KNNQueryFactory<O extends DatabaseObject, D extends Distance<D>
    * 
    * @param database Database
    */
-  public <T extends O> KNNQuery<T, D> instantiate(Database<T> database);
+  public <T extends O> KNNQuery<T, D> instantiate(Relation<T> database);
 
   /**
    * Get the underlying distance function

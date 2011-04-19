@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -54,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("LDOF: Local Distance-Based Outlier Factor")
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2_84")
-public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -95,22 +96,23 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   }
 
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k);
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<O> relation = database.getRelation(getInputTypeRestriction());
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k);
 
     // track the maximum value for normalization
     MinMax<Double> ldofminmax = new MinMax<Double>();
     // compute the ldof values
-    WritableDataStore<Double> ldofs = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> ldofs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
 
     // compute LOF_SCORE of each db object
     if(logger.isVerbose()) {
       logger.verbose("Computing LDOFs");
     }
-    FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", database.size(), logger) : null;
+    FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", relation.size(), logger) : null;
 
-    for(DBID id : database) {
+    for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
       List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
       int nsize = neighbors.size() - 1;
       // skip the point itself
@@ -151,6 +153,11 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -162,7 +169,7 @@ public class LDOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected int k = 0;
 
     @Override

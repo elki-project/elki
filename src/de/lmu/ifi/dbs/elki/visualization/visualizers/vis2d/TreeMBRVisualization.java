@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -9,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
@@ -16,6 +18,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -32,6 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize the bounding rectangles of an R-Tree based index.
@@ -46,7 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <E> Tree entry type
  */
 // TODO: listen for tree changes instead of data changes?
-public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends P2DVisualization<NV> implements DataStoreListener<NV> {
+public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends P2DVisualization<NV> implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -152,7 +156,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
+  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
     synchronizedRedraw();
   }
 
@@ -166,7 +170,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
    * 
    * @param <NV> vector type
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Flag for half-transparent filling of bubbles.
      * 
@@ -183,7 +187,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
 
     /**
      * Constructor.
-     *
+     * 
      * @param fill
      */
     public Factory(boolean fill) {
@@ -197,12 +201,15 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      ArrayList<AbstractRStarTree<NV, RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
-      for(AbstractRStarTree<NV, RStarTreeNode, SpatialEntry> tree : trees) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, tree, this, P2DVisualization.class);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
-        context.addVisualizer(tree, task);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        ArrayList<AbstractRStarTree<NV, RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
+        for(AbstractRStarTree<NV, RStarTreeNode, SpatialEntry> tree : trees) {
+          final VisualizationTask task = new VisualizationTask(NAME, context, tree, rep, this, P2DVisualization.class);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
+          context.addVisualizer(tree, task);
+        }
       }
     }
 

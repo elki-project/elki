@@ -5,11 +5,11 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
@@ -22,7 +22,7 @@ public class CASHIntervalSplit {
   /**
    * The database storing the parameterization functions.
    */
-  private Database<ParameterizationFunction> database;
+  private Relation<ParameterizationFunction> database;
 
   /**
    * Caches minimum function values for given intervals, used for better split
@@ -52,7 +52,7 @@ public class CASHIntervalSplit {
    * @param database the database storing the parameterization functions
    * @param minPts the number of minimum points
    */
-  public CASHIntervalSplit(Database<ParameterizationFunction> database, int minPts) {
+  public CASHIntervalSplit(Relation<ParameterizationFunction> database, int minPts) {
     super();
 
     this.database = database;

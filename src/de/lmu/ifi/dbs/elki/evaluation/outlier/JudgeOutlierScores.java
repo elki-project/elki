@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -100,10 +99,10 @@ public class JudgeOutlierScores implements Evaluator {
    * @return Outlier score result
    * @throws IllegalStateException
    */
-  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, Database<?> database, OutlierResult or) throws IllegalStateException {
+  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, Database database, OutlierResult or) throws IllegalStateException {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
-      oscaling.prepare(database.getIDs(), or);
+      oscaling.prepare(database.getDBIDs(), or);
     }
 
     final ScalingFunction innerScaling;
@@ -148,25 +147,20 @@ public class JudgeOutlierScores implements Evaluator {
   }
 
   @Override
-  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if(ors == null || ors.size() <= 0) {
       // logger.warning("No results found for "+JudgeOutlierScores.class.getSimpleName());
       return;
     }
 
-    ModifiableDBIDs ids = DBIDUtil.newHashSet(db.getIDs());
+    ModifiableDBIDs ids = DBIDUtil.newHashSet(db.getDBIDs());
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
     ids.removeDBIDs(outlierIds);
 
     for(OutlierResult or : ors) {
       hierarchy.add(or, computeScore(ids, outlierIds, db, or));
     }
-  }
-
-  @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
-    // Normalizations are ignored.
   }
 
   /**

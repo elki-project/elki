@@ -121,7 +121,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
     
        
     MinMax<Double> minmax = new MinMax<Double>();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     i = 0 ;
     for(DBID id : database) {
       Matrix h_i = hMatrix.getColumn(i).minus(hMeansMatrix) ;

@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -30,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * Association ID for DBOD.
    */
@@ -62,8 +63,9 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    * 
    */
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<O> relation = database.getRelation(getInputTypeRestriction());
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 
     DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
 
@@ -76,7 +78,12 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
   /**
    * computes an outlier score for each object of the database.
    */
-  protected abstract DataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D d);
+  protected abstract DataStore<Double> computeOutlierScores(Database database, DistanceQuery<O, D> distFunc, D d);
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
 
   /**
    * Parameterization class.
@@ -85,7 +92,7 @@ public abstract class AbstractDBOutlier<O extends DatabaseObject, D extends Dist
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static abstract class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected D d = null;
     
     @Override

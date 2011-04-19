@@ -5,12 +5,11 @@ import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has HistogramResult oneway - - visualizes
  */
-public class HistogramVisFactory extends AbstractVisFactory<DatabaseObject> {
+public class HistogramVisFactory extends AbstractVisFactory {
   /**
    * Histogram visualizer name
    */
@@ -58,7 +57,7 @@ public class HistogramVisFactory extends AbstractVisFactory<DatabaseObject> {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    VisualizerContext<?> context = task.getContext();
+    VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
     HistogramResult<? extends NumberVector<?, ?>> curve = task.getResult();
     
@@ -143,10 +142,10 @@ public class HistogramVisFactory extends AbstractVisFactory<DatabaseObject> {
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+  public void addVisualizers(VisualizerContext context, Result result) {
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(result, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, histogram, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, context, histogram, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(histogram, task);
     }

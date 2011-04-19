@@ -18,10 +18,13 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
@@ -74,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
-public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
+public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -138,12 +141,13 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Performs the DiSH algorithm on the given database.
    */
   @Override
-  protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
+  protected Clustering<SubspaceModel<V>> runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
     // Instantiate DiSH distance (and thus run the preprocessor)
     if(logger.isVerbose()) {
       logger.verbose("*** Run DiSH preprocessor.");
     }
-    DiSHDistanceFunction.Instance<V> dishDistanceQuery = dishDistance.instantiate(database);
+    DiSHDistanceFunction.Instance<V> dishDistanceQuery = dishDistance.instantiate(dataQuery);
     // Configure and run OPTICS.
     if(logger.isVerbose()) {
       logger.verbose("*** Run OPTICS algorithm.");
@@ -159,7 +163,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     if(logger.isVerbose()) {
       logger.verbose("*** Compute Clusters.");
     }
-    return computeClusters(database, opticsResult, dishDistanceQuery);
+    return computeClusters(dataQuery, opticsResult, dishDistanceQuery);
   }
 
   /**
@@ -169,7 +173,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clusterOrder the cluster order
    * @param distFunc Distance function
    */
-  private Clustering<SubspaceModel<V>> computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder, DiSHDistanceFunction.Instance<V> distFunc) {
+  private Clustering<SubspaceModel<V>> computeClusters(Relation<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder, DiSHDistanceFunction.Instance<V> distFunc) {
     int dimensionality = DatabaseUtil.dimensionality(database);
     int minpts = dishDistance.getMinpts();
 
@@ -242,7 +246,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clusterOrder the cluster order to extract the clusters from
    * @return the extracted clusters
    */
-  private Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> extractClusters(Database<V> database, DiSHDistanceFunction.Instance<V> distFunc, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
+  private Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> extractClusters(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extract Clusters", database.size(), logger) : null;
     int processed = 0;
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
@@ -341,7 +345,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clustersMap the mapping of bits sets to clusters
    * @return a sorted list of the clusters
    */
-  private List<Cluster<SubspaceModel<V>>> sortClusters(Database<V> database, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
+  private List<Cluster<SubspaceModel<V>>> sortClusters(Relation<V> database, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
     final int db_dim = DatabaseUtil.dimensionality(database);
     // int num = 1;
     List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<Cluster<SubspaceModel<V>>>();
@@ -384,7 +388,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clustersMap the map containing the clusters
    * @param minpts MinPts
    */
-  private void checkClusters(Database<V> database, DiSHDistanceFunction.Instance<V> distFunc, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap, int minpts) {
+  private void checkClusters(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap, int minpts) {
     // check if there are clusters < minpts
     // and add them to not assigned
     List<Pair<BitSet, ArrayModifiableDBIDs>> notAssigned = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>();
@@ -444,7 +448,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param clustersMap the map containing the clusters
    * @return the parent of the specified cluster
    */
-  private Pair<BitSet, ArrayModifiableDBIDs> findParent(Database<V> database, DiSHDistanceFunction.Instance<V> distFunc, Pair<BitSet, ArrayModifiableDBIDs> child, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
+  private Pair<BitSet, ArrayModifiableDBIDs> findParent(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Pair<BitSet, ArrayModifiableDBIDs> child, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
     V child_centroid = DatabaseUtil.centroid(database, child.second, child.first);
 
     Pair<BitSet, ArrayModifiableDBIDs> result = null;
@@ -488,7 +492,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param dimensionality the dimensionality of the data
    * @param database the database containing the data objects
    */
-  private void buildHierarchy(Database<V> database, DiSHDistanceFunction.Instance<V> distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
+  private void buildHierarchy(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
     StringBuffer msg = new StringBuffer();
     final int db_dim = DatabaseUtil.dimensionality(database);
 
@@ -571,7 +575,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(Database<V> database, DiSHDistanceFunction.Instance<V> distFunc, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
+  private boolean isParent(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
     V parent_centroid = DatabaseUtil.centroid(database, parent.getIDs(), parent.getModel().getDimensions());
     int dimensionality = DatabaseUtil.dimensionality(database);
     int subspaceDim_parent = dimensionality - parent.getModel().getSubspace().dimensionality();
@@ -585,6 +589,11 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
 
     return false;
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

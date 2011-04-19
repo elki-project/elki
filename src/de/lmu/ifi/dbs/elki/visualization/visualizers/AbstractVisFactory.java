@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -10,7 +9,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @apiviz.uses ThumbnailVisualization oneway - - «create»
  */
-public abstract class AbstractVisFactory<O extends DatabaseObject> implements VisFactory<O> {
+public abstract class AbstractVisFactory implements VisFactory {
   /**
    * Constructor.
    */
@@ -23,7 +22,7 @@ public abstract class AbstractVisFactory<O extends DatabaseObject> implements Vi
     // Is this a thumbnail request?
     Boolean isthumb = task.get(VisualizationTask.THUMBNAIL, Boolean.class);
     if (isthumb != null && isthumb.booleanValue() && allowThumbnails(task)) {
-      return new ThumbnailVisualization<DatabaseObject>(this, task, 0);
+      return new ThumbnailVisualization(this, task, 0);
     }
     return makeVisualization(task);
   }

@@ -4,14 +4,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.data.AbstractDatabaseObject;
-
 /**
  * Object representation consisting of (multiple) polygons.
  * 
  * @author Erich Schubert
  */
-public class PolygonsObject extends AbstractDatabaseObject {
+public class PolygonsObject {
   /**
    * Static (empty) prototype
    */

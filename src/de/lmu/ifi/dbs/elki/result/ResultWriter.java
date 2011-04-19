@@ -3,10 +3,8 @@ package de.lmu.ifi.dbs.elki.result;
 import java.io.File;
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
@@ -22,10 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * Result handler that feeds the data into a TextWriter
  * 
  * @author Erich Schubert
- * 
- * @param <O> Object type
  */
-public class ResultWriter<O extends DatabaseObject> implements ResultHandler<O, Result> {
+public class ResultWriter implements ResultHandler<Result> {
   /**
    * The logger for this class.
    */
@@ -48,11 +44,6 @@ public class ResultWriter<O extends DatabaseObject> implements ResultHandler<O, 
    */
   private File out;
 
-  /**
-   * Normalization to use.
-   */
-  private Normalization<O> normalization;
-  
   /**
    * Whether or not to do gzip compression on output.
    */
@@ -84,11 +75,8 @@ public class ResultWriter<O extends DatabaseObject> implements ResultHandler<O, 
    * @param result Result
    */
   @Override
-  public void processResult(Database<O> db, Result result) {
-    TextWriter<O> writer = new TextWriter<O>();
-    if(normalization != null) {
-      writer.setNormalization(normalization);
-    }
+  public void processResult(Database db, Result result) {
+    TextWriter writer = new TextWriter();
 
     StreamFactory output;
     try {
@@ -130,31 +118,13 @@ public class ResultWriter<O extends DatabaseObject> implements ResultHandler<O, 
   }
 
   /**
-   * @param normalization Normalization to use
-   * @see de.lmu.ifi.dbs.elki.result.ResultHandler#setNormalization
-   */
-  @Override
-  public void setNormalization(Normalization<O> normalization) {
-    this.normalization = normalization;
-  }
-
-  /**
-   * Getter for normalization
-   * 
-   * @return normalization object
-   */
-  public Normalization<O> getNormalization() {
-    return normalization;
-  }
-
-  /**
    * Parameterization class.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Holds the file to print results to.
      */
@@ -191,8 +161,8 @@ public class ResultWriter<O extends DatabaseObject> implements ResultHandler<O, 
     }
 
     @Override
-    protected ResultWriter<O> makeInstance() {
-      return new ResultWriter<O>(out, gzip, warnoverwrite);
+    protected ResultWriter makeInstance() {
+      return new ResultWriter(out, gzip, warnoverwrite);
     }
   }
 }

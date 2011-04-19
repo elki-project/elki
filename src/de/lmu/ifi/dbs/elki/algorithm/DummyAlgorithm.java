@@ -1,9 +1,11 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -20,8 +22,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <V> Vector type
  */
 @Title("Dummy Algorithm")
-@Description("The algorithm executes a 10NN query on all data points, and can be used in unit testing")
-public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Result> {
+@Description("The algorithm executes a euclidena 10NN query on all data points, and can be used in unit testing")
+public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgorithm<O, Result> {
   /**
    * The logger for this class.
    */
@@ -39,15 +41,21 @@ public class DummyAlgorithm<V extends NumberVector<V, ?>> extends AbstractAlgori
    * Iterates over all points in the database.
    */
   @Override
-  protected Result runInTime(Database<V> database) throws IllegalStateException {
-    KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, 10);
-    for(DBID id : database) {
+  protected Result runInTime(Database database) throws IllegalStateException {
+    Relation<O> dataQuery = getRelation(database);
+    KNNQuery<O, DoubleDistance> knnQuery = database.getKNNQuery(dataQuery, EuclideanDistanceFunction.STATIC, 10);
+    for(DBID id : dataQuery.iterDBIDs()) {
       // Get the actual object from the database (but discard)
-      database.get(id);
+      dataQuery.get(id);
       // run a 10NN query for each point (but discard)
       knnQuery.getKNNForDBID(id, 10);
     }
     return null;
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super O> getInputTypeRestriction() {
+    return EuclideanDistanceFunction.STATIC.getInputTypeRestriction();
   }
 
   @Override

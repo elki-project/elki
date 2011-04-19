@@ -7,13 +7,15 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -41,12 +43,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @author Erich Schubert
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.data.ClassLabel
- * 
- * @param <O> Object type
  */
 @Title("Clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
-public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
+public class ByLabelClustering extends AbstractAlgorithm<String, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -101,8 +101,10 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * @param database The database to process
    */
   @Override
-  protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-    HashMap<String, ModifiableDBIDs> labelMap = multiple ? multipleAssignment(database) : singleAssignment(database);
+  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+    Relation<String> dataQuery = DatabaseUtil.guessClassLabelRepresentation(database);
+
+    HashMap<String, ModifiableDBIDs> labelMap = multiple ? multipleAssignment(dataQuery) : singleAssignment(dataQuery);
 
     Clustering<Model> result = new Clustering<Model>("By Label Clustering", "bylabel-clustering");
     for(Entry<String, ModifiableDBIDs> entry : labelMap.entrySet()) {
@@ -120,14 +122,14 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * Assigns the objects of the database to single clusters according to their
    * labels.
    * 
-   * @param database the database storing the objects
+   * @param data the database storing the objects
    * @return a mapping of labels to ids
    */
-  private HashMap<String, ModifiableDBIDs> singleAssignment(Database<O> database) {
+  private HashMap<String, ModifiableDBIDs> singleAssignment(Relation<String> data) {
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
-    for(DBID id : database) {
-      String label = DatabaseUtil.getClassOrObjectLabel(database, id);
+    for(DBID id : data.iterDBIDs()) {
+      String label = data.get(id);
       assign(labelMap, label, id);
     }
     return labelMap;
@@ -137,14 +139,14 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * Assigns the objects of the database to multiple clusters according to their
    * labels.
    * 
-   * @param database the database storing the objects
+   * @param data the database storing the objects
    * @return a mapping of labels to ids
    */
-  private HashMap<String, ModifiableDBIDs> multipleAssignment(Database<O> database) {
+  private HashMap<String, ModifiableDBIDs> multipleAssignment(Relation<String> data) {
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
-    for(DBID id : database) {
-      String[] labels = DatabaseUtil.getClassOrObjectLabel(database, id).split(" ");
+    for(DBID id : data.iterDBIDs()) {
+      String[] labels = data.get(id).split(" ");
       for(String label : labels) {
         assign(labelMap, label, id);
       }
@@ -171,6 +173,11 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.GUESSED_LABEL;
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -182,7 +189,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     protected boolean multiple;
 
     protected Pattern noisepat;
@@ -202,8 +209,8 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
     }
 
     @Override
-    protected ByLabelClustering<O> makeInstance() {
-      return new ByLabelClustering<O>(multiple, noisepat);
+    protected ByLabelClustering makeInstance() {
+      return new ByLabelClustering(multiple, noisepat);
     }
   }
 }

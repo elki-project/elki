@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Null Algorithm")
 @Description("Algorithm which does nothing, just return a null object.")
-public class NullAlgorithm extends AbstractAlgorithm<DatabaseObject, Result> {
+public class NullAlgorithm extends AbstractAlgorithm<Object, Result> {
   /**
    * The logger for this class.
    */
@@ -32,12 +33,17 @@ public class NullAlgorithm extends AbstractAlgorithm<DatabaseObject, Result> {
    * Iterates over all points in the database.
    */
   @Override
-  protected Result runInTime(@SuppressWarnings("unused") Database<DatabaseObject> database) throws IllegalStateException {
+  protected Result runInTime(@SuppressWarnings("unused") Database database) throws IllegalStateException {
     return null;
   }
   
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.ANY;
   }
 }

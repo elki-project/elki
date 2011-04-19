@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 
@@ -16,7 +15,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public interface IndexBasedSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends SimilarityFunction<O, D> {
+public interface IndexBasedSimilarityFunction<O, D extends Distance<D>> extends SimilarityFunction<O, D> {
   /**
    * Preprocess the database to get the actual distance function.
    * 
@@ -24,7 +23,7 @@ public interface IndexBasedSimilarityFunction<O extends DatabaseObject, D extend
    * @return Actual distance query.
    */
   @Override
-  public abstract <T extends O> Instance<T, ?, D> instantiate(Database<T> database);
+  public abstract <T extends O> Instance<T, ?, D> instantiate(Relation<T> database);
 
   /**
    * Instance interface for index/preprocessor based distance functions.
@@ -34,7 +33,7 @@ public interface IndexBasedSimilarityFunction<O extends DatabaseObject, D extend
    * @param <T> Object type
    * @param <D> Distance type
    */
-  public static interface Instance<T extends DatabaseObject, I extends Index<?>, D extends Distance<D>> extends SimilarityQuery<T, D> {
+  public static interface Instance<T, I extends Index<?>, D extends Distance<D>> extends SimilarityQuery<T, D> {
     /**
      * Get the index used.
      * 

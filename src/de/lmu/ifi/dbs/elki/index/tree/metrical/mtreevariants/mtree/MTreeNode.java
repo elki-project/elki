@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -13,7 +12,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
+public class MTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
     private static final long serialVersionUID = 1;
 
     /**

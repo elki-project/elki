@@ -13,22 +13,21 @@ import java.util.EventListener;
  * 
  * @see DataStore
  * @see DataStoreEvent
- * 
  * @param <T> the data type as element of the {@link DataStore}
  */
-public interface DataStoreListener<T> extends EventListener {
+public interface DataStoreListener extends EventListener {
   /**
    * Invoked after objects of the datastore have been updated, inserted or
    * removed in some way. 
    * 
    * @param e the update event
    */
-  void contentChanged(DataStoreEvent<T> e);
+  void contentChanged(DataStoreEvent e);
 
   /**
    * Invoked after the data store has been destroyed.
    * 
    * @param e the destroy event
    */
-  //void dataStoreDestroyed(DataStoreEvent<T> e);
+  //void dataStoreDestroyed(DataStoreEvent e);
 }

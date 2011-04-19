@@ -5,7 +5,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -41,7 +43,7 @@ import experimentalcode.shared.outlier.ensemble.voting.EnsembleVoting;
  * 
  * @param <O> object type
  */
-public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {
+public class OutlierEnsemble<O> extends AbstractAlgorithm<O, OutlierResult> {
   /**
    * The logger for this class.
    */
@@ -50,12 +52,12 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
   /**
    * Parameter for the individual algorithms
    */
-  private ObjectListParameter<Algorithm<O, Result>> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private ObjectListParameter<Algorithm<Result>> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm<Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * The actual algorithms
    */
-  private List<Algorithm<O, Result>> algorithms;
+  private List<Algorithm<Result>> algorithms;
 
   /**
    * Voting strategy to use in the ensemble.
@@ -99,13 +101,13 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
   }
 
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
     int num = algorithms.size();
     // Run inner outlier algorithms
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
     {
       FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, logger) : null;
-      for(Algorithm<O, Result> alg : algorithms) {
+      for(Algorithm<Result> alg : algorithms) {
         Result res = alg.run(database);
         for(OutlierResult ors : ResultUtil.getOutlierResults(res)) {
           results.add(ors);
@@ -119,11 +121,11 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
       }
     }
     // Combine
-    WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     MinMax<Double> minmax = new MinMax<Double>();
     {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", database.size(), logger) : null;
-      for(DBID id : database) {
+      for(DBID id : database.getDBIDs()) {
         ArrayList<Double> scores = new ArrayList<Double>(num);
         for(OutlierResult r : results) {
           Double score = r.getScores().getValueFor(id);
@@ -158,5 +160,18 @@ public class OutlierEnsemble<O extends DatabaseObject> extends AbstractAlgorithm
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    TypeInformation[] trs = new TypeInformation[algorithms.size()];
+    for (int i = 0; i < trs.length; i++) {
+      try {
+        trs[i] = ((AbstractAlgorithm<?, ?>)algorithms.get(i)).getInputTypeRestriction();
+      } catch (ClassCastException e) {
+        trs[i] = TypeUtil.ANY;
+      }
+    }
+    return new CombinedTypeInformation(trs);
   }
 }

@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
@@ -65,16 +67,16 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
   }
 
   @Override
-  public Class<? super NumberVector<?, ?>> getInputDatatype() {
-    return NumberVector.class;
+  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
+  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Relation<T> database) {
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Database<NumberVector<?, ?>>) database);
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?, ?>>) database);
     return new Instance<T>(database, indexinst, delta, this);
   }
 
@@ -97,7 +99,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
      * @param delta Delta
      * @param distanceFunction Distance function
      */
-    public Instance(Database<V> database, FilteredLocalPCAIndex<V> index, double delta, PCABasedCorrelationDistanceFunction distanceFunction) {
+    public Instance(Relation<V> database, FilteredLocalPCAIndex<V> index, double delta, PCABasedCorrelationDistanceFunction distanceFunction) {
       super(database, index, distanceFunction);
       this.delta = delta;
     }
@@ -106,8 +108,8 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
     public PCACorrelationDistance distance(DBID id1, DBID id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
-      V dv1 = database.get(id1);
-      V dv2 = database.get(id2);
+      V dv1 = rep.get(id1);
+      V dv2 = rep.get(id2);
 
       int correlationDistance = correlationDistance(pca1, pca2, dv1.getDimensionality());
       double euclideanDistance = euclideanDistance(dv1, dv2);

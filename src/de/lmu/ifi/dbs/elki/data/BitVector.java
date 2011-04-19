@@ -332,7 +332,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   /**
    * Returns a String representation of this BitVector. The representation is
    * suitable to be parsed by
-   * {@link de.lmu.ifi.dbs.elki.parser.BitVectorLabelParser
+   * {@link de.lmu.ifi.dbs.elki.datasource.parser.BitVectorLabelParser
    * BitVectorLabelParser}.
    * 
    * @see Object#toString()
@@ -357,8 +357,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    * Indicates whether some other object is "equal to" this BitVector. This
    * BitVector is equal to the given object, if the object is a BitVector of
    * same dimensionality and with identical bits set.
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.DatabaseObject#equals
    */
   @Override
   public boolean equals(Object obj) {

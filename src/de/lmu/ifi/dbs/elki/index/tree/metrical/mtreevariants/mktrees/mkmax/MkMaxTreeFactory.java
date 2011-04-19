@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnifiedFactory;
@@ -17,7 +16,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkMaxTreeFactory<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkMaxTree<O, D>> {
+public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkMaxTree<O, D>> {
   /**
    * Constructor.
    *
@@ -32,8 +31,8 @@ public class MkMaxTreeFactory<O extends DatabaseObject, D extends Distance<D>> e
   }
 
   @Override
-  public MkMaxTree<O, D> instantiate(Database<O> database) {
-    return new MkMaxTree<O, D>(fileName, pageSize, cacheSize, database.getDistanceQuery(distanceFunction), distanceFunction, k_max);
+  public MkMaxTree<O, D> instantiate(Relation<O> representation) {
+    return new MkMaxTree<O, D>(representation, fileName, pageSize, cacheSize, distanceFunction.instantiate(representation), distanceFunction, k_max);
   }
 
   /**
@@ -43,7 +42,7 @@ public class MkMaxTreeFactory<O extends DatabaseObject, D extends Distance<D>> e
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D> {
     @Override
     protected MkMaxTreeFactory<O, D> makeInstance() {
       return new MkMaxTreeFactory<O, D>(fileName, pageSize, cacheSize, distanceFunction, k_max);

@@ -7,13 +7,15 @@ import java.util.Map.Entry;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -35,12 +37,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.data.ClassLabel
- * 
- * @param <O> Object type
  */
 @Title("Hierarchical clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
-public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
+public class ByLabelHierarchicalClustering extends AbstractAlgorithm<String, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -59,11 +59,13 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
    * @param database The database to process
    */
   @Override
-  protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-    HashMap<String, ModifiableDBIDs> labelmap = new HashMap<String, ModifiableDBIDs>();
+  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+    Relation<String> dataQuery = DatabaseUtil.guessClassLabelRepresentation(database);
 
-    for(DBID id : database) {
-      String label = DatabaseUtil.getClassOrObjectLabel(database, id);
+    HashMap<String, ModifiableDBIDs> labelmap = new HashMap<String, ModifiableDBIDs>();
+    
+    for(DBID id : dataQuery.iterDBIDs()) {
+      String label = dataQuery.get(id);
 
       if(labelmap.containsKey(label)) {
         labelmap.get(label).add(id);
@@ -104,6 +106,11 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
     assert (rootclusters.size() > 0);
 
     return new Clustering<Model>("By Label Hierarchical Clustering", "bylabel-clustering", rootclusters);
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.GUESSED_LABEL;
   }
 
   @Override

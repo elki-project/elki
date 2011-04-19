@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
 import java.lang.ref.WeakReference;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
@@ -24,12 +23,12 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
   /**
    * The data input configured
    */
-  private EvaluationStep<DatabaseObject> evals = null;
+  private EvaluationStep evals = null;
 
   /**
    * Result we ran last onn
    */
-  private WeakReference<? extends Object> basedOnResult = null;
+  private WeakReference<?> basedOnResult = null;
 
   /**
    * Input step to run on.
@@ -54,7 +53,6 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
     algs.addObserver(this);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected synchronized void configureStep(Parameterization config) {
     evals = config.tryInstantiate(EvaluationStep.class);
@@ -76,9 +74,9 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
       throw new AbortException("Input data not available.");
     }
     // Get the database and run the algorithms
-    Database<DatabaseObject> database = input.getInputStep().getDatabase();
+    Database database = input.getInputStep().getDatabase();
     HierarchicalResult result = algs.getAlgorithmStep().getResult();
-    evals.runEvaluators(result, database, input.getInputStep().getNormalizationUndo(), input.getInputStep().getNormalization());
+    evals.runEvaluators(result, database);
     basedOnResult = new WeakReference<Object>(result);
   }
 
@@ -87,7 +85,7 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
    * 
    * @return Evaluation step
    */
-  public EvaluationStep<DatabaseObject> getEvaluationStep() {
+  public EvaluationStep getEvaluationStep() {
     if(evals == null) {
       throw new AbortException("Evaluators not configured.");
     }

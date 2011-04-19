@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  */
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
-public class MaterializeDistances<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
+public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
   /**
    * The logger for this class.
    */
@@ -54,14 +54,14 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
    * Iterates over all points in the database.
    */
   @Override
-  protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
-    int size = database.size();
+  protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database database) throws IllegalStateException {
+    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
+    int size = distFunc.getRepresentation().size();
 
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);
 
-    for(DBID id1 : database.getIDs()) {
-      for(DBID id2 : database.getIDs()) {
+    for(DBID id1 : distFunc.getRepresentation().iterDBIDs()) {
+      for(DBID id2 : distFunc.getRepresentation().iterDBIDs()) {
         // skip inverted pairs
         if(id2.compareTo(id1) > 0) {
           continue;
@@ -78,6 +78,11 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
     return logger;
   }
 
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
+
   /**
    * Parameterization class.
    * 
@@ -85,7 +90,7 @@ public class MaterializeDistances<O extends DatabaseObject, D extends NumberDist
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     @Override
     protected MaterializeDistances<O, D> makeInstance() {
       return new MaterializeDistances<O, D>(distanceFunction);

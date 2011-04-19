@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -21,7 +20,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <D> distance type
  * @param <N> number type
  */
-class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
+class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
   /**
    * Serial version UID
    */

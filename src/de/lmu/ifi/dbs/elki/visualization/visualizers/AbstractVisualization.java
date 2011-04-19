@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractVisualization<O extends DatabaseObject> implements Visualization, ContextChangeListener, ResultListener {
+public abstract class AbstractVisualization implements Visualization, ContextChangeListener, ResultListener {
   /**
    * The visualization task we do.
    */
@@ -24,7 +23,7 @@ public abstract class AbstractVisualization<O extends DatabaseObject> implements
   /**
    * Our context
    */
-  protected final VisualizerContext<? extends O> context;
+  protected final VisualizerContext context;
 
   /**
    * The plot we are attached to

@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -85,7 +85,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @param epsilon Epsilon
      * @param distanceFunction parent distance function
      */
-    public Instance(Database<V> database, P preprocessor, double epsilon, AbstractPreferenceVectorBasedCorrelationDistanceFunction<? super V, ?> distanceFunction) {
+    public Instance(Relation<V> database, P preprocessor, double epsilon, AbstractPreferenceVectorBasedCorrelationDistanceFunction<? super V, ?> distanceFunction) {
       super(database, preprocessor, distanceFunction);
       this.epsilon = epsilon;
     }
@@ -94,8 +94,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     public PreferenceVectorBasedCorrelationDistance distance(DBID id1, DBID id2) {
       BitSet preferenceVector1 = index.getPreferenceVector(id1);
       BitSet preferenceVector2 = index.getPreferenceVector(id2);
-      V v1 = database.get(id1);
-      V v2 = database.get(id2);
+      V v1 = rep.get(id1);
+      V v2 = rep.get(id2);
       return correlationDistance(v1, v2, preferenceVector1, preferenceVector2);
     }
 
@@ -147,23 +147,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *         to the given preference vector
      */
     public double weightedDistance(DBID id1, DBID id2, BitSet weightVector) {
-      return weightedDistance(database.get(id1), database.get(id2), weightVector);
-    }
-
-    /**
-     * Computes the weighted distance between the two specified data vectors
-     * according to their preference vectors.
-     * 
-     * @param v1 the first vector
-     * @param v2 the the second vector
-     * @return the weighted distance between the two specified vectors according
-     *         to the preference vector of the first data vector
-     */
-    public double weightedPrefereneceVectorDistance(V v1, V v2) {
-      double d1 = weightedDistance(v1, v2, index.getPreferenceVector(v1.getID()));
-      double d2 = weightedDistance(v2, v1, index.getPreferenceVector(v2.getID()));
-
-      return Math.max(d1, d2);
+      return weightedDistance(rep.get(id1), rep.get(id2), weightVector);
     }
 
     /**
@@ -176,7 +160,11 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *         to the preference vector of the first data vector
      */
     public double weightedPrefereneceVectorDistance(DBID id1, DBID id2) {
-      return weightedPrefereneceVectorDistance(database.get(id1), database.get(id2));
+      final V v1 = rep.get(id1);
+      final V v2 = rep.get(id2);
+      double d1 = weightedDistance(v1, v2, index.getPreferenceVector(id1));
+      double d2 = weightedDistance(v2, v1, index.getPreferenceVector(id2));
+      return Math.max(d1, d2);
     }
   }
 

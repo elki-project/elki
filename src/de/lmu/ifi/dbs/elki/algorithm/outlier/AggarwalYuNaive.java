@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -65,9 +66,10 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    final int size = database.size();
-    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(database);
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
+    final int size = dataQuery.size();
+    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(dataQuery);
 
     ArrayList<Vector<IntIntPair>> Rk;
     // Build a list of all subspaces
@@ -76,7 +78,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       Rk = new ArrayList<Vector<IntIntPair>>();
       // Set of all dim*phi ranges
       ArrayList<IntIntPair> q = new ArrayList<IntIntPair>();
-      for(int i = 1; i <= DatabaseUtil.dimensionality(database); i++) {
+      for(int i = 1; i <= DatabaseUtil.dimensionality(dataQuery); i++) {
         for(int j = 1; j <= phi; j++) {
           IntIntPair s = new IntIntPair(i, j);
           q.add(s);
@@ -112,7 +114,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       }
     }
 
-    WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     // calculate the sparsity coefficient
     for(Vector<IntIntPair> sub : Rk) {
       DBIDs ids = computeSubspace(sub, ranges);
@@ -128,7 +130,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       }
     }
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : database) {
+    for(DBID id : dataQuery.iterDBIDs()) {
       Double val = sparsity.get(id);
       if(val == null) {
         sparsity.put(id, 0.0);

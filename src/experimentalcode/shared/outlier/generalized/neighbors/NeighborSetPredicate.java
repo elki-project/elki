@@ -1,9 +1,8 @@
 package experimentalcode.shared.outlier.generalized.neighbors;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -28,14 +27,14 @@ public interface NeighborSetPredicate {
    *
    * @param <O> Object type
    */
-  public static interface Factory<O extends DatabaseObject> extends Parameterizable {
+  public static interface Factory<O> extends Parameterizable {
     /**
      * Instantiation method.
      * 
-     * @param database Database to instantiate for.
+     * @param rep Database to instantiate for.
      * 
      * @return instance
      */
-    public NeighborSetPredicate instantiate(Database<? extends O> database);
+    public NeighborSetPredicate instantiate(Relation<? extends O> database);
   }
 }

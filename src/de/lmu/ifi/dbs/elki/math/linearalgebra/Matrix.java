@@ -775,7 +775,7 @@ public final class Matrix implements MatrixLike<Matrix> {
   public final Matrix times(final Matrix B) {
     // Optimized implementation, exploiting the storage layout
     if(B.elements.length != this.columndimension) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+      throw new IllegalArgumentException("Matrix inner dimensions must agree: "+getRowDimensionality()+","+getColumnDimensionality()+" * "+B.getRowDimensionality()+","+B.getColumnDimensionality());
     }
     final Matrix X = new Matrix(this.elements.length, B.columndimension);
     // Optimized ala Jama. jik order.

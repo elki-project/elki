@@ -115,11 +115,11 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
     //
-    WritableDataStore<Double> gi = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> gi = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     //
-    WritableDataStore<Double> hi = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> hi = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     //
     final NeighborSetPredicate npred = npredf.instantiate(database);
 
@@ -149,7 +149,7 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
     double variance = mv.getSampleVariance();
 
     MinMax<Double> minmax = new MinMax<Double>();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     for(DBID id : database) {
       double score = Math.abs((hi.get(id) - mean) / variance);
       minmax.put(score);

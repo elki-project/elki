@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -62,9 +62,9 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
   }
 
   @Override
-  public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
-    Database<V> database = DatabaseUtil.databaseUglyVectorCast(db);
-    V factory = database.getObjectFactory();
+  public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
+    Relation<V> database = DatabaseUtil.databaseUglyVectorCast(db);
+    V factory = DatabaseUtil.assumeVectorField(database).getFactory();
 
     int dim = DatabaseUtil.dimensionality(db);
 
@@ -77,7 +77,7 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
       min[d] = Double.MAX_VALUE;
       max[d] = -Double.MAX_VALUE;
     }
-    for(DBID objID : database) {
+    for(DBID objID : database.iterDBIDs()) {
       V obj = database.get(objID);
       for(int d = 0; d < dim; d++) {
         double val = obj.doubleValue(d + 1);

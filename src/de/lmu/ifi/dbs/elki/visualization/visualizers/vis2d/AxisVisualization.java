@@ -1,16 +1,16 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -46,7 +46,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
 
   @Override
   protected void redraw() {
-    int dim = DatabaseUtil.dimensionality(context.getDatabase());
+    int dim = DatabaseUtil.dimensionality(rep);
 
     // origin
     double[] orig = proj.fastProjectScaledToRender(new Vector(dim));
@@ -106,7 +106,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
    * 
    * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * A short name characterizing this Visualizer.
      */
@@ -119,25 +119,22 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
     public Factory() {
       super();
     }
-    
+
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new AxisVisualization<NV>(task);
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
-      for(Database<?> database : databases) {
-        if(!VisualizerUtil.isNumberVectorDatabase(database)) {
-          continue;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, context, database, this, P2DVisualization.class);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), rep, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
-        context.addVisualizer(database, task);
+        context.addVisualizer(rep, task);
       }
     }
-    
+
     @Override
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails

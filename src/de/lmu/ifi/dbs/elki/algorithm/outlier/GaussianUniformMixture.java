@@ -4,6 +4,8 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -14,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -54,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("Gaussian-Uniform Mixture Model Outlier Detection")
 @Description("Fits a mixture model consisting of a Gaussian and a uniform distribution to the data.")
 @Reference(prefix = "Generalization using the likelihood gain as outlier score of", authors = "Eskin, Eleazar", title = "Anomaly detection over noisy data using learned probability distributions", booktitle = "Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000)")
-public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -111,9 +114,10 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
     // Use an array list of object IDs for fast random access by an offset
-    ArrayDBIDs objids = DBIDUtil.ensureArray(database.getIDs());
+    ArrayDBIDs objids = DBIDUtil.ensureArray(database.getDBIDs());
     // A bit set to flag objects as anomalous, none at the beginning
     BitSet bits = new BitSet(objids.size());
     // Positive masked collection
@@ -121,9 +125,9 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     // Positive masked collection
     DBIDs anomalousObjs = new MaskedDBIDs(objids, bits, false);
     // resulting scores
-    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     // compute loglikelihood
-    double logLike = database.size() * logml + loglikelihoodNormal(normalObjs, database);
+    double logLike = database.size() * logml + loglikelihoodNormal(normalObjs, dataQuery);
     // logger.debugFine("normalsize   " + normalObjs.size() + " anormalsize  " +
     // anomalousObjs.size() + " all " + (anomalousObjs.size() +
     // normalObjs.size()));
@@ -135,7 +139,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
       // Change mask to make the current object anomalous
       bits.set(i);
       // Compute new likelihoods
-      double currentLogLike = normalObjs.size() * logml + loglikelihoodNormal(normalObjs, database) + anomalousObjs.size() * logl + loglikelihoodAnomalous(anomalousObjs);
+      double currentLogLike = normalObjs.size() * logml + loglikelihoodNormal(normalObjs, dataQuery) + anomalousObjs.size() * logl + loglikelihoodAnomalous(anomalousObjs);
 
       // Get the actual object id
       DBID curid = objids.get(i);
@@ -185,7 +189,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
    * @param database Database
    * @return loglikelihood for normal objects
    */
-  private double loglikelihoodNormal(DBIDs objids, Database<V> database) {
+  private double loglikelihoodNormal(DBIDs objids, Relation<V> database) {
     if(objids.isEmpty()) {
       return 0;
     }
@@ -207,6 +211,11 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
     }
     return prob;
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

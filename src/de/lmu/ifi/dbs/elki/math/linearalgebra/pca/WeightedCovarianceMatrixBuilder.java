@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -88,7 +88,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * support for other distance functions?
    */
   @Override
-  public Matrix processIds(DBIDs ids, Database<? extends V> database) {
+  public Matrix processIds(DBIDs ids, Relation<? extends V> database) {
     int dim = DatabaseUtil.dimensionality(database);
     // collecting the sums in each dimension
     double[] sums = new double[dim];
@@ -152,7 +152,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Database<? extends V> database, int k) {
+  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
     int dim = DatabaseUtil.dimensionality(database);
     // collecting the sums in each dimension
     double[] sums = new double[dim];

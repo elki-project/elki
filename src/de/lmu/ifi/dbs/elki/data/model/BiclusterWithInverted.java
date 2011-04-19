@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.data.model;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -27,7 +27,7 @@ public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Biclus
    * @param colIDs Col IDs
    * @param database Database
    */
-  public BiclusterWithInverted(int[] rowIDs, int[] colIDs, Database<V> database) {
+  public BiclusterWithInverted(int[] rowIDs, int[] colIDs, Relation<V> database) {
     super(rowIDs, colIDs, database);
   }
 

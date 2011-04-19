@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <O> Object class to process.
  */
-public class SimilarityAdapterLinear<O extends DatabaseObject> extends AbstractSimilarityAdapter<O> {
+public class SimilarityAdapterLinear<O> extends AbstractSimilarityAdapter<O> {
   /**
    * Constructor.
    * 
@@ -31,7 +30,7 @@ public class SimilarityAdapterLinear<O extends DatabaseObject> extends AbstractS
   }
 
   @Override
-  public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Database<T> database) {
+  public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
     SimilarityQuery<T, ? extends NumberDistance<?, ?>> similarityQuery = similarityFunction.instantiate(database);
     return new Instance<T>(database, this, similarityQuery);
   }
@@ -43,7 +42,7 @@ public class SimilarityAdapterLinear<O extends DatabaseObject> extends AbstractS
    * 
    * @param <O> Object type
    */
-  public static class Instance<O extends DatabaseObject> extends AbstractSimilarityAdapter.Instance<O> {
+  public static class Instance<O> extends AbstractSimilarityAdapter.Instance<O> {
     /**
      * Constructor.
      * 
@@ -51,7 +50,7 @@ public class SimilarityAdapterLinear<O extends DatabaseObject> extends AbstractS
      * @param parent Parent distance
      * @param similarityQuery similarity Query to use
      */
-    public Instance(Database<O> database, DistanceFunction<? super O, DoubleDistance> parent, SimilarityQuery<? super O, ? extends NumberDistance<?, ?>> similarityQuery) {
+    public Instance(Relation<O> database, DistanceFunction<? super O, DoubleDistance> parent, SimilarityQuery<? super O, ? extends NumberDistance<?, ?>> similarityQuery) {
       super(database, parent, similarityQuery);
     }
 
@@ -68,7 +67,7 @@ public class SimilarityAdapterLinear<O extends DatabaseObject> extends AbstractS
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractSimilarityAdapter.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

@@ -2,27 +2,24 @@ package de.lmu.ifi.dbs.elki.application;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Provides a KDDCLIApplication that can be used to perform any algorithm
  * implementing {@link Algorithm Algorithm} using any DatabaseConnection
  * implementing
- * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection
+ * {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection
  * DatabaseConnection}.
  * 
  * @author Arthur Zimek
  * 
  * @apiviz.composedOf KDDTask
- * 
- * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class KDDCLIApplication<O extends DatabaseObject> extends AbstractApplication {
+public class KDDCLIApplication extends AbstractApplication {
   /**
    * The KDD Task to perform.
    */
-  KDDTask<O> task;
+  KDDTask task;
 
   /**
    * Constructor.
@@ -30,7 +27,7 @@ public class KDDCLIApplication<O extends DatabaseObject> extends AbstractApplica
    * @param verbose Verbose flag
    * @param task Task to run
    */
-  public KDDCLIApplication(boolean verbose, KDDTask<O> task) {
+  public KDDCLIApplication(boolean verbose, KDDTask task) {
     super(verbose);
     this.task = task;
   }
@@ -47,13 +44,12 @@ public class KDDCLIApplication<O extends DatabaseObject> extends AbstractApplica
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractApplication.Parameterizer {
+  public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**
      * The KDD Task to perform.
      */
-    protected KDDTask<O> task;
+    protected KDDTask task;
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -61,8 +57,8 @@ public class KDDCLIApplication<O extends DatabaseObject> extends AbstractApplica
     }
 
     @Override
-    protected KDDCLIApplication<O> makeInstance() {
-      return new KDDCLIApplication<O>(verbose, task);
+    protected KDDCLIApplication makeInstance() {
+      return new KDDCLIApplication(verbose, task);
     }
   }
 

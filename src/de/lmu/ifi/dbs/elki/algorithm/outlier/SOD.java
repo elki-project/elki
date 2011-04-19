@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -14,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -56,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
-public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -118,20 +121,21 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * Performs the SOD algorithm on the given database.
    */
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(database);
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
+    SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(dataQuery);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", database.size(), logger) : null;
     int processed = 0;
-    WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
+    WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     DoubleMinMax minmax = new DoubleMinMax();
-    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+    for(Iterator<DBID> iter = dataQuery.iterDBIDs(); iter.hasNext();) {
       DBID queryObject = iter.next();
       processed++;
       if(progress != null) {
         progress.setProcessed(processed, logger);
       }
-      DBIDs knnList = getKNN(database, snnInstance, queryObject).asDBIDs();
-      SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
+      DBIDs knnList = getKNN(dataQuery, snnInstance, queryObject).asDBIDs();
+      SODModel<V> model = new SODModel<V>(dataQuery, knnList, alpha, dataQuery.get(queryObject));
       sod_models.put(queryObject, model);
       minmax.put(model.getSod());
     }
@@ -159,10 +163,10 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * @return the k nearest neighbors in terms of the shared nearest neighbor
    *         distance without the query object
    */
-  private KNNList<DoubleDistance> getKNN(Database<V> database, SimilarityQuery<V, IntegerDistance> snnInstance, DBID queryObject) {
+  private KNNList<DoubleDistance> getKNN(Relation<V> database, SimilarityQuery<V, IntegerDistance> snnInstance, DBID queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
     KNNHeap<DoubleDistance> kNearestNeighbors = new KNNHeap<DoubleDistance>(knn, new DoubleDistance(Double.POSITIVE_INFINITY));
-    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+    for(Iterator<DBID> iter = database.iterDBIDs(); iter.hasNext();) {
       DBID id = iter.next();
       if(!id.equals(queryObject)) {
         DoubleDistance distance = new DoubleDistance(1.0 / snnInstance.similarity(queryObject, id).doubleValue());
@@ -170,6 +174,16 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       }
     }
     return kNearestNeighbors.toKNNList();
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 
   /**
@@ -200,7 +214,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
      * @param alpha Alpha value
      * @param queryObject Query object
      */
-    public SODModel(Database<O> database, DBIDs neighborhood, double alpha, O queryObject) {
+    public SODModel(Relation<O> database, DBIDs neighborhood, double alpha, O queryObject) {
       // TODO: store database link?
       centerValues = new double[DatabaseUtil.dimensionality(database)];
       variances = new double[centerValues.length];
@@ -234,7 +248,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
           weightVector.set(d, true);
         }
       }
-      center = database.getObjectFactory().newInstance(centerValues);
+      center = DatabaseUtil.assumeVectorField(database).getFactory().newInstance(centerValues);
       sod = subspaceOutlierDegree(queryObject, center, weightVector);
     }
 
@@ -321,11 +335,6 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     public String getShortName() {
       return "sod-outlier";
     }
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return logger;
   }
 
   /**

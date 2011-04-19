@@ -2,14 +2,14 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDBIDDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> {
+public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> {
   /**
    * OptionID for the base distance used to compute reachability
    */
@@ -89,7 +89,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   @Override
-  public <T extends O> DistanceQuery<T, D> instantiate(Database<T> database) {
+  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> database) {
     return new Instance<T>(database, k, parentDistance);
   }
 
@@ -98,7 +98,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
    * 
    * @author Erich Schubert
    */
-  public class Instance<T extends O> extends AbstractDBIDDistanceQuery<T, D> {
+  public class Instance<T extends O> extends AbstractDatabaseDistanceQuery<T, D> {
     /**
      * KNN query instance
      */
@@ -115,10 +115,10 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
      * @param database Database
      * @param k Value of k
      */
-    public Instance(Database<T> database, int k, DistanceFunction<? super O, D> parentDistance) {
+    public Instance(Relation<T> database, int k, DistanceFunction<? super O, D> parentDistance) {
       super(database);
       this.k = k;
-      this.knnQuery= database.getKNNQuery(parentDistance, k, DatabaseQuery.HINT_HEAVY_USE);
+      this.knnQuery= database.getDatabase().getKNNQuery(database, parentDistance, k, DatabaseQuery.HINT_HEAVY_USE);
     }
 
     @Override
@@ -166,8 +166,8 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   @Override
-  public Class<? super O> getInputDatatype() {
-    return DatabaseObject.class;
+  public TypeInformation getInputTypeRestriction() {
+    return parentDistance.getInputTypeRestriction();
   }
 
   /**
@@ -177,7 +177,7 @@ public class MinKDistance<O extends DatabaseObject, D extends Distance<D>> exten
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
     /**
      * The distance function to determine the exact distance.
      */

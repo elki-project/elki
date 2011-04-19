@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 
@@ -38,11 +38,11 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector<?, ?>> extends Lo
     /**
      * Instantiate the index for a given database.
      * 
-     * @param database Database type
+     * @param representation Representation to use
      * 
      * @return Index
      */
     @Override
-    public I instantiate(Database<NV> database);
+    public I instantiate(Relation<NV> representation);
   }
 }

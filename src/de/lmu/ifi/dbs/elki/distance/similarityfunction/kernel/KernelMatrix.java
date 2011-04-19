@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -46,8 +46,8 @@ public class KernelMatrix {
    * @deprecated ID mapping is not reliable!
    */
   @Deprecated
-  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Database<O> database) {
-    this(kernelFunction, database, DBIDUtil.ensureArray(database.getIDs()));
+  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Relation<? extends O> database) {
+    this(kernelFunction, database, DBIDUtil.ensureArray(database.getDBIDs()));
   }
 
   /**
@@ -57,7 +57,7 @@ public class KernelMatrix {
    * @param database the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Database<O> database, final ArrayDBIDs ids) {
+  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Relation<? extends O> database, final ArrayDBIDs ids) {
     LoggingUtil.logExpensive(Level.FINER, "Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
     double value;

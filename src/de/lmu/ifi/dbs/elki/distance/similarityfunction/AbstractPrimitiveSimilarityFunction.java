@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.similarity.PrimitiveSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> object type
  * @param <D> distance type
  */
-public abstract class AbstractPrimitiveSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> implements PrimitiveSimilarityFunction<O, D> {
+public abstract class AbstractPrimitiveSimilarityFunction<O, D extends Distance<D>> implements PrimitiveSimilarityFunction<O, D> {
   /**
    * Constructor.
    */
@@ -29,13 +29,13 @@ public abstract class AbstractPrimitiveSimilarityFunction<O extends DatabaseObje
   }
 
   @Override
-  abstract public Class<? super O> getInputDatatype();
+  abstract public SimpleTypeInformation<? super O> getInputTypeRestriction();
 
   @Override
   abstract public D similarity(O o1, O o2);
 
   @Override
-  public <T extends O> SimilarityQuery<T, D> instantiate(Database<T> database) {
-    return new PrimitiveSimilarityQuery<T, D>(database, this);
+  public <T extends O> SimilarityQuery<T, D> instantiate(Relation<T> rep) {
+    return new PrimitiveSimilarityQuery<T, D>(rep, this);
   }
 }

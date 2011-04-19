@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("OPTICS: Density-Based Hierarchical Clustering")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
 @Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304187")
-public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
+public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
   /**
    * The logger for this class.
    */
@@ -115,21 +115,21 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * 
    */
   @Override
-  protected ClusterOrderResult<D> runInTime(Database<O> database) {
-    final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", database.size(), logger) : null;
-
+  protected ClusterOrderResult<D> runInTime(Database database) {
     // Default value is infinite distance
     if(epsilon == null) {
       epsilon = getDistanceFunction().getDistanceFactory().infiniteDistance();
     }
-    RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction(), epsilon);
+    RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceQuery(database), epsilon);
 
-    int size = database.size();
+    int size = rangeQuery.getRepresentation().size();
+    final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", size, logger) : null;
+
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("OPTICS Clusterorder", "optics-clusterorder");
     heap = new UpdatableHeap<ClusterOrderEntry<D>>();
 
-    for(DBID id : database) {
+    for(DBID id : rangeQuery.getRepresentation().iterDBIDs()) {
       if(!processedIDs.contains(id)) {
         expandClusterOrder(clusterOrder, database, rangeQuery, id, progress);
       }
@@ -142,7 +142,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
       if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
         logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
         ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
-        OPTICSXi.extractClusters(distanceClusterOrder, database, ixi, minpts);
+        OPTICSXi.extractClusters(distanceClusterOrder, getRelation(database), ixi, minpts);
       }
       else {
         logger.verbose("Xi cluster extraction only supported for number distances!");
@@ -162,7 +162,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database<O> database, RangeQuery<O, D> rangeQuery, DBID objectID, FiniteProgress progress) {
+  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database database, RangeQuery<O, D> rangeQuery, DBID objectID, FiniteProgress progress) {
     assert (heap.isEmpty());
     heap.add(new ClusterOrderEntry<D>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
 
@@ -190,6 +190,11 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -201,7 +206,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Abs
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected D epsilon = null;
 
     protected int minpts = 0;

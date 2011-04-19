@@ -9,9 +9,9 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -23,6 +23,8 @@ import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.SpatialIndexRangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
@@ -141,12 +143,13 @@ public class TestIndexStructures implements JUnit4Test {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);
-    Database<DoubleVector> db = dbconn.getDatabase(null);
-    DistanceQuery<DoubleVector, DoubleDistance> dist = db.getDistanceQuery(EuclideanDistanceFunction.STATIC);
+    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);
+    Database db = dbconn.getDatabase();
+    Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector, DoubleDistance> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
 
     // verify data set size.
-    assertTrue(db.size() == shoulds);
+    assertTrue(rep.size() == shoulds);
 
     {
       // get the 10 next neighbors
@@ -163,7 +166,7 @@ public class TestIndexStructures implements JUnit4Test {
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
         DBID id = res.getID();
-        DoubleVector c = db.get(id);
+        DoubleVector c = rep.get(id);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
 
@@ -185,7 +188,7 @@ public class TestIndexStructures implements JUnit4Test {
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
         DBID id = res.getID();
-        DoubleVector c = db.get(id);
+        DoubleVector c = rep.get(id);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
 

@@ -3,10 +3,10 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -57,7 +57,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
    * @param knnQuery KNN Query to use
    * @param k k value
    */
-  public KNNQueryFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
+  public KNNQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
     super(database, pca);
     this.knnQuery = knnQuery;
     this.k = k;
@@ -125,10 +125,10 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
     }
 
     @Override
-    public KNNQueryFilteredPCAIndex<V> instantiate(Database<V> database) {
+    public KNNQueryFilteredPCAIndex<V> instantiate(Relation<V> representation) {
       // TODO: set bulk flag, once the parent class supports bulk.
-      KNNQuery<V, DoubleDistance> knnquery = database.getKNNQuery(pcaDistanceFunction, k);
-      return new KNNQueryFilteredPCAIndex<V>(database, pca, knnquery, k);
+      KNNQuery<V, DoubleDistance> knnquery = representation.getDatabase().getKNNQuery(representation, pcaDistanceFunction, k);
+      return new KNNQueryFilteredPCAIndex<V>(representation, pca, knnquery, k);
     }
 
     /**

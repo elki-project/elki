@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -28,8 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
  * corresponding values within a database of NumberVectors.
  * <p/>
  * The database is supposed to present a data matrix with a row representing an
- * entry ({@link FeatureVector}), a column representing a dimension (attribute) of
- * the {@link FeatureVector}s.
+ * entry ({@link FeatureVector}), a column representing a dimension (attribute)
+ * of the {@link FeatureVector}s.
  * 
  * @author Arthur Zimek
  * @param <V> a certain subtype of NumberVector - the data matrix is supposed to
@@ -37,11 +38,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
  *        columns relate to the attribute values of these objects
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extends Bicluster<V>> extends AbstractAlgorithm<V, Clustering<M>> implements ClusteringAlgorithm<Clustering<M>, V> {
+public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M extends Bicluster<V>> extends AbstractAlgorithm<V, Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * Keeps the currently set database.
    */
-  private Database<V> database;
+  private Relation<V> database;
 
   /**
    * The row ids corresponding to the currently set {@link #database}.
@@ -77,21 +78,21 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
    * 
    */
   @Override
-  protected final Clustering<M> runInTime(Database<V> database) throws IllegalStateException {
-    if(database == null || database.size() == 0) {
+  protected final Clustering<M> runInTime(Database database) throws IllegalStateException {
+    this.database = getRelation(database);
+    if(this.database == null || this.database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
-    this.database = database;
     // FIXME: move this into subclasses!
     this.result = new Clustering<M>("Biclustering", "biclustering");
-    colIDs = new int[DatabaseUtil.dimensionality(this.getDatabase())];
+    colIDs = new int[DatabaseUtil.dimensionality(this.database)];
     for(int i = 0; i < colIDs.length; i++) {
       colIDs[i] = i + 1;
     }
-    rowIDs = new int[this.getDatabase().size()];
+    rowIDs = new int[this.database.size()];
     {
       int i = 0;
-      for(DBID id : this.getDatabase()) {
+      for(DBID id : this.database.iterDBIDs()) {
         rowIDs[i] = id.getIntegerID();
         i++;
       }
@@ -357,7 +358,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
    * 
    * @return database
    */
-  public Database<V> getDatabase() {
+  public Relation<V> getDatabase() {
     return database;
   }
 }

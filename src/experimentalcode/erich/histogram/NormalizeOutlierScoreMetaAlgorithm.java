@@ -4,7 +4,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -30,15 +32,15 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * Scale an outlier score using a given scaling function.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O>
  */
-public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {
+public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O, OutlierResult> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(NormalizeOutlierScoreMetaAlgorithm.class);
-  
+
   /**
    * Association ID for scaled values
    */
@@ -56,7 +58,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
    * Key: {@code -algorithm}
    * </p>
    */
-  private final ObjectParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private final ObjectParameter<Algorithm<Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<Result>>(OptionID.ALGORITHM, OutlierAlgorithm.class);
 
   /**
    * Parameter to specify a scaling function to use.
@@ -69,7 +71,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   /**
    * Holds the algorithm to run.
    */
-  private Algorithm<O, Result> algorithm;
+  private Algorithm<Result> algorithm;
 
   /**
    * Scaling function to use
@@ -93,17 +95,17 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   }
 
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
     Result innerresult = algorithm.run(database);
 
-    OutlierResult or = getOutlierResult(database, innerresult);
+    OutlierResult or = getOutlierResult(innerresult);
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(database.getIDs(), or);
+      ((OutlierScalingFunction) scaling).prepare(database.getDBIDs(), or);
     }
 
-    WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
-    for(DBID id : database) {
+    for(DBID id : database.getDBIDs()) {
       double val = or.getScores().getValueFor(id);
       val = scaling.getScaled(val);
       scaledscores.put(id, val);
@@ -120,11 +122,10 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   /**
    * Find an OutlierResult to work with.
    * 
-   * @param database Database context
    * @param result Result object
    * @return Iterator to work with
    */
-  private OutlierResult getOutlierResult(Database<O> database, Result result) {
+  private OutlierResult getOutlierResult(Result result) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if(ors.size() > 0) {
       return ors.get(0);
@@ -135,5 +136,15 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    try {
+      return ((AbstractAlgorithm<?, ?>) algorithm).getInputTypeRestriction();
+    }
+    catch(ClassCastException e) {
+      return TypeUtil.ANY;
+    }
   }
 }

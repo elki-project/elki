@@ -4,6 +4,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -19,20 +20,26 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * @apiviz.landmark
  * @apiviz.has Projection2D
  */
-public abstract class P2DVisualization<NV extends NumberVector<NV, ?>> extends AbstractVisualization<NV> {
+public abstract class P2DVisualization<NV extends NumberVector<?, ?>> extends AbstractVisualization {
   /**
    * The current projection
    */
   final protected Projection2D proj;
-  
+
+  /**
+   * The representation we visualize
+   */
+  final protected Relation<NV> rep;
+
   /**
    * Constructor.
-   *
+   * 
    * @param task Visualization task
    */
   public P2DVisualization(VisualizationTask task) {
     super(task);
     this.proj = task.getProj();
+    this.rep = task.getRelation();
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
   }

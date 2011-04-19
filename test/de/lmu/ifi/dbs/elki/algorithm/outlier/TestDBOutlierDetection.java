@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class TestDBOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test{
   @Test
   public void testDBOutlierDetection() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
     // Parameterization
     ListParameterization params = new ListParameterization();

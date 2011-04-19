@@ -3,11 +3,10 @@ package de.lmu.ifi.dbs.elki.workflow;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -24,11 +23,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * 
  * @param <O> database object type
  */
-public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
+public class AlgorithmStep implements WorkflowStep {
   /**
    * Holds the algorithm to run.
    */
-  private List<Algorithm<O, Result>> algorithms;
+  private List<Algorithm<Result>> algorithms;
 
   /**
    * The algorithm output
@@ -40,7 +39,7 @@ public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
    *
    * @param algorithms
    */
-  public AlgorithmStep(List<Algorithm<O, Result>> algorithms) {
+  public AlgorithmStep(List<Algorithm<Result>> algorithms) {
     super();
     this.algorithms = algorithms;
   }
@@ -51,10 +50,10 @@ public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
    * @param database Database
    * @return Algorithm result
    */
-  public HierarchicalResult runAlgorithms(Database<O> database) {
+  public HierarchicalResult runAlgorithms(Database database) {
     result = new BasicResult("Algorithm Step", "main");
     result.addChildResult(database);
-    for(Algorithm<O, Result> algorithm : algorithms) {
+    for(Algorithm<Result> algorithm : algorithms) {
       Result res = algorithm.run(database);
       if(res != null) {
         result.addChildResult(res);
@@ -79,25 +78,25 @@ public class AlgorithmStep<O extends DatabaseObject> implements WorkflowStep {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Holds the algorithm to run.
      */
-    protected List<Algorithm<O, Result>> algorithms;
+    protected List<Algorithm<Result>> algorithms;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // parameter algorithm
-      final ObjectListParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ObjectListParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
+      final ObjectListParameter<Algorithm<Result>> ALGORITHM_PARAM = new ObjectListParameter<Algorithm<Result>>(OptionID.ALGORITHM, Algorithm.class);
       if(config.grab(ALGORITHM_PARAM)) {
         algorithms = ALGORITHM_PARAM.instantiateClasses(config);
       }
     }
 
     @Override
-    protected AlgorithmStep<O> makeInstance() {
-      return new AlgorithmStep<O>(algorithms);
+    protected AlgorithmStep makeInstance() {
+      return new AlgorithmStep(algorithms);
     }
   }
 }

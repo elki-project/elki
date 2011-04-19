@@ -8,7 +8,6 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * @param <NV> Number Vector
  */
 // TODO: can we improve performance by not adding as many hovers?
-public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener<NV> {
+public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -71,10 +70,8 @@ public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> exten
       }
     };
 
-    // get the Database
-    Database<? extends NV> database = context.getDatabase();
-    for(DBID id : database) {
-      double[] v = proj.fastProjectDataToRenderSpace(database.get(id));
+    for(DBID id : rep.iterDBIDs()) {
+      double[] v = proj.fastProjectDataToRenderSpace(rep.get(id));
       Element tooltip = makeTooltip(id, v[0], v[1], dotsize);
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
@@ -152,7 +149,7 @@ public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> exten
   abstract protected void setupCSS(SVGPlot svgp);
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
+  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
     synchronizedRedraw();
   }
 }

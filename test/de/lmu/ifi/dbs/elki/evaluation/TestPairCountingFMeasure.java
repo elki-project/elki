@@ -10,10 +10,9 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllNoise;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -45,22 +44,22 @@ public class TestPairCountingFMeasure implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
-    Database<DoubleVector> db = dbconn.getDatabase(null);
+    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
+    Database db = dbconn.getDatabase();
 
     // verify data set size.
     assertTrue(db.size() == shoulds);
 
     // run all-in-one
-    TrivialAllInOne<DoubleVector> allinone = new TrivialAllInOne<DoubleVector>();
+    TrivialAllInOne allinone = new TrivialAllInOne();
     Clustering<Model> rai = allinone.run(db);
 
     // run all-in-noise
-    TrivialAllNoise<DoubleVector> allinnoise = new TrivialAllNoise<DoubleVector>();
+    TrivialAllNoise allinnoise = new TrivialAllNoise();
     Clustering<Model> ran = allinnoise.run(db);
 
     // run by-label
-    ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
+    ByLabelClustering bylabel = new ByLabelClustering();
     Clustering<?> rbl = bylabel.run(db);
 
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(rai, rai), Double.MIN_VALUE);

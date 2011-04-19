@@ -96,11 +96,11 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * 
    */
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
 
-    WritableDataStore<Double> tMeans = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> error = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> tMeans = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> error = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
 
     final NeighborSetPredicate npred = npredf.instantiate(database);
 

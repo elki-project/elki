@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 
@@ -31,8 +31,8 @@ public class RStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRSta
   }
 
   @Override
-  public RStarTree<O> instantiate(Database<O> database) {
-    return new RStarTree<O>(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public RStarTree<O> instantiate(Relation<O> representation) {
+    return new RStarTree<O>(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
   
   /**

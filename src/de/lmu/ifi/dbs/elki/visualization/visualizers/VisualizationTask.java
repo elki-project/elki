@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -113,12 +113,12 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   /**
    * The active context
    */
-  VisualizerContext<?> context;
+  VisualizerContext context;
 
   /**
    * The factory
    */
-  VisFactory<?> factory;
+  VisFactory factory;
 
   /**
    * The result we are attached to
@@ -129,6 +129,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * The current projection
    */
   Projection proj;
+
+  /**
+   * The main representation
+   */
+  Relation<?> rep;
 
   /**
    * The plot to draw onto
@@ -144,7 +149,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * Height
    */
   double height;
-  
+
   /**
    * Stack to plot to (e.g. 1D, 2D, OPTICS, ...)
    */
@@ -156,14 +161,16 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param name Name
    * @param context Context
    * @param result Result
+   * @param rep Representation to use
    * @param factory Factory
    * @param stack Stack
    */
-  public VisualizationTask(String name, VisualizerContext<?> context, Result result, VisFactory<?> factory, Object stack) {
+  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> rep, VisFactory factory, Object stack) {
     super();
     this.name = name;
     this.context = context;
     this.result = result;
+    this.rep = rep;
     this.factory = factory;
     this.stack = stack;
   }
@@ -174,6 +181,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param name Name
    * @param context Context
    * @param result Result
+   * @param rep Representation
    * @param factory Factory
    * @param stack Stack
    * @param proj Projection
@@ -181,7 +189,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param width Width
    * @param height Height
    */
-  public VisualizationTask(String name, VisualizerContext<?> context, Result result, VisFactory<?> factory, Object stack, Projection proj, SVGPlot svgp, double width, double height) {
+  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> rep, VisFactory factory, Object stack, Projection proj, SVGPlot svgp, double width, double height) {
     super();
     this.name = name;
     this.context = context;
@@ -189,14 +197,19 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     this.factory = factory;
     this.stack = stack;
     this.proj = proj;
+    this.rep = rep;
     this.svgp = svgp;
     this.width = width;
     this.height = height;
   }
 
-  @SuppressWarnings("unchecked")
-  public <O extends DatabaseObject> VisualizerContext<O> getContext() {
-    return (VisualizerContext<O>) context;
+  /**
+   * Get the visualizer context.
+   * 
+   * @return context
+   */
+  public VisualizerContext getContext() {
+    return context;
   }
 
   /**
@@ -204,7 +217,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * 
    * @return Visualizer factory
    */
-  public VisFactory<?> getFactory() {
+  public VisFactory getFactory() {
     return factory;
   }
 
@@ -216,6 +229,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   @SuppressWarnings("unchecked")
   public <P extends Projection> P getProj() {
     return (P) proj;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <R extends Relation<?>> R getRelation() {
+    return (R) rep;
   }
 
   public SVGPlot getPlot() {
@@ -327,7 +345,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     // Also don't inherit equals based on list contents!
     return (this == o);
   }
-  
+
   /**
    * Get the stacking object for visualizers.
    * 

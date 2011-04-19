@@ -9,12 +9,12 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
  *
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry oneway - - contains
+ * @apiviz.has SpatialEntry oneway - - contains
  * 
  * @param <N> Self reference
  * @param <E> Entry type
  */
-public interface SpatialNode<N extends SpatialNode<N,E>, E extends SpatialEntry> extends Node<N,E>, SpatialObject {
+public interface SpatialNode<N extends SpatialNode<N,E>, E extends SpatialEntry> extends Node<N,E>, SpatialComparable {
   /**
    * Returns the dimensionality of this spatial object.
    *

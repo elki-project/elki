@@ -8,7 +8,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -22,7 +21,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that gives the key for a clustering.
@@ -33,7 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has Clustering oneway - - visualizes
  */
-public class KeyVisFactory extends AbstractVisFactory<DatabaseObject> {
+public class KeyVisFactory extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
@@ -51,7 +49,7 @@ public class KeyVisFactory extends AbstractVisFactory<DatabaseObject> {
   public Visualization makeVisualization(VisualizationTask task) {
     Clustering<Model> clustering = task.getResult();
     SVGPlot svgp = task.getPlot();
-    VisualizerContext<DatabaseObject> context = task.getContext();
+    VisualizerContext context = task.getContext();
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
     int numc = allcs.size();
 
@@ -80,15 +78,12 @@ public class KeyVisFactory extends AbstractVisFactory<DatabaseObject> {
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
-    if(!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
-      return;
-    }
+  public void addVisualizers(VisualizerContext context, Result result) {
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, c, this, null);
+        final VisualizationTask task = new VisualizationTask(NAME, context, c, null, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         context.addVisualizer(c, task);
       }

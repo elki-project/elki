@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -12,24 +10,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @apiviz.landmark
  * @apiviz.uses Result oneway - - processes
- * @apiviz.uses Normalization
  *
- * @param <O> Object type
  * @param <R> Result type
  */
-public interface ResultHandler<O extends DatabaseObject, R extends Result> extends Parameterizable {
+public interface ResultHandler<R extends Result> extends Parameterizable {
   /**
    * Process a result.
    * 
    * @param db Database the result is for
    * @param result Result object
    */
-  public abstract void processResult(Database<O> db, R result);
-
-  /**
-   * Setter for normalization
-   * 
-   * @param normalization new normalization object
-   */
-  public abstract void setNormalization(Normalization<O> normalization);
+  public abstract void processResult(Database db, R result);
 }

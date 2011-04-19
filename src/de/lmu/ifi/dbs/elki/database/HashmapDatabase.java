@@ -1,31 +1,24 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
@@ -34,6 +27,9 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
@@ -42,25 +38,14 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.AnnotationBuiltins;
-import de.lmu.ifi.dbs.elki.result.IDResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
@@ -78,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.composedOf DBIDs
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
-public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchicalResult implements Database<O> {
+public class HashmapDatabase extends AbstractHierarchicalResult implements Database {
   /**
    * Parameter to specify the indexes to use.
    * <p>
@@ -88,24 +73,9 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("db.index", "Database indexes to add.");
 
   /**
-   * Map to hold the objects of the database.
+   * The representations we have.
    */
-  protected WritableDataStore<O> content;
-
-  /**
-   * Map to hold the object labels
-   */
-  protected WritableDataStore<String> objectlabels = null;
-
-  /**
-   * Map to hold the object labels
-   */
-  protected WritableDataStore<String> externalids = null;
-
-  /**
-   * Map to hold the class labels
-   */
-  protected WritableDataStore<ClassLabel> classlabels = null;
+  protected final List<Relation<?>> representations;
 
   /**
    * IDs of this database
@@ -113,48 +83,43 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   private TreeSetModifiableDBIDs ids;
 
   /**
-   * Object factory
-   */
-  private O objectFactory;
-
-  /**
    * The event manager, collects events and fires them on demand.
    */
-  protected DatabaseEventManager<O> eventManager = new DatabaseEventManager<O>();
+  protected final DatabaseEventManager eventManager = new DatabaseEventManager();
+
+  /**
+   * The DBID representation we use
+   */
+  private final DBIDView idrep;
 
   /**
    * Indexes
    */
-  final List<Index<O>> indexes;
+  final List<Index<?>> indexes;
 
   /**
-   * Store own parameters, needed for partitioning.
+   * Index factories
    */
-  // TODO: add some point, it would be nice to get rid of this partitioning.
-  private Collection<Pair<OptionID, Object>> params;
+  final Collection<IndexFactory<?, ?>> indexFactories;
 
   /**
    * Constructor.
    * 
    * @param indexFactories Indexes to add
-   * @param params Parameters to clone the database for partitioning
    */
-  public HashmapDatabase(Collection<IndexFactory<O, ?>> indexFactories, Collection<Pair<OptionID, Object>> params) {
+  public HashmapDatabase(Collection<IndexFactory<?, ?>> indexFactories) {
     super();
-    this.params = params;
-
     this.ids = DBIDUtil.newTreeSet();
-    this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DatabaseObject.class);
-    // this.primaryResults = new java.util.Vector<Result>(4);
-    // this.derivedResults = new java.util.Vector<Result>();
-    this.addChildResult(new IDResult());
-    this.indexes = new java.util.Vector<Index<O>>();
+    this.representations = new java.util.Vector<Relation<?>>();
+    this.idrep = new DBIDView(this, this.ids);
+    this.representations.add(idrep);
+    this.addChildResult(idrep);
+    this.indexes = new java.util.Vector<Index<?>>();
 
     // Add indexes.
+    this.indexFactories = new java.util.Vector<IndexFactory<?, ?>>();
     if(indexFactories != null) {
-      for(IndexFactory<O, ?> idx : indexFactories) {
-        addIndex(idx.instantiate(this));
-      }
+      this.indexFactories.addAll(indexFactories);
     }
   }
 
@@ -162,114 +127,179 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * Constructor with no indexes.
    */
   public HashmapDatabase() {
-    this(null, null);
+    this(null);
   }
 
   @Override
-  public void addIndex(Index<O> index) {
+  public void addIndex(Index<?> index) {
     this.indexes.add(index);
+    // TODO: actually add index to the representation used?
     this.addChildResult(index);
   }
 
-  /**
-   * Inserts the objects into this database (by calling {@link #doInsert(List)})
-   * and all indexes and fires an insertion event.
-   * 
-   * @throws UnableToComplyException if database reached limit of storage
-   *         capacity
-   */
   @Override
-  public DBIDs insert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
-    if(objectsAndAssociationsList.isEmpty()) {
+  public DBIDs insert(MultipleObjectsBundle objpackages) {
+    if(objpackages.dataLength() == 0) {
       return DBIDUtil.EMPTYDBIDS;
     }
     // insert into db
-    Pair<List<O>, DBIDs> objectsAndIds = doInsert(objectsAndAssociationsList);
-    // insert into indexes
-    List<O> objects = objectsAndIds.first;
-    for(Index<O> index : indexes) {
-      index.insert(objects);
-    }
-    // fire insertion event
-    eventManager.fireObjectsInserted(objectsAndIds.first);
+    ArrayModifiableDBIDs newids = DBIDUtil.newArray(objpackages.dataLength());
+    Relation<?>[] targets = alignColumns(objpackages);
 
-    return objectsAndIds.second;
+    int idrepnr = -1;
+    for(int i = 0; i < targets.length; i++) {
+      if(targets[i] == idrep) {
+        idrepnr = i;
+        break;
+      }
+    }
+
+    for(int j = 0; j < objpackages.dataLength(); j++) {
+      // insert object
+      final DBID newid;
+      if(idrepnr < 0) {
+        newid = DBIDUtil.generateSingleDBID();
+      }
+      else {
+        newid = (DBID) objpackages.data(j, idrepnr);
+      }
+      if(ids.contains(newid)) {
+        throw new AbortException("Duplicate DBID conflict.");
+      }
+      ids.add(newid);
+      for(int i = 0; i < targets.length; i++) {
+        // DBIDs were handled above.
+        if(i == idrepnr) {
+          continue;
+        }
+        @SuppressWarnings("unchecked")
+        final Relation<Object> rep = (Relation<Object>) targets[i];
+        rep.set(newid, objpackages.data(j, i));
+      }
+      newids.add(newid);
+
+      // insert into indexes
+      // FIXME: support bulk...
+      for(Index<?> index : indexes) {
+        for(int i = 0; i < targets.length; i++) {
+          if(index.getRepresentation() == targets[i]) {
+            @SuppressWarnings("unchecked")
+            final Index<Object> oindex = (Index<Object>) index;
+            oindex.insert(newid, objpackages.data(j, i));
+          }
+        }
+      }
+    }
+
+    // fire insertion event
+    eventManager.fireObjectsInserted(newids);
+    return newids;
   }
 
-  /**
-   * Inserts the object into this database (by calling {@link #doInsert(Pair)})
-   * and all indexes and fires an insertion event.
-   * 
-   * @throws UnableToComplyException if database reached limit of storage
-   *         capacity
-   */
   @Override
-  public DBID insert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
-    // insert into db
-    Pair<O, DBID> objectAndID = doInsert(objectAndAssociations);
+  public DBID insert(SingleObjectBundle objpackage) {
+    Relation<?>[] targets = alignColumns(objpackage);
+
+    DBID newid = null;
+    for(int i = 0; i < targets.length; i++) {
+      if(targets[i] == idrep) {
+        newid = (DBID) objpackage.data(i);
+        break;
+      }
+    }
+    if(newid == null) {
+      newid = DBIDUtil.generateSingleDBID();
+    }
+
+    if(ids.contains(newid)) {
+      throw new AbortException("Duplicate DBID conflict.");
+    }
+    ids.add(newid);
+
+    // insert object into representations
+    for(int i = 0; i < targets.length; i++) {
+      @SuppressWarnings("unchecked")
+      final Relation<Object> rep = (Relation<Object>) targets[i];
+      // Skip the DBID we used above
+      if((Object) rep == idrep) {
+        continue;
+      }
+      rep.set(newid, objpackage.data(i));
+    }
+
     // insert into indexes
-    for(Index<O> index : indexes) {
-      index.insert(objectAndAssociations.getFirst());
+    for(Index<?> index : indexes) {
+      for(int i = 0; i < targets.length; i++) {
+        if(index.getRepresentation() == targets[i]) {
+          @SuppressWarnings("unchecked")
+          final Index<Object> oindex = (Index<Object>) index;
+          oindex.insert(newid, objpackage.data(i));
+        }
+      }
     }
+
     // fire insertion event
-    eventManager.fireObjectInserted(objectAndID.first);
-
-    return objectAndID.second;
+    eventManager.fireObjectInserted(newid);
+    return newid;
   }
 
   /**
-   * Inserts the given object into this database.
+   * Find a mapping from package columns to database columns, eventually adding
+   * new database columns when needed.
    * 
-   * @param objectAndAssociations the object and its associations to be inserted
-   * @return the ID assigned to the inserted object and the object
-   * @throws UnableToComplyException if database reached limit of storage
-   *         capacity
+   * @param pack Package to process
+   * @return Column mapping
    */
-  private Pair<O, DBID> doInsert(Pair<O, DatabaseObjectMetadata> objectAndAssociations) throws UnableToComplyException {
-    O object = objectAndAssociations.getFirst();
-    if(object == null) {
-      throw new UnableToComplyException("Insertion of null objects is not allowed!");
+  protected Relation<?>[] alignColumns(ObjectBundle pack) {
+    // align representations.
+    Relation<?>[] targets = new Relation<?>[pack.metaLength()];
+    {
+      BitSet used = new BitSet(representations.size());
+      for(int i = 0; i < targets.length; i++) {
+        SimpleTypeInformation<?> meta = pack.meta(i);
+        // TODO: aggressively try to match exact metas first?
+        // Try to match unused representations only
+        for(int j = used.nextClearBit(0); j >= 0 && j < representations.size(); j = used.nextClearBit(j + 1)) {
+          Relation<?> rep = representations.get(j);
+          if(rep.getDataTypeInformation().isAssignableFromType(meta)) {
+            targets[i] = rep;
+            used.set(j);
+            break;
+          }
+        }
+        if(targets[i] == null) {
+          Relation<?> rep = addNewRepresentation(meta);
+          targets[i] = rep;
+          used.set(representations.size() - 1);
+        }
+      }
     }
-
-    // insert object
-    DBID id = setNewID(object);
-    content.put(id, object);
-    ids.add(id);
-    // insert associations
-    DatabaseObjectMetadata associations = objectAndAssociations.getSecond();
-    if(associations != null) {
-      if(associations.objectlabel != null) {
-        setObjectLabel(id, associations.objectlabel);
-      }
-      if(associations.classlabel != null) {
-        setClassLabel(id, associations.classlabel);
-      }
-      if(associations.externalId != null) {
-        setExternalId(id, associations.externalId);
-      }
-    }
-
-    return new Pair<O, DBID>(object, id);
+    return targets;
   }
 
   /**
-   * Convenience method, calls {@link #doInsert(Pair)} for each element.
+   * Add a new representation for the given meta.
    * 
-   * @param objectsAndAssociationsList
-   * @return the IDs assigned to the inserted objects
-   * @throws UnableToComplyException if database reached limit of storage
-   *         capacity
+   * @param meta meta data
+   * @return
    */
-  private Pair<List<O>, DBIDs> doInsert(List<Pair<O, DatabaseObjectMetadata>> objectsAndAssociationsList) throws UnableToComplyException {
-    List<O> objects = new ArrayList<O>(objectsAndAssociationsList.size());
-    ModifiableDBIDs ids = DBIDUtil.newArray(objectsAndAssociationsList.size());
-
-    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectsAndAssociationsList) {
-      Pair<O, DBID> objectAndID = doInsert(objectAndAssociations);
-      objects.add(objectAndID.first);
-      ids.add(objectAndID.second);
+  private Relation<?> addNewRepresentation(SimpleTypeInformation<?> meta) {
+    @SuppressWarnings("unchecked")
+    SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
+    Relation<?> rep = new MaterializedRelation<Object>(this, ometa, ids);
+    representations.add(rep);
+    getHierarchy().add(this, rep);
+    // Try to add indexes where appropriate
+    for(IndexFactory<?, ?> factory : indexFactories) {
+      if(factory.getInputTypeRestriction().isAssignableFromType(meta)) {
+        @SuppressWarnings("unchecked")
+        final IndexFactory<Object, ?> ofact = (IndexFactory<Object, ?>) factory;
+        @SuppressWarnings("unchecked")
+        final Relation<Object> orep = (Relation<Object>) rep;
+        addIndex(ofact.instantiate(orep));
+      }
     }
-    return new Pair<List<O>, DBIDs>(objects, ids);
+    return rep;
   }
 
   /**
@@ -277,23 +307,22 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * and from all indexes and fires a deletion event.
    */
   @Override
-  public O delete(DBID id) {
-    final O existing;
+  public SingleObjectBundle delete(DBID id) {
+    final SingleObjectBundle existing;
     try {
-      existing = get(id);
+      existing = getBundle(id);
     }
     catch(ObjectNotFoundException e) {
       return null;
     }
+    // remove from all indexes
+    for(Index<?> index : indexes) {
+      index.delete(id);
+    }
     // remove from db
     doDelete(id);
-    // remove from all indexes
-    for(Index<O> index : indexes) {
-      index.delete(existing);
-    }
     // fire deletion event
-    eventManager.fireObjectRemoved(existing);
-
+    eventManager.fireObjectRemoved(id);
     return existing;
   }
 
@@ -302,26 +331,26 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * for each object) and indexes and fires a deletion event.
    */
   @Override
-  public List<O> delete(DBIDs ids) {
-    final List<O> existing = new ArrayList<O>();
+  public List<SingleObjectBundle> delete(DBIDs ids) {
+    final List<SingleObjectBundle> existing = new ArrayList<SingleObjectBundle>(ids.size());
     for(DBID id : ids) {
       try {
-        existing.add(get(id));
+        existing.add(getBundle(id));
       }
       catch(ObjectNotFoundException e) {
         // do nothing?
       }
     }
     // remove from db
-    for(O o : existing) {
-      doDelete(o.getID());
+    for(DBID id : ids) {
+      doDelete(id);
     }
-    // remove from all indexes
-    for(Index<O> index : indexes) {
-      index.delete(existing);
+    // Remove from indexes
+    for(Index<?> index : indexes) {
+      index.deleteAll(ids);
     }
     // fire deletion event
-    eventManager.fireObjectsRemoved(existing);
+    eventManager.fireObjectsRemoved(ids);
 
     return existing;
   }
@@ -332,16 +361,14 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * @param id id the id of the object to be removed
    */
   private void doDelete(DBID id) {
+    // Remove id
     ids.remove(id);
-    content.delete(id);
-    if(objectlabels != null) {
-      objectlabels.delete(id);
-    }
-    if(classlabels != null) {
-      classlabels.delete(id);
-    }
-    if(externalids != null) {
-      externalids.delete(id);
+    // Remove from all representations.
+    for(Relation<?> rep : representations) {
+      // ID has already been removed, and this would loop...
+      if(rep != idrep) {
+        rep.delete(id);
+      }
     }
     restoreID(id);
   }
@@ -352,30 +379,23 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
   }
 
   @Override
-  public O getObjectFactory() {
-    if(objectFactory == null) {
-      throw new UnsupportedOperationException("No object factory / project was added to the database.");
-    }
-    return objectFactory;
-  }
-
-  @Override
-  public void setObjectFactory(O objectFactory) {
-    this.objectFactory = objectFactory;
-  }
-
-  @Override
-  public final O get(DBID id) throws ObjectNotFoundException {
+  public final SingleObjectBundle getBundle(DBID id) throws ObjectNotFoundException {
+    assert (id != null);
+    assert (ids.contains(id));
     try {
-      O ret = content.get(id);
-      if(ret == null) {
-        throw new ObjectNotFoundException(id);
+      // Build an object package
+      SingleObjectBundle ret = new SingleObjectBundle();
+      for(Relation<?> rep : representations) {
+        ret.append(rep.getDataTypeInformation(), rep.get(id));
       }
       return ret;
     }
     catch(RuntimeException e) {
       if(id == null) {
-        throw new UnsupportedOperationException("AbstractDatabase.get(null) called!");
+        throw new UnsupportedOperationException("AbstractDatabase.getPackage(null) called!");
+      }
+      if(!ids.contains(id)) {
+        throw new UnsupportedOperationException("AbstractDatabase.getPackage() called for unknown id!");
       }
       // throw e upwards.
       throw e;
@@ -388,44 +408,11 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * The list is not affected of any changes made to the database in the future
    * nor vice versa.
    * 
-   * @see de.lmu.ifi.dbs.elki.database.Database#getIDs()
+   * @see de.lmu.ifi.dbs.elki.database.Database#getDBIDs()
    */
   @Override
-  public DBIDs getIDs() {
+  public DBIDs getDBIDs() {
     return DBIDUtil.makeUnmodifiable(ids);
-  }
-
-  /**
-   * Returns an iterator iterating over all keys of the database.
-   * 
-   * @return an iterator iterating over all keys of the database
-   */
-  @Override
-  public final Iterator<DBID> iterator() {
-    return getIDs().iterator();
-  }
-
-  /**
-   * Provides a new id for the specified database object suitable as key for a
-   * new insertion and sets this id in the specified database object.
-   * 
-   * @param object the object for which a new id should be provided
-   * @return a new id suitable as key for a new insertion
-   * @throws UnableToComplyException if the database has reached the limit and,
-   *         therefore, new insertions are not possible
-   */
-  protected DBID setNewID(O object) throws UnableToComplyException {
-    if(object.getID() != null) {
-      if(ids.contains(object.getID())) {
-        throw new UnableToComplyException("ID " + object.getID() + " is already in use!");
-      }
-      // TODO: register ID with id manager?
-      return object.getID();
-    }
-
-    DBID id = DBIDFactory.FACTORY.generateSingleDBID();
-    object.setID(id);
-    return id;
   }
 
   /**
@@ -437,253 +424,159 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     DBIDFactory.FACTORY.deallocateSingleDBID(id);
   }
 
+  @SuppressWarnings({ "unchecked", "unused" })
   @Override
-  public Database<O> partition(DBIDs ids) throws UnableToComplyException {
-    Map<Integer, DBIDs> partitions = new HashMap<Integer, DBIDs>();
-    partitions.put(0, ids);
-    return partition(partitions, null, null).get(0);
-  }
-
-  @Override
-  public Map<Integer, Database<O>> partition(Map<Integer, ? extends DBIDs> partitions) throws UnableToComplyException {
-    return partition(partitions, null, null);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Map<Integer, Database<O>> partition(Map<Integer, ? extends DBIDs> partitions, Class<? extends Database<O>> dbClass, Collection<Pair<OptionID, Object>> dbParameters) throws UnableToComplyException {
-    if(dbClass == null) {
-      dbClass = ClassGenericsUtil.uglyCrossCast(this.getClass(), Database.class);
-      dbParameters = getParameters();
-    }
-
-    Map<Integer, Database<O>> databases = new Hashtable<Integer, Database<O>>();
-    for(Integer partitionID : partitions.keySet()) {
-      List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList = new ArrayList<Pair<O, DatabaseObjectMetadata>>();
-      DBIDs ids = partitions.get(partitionID);
-      for(DBID id : ids) {
-        final O object = get(id);
-        DatabaseObjectMetadata associations = new DatabaseObjectMetadata(getObjectLabel(id), getClassLabel(id), getExternalId(id));
-        objectAndAssociationsList.add(new Pair<O, DatabaseObjectMetadata>(object, associations));
-      }
-
-      Database<O> database;
-      ListParameterization config = new ListParameterization(dbParameters);
-      try {
-        database = ClassGenericsUtil.tryInstantiate(Database.class, dbClass, config);
-      }
-      catch(Exception e) {
-        throw new UnableToComplyException(e);
-      }
-
-      database.insert(objectAndAssociationsList);
-      databases.put(partitionID, database);
-    }
-    return databases;
-  }
-
-  /**
-   * Get the parameters, for database cloning/partitioning
-   * 
-   * @return Parameters for reconfiguration
-   */
-  protected Collection<Pair<OptionID, Object>> getParameters() {
-    return params;
-  }
-
-  @Override
-  public final DBIDs randomSample(int k, long seed) {
-    if(k <= 0 || k > this.size()) {
-      throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
-    }
-
-    ModifiableDBIDs sample = DBIDUtil.newHashSet(k);
-    ArrayModifiableDBIDs aids = DBIDUtil.newArray(this.ids);
-    Random random = new Random(seed);
-    // FIXME: Never sample the same two objects - this is inefficient when k
-    // almost is the full size()
-    while(sample.size() < k) {
-      sample.add(aids.get(random.nextInt(aids.size())));
-    }
-    return sample;
-  }
-
-  @Override
-  public int dimensionality() throws UnsupportedOperationException {
-    Iterator<DBID> iter = this.iterator();
-    if(iter.hasNext()) {
-      final O entry = this.get(iter.next());
-      if(FeatureVector.class.isInstance(entry)) {
-        return ((FeatureVector<?, ?>) entry).getDimensionality();
-      }
-      else {
-        throw new UnsupportedOperationException("Database entries are not implementing interface " + NumberVector.class.getName() + ".");
+  public <O> Relation<O> getRelation(TypeInformation restriction, Object... hints) throws NoSupportedDataTypeException {
+    // Get first match
+    for(Relation<?> rep : representations) {
+      if(restriction.isAssignableFromType(rep.getDataTypeInformation())) {
+        return (Relation<O>) rep;
       }
     }
-    else {
-      throw new UnsupportedOperationException(ExceptionMessages.DATABASE_EMPTY);
-    }
+    throw new NoSupportedDataTypeException(restriction);
   }
 
-  /**
-   * Helper method to extract the list of database objects from the specified
-   * list of objects and their associations.
-   * 
-   * @param objectAndAssociationsList the list of objects and their associations
-   * @return the list of database objects
-   */
-  protected List<O> getObjects(List<Pair<O, DatabaseObjectMetadata>> objectAndAssociationsList) {
-    List<O> objects = new ArrayList<O>(objectAndAssociationsList.size());
-    for(Pair<O, DatabaseObjectMetadata> objectAndAssociations : objectAndAssociationsList) {
-      objects.add(objectAndAssociations.getFirst());
-    }
-    return objects;
-  }
-
+  @SuppressWarnings("unused")
   @Override
-  public DataQuery<String> getObjectLabelQuery() {
-    return new ObjectLabelRepresentation();
-  }
-
-  @Override
-  public DataQuery<ClassLabel> getClassLabelQuery() {
-    return new ClassLabelRepresentation();
-  }
-
-  @Override
-  public DataQuery<String> getExternalIdQuery() {
-    return new ExternalIdRepresentation();
-  }
-
-  @Override
-  public DataQuery<DatabaseObjectMetadata> getMetadataQuery() {
-    return new MetadataRepresentation();
-  }
-
-  @Override
-  public <D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(DistanceFunction<? super O, D> distanceFunction) {
+  public <O, D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
     if(distanceFunction == null) {
       throw new AbortException("Distance query requested for 'null' distance!");
     }
-    return distanceFunction.instantiate(this);
+    return distanceFunction.instantiate(objQuery);
   }
 
+  @SuppressWarnings("unused")
   @Override
-  public <D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(SimilarityFunction<? super O, D> similarityFunction) {
+  public <O, D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(Relation<O> objQuery, SimilarityFunction<? super O, D> similarityFunction, Object... hints) {
     if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
-    return similarityFunction.instantiate(this);
+    return similarityFunction.instantiate(objQuery);
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+  public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
     if(distanceFunction == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<O> idx = indexes.get(i);
+      Index<?> idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
-        KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(this, distanceFunction, hints);
-        if(q != null) {
-          return q;
+        if(idx.getRepresentation() == objQuery) {
+          KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceFunction, hints);
+          if(q != null) {
+            return q;
+          }
         }
       }
     }
+
     // Default
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(distanceFunction);
-    return new LinearScanKNNQuery<O, D>(this, distanceQuery);
+    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
+    return new LinearScanKNNQuery<O, D>(objQuery, distanceQuery);
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<O> idx = indexes.get(i);
+      Index<?> idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
-        KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(this, distanceQuery, hints);
-        if(q != null) {
-          return q;
+        if(idx.getRepresentation() == distanceQuery.getRepresentation()) {
+          KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceQuery, hints);
+          if(q != null) {
+            return q;
+          }
         }
       }
     }
+
     // Default
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
-    return new LinearScanKNNQuery<O, D>(this, distanceQuery);
+    return new LinearScanKNNQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery);
   }
 
   @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+  public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
     if(distanceFunction == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<O> idx = indexes.get(i);
+      Index<?> idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
-        RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this, distanceFunction, hints);
-        if(q != null) {
-          return q;
+        if(idx.getRepresentation() == objQuery) {
+          RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceFunction, hints);
+          if(q != null) {
+            return q;
+          }
         }
       }
     }
+
     // Default
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(distanceFunction);
-    return new LinearScanRangeQuery<O, D>(this, distanceQuery);
+    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
+    return new LinearScanRangeQuery<O, D>(objQuery, distanceQuery);
   }
 
   @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<O> idx = indexes.get(i);
+      Index<?> idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
-        RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this, distanceQuery, hints);
-        if(q != null) {
-          return q;
+        if(idx.getRepresentation() == distanceQuery.getRepresentation()) {
+          RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceQuery, hints);
+          if(q != null) {
+            return q;
+          }
         }
       }
     }
+
     // Default
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
-    return new LinearScanRangeQuery<O, D>(this, distanceQuery);
+    return new LinearScanRangeQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery);
   }
 
   @Override
-  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+  public <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
     if(distanceFunction == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<O> idx = indexes.get(i);
+      Index<?> idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
-        RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this, distanceFunction, hints);
-        if(q != null) {
-          return q;
+        if(idx.getRepresentation() == objQuery) {
+          RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceFunction, hints);
+          if(q != null) {
+            return q;
+          }
         }
       }
     }
+
     Integer maxk = null;
     // Default
     for(Object hint : hints) {
@@ -694,24 +587,28 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
         maxk = (Integer) hint;
       }
     }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(distanceFunction);
-    return new LinearScanRKNNQuery<O, D>(this, distanceQuery, maxk);
+    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
+    KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
+    return new LinearScanRKNNQuery<O, D>(objQuery, distanceQuery, knnQuery, maxk);
   }
 
   @Override
-  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<O> idx = indexes.get(i);
+      Index<?> idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
-        RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this, distanceQuery, hints);
-        if(q != null) {
-          return q;
+        if(idx.getRepresentation() == distanceQuery.getRepresentation()) {
+          RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceQuery, hints);
+          if(q != null) {
+            return q;
+          }
         }
       }
     }
+
     Integer maxk = null;
     // Default
     for(Object hint : hints) {
@@ -722,67 +619,19 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
         maxk = (Integer) hint;
       }
     }
-    return new LinearScanRKNNQuery<O, D>(this, distanceQuery, maxk);
+    KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
+    return new LinearScanRKNNQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery, knnQuery, maxk);
   }
 
   @Override
-  public void addDataStoreListener(DataStoreListener<O> l) {
+  public void addDataStoreListener(DataStoreListener l) {
     eventManager.addListener(l);
   }
 
   @Override
-  public void removeDataStoreListener(DataStoreListener<O> l) {
+  public void removeDataStoreListener(DataStoreListener l) {
     eventManager.removeListener(l);
   }
-
-  /*
-   * @Override public void addResultListener(ResultListener l) {
-   * eventManager.addListener(l); }
-   */
-
-  /*
-   * @Override public void removeResultListener(ResultListener l) {
-   * eventManager.removeListener(l); }
-   */
-
-  @Override
-  public void reportPageAccesses(Logging logger) {
-    if(logger.isVerbose() && indexes.size() > 0) {
-      StringBuffer msg = new StringBuffer();
-      for(Index<O> index : indexes) {
-        PageFileStatistics pf = index.getPageFileStatistics();
-        if(pf != null) {
-          msg.append(getClass().getName()).append(" physical read access : ").append(pf.getPhysicalReadAccess()).append("\n");
-          msg.append(getClass().getName()).append(" physical write access : ").append(pf.getPhysicalWriteAccess()).append("\n");
-          msg.append(getClass().getName()).append(" logical page access : ").append(pf.getLogicalPageAccess()).append("\n");
-        }
-      }
-      logger.verbose(msg.toString());
-    }
-  }
-
-  /*
-   * @Override public Collection<Result> getPrimary() { return
-   * Collections.unmodifiableCollection(primaryResults); }
-   */
-
-  /*
-   * @Override public Collection<Result> getDerived() { return
-   * Collections.unmodifiableCollection(derivedResults); }
-   */
-
-  /*
-   * @Override public void addDerivedResult(Result r) { if(r == null) {
-   * LoggingUtil.warning("Null result added.", new Throwable()); return; }
-   * r.addResultListener(this); derivedResults.add(r);
-   * eventManager.fireResultAdded(r, this); }
-   * 
-   * @Override public void resultAdded(Result r, Result parent) {
-   * eventManager.fireResultAdded(r, parent); }
-   * 
-   * @Override public void resultRemoved(Result r, Result parent) {
-   * eventManager.fireResultRemoved(r, parent); }
-   */
 
   @Override
   public String getLongName() {
@@ -804,204 +653,6 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
     eventManager.flushDataStoreEvents();
   }
 
-  protected ClassLabel getClassLabel(DBID id) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to get class label for 'null' id.");
-      return null;
-    }
-    if(classlabels == null) {
-      return null;
-    }
-    return classlabels.get(id);
-  }
-
-  protected void setClassLabel(DBID id, ClassLabel label) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to set class label for 'null' id.");
-      return;
-    }
-    if(classlabels == null) {
-      classlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClassLabel.class);
-      addChildResult(new AnnotationBuiltins.ClassLabelAnnotation(HashmapDatabase.this));
-    }
-    classlabels.put(id, label);
-  }
-
-  protected String getObjectLabel(DBID id) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to get object label for 'null' id.");
-      return null;
-    }
-    if(objectlabels == null) {
-      return null;
-    }
-    return objectlabels.get(id);
-  }
-
-  protected void setObjectLabel(DBID id, String label) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to set object label for 'null' id.");
-      return;
-    }
-    if(objectlabels == null) {
-      objectlabels = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
-      addChildResult(new AnnotationBuiltins.ObjectLabelAnnotation(HashmapDatabase.this));
-    }
-    objectlabels.put(id, label);
-  }
-
-  protected String getExternalId(DBID id) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to get class label for 'null' id.");
-      return null;
-    }
-    if(externalids == null) {
-      return null;
-    }
-    return externalids.get(id);
-  }
-
-  protected void setExternalId(DBID id, String externalid) {
-    if(id == null) {
-      LoggingUtil.warning("Trying to set class label for 'null' id.");
-      return;
-    }
-    if(externalids == null) {
-      externalids = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, String.class);
-      addChildResult(new AnnotationBuiltins.ExternalIdAnnotation(HashmapDatabase.this));
-    }
-    externalids.put(id, externalid);
-  }
-
-  /**
-   * Representation class for class labels.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private class ClassLabelRepresentation implements DataQuery<ClassLabel> {
-    /**
-     * Constructor.
-     */
-    public ClassLabelRepresentation() {
-      super();
-    }
-
-    @Override
-    public ClassLabel get(DBID id) {
-      return getClassLabel(id);
-    }
-
-    @Override
-    public void set(DBID id, ClassLabel val) {
-      setClassLabel(id, val);
-    }
-
-    @Override
-    public Class<? super ClassLabel> getDataClass() {
-      return ClassLabel.class;
-    }
-  }
-
-  /**
-   * Representation for object labels.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private class ObjectLabelRepresentation implements DataQuery<String> {
-    /**
-     * Constructor.
-     */
-    public ObjectLabelRepresentation() {
-      super();
-    }
-
-    @Override
-    public String get(DBID id) {
-      return getObjectLabel(id);
-    }
-
-    @Override
-    public void set(DBID id, String val) {
-      setObjectLabel(id, val);
-    }
-
-    @Override
-    public Class<? super String> getDataClass() {
-      return String.class;
-    }
-  }
-
-  /**
-   * Representation for external IDs.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private class ExternalIdRepresentation implements DataQuery<String> {
-    /**
-     * Constructor.
-     */
-    public ExternalIdRepresentation() {
-      super();
-    }
-
-    @Override
-    public String get(DBID id) {
-      return getExternalId(id);
-    }
-
-    @Override
-    public void set(DBID id, String val) {
-      setExternalId(id, val);
-    }
-
-    @Override
-    public Class<? super String> getDataClass() {
-      return String.class;
-    }
-  }
-
-  /**
-   * Representation of metadata.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private class MetadataRepresentation implements DataQuery<DatabaseObjectMetadata> {
-    /**
-     * Constructor.
-     */
-    public MetadataRepresentation() {
-      super();
-    }
-
-    @Override
-    public DatabaseObjectMetadata get(DBID id) {
-      return new DatabaseObjectMetadata(getObjectLabel(id), getClassLabel(id), getExternalId(id));
-    }
-
-    @Override
-    public void set(DBID id, DatabaseObjectMetadata val) {
-      if(val.classlabel != null) {
-        setClassLabel(id, val.classlabel);
-      }
-      if(val.objectlabel != null) {
-        setObjectLabel(id, val.objectlabel);
-      }
-    }
-
-    @Override
-    public Class<? super DatabaseObjectMetadata> getDataClass() {
-      return DatabaseObjectMetadata.class;
-    }
-  }
-
   /**
    * Parameterization class.
    * 
@@ -1009,33 +660,25 @@ public class HashmapDatabase<O extends DatabaseObject> extends AbstractHierarchi
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
-    /**
-     * Parameters used for creation
-     */
-    private Collection<Pair<OptionID, Object>> params = null;
-
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Indexes to add.
      */
-    private Collection<IndexFactory<O, ?>> indexFactories;
+    private Collection<IndexFactory<?, ?>> indexFactories;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      TrackParameters track = new TrackParameters(config);
-
       // Get indexes.
-      final ObjectListParameter<IndexFactory<O, ?>> indexFactoryP = new ObjectListParameter<IndexFactory<O, ?>>(INDEX_ID, IndexFactory.class, true);
-      if(track.grab(indexFactoryP)) {
-        indexFactories = indexFactoryP.instantiateClasses(track);
+      final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<IndexFactory<?, ?>>(INDEX_ID, IndexFactory.class, true);
+      if(config.grab(indexFactoryP)) {
+        indexFactories = indexFactoryP.instantiateClasses(config);
       }
-      params = track.getGivenParameters();
     }
 
     @Override
-    protected HashmapDatabase<O> makeInstance() {
-      return new HashmapDatabase<O>(indexFactories, params);
+    protected HashmapDatabase makeInstance() {
+      return new HashmapDatabase(indexFactories);
     }
   }
 }

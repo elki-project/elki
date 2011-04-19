@@ -2,12 +2,11 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public abstract class AbstractDistanceRangeQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseQuery<O> implements RangeQuery<O, D> {
+public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RangeQuery<O, D> {
   /**
    * Hold the distance function to be used.
    */
@@ -28,10 +27,10 @@ public abstract class AbstractDistanceRangeQuery<O extends DatabaseObject, D ext
   /**
    * Constructor.
    * 
-   * @param database Database
+   * @param rep Database
    */
-  public AbstractDistanceRangeQuery(Database<? extends O> database, DistanceQuery<O, D> distanceQuery) {
-    super(database);
+  public AbstractDistanceRangeQuery(Relation<? extends O> rep, DistanceQuery<O, D> distanceQuery) {
+    super(rep);
     this.distanceQuery = distanceQuery;
   }
 

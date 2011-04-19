@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * @param <O> Object type
  * @param <R> Stored data type
  */
-public abstract class AbstractPreprocessorIndex<O extends DatabaseObject, R> extends AbstractIndex<O> {
+public abstract class AbstractPreprocessorIndex<O, R> extends AbstractIndex<O> {
   /**
    * The data store
    */
@@ -23,8 +23,8 @@ public abstract class AbstractPreprocessorIndex<O extends DatabaseObject, R> ext
   /**
    * Constructor.
    */
-  public AbstractPreprocessorIndex() {
-    super();
+  public AbstractPreprocessorIndex(Relation<O> rep) {
+    super(rep);
   }
 
   /**

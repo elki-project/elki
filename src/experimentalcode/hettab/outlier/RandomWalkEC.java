@@ -7,8 +7,9 @@ import org.apache.commons.math.stat.descriptive.moment.GeometricMean;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -17,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -43,7 +45,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * @param <V>
  * @param <D>
  */
-public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger
    */
@@ -87,7 +89,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
   /**
    * Our predicate to obtain the neighbors
    */
-  NeighborSetPredicate.Factory<DatabaseObject> npredf = null;
+  NeighborSetPredicate.Factory<V> npredf = null;
 
   /**
    * The association id to associate the SCORE of an object for the RandomWalkEC
@@ -104,7 +106,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
    * @param c
    * @param z
    */
-  protected RandomWalkEC(DistanceFunction<V, D> distanceFunction, NeighborSetPredicate.Factory<DatabaseObject> npredf, double alpha, double c, int z) {
+  protected RandomWalkEC(DistanceFunction<V, D> distanceFunction, NeighborSetPredicate.Factory<V> npredf, double alpha, double c, int z) {
     super(distanceFunction);
     this.npredf = npredf;
     this.alpha = alpha;
@@ -113,27 +115,28 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-
-    final NeighborSetPredicate npred = npredf.instantiate(database);
-    DistanceQuery<V, D> distFunc = database.getDistanceQuery(getDistanceFunction());
-    WritableDataStore<Matrix> similarityVectors = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP, Matrix.class);
-    WritableDataStore<List<Pair<DBID, Double>>> simScores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP, List.class);
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<V> relation = getRelation(database);
+    
+    final NeighborSetPredicate npred = npredf.instantiate(relation);
+    DistanceQuery<V, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    WritableDataStore<Matrix> similarityVectors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Matrix.class);
+    WritableDataStore<List<Pair<DBID, Double>>> simScores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, List.class);
 
     // construct the relation Matrix of the ec-graph
-    Matrix E = new Matrix(database.size(), database.size());
+    Matrix E = new Matrix(relation.size(), relation.size());
     int i = 0;
-    for(DBID id : database) {
+    for(DBID id : relation.iterDBIDs()) {
       npred.getNeighborDBIDs(id);
       int j = 0;
-      for(DBID n : database) {
+      for(DBID n : relation.iterDBIDs()) {
         double e;
         if(n.getIntegerID() == id.getIntegerID()) {
           e = 0;
         }
         else {
           double dist = distFunc.distance(id, n).doubleValue();
-          double diff = Math.abs(database.get(id).doubleValue(z) - database.get(n).doubleValue(z));
+          double diff = Math.abs(relation.get(id).doubleValue(z) - relation.get(n).doubleValue(z));
           diff = (Math.pow(diff, alpha));
           diff = (Math.exp(diff));
           diff = (1 / diff);
@@ -149,12 +152,12 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
 
     // compute similarity vector for each Object
     int count = 0;
-    for(DBID id : database) {
-      Matrix Si = new Matrix(1, database.size());
-      Matrix Ei = new Matrix(database.size(), 1);
+    for(DBID id : relation.iterDBIDs()) {
+      Matrix Si = new Matrix(1, relation.size());
+      Matrix Ei = new Matrix(relation.size(), 1);
       Si.transpose();
       // construct Ei
-      for(int l = 0; l < database.size(); l++) {
+      for(int l = 0; l < relation.size(); l++) {
         if(l == count) {
           Ei.set(l, 0, 1.0);
         }
@@ -164,7 +167,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
       }
       Ei.transpose();
       // compute similarity vector
-      Matrix I = Matrix.unitMatrix(database.size());
+      Matrix I = Matrix.unitMatrix(relation.size());
       Matrix R = E.times(c);
       R = I.minus(R);
       R = R.times((1 - c));
@@ -176,11 +179,11 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
 
     // compute the relevance scores between specified objects and its neighbors
 
-    for(DBID id : database) {
+    for(DBID id : relation.iterDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       ArrayList<Pair<DBID, Double>> sim = new ArrayList<Pair<DBID, Double>>();
       for(DBID n : neighbors) {
-        Pair<DBID, Double> p = new Pair<DBID, Double>(n.getID(), cosineSimilarity(similarityVectors.get(id).getColumnVector(0), similarityVectors.get(n).getColumnVector(0)));
+        Pair<DBID, Double> p = new Pair<DBID, Double>(n, cosineSimilarity(similarityVectors.get(id).getColumnVector(0), similarityVectors.get(n).getColumnVector(0)));
         sim.add(p);
       }
       simScores.put(id, sim);
@@ -188,8 +191,8 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
     }
 
     MinMax<Double> minmax = new MinMax<Double>();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : database) {
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    for(DBID id : relation.iterDBIDs()) {
       List<Pair<DBID, Double>> simScore = simScores.get(id);
       GeometricMean gm = new GeometricMean();
       for(Pair<DBID, Double> pair : simScore) {
@@ -230,7 +233,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
-    NeighborSetPredicate.Factory<DatabaseObject> npred = null;
+    NeighborSetPredicate.Factory<V> npred = null;
 
     double alpha = 0.0;
 
@@ -292,7 +295,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
      * @return
      */
     protected void configNeighborPredicate(Parameterization config) {
-      final ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>> param = new ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
+      final ObjectParameter<NeighborSetPredicate.Factory<V>> param = new ObjectParameter<NeighborSetPredicate.Factory<V>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
       if(config.grab(param)) {
         npred = param.instantiateClass(config);
       }
@@ -302,5 +305,10 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
     protected RandomWalkEC<V, D> makeInstance() {
       return new RandomWalkEC<V, D>(distanceFunction, npred, alpha, c, z);
     }
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 }

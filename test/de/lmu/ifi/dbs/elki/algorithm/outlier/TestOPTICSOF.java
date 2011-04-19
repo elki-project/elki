@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class TestOPTICSOF extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testOPTICSOF() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
 
     // Parameterization
     ListParameterization params = new ListParameterization();

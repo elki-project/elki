@@ -15,7 +15,6 @@ import java.util.StringTokenizer;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
  * This class collects various static helper methods.
@@ -367,10 +366,6 @@ public final class Util {
       i++;
     }
     DoubleVector projectedVector = new DoubleVector(newAttributes);
-    DBID id = v.getID();
-    if(id != null) {
-      projectedVector.setID(id);
-    }
     return projectedVector;
   }
 
@@ -399,10 +394,6 @@ public final class Util {
       }
     }
     SparseFloatVector projectedVector = new SparseFloatVector(values, selectedAttributes.cardinality());
-    DBID id = v.getID();
-    if(id != null) {
-      projectedVector.setID(id);
-    }
     return projectedVector;
   }
 

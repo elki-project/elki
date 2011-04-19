@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  * @param <D> the type of Distance used in the MkMaxTree
  */
-class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
+class MkMaxTreeNode<O, D extends Distance<D>>
     extends AbstractMTreeNode<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
     private static final long serialVersionUID = 1;
 

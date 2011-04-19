@@ -9,7 +9,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends AbstractVisualization<DatabaseObject> implements DragableArea.DragListener {
+public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends AbstractVisualization implements DragableArea.DragListener {
   /**
    * The logger for this class.
    */
@@ -347,7 +346,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
    */
-  public static class Factory extends AbstractVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -357,13 +356,13 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+    public void addVisualizers(VisualizerContext context, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
+          final VisualizationTask task = new VisualizationTask(NAME, context, co, null, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
           context.addVisualizer(plot, task);
         }
@@ -377,7 +376,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
 
     @Override
     public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization<DatabaseObject>(this, task, ThumbnailVisualization.ON_SELECTION);
+      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_SELECTION);
     }
 
     @Override

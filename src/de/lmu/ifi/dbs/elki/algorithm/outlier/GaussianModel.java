@@ -2,12 +2,15 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -36,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 @Title("Gaussian Model Outlier Detection")
 @Description("Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.")
-public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -74,24 +77,25 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
     MinMax<Double> mm = new MinMax<Double>();
     // resulting scores
-    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
 
     // Compute mean and covariance Matrix
-    V mean = DatabaseUtil.centroid(database);
+    V mean = DatabaseUtil.centroid(dataQuery);
     // debugFine(mean.toString());
-    Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, mean);
+    Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(dataQuery, mean);
     // debugFine(covarianceMatrix.toString());
     Matrix covarianceTransposed = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
 
     // Normalization factors for Gaussian PDF
-    final double fakt = (1.0 / (Math.sqrt(Math.pow(2 * Math.PI, DatabaseUtil.dimensionality(database)) * covarianceMatrix.det())));
+    final double fakt = (1.0 / (Math.sqrt(Math.pow(2 * Math.PI, DatabaseUtil.dimensionality(dataQuery)) * covarianceMatrix.det())));
 
     // for each object compute Mahalanobis distance
-    for(DBID id : database) {
-      V x = database.get(id);
+    for(DBID id : dataQuery.iterDBIDs()) {
+      V x = dataQuery.get(id);
       Vector x_minus_mean = x.minus(mean).getColumnVector();
       // Gaussian PDF
       final double mDist = x_minus_mean.transposeTimes(covarianceTransposed).times(x_minus_mean).get(0, 0);
@@ -104,7 +108,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     final OutlierScoreMeta meta;
     if(invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
-      for(DBID id : database.getIDs()) {
+      for(DBID id : database.getDBIDs()) {
         oscores.put(id, (max - oscores.get(id)) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);
@@ -114,6 +118,11 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     }
     AnnotationResult<Double> res = new AnnotationFromDataStore<Double>("Gaussian Model Outlier Score", "gaussian-model-outlier", GMOD_PROB, oscores);
     return new OutlierResult(meta, res);
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

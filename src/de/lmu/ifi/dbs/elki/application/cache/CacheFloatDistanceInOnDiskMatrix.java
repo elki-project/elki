@@ -4,18 +4,16 @@ import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -35,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractApplication {
+public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>> extends AbstractApplication {
   /**
    * The logger for this class.
    */
@@ -70,12 +68,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
   /**
    * Holds the database connection to have the algorithm run with.
    */
-  private DatabaseConnection<O> databaseConnection;
-
-  /**
-   * A normalization - per default no normalization is used.
-   */
-  private Normalization<O> normalization = null;
+  private DatabaseConnection databaseConnection;
 
   /**
    * Distance function that is to be cached.
@@ -92,26 +85,24 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    * 
    * @param verbose Verbose flag
    * @param databaseConnection Database connection
-   * @param normalization Normalization
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheFloatDistanceInOnDiskMatrix(boolean verbose, DatabaseConnection<O> databaseConnection, Normalization<O> normalization, DistanceFunction<O, D> distance, File out) {
+  public CacheFloatDistanceInOnDiskMatrix(boolean verbose, DatabaseConnection databaseConnection, DistanceFunction<O, D> distance, File out) {
     super(verbose);
     this.databaseConnection = databaseConnection;
-    this.normalization = normalization;
     this.distance = distance;
     this.out = out;
   }
 
   @Override
   public void run() {
-    Database<O> database = databaseConnection.getDatabase(normalization);
-    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distance);
+    Database database = databaseConnection.getDatabase();
+    Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
+    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distance);
 
-    DBIDs ids = database.getIDs();
     int matrixsize = 0;
-    for(DBID id : ids) {
+    for(DBID id : distanceQuery.getRepresentation().iterDBIDs()) {
       matrixsize = Math.max(matrixsize, id.getIntegerID() + 1);
       if(id.getIntegerID() < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
@@ -126,8 +117,8 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
       throw new AbortException("Error creating output matrix.", e);
     }
 
-    for(DBID id1 : database) {
-      for(DBID id2 : database) {
+    for(DBID id1 : distanceQuery.getRepresentation().iterDBIDs()) {
+      for(DBID id2 : distanceQuery.getRepresentation().iterDBIDs()) {
         if(id2.getIntegerID() >= id1.getIntegerID()) {
           float d = distanceQuery.distance(id1, id2).floatValue();
           if(debugExtraCheckSymmetry) {
@@ -154,16 +145,11 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
     /**
      * Holds the database connection to have the algorithm run with.
      */
-    private DatabaseConnection<O> databaseConnection = null;
-
-    /**
-     * A normalization - per default no normalization is used.
-     */
-    private Normalization<O> normalization = null;
+    private DatabaseConnection databaseConnection = null;
 
     /**
      * Distance function that is to be cached.
@@ -179,14 +165,9 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Database connection parameter
-      final ObjectParameter<DatabaseConnection<O>> dcpar = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      final ObjectParameter<DatabaseConnection> dcpar = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
       if(config.grab(dcpar)) {
         databaseConnection = dcpar.instantiateClass(config);
-      }
-      // Normalization parameter
-      final ObjectParameter<Normalization<O>> npar = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
-      if(config.grab(npar)) {
-        normalization = npar.instantiateClass(config);
       }
       // Distance function parameter
       final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
@@ -203,7 +184,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, D extend
 
     @Override
     protected CacheFloatDistanceInOnDiskMatrix<O, D> makeInstance() {
-      return new CacheFloatDistanceInOnDiskMatrix<O, D>(verbose, databaseConnection, normalization, distance, out);
+      return new CacheFloatDistanceInOnDiskMatrix<O, D>(verbose, databaseConnection, distance, out);
     }
   }
 

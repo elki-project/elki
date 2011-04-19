@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -62,7 +61,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
    * @return the conservative approximated knn distance of the entry
    */
   @Override
-  public <O extends DatabaseObject> D approximateConservativeKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
+  public <O> D approximateConservativeKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
     return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 
@@ -74,7 +73,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
    * @param distanceFunction the distance function
    * @return the progressive approximated knn distance of the entry
    */
-  public <O extends DatabaseObject> D approximateProgressiveKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
+  public <O> D approximateProgressiveKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
     return progressiveApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 

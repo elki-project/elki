@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> Distance type
  */
-public interface DBIDDistanceFunction<D extends Distance<D>> extends DistanceFunction<DatabaseObject,D> {
+public interface DBIDDistanceFunction<D extends Distance<?>> extends DistanceFunction<DBID, D> {
   /**
    * Returns the distance between the two objects specified by their object ids.
    * 

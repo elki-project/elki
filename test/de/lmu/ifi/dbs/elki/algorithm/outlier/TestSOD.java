@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class TestSOD extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testSOD() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
     // Parameterization
     ListParameterization params = new ListParameterization();

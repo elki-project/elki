@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.database.query.distance;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param O Input object type
  * @param D Distance result type
  */
-public interface DistanceQuery<O extends DatabaseObject, D extends Distance<D>> extends DatabaseQuery {
+public interface DistanceQuery<O, D extends Distance<?>> extends DatabaseQuery {
   /**
    * Returns the distance between the two objects specified by their object ids.
    * 
@@ -88,4 +88,11 @@ public interface DistanceQuery<O extends DatabaseObject, D extends Distance<D>> 
    * @return an undefined distance
    */
   public abstract D undefinedDistance();
+  
+  /**
+   * Access the underlying data query.
+   * 
+   * @return data query in use
+   */
+  public abstract Relation<? extends O> getRepresentation();
 }

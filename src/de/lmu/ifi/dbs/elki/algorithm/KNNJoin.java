@@ -6,6 +6,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
@@ -16,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -93,7 +96,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    */
   @Override
   @SuppressWarnings("unchecked")
-  protected DataStore<KNNList<D>> runInTime(Database<V> database) throws IllegalStateException {
+  protected DataStore<KNNList<D>> runInTime(Database database) throws IllegalStateException {
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
@@ -103,16 +106,17 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     }
     SpatialIndex<V, N, E> index = indexes.iterator().next();
     SpatialPrimitiveDistanceFunction<V, D> distFunction = (SpatialPrimitiveDistanceFunction<V, D>) getDistanceFunction();
-    DistanceQuery<V, D> distq = database.getDistanceQuery(getDistanceFunction());
+    DistanceQuery<V, D> distq = getDistanceQuery(database);
+    Relation<? extends V> dataQuery = distq.getRepresentation();
 
-    DBIDs ids = database.getIDs();
+    DBIDs ids = dataQuery.getDBIDs();
 
     WritableDataStore<KNNHeap<D>> knnHeaps = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, KNNHeap.class);
 
     try {
       // data pages of s
       List<E> ps_candidates = index.getLeaves();
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), database.size(), logger) : null;
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), dataQuery.size(), logger) : null;
       IndefiniteProgress pageprog = logger.isVerbose() ? new IndefiniteProgress("Number of processed data pages", logger) : null;
       if(logger.isDebugging()) {
         logger.debugFine("# ps = " + ps_candidates.size());
@@ -221,10 +225,15 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -234,13 +243,13 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    */
   public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
     protected int k;
-    
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID, 1);
       kP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
     }

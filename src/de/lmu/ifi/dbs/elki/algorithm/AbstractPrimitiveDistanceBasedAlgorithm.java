@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -19,11 +18,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has PrimitiveDistanceFunction
  * @apiviz.excludeSubtypes
  * 
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of objects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
+public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -70,7 +69,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O extends Database
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
     protected PrimitiveDistanceFunction<O, D> distanceFunction;
     
     @Override

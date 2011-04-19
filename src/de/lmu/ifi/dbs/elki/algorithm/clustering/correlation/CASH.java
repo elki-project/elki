@@ -1,9 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -20,15 +18,18 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
-import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
+import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -37,7 +38,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -55,7 +56,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides the CASH algorithm, an subspace clustering algorithm based on the
@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the hough transform.")
 @Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
-public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, ParameterizationFunction> {
+public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -168,7 +168,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
   /**
    * The database holding the objects.
    */
-  private Database<ParameterizationFunction> database;
+  private Relation<ParameterizationFunction> rep;
 
   /**
    * Constructor.
@@ -192,21 +192,21 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * Performs the CASH algorithm on the given database.
    */
   @Override
-  protected Clustering<Model> runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
-    this.database = database;
+  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+    rep = getRelation(database);
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("DB size: ").append(database.size());
+      msg.append("DB size: ").append(rep.size());
       msg.append("\nmin Dim: ").append(minDim);
       logger.verbose(msg.toString());
     }
 
     try {
-      processedIDs = DBIDUtil.newHashSet(database.size());
-      noiseDim = database.get(database.iterator().next()).getDimensionality();
+      processedIDs = DBIDUtil.newHashSet(rep.size());
+      noiseDim = rep.get(rep.iterDBIDs().next()).getDimensionality();
 
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", database.size(), logger) : null;
-      Clustering<Model> result = doRun(database, progress);
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", rep.size(), logger) : null;
+      Clustering<Model> result = doRun(rep, progress);
       if(progress != null) {
         progress.ensureCompleted(logger);
       }
@@ -249,10 +249,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @throws ParameterException if the parameter setting is wrong
    * @throws NonNumericFeaturesException if non numeric feature vectors are used
    */
-  private Clustering<Model> doRun(Database<ParameterizationFunction> database, FiniteProgress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
+  private Clustering<Model> doRun(Relation<ParameterizationFunction> database, FiniteProgress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
     Clustering<Model> res = new Clustering<Model>("CASH clustering", "cash-clustering");
 
-    int dim = database.get(database.iterator().next()).getDimensionality();
+    int dim = database.get(database.iterDBIDs().next()).getDimensionality();
 
     // init heap
     DefaultHeap<Integer, CASHInterval> heap = new DefaultHeap<Integer, CASHInterval>(false);
@@ -302,8 +302,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
           basis_dim_minus_1 = determineBasis(interval.centroid());
         }
 
-        Database<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, database);
-        if(db.size() != 0) {
+        if(ids.size() != 0) {
+          MaterializedRelation<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, database);
           // add result of dim-1 to this result
           Clustering<Model> res_dim_minus_1 = doRun(db, progress);
           for(Cluster<Model> cluster : res_dim_minus_1.getAllClusters()) {
@@ -316,7 +316,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       }
       // dim == minDim
       else {
-        LinearEquationSystem les = runDerivator(this.database, dim - 1, interval.getIDs());
+        LinearEquationSystem les = runDerivator(database, dim - 1, interval.getIDs());
         Cluster<Model> c = new Cluster<Model>(interval.getIDs(), new LinearEquationModel(les));
         res.addCluster(c);
         noiseIDs.removeDBIDs(interval.getIDs());
@@ -350,7 +350,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       else if(noiseIDs.size() >= minPts) {
         // TODO: use different class/model for noise, even when LES was
         // computed?
-        LinearEquationSystem les = runDerivator(this.database, dim - 1, noiseIDs);
+        LinearEquationSystem les = runDerivator(rep, dim - 1, noiseIDs);
         Cluster<Model> c = new Cluster<Model>(noiseIDs, new LinearEquationModel(les));
         res.addCluster(c);
         processedIDs.addAll(noiseIDs);
@@ -383,11 +383,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * Initializes the heap with the root intervals.
    * 
    * @param heap the heap to be initialized
-   * @param database the database storing the paramterization functions
+   * @param database the database storing the parameterization functions
    * @param dim the dimensionality of the database
    * @param ids the ids of the database
    */
-  private void initHeap(DefaultHeap<Integer, CASHInterval> heap, Database<ParameterizationFunction> database, int dim, DBIDs ids) {
+  private void initHeap(DefaultHeap<Integer, CASHInterval> heap, Relation<ParameterizationFunction> database, int dim, DBIDs ids) {
     CASHIntervalSplit split = new CASHIntervalSplit(database, minPts);
 
     // determine minimum and maximum function value of all functions
@@ -466,28 +466,23 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @throws UnableToComplyException if an error according to the database
    *         occurs
    */
-  private Database<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Database<ParameterizationFunction> database) throws UnableToComplyException {
-    // build objects and associations
-    List<Pair<ParameterizationFunction, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<ParameterizationFunction, DatabaseObjectMetadata>>(ids.size());
-    DataQuery<DatabaseObjectMetadata> rep = database.getMetadataQuery();
-
+  private MaterializedRelation<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Relation<ParameterizationFunction> database) throws UnableToComplyException {
+    ProxyDatabase proxy = new ProxyDatabase(ids);
+    VectorFieldTypeInformation<ParameterizationFunction> type = VectorFieldTypeInformation.get(ParameterizationFunction.class, basis.getColumnDimensionality());
+    MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<ParameterizationFunction>(proxy, type, ids);
+    proxy.addRepresentation(prep);
+    
+    // Project
     for(DBID id : ids) {
       ParameterizationFunction f = project(basis, database.get(id));
-
-      DatabaseObjectMetadata associations = rep.get(id);
-      Pair<ParameterizationFunction, DatabaseObjectMetadata> oaa = new Pair<ParameterizationFunction, DatabaseObjectMetadata>(f, associations);
-      oaas.add(oaa);
+      prep.set(id, f);
     }
-
-    // insert into db
-    Database<ParameterizationFunction> result = new HashmapDatabase<ParameterizationFunction>(null, null);
-    result.insert(oaas);
 
     if(logger.isDebugging()) {
-      logger.debugFine("db fuer dim " + (dim - 1) + ": " + result.size());
+      logger.debugFine("db fuer dim " + (dim - 1) + ": " + ids.size());
     }
 
-    return result;
+    return prep;
   }
 
   /**
@@ -503,7 +498,6 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     // double[][]{f.getPointCoordinates()}).times(basis);
     Matrix m = f.getRowVector().times(basis);
     ParameterizationFunction f_t = new ParameterizationFunction(m.getColumnPackedCopy());
-    f_t.setID(f.getID());
     return f_t;
   }
 
@@ -627,8 +621,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @param database the database containing the parameterization functions.
    * @return the set of ids belonging to the specified database
    */
-  private ModifiableDBIDs getDatabaseIDs(Database<ParameterizationFunction> database) {
-    return DBIDUtil.newHashSet(database.getIDs());
+  private ModifiableDBIDs getDatabaseIDs(Relation<ParameterizationFunction> database) {
+    return DBIDUtil.newHashSet(database.getDBIDs());
   }
 
   /**
@@ -640,7 +634,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @return an array containing the minimum and maximum function value of all
    *         parameterization functions stored in the specified database
    */
-  private double[] determineMinMaxDistance(Database<ParameterizationFunction> database, int dimensionality) {
+  private double[] determineMinMaxDistance(Relation<ParameterizationFunction> database, int dimensionality) {
     double[] min = new double[dimensionality - 1];
     double[] max = new double[dimensionality - 1];
     Arrays.fill(max, Math.PI);
@@ -648,7 +642,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
     double d_min = Double.POSITIVE_INFINITY;
     double d_max = Double.NEGATIVE_INFINITY;
-    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
       DBID id = it.next();
       ParameterizationFunction f = database.get(id);
       HyperBoundingBox minMax = f.determineAlphaMinMax(box);
@@ -675,9 +669,9 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    *         occurs
    * @throws ParameterException if the parameter setting is wrong
    */
-  private Matrix runDerivator(Database<ParameterizationFunction> database, int dim, CASHInterval interval, ModifiableDBIDs ids) throws UnableToComplyException, ParameterException {
+  private Matrix runDerivator(Relation<ParameterizationFunction> database, int dim, CASHInterval interval, ModifiableDBIDs ids) throws UnableToComplyException, ParameterException {
     // build database for derivator
-    Database<DoubleVector> derivatorDB = buildDerivatorDB(database, interval);
+    Database derivatorDB = buildDerivatorDB(database, interval);
 
     // set the parameters
     ListParameterization parameters = new ListParameterization();
@@ -691,11 +685,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
     Matrix weightMatrix = model.getSimilarityMatrix();
     DoubleVector centroid = new DoubleVector(model.getCentroid());
-    DistanceQuery<DoubleVector, DoubleDistance> df = derivatorDB.getDistanceQuery(new WeightedDistanceFunction(weightMatrix));
+    DistanceQuery<DoubleVector, DoubleDistance> df = QueryUtil.getDistanceQuery(derivatorDB, new WeightedDistanceFunction(weightMatrix));
     DoubleDistance eps = df.getDistanceFactory().parseString("0.25");
 
     ids.addDBIDs(interval.getIDs());
-    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+    // Search for nearby vectors in original database
+    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
       DBID id = it.next();
       DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
       DoubleDistance d = df.distance(v, centroid);
@@ -719,28 +714,25 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @throws UnableToComplyException if an error according to the database
    *         occurs
    */
-  private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database, CASHInterval interval) throws UnableToComplyException {
-    // build objects and associations
-    List<Pair<DoubleVector, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>(database.size());
-    DataQuery<DatabaseObjectMetadata> rep = database.getMetadataQuery();
+  private Database buildDerivatorDB(Relation<ParameterizationFunction> database, CASHInterval interval) throws UnableToComplyException {
+    DBIDs ids = interval.getIDs();
+    ProxyDatabase proxy = new ProxyDatabase(ids);
+    int dim = database.get(ids.iterator().next()).getRowVector().getRowPackedCopy().length;
+    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
+    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
+    proxy.addRepresentation(prep);
 
-    for(DBID id : interval.getIDs()) {
-      DatabaseObjectMetadata associations = rep.get(id);
+    // Project
+    for(DBID id : ids) {
       DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-      Pair<DoubleVector, DatabaseObjectMetadata> oaa = new Pair<DoubleVector, DatabaseObjectMetadata>(v, associations);
-      oaas.add(oaa);
+      prep.set(id, v);
     }
-
-    // insert into db
-    Database<DoubleVector> result = new HashmapDatabase<DoubleVector>(null, null);
-    result.setObjectFactory(database.getObjectFactory());
-    result.insert(oaas);
 
     if(logger.isDebugging()) {
-      logger.debugFine("db fuer derivator : " + result.size());
+      logger.debugFine("db fuer derivator : " + prep.size());
     }
 
-    return result;
+    return proxy;
   }
 
   /**
@@ -753,10 +745,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @param dimensionality the dimensionality of the subspace
    * @return a basis of the found subspace
    */
-  private LinearEquationSystem runDerivator(Database<ParameterizationFunction> database, int dimensionality, DBIDs ids) {
+  private LinearEquationSystem runDerivator(Relation<ParameterizationFunction> database, int dimensionality, DBIDs ids) {
     try {
       // build database for derivator
-      Database<DoubleVector> derivatorDB = buildDerivatorDB(database, ids);
+      Database derivatorDB = buildDerivatorDB(database, ids);
 
       ListParameterization parameters = new ListParameterization();
       parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
@@ -788,24 +780,25 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * @throws UnableToComplyException if initialization of the database is not
    *         possible
    */
-  private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database, DBIDs ids) throws UnableToComplyException {
-    // build objects and associations
-    List<Pair<DoubleVector, DatabaseObjectMetadata>> oaas = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>(database.size());
-    DataQuery<DatabaseObjectMetadata> rep = database.getMetadataQuery();
+  private Database buildDerivatorDB(Relation<ParameterizationFunction> database, DBIDs ids) throws UnableToComplyException {
+    ProxyDatabase proxy = new ProxyDatabase(ids);
+    int dim = database.get(ids.iterator().next()).getRowVector().getRowPackedCopy().length;
+    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
+    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
+    proxy.addRepresentation(prep);
 
+    // Project
     for(DBID id : ids) {
-      DatabaseObjectMetadata associations = rep.get(id);
       DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-      Pair<DoubleVector, DatabaseObjectMetadata> oaa = new Pair<DoubleVector, DatabaseObjectMetadata>(v, associations);
-      oaas.add(oaa);
+      prep.set(id, v);
     }
 
-    // insert into db
-    Database<DoubleVector> result = new HashmapDatabase<DoubleVector>(null, null);
-    result.setObjectFactory(database.getObjectFactory());
-    result.insert(oaas);
+    return proxy;
+  }
 
-    return result;
+  @Override
+  public VectorFieldTypeInformation<? super ParameterizationFunction> getInputTypeRestriction() {
+    return VectorFieldTypeInformation.get(ParameterizationFunction.class);
   }
 
   @Override

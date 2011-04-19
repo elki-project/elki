@@ -8,9 +8,12 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -116,7 +119,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * 
    */
   @Override
-  protected ClusterOrderResult<D> runInTime(Database<NV> database) throws IllegalStateException {
+  protected ClusterOrderResult<D> runInTime(Database database) throws IllegalStateException {
     Collection<DeLiCluTree<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTree.class);
     if(indexes.size() != 1) {
       throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes, expected exactly one.");
@@ -128,24 +131,26 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     }
     @SuppressWarnings("unchecked")
     SpatialPrimitiveDistanceFunction<NV, D> distFunction = (SpatialPrimitiveDistanceFunction<NV, D>) getDistanceFunction();
-
+    
+    Relation<NV> dataQuery = getRelation(database);
+    
     // first do the knn-Join
     if(logger.isVerbose()) {
       logger.verbose("knnJoin...");
     }
     DataStore<KNNList<D>> knns = knnJoin.run(database);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("DeLiClu", database.size(), logger) : null;
-    int size = database.size();
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("DeLiClu", dataQuery.size(), logger) : null;
+    final int size = dataQuery.size();
 
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("DeLiClu Clustering", "deliclu-clustering");
     heap = new UpdatableHeap<SpatialObjectPair>();
 
     // add start object to cluster order and (root, root) to priority queue
-    DBID startID = getStartObject(database);
+    DBID startID = getStartObject(dataQuery);
     clusterOrder.add(startID, null, distFunction.getDistanceFactory().infiniteDistance());
     int numHandled = 1;
-    index.setHandled(database.get(startID));
+    index.setHandled(startID, dataQuery.get(startID));
     SpatialEntry rootEntry = index.getRootEntry();
     SpatialObjectPair spatialObjectPair = new SpatialObjectPair(distFunction.getDistanceFactory().nullDistance(), rootEntry, rootEntry, true);
     heap.add(spatialObjectPair);
@@ -165,12 +170,13 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
         // set handled
         LeafEntry e1 = (LeafEntry) dataPair.entry1;
         LeafEntry e2 = (LeafEntry) dataPair.entry2;
-        List<TreeIndexPathComponent<DeLiCluEntry>> path = index.setHandled(database.get(e1.getDBID()));
+        final DBID e1id = e1.getDBID();
+        List<TreeIndexPathComponent<DeLiCluEntry>> path = index.setHandled(e1id, dataQuery.get(e1id));
         if(path == null) {
-          throw new RuntimeException("snh: parent(" + e1.getDBID() + ") = null!!!");
+          throw new RuntimeException("snh: parent(" + e1id + ") = null!!!");
         }
         // add to cluster order
-        clusterOrder.add(e1.getDBID(), e2.getDBID(), dataPair.distance);
+        clusterOrder.add(e1id, e2.getDBID(), dataPair.distance);
         numHandled++;
         // reinsert expanded leafs
         reinsertExpanded(distFunction, index, path, knns);
@@ -187,7 +193,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
       if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
         logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
         ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
-        OPTICSXi.extractClusters(distanceClusterOrder, database, ixi, minpts);
+        OPTICSXi.extractClusters(distanceClusterOrder, dataQuery, ixi, minpts);
       }
       else {
         logger.verbose("Xi cluster extraction only supported for number distances!");
@@ -199,17 +205,15 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   /**
    * Returns the id of the start object for the run method.
    * 
-   * @param database the database storing the objects
+   * @param rep the database storing the objects
    * @return the id of the start object for the run method
    */
-  private DBID getStartObject(Database<NV> database) {
-    Iterator<DBID> it = database.iterator();
+  private DBID getStartObject(Relation<NV> database) {
+    Iterator<DBID> it = database.iterDBIDs();
     if(!it.hasNext()) {
       return null;
     }
-    else {
-      return it.next();
-    }
+    return it.next();
   }
 
   /**
@@ -346,6 +350,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
         }
       }
     }
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super NV> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

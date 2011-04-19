@@ -1,15 +1,16 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
@@ -22,6 +23,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -37,6 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize the bounding sphere of a metric index.
@@ -51,7 +54,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @param <E> Tree entry type
  */
 // TODO: listen for tree changes!
-public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<NV, D, N, E>, E extends MTreeEntry<D>> extends P2DVisualization<NV> implements DataStoreListener<NV> {
+public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<NV, D, N, E>, E extends MTreeEntry<D>> extends P2DVisualization<NV> implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -184,10 +187,9 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    * @param depth Current depth
    */
   private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<NV, D, ? extends N, E> mtree, E entry, int depth) {
-    Database<? extends NV> database = context.getDatabase();
     DBID roid = entry.getRoutingObjectID();
     if(roid != null) {
-      NV ro = database.get(roid);
+      NV ro = rep.get(roid);
       D rad = entry.getCoveringRadius();
 
       final Element r;
@@ -224,7 +226,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
+  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
     synchronizedRedraw();
   }
 
@@ -238,15 +240,15 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    * 
    * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Fill parameter.
      */
     protected boolean fill = false;
-    
+
     /**
      * Constructor.
-     *
+     * 
      * @param fill
      */
     public Factory(boolean fill) {
@@ -255,14 +257,16 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      // FIXME: check for vector spaces - essentially, we need a "good" database, too!
-      ArrayList<AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
-      for(AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>> tree : trees) {
-        if(canVisualize(tree)) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, tree, this, P2DVisualization.class);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
-          context.addVisualizer(tree, task);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        ArrayList<AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
+        for(AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>> tree : trees) {
+          if(canVisualize(tree)) {
+            final VisualizationTask task = new VisualizationTask(NAME, context, tree, rep, this, P2DVisualization.class);
+            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
+            context.addVisualizer(tree, task);
+          }
         }
       }
     }
@@ -301,5 +305,5 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
         return new Factory<NV>(fill);
       }
     }
-}
+  }
 }

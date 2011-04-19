@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -28,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 /**
  * Simple distanced based outlier detection algorithm. User has to specify two
  * parameters An object is flagged as an outlier if at least a fraction p of all
- * data objects has a distance aboce d from c
+ * data objects has a distance above d from c
  * <p>
  * Reference: E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based
  * Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases
@@ -48,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("DBOD: Distance Based Outlier Detection")
 @Description("If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier")
 @Reference(authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
-public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
+public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
   /**
    * The logger for this class.
    */
@@ -78,22 +77,22 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   }
 
   @Override
-  protected DataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D neighborhoodSize) {
+  protected DataStore<Double> computeOutlierScores(Database database, DistanceQuery<O, D> distFunc, D neighborhoodSize) {
     // maximum number of objects in the D-neighborhood of an outlier
-    int m = (int) ((database.size()) * (1 - p));
+    int m = (int) ((distFunc.getRepresentation().size()) * (1 - p));
 
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(distFunc.getRepresentation().getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     if(logger.isVerbose()) {
       logger.verbose("computing outlier flag");
     }
 
-    FiniteProgress progressOFlags = logger.isVerbose() ? new FiniteProgress("DBOutlier for objects", database.size(), logger) : null;
+    FiniteProgress progressOFlags = logger.isVerbose() ? new FiniteProgress("DBOutlier for objects", distFunc.getRepresentation().size(), logger) : null;
     int counter = 0;
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, m, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(knnQuery != null) {
-      for(DBID id : database) {
+      for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
         counter++;
         final List<DistanceResultPair<D>> knns = knnQuery.getKNNForDBID(id, m);
         if(logger.isDebugging()) {
@@ -114,9 +113,9 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
     }
     else {
       // range query for each object. stop if m objects are found
-      for(DBID id : database) {
+      for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
         counter++;
-        Iterator<DBID> iterator = database.iterator();
+        Iterator<DBID> iterator = distFunc.getRepresentation().iterDBIDs();
         int count = 0;
         while(iterator.hasNext() && count < m) {
           DBID currentID = iterator.next();
@@ -159,7 +158,7 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
     protected double p = 0.0;
 
     @Override

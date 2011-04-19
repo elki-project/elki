@@ -1,9 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
@@ -71,8 +73,8 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
   }
 
   @Override
-  public Class<? super NumberVector<?, ?>> getInputDatatype() {
-    return NumberVector.class;
+  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
@@ -81,7 +83,7 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Database<T> database) {
+  public <T extends NumberVector<?, ?>> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
     return new PrimitiveDistanceSimilarityQuery<T, DoubleDistance>(database, this, this);
   }
 

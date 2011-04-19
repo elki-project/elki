@@ -3,7 +3,7 @@
  * 
  *  <p>{@link de.lmu.ifi.dbs.elki.KDDTask} is the main class of the ELKI-Framework
  *  for command-line interaction. It will setup a
- *  {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection},
+ *  {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection DatabaseConnection},
  *  run an {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm} on it and pass the
  *  result to a {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHandler}.</p>
  *  

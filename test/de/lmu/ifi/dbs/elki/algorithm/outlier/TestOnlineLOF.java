@@ -4,18 +4,20 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -23,9 +25,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Tests the OnlineLOF algorithm. Compares the result of the static LOF
@@ -67,7 +69,7 @@ public class TestOnlineLOF implements JUnit4Test {
   @SuppressWarnings("unchecked")
   @Test
   public void testOnlineLOF() throws UnableToComplyException {
-    Database<DoubleVector> db = getDatabase();
+    Database db = getDatabase();
 
     // 1. Run LOF
     LOF<DoubleVector, DoubleDistance> lof = new LOF<DoubleVector, DoubleDistance>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
@@ -80,7 +82,7 @@ public class TestOnlineLOF implements JUnit4Test {
     AnnotationResult<Double> scores1 = result1.getScores();
     AnnotationResult<Double> scores2 = result2.getScores();
 
-    for(DBID id : db.getIDs()) {
+    for(DBID id : db.getDBIDs()) {
       Double lof1 = scores1.getValueFor(id);
       Double lof2 = scores2.getValueFor(id);
       assertTrue("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " + lof2, lof1.equals(lof2));
@@ -91,22 +93,26 @@ public class TestOnlineLOF implements JUnit4Test {
    * Run OnlineLOF (with insertions and removals) on database.
    */
   @SuppressWarnings("unchecked")
-  private static OutlierResult runOnlineLOF(Database<DoubleVector> db) throws UnableToComplyException {
+  private static OutlierResult runOnlineLOF(Database db) throws UnableToComplyException {
+    Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+
     // setup algorithm
     OnlineLOF<DoubleVector, DoubleDistance> lof = new OnlineLOF<DoubleVector, DoubleDistance>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
-
+    
     // run OnlineLOF on database
     OutlierResult result = lof.run(db);
 
     // insert new objects
-    List<Pair<DoubleVector, DatabaseObjectMetadata>> insertions = new ArrayList<Pair<DoubleVector, DatabaseObjectMetadata>>();
-    DoubleVector o = db.get(db.getIDs().iterator().next());
+    ArrayList<Object> insertions = new ArrayList<Object>();
+    DoubleVector o = DatabaseUtil.assumeVectorField(rep).getFactory();
     Random random = new Random(seed);
     for(int i = 0; i < size; i++) {
       DoubleVector obj = o.randomInstance(random);
-      insertions.add(new Pair<DoubleVector, DatabaseObjectMetadata>(obj, new DatabaseObjectMetadata()));
+      insertions.add(obj);
     }
-    DBIDs deletions = db.insert(insertions);
+    BundleMeta meta = new BundleMeta();
+    meta.add(rep.getDataTypeInformation());
+    DBIDs deletions = db.insert(new MultipleObjectsBundle(meta , insertions));
 
     // delete objects
     db.delete(deletions);
@@ -117,18 +123,18 @@ public class TestOnlineLOF implements JUnit4Test {
   /**
    * Returns the database.
    */
-  private static Database<DoubleVector> getDatabase() {
+  private static Database getDatabase() {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
-    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
+    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
     params.failOnErrors();
     if(params.hasUnusedParameters()) {
       fail("Unused parameters: " + params.getRemainingParameters());
     }
 
     // get database
-    Database<DoubleVector> db = dbconn.getDatabase(null);
+    Database db = dbconn.getDatabase();
     return db;
   }
 

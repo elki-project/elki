@@ -19,7 +19,7 @@ public class DetailViewSelectedEvent extends ActionEvent {
   /**
    * Parent overview plot.
    */
-  OverviewPlot<?> overview;
+  OverviewPlot overview;
 
   /**
    * X Coordinate
@@ -41,7 +41,7 @@ public class DetailViewSelectedEvent extends ActionEvent {
    * @param x x click
    * @param y y click
    */
-  public DetailViewSelectedEvent(OverviewPlot<?> source, int id, String command, int modifiers, double x, double y) {
+  public DetailViewSelectedEvent(OverviewPlot source, int id, String command, int modifiers, double x, double y) {
     super(source, id, command, modifiers);
     this.overview = source;
     this.x = x;

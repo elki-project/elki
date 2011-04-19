@@ -3,11 +3,11 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
@@ -34,12 +34,13 @@ public class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distan
   /**
    * Constructor.
    * 
+   * @param rep Representation to use
    * @param index Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public SpatialIndexKNNQuery(Database<? extends O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    super(database, distanceQuery);
+  public SpatialIndexKNNQuery(Relation<? extends O> rep, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
+    super(rep, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;
   }
@@ -51,7 +52,7 @@ public class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distan
 
   @Override
   public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
-    return getKNNForObject(database.get(id), k);
+    return getKNNForObject(rep.get(id), k);
   }
   
   @Override

@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -16,17 +15,15 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
  * @apiviz.stereotype factory
  * @apiviz.uses Visualization - - «create»
  * @apiviz.uses VisualizationTask - - «create»
- * 
- * @param <O> object type
  */
-public interface VisFactory<O extends DatabaseObject> extends Parameterizable {
+public interface VisFactory extends Parameterizable {
   /**
    * Add visualizers for the given result (tree) to the context.
    * 
    * @param context Context to work with
    * @param result Result to process
    */
-  public void addVisualizers(VisualizerContext<? extends O> context, Result result);
+  public void addVisualizers(VisualizerContext context, Result result);
 
   /**
    * Produce a visualization instance for the given task

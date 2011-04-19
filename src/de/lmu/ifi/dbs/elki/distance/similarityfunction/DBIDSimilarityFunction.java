@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> distance type
  */
-public interface DBIDSimilarityFunction<D extends Distance<D>> extends SimilarityFunction<DatabaseObject, D> {
+public interface DBIDSimilarityFunction<D extends Distance<D>> extends SimilarityFunction<DBID, D> {
   /**
    * Computes the similarity between two given DatabaseObjects according to this
    * similarity function.

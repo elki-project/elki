@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 
 /**
  * Database ID object.
@@ -16,8 +15,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * 
  * @apiviz.landmark
  */
-// TODO: remove "implements DatabaseObject", getID and setID.
-public interface DBID extends DatabaseObject, Comparable<DBID>, ArrayStaticDBIDs {
+public interface DBID extends Comparable<DBID>, ArrayStaticDBIDs {
   /**
    * Return the integer value of the object ID, if possible.
    * 

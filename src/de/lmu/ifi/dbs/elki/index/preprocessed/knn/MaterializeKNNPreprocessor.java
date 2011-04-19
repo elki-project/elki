@@ -3,10 +3,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.EventListenerList;
-
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -15,16 +11,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.IndexFactory;
-import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNChangeEvent.Type;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -32,12 +23,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
@@ -57,32 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorIndex<O, List<DistanceResultPair<D>>> implements KNNIndex<O> {
+public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D> {
   /**
    * Logger to use.
    */
   private static final Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
-
-  /**
-   * The query k value.
-   */
-  final protected int k;
-
-  /**
-   * The distance function to be used.
-   */
-  final protected DistanceFunction<? super O, D> distanceFunction;
-
-  /**
-   * The database to preprocess.
-   */
-  final protected Database<O> database;
-
-  /**
-   * The distance query we used.
-   */
-  // TODO: remove?
-  protected final DistanceQuery<O, D> distanceQuery;
 
   /**
    * KNNQuery instance to use.
@@ -90,36 +54,28 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   protected final KNNQuery<O, D> knnQuery;
 
   /**
-   * Holds the listener.
-   */
-  private EventListenerList listenerList = new EventListenerList();
-
-  /**
    * Constructor with preprocessing step.
    * 
-   * @param database database to preprocess
+   * @param rep Representation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MaterializeKNNPreprocessor(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k) {
-    this(database, distanceFunction, k, true);
+  public MaterializeKNNPreprocessor(Relation<O> rep, DistanceFunction<? super O, D> distanceFunction, int k) {
+    this(rep, distanceFunction, k, true);
   }
   
   /**
    * Constructor.
    * 
-   * @param database database to preprocess
+   * @param rep Representation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  protected MaterializeKNNPreprocessor(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, boolean preprocess) {
-    this.database = database;
-    this.distanceFunction = distanceFunction;
-    this.distanceQuery = database.getDistanceQuery(distanceFunction);
-    this.k = k;
+  protected MaterializeKNNPreprocessor(Relation<O> rep, DistanceFunction<? super O, D> distanceFunction, int k, boolean preprocess) {
+    super(rep, distanceFunction, k);
     // take a linear scan to ensure that the query is "up to date" in case of
     // dynamic updates
-    this.knnQuery = new LinearScanKNNQuery<O, D>(database, distanceQuery);
+    this.knnQuery = new LinearScanKNNQuery<O, D>(rep, distanceQuery);
     
     if (preprocess) {
       preprocess();
@@ -129,10 +85,11 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   /**
    * The actual preprocessing step.
    */
+  @Override
   protected void preprocess() {
-    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(database.getIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(rep.getDBIDs());
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
 
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
@@ -160,36 +117,23 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   @Override
-  public final void insert(O object) {
-    ArrayDBIDs ids = DBIDUtil.newArray(1);
-    ids.add(object.getID());
+  public final void insert(DBID id, O object) {
+    objectsInserted(id);
+  }
+
+  @Override
+  public void insertAll(ArrayDBIDs ids, List<O> objects) {
     objectsInserted(ids);
   }
 
   @Override
-  public void insert(List<O> objects) {
-    // update the materialized neighbors
-    ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
-    for(O o : objects) {
-      ids.add(o.getID());
-    }
-    objectsInserted(ids);
-  }
-
-  @Override
-  public boolean delete(O object) {
-    ArrayDBIDs ids = DBIDUtil.newArray(1);
-    ids.add(object.getID());
-    objectsRemoved(ids);
+  public boolean delete(DBID id) {
+    objectsRemoved(id);
     return true;
   }
 
   @Override
-  public void delete(List<O> objects) {
-    ArrayDBIDs ids = DBIDUtil.newArray(objects.size());
-    for(O o : objects) {
-      ids.add(o.getID());
-    }
+  public void deleteAll(DBIDs ids) {
     objectsRemoved(ids);
   }
 
@@ -199,16 +143,17 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * 
    * @param ids the ids of the newly inserted objects
    */
-  protected void objectsInserted(ArrayDBIDs ids) {
+  protected void objectsInserted(DBIDs ids) {
     StepProgress stepprog = getLogger().isVerbose() ? new StepProgress(3) : null;
 
+    ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // materialize the new kNNs
     if(stepprog != null) {
       stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs.", getLogger());
     }
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
-    for(int i = 0; i < ids.size(); i++) {
-      DBID id = ids.get(i);
+    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(aids, k);
+    for(int i = 0; i < aids.size(); i++) {
+      DBID id = aids.get(i);
       storage.put(id, kNNList.get(i));
     }
 
@@ -239,7 +184,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    */
   private ArrayDBIDs updateKNNsAfterInsertion(DBIDs ids) {
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
-    DBIDs oldids = DBIDUtil.difference(database.getIDs(), ids);
+    DBIDs oldids = DBIDUtil.difference(rep.getDBIDs(), ids);
     for(DBID id1 : oldids) {
       List<DistanceResultPair<D>> kNNs = storage.get(id1);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
@@ -247,7 +192,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
       List<DistanceResultPair<D>> newKNNs = new ArrayList<DistanceResultPair<D>>();
       KNNHeap<D> heap = null;
       for(DBID id2 : ids) {
-        D dist = database.getDistanceQuery(distanceFunction).distance(id1, id2);
+        D dist = distanceQuery.distance(id1, id2);
         if(dist.compareTo(knnDist) <= 0) {
           if(heap == null) {
             heap = new KNNHeap<D>(k);
@@ -275,7 +220,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   private ArrayDBIDs updateKNNsAfterDeletion(DBIDs ids) {
     TreeSetModifiableDBIDs idsSet = DBIDUtil.newTreeSet(ids);
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
-    for(DBID id1 : database.getIDs()) {
+    for(DBID id1 : rep.getDBIDs()) {
       List<DistanceResultPair<D>> kNNs = storage.get(id1);
       for(DistanceResultPair<D> kNN : kNNs) {
         if(idsSet.contains(kNN.second)) {
@@ -301,7 +246,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * 
    * @param ids the ids of the removed objects
    */
-  protected void objectsRemoved(ArrayDBIDs ids) {
+  protected void objectsRemoved(DBIDs ids) {
     StepProgress stepprog = getLogger().isVerbose() ? new StepProgress(3) : null;
 
     // delete the materialized (old) kNNs
@@ -367,34 +312,6 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   /**
-   * Get the distance factory.
-   * 
-   * @return distance factory
-   */
-  public D getDistanceFactory() {
-    return distanceFunction.getDistanceFactory();
-  }
-
-  /**
-   * The distance query we used.
-   * 
-   * @return Distance query
-   */
-  // TODO: remove?
-  public DistanceQuery<O, D> getDistanceQuery() {
-    return distanceQuery;
-  }
-
-  /**
-   * Get the value of 'k' supported by this preprocessor.
-   * 
-   * @return k
-   */
-  public int getK() {
-    return k;
-  }
-
-  /**
    * Extracts and removes the DBIDs in the given collections.
    * 
    * @param extraxt a list of lists of DistanceResultPair to extract
@@ -437,40 +354,6 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     listenerList.remove(KNNListener.class, l);
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceFunction<? super O, S> distanceFunction, Object... hints) {
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      return null;
-    }
-    // k max supported?
-    for(Object hint : hints) {
-      if(hint instanceof Integer) {
-        if(((Integer) hint) > k) {
-          return null;
-        }
-      }
-    }
-    return new PreprocessorKNNQuery<O, S>(database, (MaterializeKNNPreprocessor<O, S>) this);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(Database<O> database, DistanceQuery<O, S> distanceQuery, Object... hints) {
-    if(!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
-      return null;
-    }
-    // k max supported?
-    for(Object hint : hints) {
-      if(hint instanceof Integer) {
-        if(((Integer) hint) > k) {
-          return null;
-        }
-      }
-    }
-    return new PreprocessorKNNQuery<O, S>(database, (MaterializeKNNPreprocessor<O, S>) this);
-  }
-
   @Override
   public String getLongName() {
     return "kNN Preprocessor";
@@ -498,39 +381,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O extends DatabaseObject, D extends Distance<D>> implements IndexFactory<O, KNNIndex<O>> {
-    /**
-     * Parameter to specify the number of nearest neighbors of an object to be
-     * materialized. must be an integer greater than 1.
-     * <p>
-     * Key: {@code -materialize.k}
-     * </p>
-     */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("materialize.k", "The number of nearest neighbors of an object to be materialized.");
-
-    /**
-     * Holds the value of {@link #K_ID}.
-     */
-    protected int k;
-
-    /**
-     * Parameter to indicate the distance function to be used to ascertain the
-     * nearest neighbors.
-     * <p/>
-     * <p>
-     * Default value: {@link EuclideanDistanceFunction}
-     * </p>
-     * <p>
-     * Key: {@code materialize.distance}
-     * </p>
-     */
-    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("materialize.distance", "the distance function to materialize the nearest neighbors");
-
-    /**
-     * Hold the distance function to be used.
-     */
-    protected DistanceFunction<? super O, D> distanceFunction;
-
+  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D> {
     /**
      * Index factory.
      * 
@@ -538,36 +389,15 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * @param distanceFunction distance function
      */
     public Factory(int k, DistanceFunction<? super O, D> distanceFunction) {
-      super();
-      this.k = k;
-      this.distanceFunction = distanceFunction;
+      super(k, distanceFunction);
     }
 
     @Override
-    public MaterializeKNNPreprocessor<O, D> instantiate(Database<O> database) {
-      MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<O, D>(database, distanceFunction, k);
+    public MaterializeKNNPreprocessor<O, D> instantiate(Relation<O> representation) {
+      MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<O, D>(representation, distanceFunction, k);
       return instance;
     }
 
-    /**
-     * Get the distance function.
-     * 
-     * @return Distance function
-     */
-    // TODO: hide this?
-    public DistanceFunction<? super O, D> getDistanceFunction() {
-      return distanceFunction;
-    }
-
-    /**
-     * Get the distance factory.
-     * 
-     * @return Distance factory
-     */
-    public D getDistanceFactory() {
-      return distanceFunction.getDistanceFactory();
-    }
-  
     /**
      * Parameterization class.
      * 
@@ -575,33 +405,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
-      /**
-       * Holds the value of {@link #K_ID}.
-       */
-      protected int k;
-
-      /**
-       * Hold the distance function to be used.
-       */
-      protected DistanceFunction<? super O, D> distanceFunction;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        // number of neighbors
-        final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
-        if(config.grab(kP)) {
-          k = kP.getValue();
-        }
-
-        // distance function
-        final ObjectParameter<DistanceFunction<? super O, D>> distanceFunctionP = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-        if(config.grab(distanceFunctionP)) {
-          distanceFunction = distanceFunctionP.instantiateClass(config);
-        }
-      }
-
+    public static class Parameterizer<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
       protected Factory<O,D> makeInstance() {
         return new Factory<O,D>(k, distanceFunction);

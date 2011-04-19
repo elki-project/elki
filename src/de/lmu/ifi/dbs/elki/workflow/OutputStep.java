@@ -3,9 +3,7 @@ package de.lmu.ifi.dbs.elki.workflow;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
@@ -23,21 +21,19 @@ import de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer;
  * 
  * @apiviz.uses Result
  * @apiviz.has ResultHandler
- * 
- * @param <O> database object type
  */
-public class OutputStep<O extends DatabaseObject> implements WorkflowStep {
+public class OutputStep implements WorkflowStep {
   /**
    * Output handler.
    */
-  private List<ResultHandler<O, Result>> resulthandlers = null;
+  private List<ResultHandler<Result>> resulthandlers = null;
 
   /**
    * Constructor.
    * 
    * @param resulthandlers Result handlers to use
    */
-  public OutputStep(List<ResultHandler<O, Result>> resulthandlers) {
+  public OutputStep(List<ResultHandler<Result>> resulthandlers) {
     super();
     this.resulthandlers = resulthandlers;
   }
@@ -47,15 +43,10 @@ public class OutputStep<O extends DatabaseObject> implements WorkflowStep {
    * 
    * @param result Result to run on
    * @param db Database
-   * @param normalizationUndo Flag to undo normalization
-   * @param normalization Normalization
    */
-  public void runResultHandlers(Result result, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
+  public void runResultHandlers(Result result, Database db) {
     // Run result handlers
-    for(ResultHandler<O, Result> resulthandler : resulthandlers) {
-      if(normalizationUndo) {
-        resulthandler.setNormalization(normalization);
-      }
+    for(ResultHandler<Result> resulthandler : resulthandlers) {
       resulthandler.processResult(db, result);
     }
   }
@@ -63,12 +54,11 @@ public class OutputStep<O extends DatabaseObject> implements WorkflowStep {
   /**
    * Get a default handler list containing a {@link ResultWriter}.
    * 
-   * @param <O> Object type
    * @return Result handler list
    */
-  public static <O extends DatabaseObject> ArrayList<Class<? extends ResultHandler<O, Result>>> defaultWriter() {
-    ArrayList<Class<? extends ResultHandler<O, Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<O, Result>>>(1);
-    final Class<ResultHandler<O, Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultWriter.class, ResultHandler.class);
+  public static ArrayList<Class<? extends ResultHandler<Result>>> defaultWriter() {
+    ArrayList<Class<? extends ResultHandler<Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<Result>>>(1);
+    final Class<ResultHandler<Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultWriter.class, ResultHandler.class);
     defaultHandlers.add(rwcls);
     return defaultHandlers;
   }
@@ -76,12 +66,11 @@ public class OutputStep<O extends DatabaseObject> implements WorkflowStep {
   /**
    * Get a default handler list containing a {@link ResultVisualizer}.
    * 
-   * @param <O> Object type
    * @return Result handler list
    */
-  public static <O extends DatabaseObject> ArrayList<Class<? extends ResultHandler<O, Result>>> defaultVisualizer() {
-    ArrayList<Class<? extends ResultHandler<O, Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<O, Result>>>(1);
-    final Class<ResultHandler<O, Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultVisualizer.class, ResultHandler.class);
+  public static ArrayList<Class<? extends ResultHandler<Result>>> defaultVisualizer() {
+    ArrayList<Class<? extends ResultHandler<Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<Result>>>(1);
+    final Class<ResultHandler<Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultVisualizer.class, ResultHandler.class);
     defaultHandlers.add(rwcls);
     return defaultHandlers;
   }
@@ -93,25 +82,25 @@ public class OutputStep<O extends DatabaseObject> implements WorkflowStep {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Output handlers.
      */
-    private List<ResultHandler<O, Result>> resulthandlers = null;
+    private List<ResultHandler<Result>> resulthandlers = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // result handlers
-      final ObjectListParameter<ResultHandler<O, Result>> resultHandlerParam = new ObjectListParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class);
+      final ObjectListParameter<ResultHandler<Result>> resultHandlerParam = new ObjectListParameter<ResultHandler<Result>>(OptionID.RESULT_HANDLER, ResultHandler.class);
       if(config.grab(resultHandlerParam)) {
         resulthandlers = resultHandlerParam.instantiateClasses(config);
       }
     }
 
     @Override
-    protected OutputStep<O> makeInstance() {
-      return new OutputStep<O>(resulthandlers);
+    protected OutputStep makeInstance() {
+      return new OutputStep(resulthandlers);
     }
   }
 }

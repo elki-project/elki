@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -24,7 +24,7 @@ public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processDatabase(Database<? extends V> database) {
+  public Matrix processDatabase(Relation<? extends V> database) {
     return DatabaseUtil.covarianceMatrix(database);
   }
 
@@ -36,7 +36,7 @@ public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processIds(DBIDs ids, Database<? extends V> database) {
+  public Matrix processIds(DBIDs ids, Relation<? extends V> database) {
     return DatabaseUtil.covarianceMatrix(database, ids);
   }
 }

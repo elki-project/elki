@@ -13,13 +13,14 @@ import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -37,6 +38,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
@@ -47,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -103,7 +106,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   /**
    * Constructor
    * 
-   * @param database Database
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -111,8 +113,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public AbstractRStarTree(Database<O> database, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy);
+  public AbstractRStarTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy);
     this.insertionCandidates = insertionCandidates;
   }
 
@@ -122,9 +124,9 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param object the vector to be inserted
    */
   @Override
-  public final void insert(O object) {
+  public final void insert(DBID id, O object) {
     if(getLogger().isDebugging()) {
-      getLogger().debug("insert object " + object.getID() + "\n");
+      getLogger().debug("insert object " + id + "\n");
     }
 
     if(!initialized) {
@@ -133,7 +135,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
     reinsertions.clear();
 
-    E entry = createNewLeafEntry(object);
+    E entry = createNewLeafEntry(id, object);
     preInsert(entry);
     insertLeafEntry(entry);
 
@@ -149,7 +151,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param objects the objects to be inserted
    */
   @Override
-  public final void insert(List<O> objects) {
+  public final void insertAll(ArrayDBIDs ids, List<O> objects) {
     // empty input file
     if(objects.isEmpty() || (objects.size() == 1 && (objects.get(0) == null || objects.get(0).getDimensionality() == 0))) {
       // FIXME: abusing this empty-insert for re-loading an on-disk tree is an
@@ -158,9 +160,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       return;
     }
 
+    assert (ids.size() == objects.size());
+
     if(bulk && !initialized) {
       initialize(objects.get(0));
-      bulkLoad(objects);
+      bulkLoad(ids, objects);
       if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append(" height  = ").append(height).append("\n");
@@ -172,8 +176,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       if(!initialized) {
         initialize(objects.get(0));
       }
-      for(O object : objects) {
-        insert(object);
+      for(int i = 0; i < ids.size(); i++) {
+        insert(ids.get(i), objects.get(i));
       }
     }
 
@@ -232,20 +236,19 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   /**
    * Deletes the specified object from this index.
    * 
-   * @param object the object to be deleted
    * @return true if this index did contain the object with the specified id,
    *         false otherwise
    */
   @Override
-  public final boolean delete(O object) {
+  public final boolean delete(DBID id) {
     if(getLogger().isDebugging()) {
-      getLogger().debugFine("delete " + object.getID() + "\n");
+      getLogger().debugFine("delete " + id + "\n");
     }
 
     // find the leaf node containing o
-    double[] values = getValues(object);
+    double[] values = getValues(rep.get(id));
     HyperBoundingBox mbr = new HyperBoundingBox(values, values);
-    TreeIndexPath<E> deletionPath = findPathToObject(getRootPath(), mbr, object.getID());
+    TreeIndexPath<E> deletionPath = findPathToObject(getRootPath(), mbr, id);
     if(deletionPath == null) {
       return false;
     }
@@ -282,17 +285,14 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       getRoot().integrityCheck();
     }
 
-    postDelete(object);
+    postDelete(id);
     return true;
   }
 
-  /**
-   * Calls {@link #delete(NumberVector)} for each object.
-   */
   @Override
-  public void delete(List<O> objects) {
-    for(O o : objects) {
-      delete(o);
+  public void deleteAll(DBIDs ids) {
+    for(DBID id : ids) {
+      delete(id);
     }
   }
 
@@ -674,23 +674,23 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param objects the objects to be inserted
    * @return the array of leaf nodes containing the objects
    */
-  protected List<N> createLeafNodes(List<O> objects) {
+  protected List<N> createLeafNodes(List<SpatialPair<DBID, O>> objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
 
     ArrayList<N> result = new ArrayList<N>();
-    BulkSplit<O> split = new BulkSplit<O>();
-    List<List<O>> partitions = split.partition(objects, minEntries, maxEntries, bulkLoadStrategy);
+    BulkSplit<SpatialPair<DBID, O>> split = new BulkSplit<SpatialPair<DBID, O>>();
+    List<List<SpatialPair<DBID, O>>> partitions = split.partition(objects, minEntries, maxEntries, bulkLoadStrategy);
 
-    for(List<O> partition : partitions) {
+    for(List<SpatialPair<DBID, O>> partition : partitions) {
       // create leaf node
       N leafNode = createNewLeafNode(leafCapacity);
       file.writePage(leafNode);
       result.add(leafNode);
 
       // insert data
-      for(O o : partition) {
-        leafNode.addLeafEntry(createNewLeafEntry(o));
+      for(Pair<DBID, O> o : partition) {
+        leafNode.addLeafEntry(createNewLeafEntry(o.getFirst(), o.getSecond()));
       }
 
       // write to file
@@ -822,16 +822,17 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * 
    * @param objects the data objects to be indexed
    */
-  abstract protected void bulkLoad(List<O> objects);
+  abstract protected void bulkLoad(ArrayDBIDs ids, List<O> objects);
 
   /**
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
    * 
+   * @param id the object id
    * @param object the data object to be represented by the new entry
    * @return the newly created leaf entry
    */
-  abstract protected E createNewLeafEntry(O object);
+  abstract protected E createNewLeafEntry(DBID id, O object);
 
   /**
    * Creates a new directory entry representing the specified node.
