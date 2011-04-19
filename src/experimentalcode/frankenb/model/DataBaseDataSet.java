@@ -6,9 +6,10 @@ package experimentalcode.frankenb.model;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 
 /**
@@ -18,9 +19,9 @@ import experimentalcode.frankenb.model.ifaces.IDataSet;
  */
 public class DataBaseDataSet implements IDataSet {
 
-  private final Database<NumberVector<?, ?>> dataBase;
+  private final Relation<? extends NumberVector<?, ?>> dataBase;
   
-  public DataBaseDataSet(Database<NumberVector<?, ?>> dataBase) {
+  public DataBaseDataSet(Relation<? extends NumberVector<?, ?>> dataBase) {
     this.dataBase = dataBase;
   }
   
@@ -37,7 +38,7 @@ public class DataBaseDataSet implements IDataSet {
    */
   @Override
   public int getDimensionality() {
-    return dataBase.dimensionality();
+    return DatabaseUtil.dimensionality(dataBase);
   }
 
   /* (non-Javadoc)
@@ -51,7 +52,7 @@ public class DataBaseDataSet implements IDataSet {
       public Iterator<Integer> iterator() {
         return new Iterator<Integer>() {
 
-          Iterator<DBID> iterator = dataBase.iterator();
+          Iterator<DBID> iterator = dataBase.iterDBIDs();
           
           @Override
           public boolean hasNext() {

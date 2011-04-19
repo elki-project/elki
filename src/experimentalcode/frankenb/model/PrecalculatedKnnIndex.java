@@ -7,10 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import experimentalcode.frankenb.main.KnnDataMerger;
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 
 /**
@@ -32,7 +33,7 @@ import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage
  */
 @Title("Precalculated kNN Neighborhood index")
 @Description("Uses a precalculated kNN Neighborhood as index for a given database. Be aware that the index must be generated from the database.")
-public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex<O> {
+public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
 
   private DynamicBPlusTree<Integer, DistanceList> resultTree;
 
@@ -44,11 +45,6 @@ public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex
     this.resultTree = resultTree;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.index.Index#getPageFileStatistics()
-   */
   @Override
   public PageFileStatistics getPageFileStatistics() {
     return null;
@@ -66,11 +62,6 @@ public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex
     throw new UnsupportedOperationException();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.index.Index#insert(java.util.List)
-   */
   @Override
   public void insert(List<O> objects) {
     //throw new UnsupportedOperationException();
@@ -88,31 +79,16 @@ public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex
     throw new UnsupportedOperationException();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.index.Index#delete(java.util.List)
-   */
   @Override
   public void delete(List<O> objects) {
     throw new UnsupportedOperationException();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.result.Result#getLongName()
-   */
   @Override
   public String getLongName() {
     return "Precalculated Knn Query";
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.result.Result#getShortName()
-   */
   @Override
   public String getShortName() {
     return "Precalculated Knn Query";
@@ -146,7 +122,7 @@ public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex
     return (KNNQuery<O, D>) new PrecalculatedKnnQuery<O>(this.resultTree);
   }
 
-  public static class Factory<O extends DatabaseObject, D extends Distance<D>> implements IndexFactory<O, KNNIndex<O>> {
+  public static class Factory<O, D extends Distance<D>> implements IndexFactory<O, KNNIndex<O>> {
 
     /**
      * OptionID for {@link #PRECALC_DIR_PARAM}
@@ -208,7 +184,7 @@ public class PrecalculatedKnnIndex<O extends DatabaseObject> implements KNNIndex
     }
 
     @Override
-    public PrecalculatedKnnIndex<O> instantiate(Database<O> database) {
+    public PrecalculatedKnnIndex<O> instantiate(Relation<O> database) {
       return new PrecalculatedKnnIndex<O>(resultTree);
     }
 

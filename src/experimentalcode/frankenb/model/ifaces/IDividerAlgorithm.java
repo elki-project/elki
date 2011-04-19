@@ -6,7 +6,7 @@ package experimentalcode.frankenb.model.ifaces;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import experimentalcode.frankenb.model.PartitionPairing;
 
@@ -18,6 +18,6 @@ import experimentalcode.frankenb.model.PartitionPairing;
  */
 public interface IDividerAlgorithm {
 
-  public List<PartitionPairing> divide(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException;
+  public List<PartitionPairing> divide(Relation<? extends NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException;
   
 }

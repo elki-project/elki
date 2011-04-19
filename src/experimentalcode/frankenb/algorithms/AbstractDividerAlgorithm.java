@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.DataBaseDataSet;
@@ -50,7 +51,7 @@ public abstract class AbstractDividerAlgorithm implements IDividerAlgorithm {
    * @see experimentalcode.frankenb.model.ifaces.IDividerAlgorithm#divide(de.lmu.ifi.dbs.elki.database.Database, experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage, int)
    */
   @Override
-  public List<PartitionPairing> divide(Database<NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException {
+  public List<PartitionPairing> divide(Relation<? extends NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException {
     if (partitioning == null) throw new UnableToComplyException("No partitioning strategy has been selected.");
     if (pairing == null) throw new UnableToComplyException("No partition pairing strategy has been selected.");
 

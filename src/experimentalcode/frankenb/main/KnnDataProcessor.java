@@ -123,11 +123,6 @@ public class KnnDataProcessor extends AbstractApplication {
     Log.setFilter(LogLevel.INFO);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.application.AbstractApplication#run()
-   */
   @Override
   public void run() throws UnableToComplyException {
     Runtime runtime = Runtime.getRuntime();

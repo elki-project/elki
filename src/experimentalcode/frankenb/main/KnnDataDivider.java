@@ -13,11 +13,14 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -60,7 +63,7 @@ public class KnnDataDivider extends AbstractApplication {
   private int packageQuantity = 0;
   
   
-  private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
+  private final DatabaseConnection databaseConnection;
   private IDividerAlgorithm algorithm;
   
   File outputDir;
@@ -72,7 +75,7 @@ public class KnnDataDivider extends AbstractApplication {
    * @param databaseConnection
    * @param algorithm
    */
-  public KnnDataDivider(boolean verbose, File outputDir, int packageQuantity, DatabaseConnection<NumberVector<?, ?>> databaseConnection, IDividerAlgorithm algorithm) {
+  public KnnDataDivider(boolean verbose, File outputDir, int packageQuantity, DatabaseConnection databaseConnection, IDividerAlgorithm algorithm) {
     super(verbose);
     this.outputDir = outputDir;
     this.packageQuantity = packageQuantity;
@@ -103,17 +106,19 @@ public class KnnDataDivider extends AbstractApplication {
       Log.info("knn data divider started @ " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
       
       Log.info("reading database ...");
-      final Database<NumberVector<?, ?>> dataBase = databaseConnection.getDatabase(null);
-      long totalCalculationsWithoutApproximation = Utils.sumFormular(dataBase.size() - 1);
+      final Database dataBase = databaseConnection.getDatabase();
+      Relation<DoubleVector> relation = dataBase.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+      int dim = DatabaseUtil.assumeVectorField(relation).dimensionality();
+      long totalCalculationsWithoutApproximation = Utils.sumFormular(relation.size() - 1);
       
-      Log.info(String.format("DB Size: %,d (%d dimensions)", dataBase.size(), dataBase.dimensionality()));
+      Log.info(String.format("DB Size: %,d (%d dimensions)", relation.size(), dim));
       Log.info(String.format("Packages to create: %,8d", packageQuantity));
       Log.info(String.format("Algorithm used: %s", algorithm.getClass().getSimpleName()));
       Log.info();
       
       Log.info(String.format("Creating partitions (algorithm used: %s) ...", algorithm.getClass().getSimpleName()));
       
-      List<PartitionPairing> pairings = this.algorithm.divide(dataBase, packageQuantity);
+      List<PartitionPairing> pairings = this.algorithm.divide(relation, packageQuantity);
       
       Log.info(String.format("Total partition pairings: %,d", pairings.size()));
       
@@ -151,7 +156,7 @@ public class KnnDataDivider extends AbstractApplication {
         
         File packageDescriptorFile = new File(targetDirectory, String.format("package%05d_descriptor.dat", i));
         int bufferSize = expectedPairingsPerPackage * PackageDescriptor.PAIRING_DATA_SIZE + PackageDescriptor.HEADER_SIZE; 
-        PackageDescriptor packageDescriptor = new PackageDescriptor(i + 1, dataBase.dimensionality(), new BufferedDiskBackedDataStorage(packageDescriptorFile, bufferSize));
+        PackageDescriptor packageDescriptor = new PackageDescriptor(i + 1, dim, new BufferedDiskBackedDataStorage(packageDescriptorFile, bufferSize));
         
         Log.info(String.format("Creating package %08d of max. %08d (%s)", i + 1, packageQuantity, packageDescriptorFile.toString()));
         
@@ -239,7 +244,7 @@ public class KnnDataDivider extends AbstractApplication {
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     private int packageQuantity = 0;
     
-    private DatabaseConnection<NumberVector<?, ?>> databaseConnection = null;
+    private DatabaseConnection databaseConnection = null;
     private IDividerAlgorithm algorithm = null;
     
     File outputDir;
@@ -258,7 +263,7 @@ public class KnnDataDivider extends AbstractApplication {
         algorithm = paramPartitioner.instantiateClass(config);
       }
       
-      Class<FileBasedDatabaseConnection<NumberVector<?, ?>>> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
+      Class<FileBasedDatabaseConnection> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
       databaseConnection = config.tryInstantiate(dbcls );
     }
 

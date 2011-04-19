@@ -18,8 +18,8 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
@@ -122,13 +122,13 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
 
   private final ComputeROCCurve rocComputer;
 
-  private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
+  private final DatabaseConnection databaseConnection;
 
   private File inputFolder = null;
 
   private boolean inMemory = false;
 
-  public KnnPerformanceTestSuite(boolean verbose, ComputeROCCurve rocComputer, DatabaseConnection<NumberVector<?, ?>> databaseConnection, File inputFolder, boolean inMemory) {
+  public KnnPerformanceTestSuite(boolean verbose, ComputeROCCurve rocComputer, DatabaseConnection databaseConnection, File inputFolder, boolean inMemory) {
     super(verbose);
     this.rocComputer = rocComputer;
     this.databaseConnection = databaseConnection;
@@ -140,11 +140,6 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     Log.setFilter(LogLevel.DEBUG);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.application.AbstractApplication#run()
-   */
   @Override
   public void run() throws UnableToComplyException {
     try {
@@ -153,7 +148,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       Log.info("using inMemory strategy: " + Boolean.toString(inMemory));
 
       Log.info("Reading database ...");
-      Database<NumberVector<?, ?>> database = databaseConnection.getDatabase(null);
+      Database database = databaseConnection.getDatabase();
 
       List<File> resultDirectories = findResultDirectories(this.inputFolder);
       for(File resultDirectory : resultDirectories) {
@@ -172,7 +167,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     }
   }
 
-  private void runTestSuiteFor(Database<NumberVector<?, ?>> database, File inputFolder) throws IOException {
+  private void runTestSuiteFor(Database database, File inputFolder) throws IOException {
     Log.info("Opening result tree ...");
     File resultDirectory = new File(inputFolder, "result.dir");
     File resultData = new File(inputFolder, "result.dat");
@@ -206,7 +201,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       rocComputer.processResult(database, result, totalResult.getHierarchy());
 
       tmpDirectory.mkdirs();
-      ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(tmpDirectory);
+      ResultWriter resultWriter = getResultWriter(tmpDirectory);
 
       for(Result aResult : totalResult.getHierarchy().iterDescendants(result)) {
         resultWriter.processResult(database, aResult);
@@ -253,8 +248,8 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     return sb.toString();
   }
 
-  private static ResultWriter<NumberVector<?, ?>> getResultWriter(File targetFile) {
-    return new ResultWriter<NumberVector<?, ?>>(targetFile, false, false);
+  private static ResultWriter getResultWriter(File targetFile) {
+    return new ResultWriter(targetFile, false, false);
   }
 
   private static List<File> findResultDirectories(File dir) {
@@ -288,7 +283,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     ComputeROCCurve rocComputer;
 
-    FileBasedDatabaseConnection<NumberVector<?, ?>> databaseConnection;
+    FileBasedDatabaseConnection databaseConnection;
 
     File inputFolder = null;
 
@@ -307,7 +302,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
         inMemory = IN_MEMORY_PARAM.getValue();
       }
 
-      Class<FileBasedDatabaseConnection<NumberVector<?, ?>>> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
+      Class<FileBasedDatabaseConnection> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
       databaseConnection = config.tryInstantiate(dbcls);
       rocComputer = config.tryInstantiate(ComputeROCCurve.class);
     }

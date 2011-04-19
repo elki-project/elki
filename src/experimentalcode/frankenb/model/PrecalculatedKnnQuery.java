@@ -6,18 +6,18 @@ package experimentalcode.frankenb.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.log.Log;
 
-public class PrecalculatedKnnQuery<O extends DatabaseObject> implements KNNQuery<O, DoubleDistance> {
+public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
 
   private final DynamicBPlusTree<Integer, DistanceList> resultTree;
 
@@ -25,13 +25,6 @@ public class PrecalculatedKnnQuery<O extends DatabaseObject> implements KNNQuery
     this.resultTree = resultTree;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery#getKNNForDBID(de.lmu.ifi
-   * .dbs.elki.database.ids.DBID, int)
-   */
   private int requested = 0;
   @Override
   public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
@@ -81,35 +74,23 @@ public class PrecalculatedKnnQuery<O extends DatabaseObject> implements KNNQuery
     return results;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery#getKNNForObject(de.lmu.
-   * ifi.dbs.elki.data.DatabaseObject, int)
-   */
   @Override
   public List<DistanceResultPair<DoubleDistance>> getKNNForObject(O obj, int k) {
     throw new UnsupportedOperationException();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery#getDistanceQuery()
-   */
   @Override
   public DistanceQuery<O, DoubleDistance> getDistanceQuery() {
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery#getDistanceFactory()
-   */
   @Override
   public DoubleDistance getDistanceFactory() {
     return null;
+  }
+
+  @Override
+  public Relation<? extends O> getRepresentation() {
+    return dataBase;
   }
 }

@@ -10,8 +10,8 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
@@ -45,7 +45,7 @@ public class PINN extends AbstractApplication {
 
   public static final OptionID K_FACTOR_ID = OptionID.getOrCreateOptionID("kfactor", "factor to multiply with k when searching for the neighborhood in the projected space");
 
-  private final DatabaseConnection<NumberVector<?, ?>> databaseConnection;
+  private final DatabaseConnection databaseConnection;
 
   private final RandomProjection randomProjection;
 
@@ -68,7 +68,7 @@ public class PINN extends AbstractApplication {
    * @param kFactor
    * @param outputFile
    */
-  public PINN(boolean verbose, DatabaseConnection<NumberVector<?, ?>> databaseConnection, RandomProjection randomProjection, ComputeROCCurve rocComputer, int k, int kFactor, File outputFile) {
+  public PINN(boolean verbose, DatabaseConnection databaseConnection, RandomProjection randomProjection, ComputeROCCurve rocComputer, int k, int kFactor, File outputFile) {
     super(verbose);
     this.databaseConnection = databaseConnection;
     this.randomProjection = randomProjection;
@@ -85,7 +85,7 @@ public class PINN extends AbstractApplication {
   @Override
   public void run() throws UnableToComplyException {
     Log.info("Reading database ...");
-    final Database<NumberVector<?, ?>> dataBase = databaseConnection.getDatabase(null);
+    final Database dataBase = databaseConnection.getDatabase();
 
     Log.info("Projecting ...");
     IDataSet dataSet = randomProjection.project(new DataBaseDataSet(dataBase));
@@ -107,7 +107,7 @@ public class PINN extends AbstractApplication {
     rocComputer.processResult(dataBase, result, totalResult.getHierarchy());
 
     this.outputFile.mkdirs();
-    ResultWriter<NumberVector<?, ?>> resultWriter = getResultWriter(this.outputFile);
+    ResultWriter resultWriter = getResultWriter(this.outputFile);
 
     for(Result aResult : totalResult.getHierarchy().iterDescendants(result)) {
       resultWriter.processResult(dataBase, aResult);
@@ -117,8 +117,8 @@ public class PINN extends AbstractApplication {
     Log.info("Done.");
   }
 
-  private static ResultWriter<NumberVector<?, ?>> getResultWriter(File targetFile) {
-    return new ResultWriter<NumberVector<?, ?>>(targetFile, false, false);
+  private static ResultWriter getResultWriter(File targetFile) {
+    return new ResultWriter(targetFile, false, false);
   }
 
   public static void main(String[] args) {
@@ -133,7 +133,7 @@ public class PINN extends AbstractApplication {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
-    private FileBasedDatabaseConnection<NumberVector<?, ?>> databaseConnection;
+    private FileBasedDatabaseConnection databaseConnection;
 
     private RandomProjection randomProjection;
 
@@ -162,7 +162,7 @@ public class PINN extends AbstractApplication {
 
       randomProjection = new RandomProjection(config);
 
-      Class<FileBasedDatabaseConnection<NumberVector<?, ?>>> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
+      Class<FileBasedDatabaseConnection> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
       databaseConnection = config.tryInstantiate(dbcls);
       rocComputer = config.tryInstantiate(ComputeROCCurve.class);
     }

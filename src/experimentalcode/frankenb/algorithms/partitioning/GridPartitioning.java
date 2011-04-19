@@ -51,11 +51,6 @@ public class GridPartitioning implements IPartitioning {
       this.value = value;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(OrderItem o) {
       if(this.value > o.value) {
@@ -90,11 +85,6 @@ public class GridPartitioning implements IPartitioning {
       tainted = true;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
       if(tainted) {
@@ -107,11 +97,6 @@ public class GridPartitioning implements IPartitioning {
       return hashCode;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object o) {
       if(!(o instanceof PartitionPosition)) {
@@ -129,11 +114,6 @@ public class GridPartitioning implements IPartitioning {
       return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
       StringBuilder sb = new StringBuilder();
