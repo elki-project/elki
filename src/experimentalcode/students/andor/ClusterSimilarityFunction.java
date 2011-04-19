@@ -3,6 +3,7 @@ package experimentalcode.students.andor;
 import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -14,7 +15,7 @@ public class ClusterSimilarityFunction<C extends Cluster<?>> extends AbstractPri
   /**
    * @param rep
    */
-  public ClusterSimilarityFunction(Database<C> database) {
+  public ClusterSimilarityFunction(Database database) {
     super();
   }
 
@@ -34,8 +35,8 @@ public class ClusterSimilarityFunction<C extends Cluster<?>> extends AbstractPri
   }
 
   @Override
-  public Class<? super C> getInputTypeRestriction() {
-    return Cluster.class;
+  public SimpleTypeInformation<? super Cluster<?>> getInputTypeRestriction() {
+    return SimpleTypeInformation.get(Cluster.class);
   }
 
   @Override

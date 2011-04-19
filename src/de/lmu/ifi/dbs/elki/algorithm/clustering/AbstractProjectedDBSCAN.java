@@ -153,7 +153,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     processedIDs = DBIDUtil.newHashSet(dataQuery.size());
 
     LocallyWeightedDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(dataQuery);
-    RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(dataQuery, distanceFunction);
+    RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
 
     if(dataQuery.size() >= minpts) {
       for(DBID id : dataQuery.iterDBIDs()) {

@@ -21,24 +21,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  */
-public class ResultWriter implements ResultHandler<Result> {
+public class ResultWriter implements ResultHandler {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(ResultWriter.class);
-  
+
   /**
    * Flag to control GZIP compression.
-   * <p>Key: {@code -out.gzip}</p>
+   * <p>
+   * Key: {@code -out.gzip}
+   * </p>
    */
   public static final OptionID GZIP_OUTPUT_ID = OptionID.getOrCreateOptionID("out.gzip", "Enable gzip compression of output files.");
-  
+
   /**
    * Flag to suppress overwrite warning.
-   * <p>Key: {@code -out.silentoverwrite}</p>
+   * <p>
+   * Key: {@code -out.silentoverwrite}
+   * </p>
    */
   public static final OptionID OVERWRITE_OPTION_ID = OptionID.getOrCreateOptionID("out.silentoverwrite", "Silently overwrite output files.");
-  
+
   /**
    * Holds the file to print results to.
    */
@@ -48,7 +52,7 @@ public class ResultWriter implements ResultHandler<Result> {
    * Whether or not to do gzip compression on output.
    */
   private boolean gzip = false;
-  
+
   /**
    * Whether or not to warn on overwrite
    */
@@ -56,7 +60,7 @@ public class ResultWriter implements ResultHandler<Result> {
 
   /**
    * Constructor.
-   *
+   * 
    * @param out
    * @param gzip
    * @param warnoverwrite
@@ -71,7 +75,7 @@ public class ResultWriter implements ResultHandler<Result> {
   /**
    * Process a single result.
    * 
-   * @param db Database 
+   * @param db Database
    * @param result Result
    */
   @Override
@@ -91,7 +95,7 @@ public class ResultWriter implements ResultHandler<Result> {
           output = new MultipleFilesOutput(out, gzip);
         }
         else {
-          if (warnoverwrite) {
+          if(warnoverwrite) {
             logger.warning("Output file exists and will be overwritten!");
           }
           output = new SingleStreamOutput(out, gzip);
@@ -134,7 +138,7 @@ public class ResultWriter implements ResultHandler<Result> {
      * Whether or not to do gzip compression on output.
      */
     private boolean gzip = false;
-    
+
     /**
      * Whether or not to warn on overwrite
      */
@@ -144,17 +148,17 @@ public class ResultWriter implements ResultHandler<Result> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       FileParameter outputP = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE, true);
-      if (config.grab(outputP)) {
+      if(config.grab(outputP)) {
         out = outputP.getValue();
       }
 
       Flag gzipF = new Flag(GZIP_OUTPUT_ID);
-      if (config.grab(gzipF)) {
+      if(config.grab(gzipF)) {
         gzip = gzipF.getValue();
       }
 
       Flag overwriteF = new Flag(OVERWRITE_OPTION_ID);
-      if (config.grab(overwriteF)) {
+      if(config.grab(overwriteF)) {
         // note: inversed meaning
         warnoverwrite = !overwriteF.getValue();
       }

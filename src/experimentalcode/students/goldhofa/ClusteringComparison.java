@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -95,7 +94,7 @@ public class ClusteringComparison implements Evaluator {
    * Perform clusterings evaluation
    */
   @Override
-  public void processResult(Database db, Result result, ResultHierarchy hier) {
+  public void processResult(Database db, Result result) {
 
     // get all clustering
     List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
@@ -243,6 +242,6 @@ public class ClusteringComparison implements Evaluator {
 
     thisResult.add(segments);
 
-    hier.add(result, thisResult);
+    db.getHierarchy().add(result, thisResult);
   }
 }

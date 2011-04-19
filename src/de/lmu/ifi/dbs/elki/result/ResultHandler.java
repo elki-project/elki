@@ -10,15 +10,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @apiviz.landmark
  * @apiviz.uses Result oneway - - processes
- *
- * @param <R> Result type
  */
-public interface ResultHandler<R extends Result> extends Parameterizable {
+public interface ResultHandler extends Parameterizable {
   /**
    * Process a result.
    * 
    * @param db Database the result is for
    * @param result Result object
    */
-  public abstract void processResult(Database db, R result);
+  public abstract void processResult(Database db, Result result);
 }

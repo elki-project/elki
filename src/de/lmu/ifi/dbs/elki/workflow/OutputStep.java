@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -26,14 +25,14 @@ public class OutputStep implements WorkflowStep {
   /**
    * Output handler.
    */
-  private List<ResultHandler<Result>> resulthandlers = null;
+  private List<ResultHandler> resulthandlers = null;
 
   /**
    * Constructor.
    * 
    * @param resulthandlers Result handlers to use
    */
-  public OutputStep(List<ResultHandler<Result>> resulthandlers) {
+  public OutputStep(List<ResultHandler> resulthandlers) {
     super();
     this.resulthandlers = resulthandlers;
   }
@@ -46,7 +45,7 @@ public class OutputStep implements WorkflowStep {
    */
   public void runResultHandlers(Result result, Database db) {
     // Run result handlers
-    for(ResultHandler<Result> resulthandler : resulthandlers) {
+    for(ResultHandler resulthandler : resulthandlers) {
       resulthandler.processResult(db, result);
     }
   }
@@ -56,10 +55,9 @@ public class OutputStep implements WorkflowStep {
    * 
    * @return Result handler list
    */
-  public static ArrayList<Class<? extends ResultHandler<Result>>> defaultWriter() {
-    ArrayList<Class<? extends ResultHandler<Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<Result>>>(1);
-    final Class<ResultHandler<Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultWriter.class, ResultHandler.class);
-    defaultHandlers.add(rwcls);
+  public static ArrayList<Class<? extends ResultHandler>> defaultWriter() {
+    ArrayList<Class<? extends ResultHandler>> defaultHandlers = new ArrayList<Class<? extends ResultHandler>>(1);
+    defaultHandlers.add(ResultWriter.class);
     return defaultHandlers;
   }
 
@@ -68,10 +66,9 @@ public class OutputStep implements WorkflowStep {
    * 
    * @return Result handler list
    */
-  public static ArrayList<Class<? extends ResultHandler<Result>>> defaultVisualizer() {
-    ArrayList<Class<? extends ResultHandler<Result>>> defaultHandlers = new ArrayList<Class<? extends ResultHandler<Result>>>(1);
-    final Class<ResultHandler<Result>> rwcls = ClassGenericsUtil.uglyCrossCast(ResultVisualizer.class, ResultHandler.class);
-    defaultHandlers.add(rwcls);
+  public static ArrayList<Class<? extends ResultHandler>> defaultVisualizer() {
+    ArrayList<Class<? extends ResultHandler>> defaultHandlers = new ArrayList<Class<? extends ResultHandler>>(1);
+    defaultHandlers.add(ResultVisualizer.class);
     return defaultHandlers;
   }
 
@@ -86,13 +83,13 @@ public class OutputStep implements WorkflowStep {
     /**
      * Output handlers.
      */
-    private List<ResultHandler<Result>> resulthandlers = null;
+    private List<ResultHandler> resulthandlers = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // result handlers
-      final ObjectListParameter<ResultHandler<Result>> resultHandlerParam = new ObjectListParameter<ResultHandler<Result>>(OptionID.RESULT_HANDLER, ResultHandler.class);
+      final ObjectListParameter<ResultHandler> resultHandlerParam = new ObjectListParameter<ResultHandler>(OptionID.RESULT_HANDLER, ResultHandler.class);
       if(config.grab(resultHandlerParam)) {
         resulthandlers = resultHandlerParam.instantiateClasses(config);
       }

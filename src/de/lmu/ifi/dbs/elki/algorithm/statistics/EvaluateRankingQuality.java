@@ -16,10 +16,9 @@ import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -98,13 +97,9 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
-    // local copy, not entirely necessary. I just like control, guaranteed
-    // sequences and stable+efficient array index -> id lookups.
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(dataQuery.getDBIDs());
-    int size = ids.size();
-
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(dataQuery, getDistanceFunction(), size);
+    final Relation<V> relation = database.getRelation(getInputTypeRestriction());
+    final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, relation.size());
 
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");
@@ -116,8 +111,8 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(split.size());
     HashMap<Cluster<?>, Matrix> covmats = new HashMap<Cluster<?>, Matrix>(split.size());
     for(Cluster<?> clus : split) {
-      averages.put(clus, DatabaseUtil.centroid(dataQuery, clus.getIDs()));
-      covmats.put(clus, DatabaseUtil.covarianceMatrix(dataQuery, clus.getIDs()));
+      averages.put(clus, DatabaseUtil.centroid(relation, clus.getIDs()));
+      covmats.put(clus, DatabaseUtil.covarianceMatrix(relation, clus.getIDs()));
     }
 
     AggregatingHistogram<MeanVariance, Double> hist = AggregatingHistogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
@@ -125,7 +120,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
-    FiniteProgress rocloop = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", size, logger) : null;
+    FiniteProgress rocloop = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), logger) : null;
 
     // sort neighbors
     for(Cluster<?> clus : split) {
@@ -134,15 +129,15 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       Matrix covm = covmats.get(clus);
 
       for(DBID i1 : clus.getIDs()) {
-        Double d = MathUtil.mahalanobisDistance(covm, av.minus(dataQuery.get(i1).getColumnVector()));
+        Double d = MathUtil.mahalanobisDistance(covm, av.minus(relation.get(i1).getColumnVector()));
         cmem.add(new FCPair<Double, DBID>(d, i1));
       }
       Collections.sort(cmem);
 
       for(int ind = 0; ind < cmem.size(); ind++) {
         DBID i1 = cmem.get(ind).getSecond();
-        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, size);
-        double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
+        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, relation.size());
+        double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         hist.aggregate(((double) ind) / clus.size(), result);
 
@@ -157,7 +152,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<DoubleVector>(size);
+    Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
     for(Pair<Double, MeanVariance> pair : hist) {
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getSampleVariance() });
       res.add(row);

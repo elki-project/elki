@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
  * 
  * @author Erich Schubert
  */
-public class LogResultStructure implements ResultHandler<Result> {
+public class LogResultStructure implements ResultHandler {
   Logging logger = Logging.getLogger(LogResultStructure.class);
 
   @Override

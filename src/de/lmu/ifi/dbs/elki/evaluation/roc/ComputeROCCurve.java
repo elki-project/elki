@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -139,7 +138,7 @@ public class ComputeROCCurve implements Evaluator {
   }
 
   @Override
-  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result) {
     // Prepare
     DBIDs positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
 
@@ -149,7 +148,7 @@ public class ComputeROCCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      hierarchy.add(o, computeROCResult(db, positiveids, o));
+      db.getHierarchy().add(o, computeROCResult(db, positiveids, o));
       // Process them only once.
       orderings.remove(o.getOrdering());
       nonefound = false;
@@ -160,7 +159,7 @@ public class ComputeROCCurve implements Evaluator {
     for(IterableResult<?> ir : iterables) {
       Iterator<DBID> iter = getDBIDIterator(ir);
       if(iter != null) {
-        hierarchy.add(ir, computeROCResult(db, positiveids, iter));
+        db.getHierarchy().add(ir, computeROCResult(db, positiveids, iter));
         nonefound = false;
       }
     }
@@ -168,7 +167,7 @@ public class ComputeROCCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Iterator<DBID> iter = or.iter(db.getDBIDs());
-      hierarchy.add(or, computeROCResult(db, positiveids, iter));
+      db.getHierarchy().add(or, computeROCResult(db, positiveids, iter));
       nonefound = false;
     }
 

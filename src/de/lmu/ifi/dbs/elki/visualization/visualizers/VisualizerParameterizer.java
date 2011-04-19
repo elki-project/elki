@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
@@ -109,7 +108,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * @param result Base result
    * @return New context
    */
-  public VisualizerContext newContext(Database db, HierarchicalResult result) {
+  public VisualizerContext newContext(Database db, Result result) {
     VisualizerContext context = new VisualizerContext(db, result, stylelib, factories, hideVisualizers);
     return context;
   }

@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -186,7 +185,7 @@ public class ComputeOutlierHistogram implements Evaluator {
   }
 
   @Override
-  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if(ors == null || ors.size() <= 0) {
       // logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
@@ -194,7 +193,7 @@ public class ComputeOutlierHistogram implements Evaluator {
     }
 
     for(OutlierResult or : ors) {
-      hierarchy.add(or, evaluateOutlierResult(db, or));
+      db.getHierarchy().add(or, evaluateOutlierResult(db, or));
     }
   }
 

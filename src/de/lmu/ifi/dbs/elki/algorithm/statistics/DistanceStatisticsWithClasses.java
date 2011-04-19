@@ -108,10 +108,9 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database database) throws IllegalStateException {
-    Relation<O> dataQuery = getRelation(database);
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(dataQuery, getDistanceFunction());
-    final int size = dataQuery.size();
-
+    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
+    final DistanceQuery<O, D> distFunc = database.getDistanceQuery(dataQuery, getDistanceFunction());
+    
     // determine binning ranges.
     DoubleMinMax gminmax = new DoubleMinMax();
 
@@ -210,7 +209,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     }
     long bnum = inum + onum;
     // Note: when full sampling is added, this assertion won't hold anymore.
-    assert (bnum == size * (size - 1));
+    assert (bnum == dataQuery.size() * (dataQuery.size() - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
     for(Pair<Double, Pair<Long, Long>> ppair : histogram) {

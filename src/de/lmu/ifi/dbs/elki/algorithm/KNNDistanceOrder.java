@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -83,8 +84,10 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    */
   @Override
   protected KNNDistanceOrderResult<D> runInTime(Database database) throws IllegalStateException {
-    final Relation<O> dataQuery = getRelation(database);
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(dataQuery, getDistanceFunction(), k);
+    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
+    final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
+
     final Random random = new Random();
     List<D> knnDistances = new ArrayList<D>();
     for(Iterator<DBID> iter = dataQuery.iterDBIDs(); iter.hasNext();) {

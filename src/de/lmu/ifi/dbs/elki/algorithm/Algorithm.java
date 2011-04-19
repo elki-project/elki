@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -22,9 +23,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * </p>
  * 
  * @author Arthur Zimek
- * @param <O> the type of object handled by this Algorithm
- * @param <R> the type of result to retrieve from this Algorithm
- * @see AbstractAlgorithm
+ * 
+ * @param <R> Result type
  */
 public interface Algorithm<R extends Result> extends Parameterizable {
   /**
@@ -37,4 +37,12 @@ public interface Algorithm<R extends Result> extends Parameterizable {
    *         to be called).
    */
   R run(Database database) throws IllegalStateException;
+
+  /**
+   * Get the input type restriction used for negotiating the data query.
+   * 
+   * @return Type restriction
+   */
+  // TODO: this is only appropriate for single-input algorithms!
+  public TypeInformation getInputTypeRestriction();
 }
