@@ -226,7 +226,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
       return ExtremumType.CONSTANT;
     }
 
-    throw new IllegalArgumentException("Houston, we have a problem!\n" + getID() + "\n" + this + "\n" + "f_l " + f_l + "\n" + "f_c " + f_c + "\n" + "f_r " + f_r + "\n" + "p " + getColumnVector() + "\n" + "box min " + FormatUtil.format(interval.getMin()) + "\n" + "box max " + FormatUtil.format(interval.getMax()) + "\n" + "alpha   " + FormatUtil.format(alpha_extreme_c) + "\n" + "alpha_l " + FormatUtil.format(alpha_extreme_l) + "\n" + "alpha_r " + FormatUtil.format(alpha_extreme_r) + "\n" + "n " + n);
+    throw new IllegalArgumentException("Houston, we have a problem!\n" + this + "\n" + "f_l " + f_l + "\n" + "f_c " + f_c + "\n" + "f_r " + f_r + "\n" + "p " + getColumnVector() + "\n" + "box min " + FormatUtil.format(interval.getMin()) + "\n" + "box max " + FormatUtil.format(interval.getMax()) + "\n" + "alpha   " + FormatUtil.format(alpha_extreme_c) + "\n" + "alpha_l " + FormatUtil.format(alpha_extreme_l) + "\n" + "alpha_r " + FormatUtil.format(alpha_extreme_r) + "\n" + "n " + n);
 
   }
 

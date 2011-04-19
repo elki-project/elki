@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.result;
 
-
 /**
  * Abstract class for a result object with hierarchy
  * 
@@ -11,7 +10,7 @@ public abstract class AbstractHierarchicalResult implements HierarchicalResult {
    * The hierarchy storage.
    */
   private ResultHierarchy hierarchy;
-  
+
   /**
    * Constructor.
    */
@@ -29,7 +28,7 @@ public abstract class AbstractHierarchicalResult implements HierarchicalResult {
   public final void setHierarchy(ResultHierarchy hierarchy) {
     this.hierarchy = hierarchy;
   }
-  
+
   /**
    * Add a child result.
    * 

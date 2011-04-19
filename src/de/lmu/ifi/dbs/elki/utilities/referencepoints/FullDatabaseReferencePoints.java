@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
 /**
@@ -22,7 +22,7 @@ public class FullDatabaseReferencePoints<O extends NumberVector<? extends O, ?>>
   }
 
   @Override
-  public <T extends O> Collection<O> getReferencePoints(Database<T> db) {
+  public <T extends O> Collection<O> getReferencePoints(Relation<T> db) {
     return new DatabaseUtil.CollectionFromDatabase<O>(db);
   }
 }

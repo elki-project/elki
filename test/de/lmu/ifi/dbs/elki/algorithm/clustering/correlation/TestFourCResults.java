@@ -30,7 +30,7 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
    */
   @Test
   public void testFourCResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
 
     // Setup 4C
     ListParameterization params = new ListParameterization();
@@ -55,7 +55,7 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
    */
   @Test
   public void testFourCOverlap() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
+    Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
   
     // Setup algorithm
     ListParameterization params = new ListParameterization();

@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -9,10 +10,10 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
@@ -21,6 +22,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -33,6 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
 /**
@@ -89,7 +92,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
   public SelectionToolCubeVisualization(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
-    this.dim = DatabaseUtil.dimensionality(context.getDatabase());
+    this.dim = DatabaseUtil.dimensionality(rep);
     context.addContextChangeListener(this);
     incrementalRedraw();
   }
@@ -149,9 +152,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
     v2.set(0, x2);
     v2.set(1, y2);
 
-    Database<? extends NV> database = context.getDatabase();
-
-    NV factory = database.getObjectFactory();
+    NV factory = DatabaseUtil.assumeVectorField(rep).getFactory();
 
     NV nv1 = proj.projectRenderToDataSpace(v1, factory);
     NV nv2 = proj.projectRenderToDataSpace(v2, factory);
@@ -194,7 +195,6 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
    * @param p2 Second Point of the selected rectangle
    */
   private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
-    Database<? extends NV> database = context.getDatabase();
     DBIDSelection selContext = context.getSelection();
     ModifiableDBIDs selection;
     if(selContext != null) {
@@ -224,8 +224,8 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
 
       selection.clear();
       boolean idIn = true;
-      for(DBID id : database) {
-        NV dbTupel = database.get(id);
+      for(DBID id : rep.iterDBIDs()) {
+        NV dbTupel = rep.get(id);
         idIn = true;
         for(int i = 0; i < dim; i++) {
           if(ranges != null && ranges[i] != null) {
@@ -270,7 +270,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -285,15 +285,18 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-      for(SelectionResult selres : selectionResults) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this, P2DVisualization.class);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-        task.put(VisualizationTask.META_TOOL, true);
-        task.put(VisualizationTask.META_NOTHUMB, true);
-        task.put(VisualizationTask.META_NOEXPORT, true);
-        context.addVisualizer(selres, task);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
+        for(SelectionResult selres : selectionResults) {
+          final VisualizationTask task = new VisualizationTask(NAME, context, selres, rep, this, P2DVisualization.class);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+          task.put(VisualizationTask.META_TOOL, true);
+          task.put(VisualizationTask.META_NOTHUMB, true);
+          task.put(VisualizationTask.META_NOEXPORT, true);
+          context.addVisualizer(selres, task);
+        }
       }
     }
 

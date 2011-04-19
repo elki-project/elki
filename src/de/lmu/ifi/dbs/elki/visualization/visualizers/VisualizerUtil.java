@@ -1,7 +1,14 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import java.util.Iterator;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
 
 /**
  * Visualizer utilities.
@@ -42,22 +49,38 @@ public final class VisualizerUtil {
   }
 
   /**
-   * Test if the database contains number vectors.
+   * Filter for number vector field representations
    * 
-   * @param database Database
-   * @return true when the factory is for number vectors.
+   * @param result Result to filter
+   * @return Iterator over suitable representations
    */
-  // FIXME: move to DatabaseUtil
-  public static boolean isNumberVectorDatabase(Database<?> database) {
-    if (NumberVector.class.isInstance(database.getObjectFactory())) {
-      return true;
-    }
-    return false;
+  // TODO: move to DatabaseUtil?
+  public static Iterator<Relation<? extends NumberVector<?, ?>>> iterateVectorFieldRepresentations(final Result result) {
+    final Iterator<Relation<?>> parent = ResultUtil.filteredResults(result, Relation.class);
+    return new AbstractFilteredIterator<Relation<?>, Relation<? extends NumberVector<?, ?>>>() {
+      @Override
+      protected Iterator<Relation<?>> getParentIterator() {
+        return parent;
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      protected Relation<? extends NumberVector<?, ?>> testFilter(Relation<?> nextobj) {
+        final SimpleTypeInformation<?> type = nextobj.getDataTypeInformation();
+        if(!NumberVector.class.isAssignableFrom(type.getRestrictionClass())) {
+          return null;
+        }
+        if(!(type instanceof VectorFieldTypeInformation)) {
+          return null;
+        }
+        return (Relation<? extends NumberVector<?, ?>>) nextobj;
+      }
+    };
   }
 
   /**
    * Test whether a thumbnail is enabled for this visualizer.
-   *  
+   * 
    * @param vis Visualizer
    * @return boolean
    */

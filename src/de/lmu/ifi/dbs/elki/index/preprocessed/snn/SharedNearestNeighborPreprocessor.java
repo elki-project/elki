@@ -1,10 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.snn;
 
-import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -14,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -52,16 +51,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Shared nearest neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
-public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorIndex<O, TreeSetDBIDs> implements SharedNearestNeighborIndex<O> {
+public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends AbstractPreprocessorIndex<O, TreeSetDBIDs> implements SharedNearestNeighborIndex<O> {
   /**
    * Get a logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SharedNearestNeighborPreprocessor.class);
-
-  /**
-   * Database we are attached to
-   */
-  final protected Database<O> database;
 
   /**
    * Holds the number of nearest neighbors to be used.
@@ -76,13 +70,12 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
   /**
    * Constructor.
    * 
-   * @param database Database to use
+   * @param rep Database to use
    * @param numberOfNeighbors Number of neighbors
    * @param distanceFunction Distance function
    */
-  public SharedNearestNeighborPreprocessor(Database<O> database, int numberOfNeighbors, DistanceFunction<O, D> distanceFunction) {
-    super();
-    this.database = database;
+  public SharedNearestNeighborPreprocessor(Relation<O> representation, int numberOfNeighbors, DistanceFunction<O, D> distanceFunction) {
+    super(representation);
     this.numberOfNeighbors = numberOfNeighbors;
     this.distanceFunction = distanceFunction;
   }
@@ -94,14 +87,11 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
     if(getLogger().isVerbose()) {
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
-    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, SetDBIDs.class);
-    KNNQuery<O, D> knnquery = database.getKNNQuery(distanceFunction, numberOfNeighbors);
+    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, SetDBIDs.class);
+    KNNQuery<O, D> knnquery = rep.getDatabase().getKNNQuery(rep, distanceFunction, numberOfNeighbors);
 
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", database.size(), getLogger()) : null;
-    int count = 0;
-    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
-      count++;
-      DBID id = iter.next();
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", rep.size(), getLogger()) : null;
+    for(DBID id : rep.iterDBIDs()) {
       TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
       List<DistanceResultPair<D>> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors);
       for(int i = 0; i < kNN.size(); i++) {
@@ -165,7 +155,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
    * @apiviz.stereotype factory
    * @apiviz.uses SharedNearestNeighborPreprocessor oneway - - «create»
    */
-  public static class Factory<O extends DatabaseObject, D extends Distance<D>> implements SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborPreprocessor<O, D>>, Parameterizable {
+  public static class Factory<O, D extends Distance<D>> implements SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborPreprocessor<O, D>>, Parameterizable {
     /**
      * Parameter to indicate the number of neighbors to be taken into account
      * for the shared-nearest-neighbor similarity.
@@ -215,8 +205,8 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
     }
 
     @Override
-    public SharedNearestNeighborPreprocessor<O, D> instantiate(Database<O> database) {
-      return new SharedNearestNeighborPreprocessor<O, D>(database, numberOfNeighbors, distanceFunction);
+    public SharedNearestNeighborPreprocessor<O, D> instantiate(Relation<O> representation) {
+      return new SharedNearestNeighborPreprocessor<O, D>(representation, numberOfNeighbors, distanceFunction);
     }
 
     /**
@@ -229,6 +219,11 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
       return numberOfNeighbors;
     }
 
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return distanceFunction.getInputTypeRestriction();
+    }
+    
     /**
      * Parameterization class.
      * 
@@ -236,7 +231,7 @@ public class SharedNearestNeighborPreprocessor<O extends DatabaseObject, D exten
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizer {
+    public static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
       /**
        * Holds the number of nearest neighbors to be used.
        */

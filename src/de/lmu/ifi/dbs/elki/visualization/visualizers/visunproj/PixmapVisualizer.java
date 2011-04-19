@@ -6,7 +6,6 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @apiviz.has PixmapResult oneway - 1 visualizes
  */
-public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
+public class PixmapVisualizer extends AbstractVisualization {
   /**
    * Name for this visualizer.
    */
@@ -86,7 +85,7 @@ public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
    * @apiviz.stereotype factory
    * @apiviz.uses PixmapVisualizer oneway - - «create»
    */
-  public static class Factory extends AbstractVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -96,11 +95,11 @@ public class PixmapVisualizer extends AbstractVisualization<DatabaseObject> {
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+    public void addVisualizers(VisualizerContext context, Result result) {
       Collection<PixmapResult> prs = ResultUtil.filterResults(result, PixmapResult.class);
       for(PixmapResult pr : prs) {
         // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, context, pr, this, null);
+        final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         context.addVisualizer(pr, task);
       }

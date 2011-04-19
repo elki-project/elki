@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
@@ -18,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MTreeFactory<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeFactory<O, D, MTree<O, D>> {
+public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory<O, D, MTree<O, D>> {
   /**
    * Constructor.
    * 
@@ -32,8 +31,8 @@ public class MTreeFactory<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   @Override
-  public MTree<O, D> instantiate(Database<O> database) {
-    return new MTree<O, D>(fileName, pageSize, cacheSize, database.getDistanceQuery(distanceFunction), distanceFunction);
+  public MTree<O, D> instantiate(Relation<O> representation) {
+    return new MTree<O, D>(representation, fileName, pageSize, cacheSize, distanceFunction.instantiate(representation), distanceFunction);
   }
 
   /**
@@ -43,7 +42,7 @@ public class MTreeFactory<O extends DatabaseObject, D extends Distance<D>> exten
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

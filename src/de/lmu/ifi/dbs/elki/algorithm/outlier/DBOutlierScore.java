@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -33,12 +32,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("Distance based outlier score")
 @Description("Generalization of the original DB-Outlier approach to a ranking method, by turning the fraction parameter into the output value.")
 @Reference(prefix = "Generalization of a method proposed in", authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
-public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
+public class DBOutlierScore<O, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(DBOutlierScore.class);
-  
+
   /**
    * Constructor with parameters.
    * 
@@ -50,13 +49,14 @@ public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ext
   }
 
   @Override
-  protected DataStore<Double> computeOutlierScores(Database<O> database, DistanceQuery<O, D> distFunc, D d) {
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+  protected DataStore<Double> computeOutlierScores(Database database, DistanceQuery<O, D> distFunc, D d) {
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(distFunc.getRepresentation().getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distFunc);
+    final double size = distFunc.getRepresentation().size();
     // TODO: use bulk when implemented.
-    for(DBID id : database) {
+    for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
       // compute percentage of neighbors in the given neighborhood with size d
-      double n = (rangeQuery.getRangeForDBID(id, d).size()) / (double) database.size();
+      double n = (rangeQuery.getRangeForDBID(id, d).size()) / size;
       scores.put(id, 1.0 - n);
     }
     scores.toString();
@@ -67,6 +67,7 @@ public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ext
   protected Logging getLogger() {
     return logger;
   }
+
   /**
    * Parameterization class.
    * 
@@ -74,7 +75,7 @@ public class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ext
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
     @Override
     protected DBOutlierScore<O, D> makeInstance() {
       return new DBOutlierScore<O, D>(distanceFunction, d);

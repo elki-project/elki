@@ -1,18 +1,18 @@
 package experimentalcode.students.roedler;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -21,12 +21,14 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
@@ -38,6 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
@@ -54,8 +57,7 @@ import experimentalcode.students.roedler.utils.DistanceFunctionDrawUtils;
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> extends P2DVisualization<NV> implements ContextChangeListener, DataStoreListener<NV> {
-
+public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> extends P2DVisualization<NV> implements ContextChangeListener, DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -102,7 +104,6 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
     p = getLPNormP(result);
 
     if(selContext != null) {
-      Database<? extends NV> database = context.getDatabase();
       DBIDs selection = selContext.getSelectedIds();
       int counter;
       Element dist = null;
@@ -112,7 +113,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
         drawDistancefunction: for(DistanceResultPair<DoubleDistance> j : result.get(i)) {
           try {
-            double[] v = proj.fastProjectDataToRenderSpace(database.get(j.second));
+            double[] v = proj.fastProjectDataToRenderSpace(rep.get(j.second));
             Element dot = svgp.svgCircle(v[0], v[1], size);
             SVGUtil.addCSSClass(dot, KNNMARKER);
             layer.appendChild(dot);
@@ -124,19 +125,19 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
             if(result.getK() == counter) {
               switch((int) p[0]){
               case 1: {
-                dist = SVGHyperSphere.drawManhattan(svgp, proj, (NV) database.get(i), j.getDistance());
+                dist = SVGHyperSphere.drawManhattan(svgp, proj, rep.get(i), j.getDistance());
                 break;
               }
               case 2: {
-                dist = SVGHyperSphere.drawEuclidean(svgp, proj, (NV) database.get(i), j.getDistance());
+                dist = SVGHyperSphere.drawEuclidean(svgp, proj, rep.get(i), j.getDistance());
                 break;
               }
               case 3: {
-                dist = SVGHyperSphere.drawLp(svgp, proj, (NV) database.get(i), j.getDistance(), p[1]);
+                dist = SVGHyperSphere.drawLp(svgp, proj, rep.get(i), j.getDistance(), p[1]);
                 break;
               }
               case 4: {
-                dist = DistanceFunctionDrawUtils.drawCosine(svgp, proj, database.get(i), database.get(j.second));
+                dist = DistanceFunctionDrawUtils.drawCosine(svgp, proj, rep.get(i), rep.get(j.second));
                 break;
               }
               default: {
@@ -200,7 +201,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
    *         Cosine =-1 -> visualization not implemented so far p[1] the p value
    *         itself
    */
-  public static double[] getLPNormP(MaterializeKNNPreprocessor<?, ?> kNN) {
+  public static <NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> double[] getLPNormP(AbstractMaterializeKNNPreprocessor<NV, D> kNN) {
     double[] p = new double[2];
     // Note: we deliberately lose generics here, so the compilers complain less
     // on the next typecheck and cast!
@@ -225,7 +226,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<NV> e) {
+  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
     synchronizedRedraw();
   }
 
@@ -256,7 +257,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> extends AbstractVisFactory {
     /**
      * Constructor
      */
@@ -271,16 +272,19 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
     @Override
     public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization<DatabaseObject>(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
+      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      final ArrayList<MaterializeKNNPreprocessor<NV, DoubleDistance>> kNNIndex = ResultUtil.filterResults(result, MaterializeKNNPreprocessor.class);
-      for(MaterializeKNNPreprocessor<NV, DoubleDistance> kNN : kNNIndex) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, kNN, this, P2DVisualization.class);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
-        context.addVisualizer(kNN, task);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        final ArrayList<MaterializeKNNPreprocessor<NV, D>> kNNIndex = ResultUtil.filterResults(result, MaterializeKNNPreprocessor.class);
+        for(AbstractMaterializeKNNPreprocessor<NV, D> kNN : kNNIndex) {
+          final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rep, this, P2DVisualization.class);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+          context.addVisualizer(kNN, task);
+        }
       }
     }
 

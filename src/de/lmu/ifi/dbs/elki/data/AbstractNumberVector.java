@@ -1,12 +1,7 @@
 package de.lmu.ifi.dbs.elki.data;
 
 /**
- * AbstractNumberVector is an abstract implementation of FeatureVector. Provided is an
- * attribute separator (space), and the ID-methods as required for a
- * DatabaseObject. The equals-method is implemented dynamically for all
- * subclasses to satisfy the requirements as defined in
- * {@link de.lmu.ifi.dbs.elki.data.DatabaseObject#equals DatabaseObject.equals(Object)}. It needs
- * not to be overwritten except for sake of efficiency.
+ * AbstractNumberVector is an abstract implementation of FeatureVector.
  * 
  * @author Arthur Zimek
  * @param <V> the concrete type of this AbstractNumberVector
@@ -14,7 +9,7 @@ package de.lmu.ifi.dbs.elki.data;
  *        AbstractNumberVector {@code v} of type {@code V} and dimensionality {@code d}
  *        is an element of {@code N}<sup>{@code d}</sup>)
  */
-public abstract class AbstractNumberVector<V extends AbstractNumberVector<? extends V, N>, N extends Number> extends AbstractDatabaseObject implements NumberVector<V, N> {
+public abstract class AbstractNumberVector<V extends AbstractNumberVector<? extends V, N>, N extends Number> implements NumberVector<V, N> {
   /**
    * The String to separate attribute values in a String that represents the
    * values.
@@ -89,10 +84,5 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
   @Override
   public short shortValue(int dimension) {
     return (short) longValue(dimension);
-  }
-
-  @Override
-  public Integer getPageID() {
-    return getID().getIntegerID();
   }
 }

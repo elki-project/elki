@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
@@ -37,7 +38,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
    */
   @Test
   public void testCOPACResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
+    Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
 
     // these parameters are not picked too smartly - room for improvement.
     ListParameterization params = new ListParameterization();
@@ -47,7 +48,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
     params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
     params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 15);
 
-    COPAC<DoubleVector> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
+    COPAC<DoubleVector, DoubleDistance> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
     testParameterizationOk(params);
 
     // run COPAC on database
@@ -65,7 +66,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
    */
   @Test
   public void testCOPACOverlap() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
+    Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
   
     // Setup algorithm
     ListParameterization params = new ListParameterization();
@@ -80,7 +81,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
     params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
     params.addParameter(PercentageEigenPairFilter.ALPHA_ID, 0.8);
   
-    COPAC<DoubleVector> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
+    COPAC<DoubleVector, DoubleDistance> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
     testParameterizationOk(params);
   
     Clustering<Model> result = copac.run(db);

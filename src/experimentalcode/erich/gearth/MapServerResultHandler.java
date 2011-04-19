@@ -8,13 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.parser.Parser;
-import de.lmu.ifi.dbs.elki.parser.ParsingResult;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -31,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  */
-public class MapServerResultHandler implements ResultHandler<DatabaseObject, Result> {
+public class MapServerResultHandler implements ResultHandler<Result> {
   /**
    * Polygon input file parameter
    * <p>
@@ -51,7 +49,7 @@ public class MapServerResultHandler implements ResultHandler<DatabaseObject, Res
   /**
    * The parser instance.
    */
-  private Parser<PolygonsObject> polygonParser;
+  private Parser polygonParser;
 
   private File inputFile;
 
@@ -66,7 +64,7 @@ public class MapServerResultHandler implements ResultHandler<DatabaseObject, Res
     config = config.descend(this);
     // polygon data source
 
-    final ObjectParameter<Parser<PolygonsObject>> pparse_param = new ObjectParameter<Parser<PolygonsObject>>(POLYGONS_ID, Parser.class, SimplePolygonParser.class);
+    final ObjectParameter<Parser> pparse_param = new ObjectParameter<Parser>(POLYGONS_ID, Parser.class, SimplePolygonParser.class);
     polygonParser = (config.grab(pparse_param)) ? pparse_param.instantiateClass(config) : null;
 
     final FileParameter inputParam = new FileParameter(POLYGONS_FILE_ID, FileParameter.FileType.INPUT_FILE);
@@ -75,12 +73,12 @@ public class MapServerResultHandler implements ResultHandler<DatabaseObject, Res
   }
 
   @Override
-  public void processResult(Database<DatabaseObject> db, Result result) {
+  public void processResult(Database db, Result result) {
     // Build a map for the main database, using external IDs
     Map<String, DBID> lblmap = new HashMap<String, DBID>(db.size() * 2);
     {
-      DataQuery<String> olq = db.getObjectLabelQuery();
-      DataQuery<String> eidq = db.getExternalIdQuery();
+      Relation<String> olq = db.getObjectLabelQuery();
+      Relation<String> eidq = db.getExternalIdQuery();
       for(DBID id : db) {
         if(olq != null) {
           String label = olq.get(id);
@@ -107,7 +105,7 @@ public class MapServerResultHandler implements ResultHandler<DatabaseObject, Res
       catch(IOException e) {
         throw new AbortException("Error loading polygon data file.");
       }
-      ParsingResult<PolygonsObject> polys = polygonParser.parse(in);
+      MultipleObjectsBundle polys = polygonParser.parse(in);
       // Build reverse map
       for(Pair<PolygonsObject, List<String>> pair : polys.getObjectAndLabelList()) {
         for(String lbl : pair.getSecond()) {
@@ -117,16 +115,10 @@ public class MapServerResultHandler implements ResultHandler<DatabaseObject, Res
     }
 
     // FIXME: Make port configurable.
-    HierarchicalResult hresult = (result instanceof HierarchicalResult) ?  ((HierarchicalResult) result) : null;
+    HierarchicalResult hresult = (result instanceof HierarchicalResult) ? ((HierarchicalResult) result) : null;
     MapWebServer serv = new MapWebServer(8080, lblmap, polymap, db, hresult);
 
     // TODO: stop somehow. UI with stop button?
     // watch for restarts due to result changes.
-  }
-
-  @SuppressWarnings("unused")
-  @Override
-  public void setNormalization(Normalization<DatabaseObject> normalization) {
-    // ignore.
   }
 }

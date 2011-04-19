@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @apiviz.has VisualizerContext oneway - - «create»
  * @apiviz.uses VisFactory oneway - n «configure»
  */
-public class VisualizerParameterizer<O extends DatabaseObject> implements Parameterizable {
+public class VisualizerParameterizer implements Parameterizable {
   /**
    * Get a logger for this class.
    */
@@ -82,7 +81,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
   /**
    * (Result-to-visualization) Adapters
    */
-  private Collection<VisFactory<O>> factories;
+  private Collection<VisFactory> factories;
 
   /**
    * Visualizer disabling pattern
@@ -96,7 +95,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * @param factories Factories to use
    * @param hideVisualizers Visualizer hiding pattern
    */
-  public VisualizerParameterizer(StyleLibrary stylelib, Collection<VisFactory<O>> factories, Pattern hideVisualizers) {
+  public VisualizerParameterizer(StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
     super();
     this.stylelib = stylelib;
     this.factories = factories;
@@ -110,8 +109,8 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * @param result Base result
    * @return New context
    */
-  public VisualizerContext<O> newContext(Database<O> db, HierarchicalResult result) {
-    VisualizerContext<O> context = new VisualizerContext<O>(db, result, stylelib, factories, hideVisualizers);
+  public VisualizerContext newContext(Database db, HierarchicalResult result) {
+    VisualizerContext context = new VisualizerContext(db, result, stylelib, factories, hideVisualizers);
     return context;
   }
 
@@ -122,7 +121,7 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * @param result Result object
    * @return generated title
    */
-  public static String getTitle(Database<? extends DatabaseObject> db, Result result) {
+  public static String getTitle(Database db, Result result) {
     List<Pair<Object, Parameter<?, ?>>> settings = new ArrayList<Pair<Object, Parameter<?, ?>>>();
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
@@ -183,12 +182,12 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     protected StyleLibrary stylelib = null;
 
     protected Pattern hideVisualizers = null;
 
-    protected Collection<VisFactory<O>> factories = null;
+    protected Collection<VisFactory> factories = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -219,12 +218,11 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
      * @param config Parameterization
      * @return List of all adapters found.
      */
-    @SuppressWarnings("unchecked")
-    private static <O extends DatabaseObject> Collection<VisFactory<O>> collectAlgorithmAdapters(Parameterization config) {
-      ArrayList<VisFactory<O>> algorithmAdapters = new ArrayList<VisFactory<O>>();
+    private static <O> Collection<VisFactory> collectAlgorithmAdapters(Parameterization config) {
+      ArrayList<VisFactory> algorithmAdapters = new ArrayList<VisFactory>();
       for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
         try {
-          VisFactory<O> a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
+          VisFactory a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
           algorithmAdapters.add(a);
         }
         catch(Throwable e) {
@@ -235,8 +233,8 @@ public class VisualizerParameterizer<O extends DatabaseObject> implements Parame
     }
 
     @Override
-    protected VisualizerParameterizer<O> makeInstance() {
-      return new VisualizerParameterizer<O>(stylelib, factories, hideVisualizers);
+    protected VisualizerParameterizer makeInstance() {
+      return new VisualizerParameterizer(stylelib, factories, hideVisualizers);
     }
   }
 }

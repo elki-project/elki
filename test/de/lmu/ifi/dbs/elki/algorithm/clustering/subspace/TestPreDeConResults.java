@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex.Factory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -36,7 +36,7 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
     // Additional input parameters
     ListParameterization inp = new ListParameterization();
     inp.addParameter(FileBasedDatabaseConnection.CLASS_LABEL_INDEX_ID, 1);
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp);
+    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp);
 
     ListParameterization params = new ListParameterization();
     // PreDeCon
@@ -65,7 +65,7 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
    */
   @Test
   public void testPreDeConSubspaceOverlapping() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
+    Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
   
     // Setup algorithm
     ListParameterization params = new ListParameterization();

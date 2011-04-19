@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.text.NumberFormat;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -9,10 +10,12 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -124,7 +127,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
    * 
    * @param <NV> Data type visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Parameter for the gamma-correction.
      * 
@@ -161,16 +164,16 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      if(!VisualizerUtil.isNumberVectorDatabase(context.getDatabase())) {
-        return;
-      }
-      // TODO: we can also visualize other scores!
-      List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-      for(OutlierResult o : ors) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, o.getScores(), this, P2DVisualization.class);
-        task.put(VisualizationTask.META_TOOL, true);
-        context.addVisualizer(o.getScores(), task);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        // TODO: we can also visualize other scores!
+        List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+        for(OutlierResult o : ors) {
+          final VisualizationTask task = new VisualizationTask(NAME, context, o.getScores(), rep, this, P2DVisualization.class);
+          task.put(VisualizationTask.META_TOOL, true);
+          context.addVisualizer(o.getScores(), task);
+        }
       }
     }
 

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
@@ -22,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkAppTreeFactory<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeFactory<O, D, MkAppTree<O, D, N>> {
+public class MkAppTreeFactory<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeFactory<O, D, MkAppTree<O, D, N>> {
   /**
    * Parameter for nolog
    */
@@ -72,8 +71,8 @@ public class MkAppTreeFactory<O extends DatabaseObject, D extends NumberDistance
   }
 
   @Override
-  public MkAppTree<O, D, N> instantiate(Database<O> database) {
-    return new MkAppTree<O, D, N>(fileName, pageSize, cacheSize, database.getDistanceQuery(distanceFunction), distanceFunction, k_max, p, log);
+  public MkAppTree<O, D, N> instantiate(Relation<O> representation) {
+    return new MkAppTree<O, D, N>(representation, fileName, pageSize, cacheSize, distanceFunction.instantiate(representation), distanceFunction, k_max, p, log);
   }
 
   /**
@@ -83,7 +82,7 @@ public class MkAppTreeFactory<O extends DatabaseObject, D extends NumberDistance
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeFactory.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeFactory.Parameterizer<O, D> {
     /**
      * Parameter k.
      */

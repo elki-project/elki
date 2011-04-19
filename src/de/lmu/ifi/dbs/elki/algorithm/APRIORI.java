@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -101,14 +104,15 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
    * @return the AprioriResult learned by this APRIORI
    */
   @Override
-  protected AprioriResult runInTime(Database<BitVector> database) throws IllegalStateException {
+  protected AprioriResult runInTime(Database database) throws IllegalStateException {
+    Relation<BitVector> dataQuery = getRelation(database);
     Map<BitSet, Integer> support = new Hashtable<BitSet, Integer>();
     List<BitSet> solution = new ArrayList<BitSet>();
-    int size = database.size();
+    final int size = dataQuery.size();
     if(size > 0) {
       int dim;
       try {
-        dim = DatabaseUtil.dimensionality(database);
+        dim = DatabaseUtil.dimensionality(dataQuery);
       }
       catch(UnsupportedOperationException e) {
         dim = 0;
@@ -120,7 +124,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
       }
       while(candidates.length > 0) {
         StringBuffer msg = new StringBuffer();
-        BitSet[] frequentItemsets = frequentItemsets(support, candidates, database);
+        BitSet[] frequentItemsets = frequentItemsets(support, candidates, dataQuery);
         if(logger.isVerbose()) {
           msg.append("\ncandidates").append(Arrays.asList(candidates));
           msg.append("\nfrequentItemsets").append(Arrays.asList(frequentItemsets));
@@ -232,13 +236,13 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
    * @return the frequent BitSets out of the given BitSets with respect to the
    *         given database
    */
-  protected BitSet[] frequentItemsets(Map<BitSet, Integer> support, BitSet[] candidates, Database<BitVector> database) {
+  protected BitSet[] frequentItemsets(Map<BitSet, Integer> support, BitSet[] candidates, Relation<BitVector> database) {
     for(BitSet bitSet : candidates) {
       if(support.get(bitSet) == null) {
         support.put(bitSet, 0);
       }
     }
-    for(DBID id : database) {
+    for(DBID id : database.iterDBIDs()) {
       BitVector bv = database.get(id);
       for(BitSet bitSet : candidates) {
         if(bv.contains(bitSet)) {
@@ -267,6 +271,11 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
     return frequentItemsets.toArray(new BitSet[frequentItemsets.size()]);
   }
 
+  @Override
+  public VectorFieldTypeInformation<BitVector> getInputTypeRestriction() {
+    return TypeUtil.BIT_VECTOR_FIELD;
+  }
+  
   @Override
   protected Logging getLogger() {
     return logger;

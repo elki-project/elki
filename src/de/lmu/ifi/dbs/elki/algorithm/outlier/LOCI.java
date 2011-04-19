@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -13,10 +13,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
-public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -125,14 +125,15 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * Runs the algorithm in the timed evaluation part.
    */
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
-    RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceFunction());
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<O> relation = database.getRelation(getInputTypeRestriction());
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    RangeQuery<O, D> rangeQuery = database.getRangeQuery(distFunc);
 
-    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", database.size(), logger) : null;
+    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", relation.size(), logger) : null;
     // LOCI preprocessing step
-    WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
-    for(DBID id : database.getIDs()) {
+    WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
+    for(DBID id : relation.iterDBIDs()) {
       List<DistanceResultPair<D>> neighbors = rangeQuery.getRangeForDBID(id, rmax);
       // build list of critical distances
       ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() * 2);
@@ -167,11 +168,11 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       progressPreproc.ensureCompleted(logger);
     }
     // LOCI main step
-    FiniteProgress progressLOCI = logger.isVerbose() ? new FiniteProgress("LOCI scores", database.size(), logger) : null;
-    WritableRecordStore store = DataStoreUtil.makeRecordStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class, Double.class);
+    FiniteProgress progressLOCI = logger.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), logger) : null;
+    WritableRecordStore store = DataStoreUtil.makeRecordStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class, Double.class);
     WritableDataStore<Double> mdef_norm = store.getStorage(0, Double.class);
     WritableDataStore<Double> mdef_radius = store.getStorage(1, Double.class);
-    for(DBID id : database.getIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double maxmdefnorm = 0.0;
       double maxnormr = 0;
       List<DoubleIntPair> cdist = interestingDistances.get(id);
@@ -179,7 +180,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       // TODO: avoid the string roundtrip!
       D range = distFunc.getDistanceFactory().parseString(Double.toString(maxdist));
       // Compute the largest neighborhood we will need.
-      List<DistanceResultPair<D>> maxneighbors = DatabaseQueryUtil.singleRangeQueryByDBID(database, distFunc, range, id);
+      List<DistanceResultPair<D>> maxneighbors = rangeQuery.getRangeForDBID(id, range);
       for(DoubleIntPair c : cdist) {
         double alpha_r = alpha * c.first;
         // compute n(p_i, \alpha * r) from list
@@ -263,6 +264,11 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -274,7 +280,7 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected D rmax = null;
 
     protected int nmin = 0;

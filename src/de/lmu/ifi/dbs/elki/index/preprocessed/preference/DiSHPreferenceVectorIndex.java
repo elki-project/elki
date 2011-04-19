@@ -12,11 +12,13 @@ import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -24,6 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -45,7 +48,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Preprocessor for DiSH preference vector assignment to objects of a certain
@@ -94,13 +96,14 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Constructor.
    * 
-   * @param database
+   * @param representation
+   * @param representation
    * @param epsilon
    * @param minpts
    * @param strategy
    */
-  public DiSHPreferenceVectorIndex(Database<V> database, DoubleDistance[] epsilon, int minpts, Strategy strategy) {
-    super(database);
+  public DiSHPreferenceVectorIndex(Relation<V> representation, DoubleDistance[] epsilon, int minpts, Strategy strategy) {
+    super(representation);
     this.epsilon = epsilon;
     this.minpts = minpts;
     this.strategy = strategy;
@@ -108,11 +111,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
   @Override
   protected void preprocess() {
-    if(database == null || database.size() == 0) {
+    if(rep == null || rep.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
-    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
@@ -124,10 +127,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
     try {
       long start = System.currentTimeMillis();
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", rep.size(), logger) : null;
 
       // only one epsilon value specified
-      int dim = DatabaseUtil.dimensionality(database);
+      int dim = DatabaseUtil.dimensionality(rep);
       if(epsilon.length == 1 && dim != 1) {
         DoubleDistance eps = epsilon[0];
         epsilon = new DoubleDistance[dim];
@@ -135,16 +138,16 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       }
 
       // epsilons as string
-      RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(database, dim);
+      RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(rep, dim);
 
-      for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+      for(Iterator<DBID> it = rep.iterDBIDs(); it.hasNext();) {
         StringBuffer msg = new StringBuffer();
         final DBID id = it.next();
 
         if(logger.isDebugging()) {
           msg.append("\nid = ").append(id);
           // msg.append(" ").append(database.get(id));
-          msg.append(" ").append(database.getObjectLabelQuery().get(id));
+          //msg.append(" ").append(database.getObjectLabelQuery().get(id));
         }
 
         // determine neighbors in each dimension
@@ -165,7 +168,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
           }
         }
 
-        BitSet preferenceVector = determinePreferenceVector(database, allNeighbors, msg);
+        BitSet preferenceVector = determinePreferenceVector(rep, allNeighbors, msg);
         storage.put(id, preferenceVector);
 
         if(logger.isDebugging()) {
@@ -198,7 +201,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Determines the preference vector according to the specified neighbor ids.
    * 
-   * @param database the database storing the objects
+   * @param rep the database storing the objects
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector
@@ -207,7 +210,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    * 
    */
-  private BitSet determinePreferenceVector(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+  private BitSet determinePreferenceVector(Relation<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
     if(strategy.equals(Strategy.APRIORI)) {
       return determinePreferenceVectorByApriori(database, neighborIDs, msg);
     }
@@ -222,7 +225,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Determines the preference vector with the apriori strategy.
    * 
-   * @param database the database storing the objects
+   * @param rep the database storing the objects
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector
@@ -231,14 +234,13 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    * 
    */
-  private BitSet determinePreferenceVectorByApriori(Database<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+  private BitSet determinePreferenceVectorByApriori(Relation<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
     int dimensionality = neighborIDs.length;
 
-    APRIORI apriori = new APRIORI(minpts);
-
     // database for apriori
-    Database<BitVector> apriori_db = new HashmapDatabase<BitVector>(null, null);
-    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+    Database apriori_db = new HashmapDatabase();
+    SimpleTypeInformation<?> bitmeta = VectorFieldTypeInformation.get(BitVector.class, dimensionality);
+    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
       DBID id = it.next();
       Bit[] bits = new Bit[dimensionality];
       boolean allFalse = true;
@@ -252,10 +254,12 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         }
       }
       if(!allFalse) {
-        Pair<BitVector, DatabaseObjectMetadata> oaa = new Pair<BitVector, DatabaseObjectMetadata>(new BitVector(bits), null);
+        SingleObjectBundle oaa = new SingleObjectBundle();
+        oaa.append(bitmeta, new BitVector(bits));
         apriori_db.insert(oaa);
       }
     }
+    APRIORI apriori = new APRIORI(minpts);
     AprioriResult aprioriResult = apriori.run(apriori_db);
 
     // result of apriori
@@ -387,17 +391,17 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * Initializes the dimension selecting distancefunctions to determine the
    * preference vectors.
    * 
-   * @param database the database storing the objects
+   * @param rep the database storing the objects
    * @param dimensionality the dimensionality of the objects
    * @return the dimension selecting distancefunctions to determine the
    *         preference vectors
    * @throws ParameterException
    */
-  private RangeQuery<V, DoubleDistance>[] initRangeQueries(Database<V> database, int dimensionality) throws ParameterException {
+  private RangeQuery<V, DoubleDistance>[] initRangeQueries(Relation<V> rep, int dimensionality) throws ParameterException {
     Class<RangeQuery<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
     RangeQuery<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {
-      rangeQueries[d] = database.getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(database, new DimensionSelectingDistanceFunction(d + 1)));
+      rangeQueries[d] = rep.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(rep, new DimensionSelectingDistanceFunction(d + 1)));
     }
     return rangeQueries;
   }
@@ -519,8 +523,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     }
 
     @Override
-    public DiSHPreferenceVectorIndex<V> instantiate(Database<V> database) {
-      return new DiSHPreferenceVectorIndex<V>(database, epsilon, minpts, strategy);
+    public DiSHPreferenceVectorIndex<V> instantiate(Relation<V> representation) {
+      return new DiSHPreferenceVectorIndex<V>(representation, epsilon, minpts, strategy);
     }
 
     /**

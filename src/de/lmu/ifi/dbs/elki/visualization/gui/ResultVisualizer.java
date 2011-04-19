@@ -2,10 +2,8 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import javax.swing.JFrame;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -28,7 +26,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.uses ResultWindow oneway
  */
-public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler<O, HierarchicalResult> {
+public class ResultVisualizer implements ResultHandler<HierarchicalResult> {
   // TODO: move title/maxdim parameters into a layouter class.
   
   /**
@@ -74,7 +72,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   /**
    * Visualization manager.
    */
-  VisualizerParameterizer<O> manager;
+  VisualizerParameterizer manager;
 
   /**
    * Constructor.
@@ -83,7 +81,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
    * @param maxdim
    * @param manager
    */
-  public ResultVisualizer(String title, int maxdim, VisualizerParameterizer<O> manager) {
+  public ResultVisualizer(String title, int maxdim, VisualizerParameterizer manager) {
     super();
     this.title = title;
     this.maxdim = maxdim;
@@ -91,11 +89,11 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
   }
 
   @Override
-  public void processResult(final Database<O> db, final HierarchicalResult result) {
+  public void processResult(final Database db, final HierarchicalResult result) {
     ResultUtil.ensureClusteringResult(db, result);
     ResultUtil.ensureSelectionResult(db, result);
 
-    final VisualizerContext<O> context = manager.newContext(db, result);
+    final VisualizerContext context = manager.newContext(db, result);
 
     if(title == null) {
       title = VisualizerParameterizer.getTitle(db, result);
@@ -122,12 +120,6 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     });
   }
 
-  @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<O> normalization) {
-    // TODO: handle normalizations
-    logger.warning("Normalizations not yet supported in " + ResultVisualizer.class.getName());
-  }
-
   /**
    * Parameterization class.
    * 
@@ -135,7 +127,7 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Stores the set title.
      */
@@ -149,9 +141,8 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     /**
      * Visualization manager.
      */
-    VisualizerParameterizer<O> manager;
+    VisualizerParameterizer manager;
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -168,8 +159,8 @@ public class ResultVisualizer<O extends DatabaseObject> implements ResultHandler
     }
 
     @Override
-    protected ResultVisualizer<O> makeInstance() {
-      return new ResultVisualizer<O>(title, maxdim, manager);
+    protected ResultVisualizer makeInstance() {
+      return new ResultVisualizer(title, maxdim, manager);
     }
   }
 }

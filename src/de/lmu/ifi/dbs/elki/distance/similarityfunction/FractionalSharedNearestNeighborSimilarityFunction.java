@@ -2,10 +2,9 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <D> distance type
  */
 // todo arthur comment class
-public class FractionalSharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
+public class FractionalSharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
   /**
    * Constructor.
    * 
@@ -38,9 +37,9 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends O> Instance<T, D> instantiate(Database<T> database) {
-    SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Database<O>) database);
-    return (Instance<T, D>) new Instance<O, D>((Database<O>) database, indexi, indexi.getNumberOfNeighbors());
+  public <T extends O> Instance<T, D> instantiate(Relation<T> database) {
+    SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Relation<O>) database);
+    return (Instance<T, D>) new Instance<O, D>((Relation<O>) database, indexi, indexi.getNumberOfNeighbors());
   }
 
   /**
@@ -50,10 +49,10 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * 
    * @apiviz.uses SharedNearestNeighborIndex
    * 
-   * @param <O>
-   * @param <D>
+   * @param <T> Object type
+   * @param <D> Distance type
    */
-  public static class Instance<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, TreeSetDBIDs, DoubleDistance> {
+  public static class Instance<T, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>, TreeSetDBIDs, DoubleDistance> {
     /**
      * Holds the number of nearest neighbors to be used.
      */
@@ -66,7 +65,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
      * @param preprocessor Preprocessor
      * @param numberOfNeighbors Neighborhood size
      */
-    public Instance(Database<O> database, SharedNearestNeighborIndex<O> preprocessor, int numberOfNeighbors) {
+    public Instance(Relation<T> database, SharedNearestNeighborIndex<T> preprocessor, int numberOfNeighbors) {
       super(database, preprocessor);
       this.numberOfNeighbors = numberOfNeighbors;
     }
@@ -146,7 +145,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

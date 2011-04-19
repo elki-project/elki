@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.evaluation;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -11,8 +10,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * evaluations, ...
  * 
  * @author Erich Schubert
- * 
- * @apiviz.uses Normalization
  */
 public interface Evaluator extends Parameterizable {
   /**
@@ -22,12 +19,5 @@ public interface Evaluator extends Parameterizable {
    * @param result Result object
    * @param hierarchy Result hierarchy to use
    */
-  public abstract void processResult(Database<?> db, Result result, ResultHierarchy hierarchy);
-
-  /**
-   * Setter for normalization
-   * 
-   * @param normalization new normalization object
-   */
-  public abstract void setNormalization(Normalization<?> normalization);
+  public abstract void processResult(Database db, Result result, ResultHierarchy hierarchy);
 }

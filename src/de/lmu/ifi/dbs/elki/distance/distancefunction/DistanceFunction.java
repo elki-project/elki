@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.landmark
  * @apiviz.has Distance
  */
-public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
+public interface DistanceFunction<O, D extends Distance<?>> extends Parameterizable {
   /**
    * Method to get the distance functions factory.
    * 
@@ -42,14 +42,16 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D
 
   /**
    * Get the input data type of the function.
+   * 
+   * @return Type restriction
    */
-  Class<? super O> getInputDatatype();
+  TypeInformation getInputTypeRestriction();
 
   /**
    * Instantiate with a database to get the actual distance query.
    * 
-   * @param database
+   * @param rep The representation to use
    * @return Actual distance query.
    */
-  public <T extends O> DistanceQuery<T, D> instantiate(Database<T> database);
+  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> rep);
 }

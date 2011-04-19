@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
 import java.lang.ref.WeakReference;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -23,12 +22,12 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
   /**
    * The data input configured
    */
-  private AlgorithmStep<DatabaseObject> algorithms = null;
+  private AlgorithmStep algorithms = null;
 
   /**
    * Database we ran last onn
    */
-  private WeakReference<? extends Object> basedOnDatabase = null;
+  private WeakReference<?> basedOnDatabase = null;
 
   /**
    * Input step to run on.
@@ -46,7 +45,6 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
     input.addObserver(this);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected synchronized void configureStep(Parameterization config) {
     algorithms = config.tryInstantiate(AlgorithmStep.class);
@@ -65,7 +63,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
       throw new AbortException("Input data not available.");
     }
     // Get the database and run the algorithms
-    Database<DatabaseObject> database = input.getInputStep().getDatabase();
+    Database database = input.getInputStep().getDatabase();
     algorithms.runAlgorithms(database);
     basedOnDatabase = new WeakReference<Object>(database);
   }
@@ -95,7 +93,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
    * 
    * @return Algorithm step
    */
-  public AlgorithmStep<DatabaseObject> getAlgorithmStep() {
+  public AlgorithmStep getAlgorithmStep() {
     if(algorithms == null) {
       throw new AbortException("Algorithms not configured.");
     }

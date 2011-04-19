@@ -30,7 +30,7 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
    */
   @Test
   public void testDiSHResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-hierarchy.csv", 450);
+    Database db = makeSimpleDatabase(UNITTEST + "subspace-hierarchy.csv", 450);
 
     ListParameterization params = new ListParameterization();
     params.addParameter(DiSH.EPSILON_ID, 0.005);
@@ -54,7 +54,7 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
    */
   @Test
   public void testDiSHSubspaceOverlapping() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
+    Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
   
     // Setup algorithm
     ListParameterization params = new ListParameterization();

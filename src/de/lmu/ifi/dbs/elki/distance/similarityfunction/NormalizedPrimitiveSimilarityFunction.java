@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -12,6 +11,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public interface NormalizedPrimitiveSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends PrimitiveSimilarityFunction<O, D>, NormalizedSimilarityFunction<O, D> {
+public interface NormalizedPrimitiveSimilarityFunction<O, D extends Distance<D>> extends PrimitiveSimilarityFunction<O, D>, NormalizedSimilarityFunction<O, D> {
   // empty marker interface
 }

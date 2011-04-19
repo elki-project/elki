@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -17,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -116,10 +119,11 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k + 1);
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<V> data = getRelation(database);
+    KNNQuery<V, D> knnQuery = database.getKNNQuery(data, getDistanceFunction(), k + 1);
 
-    DBIDs ids = database.getIDs();
+    DBIDs ids = data.getDBIDs();
 
     WritableDataStore<Double> cop_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     WritableDataStore<Vector> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Vector.class);
@@ -129,7 +133,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     {// compute neighbors of each db object
       FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", database.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
-      for(DBID id : database) {
+      for(DBID id : data.iterDBIDs()) {
         List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k + 1);
         neighbors.remove(0);
 
@@ -139,7 +143,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
         }
 
         // TODO: do we want to use the query point as centroid?
-        CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(database, nids);
+        CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(data, nids);
 
         // temp code, experimental.
         /*
@@ -151,15 +155,15 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
          * cop_score.put(id, 0.0); } }
          */
         double stddev = depsol.getStandardDeviation();
-        double distance = depsol.distance(database.get(id));
+        double distance = depsol.distance(data.get(id));
         double prob = ErrorFunctions.erf(distance / (stddev * sqrt2));
 
         cop_score.put(id, prob);
 
-        Vector errv = depsol.errorVector(database.get(id));
+        Vector errv = depsol.errorVector(data.get(id));
         cop_err_v.put(id, errv);
 
-        Matrix datav = depsol.dataProjections(database.get(id));
+        Matrix datav = depsol.dataProjections(data.get(id));
         cop_datav.put(id, datav);
 
         cop_dim.put(id, depsol.getCorrelationDimensionality());
@@ -184,6 +188,11 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     result.addChildResult(new AnnotationFromDataStore<Matrix>("Data vectors", "cop-datavec", COP_DATA_VECTORS, cop_datav));
     result.addChildResult(new AnnotationFromDataStore<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", COP_SOL, cop_sol));
     return result;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

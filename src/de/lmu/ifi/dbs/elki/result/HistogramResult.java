@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-
 /**
  * Histogram result.
  * 
@@ -11,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  *
  * @param <O> Object class (e.g. {@link de.lmu.ifi.dbs.elki.data.DoubleVector})
  */
-public class HistogramResult<O extends DatabaseObject> extends CollectionResult<O> {
+public class HistogramResult<O> extends CollectionResult<O> {
   /**
    * Constructor
    * 

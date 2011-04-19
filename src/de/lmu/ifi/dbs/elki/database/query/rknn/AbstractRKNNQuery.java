@@ -2,12 +2,11 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractRKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseQuery<O> implements RKNNQuery<O, D> {
+public abstract class AbstractRKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RKNNQuery<O, D> {
   /**
    * Hold the distance function to be used.
    */
@@ -24,11 +23,11 @@ public abstract class AbstractRKNNQuery<O extends DatabaseObject, D extends Dist
   /**
    * Constructor.
    * 
-   * @param database Database
+   * @param rep Data to query
    * @param distanceQuery distance query
    */
-  public AbstractRKNNQuery(Database<? extends O> database, DistanceQuery<O, D> distanceQuery) {
-    super(database);
+  public AbstractRKNNQuery(Relation<? extends O> rep, DistanceQuery<O, D> distanceQuery) {
+    super(rep);
     this.distanceQuery = distanceQuery;
   }
 

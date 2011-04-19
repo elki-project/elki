@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> object class to process
  */
-public abstract class AbstractSimilarityAdapter<O extends DatabaseObject> extends AbstractDatabaseDistanceFunction<O, DoubleDistance> {
+public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDistanceFunction<O, DoubleDistance> {
   /**
    * Parameter to specify the similarity function to derive the distance between
    * database objects from. Must extend
@@ -60,8 +60,8 @@ public abstract class AbstractSimilarityAdapter<O extends DatabaseObject> extend
   }
 
   @Override
-  public Class<? super O> getInputDatatype() {
-    return similarityFunction.getInputDatatype();
+  public TypeInformation getInputTypeRestriction() {
+    return similarityFunction.getInputTypeRestriction();
   }
 
   @Override
@@ -75,7 +75,7 @@ public abstract class AbstractSimilarityAdapter<O extends DatabaseObject> extend
   }
 
   @Override
-  abstract public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Database<T> database);
+  abstract public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Relation<T> database);
 
   /**
    * Inner proxy class for SNN distance function.
@@ -84,7 +84,7 @@ public abstract class AbstractSimilarityAdapter<O extends DatabaseObject> extend
    * 
    * @param <O> Object type
    */
-  public abstract static class Instance<O extends DatabaseObject> extends AbstractDatabaseDistanceFunction.Instance<O, DoubleDistance> {
+  public abstract static class Instance<O> extends AbstractDatabaseDistanceFunction.Instance<O, DoubleDistance> {
     /**
      * The similarity query we use.
      */
@@ -97,7 +97,7 @@ public abstract class AbstractSimilarityAdapter<O extends DatabaseObject> extend
      * @param parent Parent distance function
      * @param similarityQuery Similarity query
      */
-    public Instance(Database<O> database, DistanceFunction<? super O, DoubleDistance> parent, SimilarityQuery<? super O, ? extends NumberDistance<?, ?>> similarityQuery) {
+    public Instance(Relation<O> database, DistanceFunction<? super O, DoubleDistance> parent, SimilarityQuery<? super O, ? extends NumberDistance<?, ?>> similarityQuery) {
       super(database, parent);
       this.similarityQuery = similarityQuery;
     }
@@ -129,7 +129,7 @@ public abstract class AbstractSimilarityAdapter<O extends DatabaseObject> extend
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static abstract class Parameterizer<O> extends AbstractParameterizer {
     /**
      * Holds the similarity function.
      */

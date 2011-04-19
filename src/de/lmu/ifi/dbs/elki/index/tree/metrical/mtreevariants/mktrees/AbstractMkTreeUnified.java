@@ -4,11 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
@@ -31,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  */
-public abstract class AbstractMkTreeUnified<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMkTree<O, D, N, E> {
+public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMkTree<O, D, N, E> {
   /**
    * Holds the maximum value of k to support.
    */
@@ -47,8 +46,8 @@ public abstract class AbstractMkTreeUnified<O extends DatabaseObject, D extends 
    * @param distanceFunction Distance function
    * @param k_max Maximum value for k
    */
-  public AbstractMkTreeUnified(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public AbstractMkTreeUnified(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
     this.k_max = k_max;
   }
 
@@ -59,16 +58,17 @@ public abstract class AbstractMkTreeUnified<O extends DatabaseObject, D extends 
    * <p/>
    * <p>
    * Calls for each object
-   * {@link AbstractMTree#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
+   * {@link AbstractMTree#insertAll(ArrayDBIDs,boolean)
    * AbstractMTree.insert(object, false)}. After insertion a batch knn query is
    * performed and the knn distances are adjusted.
    * <p/>
    */
   @Override
-  public final void insert(List<O> objects) {
+  public final void insertAll(ArrayDBIDs ids, List<O> objects) {
     if(objects.isEmpty()) {
       return;
     }
+    assert(ids.size() == objects.size());
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insert " + objects + "\n");
@@ -78,17 +78,15 @@ public abstract class AbstractMkTreeUnified<O extends DatabaseObject, D extends 
       initialize(objects.get(0));
     }
 
-    ModifiableDBIDs ids = DBIDUtil.newArray();
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
 
     // insert sequentially
-    for(O object : objects) {
+    for (int i = 0; i < ids.size(); i++) {
       // create knnList for the object
-      ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNHeap<D>(k_max, getDistanceFactory().infiniteDistance()));
+      knnLists.put(ids.get(i), new KNNHeap<D>(k_max, getDistanceFactory().infiniteDistance()));
 
       // insert the object
-      super.insert(object, false);
+      super.insert(ids.get(i), objects.get(i), false);
     }
 
     // do batch nn

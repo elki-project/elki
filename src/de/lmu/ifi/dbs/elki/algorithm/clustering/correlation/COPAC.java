@@ -14,26 +14,30 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex.Factory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -66,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger P., A. Zimek", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
-public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
+public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -107,24 +111,15 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   public static final OptionID PARTITION_ALGORITHM_ID = OptionID.getOrCreateOptionID("copac.partitionAlgorithm", "Clustering algorithm to apply to each partition.");
 
   /**
-   * Parameter to specify the database class for each partition, must extend
-   * {@link de.lmu.ifi.dbs.elki.database.Database}.
-   * <p>
-   * Key: {@code -copac.partitionDB}
-   * </p>
-   */
-  public static final OptionID PARTITION_DB_ID = OptionID.getOrCreateOptionID("copac.partitionDB", "Database class for each partition. " + "If this parameter is not set, the databases of the partitions have " + "the same class as the original database.");
-
-  /**
    * Holds the instance of the preprocessed distance function
    * {@link #PARTITION_DISTANCE_ID}.
    */
-  private FilteredLocalPCABasedDistanceFunction<V, ?, ?> partitionDistanceFunction;
+  private FilteredLocalPCABasedDistanceFunction<V, ?, D> partitionDistanceFunction;
 
   /**
    * Get the algorithm to run on each partition.
    */
-  private Class<? extends ClusteringAlgorithm<Clustering<Model>, V>> partitionAlgorithm;
+  private Class<? extends ClusteringAlgorithm<Clustering<Model>>> partitionAlgorithm;
 
   /**
    * Holds the parameters of the algorithm to run on each partition.
@@ -132,22 +127,11 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
   private Collection<Pair<OptionID, Object>> partitionAlgorithmParameters;
 
   /**
-   * Holds the instance of the partition database specified by
-   * {@link #PARTITION_DB_ID}.
-   */
-  private Class<? extends Database<V>> partitionDatabase;
-
-  /**
-   * Holds the parameters of the partition databases.
-   */
-  private Collection<Pair<OptionID, Object>> partitionDatabaseParameters;
-
-  /**
    * The last used distance query
    */
   // FIXME: remove this when migrating to a full Factory pattern! This is
   // non-reentrant!
-  private FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, ?> partitionDistanceQuery;
+  private FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D> partitionDistanceQuery;
 
   /**
    * Constructor.
@@ -156,16 +140,12 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * @param partitionAlgorithm Algorithm to use on partitions
    * @param partitionAlgorithmParameters Parameters for Algorithm to run on
    *        partitions
-   * @param partitionDatabase Database to use for Partitions
-   * @param partitionDatabaseParameters Parameters for database to use.
    */
-  public COPAC(FilteredLocalPCABasedDistanceFunction<V, ?, ?> partitionDistanceFunction, Class<? extends ClusteringAlgorithm<Clustering<Model>, V>> partitionAlgorithm, Collection<Pair<OptionID, Object>> partitionAlgorithmParameters, Class<Database<V>> partitionDatabase, Collection<Pair<OptionID, Object>> partitionDatabaseParameters) {
+  public COPAC(FilteredLocalPCABasedDistanceFunction<V, ?, D> partitionDistanceFunction, Class<? extends ClusteringAlgorithm<Clustering<Model>>> partitionAlgorithm, Collection<Pair<OptionID, Object>> partitionAlgorithmParameters) {
     super();
     this.partitionDistanceFunction = partitionDistanceFunction;
     this.partitionAlgorithm = partitionAlgorithm;
     this.partitionAlgorithmParameters = partitionAlgorithmParameters;
-    this.partitionDatabase = partitionDatabase;
-    this.partitionDatabaseParameters = partitionDatabaseParameters;
   }
 
   /**
@@ -173,20 +153,21 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
+  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
     if(logger.isVerbose()) {
-      logger.verbose("Running COPAC on db size = " + database.size() + " with dimensionality = " + DatabaseUtil.dimensionality(database));
+      logger.verbose("Running COPAC on db size = " + dataQuery.size() + " with dimensionality = " + DatabaseUtil.dimensionality(dataQuery));
     }
 
-    partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, ?>) partitionDistanceFunction.instantiate(database);
+    partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D>) partitionDistanceFunction.instantiate(dataQuery);
     LocalProjectionIndex<V, ?> preprocin = partitionDistanceQuery.getIndex();
 
     // partitioning
     Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
-    FiniteProgress partitionProgress = logger.isVerbose() ? new FiniteProgress("Partitioning", database.size(), logger) : null;
+    FiniteProgress partitionProgress = logger.isVerbose() ? new FiniteProgress("Partitioning", dataQuery.size(), logger) : null;
     int processed = 1;
 
-    for(DBID id : database) {
+    for(DBID id : dataQuery.iterDBIDs()) {
       Integer corrdim = preprocin.getLocalProjection(id).getCorrelationDimension();
 
       if(!partitionMap.containsKey(corrdim)) {
@@ -216,7 +197,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       pmap.put(ent.getKey(), ent.getValue());
     }
     // running partition algorithm
-    return runPartitionAlgorithm(database, pmap, partitionDistanceQuery);
+    return runPartitionAlgorithm(dataQuery, pmap, partitionDistanceQuery);
   }
 
   /**
@@ -226,43 +207,39 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * @param partitionMap the map of partition IDs to object ids
    * @param query The preprocessor based query function
    */
-  private Clustering<Model> runPartitionAlgorithm(Database<V> database, Map<Integer, DBIDs> partitionMap, DistanceQuery<V, ?> query) {
-    try {
-      Map<Integer, Database<V>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
+  private Clustering<Model> runPartitionAlgorithm(Relation<V> database, Map<Integer, DBIDs> partitionMap, DistanceQuery<V, D> query) {
+    Clustering<Model> result = new Clustering<Model>("COPAC clustering", "copac-clustering");
 
-      Clustering<Model> result = new Clustering<Model>("COPAC clustering", "copac-clustering");
-
-      // TODO: use an extra finite progress for the partitions?
-      for(Integer partitionID : databasePartitions.keySet()) {
-        // noise partition
-        if(partitionID == DatabaseUtil.dimensionality(database)) {
-          Database<V> noiseDB = databasePartitions.get(partitionID);
-          // Make a Noise cluster
-          result.addCluster(new Cluster<Model>(noiseDB.getIDs(), true, ClusterModel.CLUSTER));
+    // TODO: use an extra finite progress for the partitions?
+    for(Entry<Integer, DBIDs> pair : partitionMap.entrySet()) {
+      // noise partition
+      if(pair.getKey() == DatabaseUtil.dimensionality(database)) {
+        // Make a Noise cluster
+        result.addCluster(new Cluster<Model>(pair.getValue(), true, ClusterModel.CLUSTER));
+      }
+      else {
+        DBIDs partids = pair.getValue();
+        ProxyDatabase proxy = new ProxyDatabase(partids);
+        Relation<V> partition = ProxyView.wrap(proxy, partids, database);
+        proxy.addRepresentation(partition);
+        
+        ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = getPartitionAlgorithm(query);
+        if(logger.isVerbose()) {
+          logger.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + pair.getKey() + "]...");
         }
-        else {
-          ClusteringAlgorithm<Clustering<Model>, V> partitionAlgorithm = getPartitionAlgorithm(query);
-
-          if(logger.isVerbose()) {
-            logger.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + partitionID + "]...");
+        Clustering<Model> p = partitionAlgorithm.run(proxy);
+        // Re-Wrap resulting Clusters as DimensionModel clusters.
+        for(Cluster<Model> clus : p.getAllClusters()) {
+          if(clus.isNoise()) {
+            result.addCluster(new Cluster<Model>(clus.getIDs(), true, ClusterModel.CLUSTER));
           }
-          Clustering<Model> p = partitionAlgorithm.run(databasePartitions.get(partitionID));
-          // Re-Wrap resulting Clusters as DimensionModel clusters.
-          for(Cluster<Model> clus : p.getAllClusters()) {
-            if(clus.isNoise()) {
-              result.addCluster(new Cluster<Model>(clus.getIDs(), true, ClusterModel.CLUSTER));
-            }
-            else {
-              result.addCluster(new Cluster<Model>(clus.getIDs(), new DimensionModel(partitionID)));
-            }
+          else {
+            result.addCluster(new Cluster<Model>(clus.getIDs(), new DimensionModel(pair.getKey())));
           }
         }
       }
-      return result;
     }
-    catch(UnableToComplyException e) {
-      throw new IllegalStateException(e);
-    }
+    return result;
   }
 
   /**
@@ -270,11 +247,11 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * 
    * @return the specified partition algorithm
    */
-  public ClusteringAlgorithm<Clustering<Model>, V> getPartitionAlgorithm(DistanceQuery<V, ?> query) {
+  public ClusteringAlgorithm<Clustering<Model>> getPartitionAlgorithm(DistanceQuery<V, D> query) {
     ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
-    ProxyDistanceFunction<V, ?> dist = ProxyDistanceFunction.proxy(query);
+    ProxyDistanceFunction<V, D> dist = ProxyDistanceFunction.proxy(query);
     reconfig.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);
-    ClusteringAlgorithm<Clustering<Model>, V> instance = reconfig.tryInstantiate(partitionAlgorithm);
+    ClusteringAlgorithm<Clustering<Model>> instance = reconfig.tryInstantiate(partitionAlgorithm);
     reconfig.failOnErrors();
     return instance;
   }
@@ -286,8 +263,13 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * 
    * @return distance query
    */
-  public FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, ?> getPartitionDistanceQuery() {
+  public FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D> getPartitionDistanceQuery() {
     return partitionDistanceQuery;
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
@@ -302,18 +284,14 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractParameterizer {
     protected LocalProjectionIndex.Factory<V, ?> indexI = null;
 
-    protected FilteredLocalPCABasedDistanceFunction<V, ?, ?> pdistI = null;
+    protected FilteredLocalPCABasedDistanceFunction<V, ?, D> pdistI = null;
 
-    protected Class<? extends ClusteringAlgorithm<Clustering<Model>, V>> algC = null;
+    protected Class<? extends ClusteringAlgorithm<Clustering<Model>>> algC = null;
 
     protected Collection<Pair<OptionID, Object>> algO = null;
-
-    protected Class<Database<V>> partDBC = null;
-
-    protected Collection<Pair<OptionID, Object>> partDBO = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -323,7 +301,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
         indexI = indexP.instantiateClass(config);
       }
 
-      ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, ?>> pdistP = new ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, ?>>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+      ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, D>> pdistP = new ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, D>>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
       if(config.grab(pdistP)) {
         ListParameterization predefinedDist = new ListParameterization();
         predefinedDist.addParameter(IndexBasedDistanceFunction.INDEX_ID, indexI);
@@ -334,7 +312,7 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
       }
 
       // Parameterize algorithm:
-      ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>> algP = new ClassParameter<ClusteringAlgorithm<Clustering<Model>, V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
+      ClassParameter<ClusteringAlgorithm<Clustering<Model>>> algP = new ClassParameter<ClusteringAlgorithm<Clustering<Model>>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(algP)) {
         ListParameterization predefined = new ListParameterization();
         predefined.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, pdistI);
@@ -346,20 +324,11 @@ public class COPAC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Cl
         algO = trackpar.getGivenParameters();
         predefined.reportInternalParameterizationErrors(chain);
       }
-
-      // Parameterize database for partitions
-      ClassParameter<Database<V>> partDBP = new ClassParameter<Database<V>>(PARTITION_DB_ID, Database.class, true);
-      if(config.grab(partDBP)) {
-        TrackParameters trackpar = new TrackParameters(config);
-        partDBP.instantiateClass(trackpar);
-        partDBC = ClassGenericsUtil.uglyCrossCast(partDBP.getValue(), Database.class);
-        partDBO = trackpar.getGivenParameters();
-      }
     }
 
     @Override
-    protected COPAC<V> makeInstance() {
-      return new COPAC<V>(pdistI, algC, algO, partDBC, partDBO);
+    protected COPAC<V, D> makeInstance() {
+      return new COPAC<V, D>(pdistI, algC, algO);
     }
   }
 }

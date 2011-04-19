@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @apiviz.has Parameter
  * @apiviz.excludeSubtypes
  */
-public abstract class AbstractParameterizer {
+public abstract class AbstractParameterizer implements Parameterizer {
   /**
    * Constant for "fresh" state
    */
@@ -48,6 +48,12 @@ public abstract class AbstractParameterizer {
    */
   protected void makeOptions(Parameterization config) {
     // Nothing to do here.
+  }
+
+  // TODO: remove
+  @Override
+  public final void configure(Parameterization config) {
+    makeOptions(config);
   }
 
   /**

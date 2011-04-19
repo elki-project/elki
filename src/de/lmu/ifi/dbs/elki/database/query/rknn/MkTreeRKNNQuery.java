@@ -2,14 +2,14 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree
  */
-public class MkTreeRKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractRKNNQuery<O, D> {
+public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery<O, D> {
   /**
    * The index to use
    */
@@ -28,24 +28,24 @@ public class MkTreeRKNNQuery<O extends DatabaseObject, D extends Distance<D>> ex
   /**
    * Constructor.
    *
-   * @param database Database to use
+   * @param rep Representation to use
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MkTreeRKNNQuery(Database<? extends O> database, AbstractMkTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
-    super(database, distanceQuery);
+  public MkTreeRKNNQuery(Relation<? extends O> rep, AbstractMkTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+    super(rep, distanceQuery);
     this.index = index;
   }
 
+  @SuppressWarnings("unused")
   @Override
   public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k) {
-    return index.reverseKNNQuery(obj, k);
+    throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
 
   @Override
   public List<DistanceResultPair<D>> getRKNNForDBID(DBID id, int k) {
-    // TODO: do this in the DB layer, we might have a better index?
-    return getRKNNForObject(database.get(id), k);
+    return index.reverseKNNQuery(id, k);
   }
 
   @SuppressWarnings("unused")

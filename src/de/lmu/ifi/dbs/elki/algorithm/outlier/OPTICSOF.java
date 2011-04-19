@@ -5,7 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -54,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("OPTICS-OF: Identifying Local Outliers")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'minpts'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "OPTICS-OF: Identifying Local Outliers", booktitle = "Proc. of the 3rd European Conference on Principles of Knowledge Discovery and Data Mining (PKDD), Prague, Czech Republic", url = "http://springerlink.metapress.com/content/76bx6413gqb4tvta/")
-public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -83,11 +84,12 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
   }
 
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distQuery = database.getDistanceQuery(getDistanceFunction());
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<O> dataQuery = getRelation(database);
+    DistanceQuery<O, D> distQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, minpts);
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distQuery);
-    DBIDs ids = database.getIDs();
+    DBIDs ids = database.getDBIDs();
 
     WritableDataStore<List<DistanceResultPair<D>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDataStore<Double> coreDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
@@ -96,7 +98,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     // Pass 1
     // N_minpts(id) and core-distance(id)
 
-    for(DBID id : database) {
+    for(DBID id : dataQuery.iterDBIDs()) {
       List<DistanceResultPair<D>> minptsNeighbours = knnQuery.getKNNForDBID(id, minpts);
       D d = minptsNeighbours.get(minptsNeighbours.size() - 1).getDistance();
       nMinPts.put(id, minptsNeighbours);
@@ -107,7 +109,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     // Pass 2
     WritableDataStore<List<Double>> reachDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    for(DBID id : database) {
+    for(DBID id : dataQuery.iterDBIDs()) {
       List<Double> core = new ArrayList<Double>();
       double lrd = 0;
       for(DistanceResultPair<D> neighPair : nMinPts.get(id)) {
@@ -126,7 +128,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     // Pass 3
     MinMax<Double> ofminmax = new MinMax<Double>();
     WritableDataStore<Double> ofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : database) {
+    for(DBID id : dataQuery.iterDBIDs()) {
       double of = 0;
       for(DistanceResultPair<D> pair : nMinPts.get(id)) {
         DBID idN = pair.getID();
@@ -144,6 +146,11 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
+  
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
 
   @Override
   protected Logging getLogger() {
@@ -157,7 +164,7 @@ public class OPTICSOF<O extends DatabaseObject, D extends NumberDistance<D, ?>> 
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected int minpts = 0;
 
     @Override

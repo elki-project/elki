@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -25,7 +24,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualization oneway - - «create»
  */
-public class LabelVisFactory extends AbstractVisFactory<DatabaseObject> {
+public class LabelVisFactory extends AbstractVisFactory {
   /**
    * The label to render
    */
@@ -50,14 +49,14 @@ public class LabelVisFactory extends AbstractVisFactory<DatabaseObject> {
 
   @SuppressWarnings("unused")
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+  public void addVisualizers(VisualizerContext context, Result result) {
     // No auto discovery supported.
   }
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
     SVGPlot svgp = task.getPlot();
-    VisualizerContext<DatabaseObject> context = task.getContext();
+    VisualizerContext context = task.getContext();
     CSSClass cls = new CSSClass(svgp, "unmanaged");
     StyleLibrary style = context.getStyleLibrary();
     double fontsize = style.getTextSize("overview.labels") / StyleLibrary.SCALE;

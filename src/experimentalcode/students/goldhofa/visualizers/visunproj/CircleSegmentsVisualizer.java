@@ -15,7 +15,6 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MouseEvent;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -48,7 +47,7 @@ import experimentalcode.students.goldhofa.Segments;
  * 
  * @author Sascha Goldhofer
  */
-public class CircleSegmentsVisualizer extends AbstractVisFactory<DatabaseObject> implements ContextChangeListener {
+public class CircleSegmentsVisualizer extends AbstractVisFactory implements ContextChangeListener {
   
   /**
    * CircleSegments visualizer name
@@ -210,19 +209,19 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory<DatabaseObject>
   
   
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+  public void addVisualizers(VisualizerContext context, Result result) {
     
     // If no comparison result found abort
     List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
     if (ccr.size() != 1) return;
     
-    final VisualizationTask task = new VisualizationTask(NAME, context, ccr.get(0), this, null);
+    final VisualizationTask task = new VisualizationTask(NAME, context, ccr.get(0), null, this, null);
     task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
     context.addVisualizer(ccr.get(0), task);
   }
   
  /* 
-  public void init(VisualizerContext<? extends DatabaseObject> context, ClusteringComparisonResult ccr) {
+  public void init(VisualizerContext context, ClusteringComparisonResult ccr) {
     super.init(context);
     
     
@@ -232,7 +231,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory<DatabaseObject>
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
     
-    VisualizerContext<?> context = task.getContext();
+    VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
     
     ccr = task.getResult();
@@ -805,14 +804,14 @@ class MouseOutSegmentCluster implements EventListener {
  */
 class MouseClickSegmentCluster implements EventListener {
   
-  private VisualizerContext<? extends DatabaseObject> context;
+  private VisualizerContext context;
   private Segments segments;
   private SortedSet<String> selection;
   
   private int selectionID = 0;
   private long lastClick = 0;
   
-  MouseClickSegmentCluster(VisualizerContext<? extends DatabaseObject> context, Segments segments) {
+  MouseClickSegmentCluster(VisualizerContext context, Segments segments) {
     
     this.context = context;
     this.segments = segments;

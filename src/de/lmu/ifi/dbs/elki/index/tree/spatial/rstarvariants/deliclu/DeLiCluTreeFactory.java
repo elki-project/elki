@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 
@@ -31,8 +31,8 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
   }
 
   @Override
-  public DeLiCluTree<O> instantiate(Database<O> database) {
-    return new DeLiCluTree<O>(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public DeLiCluTree<O> instantiate(Relation<O> representation) {
+    return new DeLiCluTree<O>(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**

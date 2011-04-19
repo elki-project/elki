@@ -12,7 +12,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
@@ -23,7 +22,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -34,7 +32,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleDoublePair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectArray;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
@@ -43,7 +40,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
@@ -62,10 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * @apiviz.uses TextWriterStream oneway - - writesTo
  * @apiviz.composedOf TextWriterWriterInterface
  * @apiviz.has NamingScheme
- * 
- * @param <O> Object type
  */
-public class TextWriter<O extends DatabaseObject> {
+public class TextWriter {
   /**
    * Logger
    */
@@ -87,7 +81,7 @@ public class TextWriter<O extends DatabaseObject> {
   static {
     TextWriterObjectInline trivialwriter = new TextWriterObjectInline();
     writers.insertHandler(Object.class, new TextWriterObjectComment());
-    writers.insertHandler(DatabaseObject.class, new TextWriterDatabaseObjectInline<DatabaseObject>());
+    writers.insertHandler(FeatureVector.class, new TextWriterObjectInline());
     // these object can be serialized inline with toString()
     writers.insertHandler(String.class, trivialwriter);
     writers.insertHandler(Double.class, trivialwriter);
@@ -108,11 +102,6 @@ public class TextWriter<O extends DatabaseObject> {
   }
 
   /**
-   * Normalization to use.
-   */
-  private Normalization<O> normalization;
-
-  /**
    * Writes a header providing information concerning the underlying database
    * and the specified parameter-settings.
    * 
@@ -120,13 +109,12 @@ public class TextWriter<O extends DatabaseObject> {
    * @param out the print stream where to write
    * @param sr the settings to be written into the header
    */
-  protected void printSettings(Database<O> db, TextWriterStream out, List<SettingsResult> sr) {
+  protected void printSettings(Database db, TextWriterStream out, List<SettingsResult> sr) {
     out.commentPrintSeparator();
     out.commentPrintLn("Settings and meta information:");
     out.commentPrintLn("db size = " + db.size());
     try {
-      @SuppressWarnings("unchecked")
-      int dimensionality = DatabaseUtil.dimensionality((Database<FeatureVector<?, ?>>) db);
+      int dimensionality = 1; //FIXME: DatabaseUtil.dimensionality(db);
       out.commentPrintLn("db dimensionality = " + dimensionality);
     }
     catch(UnsupportedOperationException e) {
@@ -177,7 +165,7 @@ public class TextWriter<O extends DatabaseObject> {
    * @throws UnableToComplyException when no usable results were found
    * @throws IOException on IO error
    */
-  public void output(Database<O> db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
+  public void output(Database db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
     List<AnnotationResult<?>> ra = null;
     List<OrderingResult> ro = null;
     List<Clustering<? extends Model>> rc = null;
@@ -228,7 +216,7 @@ public class TextWriter<O extends DatabaseObject> {
       // only 'magically' create a group if we don't have iterators either.
       // if(ri == null || ri.size() == 0) {
       groups = new ArrayList<DBIDs>();
-      groups.add(db.getIDs());
+      groups.add(db.getDBIDs());
       // }
     }
 
@@ -250,13 +238,13 @@ public class TextWriter<O extends DatabaseObject> {
     }
   }
 
-  private void writeOtherResult(Database<O> db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
+  private void writeOtherResult(Database db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
     String filename = r.getShortName();
     if(filename == null) {
       throw new UnableToComplyException("No result name for result class: " + r.getClass().getName());
     }
     PrintStream outStream = streamOpener.openStream(filename);
-    TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
+    TextWriterStream out = new TextWriterStream(outStream, writers);
     TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
     if(owriter == null) {
       throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
@@ -268,7 +256,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void printObject(TextWriterStream out, O obj, List<Pair<String, Object>> anns) throws UnableToComplyException, IOException {
+  private void printObject(TextWriterStream out, Object obj, List<Pair<String, Object>> anns) throws UnableToComplyException, IOException {
     // Write database element itself.
     {
       TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
@@ -295,7 +283,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DBIDs group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeGroupResult(Database db, StreamFactory streamOpener, DBIDs group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
     if(group instanceof Cluster) {
@@ -310,7 +298,7 @@ public class TextWriter<O extends DatabaseObject> {
     }
 
     PrintStream outStream = streamOpener.openStream(filename);
-    TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
+    TextWriterStream out = new TextWriterStream(outStream, writers);
 
     printSettings(db, out, sr);
     // print group information...
@@ -343,7 +331,7 @@ public class TextWriter<O extends DatabaseObject> {
         // shoulnd't really happen?
         continue;
       }
-      O obj = db.get(objID);
+      Object obj = null; // FIXME: db.get(objID);
       if(obj == null) {
         continue;
       }
@@ -361,14 +349,14 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, Result mr, List<SettingsResult> sr) throws UnableToComplyException, IOException {
+  private void writeIterableResult(Database db, StreamFactory streamOpener, IterableResult<?> ri, Result mr, List<SettingsResult> sr) throws UnableToComplyException, IOException {
     String filename = ri.getShortName();
     logger.debugFine("Filename is " + filename);
     if(filename == null) {
       filename = "list";
     }
     PrintStream outStream = streamOpener.openStream(filename);
-    TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
+    TextWriterStream out = new TextWriterStream(outStream, writers);
     printSettings(db, out, sr);
 
     if(mr != null) {
@@ -405,24 +393,6 @@ public class TextWriter<O extends DatabaseObject> {
     }
     out.commentPrintSeparator();
     out.flush();
-  }
-
-  /**
-   * Setter for normalization
-   * 
-   * @param normalization new normalization object
-   */
-  public void setNormalization(Normalization<O> normalization) {
-    this.normalization = normalization;
-  }
-
-  /**
-   * Getter for normalization
-   * 
-   * @return normalization object
-   */
-  public Normalization<O> getNormalization() {
-    return normalization;
   }
 
   /**

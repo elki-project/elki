@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
@@ -90,16 +92,16 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
   }
 
   @Override
-  public Class<? super NumberVector<?, ?>> getInputDatatype() {
-    return NumberVector.class;
+  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
+  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Relation<T> database) {
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Database<NumberVector<?, ?>>) database);
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?, ?>>) database);
     return new Instance<T>(database, indexinst, this, delta, tau);
   }
 
@@ -206,7 +208,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
      * @param delta Delta parameter
      * @param tau Tau parameter
      */
-    public Instance(Database<V> database, FilteredLocalPCAIndex<V> index, ERiCDistanceFunction parent, double delta, double tau) {
+    public Instance(Relation<V> database, FilteredLocalPCAIndex<V> index, ERiCDistanceFunction parent, double delta, double tau) {
       super(database, index, parent);
       this.delta = delta;
       this.tau = tau;
@@ -220,8 +222,8 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     public BitDistance distance(DBID id1, DBID id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
-      V v1 = database.get(id1);
-      V v2 = database.get(id2);
+      V v1 = rep.get(id1);
+      V v2 = rep.get(id2);
       return parent.distance(v1, v2, pca1, pca2);
     }
   }

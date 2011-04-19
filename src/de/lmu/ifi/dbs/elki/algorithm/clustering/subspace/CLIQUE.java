@@ -20,9 +20,12 @@ import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -72,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")
 @Description("Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality.")
 @Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", url = "http://dx.doi.org/10.1145/276304.276314")
-public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
+public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -140,14 +143,15 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Performs the CLIQUE algorithm on the given database.
    */
   @Override
-  protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
+  protected Clustering<SubspaceModel<V>> runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
     // 1. Identification of subspaces that contain clusters
     // TODO: use step logging.
     if(logger.isVerbose()) {
       logger.verbose("*** 1. Identification of subspaces that contain clusters ***");
     }
     SortedMap<Integer, List<CLIQUESubspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, List<CLIQUESubspace<V>>>();
-    List<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(database);
+    List<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(dataQuery);
     dimensionToDenseSubspaces.put(0, denseSubspaces);
     if(logger.isVerbose()) {
       logger.verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
@@ -158,9 +162,9 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       }
     }
 
-    int dimensionality = DatabaseUtil.dimensionality(database);
+    int dimensionality = DatabaseUtil.dimensionality(dataQuery);
     for(int k = 2; k <= dimensionality && !denseSubspaces.isEmpty(); k++) {
-      denseSubspaces = findDenseSubspaces(database, denseSubspaces);
+      denseSubspaces = findDenseSubspaces(dataQuery, denseSubspaces);
       dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
       if(logger.isVerbose()) {
         logger.verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
@@ -189,7 +193,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
 
       for(Pair<Subspace<V>, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
         Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(modelAndCluster.second);
-        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, DatabaseUtil.centroid(database, modelAndCluster.second)));
+        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, DatabaseUtil.centroid(dataQuery, modelAndCluster.second)));
         newCluster.setName("cluster_" + numClusters++);
         result.addCluster(newCluster);
       }
@@ -227,7 +231,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @return the one dimensional dense subspaces reverse ordered by their
    *         coverage
    */
-  private List<CLIQUESubspace<V>> findOneDimensionalDenseSubspaces(Database<V> database) {
+  private List<CLIQUESubspace<V>> findOneDimensionalDenseSubspaces(Relation<V> database) {
     List<CLIQUESubspace<V>> denseSubspaceCandidates = findOneDimensionalDenseSubspaceCandidates(database);
 
     if(prune) {
@@ -246,7 +250,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @return a list of the {@code k}-dimensional dense subspaces sorted in
    *         reverse order by their coverage
    */
-  private List<CLIQUESubspace<V>> findDenseSubspaces(Database<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
+  private List<CLIQUESubspace<V>> findDenseSubspaces(Relation<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
     List<CLIQUESubspace<V>> denseSubspaceCandidates = findDenseSubspaceCandidates(database, denseSubspaces);
 
     if(prune) {
@@ -262,7 +266,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @param database the database to run the algorithm on
    * @return the created one dimensional units
    */
-  private Collection<CLIQUEUnit<V>> initOneDimensionalUnits(Database<V> database) {
+  private Collection<CLIQUEUnit<V>> initOneDimensionalUnits(Relation<V> database) {
     int dimensionality = DatabaseUtil.dimensionality(database);
     // initialize minima and maxima
     double[] minima = new double[dimensionality];
@@ -272,7 +276,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       minima[d] = Double.MAX_VALUE;
     }
     // update minima and maxima
-    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
       V featureVector = database.get(it.next());
       updateMinMax(featureVector, minima, maxima);
     }
@@ -359,17 +363,18 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @return the one-dimensional dense subspace candidates reverse ordered by
    *         their coverage
    */
-  private List<CLIQUESubspace<V>> findOneDimensionalDenseSubspaceCandidates(Database<V> database) {
+  private List<CLIQUESubspace<V>> findOneDimensionalDenseSubspaceCandidates(Relation<V> database) {
     Collection<CLIQUEUnit<V>> units = initOneDimensionalUnits(database);
     Collection<CLIQUEUnit<V>> denseUnits = new ArrayList<CLIQUEUnit<V>>();
     Map<Integer, CLIQUESubspace<V>> denseSubspaces = new HashMap<Integer, CLIQUESubspace<V>>();
 
     // identify dense units
     double total = database.size();
-    for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
-      V featureVector = database.get(it.next());
+    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
+      final DBID id = it.next();
+      V featureVector = database.get(id);
       for(CLIQUEUnit<V> unit : units) {
-        unit.addFeatureVector(featureVector);
+        unit.addFeatureVector(id, featureVector);
         // unit is a dense unit
         if(!it.hasNext() && unit.selectivity(total) >= tau) {
           denseUnits.add(unit);
@@ -406,7 +411,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @return a list of the {@code k}-dimensional dense subspace candidates
    *         reverse ordered by their coverage
    */
-  private List<CLIQUESubspace<V>> findDenseSubspaceCandidates(Database<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
+  private List<CLIQUESubspace<V>> findDenseSubspaceCandidates(Relation<V> database, List<CLIQUESubspace<V>> denseSubspaces) {
     // sort (k-1)-dimensional dense subspace according to their dimensions
     List<CLIQUESubspace<V>> denseSubspacesByDimensions = new ArrayList<CLIQUESubspace<V>>(denseSubspaces);
     Collections.sort(denseSubspacesByDimensions, new Subspace.DimensionComparator());
@@ -536,6 +541,11 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
     result[1] = diff_mp;
 
     return result;
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

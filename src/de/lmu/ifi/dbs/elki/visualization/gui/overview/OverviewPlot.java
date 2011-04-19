@@ -12,9 +12,10 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -51,10 +52,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
  * @apiviz.has DetailViewSelectedEvent
  * @apiviz.uses DetailView
  * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.projections.Projection
- * 
- * @param <NV> Number vector type
  */
-public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implements ResultListener {
+public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Maximum number of dimensions to visualize.
    * 
@@ -70,12 +69,12 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   /**
    * Visualizer context
    */
-  private VisualizerContext<? extends DatabaseObject> context;
+  private VisualizerContext context;
 
   /**
    * Database we work on.
    */
-  private Database<? extends DatabaseObject> db;
+  private Database db;
 
   /**
    * Result we work on. Currently unused, but kept for future requirements.
@@ -86,7 +85,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
   /**
    * Map of coordinates to plots.
    */
-  protected PlotMap<NV> plotmap;
+  protected PlotMap<NumberVector<?, ?>> plotmap;
 
   /**
    * Action listeners for this plot.
@@ -101,7 +100,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
    * @param maxdim Maximum number of dimensions
    * @param context Visualizer context
    */
-  public OverviewPlot(Database<? extends DatabaseObject> db, Result result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
+  public OverviewPlot(Database db, Result result, int maxdim, VisualizerContext context) {
     super();
     this.maxdim = maxdim;
     this.db = db;
@@ -166,9 +165,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     // 2D projections starting at 0,0 and going right and down.
     // 1D projections starting at 0, -1 and going right
     // Other projections starting at -1, min() and going down.
-    plotmap = new PlotMap<NV>();
+    plotmap = new PlotMap<NumberVector<?, ?>>();
     // FIXME: ugly cast used here.
-    Database<NV> dvdb = uglyCastDatabase();
+    Relation<NumberVector<?, ?>> dvdb = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     LinearScale[] scales = null;
     scales = Scales.calcScales(dvdb);
     int dmax = Math.min(DatabaseUtil.dimensionality(dvdb), maxdim);
@@ -200,13 +199,13 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     }
     // insert column numbers
     for(int d1 = 1; d1 <= dmax; d1++) {
-      VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, null, this, 1, .1);
+      VisualizationTask colvi = new VisualizationTask("", context, null, null, new LabelVisFactory(Integer.toString(d1)), null, null, this, 1, .1);
       colvi.put(VisualizationTask.META_NODETAIL, true);
       plotmap.addVis(d1 - 1, -.1, 1., .1, null, colvi);
     }
     // insert row numbers
     for(int d1 = 2; d1 <= dmax; d1++) {
-      VisualizationTask colvi = new VisualizationTask("", context, null, new LabelVisFactory(Integer.toString(d1)), null, null, this, .1, 1);
+      VisualizationTask colvi = new VisualizationTask("", context, null, null, new LabelVisFactory(Integer.toString(d1)), null, null, this, .1, 1);
       colvi.put(VisualizationTask.META_NODETAIL, true);
       plotmap.addVis(-.1, d1 - 2, .1, 1., null, colvi);
     }
@@ -406,16 +405,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot implem
     addCSSClassOrLogError(hovcss);
     // Hover listener.
     hoverer = new CSSHoverClass(hovcss.getName(), null, true);
-  }
-
-  /**
-   * Ugly cast of the database to a default number vector.
-   * 
-   * @return Database
-   */
-  @SuppressWarnings("unchecked")
-  private Database<NV> uglyCastDatabase() {
-    return (Database<NV>) db;
   }
 
   /**

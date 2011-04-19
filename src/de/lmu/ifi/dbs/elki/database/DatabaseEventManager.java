@@ -1,17 +1,18 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.result.ResultListener;
 /**
  * @apiviz.has ResultListener
  */
-public class DatabaseEventManager<O extends DatabaseObject> {
+public class DatabaseEventManager {
   /**
    * Holds the listener.
    */
@@ -39,7 +40,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
   /**
    * The objects that were changed in the current DataStoreEvent.
    */
-  private Collection<O> dataStoreObjects = new ArrayList<O>();
+  private HashSetModifiableDBIDs dataStoreObjects;
 
   /**
    * Collects successive insertion, deletion or update events. The accumulated
@@ -63,23 +64,22 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @see DataStoreListener
    * @see DataStoreEvent
    */
-  @SuppressWarnings("unchecked")
   public void flushDataStoreEvents() {
     // inform listeners
     Object[] listeners = listenerList.getListenerList();
-    Map<Type, Collection<O>> objects = new HashMap<Type, Collection<O>>();
-    objects.put(currentDataStoreEventType, Collections.unmodifiableCollection(dataStoreObjects));
-    DataStoreEvent<O> e = new DataStoreEvent<O>(this, objects);
+    Map<Type, DBIDs> objects = new HashMap<Type, DBIDs>();
+    objects.put(currentDataStoreEventType, DBIDUtil.makeUnmodifiable(dataStoreObjects));
+    DataStoreEvent e = new DataStoreEvent(this, objects);
 
     for(int i = listeners.length - 2; i >= 0; i -= 2) {
       if(listeners[i] == DataStoreListener.class) {
-        ((DataStoreListener<O>) listeners[i + 1]).contentChanged(e);
+        ((DataStoreListener) listeners[i + 1]).contentChanged(e);
       }
     }
     // reset
     accumulateDataStoreEvents = false;
     currentDataStoreEventType = null;
-    dataStoreObjects = new ArrayList<O>();
+    dataStoreObjects = null;
   }
 
   /**
@@ -91,7 +91,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @see DataStoreListener
    * @see DataStoreEvent
    */
-  public void addListener(DataStoreListener<O> l) {
+  public void addListener(DataStoreListener l) {
     listenerList.add(DataStoreListener.class, l);
   }
 
@@ -104,7 +104,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @see DataStoreListener
    * @see DataStoreEvent
    */
-  public void removeListener(DataStoreListener<O> l) {
+  public void removeListener(DataStoreListener l) {
     listenerList.remove(DataStoreListener.class, l);
   }
 
@@ -142,7 +142,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
-  public void fireObjectsInserted(Collection<O> insertions) {
+  public void fireObjectsInserted(DBIDs insertions) {
     fireObjectsChanged(insertions, DataStoreEvent.Type.INSERT);
   }
 
@@ -151,11 +151,11 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * DataStoreEvent.Type.INSERT)}.
    * 
    * @param insertion the object that has been inserted
-   * @see #fireObjectChanged(DatabaseObject, DataStoreEvent.Type)
+   * @see #fireObjectsChanged(DBIDs, DataStoreEvent.Type)
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
-  public void fireObjectInserted(O insertion) {
-    fireObjectChanged(insertion, DataStoreEvent.Type.INSERT);
+  public void fireObjectInserted(DBID insertion) {
+    fireObjectsChanged(insertion, DataStoreEvent.Type.INSERT);
   }
 
   /**
@@ -166,7 +166,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#UPDATE
    */
-  public void fireObjectsUpdated(Collection<O> updates) {
+  public void fireObjectsUpdated(DBIDs updates) {
     fireObjectsChanged(updates, DataStoreEvent.Type.UPDATE);
   }
 
@@ -178,7 +178,7 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
-  protected void fireObjectsRemoved(Collection<O> deletions) {
+  protected void fireObjectsRemoved(DBIDs deletions) {
     fireObjectsChanged(deletions, DataStoreEvent.Type.DELETE);
   }
 
@@ -190,8 +190,8 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
-  protected void fireObjectRemoved(O deletion) {
-    fireObjectChanged(deletion, DataStoreEvent.Type.DELETE);
+  protected void fireObjectRemoved(DBID deletion) {
+    fireObjectsChanged(deletion, DataStoreEvent.Type.DELETE);
   }
 
   /**
@@ -207,40 +207,15 @@ public class DatabaseEventManager<O extends DatabaseObject> {
    * @param objects the objects that have been changed, i.e. inserted, deleted
    *        or updated
    */
-  private void fireObjectsChanged(Collection<O> objects, DataStoreEvent.Type type) {
+  private void fireObjectsChanged(DBIDs objects, DataStoreEvent.Type type) {
     // flush first
     if(currentDataStoreEventType != null && !currentDataStoreEventType.equals(type)) {
       flushDataStoreEvents();
     }
-
-    this.dataStoreObjects.addAll(objects);
-    currentDataStoreEventType = type;
-
-    if(!accumulateDataStoreEvents) {
-      flushDataStoreEvents();
+    if (this.dataStoreObjects == null) {
+      this.dataStoreObjects = DBIDUtil.newHashSet();
     }
-  }
-
-  /**
-   * Handles a DataStoreEvent with the specified type. If the current event type
-   * is not equal to the specified type, the events accumulated up to now will
-   * be fired first.
-   * 
-   * The new event will be aggregated and fired on demand if
-   * {@link #accumulateDataStoreEvents} is set, otherwise all registered
-   * <code>DataStoreListener</code> will be notified immediately that the
-   * content of the database has been changed.
-   * 
-   * @param object the object that has been changed, i.e. inserted, deleted or
-   *        updated
-   */
-  private void fireObjectChanged(O object, DataStoreEvent.Type type) {
-    // flush first
-    if(currentDataStoreEventType != null && !currentDataStoreEventType.equals(type)) {
-      flushDataStoreEvents();
-    }
-
-    this.dataStoreObjects.add(object);
+    this.dataStoreObjects.addDBIDs(objects);
     currentDataStoreEventType = type;
 
     if(!accumulateDataStoreEvents) {

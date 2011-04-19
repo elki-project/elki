@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -11,10 +10,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Arthur Zimek
  * 
- * @param <O> the type of DatabaseObject to compute the distances in between
+ * @param <O> the type of objects to compute the distances in between
  * @param <D> the type of Distance used
  */
-public abstract class AbstractPrimitiveDistanceFunction<O extends DatabaseObject, D extends Distance<D>> implements PrimitiveDistanceFunction<O, D> {
+public abstract class AbstractPrimitiveDistanceFunction<O, D extends Distance<D>> implements PrimitiveDistanceFunction<O, D> {
   /**
    * Provides an abstract DistanceFunction.
    */
@@ -43,11 +42,11 @@ public abstract class AbstractPrimitiveDistanceFunction<O extends DatabaseObject
   /**
    * Instantiate with a database to get the actual distance query.
    * 
-   * @param database
+   * @param rep Representation
    * @return Actual distance query.
    */
   @Override
-  public <T extends O> DistanceQuery<T, D> instantiate(Database<T> database) {
-    return new PrimitiveDistanceQuery<T, D>(database, this);
+  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> rep) {
+    return new PrimitiveDistanceQuery<T, D>(rep, this);
   }
 }

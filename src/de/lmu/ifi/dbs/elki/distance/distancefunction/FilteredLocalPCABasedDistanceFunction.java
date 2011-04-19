@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
@@ -24,7 +24,7 @@ public interface FilteredLocalPCABasedDistanceFunction<O extends NumberVector<?,
    * @return Actual distance query.
    */
   @Override
-  public <T extends O> Instance<T, ?, D> instantiate(Database<T> database);
+  public <T extends O> Instance<T, ?, D> instantiate(Relation<T> database);
 
   /**
    * Instance produced by the distance function.

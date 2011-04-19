@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
 
@@ -41,11 +41,11 @@ public interface SubspaceProjectionIndex<NV extends NumberVector<?, ?>, P extend
     /**
      * Instantiate the index for a given database.
      * 
-     * @param database Database type
+     * @param rep Representation
      * 
      * @return Index
      */
     @Override
-    public I instantiate(Database<NV> database);
+    public I instantiate(Relation<NV> rep);
   }
 }

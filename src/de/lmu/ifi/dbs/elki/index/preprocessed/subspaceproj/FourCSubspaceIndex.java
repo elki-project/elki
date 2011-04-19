@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -59,19 +59,19 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
   /**
    * Full constructor.
    * 
-   * @param database
+   * @param rep
    * @param epsilon
    * @param rangeQueryDistanceFunction
    * @param minpts
    * @param pca
    */
-  public FourCSubspaceIndex(Database<V> database, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V, ?> pca) {
-    super(database, epsilon, rangeQueryDistanceFunction, minpts);
+  public FourCSubspaceIndex(Relation<V> rep, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V, ?> pca) {
+    super(rep, epsilon, rangeQueryDistanceFunction, minpts);
     this.pca = pca;
   }
 
   @Override
-  protected PCAFilteredResult computeProjection(DBID id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
+  protected PCAFilteredResult computeProjection(DBID id, List<DistanceResultPair<D>> neighbors, Relation<V> database) {
     ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
     for(DistanceResultPair<D> neighbor : neighbors) {
       ids.add(neighbor.getID());
@@ -80,7 +80,7 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
-      msg.append(id).append(" ").append(database.getObjectLabelQuery().get(id));
+      msg.append(id).append(" "); //.append(database.getObjectLabelQuery().get(id));
       msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
       logger.debugFine(msg.toString());
     }
@@ -138,8 +138,8 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
     }
 
     @Override
-    public FourCSubspaceIndex<V, D> instantiate(Database<V> database) {
-      return new FourCSubspaceIndex<V, D>(database, epsilon, rangeQueryDistanceFunction, minpts, pca);
+    public FourCSubspaceIndex<V, D> instantiate(Relation<V> representation) {
+      return new FourCSubspaceIndex<V, D>(representation, epsilon, rangeQueryDistanceFunction, minpts, pca);
     }
 
     /**

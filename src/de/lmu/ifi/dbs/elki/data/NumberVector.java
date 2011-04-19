@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @apiviz.has Matrix
  * @apiviz.has Vector
  */
-public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V, N>, SpatialObject {
+public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V, N>, SpatialComparable {
   /**
    * Returns a NumberVector of V with uniformly distributed (0-1) random values.
    * 

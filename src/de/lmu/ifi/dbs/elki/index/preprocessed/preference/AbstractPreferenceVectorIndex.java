@@ -3,8 +3,10 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -12,23 +14,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * Abstract base class for preference vector based algorithms.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <NV> Number vector
  */
 public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?>> extends AbstractPreprocessorIndex<NV, BitSet> implements PreferenceVectorIndex<NV> {
   /**
-   * Database we are attached to
-   */
-  final protected Database<NV> database;
-
-  /**
    * Constructor.
    * 
-   * @param database Database to use
+   * @param rep Database to use
    */
-  public AbstractPreferenceVectorIndex(Database<NV> database) {
-    super();
-    this.database = database;
+  public AbstractPreferenceVectorIndex(Relation<NV> representation) {
+    super(representation);
   }
 
   /**
@@ -54,6 +50,11 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
    */
   public static abstract class Factory<V extends NumberVector<?, ?>, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I>, Parameterizable {
     @Override
-    public abstract I instantiate(Database<V> database);
+    public abstract I instantiate(Relation<V> representation);
+
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return TypeUtil.NUMBER_VECTOR_FIELD;
+    }
   }
 }

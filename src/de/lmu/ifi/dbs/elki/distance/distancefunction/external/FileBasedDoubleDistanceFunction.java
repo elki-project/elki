@@ -6,17 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.datasource.parser.DistanceParser;
+import de.lmu.ifi.dbs.elki.datasource.parser.DistanceParsingResult;
+import de.lmu.ifi.dbs.elki.datasource.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.parser.DistanceParser;
-import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
-import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -65,7 +64,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    * @param parser Parser
    * @param matrixfile input file
    */
-  public FileBasedDoubleDistanceFunction(DistanceParser<?, DoubleDistance> parser, File matrixfile) {
+  public FileBasedDoubleDistanceFunction(DistanceParser<DoubleDistance> parser, File matrixfile) {
     super();
     try {
       loadCache(parser, matrixfile);
@@ -101,9 +100,9 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
     return cache.get(DBIDUtil.newPair(id1, id2));
   }
 
-  private void loadCache(DistanceParser<?, DoubleDistance> parser, File matrixfile) throws IOException {
+  private void loadCache(DistanceParser<DoubleDistance> parser, File matrixfile) throws IOException {
     InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
-    DistanceParsingResult<?, DoubleDistance> res = parser.parse(in);
+    DistanceParsingResult<DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
   }
 
@@ -136,7 +135,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
   public static class Parameterizer extends AbstractParameterizer {
     protected File matrixfile = null;
 
-    protected DistanceParser<?, DoubleDistance> parser = null;
+    protected DistanceParser<DoubleDistance> parser = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -145,7 +144,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
       if(config.grab(MATRIX_PARAM)) {
         matrixfile = MATRIX_PARAM.getValue();
       }
-      final ObjectParameter<DistanceParser<DatabaseObject, DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DatabaseObject, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+      final ObjectParameter<DistanceParser<DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         parser = PARSER_PARAM.instantiateClass(config);
       }

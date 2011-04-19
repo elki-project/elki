@@ -13,12 +13,11 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -69,15 +68,15 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param params Extra parameters
    * @return Database
    */
-  protected <T extends DatabaseObject> Database<T> makeSimpleDatabase(String filename, int expectedSize, ListParameterization params) {
+  protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params) {
     org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
     params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
-    FileBasedDatabaseConnection<T> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
+    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
 
     testParameterizationOk(params);
 
-    Database<T> db = dbconn.getDatabase(null);
+    Database db = dbconn.getDatabase();
     org.junit.Assert.assertEquals("Database size does not match.", expectedSize, db.size());
     return db;
   }
@@ -89,7 +88,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param expectedSize Expected size in records
    * @return Database
    */
-  protected<T extends DatabaseObject> Database<T> makeSimpleDatabase(String filename, int expectedSize) {
+  protected<T> Database makeSimpleDatabase(String filename, int expectedSize) {
     return makeSimpleDatabase(filename, expectedSize, new ListParameterization());
   }
 
@@ -113,9 +112,9 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param clustering Clustering result
    * @param expected Expected score
    */
-  protected <O extends DatabaseObject> void testFMeasure(Database<O> database, Clustering<?> clustering, double expected) {
+  protected <O> void testFMeasure(Database database, Clustering<?> clustering, double expected) {
     // Run by-label as reference
-    ByLabelClustering<O> bylabel = new ByLabelClustering<O>();
+    ByLabelClustering bylabel = new ByLabelClustering();
     Clustering<Model> rbl = bylabel.run(database);
 
     double score = PairCountingFMeasure.compareClusterings(clustering, rbl, 1.0);
@@ -132,9 +131,9 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param clustering Clustering result
    * @param expected Expected score
    */
-  protected <O extends DatabaseObject> void testFMeasureHierarchical(Database<O> database, Clustering<?> clustering, double expected) {
+  protected <O> void testFMeasureHierarchical(Database database, Clustering<?> clustering, double expected) {
     // Run by-label as reference
-    ByLabelHierarchicalClustering<O> bylabel = new ByLabelHierarchicalClustering<O>();
+    ByLabelHierarchicalClustering bylabel = new ByLabelHierarchicalClustering();
     Clustering<Model> rbl = bylabel.run(database);
 
     double score = PairCountingFMeasure.compareClusterings(clustering, rbl, 1.0, false, true);
@@ -185,7 +184,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param result Outlier result to process
    * @param expected Expected AUC value
    */
-  protected void testAUC(Database<DoubleVector> db, String positive, OutlierResult result, double expected) {
+  protected void testAUC(Database db, String positive, OutlierResult result, double expected) {
     ListParameterization params = new ListParameterization();
     params.addParameter(ComputeROCCurve.POSITIVE_CLASS_NAME_ID, positive);
     ComputeROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(ComputeROCCurve.class, params);
@@ -208,7 +207,11 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param expected expected value
    */
   protected void testSingleScore(OutlierResult result, int id, double expected) {
-    double actual = result.getScores().getValueFor(DBIDUtil.importInteger(id));
+    org.junit.Assert.assertNotNull("No outlier result", result);
+    org.junit.Assert.assertNotNull("No score result.", result.getScores());
+    final DBID dbid = DBIDUtil.importInteger(id);
+    org.junit.Assert.assertNotNull("No result for ID "+id, result.getScores().getValueFor(dbid));
+    double actual = result.getScores().getValueFor(dbid);
     org.junit.Assert.assertEquals("Outlier score of object " + id + " doesn't match.", expected, actual, 0.0001);
   }
 }

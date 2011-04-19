@@ -34,7 +34,7 @@ public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUn
    */
   @Test
   public void testSLINKResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();

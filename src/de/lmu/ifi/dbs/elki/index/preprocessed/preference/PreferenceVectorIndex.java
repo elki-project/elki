@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 
@@ -39,11 +39,11 @@ public interface PreferenceVectorIndex<NV extends NumberVector<?, ?>> extends In
     /**
      * Instantiate the index for a given database.
      * 
-     * @param database Database type
+     * @param representation Representation to use
      * 
      * @return Index
      */
     @Override
-    public I instantiate(Database<V> database);
+    public I instantiate(Relation<V> representation);
   }
 }

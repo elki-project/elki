@@ -12,12 +12,16 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
@@ -93,27 +97,27 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * Run the algorithm.
    */
   @Override
-  protected HistogramResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
+  protected HistogramResult<DoubleVector> runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
     // local copy, not entirely necessary. I just like control, guaranteed
     // sequences and stable+efficient array index -> id lookups.
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(database.getIDs());
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(dataQuery.getDBIDs());
     int size = ids.size();
 
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(getDistanceFunction(), size);
+    KNNQuery<V, D> knnQuery = database.getKNNQuery(dataQuery, getDistanceFunction(), size);
 
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    ByLabelClustering<V> splitter = new ByLabelClustering<V>();
-    Collection<Cluster<Model>> split = splitter.run(database).getAllClusters();
+    Collection<Cluster<Model>> split = (new ByLabelClustering()).run(database).getAllClusters();
 
     // Compute cluster averages and covariance matrix
     HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(split.size());
     HashMap<Cluster<?>, Matrix> covmats = new HashMap<Cluster<?>, Matrix>(split.size());
     for(Cluster<?> clus : split) {
-      averages.put(clus, DatabaseUtil.centroid(database, clus.getIDs()));
-      covmats.put(clus, DatabaseUtil.covarianceMatrix(database, clus.getIDs()));
+      averages.put(clus, DatabaseUtil.centroid(dataQuery, clus.getIDs()));
+      covmats.put(clus, DatabaseUtil.covarianceMatrix(dataQuery, clus.getIDs()));
     }
 
     AggregatingHistogram<MeanVariance, Double> hist = AggregatingHistogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
@@ -130,7 +134,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       Matrix covm = covmats.get(clus);
 
       for(DBID i1 : clus.getIDs()) {
-        Double d = MathUtil.mahalanobisDistance(covm, av.minus(database.get(i1).getColumnVector()));
+        Double d = MathUtil.mahalanobisDistance(covm, av.minus(dataQuery.get(i1).getColumnVector()));
         cmem.add(new FCPair<Double, DBID>(d, i1));
       }
       Collections.sort(cmem);
@@ -159,6 +163,11 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       res.add(row);
     }
     return new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return new CombinedTypeInformation(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override

@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract superclass for all non-flat R*-Tree variants.
@@ -23,7 +27,6 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
   /**
    * Constructor.
    * 
-   * @param database Database
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -31,8 +34,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public NonFlatRStarTree(Database<O> database, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public NonFlatRStarTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**
@@ -104,9 +107,14 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
    * @param objects the data objects to be indexed
    */
   @Override
-  protected void bulkLoad(List<O> objects) {
+  protected void bulkLoad(ArrayDBIDs ids, List<O> objects) {
     StringBuffer msg = new StringBuffer();
-    List<SpatialObject> spatialObjects = new ArrayList<SpatialObject>(objects);
+
+    assert (ids.size() == objects.size());
+    List<SpatialPair<DBID, O>> spatialObjects = new ArrayList<SpatialPair<DBID, O>>(objects.size());
+    for(int i = 0; i < ids.size(); i++) {
+      spatialObjects.add(new SpatialPair<DBID, O>(ids.get(i), objects.get(i)));
+    }
 
     // root is leaf node
     double size = objects.size();
@@ -128,7 +136,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
       file.writePage(root);
 
       // create leaf nodes
-      List<N> nodes = createLeafNodes(objects);
+      List<N> nodes = createLeafNodes(spatialObjects);
 
       int numNodes = nodes.size();
       if(getLogger().isDebugging()) {
@@ -144,7 +152,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
       }
 
       // create root
-      createRoot(root, new ArrayList<SpatialObject>(nodes));
+      createRoot(root, new ArrayList<N>(nodes));
       numNodes++;
       setHeight(getHeight() + 1);
       if(getLogger().isDebugging()) {
@@ -205,11 +213,16 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
    * @return the root node
    */
   @SuppressWarnings("unchecked")
-  private N createRoot(N root, List<SpatialObject> objects) {
+  private N createRoot(N root, List<? extends SpatialComparable> objects) {
     // insert data
-    for(SpatialObject object : objects) {
-      if(object instanceof NumberVector) {
-        root.addLeafEntry(createNewLeafEntry((O) object));
+    for(SpatialComparable object : objects) {
+      if(object instanceof SpatialPair) {
+        SpatialPair<?, ?> pair = (SpatialPair<?, ?>) object;
+        if(pair.first instanceof DBID && pair.second instanceof NumberVector) {
+          root.addLeafEntry(createNewLeafEntry((DBID) pair.first, (O) pair.second));
+          continue;
+        }
+        throw new AbortException("Unexpected spatial comparable encountered.");
       }
       else {
         root.addDirectoryEntry(createNewDirectoryEntry((N) object));

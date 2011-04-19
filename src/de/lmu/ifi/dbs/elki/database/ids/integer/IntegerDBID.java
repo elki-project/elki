@@ -23,12 +23,10 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.composedOf 
- *                    de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID.DynamicSerializer
- * @apiviz.composedOf 
- *                    de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBID.StaticSerializer
+ * @apiviz.composedOf DynamicSerializer
+ * @apiviz.composedOf StaticSerializer
  */
-public class IntegerDBID extends AbstractList<DBID> implements DBID {
+class IntegerDBID extends AbstractList<DBID> implements DBID {
   /**
    * The actual object ID.
    */
@@ -81,18 +79,6 @@ public class IntegerDBID extends AbstractList<DBID> implements DBID {
     }
     IntegerDBID other = (IntegerDBID) obj;
     return this.id == other.id;
-  }
-
-  @Override
-  @Deprecated
-  public DBID getID() {
-    return this;
-  }
-
-  @Override
-  @Deprecated
-  public void setID(@SuppressWarnings("unused") DBID id) {
-    throw new UnsupportedOperationException("IDs in new DB layer are static.");
   }
 
   @Override

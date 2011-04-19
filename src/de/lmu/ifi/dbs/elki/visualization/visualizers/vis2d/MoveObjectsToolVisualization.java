@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -8,16 +8,12 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea.DragListener;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -64,14 +60,8 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
    */
   private Element rtag;
 
-  /**
-   * Our database
-   */
-  private Database<NV> database;
-
   public MoveObjectsToolVisualization(VisualizationTask task) {
     super(task);
-    this.database = task.getResult();
     context.addContextChangeListener(this);
     incrementalRedraw();
   }
@@ -109,8 +99,9 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
    */
   // TODO: move to DatabaseUtil?
   private void updateDB(DBIDs dbids, Vector movingVector) {
-    database.accumulateDataStoreEvents();
-    DataQuery<DatabaseObjectMetadata> mrep = database.getMetadataQuery();
+    throw new AbortException("FIXME: INCOMPLETE TRANSITION");
+    /* database.accumulateDataStoreEvents();
+    Representation<DatabaseObjectMetadata> mrep = database.getMetadataQuery();
     for(DBID dbid : dbids) {
       NV obj = database.get(dbid);
       // Copy metadata to keep
@@ -130,7 +121,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
       }
     }
-    database.flushDataStoreEvents();
+    database.flushDataStoreEvents(); */
   }
 
   /**
@@ -196,7 +187,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Constructor
      */
@@ -210,18 +201,15 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      ArrayList<Database<?>> databases = ResultUtil.filterResults(result, Database.class);
-      for(Database<?> database : databases) {
-        if(!VisualizerUtil.isNumberVectorDatabase(database)) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, context, database, this, P2DVisualization.class);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        final VisualizationTask task = new VisualizationTask(NAME, context, rep, rep, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_TOOL, true);
         task.put(VisualizationTask.META_NOTHUMB, true);
         task.put(VisualizationTask.META_NOEXPORT, true);
-        context.addVisualizer(database, task);
+        context.addVisualizer(rep, task);
       }
     }
 

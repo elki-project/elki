@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayStaticDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector handled by this Result
  */
-public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, Model {
+public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, Model {
   /**
    * The ids of the rows included in the bicluster.
    */
@@ -33,7 +33,7 @@ public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, 
   /**
    * The database this bicluster is defined for.
    */
-  private Database<V> database;
+  private Relation<V> database;
 
   /**
    * Defines a new bicluster for given parameters.
@@ -42,7 +42,7 @@ public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, 
    * @param colIDs the ids of the columns included in the bicluster
    * @param database the database this bicluster is defined for
    */
-  public Bicluster(int[] rowIDs, int[] colIDs, Database<V> database) {
+  public Bicluster(int[] rowIDs, int[] colIDs, Relation<V> database) {
     this.rowIDs = rowIDs;
     this.colIDs = colIDs;
     this.database = database;
@@ -114,7 +114,7 @@ public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, 
    * 
    * @return Database
    */
-  public Database<V> getDatabase() {
+  public Relation<V> getDatabase() {
     return database;
   }
 

@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
  * @param <D> Distance type
  * @param <N> Number type
  */
-public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMkTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
+public class MkCoPTree<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMkTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
   /**
    * The logger for this class.
    */
@@ -70,8 +71,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param distanceFunction Distance function
    * @param k_max Maximum value of k supported
    */
-  public MkCoPTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public MkCoPTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
     this.k_max = k_max;
     // init log k
     log_k = new double[k_max];
@@ -83,8 +84,9 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * @throws UnsupportedOperationException since this operation is not supported
    */
+  @SuppressWarnings("unused")
   @Override
-  public void insert(@SuppressWarnings("unused") O object) {
+  public void insert(DBID id, O object) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -102,10 +104,11 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @param objects the object to be inserted
    */
   @Override
-  public void insert(List<O> objects) {
+  public void insertAll(ArrayDBIDs ids, List<O> objects) {
     if (objects.isEmpty()) {
       return;
     }
+    assert(ids.size() == objects.size());
     
     if(logger.isDebugging()) {
       logger.debugFine("insert " + objects + "\n");
@@ -115,17 +118,15 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       initialize(objects.get(0));
     }
 
-    ModifiableDBIDs ids = DBIDUtil.newArray();
     Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
 
     // insert
-    for(O object : objects) {
+    for(int i = 0; i < ids.size(); i++) {
       // create knnList for the object
-      ids.add(object.getID());
-      knnHeaps.put(object.getID(), new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
+      knnHeaps.put(ids.get(i), new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
 
       // insert the object
-      super.insert(object, false);
+      super.insert(ids.get(i), objects.get(i), false);
     }
 
     // do batch nn
@@ -154,19 +155,19 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    * @return a List of the query results
    */
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(O object, int k) {
+  public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
     if(k > this.k_max) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MCop-Tree!");
     }
 
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     ModifiableDBIDs candidates = DBIDUtil.newArray();
-    doReverseKNNQuery(k, object.getID(), result, candidates);
+    doReverseKNNQuery(k, id, result, candidates);
 
     // refinement of candidates
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
-    for(DBID id : candidates) {
-      knnLists.put(id, new KNNHeap<D>(k, getDistanceQuery().infiniteDistance()));
+    for(DBID cid : candidates) {
+      knnLists.put(cid, new KNNHeap<D>(k, getDistanceQuery().infiniteDistance()));
     }
     batchNN(getRoot(), candidates, knnLists);
 
@@ -176,10 +177,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     rkNNStatistics.addCandidates(candidates.size());
     rkNNStatistics.addTrueHits(result.size());
 
-    for(DBID id : candidates) {
+    for(DBID cid : candidates) {
       for(DistanceResultPair<D> qr : knnLists.get(id)) {
-        if(qr.getID() == object.getID()) {
-          result.add(new DistanceResultPair<D>(qr.getDistance(), id));
+        if(qr.getID().equals(id)) {
+          result.add(new DistanceResultPair<D>(qr.getDistance(), cid));
           break;
         }
       }
@@ -754,14 +755,13 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
-   * 
    * @param object the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
    */
   @Override
-  protected MkCoPEntry<D, N> createNewLeafEntry(O object, D parentDistance) {
-    MkCoPLeafEntry<D, N> leafEntry = new MkCoPLeafEntry<D, N>(object.getID(), parentDistance, null, null);
+  protected MkCoPEntry<D, N> createNewLeafEntry(DBID id, O object, D parentDistance) {
+    MkCoPLeafEntry<D, N> leafEntry = new MkCoPLeafEntry<D, N>(id, parentDistance, null, null);
     return leafEntry;
   }
 

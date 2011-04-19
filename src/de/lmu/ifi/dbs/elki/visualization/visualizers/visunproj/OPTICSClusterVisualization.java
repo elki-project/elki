@@ -8,7 +8,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses ClusterOrderResult
  * @apiviz.uses OPTICSPlot
  */
-public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseObject> {
+public class OPTICSClusterVisualization extends AbstractVisualization {
   /**
    * The logger for this class.
    */
@@ -181,7 +180,7 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
    */
-  public static class Factory extends AbstractVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -191,13 +190,13 @@ public class OPTICSClusterVisualization extends AbstractVisualization<DatabaseOb
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+    public void addVisualizers(VisualizerContext context, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null && findOPTICSClustering(co) != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
+          final VisualizationTask task = new VisualizationTask(NAME, context, co, null, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
           context.addVisualizer(plot, task);
         }

@@ -3,11 +3,12 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -40,11 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
 public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> extends AbstractPreprocessorIndex<NV, PCAFilteredResult> implements FilteredLocalPCAIndex<NV> {
   /**
-   * Database we are attached to
-   */
-  final protected Database<NV> database;
-
-  /**
    * PCA utility object.
    */
   final protected PCAFilteredRunner<? super NV, DoubleDistance> pca;
@@ -52,12 +48,11 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
   /**
    * Constructor.
    * 
-   * @param database Database to use
+   * @param representation Representation to use
    * @param pca PCA runner to use
    */
-  public AbstractFilteredPCAIndex(Database<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca) {
-    super();
-    this.database = database;
+  public AbstractFilteredPCAIndex(Relation<NV> representation, PCAFilteredRunner<? super NV, DoubleDistance> pca) {
+    super(representation);
     this.pca = pca;
   }
 
@@ -65,7 +60,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
    * Preprocessing step.
    */
   protected void preprocess() {
-    if(database == null || database.size() <= 0) {
+    if(rep == null || rep.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
@@ -75,16 +70,16 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
       return;
     }
 
-    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
+    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Performing local PCA", database.size(), getLogger()) : null;
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Performing local PCA", rep.size(), getLogger()) : null;
 
     // TODO: use a bulk operation?
-    for(DBID id : database) {
+    for(DBID id : rep.iterDBIDs()) {
       List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id);
 
-      PCAFilteredResult pcares = pca.processQueryResult(objects, database);
+      PCAFilteredResult pcares = pca.processQueryResult(objects, rep);
 
       storage.put(id, pcares);
 
@@ -161,8 +156,13 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
     }
 
     @Override
-    public abstract I instantiate(Database<NV> database);
+    public abstract I instantiate(Relation<NV> representation);
 
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return pcaDistanceFunction.getInputTypeRestriction();
+    }
+    
     /**
      * Parameterization class.
      * 

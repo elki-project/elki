@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -19,7 +17,7 @@ import java.util.Queue;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N, E>, E extends Entry> implements Enumeration<TreeIndexPath<E>> {
+public class BreadthFirstEnumeration<O, N extends Node<N, E>, E extends Entry> implements Enumeration<TreeIndexPath<E>> {
   /**
    * Represents an empty enumeration.
    */

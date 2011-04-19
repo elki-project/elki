@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <D> Distance type
  */
-public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisualization<DatabaseObject> {
+public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisualization {
   /**
    * Name for this visualizer.
    */
@@ -104,7 +103,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotVisualizer oneway - - «create»
    */
-  public static class Factory extends AbstractVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -114,13 +113,13 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+    public void addVisualizers(VisualizerContext context, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, plot, this, plot);
+          final VisualizationTask task = new VisualizationTask(NAME, context, plot, null, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
           context.addVisualizer(plot, task);
         }

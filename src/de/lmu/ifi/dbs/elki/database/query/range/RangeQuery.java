@@ -2,11 +2,11 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public interface RangeQuery<O extends DatabaseObject, D extends Distance<D>> extends DatabaseQuery {
+public interface RangeQuery<O, D extends Distance<D>> extends DatabaseQuery {
   /**
    * Get the nearest neighbors for a particular id in a given query range
    * 
@@ -52,4 +52,11 @@ public interface RangeQuery<O extends DatabaseObject, D extends Distance<D>> ext
    * Get the distance data type of the function.
    */
   public D getDistanceFactory();
+  
+  /**
+   * Access the underlying data query.
+   * 
+   * @return data query in use
+   */
+  public abstract Relation<? extends O> getRepresentation();
 }

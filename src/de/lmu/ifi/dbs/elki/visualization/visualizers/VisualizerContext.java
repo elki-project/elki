@@ -9,7 +9,6 @@ import javax.swing.event.EventListenerList;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * @apiviz.composedOf ResultHierarchy
  * @apiviz.composedOf EventListenerList
  */
-public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> implements DataStoreListener<O>, ResultListener {
+public class VisualizerContext extends AnyMap<String> implements DataStoreListener, ResultListener {
   /**
    * Serial version.
    */
@@ -58,7 +57,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   /**
    * The database
    */
-  private Database<O> database;
+  private Database database;
 
   /**
    * The full result object
@@ -78,7 +77,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
   /**
    * Factories to use
    */
-  private Collection<VisFactory<O>> factories;
+  private Collection<VisFactory> factories;
 
   /**
    * Visualizers to hide by default
@@ -114,7 +113,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param factories Visualizer Factories to use
    * @param hideVisualizers Pattern to hide visualizers
    */
-  public VisualizerContext(Database<O> database, HierarchicalResult result, StyleLibrary stylelib, Collection<VisFactory<O>> factories, Pattern hideVisualizers) {
+  public VisualizerContext(Database database, HierarchicalResult result, StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
     super();
     this.database = database;
     this.result = result;
@@ -145,7 +144,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * 
    * @return Database
    */
-  public Database<O> getDatabase() {
+  public Database getDatabase() {
     return database;
   }
 
@@ -203,7 +202,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    */
   private Clustering<Model> generateDefaultClustering() {
     // Cluster by labels
-    ByLabelHierarchicalClustering<O> split = new ByLabelHierarchicalClustering<O>();
+    ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
     Clustering<Model> c = split.run(getDatabase());
     // store.
     put(CLUSTERING_FALLBACK, c);
@@ -294,7 +293,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param l the listener to add
    * @see #removeDataStoreListener
    */
-  public void addDataStoreListener(DataStoreListener<?> l) {
+  public void addDataStoreListener(DataStoreListener l) {
     listenerList.add(DataStoreListener.class, l);
   }
 
@@ -304,18 +303,17 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    * @param l the listener to remove
    * @see #addDataStoreListener
    */
-  public void removeDataStoreListener(DataStoreListener<?> l) {
+  public void removeDataStoreListener(DataStoreListener l) {
     listenerList.remove(DataStoreListener.class, l);
   }
 
   /**
    * Proxy datastore event to child listeners.
    */
-  @SuppressWarnings("unchecked")
   @Override
-  public void contentChanged(DataStoreEvent<O> e) {
-    for(DataStoreListener<?> listener : listenerList.getListeners(DataStoreListener.class)) {
-      ((DataStoreListener<O>) listener).contentChanged(e);
+  public void contentChanged(DataStoreEvent e) {
+    for(DataStoreListener listener : listenerList.getListeners(DataStoreListener.class)) {
+      listener.contentChanged(e);
     }
   }
 
@@ -326,7 +324,7 @@ public class VisualizerContext<O extends DatabaseObject> extends AnyMap<String> 
    */
   private void processResult(Result result) {
     // Collect all visualizers.
-    for(VisFactory<O> f : factories) {
+    for(VisFactory f : factories) {
       try {
         f.addVisualizers(this, result);
       }

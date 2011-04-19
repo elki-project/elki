@@ -1,17 +1,18 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -43,11 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
 public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?, ?>, D extends Distance<D>, P extends ProjectionResult> extends AbstractPreprocessorIndex<NV, P> implements SubspaceProjectionIndex<NV, P> {
   /**
-   * Database we are attached to
-   */
-  final protected Database<NV> database;
-
-  /**
    * Contains the value of parameter epsilon;
    */
   protected D epsilon;
@@ -64,12 +60,14 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
 
   /**
    * Constructor.
-   * 
-   * @param database Database to use
+   *
+   * @param rep Representation
+   * @param epsilon Maximum Epsilon
+   * @param rangeQueryDistanceFunction range query
+   * @param minpts Minpts
    */
-  public AbstractSubspaceProjectionIndex(Database<NV> database, D epsilon, DistanceFunction<NV, D> rangeQueryDistanceFunction, int minpts) {
-    super();
-    this.database = database;
+  public AbstractSubspaceProjectionIndex(Relation<NV> rep, D epsilon, DistanceFunction<NV, D> rangeQueryDistanceFunction, int minpts) {
+    super(rep);
     this.epsilon = epsilon;
     this.rangeQueryDistanceFunction = rangeQueryDistanceFunction;
     this.minpts = minpts;
@@ -79,33 +77,31 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
    * Preprocessing step.
    */
   protected void preprocess() {
-    if(database == null || database.size() <= 0) {
+    if(rep == null || rep.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     if(storage != null) {
       // Preprocessor was already run.
       return;
     }
-    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
+    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
     long start = System.currentTimeMillis();
-    RangeQuery<NV, D> rangeQuery = database.getRangeQuery(rangeQueryDistanceFunction);
+    RangeQuery<NV, D> rangeQuery = rep.getDatabase().getRangeQuery(rep, rangeQueryDistanceFunction);
 
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), database.size(), getLogger()) : null;
-    Iterator<DBID> it = database.iterator();
-    while(it.hasNext()) {
-      DBID id = it.next();
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), rep.size(), getLogger()) : null;
+    for(DBID id : rep.iterDBIDs()) {
       List<DistanceResultPair<D>> neighbors = rangeQuery.getRangeForDBID(id, epsilon);
 
       final P pres;
       if(neighbors.size() >= minpts) {
-        pres = computeProjection(id, neighbors, database);
+        pres = computeProjection(id, neighbors, rep);
       }
       else {
         DistanceResultPair<D> firstQR = neighbors.get(0);
         neighbors = new ArrayList<DistanceResultPair<D>>();
         neighbors.add(firstQR);
-        pres = computeProjection(id, neighbors, database);
+        pres = computeProjection(id, neighbors, rep);
       }
       storage.put(id, pres);
 
@@ -143,11 +139,11 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
    * 
    * @param id the given point
    * @param neighbors the neighbors as query results of the given point
-   * @param database the database for which the preprocessing is performed
+   * @param rep the database for which the preprocessing is performed
    * 
    * @return local subspace projection
    */
-  protected abstract P computeProjection(DBID id, List<DistanceResultPair<D>> neighbors, Database<NV> database);
+  protected abstract P computeProjection(DBID id, List<DistanceResultPair<D>> neighbors, Relation<NV> database);
 
   /**
    * Factory class
@@ -172,7 +168,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
      * Holds the value of parameter minpts.
      */
     protected int minpts;
-    
+
     /**
      * Constructor.
      * 
@@ -188,7 +184,12 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
     }
 
     @Override
-    public abstract I instantiate(Database<NV> database);
+    public abstract I instantiate(Relation<NV> rep);
+
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return TypeUtil.NUMBER_VECTOR_FIELD;
+    }
 
     /**
      * Parameterization class.

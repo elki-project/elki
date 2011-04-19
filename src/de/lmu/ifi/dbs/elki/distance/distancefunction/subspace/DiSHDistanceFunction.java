@@ -3,8 +3,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -37,16 +38,16 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
   }
 
   @Override
-  public Class<? super NumberVector<?, ?>> getInputDatatype() {
-    return NumberVector.class;
+  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Database<T> database) {
+  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Relation<T> database) {
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    DiSHPreferenceVectorIndex<T> indexinst = (DiSHPreferenceVectorIndex<T>) indexFactory.instantiate((Database<NumberVector<?, ?>>) database);
+    DiSHPreferenceVectorIndex<T> indexinst = (DiSHPreferenceVectorIndex<T>) indexFactory.instantiate((Relation<NumberVector<?, ?>>) database);
     return new Instance<T>(database, indexinst, getEpsilon(), this);
   }
 
@@ -74,7 +75,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
      * @param epsilon Epsilon
      * @param distanceFunction parent distance function
      */
-    public Instance(Database<V> database, DiSHPreferenceVectorIndex<V> index, double epsilon, DiSHDistanceFunction distanceFunction) {
+    public Instance(Relation<V> database, DiSHPreferenceVectorIndex<V> index, double epsilon, DiSHDistanceFunction distanceFunction) {
       super(database, index, epsilon, distanceFunction);
     }
 
@@ -103,11 +104,11 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
         if(d > 2 * epsilon) {
           subspaceDim++;
           if(logger.isDebugging()) {
-            DataQuery<String> rep = database.getObjectLabelQuery();
+            //Representation<String> rep = database.getObjectLabelQuery();
             StringBuffer msg = new StringBuffer();
             msg.append("d ").append(d);
-            msg.append("\nv1 ").append(rep.get(v1.getID()));
-            msg.append("\nv2 ").append(rep.get(v2.getID()));
+            //msg.append("\nv1 ").append(rep.get(v1.getID()));
+            //msg.append("\nv2 ").append(rep.get(v2.getID()));
             msg.append("\nsubspaceDim ").append(subspaceDim);
             msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
             logger.debugFine(msg.toString());
@@ -119,7 +120,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
       BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();
       inverseCommonPreferenceVector.flip(0, dim);
 
-      return new PreferenceVectorBasedCorrelationDistance(DatabaseUtil.dimensionality(database), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
+      return new PreferenceVectorBasedCorrelationDistance(DatabaseUtil.dimensionality(rep), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
     }
   }
 

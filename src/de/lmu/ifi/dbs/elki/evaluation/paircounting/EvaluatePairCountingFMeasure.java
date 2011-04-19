@@ -8,14 +8,12 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGeneratorInterface;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -56,7 +54,7 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
   /**
    * Reference algorithm.
    */
-  private Algorithm<?, ?> referencealg;
+  private Algorithm<?> referencealg;
 
   /**
    * Apply special handling to noise "clusters".
@@ -69,21 +67,21 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
    * @param referencealg Reference clustering
    * @param noiseSpecialHandling Noise handling flag
    */
-  public EvaluatePairCountingFMeasure(Algorithm<?, ?> referencealg, boolean noiseSpecialHandling) {
+  public EvaluatePairCountingFMeasure(Algorithm<?> referencealg, boolean noiseSpecialHandling) {
     super();
     this.referencealg = referencealg;
     this.noiseSpecialHandling = noiseSpecialHandling;
   }
 
   @Override
-  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs == null || crs.size() < 1) {
       // logger.warning("No clustering results found - nothing to evaluate!");
       return;
     }
     // Compute the reference clustering
-    Result refres = tryReferenceClustering(db);
+    Result refres = referencealg.run(db);
     List<Clustering<?>> refcrs = ResultUtil.getClusteringResults(refres);
     if(refcrs.size() == 0) {
       logger.warning("Reference algorithm did not return a clustering result!");
@@ -110,23 +108,6 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
   }
 
   /**
-   * Try to run the reference clustering algorithm.
-   * 
-   * @param db Database
-   * @return clustering result
-   */
-  private Result tryReferenceClustering(Database<?> db) {
-    @SuppressWarnings("unchecked")
-    Result refres = ((ClusteringAlgorithm<?, DatabaseObject>) referencealg).run((Database<DatabaseObject>) db);
-    return refres;
-  }
-
-  @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
-    // Nothing to do.
-  }
-
-  /**
    * Result object for outlier score judgements.
    * 
    * @author Erich Schubert
@@ -150,14 +131,14 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    protected Algorithm<?, ?> referencealg = null;
+    protected Algorithm< ?> referencealg = null;
 
     protected boolean noiseSpecialHandling = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<ClusteringAlgorithm<?, ?>> referencealgP = new ObjectParameter<ClusteringAlgorithm<?, ?>>(REFERENCE_ID, ClusteringAlgorithm.class, ByLabelClustering.class);
+      ObjectParameter<ClusteringAlgorithm<?>> referencealgP = new ObjectParameter<ClusteringAlgorithm<?>>(REFERENCE_ID, ClusteringAlgorithm.class, ByLabelClustering.class);
       if(config.grab(referencealgP)) {
         referencealg = referencealgP.instantiateClass(config);
       }

@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -96,7 +95,7 @@ public class ClusteringComparison implements Evaluator {
    * Perform clusterings evaluation
    */
   @Override
-  public void processResult(Database<?> db, Result result, ResultHierarchy hier) {
+  public void processResult(Database db, Result result, ResultHierarchy hier) {
 
     // get all clustering
     List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
@@ -117,7 +116,7 @@ public class ClusteringComparison implements Evaluator {
 
       measureResults = new TreeSet<MeasureResult>();
 
-      int totalObjects = db.getIDs().size();
+      int totalObjects = db.getDBIDs().size();
       int allPairs = (totalObjects * (totalObjects - 1)) / 2;
       int allPairsSelfPaired = (totalObjects + 1) * totalObjects / 2;
 
@@ -232,7 +231,7 @@ public class ClusteringComparison implements Evaluator {
     // converts ObjectSegments into PairSegments
     Segments segments = new Segments(clusterings);
 
-    for(DBID id : db.getIDs()) {
+    for(DBID id : db.getDBIDs()) {
 
       // tag Object over SegmentID
       segments.addObject(id);
@@ -245,10 +244,5 @@ public class ClusteringComparison implements Evaluator {
     thisResult.add(segments);
 
     hier.add(result, thisResult);
-  }
-
-  @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
-    // Nothing to do.
   }
 }

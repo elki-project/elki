@@ -14,16 +14,20 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
 import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
@@ -65,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("ERiC: Exploring Relationships among Correlation Clusters")
 @Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " + "a hierarchy that allows multiple inheritance from the correlation clustering result.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", title = "On Exploring Complex Relationships of Correlation Clusters", booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
-public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>, V> {
+public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -74,14 +78,14 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   /**
    * The COPAC clustering algorithm.
    */
-  private COPAC<V> copacAlgorithm;
+  private COPAC<V, IntegerDistance> copacAlgorithm;
 
   /**
    * Constructor.
    * 
    * @param copacAlgorithm COPAC to use
    */
-  public ERiC(COPAC<V> copacAlgorithm) {
+  public ERiC(COPAC<V, IntegerDistance> copacAlgorithm) {
     super();
     this.copacAlgorithm = copacAlgorithm;
   }
@@ -90,8 +94,9 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Performs the ERiC algorithm on the given database.
    */
   @Override
-  protected Clustering<CorrelationModel<V>> runInTime(Database<V> database) throws IllegalStateException {
-    int dimensionality = DatabaseUtil.dimensionality(database);
+  protected Clustering<CorrelationModel<V>> runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
+    int dimensionality = DatabaseUtil.dimensionality(dataQuery);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
 
@@ -101,13 +106,13 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     }
     Clustering<Model> copacResult = copacAlgorithm.run(database);
 
-    DistanceQuery<V, ?> query = copacAlgorithm.getPartitionDistanceQuery();
+    DistanceQuery<V, IntegerDistance> query = copacAlgorithm.getPartitionDistanceQuery();
 
     // extract correlation clusters
     if(stepprog != null) {
       stepprog.beginStep(2, "Extract correlation clusters", logger);
     }
-    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, database, dimensionality);
+    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, dataQuery, dimensionality);
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
       for(Integer corrDim : clusterMap.keySet()) {
@@ -176,7 +181,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * @param dimensionality the dimensionality of the feature space
    * @return a mapping of correlation dimension to maps of clusters
    */
-  private SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Clustering<Model> copacResult, Database<V> database, int dimensionality) {
+  private SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Clustering<Model> copacResult, Relation<V> database, int dimensionality) {
     // result
     SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = new TreeMap<Integer, List<Cluster<CorrelationModel<V>>>>();
 
@@ -263,7 +268,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     return parameters;
   }
 
-  private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, ?> query) throws IllegalStateException {
+  private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, IntegerDistance> query) throws IllegalStateException {
     StringBuffer msg = new StringBuffer();
 
     DBSCAN<V, DoubleDistance> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm(query));
@@ -271,7 +276,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
       // TODO: appropriate exception class?
       throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");
     }
-    DistanceFunction<? super V, ?> dfun = DistanceUtil.unwrapDistance(dbscan.getDistanceFunction());
+    DistanceFunction<? super V, ?> dfun = ProxyDistanceFunction.unwrapDistance(dbscan.getDistanceFunction());
     ERiCDistanceFunction distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dfun);
     if(distanceFunction == null) {
       // TODO: appropriate exception class?
@@ -358,6 +363,11 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   }
 
   @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -373,7 +383,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     /**
      * The COPAC instance to use
      */
-    protected COPAC<V> copac;
+    protected COPAC<V, IntegerDistance> copac;
 
     @SuppressWarnings("unchecked")
     @Override

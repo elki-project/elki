@@ -12,10 +12,10 @@ import java.util.Map.Entry;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("SLINK: Single Link Clustering")
 @Description("Hierarchical clustering algorithm based on single-link connectivity.")
 @Reference(authors = "R. Sibson", title = "SLINK: An optimally efficient algorithm for the single-link cluster method", booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
-public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, Result> {
+public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, Result> {
   /**
    * The logger for this class.
    */
@@ -116,23 +116,23 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected Result runInTime(Database<O> database) {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
+  protected Result runInTime(Database database) {
+    DistanceQuery<O, D> distQuery = getDistanceQuery(database);
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
-    WritableRecordStore store = DataStoreUtil.makeRecordStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
+    WritableRecordStore store = DataStoreUtil.makeRecordStorage(distQuery.getRepresentation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
     pi = store.getStorage(0, DBID.class);
     lambda = store.getStorage(1, distCls);
     // Temporary storage for m.
-    WritableDataStore<D> m = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
+    WritableDataStore<D> m = DataStoreUtil.makeStorage(distQuery.getRepresentation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", database.size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", distQuery.getRepresentation().size(), logger) : null;
     // has to be an array for monotonicity reasons!
-    ModifiableDBIDs processedIDs = DBIDUtil.newArray(database.size());
+    ModifiableDBIDs processedIDs = DBIDUtil.newArray(distQuery.getRepresentation().size());
 
     // apply the algorithm
-    for(DBID id : database) {
+    for(DBID id : distQuery.getRepresentation().iterDBIDs()) {
       step1(id);
-      step2(id, processedIDs, distFunc, m);
+      step2(id, processedIDs, distQuery, m);
       step3(id, processedIDs, m);
       step4(id, processedIDs);
 
@@ -154,8 +154,8 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
     BasicResult result = null;
 
     // Build clusters identified by their target object
-    int minc = minclusters != null ? minclusters : database.size();
-    result = extractClusters(database, pi, lambda, minc);
+    int minc = minclusters != null ? minclusters : distQuery.getRepresentation().size();
+    result = extractClusters(distQuery.getRepresentation().getDBIDs(), pi, lambda, minc);
 
     result.addChildResult(new AnnotationFromDataStore<DBID>("SLINK pi", "slink-order", SLINK_PI, pi));
     result.addChildResult(new AnnotationFromDataStore<Distance<?>>("SLINK lambda", "slink-order", SLINK_LAMBDA, lambda));
@@ -260,22 +260,22 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
   /**
    * Extract all clusters from the pi-lambda-representation.
    * 
-   * @param database Database
+   * @param rep Database
    * @param pi Pi store
    * @param lambda Lambda store
    * @param minclusters Minimum number of clusters to extract
    * 
    * @return Hierarchical clustering
    */
-  private Clustering<DendrogramModel<D>> extractClusters(Database<O> database, final DataStore<DBID> pi, final DataStore<D> lambda, int minclusters) {
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extracting clusters", database.size(), logger) : null;
+  private Clustering<DendrogramModel<D>> extractClusters(DBIDs ids, final DataStore<DBID> pi, final DataStore<D> lambda, int minclusters) {
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), logger) : null;
 
     // stopdist
     D stopdist = null;
     // sort by lambda
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(database.getIDs());
+    ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
     Collections.sort(order, new CompareByLambda<D>(lambda));
-    int index = database.size() - minclusters - 1;
+    int index = ids.size() - minclusters - 1;
     while(index >= 0) {
       if(lambda.get(order.get(index)).equals(lambda.get(order.get(index + 1)))) {
         index--;
@@ -289,7 +289,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
     // extract the child clusters
     Map<DBID, ModifiableDBIDs> cluster_ids = new HashMap<DBID, ModifiableDBIDs>();
     Map<DBID, D> cluster_distances = new HashMap<DBID, D>();
-    for(DBID id : database.getIDs()) {
+    for(DBID id : ids) {
       DBID lastObjectInCluster = lastObjectInCluster(id, stopdist, pi, lambda);
       ModifiableDBIDs cluster = cluster_ids.get(lastObjectInCluster);
       if(cluster == null) {
@@ -432,7 +432,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
   /**
    * Extract all clusters from the pi-lambda-representation.
    * 
-   * @param database Database
+   * @param rep Database
    * @param pi Pi store
    * @param lambda Lambda store
    * @param minclusters Minimum number of clusters to extract
@@ -440,23 +440,23 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * @return Hierarchical clustering
    */
   @SuppressWarnings("unused")
-  private Clustering<Model> extractClusters_erich(Database<O> database, final DataStore<DBID> pi, final DataStore<D> lambda, int minclusters) {
+  private Clustering<Model> extractClusters_erich(DBIDs ids, final DataStore<DBID> pi, final DataStore<D> lambda, int minclusters) {
     // extract a hierarchical clustering
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(database.getIDs());
+    ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
     // sort by lambda
     Collections.sort(order, new CompareByLambda<D>(lambda));
     D curdist = null;
 
     D stopdist = null;
-    if(minclusters < database.size()) {
-      stopdist = lambda.get(order.get(database.size() - minclusters));
+    if(minclusters < ids.size()) {
+      stopdist = lambda.get(order.get(ids.size() - minclusters));
     }
 
     ModifiableHierarchy<Cluster<Model>> hier = new HierarchyHashmapList<Cluster<Model>>();
     Map<DBID, Cluster<Model>> clusters = new HashMap<DBID, Cluster<Model>>();
     Map<DBID, ModifiableDBIDs> cids = new HashMap<DBID, ModifiableDBIDs>();
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extracting clusters", database.size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), logger) : null;
 
     for(DBID cur : order) {
       DBID dest = pi.get(cur);
@@ -556,6 +556,11 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -601,7 +606,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected int minclusters = 0;
 
     @Override

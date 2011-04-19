@@ -5,6 +5,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -38,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // TODO: re-use an existing EM when present?
 @Title("EM Outlier: Outlier Detection based on the generic EM clustering")
 @Description("The outlier score assigned is based on the highest cluster probability obtained from EM clustering.")
-public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -68,12 +70,12 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
    * Runs the algorithm in the timed evaluation part.
    */
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
     Clustering<EMModel<V>> emresult = emClustering.run(database);
 
     double globmax = 0.0;
-    WritableDataStore<Double> emo_score = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-    for(DBID id : database) {
+    WritableDataStore<Double> emo_score = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    for(DBID id : database.getDBIDs()) {
       double maxProb = Double.POSITIVE_INFINITY;
       double[] probs = emClustering.getProbClusterIGivenX(id);
       for(double prob : probs) {
@@ -89,6 +91,11 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
     // TODO: add a keep-EM flag?
     result.addChildResult(emresult);
     return result;
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -35,7 +36,6 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
   /**
    * Constructor.
    * 
-   * @param database Database
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -43,8 +43,8 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public RStarTree(Database<O> database, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public RStarTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**
@@ -56,8 +56,8 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
   }
 
   @Override
-  protected SpatialEntry createNewLeafEntry(O o) {
-    return new SpatialLeafEntry(o.getID(), getValues(o));
+  protected SpatialEntry createNewLeafEntry(DBID id, O o) {
+    return new SpatialLeafEntry(id, getValues(o));
   }
 
   @Override
@@ -98,8 +98,9 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
   /**
    * Does nothing.
    */
+  @SuppressWarnings("unused")
   @Override
-  protected void postDelete(@SuppressWarnings("unused") O o) {
+  protected void postDelete(DBID id) {
     // do nothing
   }
 

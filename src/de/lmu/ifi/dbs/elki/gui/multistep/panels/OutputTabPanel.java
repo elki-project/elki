@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
 import java.lang.ref.WeakReference;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
@@ -24,12 +23,12 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
   /**
    * The data input configured
    */
-  private OutputStep<DatabaseObject> outs = null;
+  private OutputStep outs = null;
 
   /**
    * Result we ran last on
    */
-  private WeakReference<? extends Object> basedOnResult = null;
+  private WeakReference<?> basedOnResult = null;
 
   /**
    * Input step to run on.
@@ -54,7 +53,6 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
     evals.addObserver(this);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected synchronized void configureStep(Parameterization config)  {
     outs = config.tryInstantiate(OutputStep.class);
@@ -79,9 +77,9 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
       throw new AbortException("Evaluation failed.");
     }
     // Get the database and run the algorithms
-    Database<DatabaseObject> database = input.getInputStep().getDatabase();
+    Database database = input.getInputStep().getDatabase();
     Result result = evals.getEvaluationStep().getResult();
-    outs.runResultHandlers(result, database, input.getInputStep().getNormalizationUndo(), input.getInputStep().getNormalization());
+    outs.runResultHandlers(result, database);
     basedOnResult = new WeakReference<Object>(result);
   }
 

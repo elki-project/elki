@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
@@ -13,7 +12,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * @apiviz.landmark
  * @apiviz.has Projection1D
  */
-public abstract class P1DVisualization<NV extends NumberVector<NV, ?>> extends AbstractVisualization<NV> {
+public abstract class P1DVisualization extends AbstractVisualization {
   /**
    * The current projection
    */

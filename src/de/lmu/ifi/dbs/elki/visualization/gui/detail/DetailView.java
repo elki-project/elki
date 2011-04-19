@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -49,7 +48,7 @@ public class DetailView extends SVGPlot implements ResultListener {
   /**
    * The visualizer context
    */
-  VisualizerContext<? extends DatabaseObject> context;
+  VisualizerContext context;
 
   /**
    * Map from visualizers to layers
@@ -72,7 +71,7 @@ public class DetailView extends SVGPlot implements ResultListener {
    * @param vis Visualizations to use
    * @param ratio Plot ratio
    */
-  public DetailView(VisualizerContext<? extends DatabaseObject> context, PlotItem vis, double ratio) {
+  public DetailView(VisualizerContext context, PlotItem vis, double ratio) {
     super();
     this.context = context;
     this.visi = vis;
@@ -94,7 +93,7 @@ public class DetailView extends SVGPlot implements ResultListener {
    * 
    * @param context
    */
-  private void addBackground(VisualizerContext<? extends DatabaseObject> context) {
+  private void addBackground(VisualizerContext context) {
     // Make a background
     CSSClass cls = new CSSClass(this, "background");
     cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));

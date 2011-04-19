@@ -1,9 +1,7 @@
 package experimentalcode.erich;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -17,11 +15,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
  * 
  * @author Erich Schubert
  */
-public class LogResultStructure implements ResultHandler<DatabaseObject, Result> {
+public class LogResultStructure implements ResultHandler<Result> {
   Logging logger = Logging.getLogger(LogResultStructure.class);
 
   @Override
-  public void processResult(@SuppressWarnings("unused") Database<DatabaseObject> db, Result result) {
+  public void processResult(@SuppressWarnings("unused") Database db, Result result) {
     if(logger.isVerbose()) {
       if(result instanceof HierarchicalResult) {
         Hierarchy<Result> hier = ((HierarchicalResult) result).getHierarchy();
@@ -61,10 +59,5 @@ public class LogResultStructure implements ResultHandler<DatabaseObject, Result>
         recursiveLogResult(buf, hier, r, depth + 1);
       }
     }
-  }
-
-  @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<DatabaseObject> normalization) {
-    // Ignore
   }
 }

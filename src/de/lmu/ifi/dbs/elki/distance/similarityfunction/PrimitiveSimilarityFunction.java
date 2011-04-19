@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> object type
  * @param <D> distance type
  */
-public interface PrimitiveSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends SimilarityFunction<O, D> {
+public interface PrimitiveSimilarityFunction<O, D extends Distance<D>> extends SimilarityFunction<O, D> {
   /**
    * Computes the similarity between two given DatabaseObjects according to this
    * similarity function.
@@ -26,4 +26,7 @@ public interface PrimitiveSimilarityFunction<O extends DatabaseObject, D extends
    *         similarity function
    */
   D similarity(O o1, O o2);
+
+  @Override
+  abstract public SimpleTypeInformation<? super O> getInputTypeRestriction();
 }

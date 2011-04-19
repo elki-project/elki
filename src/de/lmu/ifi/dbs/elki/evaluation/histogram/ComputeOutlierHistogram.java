@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -133,13 +132,13 @@ public class ComputeOutlierHistogram implements Evaluator {
    * @param or Outlier result
    * @return Result
    */
-  public HistogramResult<DoubleVector> evaluateOutlierResult(Database<?> database, OutlierResult or) {
+  public HistogramResult<DoubleVector> evaluateOutlierResult(Database database, OutlierResult or) {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
-      oscaling.prepare(database.getIDs(), or);
+      oscaling.prepare(database.getDBIDs(), or);
     }
 
-    ModifiableDBIDs ids = DBIDUtil.newHashSet(database.getIDs());
+    ModifiableDBIDs ids = DBIDUtil.newHashSet(database.getDBIDs());
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positiveClassName);
     // first value for outliers, second for each object
     final AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> hist;
@@ -187,7 +186,7 @@ public class ComputeOutlierHistogram implements Evaluator {
   }
 
   @Override
-  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if(ors == null || ors.size() <= 0) {
       // logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
@@ -197,11 +196,6 @@ public class ComputeOutlierHistogram implements Evaluator {
     for(OutlierResult or : ors) {
       hierarchy.add(or, evaluateOutlierResult(db, or));
     }
-  }
-
-  @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
-    // Ignore normalizations.
   }
 
   /**

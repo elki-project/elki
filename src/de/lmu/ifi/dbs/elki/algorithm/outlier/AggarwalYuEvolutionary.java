@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -114,13 +115,14 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    * Performs the EAFOD algorithm on the given database.
    */
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
-    final int dbsize = database.size();
-    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(database);
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<V> dataQuery = getRelation(database);
+    final int dbsize = dataQuery.size();
+    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(dataQuery);
 
-    Collection<Individuum> individuums = (new EvolutionarySearch(database, ranges, m, seed)).run();
+    Collection<Individuum> individuums = (new EvolutionarySearch(dataQuery, ranges, m, seed)).run();
 
-    WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     for(Individuum ind : individuums) {
       DBIDs ids = computeSubspaceForGene(ind.getGene(), ranges);
       double sparsityC = sparsity(ids.size(), dbsize, k);
@@ -133,7 +135,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : database) {
+    for(DBID id : dataQuery.iterDBIDs()) {
       Double val = outlierScore.get(id);
       if(val == null) {
         outlierScore.put(id, 0.0);
@@ -191,7 +193,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
      * @param m Population size
      * @param seed Random generator seed
      */
-    public EvolutionarySearch(Database<V> database, ArrayList<ArrayList<DBIDs>> ranges, int m, Long seed) {
+    public EvolutionarySearch(Relation<V> database, ArrayList<ArrayList<DBIDs>> ranges, int m, Long seed) {
       super();
       this.ranges = ranges;
       this.m = m;

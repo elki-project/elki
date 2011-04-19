@@ -2,12 +2,11 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex
  */
-public class MetricalIndexKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
+public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
   /**
    * The index to use
    */
@@ -28,12 +27,12 @@ public class MetricalIndexKNNQuery<O extends DatabaseObject, D extends Distance<
   /**
    * Constructor.
    *
-   * @param database Database to use
+   * @param rep Representation to use
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexKNNQuery(Database<? extends O> database, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
-    super(database, distanceQuery);
+  public MetricalIndexKNNQuery(Relation<? extends O> rep, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+    super(rep, distanceQuery);
     this.index = index;
   }
 
@@ -45,7 +44,7 @@ public class MetricalIndexKNNQuery<O extends DatabaseObject, D extends Distance<
   @Override
   public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
     // TODO: do this in the DB layer, we might have a better index?
-    return getKNNForObject(database.get(id), k);
+    return getKNNForObject(rep.get(id), k);
   }
 
   @SuppressWarnings("unused")

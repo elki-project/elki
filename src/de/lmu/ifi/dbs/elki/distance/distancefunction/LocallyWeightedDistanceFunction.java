@@ -2,8 +2,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
@@ -50,16 +52,16 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
   }
 
   @Override
-  public Class<? super V> getInputDatatype() {
-    return NumberVector.class;
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
-  public <T extends V> Instance<T> instantiate(Database<T> database) {
+  public <T extends V> Instance<T> instantiate(Relation<T> database) {
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    LocalProjectionIndex<T, ?> indexinst = (LocalProjectionIndex<T, ?>) indexFactory.instantiate((Database<V>) database);
+    LocalProjectionIndex<T, ?> indexinst = (LocalProjectionIndex<T, ?>) indexFactory.instantiate((Relation<V>) database);
     return new Instance<T>(database, indexinst, this);
   }
 
@@ -76,7 +78,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
      * @param index Index
      * @param distanceFunction Distance Function
      */
-    public Instance(Database<V> database, LocalProjectionIndex<V, ?> index, LocallyWeightedDistanceFunction<? super V> distanceFunction) {
+    public Instance(Relation<V> database, LocalProjectionIndex<V, ?> index, LocallyWeightedDistanceFunction<? super V> distanceFunction) {
       super(database, index, distanceFunction);
     }
 
@@ -98,8 +100,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
         return new DoubleDistance(Double.POSITIVE_INFINITY);
       }
 
-      V v1 = database.get(id1);
-      V v2 = database.get(id2);
+      V v1 = rep.get(id1);
+      V v2 = rep.get(id2);
       Vector v1Mv2 = v1.getColumnVector().minus(v2.getColumnVector());
       Vector v2Mv1 = v2.getColumnVector().minus(v1.getColumnVector());
 
@@ -128,7 +130,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
 
     // @Override
     // TODO: re-enable spatial interfaces
-    public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
+    public DoubleDistance minDistBROKEN(HyperBoundingBox mbr, V v) {
       if(mbr.getDimensionality() != v.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString());
       }
@@ -147,8 +149,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
         }
       }
 
-      Matrix m = index.getLocalProjection(v.getID()).similarityMatrix();
-      // noinspection unchecked
+      Matrix m = null; // index.getLocalProjection(v.getID()).similarityMatrix();
       Vector rv1Mrv2 = v.getColumnVector().minus(new Vector(r));
       double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0, 0);
 

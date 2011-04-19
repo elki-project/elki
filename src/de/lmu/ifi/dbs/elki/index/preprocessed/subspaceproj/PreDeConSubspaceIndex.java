@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -52,19 +52,19 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
   /**
    * Constructor.
    * 
-   * @param database
+   * @param rep
    * @param epsilon
    * @param rangeQueryDistanceFunction
    * @param minpts
    * @param delta
    */
-  public PreDeConSubspaceIndex(Database<V> database, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, double delta) {
-    super(database, epsilon, rangeQueryDistanceFunction, minpts);
+  public PreDeConSubspaceIndex(Relation<V> rep, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, double delta) {
+    super(rep, epsilon, rangeQueryDistanceFunction, minpts);
     this.delta = delta;
   }
 
   @Override
-  protected SubspaceProjectionResult computeProjection(DBID id, List<DistanceResultPair<D>> neighbors, Database<V> database) {
+  protected SubspaceProjectionResult computeProjection(DBID id, List<DistanceResultPair<D>> neighbors, Relation<V> database) {
     StringBuffer msg = null;
 
     int referenceSetSize = neighbors.size();
@@ -122,8 +122,8 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
     }
 
     if(msg != null) {
-      msg.append("\nprojDim " + database.getObjectLabelQuery().get(id) + ": " + projDim);
-      msg.append("\nsimMatrix " + database.getObjectLabelQuery().get(id) + ": " + FormatUtil.format(simMatrix, FormatUtil.NF4));
+      msg.append("\nprojDim " /*+ database.getObjectLabelQuery().get(id)*/ + ": " + projDim);
+      msg.append("\nsimMatrix " /*+ database.getObjectLabelQuery().get(id)*/ + ": " + FormatUtil.format(simMatrix, FormatUtil.NF4));
       getLogger().debugFine(msg.toString());
     }
 
@@ -186,8 +186,8 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
     }
 
     @Override
-    public PreDeConSubspaceIndex<V, D> instantiate(Database<V> database) {
-      return new PreDeConSubspaceIndex<V, D>(database, epsilon, rangeQueryDistanceFunction, minpts, delta);
+    public PreDeConSubspaceIndex<V, D> instantiate(Relation<V> rep) {
+      return new PreDeConSubspaceIndex<V, D>(rep, epsilon, rangeQueryDistanceFunction, minpts, delta);
     }
 
     /**

@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.database.datastore;
 
-import java.util.Collection;
 import java.util.EventObject;
 import java.util.Map;
 import java.util.Set;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Encapsulates information describing changes, i.e. updates, insertions, and /
@@ -11,11 +12,10 @@ import java.util.Set;
  * {@link DataStoreListener} of the change.
  * 
  * @author Elke Achtert
- * @param <T> the data type as element of the {@link DataStore}
  * @see DataStore
  * @see DataStoreListener
  */
-public class DataStoreEvent<T> extends EventObject {
+public class DataStoreEvent extends EventObject {
   /**
    * Serialization ID since Java EventObjects are expected to be serializable.
    */
@@ -47,7 +47,8 @@ public class DataStoreEvent<T> extends EventObject {
    * The objects that were changed in the {@link DataStore} mapped by the type
    * of change.
    */
-  private final Map<Type, Collection<T>> objects;
+  // FIXME: instead of a (costly) map, use just three DBIDs references?
+  private final Map<Type, DBIDs> objects;
 
   /**
    * Used to create an event when objects have been updated in, inserted into,
@@ -60,7 +61,7 @@ public class DataStoreEvent<T> extends EventObject {
    * @see Type#DELETE
    * @see Type#UPDATE
    */
-  public DataStoreEvent(Object source, Map<Type, Collection<T>> objects) {
+  public DataStoreEvent(Object source, Map<Type, DBIDs> objects) {
     super(source);
     this.objects = objects;
   }
@@ -83,7 +84,7 @@ public class DataStoreEvent<T> extends EventObject {
    * 
    * @return the objects that have been changed
    */
-  public Map<Type, Collection<T>> getObjects() {
+  public Map<Type, DBIDs> getObjects() {
     return objects;
   }
 }

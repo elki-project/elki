@@ -2,14 +2,12 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-
 /**
  * Static visualization
  * 
  * @author Erich Schubert
  */
-public class StaticVisualization extends AbstractVisualization<DatabaseObject> {
+public class StaticVisualization extends AbstractVisualization {
   /**
    * Unchanging precomputed visualization.
    * 

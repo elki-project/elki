@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import de.lmu.ifi.dbs.elki.persistent.Page;
-
 import java.util.Enumeration;
+
+import de.lmu.ifi.dbs.elki.persistent.Page;
 
 /**
  * This interface defines the common requirements of nodes in an index

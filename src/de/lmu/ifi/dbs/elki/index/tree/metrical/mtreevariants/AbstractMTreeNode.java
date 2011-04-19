@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 import java.util.List;
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -25,7 +24,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
-public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<N, E> implements MetricalNode<N, E> {
+public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<N, E> implements MetricalNode<N, E> {
   /**
    * Empty constructor for Externalizable interface.
    */

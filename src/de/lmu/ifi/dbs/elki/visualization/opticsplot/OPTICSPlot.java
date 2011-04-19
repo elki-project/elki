@@ -325,7 +325,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * 
    * @return New or existing optics plot
    */
-  public static <D extends Distance<D>> OPTICSPlot<D> plotForClusterOrder(ClusterOrderResult<D> co, VisualizerContext<?> context) {
+  public static <D extends Distance<D>> OPTICSPlot<D> plotForClusterOrder(ClusterOrderResult<D> co, VisualizerContext context) {
     // Check for an existing plot
     ArrayList<OPTICSPlot<D>> plots = ResultUtil.filterResults(co, OPTICSPlot.class);
     if (plots.size() > 0) {

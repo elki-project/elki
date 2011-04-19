@@ -4,18 +4,18 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.Normalization;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStreamNormalizing;
 
 /**
  * A solution of correlation analysis is a matrix of equations describing the
@@ -85,7 +85,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param centroid the centroid if the objects belonging to the hyperplane
    *        induced by the correlation
    */
-  public CorrelationAnalysisSolution(LinearEquationSystem solution, Database<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid) {
+  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid) {
     this(solution, db, strongEigenvectors, weakEigenvectors, similarityMatrix, centroid, NumberFormat.getInstance(Locale.US));
   }
 
@@ -106,7 +106,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    *        induced by the correlation
    * @param nf the number format for output accuracy
    */
-  public CorrelationAnalysisSolution(LinearEquationSystem solution, Database<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid, NumberFormat nf) {
+  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid, NumberFormat nf) {
     this.linearEquationSystem = solution;
     this.correlationDimensionality = strongEigenvectors.getColumnDimensionality();
     this.strongEigenvectors = strongEigenvectors;
@@ -117,11 +117,12 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
 
     // determine standard deviation
     double variance = 0;
-    for (DBID id : db) {
+    DBIDs ids = db.getDBIDs();
+    for (DBID id : ids) {
       double distance = distance(db.get(id).getColumnVector());
       variance += distance * distance;
     }
-    standardDeviation = Math.sqrt(variance / db.size());
+    standardDeviation = Math.sqrt(variance / ids.size());
   }
 
   /**
@@ -134,7 +135,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @throws NonNumericFeaturesException if the linear equation system is not
    *         compatible with values initialized during normalization
    */
-  public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<V> normalization) throws NonNumericFeaturesException {
+  public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<?> normalization) throws NonNumericFeaturesException {
     if(normalization != null) {
       LinearEquationSystem lq = normalization.transform(linearEquationSystem);
       lq.solveByTotalPivotSearch();
@@ -311,7 +312,6 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
   /**
    * Text output of the equation system
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void writeToText(TextWriterStream out, String label) {
     if(label != null) {
@@ -321,16 +321,16 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
     try {
       if(getNormalizedLinearEquationSystem(null) != null) {
         // TODO: more elegant way of doing normalization here?
-        if(out instanceof TextWriterStreamNormalizing) {
+        /*if(out instanceof TextWriterStreamNormalizing) {
           TextWriterStreamNormalizing<V> nout = (TextWriterStreamNormalizing<V>) out;
           LinearEquationSystem lq = getNormalizedLinearEquationSystem(nout.getNormalization());
           out.commentPrint("Linear Equation System: ");
           out.commentPrintLn(lq.equationsToString(nf));
-        } else {
-          LinearEquationSystem lq = getNormalizedLinearEquationSystem(null);
-          out.commentPrint("Linear Equation System: ");
-          out.commentPrintLn(lq.equationsToString(nf));
-        }
+        } else { */
+        LinearEquationSystem lq = getNormalizedLinearEquationSystem(null);
+        out.commentPrint("Linear Equation System: ");
+        out.commentPrintLn(lq.equationsToString(nf));
+        //}
       }
     }
     catch(NonNumericFeaturesException e) {

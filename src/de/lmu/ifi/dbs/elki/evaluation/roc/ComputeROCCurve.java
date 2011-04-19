@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
@@ -82,7 +81,7 @@ public class ComputeROCCurve implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
-  private ROCResult computeROCResult(Database<?> database, DBIDs positiveids, Iterator<DBID> iter) {
+  private ROCResult computeROCResult(Database database, DBIDs positiveids, Iterator<DBID> iter) {
     ArrayModifiableDBIDs order = DBIDUtil.newArray(database.size());
     while(iter.hasNext()) {
       Object o = iter.next();
@@ -109,8 +108,8 @@ public class ComputeROCCurve implements Evaluator {
     return rocresult;
   }
 
-  private ROCResult computeROCResult(Database<?> database, DBIDs positiveids, OutlierResult or) {
-    List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.OutlierScoreAdapter(database.getIDs(), or));
+  private ROCResult computeROCResult(Database database, DBIDs positiveids, OutlierResult or) {
+    List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.OutlierScoreAdapter(database.getDBIDs(), or));
     double rocauc = ROC.computeAUC(roccurve);
     if(logger.isVerbose()) {
       logger.verbose("ROCAUC: " + rocauc);
@@ -140,7 +139,7 @@ public class ComputeROCCurve implements Evaluator {
   }
 
   @Override
-  public void processResult(Database<?> db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
     // Prepare
     DBIDs positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
 
@@ -168,7 +167,7 @@ public class ComputeROCCurve implements Evaluator {
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      Iterator<DBID> iter = or.iter(db.getIDs());
+      Iterator<DBID> iter = or.iter(db.getDBIDs());
       hierarchy.add(or, computeROCResult(db, positiveids, iter));
       nonefound = false;
     }
@@ -177,11 +176,6 @@ public class ComputeROCCurve implements Evaluator {
       return;
       // logger.warning("No results found to process with ROC curve analyzer. Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }
-  }
-
-  @Override
-  public void setNormalization(@SuppressWarnings("unused") Normalization<?> normalization) {
-    // Normalizations are ignored
   }
 
   /**

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -30,7 +29,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has EvaluatePairCountingFMeasure.ScoreResult oneway - - visualizes
  */
-public class ClusterEvaluationVisFactory extends AbstractVisFactory<DatabaseObject> {
+public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
@@ -45,10 +44,10 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory<DatabaseObje
   }
   
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+  public void addVisualizers(VisualizerContext context, Result result) {
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(result, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, sr, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(sr, task);
     }

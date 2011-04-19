@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -27,8 +25,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-// TODO: validate this works correctly
-public class LinearScanRKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractRKNNQuery<O, D> implements LinearScanQuery {
+// FIXME: Validate this works correctly.
+public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery<O, D> implements LinearScanQuery {
   /**
    * KNN query we use.
    */
@@ -37,20 +35,21 @@ public class LinearScanRKNNQuery<O extends DatabaseObject, D extends Distance<D>
   /**
    * Constructor.
    * 
-   * @param database Database to query
+   * @param rep Database to query
    * @param distanceQuery Distance function to use
+   * @param knnQuery kNN query to use.
    * @param maxk k to use
    */
-  public LinearScanRKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, Integer maxk) {
-    super(database, distanceQuery);
-    this.knnQuery = database.getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
+  public LinearScanRKNNQuery(Relation<? extends O> rep, DistanceQuery<O, D> distanceQuery, KNNQuery<O, D> knnQuery, Integer maxk) {
+    super(rep, distanceQuery);
+    this.knnQuery = knnQuery;
   }
 
   @Override
   public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k) {
     ArrayList<DistanceResultPair<D>> rNNlist = new ArrayList<DistanceResultPair<D>>();
     
-    ArrayDBIDs allIDs = DBIDUtil.ensureArray(database.getIDs());
+    ArrayDBIDs allIDs = DBIDUtil.ensureArray(rep.getDBIDs());
     List<List<DistanceResultPair<D>>> kNNLists = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
@@ -79,7 +78,7 @@ public class LinearScanRKNNQuery<O extends DatabaseObject, D extends Distance<D>
       rNNList.add(new ArrayList<DistanceResultPair<D>>());
     }
 
-    ArrayDBIDs allIDs = DBIDUtil.ensureArray(database.getIDs());
+    ArrayDBIDs allIDs = DBIDUtil.ensureArray(rep.getDBIDs());
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;

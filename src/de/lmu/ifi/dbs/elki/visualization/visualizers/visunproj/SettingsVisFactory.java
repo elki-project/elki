@@ -5,7 +5,6 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
@@ -33,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.has SettingsResult oneway - - visualizes
  */
 // TODO: make this a menu item instead of a "visualization"?
-public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
+public class SettingsVisFactory extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
@@ -50,7 +49,7 @@ public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
     SettingsResult sr = task.getResult();
-    VisualizerContext<? extends DatabaseObject> context = task.getContext();
+    VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
 
     Collection<Pair<Object, Parameter<?, ?>>> settings = sr.getSettings();
@@ -115,10 +114,10 @@ public class SettingsVisFactory extends AbstractVisFactory<DatabaseObject> {
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+  public void addVisualizers(VisualizerContext context, Result result) {
     final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(result, SettingsResult.class);
     for(SettingsResult sr : settingsResults) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, sr, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(sr, task);
     }

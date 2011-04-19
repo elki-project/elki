@@ -34,7 +34,7 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testCLIQUEResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
+    Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
     ListParameterization params = new ListParameterization();
     params.addParameter(CLIQUE.TAU_ID, "0.1");
@@ -47,7 +47,7 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
     // run CLIQUE on database
     Clustering<SubspaceModel<DoubleVector>> result = clique.run(db);
     // Run by-label as reference
-    ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>(true, null);
+    ByLabelClustering bylabel = new ByLabelClustering(true, null);
     Clustering<Model> rbl = bylabel.run(db);
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
@@ -63,7 +63,7 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testCLIQUESubspaceOverlapping() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
+    Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
   
     // Setup algorithm
     ListParameterization params = new ListParameterization();

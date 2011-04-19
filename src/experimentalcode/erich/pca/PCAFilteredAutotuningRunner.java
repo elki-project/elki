@@ -6,9 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
 /**
  * Performs a self-tuning local PCA based on the covariance matrices of given
@@ -48,11 +49,11 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>,
    * Run PCA on a collection of database IDs
    * 
    * @param ids a collection of ids
-   * @param database the database used
+   * @param rep the database used
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processIds(DBIDs ids, Database<? extends V> database) {
+  public PCAFilteredResult processIds(DBIDs ids, Relation<? extends V> database) {
     // FIXME: We're only supporting QueryResults for now, add compatibility
     // wrapper?
     return null;
@@ -62,13 +63,13 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>,
    * Run PCA on a QueryResult Collection
    * 
    * @param results a collection of QueryResults
-   * @param database the database used
+   * @param rep the database used
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<? extends V> database) {
+  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
     assertSortedByDistance(results);
-    int dim = database.dimensionality();
+    final int dim = DatabaseUtil.dimensionality(database);
 
     List<Matrix> best = new LinkedList<Matrix>();
     for(int i = 0; i < dim; i++) {

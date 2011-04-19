@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -43,6 +45,11 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
   public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
     super(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy);
     this.insertionCandidates = insertionCandidates;
+  }
+  
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   /**

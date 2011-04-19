@@ -13,11 +13,9 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseObjectMetadata;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -39,18 +37,15 @@ public class MapWebServer {
 
   private Map<String, DBID> lblmap;
 
-  private DataQuery<DatabaseObjectMetadata> metaq;
-
-  private Database<? extends DatabaseObject> db;
+  private Database db;
 
   private HierarchicalResult result;
 
-  public MapWebServer(int port, Map<String, DBID> lblmap, Map<String, PolygonsObject> polymap, Database<? extends DatabaseObject> db, HierarchicalResult result) {
+  public MapWebServer(int port, Map<String, DBID> lblmap, Map<String, PolygonsObject> polymap, Database db, HierarchicalResult result) {
     super();
     this.lblmap = lblmap;
     this.polymap = polymap;
     this.db = db;
-    this.metaq = db.getMetadataQuery();
     this.result = result;
 
     try {
@@ -182,10 +177,10 @@ public class MapWebServer {
     }
     if(cur instanceof OutlierResult) {
       re.append("\"scores\":[");
-      DataQuery<DatabaseObjectMetadata> mq = db.getMetadataQuery();
+      Relation<DatabaseObjectMetadata> mq = db.getMetadataQuery();
       OutlierResult or = (OutlierResult) cur;
       AnnotationResult<Double> scores = or.getScores();
-      Iterator<DBID> iter = or.getOrdering().iter(db.getIDs()).iterator();
+      Iterator<DBID> iter = or.getOrdering().iter(db.getDBIDs()).iterator();
       while(iter.hasNext()) {
         DBID id = iter.next();
         re.append("{");

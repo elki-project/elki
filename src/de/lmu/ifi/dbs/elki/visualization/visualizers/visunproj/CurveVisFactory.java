@@ -6,7 +6,6 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has IterableResult oneway - - visualizes
  */
-public class CurveVisFactory extends AbstractVisFactory<DatabaseObject> {
+public class CurveVisFactory extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
@@ -62,7 +61,7 @@ public class CurveVisFactory extends AbstractVisFactory<DatabaseObject> {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    VisualizerContext<?> context = task.getContext();
+    VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
     IterableResult<DoubleDoublePair> curve = task.getResult();
 
@@ -143,7 +142,7 @@ public class CurveVisFactory extends AbstractVisFactory<DatabaseObject> {
    * 
    * @param svgp Plot
    */
-  private void setupCSS(VisualizerContext<?> context, SVGPlot svgp) {
+  private void setupCSS(VisualizerContext context, SVGPlot svgp) {
     CSSClass csscls = new CSSClass(this, SERIESID);
     // csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
     csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
@@ -200,11 +199,11 @@ public class CurveVisFactory extends AbstractVisFactory<DatabaseObject> {
   }
 
   @Override
-  public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+  public void addVisualizers(VisualizerContext context, Result result) {
     final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
     final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, curve, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, context, curve, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(curve, task);
     }

@@ -3,11 +3,11 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
@@ -35,12 +35,13 @@ public class SpatialIndexRangeQuery<O extends NumberVector<?, ?>, D extends Dist
   /**
    * Constructor.
    * 
+   * @param rep Representation to use
    * @param index Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public SpatialIndexRangeQuery(Database<? extends O> database, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    super(database, distanceQuery);
+  public SpatialIndexRangeQuery(Relation<? extends O> rep, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
+    super(rep, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;
   }
@@ -52,7 +53,7 @@ public class SpatialIndexRangeQuery<O extends NumberVector<?, ?>, D extends Dist
 
   @Override
   public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
-    return getRangeForObject(database.get(id), range);
+    return getRangeForObject(rep.get(id), range);
   }
 
   @SuppressWarnings("unused")

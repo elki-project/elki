@@ -2,10 +2,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -33,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("M-Tree")
 @Description("Efficient Access Method for Similarity Search in Metric Spaces")
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class MTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
+public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
   /**
    * The logger for this class.
    */
@@ -48,37 +49,37 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    */
-  public MTree(String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
-    super(fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public MTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
+    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
   }
 
   /**
    * Inserts the specified object into this M-Tree by calling
-   * {@link AbstractMTree#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
+   * {@link AbstractMTree#insertAll(ArrayDBIDs,boolean)
    * AbstractMTree.insert(object, false)}.
    * 
    * @param object the object to be inserted
    */
   @Override
-  public void insert(O object) {
-    this.insert(object, false);
+  public void insert(DBID id, O object) {
+    this.insert(id, object, false);
   }
 
   /**
    * Inserts the specified objects into this M-Tree sequentially since a bulk
    * load method is not implemented so far. Calls for each object
-   * {@link AbstractMTree#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
+   * {@link AbstractMTree#insertAll(ArrayDBIDs,boolean)
    * AbstractMTree.insert(object, false)}.
    */
   // todo: bulk load method
   @Override
-  public void insert(List<O> objects) {
+  public void insertAll(ArrayDBIDs ids, List<O> objects) {
     if (objects.isEmpty()) {
       return;
     }
-    
-    for(O object : objects) {
-      insert(object, false);
+    assert(ids.size() == objects.size());
+    for (int i = 0; i < ids.size(); i++) {
+      insert(ids.get(i), objects.get(i), false);
     }
 
     if(extraIntegrityChecks) {
@@ -149,8 +150,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
    * @return a new MTreeLeafEntry representing the specified data object
    */
   @Override
-  protected MTreeEntry<D> createNewLeafEntry(O object, D parentDistance) {
-    return new MTreeLeafEntry<D>(object.getID(), parentDistance);
+  protected MTreeEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
+    return new MTreeLeafEntry<D>(id, parentDistance);
   }
 
   /**

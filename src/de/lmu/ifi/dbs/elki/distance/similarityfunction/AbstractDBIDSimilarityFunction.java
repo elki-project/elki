@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -11,18 +11,18 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> distance type
  */
-public abstract class AbstractDBIDSimilarityFunction<D extends Distance<D>> extends AbstractPrimitiveSimilarityFunction<DatabaseObject, D> implements DBIDSimilarityFunction<D> {
+public abstract class AbstractDBIDSimilarityFunction<D extends Distance<D>> extends AbstractPrimitiveSimilarityFunction<DBID, D> implements DBIDSimilarityFunction<D> {
   /**
    * The database we work on
    */
-  protected Database<? extends DatabaseObject> database;
+  protected Relation<? extends DBID> database;
 
   /**
    * Constructor.
    * 
    * @param database Database
    */
-  public AbstractDBIDSimilarityFunction(Database<? extends DatabaseObject> database) {
+  public AbstractDBIDSimilarityFunction(Relation<? extends DBID> database) {
     super();
     this.database = database;
   }

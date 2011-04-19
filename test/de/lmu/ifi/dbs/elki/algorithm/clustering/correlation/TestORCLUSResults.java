@@ -30,7 +30,7 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testORCLUSResults() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
+    Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
 
     ListParameterization params = new ListParameterization();
     // these parameters are not picked too smartly - room for improvement.
@@ -57,7 +57,7 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
    */
   @Test
   public void testORCLUSSkewedDisjoint() throws ParameterException {
-    Database<DoubleVector> db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
+    Database db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
   
     // Setup algorithm
     ListParameterization params = new ListParameterization();

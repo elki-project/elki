@@ -343,7 +343,7 @@ public class MiniGUI extends JPanel {
       public Void doInBackground() {
         SerializedParameterization config = new SerializedParameterization(params);
         config.tryInstantiate(LoggingStep.class);
-        KDDTask<?> task = config.tryInstantiate(KDDTask.class);
+        KDDTask task = config.tryInstantiate(KDDTask.class);
         try {
           config.logUnusedParameters();
           if(config.getErrors().size() == 0) {

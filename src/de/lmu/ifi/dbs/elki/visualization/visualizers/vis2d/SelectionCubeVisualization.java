@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
@@ -14,6 +15,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -30,6 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
@@ -132,7 +135,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     DBIDSelection selContext = context.getSelection();
     if(selContext instanceof RangeSelection) {
       DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-      int dim = DatabaseUtil.dimensionality(context.getDatabase());
+      int dim = DatabaseUtil.dimensionality(rep);
 
       double[] min = new double[dim];
       double[] max = new double[dim];
@@ -178,7 +181,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
    * 
    * @param <NV> vector type
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory<NV> {
+  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Flag for half-transparent filling of selection cubes.
      * 
@@ -195,7 +198,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
 
     /**
      * Constructor.
-     *
+     * 
      * @param nofill
      */
     public Factory(boolean nofill) {
@@ -209,18 +212,21 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends NV> context, Result result) {
-      final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-      for(SelectionResult selres : selectionResults) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, selres, this, P2DVisualization.class);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
-        context.addVisualizer(selres, task);
+    public void addVisualizers(VisualizerContext context, Result result) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+        final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
+        for(SelectionResult selres : selectionResults) {
+          final VisualizationTask task = new VisualizationTask(NAME, context, selres, rep, this, P2DVisualization.class);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
+          context.addVisualizer(selres, task);
+        }
       }
     }
 
     @Override
     public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization<DatabaseObject>(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
+      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
 
     @Override
@@ -230,9 +236,9 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
 
     /**
      * Parameterization class.
-     *
+     * 
      * @author Erich Schubert
-     *
+     * 
      * @apiviz.exclude
      */
     public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {

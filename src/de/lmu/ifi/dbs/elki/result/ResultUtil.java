@@ -8,7 +8,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -259,10 +258,10 @@ public class ResultUtil {
    * @param db Database to process
    * @param result result
    */
-  public static <O extends DatabaseObject> void ensureClusteringResult(final Database<O> db, final HierarchicalResult result) {
+  public static <O> void ensureClusteringResult(final Database db, final HierarchicalResult result) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     if(clusterings.size() == 0) {
-      ByLabelHierarchicalClustering<O> split = new ByLabelHierarchicalClustering<O>();
+      ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
       Clustering<Model> c = split.run(db);
       addChildResult(db, c);
     }
@@ -274,7 +273,7 @@ public class ResultUtil {
    * @param db Database
    * @param result Result
    */
-  public static void ensureSelectionResult(final Database<?> db, final HierarchicalResult result) {
+  public static void ensureSelectionResult(final Database db, final HierarchicalResult result) {
     Collection<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
     if(selections.size() == 0) {
       addChildResult(db, new SelectionResult());

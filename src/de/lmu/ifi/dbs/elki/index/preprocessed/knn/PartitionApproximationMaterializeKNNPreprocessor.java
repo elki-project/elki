@@ -3,8 +3,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 import java.util.HashMap;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -14,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
-public class PartitionApproximationMaterializeKNNPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> {
+public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D> {
   // TODO: randomize/shuffle?
 
   /**
@@ -56,14 +55,13 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
   /**
    * Constructor
    * 
-   * @param database database to preprocess
+   * @param representation Representation to process
    * @param distanceFunction the distance function to use
    * @param k query k
    * @param partitions Number of partitions
    */
-  public PartitionApproximationMaterializeKNNPreprocessor(Database<O> database, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
-    // calling super class without preprocessing!
-    super(database, distanceFunction, k, false);
+  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> representation, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
+    super(representation, distanceFunction, k);
     this.partitions = partitions;
     // preprocess now
     preprocess();
@@ -71,14 +69,14 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(distanceFunction);
-    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    DistanceQuery<O, D> distanceQuery = rep.getDatabase().getDistanceQuery(rep, distanceFunction);
+    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
     MeanVariance ksize = new MeanVariance();
     if(logger.isVerbose()) {
       logger.verbose("Approximating nearest neighbor lists to database objects");
     }
 
-    ArrayDBIDs aids = DBIDUtil.ensureArray(database.getIDs());
+    ArrayDBIDs aids = DBIDUtil.ensureArray(rep.getDBIDs());
     int minsize = (int) Math.floor(aids.size() / partitions);
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, logger) : null;
@@ -129,16 +127,19 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     }
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void insert(List<O> objects) {
-    throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
+  protected Logging getLogger() {
+    return logger;
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public boolean delete(O object) {
-    throw new UnsupportedOperationException("The preprocessor " + getClass().getSimpleName() + " does currently not allow dynamic updates.");
+  public String getLongName() {
+    return "Random partition kNN approximation";
+  }
+
+  @Override
+  public String getShortName() {
+    return "random-partition-knn";
   }
 
   /**
@@ -153,7 +154,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory<O, D> {
+  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D> {
     /**
      * Parameter to specify the number of partitions to use for materializing
      * the kNN. Must be an integer greater than 1.
@@ -181,8 +182,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
     }
 
     @Override
-    public PartitionApproximationMaterializeKNNPreprocessor<O, D> instantiate(Database<O> database) {
-      PartitionApproximationMaterializeKNNPreprocessor<O, D> instance = new PartitionApproximationMaterializeKNNPreprocessor<O, D>(database, distanceFunction, k, partitions);
+    public PartitionApproximationMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> representation) {
+      PartitionApproximationMaterializeKNNPreprocessor<O, D> instance = new PartitionApproximationMaterializeKNNPreprocessor<O, D>(representation, distanceFunction, k, partitions);
       return instance;
     }
 
@@ -193,7 +194,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O extends Database
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       protected int partitions = 0;
 
       @Override

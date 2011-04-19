@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.database.query.similarity;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param O Input object type
  * @param D Distance result type
  */
-public interface SimilarityQuery<O extends DatabaseObject, D extends Distance<?>> extends DatabaseQuery {
+public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery {
   /**
    * Returns the similarity between the two objects specified by their object
    * ids.
@@ -68,4 +68,11 @@ public interface SimilarityQuery<O extends DatabaseObject, D extends Distance<?>
    * @return Factory for distance objects
    */
   public abstract D getDistanceFactory();
+  
+  /**
+   * Access the underlying data query.
+   * 
+   * @return data query in use
+   */
+  public abstract Relation<? extends O> getRepresentation();
 }

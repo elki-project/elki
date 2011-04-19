@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 
 /**
  * A dummy result handler that discards the actual result, for use in benchmarks.
@@ -12,7 +10,7 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
  * @param <O> Object class
  * @param <R> Result class
  */
-public class DiscardResultHandler<O extends DatabaseObject, R extends Result> implements ResultHandler<O, R> {
+public class DiscardResultHandler<O, R extends Result> implements ResultHandler<R> {
   /**
    * Default constructor.
    */
@@ -27,17 +25,7 @@ public class DiscardResultHandler<O extends DatabaseObject, R extends Result> im
    * @param result discarded
    */
   @Override
-  public void processResult(Database<O> db, R result) {
+  public void processResult(Database db, R result) {
     // discard the result.
-  }
-
-  /**
-   * Set normalization
-   * 
-   * @param normalization discarded
-   */
-  @Override
-  public void setNormalization(Normalization<O> normalization) {
-    // do nothing
   }
 }

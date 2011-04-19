@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import de.lmu.ifi.dbs.elki.persistent.DefaultPageHeader;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,6 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.util.Stack;
+
+import de.lmu.ifi.dbs.elki.persistent.DefaultPageHeader;
 
 /**
  * Encapsulates the header information of a tree-like index structure. This

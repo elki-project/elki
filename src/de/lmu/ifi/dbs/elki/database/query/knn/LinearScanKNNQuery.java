@@ -3,14 +3,13 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
@@ -22,21 +21,21 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
  * @apiviz.landmark
  * @apiviz.has DistanceQuery
  */
-public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> implements LinearScanQuery {
+public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> implements LinearScanQuery {
   /**
    * Constructor.
    * 
-   * @param database Database to query
+   * @param rep Data to query
    * @param distanceQuery Distance function to use
    */
-  public LinearScanKNNQuery(Database<? extends O> database, DistanceQuery<O, D> distanceQuery) {
-    super(database, distanceQuery);
+  public LinearScanKNNQuery(Relation<? extends O> reo, DistanceQuery<O, D> distanceQuery) {
+    super(reo, distanceQuery);
   }
 
   @Override
   public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
     KNNHeap<D> heap = new KNNHeap<D>(k);
-    for(DBID candidateID : database) {
+    for(DBID candidateID : rep.iterDBIDs()) {
       heap.add(new DistanceResultPair<D>(distanceQuery.distance(id, candidateID), candidateID));
     }
     return heap.toSortedArrayList();
@@ -52,12 +51,12 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
     if(PrimitiveDistanceQuery.class.isAssignableFrom(distanceQuery.getClass())) {
       // The distance is computed on arbitrary vectors, we can reduce object
       // loading by working on the actual vectors.
-      for(DBID candidateID : database) {
-        O candidate = database.get(candidateID);
+      for(DBID candidateID : rep.iterDBIDs()) {
+        O candidate = rep.get(candidateID);
         Integer index = -1;
         for(DBID id : ids) {
           index++;
-          O object = database.get(id);
+          O object = rep.get(id);
           KNNHeap<D> heap = heaps.get(index);
           heap.add(new DistanceResultPair<D>(distanceQuery.distance(object, candidate), candidateID));
         }
@@ -65,7 +64,7 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
     }
     else {
       // The distance is computed on database IDs
-      for(DBID candidateID : database) {
+      for(DBID candidateID : rep.iterDBIDs()) {
         Integer index = -1;
         for(DBID id : ids) {
           index++;
@@ -85,8 +84,8 @@ public class LinearScanKNNQuery<O extends DatabaseObject, D extends Distance<D>>
   @Override
   public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
     KNNHeap<D> heap = new KNNHeap<D>(k);
-    for(DBID candidateID : database) {
-      O candidate = database.get(candidateID);
+    for(DBID candidateID : rep.iterDBIDs()) {
+      O candidate = rep.get(candidateID);
       heap.add(new DistanceResultPair<D>(distanceQuery.distance(obj, candidate), candidateID));
     }
     return heap.toSortedArrayList();

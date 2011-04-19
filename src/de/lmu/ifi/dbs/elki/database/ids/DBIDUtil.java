@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
@@ -210,7 +212,7 @@ public final class DBIDUtil {
     result.addDBIDs(ids2);
     return result;
   }
-  
+
   /**
    * Returns the difference of the two specified collection of IDs.
    * 
@@ -231,12 +233,9 @@ public final class DBIDUtil {
    * @param existing Existing collection
    * @return Unmodifiable collection
    */
-  public static DBIDs makeUnmodifiable(DBIDs existing) {
+  public static StaticDBIDs makeUnmodifiable(DBIDs existing) {
     if(existing instanceof StaticDBIDs) {
-      return existing;
-    }
-    if(existing instanceof UnmodifiableDBIDs) {
-      return existing;
+      return (StaticDBIDs) existing;
     }
     return new UnmodifiableDBIDs(existing);
   }
@@ -308,5 +307,44 @@ public final class DBIDUtil {
    */
   public static DBIDPair newPair(DBID id1, DBID id2) {
     return DBIDFactory.FACTORY.makePair(id1, id2);
+  }
+
+  /**
+   * Produce a random sample of the given DBIDs
+   * 
+   * @param source Original DBIDs
+   * @param k k Parameter
+   * @param seed Random generator seed
+   * @return new DBIDs
+   */
+  public static ModifiableDBIDs randomSample(DBIDs source, int k, long seed) {
+    if(k <= 0 || k > source.size()) {
+      throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
+    }
+    Random random = new Random(seed);
+    // TODO: better balancing for different sizes
+    // Two methods: constructive vs. destructive
+    if(k < source.size() / 2) {
+      ArrayDBIDs aids = DBIDUtil.ensureArray(source);
+      HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);
+      while(sample.size() < k) {
+        sample.add(aids.get(random.nextInt(aids.size())));
+      }
+      return sample;
+    }
+    else {
+      ArrayModifiableDBIDs sample = DBIDUtil.newArray(source);
+      while(sample.size() > k) {
+        // Element to remove
+        int idx = random.nextInt(sample.size());
+        // Remove last element
+        DBID last = sample.remove(sample.size() - 1);
+        // Replace target element:
+        if(idx < sample.size()) {
+          sample.set(idx, last);
+        }
+      }
+      return sample;
+    }
   }
 }

@@ -32,20 +32,20 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -125,7 +125,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
   /**
    * Holds the database connection to have the algorithm run with.
    */
-  private DatabaseConnection<O> databaseConnection;
+  private DatabaseConnection databaseConnection;
 
   /**
    * Holds the instance of the distance function specified by
@@ -134,29 +134,24 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
   private DistanceFunction<O, D> distanceFunction;
 
   /**
-   * A normalization - per default no normalization is used.
-   */
-  private Normalization<O> normalization = null;
-
-  /**
    * Constructor.
    * 
    * @param verbose Verbose flag
    * @param databaseConnection Database connection
    * @param distanceFunction Distance function
-   * @param normalization Normalization
    */
-  public KNNExplorer(boolean verbose, DatabaseConnection<O> databaseConnection, DistanceFunction<O, D> distanceFunction, Normalization<O> normalization) {
+  public KNNExplorer(boolean verbose, DatabaseConnection databaseConnection, DistanceFunction<O, D> distanceFunction) {
     super(verbose);
     this.databaseConnection = databaseConnection;
     this.distanceFunction = distanceFunction;
-    this.normalization = normalization;
   }
 
   @Override
   public void run() throws IllegalStateException {
-    Database<O> db = databaseConnection.getDatabase(normalization);
-    (new ExplorerWindow()).run(db, db.getDistanceQuery(distanceFunction));
+    Database database = databaseConnection.getDatabase();
+    Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction());
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, distanceFunction);
+    (new ExplorerWindow()).run(database, distFunc);
   }
 
   /**
@@ -215,7 +210,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
     protected LinearScale s;
 
     // The current database
-    protected Database<O> db;
+    protected Relation<? extends O> data;
 
     // Distance cache
     protected HashMap<DBID, Double> distancecache = new HashMap<DBID, Double>();
@@ -237,12 +232,14 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
     /**
      * The label representation
      */
-    protected DataQuery<String> labelRep;
+    protected Relation<String> labelRep;
 
     /**
      * The class representation
      */
-    protected DataQuery<ClassLabel> classRep;
+    protected Relation<ClassLabel> classRep;
+
+    private Database db;
 
     /**
      * Constructor.
@@ -344,18 +341,19 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * @param db Database
      * @param distanceQuery Distance function
      */
-    public void run(Database<O> db, DistanceQuery<O, D> distanceQuery) {
+    public void run(Database db, DistanceQuery<O, D> distanceQuery) {
       this.db = db;
-      this.classRep = db.getClassLabelQuery();
-      this.labelRep = db.getObjectLabelQuery();
-      this.dim = DatabaseUtil.dimensionality(db);
+      this.data = distanceQuery.getRepresentation();
+      this.classRep = db.getRelation(TypeUtil.CLASSLABEL);
+      this.labelRep = db.getRelation(TypeUtil.LABELLIST);
+      this.dim = DatabaseUtil.dimensionality(distanceQuery.getRepresentation());
       this.distanceQuery = distanceQuery;
       this.updateK(k);
 
       double min = Double.MAX_VALUE;
       double max = Double.MIN_VALUE;
-      for(DBID objID : db) {
-        O vec = db.get(objID);
+      for(DBID objID : data.iterDBIDs()) {
+        O vec = data.get(objID);
         MinMax<Double> mm = VectorUtil.getRangeDouble(vec);
         min = Math.min(min, mm.getMin());
         max = Math.max(max, mm.getMax());
@@ -387,7 +385,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       svgCanvas.setPlot(plot);
 
       DefaultListModel m = new DefaultListModel();
-      for(DBID dbid : db) {
+      for(DBID dbid : data.iterDBIDs()) {
         m.addElement(dbid);
       }
       seriesList.setModel(m);
@@ -461,7 +459,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * @return SVG element
      */
     private Element plotSeries(DBID idx, int resolution) {
-      O series = db.get(idx);
+      O series = data.get(idx);
 
       double step = 1.0;
       if(resolution < dim) {
@@ -531,17 +529,15 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
    * @apiviz.exclude
    */
   public static class Parameterizer<O extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
-    protected DatabaseConnection<O> databaseConnection = null;
+    protected DatabaseConnection databaseConnection = null;
 
     protected DistanceFunction<O, D> distanceFunction = null;
-
-    protected Normalization<O> normalization = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // parameter database connection
-      final ObjectParameter<DatabaseConnection<O>> dbcpar = new ObjectParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      final ObjectParameter<DatabaseConnection> dbcpar = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
       if(config.grab(dbcpar)) {
         databaseConnection = dbcpar.instantiateClass(config);
       }
@@ -551,17 +547,11 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       if(config.grab(dfpar)) {
         distanceFunction = dfpar.instantiateClass(config);
       }
-
-      // parameter normalization
-      final ObjectParameter<Normalization<O>> npar = new ObjectParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
-      if(config.grab(npar)) {
-        normalization = npar.instantiateClass(config);
-      }
     }
 
     @Override
     protected KNNExplorer<O, D> makeInstance() {
-      return new KNNExplorer<O, D>(verbose, databaseConnection, distanceFunction, normalization);
+      return new KNNExplorer<O, D>(verbose, databaseConnection, distanceFunction);
     }
   }
 

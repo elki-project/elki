@@ -139,4 +139,9 @@ public class TrivialDBIDFactory implements DBIDFactory {
   public ByteBufferSerializer<DBID> getDBIDSerializerStatic() {
     return IntegerDBID.staticSerializer;
   }
+
+  @Override
+  public Class<? extends DBID> getTypeRestriction() {
+    return IntegerDBID.class;
+  }
 }

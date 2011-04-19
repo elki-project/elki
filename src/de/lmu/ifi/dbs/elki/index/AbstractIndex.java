@@ -2,7 +2,10 @@ package de.lmu.ifi.dbs.elki.index;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 
 /**
@@ -12,7 +15,27 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
  *
  * @param <O> Object type
  */
-public abstract class AbstractIndex<O extends DatabaseObject> implements Index<O> {
+public abstract class AbstractIndex<O> implements Index<O> {
+  /**
+   * The representation we are bound to.
+   */
+  protected final Relation<O> rep;
+  
+  /**
+   * Constructor.
+   *
+   * @param rep Representation
+   */
+  public AbstractIndex(Relation<O> rep) {
+    super();
+    this.rep = rep;
+  }
+  
+  @Override
+  public Relation<O> getRepresentation() {
+    return rep;
+  }
+
   @Override
   abstract public String getLongName();
 
@@ -28,25 +51,25 @@ public abstract class AbstractIndex<O extends DatabaseObject> implements Index<O
 
   @SuppressWarnings("unused")
   @Override
-  public void insert(O object) {
+  public void insert(DBID id, O object) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
   @SuppressWarnings("unused")
   @Override
-  public void insert(List<O> objects) {
+  public void insertAll(ArrayDBIDs id, List<O> objects) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
   @SuppressWarnings("unused")
   @Override
-  public boolean delete(O object) {
+  public boolean delete(DBID id) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
   @SuppressWarnings("unused")
   @Override
-  public void delete(List<O> objects) {
+  public void deleteAll(DBIDs id) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 }

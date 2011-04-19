@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -24,7 +23,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
  * {@link Algorithm Algorithm} using any DatabaseConnection implementing
- * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection
+ * {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection
  * DatabaseConnection}.
  * 
  * @author Arthur Zimek
@@ -33,10 +32,8 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @apiviz.composedOf AlgorithmStep
  * @apiviz.composedOf EvaluationStep
  * @apiviz.composedOf OutputStep
- * 
- * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class KDDTask<O extends DatabaseObject> implements Parameterizable {
+public class KDDTask implements Parameterizable {
   /**
    * The settings used, for settings reporting.
    */
@@ -45,22 +42,22 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
   /**
    * The data input step
    */
-  private InputStep<O> inputStep;
+  private InputStep inputStep;
 
   /**
    * The algorithm (data mining) step.
    */
-  private AlgorithmStep<O> algorithmStep;
+  private AlgorithmStep algorithmStep;
 
   /**
    * The evaluation step.
    */
-  private EvaluationStep<O> evaluationStep;
+  private EvaluationStep evaluationStep;
 
   /**
    * The output/visualization step
    */
-  private OutputStep<O> outputStep;
+  private OutputStep outputStep;
 
   /**
    * The result object.
@@ -76,7 +73,7 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
    * @param outputStep
    * @param settings
    */
-  public KDDTask(InputStep<O> inputStep, AlgorithmStep<O> algorithmStep, EvaluationStep<O> evaluationStep, OutputStep<O> outputStep, Collection<Pair<Object, Parameter<?, ?>>> settings) {
+  public KDDTask(InputStep inputStep, AlgorithmStep algorithmStep, EvaluationStep evaluationStep, OutputStep outputStep, Collection<Pair<Object, Parameter<?, ?>>> settings) {
     super();
     this.inputStep = inputStep;
     this.algorithmStep = algorithmStep;
@@ -93,7 +90,7 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
    */
   public void run() throws IllegalStateException {
     // Input step
-    Database<O> db = inputStep.getDatabase();
+    Database db = inputStep.getDatabase();
 
     // Algorithms - Data Mining Step
     result = algorithmStep.runAlgorithms(db);
@@ -103,10 +100,10 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
     hierarchy.add(result, new SettingsResult(settings));
 
     // Evaluation
-    evaluationStep.runEvaluators(result, db, inputStep.getNormalizationUndo(), inputStep.getNormalization());
+    evaluationStep.runEvaluators(result, db);
 
     // Output / Visualization
-    outputStep.runResultHandlers(result, db, inputStep.getNormalizationUndo(), inputStep.getNormalization());
+    outputStep.runResultHandlers(result, db);
   }
 
   /**
@@ -125,18 +122,17 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
-    InputStep<O> inputStep = null;
+  public static class Parameterizer extends AbstractParameterizer {
+    InputStep inputStep = null;
 
-    AlgorithmStep<O> algorithmStep = null;
+    AlgorithmStep algorithmStep = null;
 
-    EvaluationStep<O> evaluationStep = null;
+    EvaluationStep evaluationStep = null;
 
     Collection<Pair<Object, Parameter<?, ?>>> settings = null;
 
-    OutputStep<O> outputStep = null;
+    OutputStep outputStep = null;
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -154,8 +150,8 @@ public class KDDTask<O extends DatabaseObject> implements Parameterizable {
     }
 
     @Override
-    protected KDDTask<O> makeInstance() {
-      return new KDDTask<O>(inputStep, algorithmStep, evaluationStep, outputStep, settings);
+    protected KDDTask makeInstance() {
+      return new KDDTask(inputStep, algorithmStep, evaluationStep, outputStep, settings);
     }
   }
 

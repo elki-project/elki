@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -63,10 +63,10 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
   }
 
   @Override
-  public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
-    Database<V> database = DatabaseUtil.databaseUglyVectorCast(db);
+  public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
+    Relation<V> database = DatabaseUtil.databaseUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
-    V factory = database.getObjectFactory();
+    V factory = DatabaseUtil.assumeVectorField(database).getFactory();
 
     int dim = DatabaseUtil.dimensionality(db);
 

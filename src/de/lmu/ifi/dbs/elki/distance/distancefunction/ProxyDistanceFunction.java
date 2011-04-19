@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -14,7 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> object type
  * @param <D> distance type
  */
-public class ProxyDistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBIDDistanceFunction<D> {
+public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBIDDistanceFunction<D> {
   /**
    * Distance query
    */
@@ -38,7 +37,7 @@ public class ProxyDistanceFunction<O extends DatabaseObject, D extends Distance<
    * @param inner Inner distance query
    * @return Proxy object
    */
-  public static <O extends DatabaseObject, D extends Distance<D>> ProxyDistanceFunction<O, D> proxy(DistanceQuery<O, D> inner) {
+  public static <O, D extends Distance<D>> ProxyDistanceFunction<O, D> proxy(DistanceQuery<O, D> inner) {
     return new ProxyDistanceFunction<O, D>(inner);
   }
 
@@ -66,5 +65,21 @@ public class ProxyDistanceFunction<O extends DatabaseObject, D extends Distance<
    */
   public void setDistanceQuery(DistanceQuery<O, D> inner) {
     this.inner = inner;
+  }
+
+  /**
+   * Helper function, to resolve any wrapped Proxy Distances
+   * 
+   * @param <V> Object type
+   * @param <D> Distance type
+   * @param dfun Distance function to unwrap.
+   * @return unwrapped distance function
+   */
+  @SuppressWarnings("unchecked")
+  public static <V, T extends V, D extends Distance<D>> DistanceFunction<? super V, D> unwrapDistance(DistanceFunction<V, D> dfun) {
+    if(ProxyDistanceFunction.class.isInstance(dfun)) {
+      return unwrapDistance(((ProxyDistanceFunction<V, D>) dfun).getDistanceQuery().getDistanceFunction());
+    }
+    return dfun;
   }
 }

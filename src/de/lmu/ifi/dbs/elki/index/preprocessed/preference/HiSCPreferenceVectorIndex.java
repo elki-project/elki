@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -15,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -61,38 +61,38 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Constructor.
    * 
-   * @param database
+   * @param representation
    * @param alpha
    * @param k
    */
-  public HiSCPreferenceVectorIndex(Database<V> database, double alpha, int k) {
-    super(database);
+  public HiSCPreferenceVectorIndex(Relation<V> representation, double alpha, int k) {
+    super(representation);
     this.alpha = alpha;
     this.k = k;
   }
 
   @Override
   protected void preprocess() {
-    if(database == null || database.size() <= 0) {
+    if(rep == null || rep.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
-    storage = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
     StringBuffer msg = new StringBuffer();
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", database.size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", rep.size(), logger) : null;
 
-    KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(EuclideanDistanceFunction.STATIC, k);
+    KNNQuery<V, DoubleDistance> knnQuery = rep.getDatabase().getKNNQuery(rep, EuclideanDistanceFunction.STATIC, k);
 
-    Iterator<DBID> it = database.iterator();
+    Iterator<DBID> it = rep.iterDBIDs();
     while(it.hasNext()) {
       DBID id = it.next();
 
       if(logger.isDebugging()) {
         msg.append("\n\nid = ").append(id);
-        msg.append(" ").append(database.getObjectLabelQuery().get(id));
+        ///msg.append(" ").append(database.getObjectLabelQuery().get(id));
         msg.append("\n knns: ");
       }
 
@@ -100,12 +100,12 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       ModifiableDBIDs knnIDs = DBIDUtil.newArray(knns.size());
       for(DistanceResultPair<DoubleDistance> knn : knns) {
         knnIDs.add(knn.getID());
-        if(logger.isDebugging()) {
-          msg.append(database.getObjectLabelQuery().get(knn.getID())).append(" ");
-        }
+        //if(logger.isDebugging()) {
+        //  msg.append(database.getObjectLabelQuery().get(knn.getID())).append(" ");
+        //}
       }
 
-      BitSet preferenceVector = determinePreferenceVector(database, id, knnIDs, msg);
+      BitSet preferenceVector = determinePreferenceVector(rep, id, knnIDs, msg);
       storage.put(id, preferenceVector);
 
       if(progress != null) {
@@ -131,16 +131,16 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Determines the preference vector according to the specified neighbor ids.
    * 
-   * @param database the database storing the objects
+   * @param rep the database storing the objects
    * @param id the id of the object for which the preference vector should be
    *        determined
    * @param neighborIDs the ids of the neighbors
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Database<V> database, DBID id, DBIDs neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVector(Relation<V> rep, DBID id, DBIDs neighborIDs, StringBuffer msg) {
     // variances
-    double[] variances = DatabaseUtil.variances(database, database.get(id), neighborIDs);
+    double[] variances = DatabaseUtil.variances(rep, rep.get(id), neighborIDs);
 
     // preference vector
     BitSet preferenceVector = new BitSet(variances.length);
@@ -240,15 +240,15 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     }
 
     @Override
-    public HiSCPreferenceVectorIndex<V> instantiate(Database<V> database) {
+    public HiSCPreferenceVectorIndex<V> instantiate(Relation<V> representation) {
       final int usek;
       if(k == null) {
-        usek = 3 * DatabaseUtil.dimensionality(database);
+        usek = 3 * DatabaseUtil.dimensionality(representation);
       }
       else {
         usek = k;
       }
-      return new HiSCPreferenceVectorIndex<V>(database, alpha, usek);
+      return new HiSCPreferenceVectorIndex<V>(representation, alpha, usek);
     }
 
     /**

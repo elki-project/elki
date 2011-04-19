@@ -15,8 +15,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -61,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("SUBCLU: Density connected Subspace Clustering")
 @Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. SUBCLU delivers for each subspace the same clusters DBSCAN would have found, when applied to this subspace seperately.")
 @Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
-public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
+public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -136,9 +141,10 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Performs the SUBCLU algorithm on the given database.
    */
   @Override
-  protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
+  protected Clustering<SubspaceModel<V>> runInTime(Database database) throws IllegalStateException {
     try {
-      int dimensionality = DatabaseUtil.dimensionality(database);
+      Relation<V> dataQuery = getRelation(database);
+      int dimensionality = DatabaseUtil.dimensionality(dataQuery);
 
       StepProgress stepprog = logger.isVerbose() ? new StepProgress(dimensionality) : null;
 
@@ -159,7 +165,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
 
       for(int d = 0; d < dimensionality; d++) {
         Subspace<V> currentSubspace = new Subspace<V>(d);
-        List<Cluster<Model>> clusters = runDBSCAN(database, null, currentSubspace);
+        List<Cluster<Model>> clusters = runDBSCAN(dataQuery, null, currentSubspace);
 
         if(logger.isDebuggingFiner()) {
           StringBuffer msg = new StringBuffer();
@@ -204,7 +210,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
           List<Cluster<Model>> bestSubspaceClusters = clusterMap.get(bestSubspace);
           List<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>();
           for(Cluster<Model> cluster : bestSubspaceClusters) {
-            List<Cluster<Model>> candidateClusters = runDBSCAN(database, cluster.getIDs(), candidate);
+            List<Cluster<Model>> candidateClusters = runDBSCAN(dataQuery, cluster.getIDs(), candidate);
             if(!candidateClusters.isEmpty()) {
               clusters.addAll(candidateClusters);
             }
@@ -237,7 +243,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
         List<Cluster<Model>> clusters = clusterMap.get(subspace);
         for(Cluster<Model> cluster : clusters) {
           Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getIDs());
-          newCluster.setModel(new SubspaceModel<V>(subspace, DatabaseUtil.centroid(database, cluster.getIDs())));
+          newCluster.setModel(new SubspaceModel<V>(subspace, DatabaseUtil.centroid(dataQuery, cluster.getIDs())));
           newCluster.setName("cluster_" + numClusters++);
           result.addCluster(newCluster);
         }
@@ -270,7 +276,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * given subspace. If parameter {@code ids} is null DBSCAN will be applied to
    * the whole database.
    * 
-   * @param database the database holding the objects to run DBSCAN on
+   * @param rep the database holding the objects to run DBSCAN on
    * @param ids the IDs of the database defining the partition to run DBSCAN on
    *        - if this parameter is null DBSCAN will be applied to the whole
    *        database
@@ -280,23 +286,26 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @throws UnableToComplyException in case of problems during the creation of
    *         the database partition
    */
-  private List<Cluster<Model>> runDBSCAN(Database<V> database, DBIDs ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
+  private List<Cluster<Model>> runDBSCAN(Relation<V> rep, DBIDs ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
     // distance function
     distanceFunction.setSelectedDimensions(subspace.getDimensions());
+
+    ProxyDatabase proxy;
+    if(ids == null) {
+      // TODO: in this case, we might want to use an index - the proxy below will prevent this!
+      ids = rep.getDBIDs();
+    }
+    
+    proxy = new ProxyDatabase(ids);
+    Relation<V> prep = ProxyView.wrap(proxy, ids, rep);
+    proxy.addRepresentation(prep);
 
     DBSCAN<V, DoubleDistance> dbscan = new DBSCAN<V, DoubleDistance>(distanceFunction, epsilon, minpts);
     // run DBSCAN
     if(logger.isVerbose()) {
       logger.verbose("\nRun DBSCAN on subspace " + subspace.dimensonsToString());
     }
-    Clustering<Model> dbsres;
-    if(ids == null) {
-      dbsres = dbscan.run(database);
-    }
-    else {
-      Database<V> db = database.partition(ids);
-      dbsres = dbscan.run(db);
-    }
+    Clustering<Model> dbsres = dbscan.run(proxy);
 
     // separate cluster and noise
     List<Cluster<Model>> clusterAndNoise = dbsres.getAllClusters();
@@ -434,6 +443,11 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   }
 
   @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -447,7 +461,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    */
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
     protected int minpts = 0;
-    
+
     protected DoubleDistance epsilon = null;
 
     protected AbstractDimensionsSelectingDoubleDistanceFunction<V> distance = null;
@@ -464,11 +478,11 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
-      
+
       IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
-      }      
+      }
     }
 
     @Override

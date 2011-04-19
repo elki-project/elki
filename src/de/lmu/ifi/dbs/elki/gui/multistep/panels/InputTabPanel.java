@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
@@ -19,14 +18,13 @@ public class InputTabPanel extends ParameterTabPanel {
   /**
    * The data input configured
    */
-  private InputStep<DatabaseObject> input = null;
+  private InputStep input = null;
   
   /**
    * Signal when an database input has been executed. 
    */
   private boolean executed = false;
 
-  @SuppressWarnings("unchecked")
   @Override
   protected synchronized void configureStep(Parameterization config)  {
     input = config.tryInstantiate(InputStep.class);
@@ -48,7 +46,7 @@ public class InputTabPanel extends ParameterTabPanel {
    * 
    * @return input step
    */
-  public InputStep<DatabaseObject> getInputStep() {
+  public InputStep getInputStep() {
     if (input == null) {
       throw new AbortException("Data input not configured.");
     }

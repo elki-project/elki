@@ -11,16 +11,19 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.database.relation.ConvertToStringView;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -36,17 +39,30 @@ public final class DatabaseUtil {
   /**
    * Get the dimensionality of a database
    * 
-   * @param database Database
+   * @param dataQuery data query
+   * @return Vector field type information
+   */
+  public static <V extends FeatureVector<?, ?>> VectorFieldTypeInformation<V> assumeVectorField(Relation<V> dataQuery) {
+    try {
+      return ((VectorFieldTypeInformation<V>) dataQuery.getDataTypeInformation());
+    }
+    catch(Exception e) {
+      throw new UnsupportedOperationException("Expected a vector field, got type information: " + dataQuery.getDataTypeInformation().toString());
+    }
+  }
+
+  /**
+   * Get the dimensionality of a database
+   * 
+   * @param dataQuery data query
    * @return Database dimensionality
    */
-  public static int dimensionality(Database<? extends FeatureVector<?, ?>> database) {
+  public static int dimensionality(Relation<? extends FeatureVector<?, ?>> dataQuery) {
     try {
-      return database.dimensionality();
-      // soon:
-      // return database.getObjectFactory().getDimensionality();
+      return ((VectorFieldTypeInformation<? extends FeatureVector<?, ?>>) dataQuery.getDataTypeInformation()).dimensionality();
     }
-    catch(NullPointerException e) {
-      throw new UnsupportedOperationException("Empty database has no dimensionality.");
+    catch(Exception e) {
+      return -1;
     }
   }
 
@@ -56,21 +72,21 @@ public final class DatabaseUtil {
    * must be instance of <code>NumberVector</code>.
    * 
    * @param <V> Vector type
-   * @param database the database storing the objects
+   * @param dataQuery the data query
    * @param ids the ids of the objects
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Database<? extends V> database, DBIDs ids) {
+  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> dataQuery, DBIDs ids) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
 
-    int dim = dimensionality(database);
+    int dim = dimensionality(dataQuery);
     double[] centroid = new double[dim];
 
     for(DBID id : ids) {
-      V o = database.get(id);
+      V o = dataQuery.get(id);
       for(int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.doubleValue(j);
       }
@@ -80,7 +96,7 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    return database.getObjectFactory().newInstance(centroid);
+    return assumeVectorField(dataQuery).getFactory().newInstance(centroid);
   }
 
   /**
@@ -97,7 +113,7 @@ public final class DatabaseUtil {
    *         w.r.t. the specified subspace
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, DBIDs ids, BitSet dimensions) {
+  public static <V extends NumberVector<V, ?>> V centroid(Relation<V> database, DBIDs ids, BitSet dimensions) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -117,7 +133,7 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    return database.getObjectFactory().newInstance(centroid);
+    return assumeVectorField(database).getFactory().newInstance(centroid);
   }
 
   /**
@@ -133,7 +149,7 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Iterator<DBID> iter, BitSet bitSet) {
+  public static <V extends NumberVector<V, ?>> V centroid(Relation<V> database, Iterator<DBID> iter, BitSet bitSet) {
     if(!iter.hasNext()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -159,7 +175,7 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    return database.getObjectFactory().newInstance(centroid);
+    return assumeVectorField(database).getFactory().newInstance(centroid);
   }
 
   /**
@@ -171,14 +187,14 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the database is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database) {
+  public static <V extends NumberVector<V, ?>> V centroid(Relation<V> database) {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
-    Iterator<DBID> it = database.iterator();
+    Iterator<DBID> it = database.iterDBIDs();
     while(it.hasNext()) {
       V o = database.get(it.next());
       for(int j = 1; j <= dim; j++) {
@@ -190,7 +206,7 @@ public final class DatabaseUtil {
     for(int i = 0; i < dim; i++) {
       centroid[i] /= size;
     }
-    return database.getObjectFactory().newInstance(centroid);
+    return assumeVectorField(database).getFactory().newInstance(centroid);
   }
 
   /**
@@ -203,7 +219,7 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  private static NumberVector<?, ?> centroidRelaxed(Database<? extends NumberVector<?, ?>> database, DBIDs ids) {
+  private static NumberVector<?, ?> centroidRelaxed(Relation<? extends NumberVector<?, ?>> database, DBIDs ids) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -222,9 +238,7 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    // FIXME: This is an ugly generics hack...
-    Database<DoubleVector> db = databaseUglyVectorCast(database);
-    return db.getObjectFactory().newInstance(centroid);
+    return assumeVectorField(database).getFactory().newInstance(centroid);
   }
 
   /**
@@ -235,14 +249,14 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the database is empty
    */
-  private static NumberVector<?, ?> centroidRelaxed(Database<? extends NumberVector<?, ?>> database) {
+  private static NumberVector<?, ?> centroidRelaxed(Relation<? extends NumberVector<?, ?>> database) {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
-    Iterator<DBID> it = database.iterator();
+    Iterator<DBID> it = database.iterDBIDs();
     while(it.hasNext()) {
       NumberVector<?, ?> o = database.get(it.next());
       for(int j = 1; j <= dim; j++) {
@@ -254,9 +268,7 @@ public final class DatabaseUtil {
     for(int i = 0; i < dim; i++) {
       centroid[i] /= size;
     }
-    // FIXME: This is an ugly generics hack...
-    Database<DoubleVector> db = databaseUglyVectorCast(database);
-    return db.getObjectFactory().newInstance(centroid);
+    return assumeVectorField(database).getFactory().newInstance(centroid);
   }
 
   /**
@@ -293,7 +305,7 @@ public final class DatabaseUtil {
    * @param ids the ids of the objects
    * @return the covariance matrix of the specified objects
    */
-  public static <V extends NumberVector<? extends V, ?>> Matrix covarianceMatrix(Database<? extends V> database, DBIDs ids) {
+  public static <V extends NumberVector<? extends V, ?>> Matrix covarianceMatrix(Relation<? extends V> database, DBIDs ids) {
     // centroid
     V centroid = centroid(database, ids);
 
@@ -322,7 +334,7 @@ public final class DatabaseUtil {
    * @param database the database storing the objects
    * @return the covariance matrix of the specified objects
    */
-  public static <V extends NumberVector<?, ?>> Matrix covarianceMatrix(Database<? extends V> database) {
+  public static <V extends NumberVector<?, ?>> Matrix covarianceMatrix(Relation<? extends V> database) {
     // centroid
     NumberVector<?, ?> centroid = centroidRelaxed(database);
 
@@ -340,13 +352,13 @@ public final class DatabaseUtil {
    * @param centroid the centroid of the database
    * @return the covariance matrix of the specified objects
    */
-  public static <V extends NumberVector<?, ?>> Matrix covarianceMatrix(Database<? extends V> database, V centroid) {
+  public static <V extends NumberVector<?, ?>> Matrix covarianceMatrix(Relation<? extends V> database, V centroid) {
     // centered matrix
     int columns = centroid.getDimensionality();
     int rows = database.size();
     double[][] matrixArray = new double[rows][columns];
 
-    Iterator<DBID> it = database.iterator();
+    Iterator<DBID> it = database.iterDBIDs();
     int i = 0;
     while(it.hasNext()) {
       NumberVector<?, ?> obj = database.get(it.next());
@@ -397,14 +409,14 @@ public final class DatabaseUtil {
    * @return the variances in each dimension of all objects stored in the given
    *         database
    */
-  public static double[] variances(Database<? extends NumberVector<?, ?>> database) {
+  public static double[] variances(Relation<? extends NumberVector<?, ?>> database) {
     NumberVector<?, ?> centroid = centroidRelaxed(database);
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.doubleValue(d);
 
-      for(Iterator<DBID> it = database.iterator(); it.hasNext();) {
+      for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
         NumberVector<?, ?> o = database.get(it.next());
         double diff = o.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
@@ -424,7 +436,7 @@ public final class DatabaseUtil {
    * @param ids the ids of the objects
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<? extends NumberVector<?, ?>> database, DBIDs ids) {
+  public static double[] variances(Relation<? extends NumberVector<?, ?>> database, DBIDs ids) {
     return variances(database, centroidRelaxed(database, ids), ids);
   }
 
@@ -437,7 +449,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<? extends NumberVector<?, ?>> database, NumberVector<?, ?> centroid, DBIDs ids) {
+  public static double[] variances(Relation<? extends NumberVector<?, ?>> database, NumberVector<?, ?> centroid, DBIDs ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -464,7 +476,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<? extends NumberVector<?, ?>> database, NumberVector<?, ?> centroid, DBIDs[] ids) {
+  public static double[] variances(Relation<? extends NumberVector<?, ?>> database, NumberVector<?, ?> centroid, DBIDs[] ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -491,7 +503,7 @@ public final class DatabaseUtil {
    * @param database the database storing the objects
    * @return Minimum and Maximum vector for the hyperrectangle
    */
-  public static <NV extends NumberVector<NV, ?>> Pair<NV, NV> computeMinMax(Database<NV> database) {
+  public static <NV extends NumberVector<NV, ?>> Pair<NV, NV> computeMinMax(Relation<NV> database) {
     int dim = dimensionality(database);
     double[] mins = new double[dim];
     double[] maxs = new double[dim];
@@ -499,7 +511,7 @@ public final class DatabaseUtil {
       mins[i] = Double.MAX_VALUE;
       maxs[i] = -Double.MAX_VALUE;
     }
-    for(DBID it : database) {
+    for(DBID it : database.iterDBIDs()) {
       NV o = database.get(it);
       for(int d = 0; d < dim; d++) {
         double v = o.doubleValue(d + 1);
@@ -507,10 +519,84 @@ public final class DatabaseUtil {
         maxs[d] = Math.max(maxs[d], v);
       }
     }
-    NV factory = database.getObjectFactory();
+    NV factory = assumeVectorField(database).getFactory();
     NV min = factory.newInstance(mins);
     NV max = factory.newInstance(maxs);
     return new Pair<NV, NV>(min, max);
+  }
+
+  /**
+   * Guess a potentially label-like representation.
+   * 
+   * @param database
+   * @return string representation
+   */
+  public static Relation<String> guessClassLabelRepresentation(Database database) throws NoSupportedDataTypeException {
+    try {
+      Relation<? extends ClassLabel> classrep = database.getRelation(TypeUtil.CLASSLABEL);
+      if(classrep != null) {
+        return new ConvertToStringView(classrep);
+      }
+    }
+    catch(NoSupportedDataTypeException e) {
+      // retry.
+    }
+    try {
+      Relation<? extends LabelList> labelsrep = database.getRelation(TypeUtil.LABELLIST);
+      if(labelsrep != null) {
+        return new ConvertToStringView(labelsrep);
+      }
+    }
+    catch(NoSupportedDataTypeException e) {
+      // retry.
+    }
+    try {
+      Relation<String> stringrep = database.getRelation(TypeUtil.STRING);
+      if(stringrep != null) {
+        return stringrep;
+      }
+    }
+    catch(NoSupportedDataTypeException e) {
+      // retry.
+    }
+    throw new NoSupportedDataTypeException("No label-like representation was found.");
+  }
+
+  /**
+   * Guess a potentially object label-like representation.
+   * 
+   * @param database
+   * @return string representation
+   */
+  public static Relation<String> guessObjectLabelRepresentation(Database database) throws NoSupportedDataTypeException {
+    try {
+      Relation<? extends LabelList> labelsrep = database.getRelation(TypeUtil.LABELLIST);
+      if(labelsrep != null) {
+        return new ConvertToStringView(labelsrep);
+      }
+    }
+    catch(NoSupportedDataTypeException e) {
+      // retry.
+    }
+    try {
+      Relation<String> stringrep = database.getRelation(TypeUtil.STRING);
+      if(stringrep != null) {
+        return stringrep;
+      }
+    }
+    catch(NoSupportedDataTypeException e) {
+      // retry.
+    }
+    try {
+      Relation<? extends ClassLabel> classrep = database.getRelation(TypeUtil.CLASSLABEL);
+      if(classrep != null) {
+        return new ConvertToStringView(classrep);
+      }
+    }
+    catch(NoSupportedDataTypeException e) {
+      // retry.
+    }
+    throw new NoSupportedDataTypeException("No label-like representation was found.");
   }
 
   /**
@@ -520,18 +606,24 @@ public final class DatabaseUtil {
    * @return a set comprising all class labels that are currently set in the
    *         database
    */
-  public static SortedSet<ClassLabel> getClassLabels(Database<?> database) {
-    // FIXME: re-add a similar check!
-    // if(!database.isSetForAllObjects(AssociationID.CLASS)) {
-    // throw new IllegalStateException("AssociationID " +
-    // AssociationID.CLASS.getName() + " is not set.");
-    // }
+  public static SortedSet<ClassLabel> getClassLabels(Relation<? extends ClassLabel> database) {
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
-    final DataQuery<ClassLabel> rep = database.getClassLabelQuery();
-    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
-      labels.add(rep.get(iter.next()));
+    for(Iterator<DBID> iter = database.iterDBIDs(); iter.hasNext();) {
+      labels.add(database.get(iter.next()));
     }
     return labels;
+  }
+
+  /**
+   * Retrieves all class labels within the database.
+   * 
+   * @param database the database to be scanned for class labels
+   * @return a set comprising all class labels that are currently set in the
+   *         database
+   */
+  public static SortedSet<ClassLabel> getClassLabels(Database database) {
+    final Relation<ClassLabel> rep = database.getRelation(TypeUtil.CLASSLABEL);
+    return getClassLabels(rep);
   }
 
   /**
@@ -542,8 +634,8 @@ public final class DatabaseUtil {
    * @return Class of first object in the Database.
    */
   @SuppressWarnings("unchecked")
-  public static <O extends DatabaseObject> Class<? extends O> guessObjectClass(Database<O> database) {
-    for(DBID id : database) {
+  public static <O> Class<? extends O> guessObjectClass(Relation<O> database) {
+    for(DBID id : database.iterDBIDs()) {
       return (Class<? extends O>) database.get(id).getClass();
     }
     return null;
@@ -561,11 +653,9 @@ public final class DatabaseUtil {
    * @param database Database
    * @return Superclass of all objects in the database
    */
-  @SuppressWarnings("unchecked")
-  public static <O extends DatabaseObject> Class<? extends DatabaseObject> getBaseObjectClassExpensive(Database<O> database) {
-    final Class<DatabaseObject> databaseObjectClass = DatabaseObject.class;
-    List<Class<? extends DatabaseObject>> candidates = new ArrayList<Class<? extends DatabaseObject>>();
-    Iterator<DBID> iditer = database.iterator();
+  public static <O> Class<?> getBaseObjectClassExpensive(Relation<O> database) {
+    List<Class<?>> candidates = new ArrayList<Class<?>>();
+    Iterator<DBID> iditer = database.iterDBIDs();
     // empty database?!
     if(!iditer.hasNext()) {
       return null;
@@ -574,34 +664,30 @@ public final class DatabaseUtil {
     candidates.add(database.get(iditer.next()).getClass());
     // other objects
     while(iditer.hasNext()) {
-      Class<? extends DatabaseObject> newcls = database.get(iditer.next()).getClass();
+      Class<?> newcls = database.get(iditer.next()).getClass();
       // validate all candidates
-      Iterator<Class<? extends DatabaseObject>> ci = candidates.iterator();
+      Iterator<Class<?>> ci = candidates.iterator();
       while(ci.hasNext()) {
-        Class<? extends DatabaseObject> cand = ci.next();
+        Class<?> cand = ci.next();
         if(cand.isAssignableFrom(newcls)) {
           continue;
         }
         // TODO: resolve conflicts by finding all superclasses!
         // Does this code here work?
         for(Class<?> interf : cand.getInterfaces()) {
-          if(interf.isAssignableFrom(databaseObjectClass)) {
-            candidates.add((Class<? extends DatabaseObject>) interf);
-          }
+          candidates.add(interf);
         }
-        if(cand.getSuperclass().isAssignableFrom(databaseObjectClass)) {
-          candidates.add((Class<? extends DatabaseObject>) cand.getSuperclass());
-        }
+        candidates.add(cand.getSuperclass());
         ci.remove();
       }
     }
     // if we have any candidates left ...
     if(candidates != null && candidates.size() > 0) {
       // remove subclasses
-      Iterator<Class<? extends DatabaseObject>> ci = candidates.iterator();
+      Iterator<Class<?>> ci = candidates.iterator();
       while(ci.hasNext()) {
-        Class<? extends DatabaseObject> cand = ci.next();
-        for(Class<? extends DatabaseObject> oc : candidates) {
+        Class<?> cand = ci.next();
+        for(Class<?> oc : candidates) {
           if(oc != cand && cand.isAssignableFrom(oc)) {
             ci.remove();
             break;
@@ -627,13 +713,14 @@ public final class DatabaseUtil {
    * @param name_pattern Name to match against class or object label
    * @return found cluster or it throws an exception.
    */
-  public static ArrayModifiableDBIDs getObjectsByLabelMatch(Database<?> database, Pattern name_pattern) {
+  public static ArrayModifiableDBIDs getObjectsByLabelMatch(Database database, Pattern name_pattern) {
+    Relation<String> rep = guessObjectLabelRepresentation(database);
     if(name_pattern == null) {
       return DBIDUtil.newArray();
     }
     ArrayModifiableDBIDs ret = DBIDUtil.newArray();
-    for(DBID objid : database) {
-      if(name_pattern.matcher(getClassOrObjectLabel(database, objid)).matches()) {
+    for(DBID objid : rep.iterDBIDs()) {
+      if(name_pattern.matcher(rep.get(objid)).matches()) {
         ret.add(objid);
       }
     }
@@ -641,26 +728,11 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Get the class label or object label of an object in the database
-   * 
-   * @param database Database
-   * @param objid Object ID
-   * @return String representation of label or object label
-   */
-  public static String getClassOrObjectLabel(Database<?> database, DBID objid) {
-    ClassLabel lbl = database.getClassLabelQuery().get(objid);
-    if(lbl != null) {
-      return lbl.toString();
-    }
-    return database.getObjectLabelQuery().get(objid);
-  }
-
-  /**
    * Iterator class that retrieves the given objects from the database.
    * 
    * @author Erich Schubert
    */
-  public static class DatabaseObjectIterator<O extends DatabaseObject> implements Iterator<O> {
+  public static class DatabaseObjectIterator<O> implements Iterator<O> {
     /**
      * The real iterator.
      */
@@ -669,7 +741,7 @@ public final class DatabaseUtil {
     /**
      * The database we use
      */
-    final Database<? extends O> database;
+    final Relation<? extends O> database;
 
     /**
      * Full Constructor.
@@ -677,7 +749,7 @@ public final class DatabaseUtil {
      * @param iter Original iterator.
      * @param database Database
      */
-    public DatabaseObjectIterator(Iterator<DBID> iter, Database<? extends O> database) {
+    public DatabaseObjectIterator(Iterator<DBID> iter, Relation<? extends O> database) {
       super();
       this.iter = iter;
       this.database = database;
@@ -688,10 +760,10 @@ public final class DatabaseUtil {
      * 
      * @param database Database
      */
-    public DatabaseObjectIterator(Database<? extends O> database) {
+    public DatabaseObjectIterator(Relation<? extends O> database) {
       super();
       this.database = database;
-      this.iter = database.iterator();
+      this.iter = database.iterDBIDs();
     }
 
     @Override
@@ -716,18 +788,18 @@ public final class DatabaseUtil {
    * 
    * @author Erich Schubert
    */
-  public static class CollectionFromDatabase<O extends DatabaseObject> extends AbstractCollection<O> implements Collection<O> {
+  public static class CollectionFromDatabase<O> extends AbstractCollection<O> implements Collection<O> {
     /**
      * The database we query
      */
-    Database<? extends O> db;
+    Relation<? extends O> db;
 
     /**
      * Constructor.
      * 
      * @param db Database
      */
-    public CollectionFromDatabase(Database<? extends O> db) {
+    public CollectionFromDatabase(Relation<? extends O> db) {
       super();
       this.db = db;
     }
@@ -752,7 +824,7 @@ public final class DatabaseUtil {
    * @return Database
    */
   @SuppressWarnings("unchecked")
-  public static <V extends NumberVector<?, ?>, T extends NumberVector<?, ?>> Database<V> databaseUglyVectorCast(Database<T> database) {
-    return (Database<V>) database;
+  public static <V extends NumberVector<?, ?>, T extends NumberVector<?, ?>> Relation<V> databaseUglyVectorCast(Relation<T> database) {
+    return (Relation<V>) database;
   }
 }

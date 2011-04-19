@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  */
-public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MetricalEntry> extends TreeIndex<O, N, E> implements KNNIndex<O>, RangeIndex<O> {
+public abstract class MetricalIndex<O, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MetricalEntry> extends TreeIndex<O, N, E> implements KNNIndex<O>, RangeIndex<O> {
   /**
    * Constructor.
    * 
@@ -31,8 +31,8 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
    * @param pageSize page size
    * @param cacheSize cache size
    */
-  public MetricalIndex(String fileName, int pageSize, long cacheSize) {
-    super(fileName, pageSize, cacheSize);
+  public MetricalIndex(Relation<O> representation, String fileName, int pageSize, long cacheSize) {
+    super(representation, fileName, pageSize, cacheSize);
   }
 
   /**
@@ -77,4 +77,6 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
    * @return a list of entries pointing to the leaf nodes of this spatial index
    */
   public abstract List<E> getLeaves();  
+  
+  
 }

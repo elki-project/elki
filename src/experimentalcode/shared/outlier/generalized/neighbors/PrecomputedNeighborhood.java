@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DataQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -88,7 +88,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
    * 
    * @author Erich Schubert
    */
-  public static class Factory implements NeighborSetPredicate.Factory<DatabaseObject> {
+  public static class Factory implements NeighborSetPredicate.Factory<Object> {
     /**
      * The input file.
      */
@@ -112,7 +112,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
     }
 
     @Override
-    public NeighborSetPredicate instantiate(Database<? extends DatabaseObject> database) {
+    public NeighborSetPredicate instantiate(Relation<?> database) {
       DataStore<DBIDs> store = loadNeighbors(database);
       PrecomputedNeighborhood neighborhood = new PrecomputedNeighborhood(store);
       ResultHierarchy hier = database.getHierarchy();
@@ -125,15 +125,15 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
     /**
      * Method to load the external neighbors.
      */
-    private DataStore<DBIDs> loadNeighbors(Database<? extends DatabaseObject> database) {
-      final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
+    private DataStore<DBIDs> loadNeighbors(Relation<?> database) {
+      final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
       final WritableDataStore<DBIDs> tstore;
       // TStore is temporary when we need to do multi-step
       if(steps <= 1) {
         tstore = store;
       }
       else {
-        tstore = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
+        tstore = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
       }
 
       if(logger.isVerbose()) {
@@ -148,9 +148,9 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
       // TODO: move this into the database layer to share?
       Map<String, DBID> lblmap = new HashMap<String, DBID>(database.size() * 2);
       {
-        DataQuery<String> olq = database.getObjectLabelQuery();
-        DataQuery<String> eidq = database.getExternalIdQuery();
-        for(DBID id : database) {
+        Relation<LabelList> olq = database.getDatabase().getRelation(SimpleTypeInformation.get(LabelList.class));
+        Relation<String> eidq = null; // database.getExternalIdQuery();
+        for(DBID id : database.iterDBIDs()) {
           if(eidq != null) {
             String eid = eidq.get(id);
             if(eid != null) {
@@ -158,9 +158,11 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
             }
           }
           if(olq != null) {
-            String label = olq.get(id);
+            LabelList label = olq.get(id);
             if(label != null) {
-              lblmap.put(label, id);
+              for (String lbl: label) {
+                lblmap.put(lbl, id);
+              }
             }
           }
         }
@@ -200,7 +202,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
         // Expand multiple steps
         if(steps > 0) {
           FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Expanding neighborhoods.", database.size(), logger) : null;
-          for(final DBID id : database) {
+          for(final DBID id : database.iterDBIDs()) {
             DBIDs cur = id;
             for(int i = 0; i < steps; i++) {
               ModifiableDBIDs upd = DBIDUtil.newHashSet(cur);

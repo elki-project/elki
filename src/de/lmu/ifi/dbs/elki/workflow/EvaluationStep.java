@@ -2,10 +2,8 @@ package de.lmu.ifi.dbs.elki.workflow;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -23,10 +21,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @apiviz.has Evaluator
  * @apiviz.has Result
  * @apiviz.uses Result
- * 
- * @param <O> database object type
  */
-public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
+public class EvaluationStep implements WorkflowStep {
   /**
    * Evaluators to run
    */
@@ -47,10 +43,10 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
     this.evaluators = evaluators;
   }
 
-  public void runEvaluators(HierarchicalResult r, Database<O> db, boolean normalizationUndo, Normalization<O> normalization) {
+  public void runEvaluators(HierarchicalResult r, Database db) {
     // Run evaluation helpers
     if(evaluators != null) {
-      new Evaluation(db, r.getHierarchy(), normalizationUndo, normalization, evaluators).update(r);
+      new Evaluation(db, r.getHierarchy(), evaluators).update(r);
     }
     this.result = r;
   }
@@ -62,19 +58,9 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
    */
   public class Evaluation implements ResultListener {
     /**
-     * Normalization
-     */
-    private Normalization<O> normalization;
-
-    /**
-     * Normalization undo flag.
-     */
-    private boolean normalizationUndo;
-
-    /**
      * Database
      */
-    private Database<O> database;
+    private Database database;
 
     /**
      * Evaluators to run.
@@ -91,15 +77,11 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
      * 
      * @param database Database
      * @param hierarchy Result Hierarchy
-     * @param normalizationUndo Normalization undo flag
-     * @param normalization Normalization
      * @param evaluators Evaluators
      */
-    public Evaluation(Database<O> database, ResultHierarchy hierarchy, boolean normalizationUndo, Normalization<O> normalization, List<Evaluator> evaluators) {
+    public Evaluation(Database database, ResultHierarchy hierarchy, List<Evaluator> evaluators) {
       this.database = database;
       this.hierarchy = hierarchy;
-      this.normalizationUndo = normalizationUndo;
-      this.normalization = normalization;
       this.evaluators = evaluators;
 
       hierarchy.addResultListener(this);
@@ -112,9 +94,9 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
      */
     public void update(Result r) {
       for(Evaluator evaluator : evaluators) {
-        if(normalizationUndo) {
+        /*if(normalizationUndo) {
           evaluator.setNormalization(normalization);
-        }
+        }*/
         evaluator.processResult(database, r, hierarchy);
       }
     }
@@ -149,7 +131,7 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Evaluators to run
      */
@@ -166,8 +148,8 @@ public class EvaluationStep<O extends DatabaseObject> implements WorkflowStep {
     }
 
     @Override
-    protected EvaluationStep<O> makeInstance() {
-      return new EvaluationStep<O>(evaluators);
+    protected EvaluationStep makeInstance() {
+      return new EvaluationStep(evaluators);
     }
   }
 }

@@ -6,11 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -34,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 // TODO: redundant to kNN outlier detection?
 @Title("KNN-Distance-Order")
 @Description("Assesses the knn distances for a specified k and orders them.")
-public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
+public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
   /**
    * The logger for this class.
    */
@@ -81,11 +82,12 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
    * database.
    */
   @Override
-  protected KNNDistanceOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(getDistanceFunction(), k);
+  protected KNNDistanceOrderResult<D> runInTime(Database database) throws IllegalStateException {
+    final Relation<O> dataQuery = getRelation(database);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(dataQuery, getDistanceFunction(), k);
     final Random random = new Random();
     List<D> knnDistances = new ArrayList<D>();
-    for(Iterator<DBID> iter = database.iterator(); iter.hasNext();) {
+    for(Iterator<DBID> iter = dataQuery.iterDBIDs(); iter.hasNext();) {
       DBID id = iter.next();
       if(random.nextDouble() < percentage) {
         final List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
@@ -95,6 +97,11 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
     }
     Collections.sort(knnDistances, Collections.reverseOrder());
     return new KNNDistanceOrderResult<D>("kNN distance order", "knn-order", knnDistances);
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
   }
 
   @Override
@@ -109,7 +116,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected int k;
 
     protected double percentage;

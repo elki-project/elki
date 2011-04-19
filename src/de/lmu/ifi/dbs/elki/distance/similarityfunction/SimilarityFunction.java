@@ -1,15 +1,15 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface SimilarityFunction describes the requirements of any similarity
  * function.
- *
+ * 
  * @author Elke Achtert
  * 
  * @apiviz.landmark
@@ -18,18 +18,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <O> object type
  * @param <D> distance type
  */
-public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<?>> extends Parameterizable {
+public interface SimilarityFunction<O, D extends Distance<?>> extends Parameterizable {
   /**
    * Is this function symmetric?
    * 
    * @return {@code true} when symmetric
    */
-  boolean isSymmetric();  
+  boolean isSymmetric();
 
   /**
    * Get the input data type of the function.
    */
-  Class<? super O> getInputDatatype();
+  TypeInformation getInputTypeRestriction();
 
   /**
    * Get a distance factory.
@@ -39,10 +39,10 @@ public interface SimilarityFunction<O extends DatabaseObject, D extends Distance
   D getDistanceFactory();
 
   /**
-   * Instantiate with a database to get the actual distance query.
+   * Instantiate with a representation to get the actual similarity query.
    * 
-   * @param database
+   * @param rep Representation to use
    * @return Actual distance query.
    */
-  public <T extends O> SimilarityQuery<T, D> instantiate(Database<T> database);
+  public <T extends O> SimilarityQuery<T, D> instantiate(Relation<T> rep);
 }

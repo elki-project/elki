@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilari
 
 public class ClusterSimilarityFunction<C extends Cluster<?>> extends AbstractPrimitiveSimilarityFunction<C, IntegerDistance> {
   /**
-   * @param database
+   * @param rep
    */
   public ClusterSimilarityFunction(Database<C> database) {
     super();
@@ -34,7 +34,7 @@ public class ClusterSimilarityFunction<C extends Cluster<?>> extends AbstractPri
   }
 
   @Override
-  public Class<? super C> getInputDatatype() {
+  public Class<? super C> getInputTypeRestriction() {
     return Cluster.class;
   }
 

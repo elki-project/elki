@@ -9,6 +9,8 @@ import java.util.PriorityQueue;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -21,6 +23,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
@@ -65,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 @Title("ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url = "http://dx.doi.org/10.1145/1401890.1401946")
-public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlgorithm<V, DoubleDistance, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlgorithm<V, DoubleDistance, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -154,19 +157,20 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @param k k for kNN queries
    * @return result
    */
-  public OutlierResult getRanking(Database<V> database, int k) {
+  public OutlierResult getRanking(Database database, int k) {
+    Relation<V> dataQuery = getRelation(database);
     // Fix a static set of IDs
-    staticids = DBIDUtil.newArray(database.getIDs());
+    staticids = DBIDUtil.newArray(dataQuery.getDBIDs());
     Collections.sort(staticids);
 
-    KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, database, staticids);
-    PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(database.size(), Collections.reverseOrder());
+    KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, dataQuery, staticids);
+    PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(dataQuery.size(), Collections.reverseOrder());
 
     // preprocess kNN neighborhoods
     assert (k == this.k);
-    KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(getDistanceFunction(), k);
+    KNNQuery<V, DoubleDistance> knnQuery = database.getKNNQuery(dataQuery, getDistanceFunction(), k);
 
-    for(DBID objKey : database) {
+    for(DBID objKey : dataQuery.iterDBIDs()) {
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
@@ -198,7 +202,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     }
 
     MinMax<Double> minmaxabod = new MinMax<Double>();
-    WritableDataStore<Double> abodvalues = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> abodvalues = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(FCPair<Double, DBID> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
       minmaxabod.put(pair.getFirst());
@@ -217,25 +221,26 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @param sampleSize Sample size
    * @return result
    */
-  public OutlierResult getFastRanking(Database<V> database, int k, int sampleSize) {
+  public OutlierResult getFastRanking(Database database, int k, int sampleSize) {
+    Relation<V> dataQuery = getRelation(database);
     // Fix a static set of IDs
-    staticids = DBIDUtil.newArray(database.getIDs());
+    staticids = DBIDUtil.newArray(dataQuery.getDBIDs());
     Collections.sort(staticids);
 
-    KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, database, staticids);
+    KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, dataQuery, staticids);
 
-    PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(database.size(), Collections.reverseOrder());
+    PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(dataQuery.size(), Collections.reverseOrder());
     // get Candidate Ranking
-    for(DBID aKey : database) {
-      HashMap<DBID, Double> dists = new HashMap<DBID, Double>(database.size());
+    for(DBID aKey : dataQuery.iterDBIDs()) {
+      HashMap<DBID, Double> dists = new HashMap<DBID, Double>(dataQuery.size());
       // determine kNearestNeighbors and pairwise distances
       PriorityQueue<FCPair<Double, DBID>> nn;
       if(!useRNDSample) {
-        nn = calcDistsandNN(database, kernelMatrix, sampleSize, aKey, dists);
+        nn = calcDistsandNN(dataQuery, kernelMatrix, sampleSize, aKey, dists);
       }
       else {
         // alternative:
-        nn = calcDistsandRNDSample(database, kernelMatrix, sampleSize, aKey, dists);
+        nn = calcDistsandRNDSample(dataQuery, kernelMatrix, sampleSize, aKey, dists);
       }
 
       // get normalization
@@ -271,11 +276,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       // }
       v++;
       MeanVariance s = new MeanVariance();
-      for(DBID bKey : database) {
+      for(DBID bKey : dataQuery.iterDBIDs()) {
         if(bKey.equals(aKey)) {
           continue;
         }
-        for(DBID cKey : database) {
+        for(DBID cKey : dataQuery.iterDBIDs()) {
           if(cKey.equals(aKey)) {
             continue;
           }
@@ -305,7 +310,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     }
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
     MinMax<Double> minmaxabod = new MinMax<Double>();
-    WritableDataStore<Double> abodvalues = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> abodvalues = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(FCPair<Double, DBID> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
       minmaxabod.put(pair.getFirst());
@@ -435,9 +440,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return (kernelMatrix.getDistance(ai, ai) + kernelMatrix.getDistance(bi, ci) - kernelMatrix.getDistance(ai, ci) - kernelMatrix.getDistance(ai, bi));
   }
 
-  private PriorityQueue<FCPair<Double, DBID>> calcDistsandNN(Database<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
+  private PriorityQueue<FCPair<Double, DBID>> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
     PriorityQueue<FCPair<Double, DBID>> nn = new PriorityQueue<FCPair<Double, DBID>>(sampleSize);
-    for(DBID bKey : data) {
+    for(DBID bKey : data.iterDBIDs()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(nn.size() < sampleSize) {
@@ -453,11 +458,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return nn;
   }
 
-  private PriorityQueue<FCPair<Double, DBID>> calcDistsandRNDSample(Database<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
+  private PriorityQueue<FCPair<Double, DBID>> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
     PriorityQueue<FCPair<Double, DBID>> nn = new PriorityQueue<FCPair<Double, DBID>>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
-    for(DBID bKey : data) {
+    for(DBID bKey : data.iterDBIDs()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(counter % step == 0) {
@@ -474,24 +479,24 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @param data to get explanations for
    */
   // TODO: this should be done by the result classes.
-  public void getExplanations(Database<V> data) {
+  public void getExplanations(Relation<V> data) {
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, data, staticids);
     // PQ for Outlier Ranking
     PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(data.size(), Collections.reverseOrder());
     HashMap<DBID, LinkedList<DBID>> explaintab = new HashMap<DBID, LinkedList<DBID>>();
     // test all objects
-    for(DBID objKey : data) {
+    for(DBID objKey : data.iterDBIDs()) {
       MeanVariance s = new MeanVariance();
       // Queue for the best explanation
       PriorityQueue<FCPair<Double, DBID>> explain = new PriorityQueue<FCPair<Double, DBID>>();
       // determine Object
       // for each pair of other objects
-      Iterator<DBID> iter = data.iterator();
+      Iterator<DBID> iter = data.iterDBIDs();
       // Collect Explanation Vectors
       while(iter.hasNext()) {
         MeanVariance s2 = new MeanVariance();
         DBID key1 = iter.next();
-        Iterator<DBID> iter2 = data.iterator();
+        Iterator<DBID> iter2 = data.iterDBIDs();
         if(objKey.equals(key1)) {
           continue;
         }
@@ -553,7 +558,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     System.out.println("--------------------------------------------");
   }
 
-  private void generateExplanation(Database<V> data, DBID key, LinkedList<DBID> expList) {
+  private void generateExplanation(Relation<V> data, DBID key, LinkedList<DBID> expList) {
     V vect1 = data.get(key);
     Iterator<DBID> iter = expList.iterator();
     while(iter.hasNext()) {
@@ -570,13 +575,18 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
     if(sampleSize > 0) {
       return getFastRanking(database, k, sampleSize);
     }
     else {
       return getRanking(database, k);
     }
+  }
+
+  @Override
+  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 
@@ -105,7 +104,7 @@ public class ApproximationLine implements Externalizable {
    * @param distanceFunction the distance function
    * @return the approximated knn-distance at the specified k
    */
-  public <O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> D getApproximatedKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
+  public <O, D extends NumberDistance<D, N>, N extends Number> D getApproximatedKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
     if(k < k_0) {
       return distanceFunction.nullDistance();
     }

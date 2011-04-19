@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.similarity.AbstractDBIDSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <I> index type
  * @param <D> distance type
  */
-public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObject, I extends Index<O>, R, D extends Distance<D>> implements IndexBasedSimilarityFunction<O, D> {
+public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index<?>, R, D extends Distance<D>> implements IndexBasedSimilarityFunction<O, D> {
   /**
    * Parameter to specify the preprocessor to be used.
    * <p>
@@ -51,7 +51,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObj
   }
 
   @Override
-  abstract public <T extends O> Instance<T, ?, R, D> instantiate(Database<T> database);
+  abstract public <T extends O> Instance<T, ?, R, D> instantiate(Relation<T> database);
 
   @Override
   public boolean isSymmetric() {
@@ -59,8 +59,8 @@ public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObj
   }
 
   @Override
-  public Class<? super O> getInputDatatype() {
-    return DatabaseObject.class;
+  public TypeInformation getInputTypeRestriction() {
+    return indexFactory.getInputTypeRestriction();
   }
 
   /**
@@ -74,7 +74,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObj
    * @param <I> Index type
    * @param <D> Distance result type
    */
-  abstract public static class Instance<O extends DatabaseObject, I extends Index<O>, R, D extends Distance<D>> extends AbstractDBIDSimilarityQuery<O, D> implements IndexBasedSimilarityFunction.Instance<O, I, D> {
+  abstract public static class Instance<O, I extends Index<?>, R, D extends Distance<D>> extends AbstractDBIDSimilarityQuery<O, D> implements IndexBasedSimilarityFunction.Instance<O, I, D> {
     /**
      * Parent index
      */
@@ -86,7 +86,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O extends DatabaseObj
      * @param database Database
      * @param index Index to use
      */
-    public Instance(Database<O> database, I index) {
+    public Instance(Relation<O> database, I index) {
       super(database);
       this.index = index;
     }

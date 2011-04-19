@@ -4,12 +4,11 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
@@ -43,8 +42,8 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
     params.addParameter(DeLiCluTreeFactory.PAGE_SIZE_ID, 1000);
     params.addParameter(DeLiClu.XI_ID, 0.038);
     params.addParameter(DeLiClu.MINPTS_ID, 18);
-    FileBasedDatabaseConnection<DoubleVector> dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
-    Database<DoubleVector> db = dbconn.getDatabase(null);
+    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
+    Database db = dbconn.getDatabase();
     org.junit.Assert.assertEquals("Database size does not match.", 710, db.size());
 
     DeLiClu<DoubleVector, DoubleDistance> deliclu = ClassGenericsUtil.parameterizeOrAbort(DeLiClu.class, params);

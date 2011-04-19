@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -55,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("INFLO: Influenced Outlierness Factor")
 @Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
 @Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_68")
-public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm<O, OutlierResult> {
+public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -106,19 +107,20 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
   }
 
   @Override
-  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(getDistanceFunction());
+  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+    Relation<O> relation = database.getRelation(getInputTypeRestriction());
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 
-    ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(database.size());
+    ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(relation.size());
     ModifiableDBIDs pruned = DBIDUtil.newHashSet();
     // KNNS
-    WritableDataStore<ModifiableDBIDs> knns = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
+    WritableDataStore<ModifiableDBIDs> knns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
     // RNNS
-    WritableDataStore<ModifiableDBIDs> rnns = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
+    WritableDataStore<ModifiableDBIDs> rnns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
     // density
-    WritableDataStore<Double> density = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDataStore<Double> density = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     // init knns and rnns
-    for(DBID id : database) {
+    for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
       knns.put(id, DBIDUtil.newArray());
       rnns.put(id, DBIDUtil.newArray());
     }
@@ -126,7 +128,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     // TODO: use kNN preprocessor?
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
 
-    for(DBID id : database) {
+    for(DBID id : relation.iterDBIDs()) {
       // if not visited count=0
       int count = rnns.get(id).size();
       ModifiableDBIDs s;
@@ -169,8 +171,8 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
     // Calculate INFLO for any Object
     // IF Object is pruned INFLO=1.0
     MinMax<Double> inflominmax = new MinMax<Double>();
-    WritableDataStore<Double> inflos = DataStoreUtil.makeStorage(database.getIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : database) {
+    WritableDataStore<Double> inflos = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
       if(!pruned.contains(id)) {
         ModifiableDBIDs knn = knns.get(id);
         ModifiableDBIDs rnn = rnns.get(id);
@@ -202,6 +204,11 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
   }
 
   @Override
+  public TypeInformation getInputTypeRestriction() {
+    return getDistanceFunction().getInputTypeRestriction();
+  }
+
+  @Override
   protected Logging getLogger() {
     return logger;
   }
@@ -213,7 +220,7 @@ public class INFLO<O extends DatabaseObject, D extends NumberDistance<D, ?>> ext
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends DatabaseObject, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     protected double m = 1.0;
 
     protected int k = 0;

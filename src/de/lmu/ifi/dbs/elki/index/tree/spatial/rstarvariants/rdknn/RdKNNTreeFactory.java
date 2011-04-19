@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -68,7 +68,7 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
   }
 
   @Override
-  public RdKNNTree<O, D, N> instantiate(Database<O> database) {
+  public RdKNNTree<O, D, N> instantiate(Relation<O> database) {
     return new RdKNNTree<O, D, N>(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates, k_max, distanceFunction);
   }
 

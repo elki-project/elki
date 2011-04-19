@@ -3,15 +3,14 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Elke Achtert
  */
-public class PreprocessorRKNNQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractDatabaseQuery<O> implements RKNNQuery<O, D> {
+public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RKNNQuery<O, D> {
   /**
    * The last preprocessor result
    */
@@ -37,7 +36,7 @@ public class PreprocessorRKNNQuery<O extends DatabaseObject, D extends Distance<
    * @param database Database to query
    * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorRKNNQuery(Database<O> database, MaterializeKNNAndRKNNPreprocessor<O, D> preprocessor) {
+  public PreprocessorRKNNQuery(Relation<O> database, MaterializeKNNAndRKNNPreprocessor<O, D> preprocessor) {
     super(database);
     this.preprocessor = preprocessor;
   }
@@ -48,7 +47,7 @@ public class PreprocessorRKNNQuery<O extends DatabaseObject, D extends Distance<
    * @param database Database to query
    * @param preprocessor Preprocessor to use
    */
-  public PreprocessorRKNNQuery(Database<O> database, MaterializeKNNAndRKNNPreprocessor.Factory<O, D> preprocessor) {
+  public PreprocessorRKNNQuery(Relation<O> database, MaterializeKNNAndRKNNPreprocessor.Factory<O, D> preprocessor) {
     this(database, preprocessor.instantiate(database));
   }
 
@@ -60,13 +59,10 @@ public class PreprocessorRKNNQuery<O extends DatabaseObject, D extends Distance<
     return preprocessor.getRKNN(id);
   }
   
+  @SuppressWarnings("unused")
   @Override
   public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k) {
-    DBID id = obj.getID();
-    if(id != null) {
-      return getRKNNForDBID(id, k);
-    }
-    throw new AbortException("Preprocessor RkNN query used with previously unseen objects.");
+    throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
   
   @Override
@@ -86,7 +82,7 @@ public class PreprocessorRKNNQuery<O extends DatabaseObject, D extends Distance<
    * 
    * @return preprocessor instance
    */
-  public MaterializeKNNPreprocessor<O, D> getPreprocessor() {
+  public AbstractMaterializeKNNPreprocessor<O, D> getPreprocessor() {
     return preprocessor;
   }
 

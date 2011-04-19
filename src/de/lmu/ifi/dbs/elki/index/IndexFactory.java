@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.index;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -12,14 +12,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.stereotype factory,interface
  * @apiviz.uses Index oneway - - «create»
  *
- * @param <O> Object type
+ * @param <O> Input object type
  * @param <I> Index type
  */
-public interface IndexFactory<O extends DatabaseObject, I extends Index<O>> extends Parameterizable {
+public interface IndexFactory<V, I extends Index<?>> extends Parameterizable {
   /**
    * Sets the database in the distance function of this index (if existing).
    * 
-   * @param database the database
+   * @param representation the representation to index
    */
-  public I instantiate(Database<O> database);
+  public I instantiate(Relation<V> representation);
+
+  /**
+   * Get the input type restriction used for negotiating the data query.
+   * 
+   * @return Type restriction
+   */
+  public TypeInformation getInputTypeRestriction();
 }

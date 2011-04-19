@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -56,12 +56,12 @@ public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>>
   }
 
   @Override
-  public <T extends V> Collection<V> getReferencePoints(Database<T> db) {
+  public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     if(samplesize >= db.size()) {
       LoggingUtil.warning("Sample size is larger than database size!");
 
       ArrayList<V> selection = new ArrayList<V>(db.size());
-      for(DBID id : db) {
+      for(DBID id : db.iterDBIDs()) {
         selection.add(db.get(id));
       }
       return selection;
@@ -79,7 +79,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>>
       setsize += 2 << (int) Math.ceil(Math.log(samplesize * 3) / log4);
     }
     // logger.debug("Setsize: "+setsize);
-    ArrayDBIDs ids = DBIDUtil.ensureArray(db.getIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(db.getDBIDs());
     boolean fastrandomaccess = false;
     if(ArrayList.class.isAssignableFrom(ids.getClass())) {
       fastrandomaccess = true;

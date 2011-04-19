@@ -18,8 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -96,12 +94,12 @@ public class ResultWindow extends JFrame implements ResultListener {
   /**
    * The overview plot.
    */
-  private OverviewPlot<DoubleVector> overview;
+  private OverviewPlot overview;
 
   /**
    * Visualizer context
    */
-  protected VisualizerContext<? extends DatabaseObject> context;
+  protected VisualizerContext context;
 
   /**
    * Currently selected subplot.
@@ -117,7 +115,7 @@ public class ResultWindow extends JFrame implements ResultListener {
    * @param maxdim Maximal dimensionality to show.
    * @param context Visualizer context
    */
-  public ResultWindow(String title, Database<? extends DatabaseObject> db, Result result, int maxdim, VisualizerContext<? extends DatabaseObject> context) {
+  public ResultWindow(String title, Database db, Result result, int maxdim, VisualizerContext context) {
     super(title);
     this.context = context;
 
@@ -186,7 +184,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot<DoubleVector>(db, result, maxdim, context);
+    this.overview = new OverviewPlot(db, result, maxdim, context);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override
@@ -303,9 +301,7 @@ public class ResultWindow extends JFrame implements ResultListener {
    * Show a tabular view
    */
   protected void showTableView() {
-    @SuppressWarnings("unchecked")
-    VisualizerContext<DoubleVector> dvc = (VisualizerContext<DoubleVector>) context;
-    (new SelectionTableWindow<DoubleVector>(dvc)).setVisible(true);
+    (new SelectionTableWindow(context)).setVisible(true);
   }
 
   /**

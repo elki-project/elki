@@ -10,9 +10,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
+import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.parser.AbstractParser;
-import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -21,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  */
-public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
+public class SimplePolygonParser extends AbstractParser implements Parser {
   /**
    * Class logger
    */
@@ -39,7 +44,7 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
 
   /**
    * Constructor.
-   *
+   * 
    * @param colSep
    * @param quoteChar
    */
@@ -48,15 +53,21 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
   }
 
   @Override
-  public ParsingResult<PolygonsObject> parse(InputStream in) {
+  public MultipleObjectsBundle parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
-    List<Pair<PolygonsObject, List<String>>> objectAndLabelsList = new ArrayList<Pair<PolygonsObject, List<String>>>();
+
+    BundleMeta meta = new BundleMeta(2);
+    meta.add(SimpleTypeInformation.get(PolygonsObject.class));
+    meta.add(TypeUtil.LABELLIST);
+
+    List<Object> folded = new ArrayList<Object>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          Pair<PolygonsObject, List<String>> objectAndLabels = parseLine(line);
-          objectAndLabelsList.add(objectAndLabels);
+          Pair<PolygonsObject, LabelList> objectAndLabels = parseLine(line);
+          folded.add(objectAndLabels.first);
+          folded.add(objectAndLabels.second);
         }
       }
     }
@@ -64,7 +75,7 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<PolygonsObject>(objectAndLabelsList, PolygonsObject.PROTOTYPE);
+    return new MultipleObjectsBundle(meta, folded);
   }
 
   /**
@@ -74,11 +85,11 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
    * 
    * @return Parsed polygon
    */
-  private Pair<PolygonsObject, List<String>> parseLine(String line) {
+  private Pair<PolygonsObject, LabelList> parseLine(String line) {
     List<String> entries = tokenize(line);
     Iterator<String> iter = entries.iterator();
 
-    List<String> labels = new ArrayList<String>();
+    LabelList labels = new LabelList();
     List<Polygon> polys = new java.util.Vector<Polygon>(1);
 
     List<double[]> coords = new ArrayList<double[]>();
@@ -89,7 +100,7 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
         try {
           double c1 = Double.valueOf(m.group(1));
           double c2 = Double.valueOf(m.group(2));
-          if (m.group(3) != null) {
+          if(m.group(3) != null) {
             double c3 = Double.valueOf(m.group(3));
             coords.add(new double[] { c1, c2, c3 });
           }
@@ -117,7 +128,7 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
     if(coords.size() > 0) {
       polys.add(new Polygon(coords));
     }
-    return new Pair<PolygonsObject, List<String>>(new PolygonsObject(polys), labels);
+    return new Pair<PolygonsObject, LabelList>(new PolygonsObject(polys), labels);
   }
 
   @Override
@@ -132,7 +143,7 @@ public class SimplePolygonParser extends AbstractParser<PolygonsObject> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParser.Parameterizer<PolygonsObject> {
+  public static class Parameterizer extends AbstractParser.Parameterizer {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

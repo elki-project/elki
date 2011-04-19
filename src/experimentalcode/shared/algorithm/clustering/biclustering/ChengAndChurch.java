@@ -10,6 +10,8 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.BiclusterWithInverted;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -995,6 +997,11 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
       return missingValues.get(key);
     }
     return super.valueAt(row, col);
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

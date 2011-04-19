@@ -154,4 +154,11 @@ public interface DBIDFactory {
    * @return DBID serializer
    */
   public ByteBufferSerializer<DBID> getDBIDSerializerStatic();
+  
+  /**
+   * Get type restriction
+   * 
+   * @return type restriction for DBIDs
+   */
+  public Class<? extends DBID> getTypeRestriction();
 }

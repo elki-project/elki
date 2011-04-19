@@ -5,7 +5,6 @@ import java.io.File;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -29,7 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
  * @apiviz.uses Thumbnailer
  * @apiviz.uses ThumbnailThread
  */
-public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVisualization<O> implements ThumbnailThread.Listener, DataStoreListener<O> {
+public class ThumbnailVisualization extends AbstractVisualization implements ThumbnailThread.Listener, DataStoreListener {
   /**
    * Constant to listen for data changes
    */
@@ -43,7 +42,7 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
   /**
    * Visualizer factory
    */
-  protected final VisFactory<? extends O> visFactory;
+  protected final VisFactory visFactory;
 
   /**
    * The thumbnail file.
@@ -72,7 +71,7 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
    * @param task Task to use
    * @param mask Event mask (for auto-updating)
    */
-  public ThumbnailVisualization(VisFactory<? extends O> visFactory, VisualizationTask task, int mask) {
+  public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, int mask) {
     super(task);
     this.visFactory = visFactory;
     Integer tres = task.getGenerics(VisualizationTask.THUMBNAIL_RESOLUTION, Integer.class);
@@ -130,7 +129,7 @@ public class ThumbnailVisualization<O extends DatabaseObject> extends AbstractVi
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent<O> e) {
+  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
     refreshThumbnail();
   }
 

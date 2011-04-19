@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.query.similarity;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 
@@ -14,7 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * @param <O> Database object type.
  * @param <D> Distance result type.
  */
-public class PrimitiveSimilarityQuery<O extends DatabaseObject, D extends Distance<D>> extends AbstractSimilarityQuery<O, D> {
+public class PrimitiveSimilarityQuery<O, D extends Distance<D>> extends AbstractSimilarityQuery<O, D> {
   /**
    * The distance function we use.
    */
@@ -23,30 +22,30 @@ public class PrimitiveSimilarityQuery<O extends DatabaseObject, D extends Distan
   /**
    * Constructor.
    * 
-   * @param database Database to use.
+   * @param rep Representation to use.
    * @param similarityFunction Our similarity function
    */
-  public PrimitiveSimilarityQuery(Database<? extends O> database, PrimitiveSimilarityFunction<? super O, D> similarityFunction) {
-    super(database);
+  public PrimitiveSimilarityQuery(Relation<? extends O> rep, PrimitiveSimilarityFunction<? super O, D> similarityFunction) {
+    super(rep);
     this.similarityFunction = similarityFunction;
   }
 
   @Override
   public D similarity(DBID id1, DBID id2) {
-    O o1 = database.get(id1);
-    O o2 = database.get(id2);
+    O o1 = rep.get(id1);
+    O o2 = rep.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
   public D similarity(O o1, DBID id2) {
-    O o2 = database.get(id2);
+    O o2 = rep.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
   public D similarity(DBID id1, O o2) {
-    O o1 = database.get(id1);
+    O o1 = rep.get(id1);
     return similarity(o1, o2);
   }
 

@@ -8,7 +8,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @apiviz.uses OPTICS.SteepAreaResult
  */
-public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends AbstractVisualization<DatabaseObject> {
+public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends AbstractVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -177,7 +176,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
    * @apiviz.stereotype factory
    * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
    */
-  public static class Factory extends AbstractVisFactory<DatabaseObject> {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -187,7 +186,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
     }
 
     @Override
-    public void addVisualizers(VisualizerContext<? extends DatabaseObject> context, Result result) {
+    public void addVisualizers(VisualizerContext context, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         // Add plots, attach visualizer
@@ -195,7 +194,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
         if(plot != null) {
           final SteepAreaResult steep = findSteepAreaResult(co);
           if(steep != null) {
-            final VisualizationTask task = new VisualizationTask(NAME, context, co, this, plot);
+            final VisualizationTask task = new VisualizationTask(NAME, context, co, null, this, plot);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
             task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             context.addVisualizer(steep, task);

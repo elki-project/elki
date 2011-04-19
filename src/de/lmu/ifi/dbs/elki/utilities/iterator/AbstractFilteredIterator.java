@@ -70,7 +70,7 @@ public abstract class AbstractFilteredIterator<IN, OUT extends IN> implements It
       IN v = itr.next();
       nextobj = testFilter(v);
       if(nextobj != null) {
-        return;
+        break;
       }
     }
   }
