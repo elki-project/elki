@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -57,9 +57,9 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
       // Normalization scan
       for(int i = 0; i < objects.dataLength(); i++) {
         @SuppressWarnings("unchecked")
-        final I obj = (I) folded.get(i * meta.size() + r);
+        final I obj = (I) folded.get(i * objects.metaLength() + r);
         final O normalizedObj = filterSingleObject(obj);
-        folded.set(i * meta.size() + r, normalizedObj);
+        folded.set(i * objects.metaLength() + r, normalizedObj);
       }
     }
     return new MultipleObjectsBundle(meta, folded);

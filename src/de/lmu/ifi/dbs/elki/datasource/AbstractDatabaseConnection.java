@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.datasource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -11,12 +12,14 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -66,6 +69,14 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   public static final OptionID EXTERNALID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIdIndex", "The index of the label to be used as external Id.");
 
   /**
+   * Filters to apply to the input data.
+   * <p>
+   * Key: {@code -dbc.filter}
+   * </p>
+   */
+  public static final OptionID FILTERS_ID = OptionID.getOrCreateOptionID("dbc.filter", "The filters to apply to the input data.");
+
+  /**
    * The database provided by the parse method.
    */
   Database database;
@@ -88,6 +99,11 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   protected Integer externalIdIndex;
 
   /**
+   * The filters to invoke
+   */
+  protected List<ObjectFilter> filters;
+
+  /**
    * Constructor.
    * 
    * @param database the instance of the database
@@ -96,12 +112,14 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @param classLabelClass the association of occurring class labels
    * @param externalIdIndex the index of the label to be used as external id,
    *        can be null
+   * @param filters Filters to apply, can be null
    */
-  protected AbstractDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex) {
+  protected AbstractDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<ObjectFilter> filters) {
     this.database = database;
     this.classLabelIndex = classLabelIndex;
     this.classLabelClass = classLabelClass;
     this.externalIdIndex = externalIdIndex;
+    this.filters = filters;
   }
 
   /**
@@ -113,6 +131,11 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    */
   // TODO: this should be done in the parser!
   protected MultipleObjectsBundle transformLabels(MultipleObjectsBundle origpkgs) {
+    if(filters != null) {
+      for(ObjectFilter filter : filters) {
+        origpkgs = filter.filter(origpkgs);
+      }
+    }
     if(classLabelIndex == null && externalIdIndex == null) {
       return origpkgs;
     }
@@ -133,10 +156,10 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
       // updated type map:
       for(int i = 0; i < origpkgs.metaLength(); i++) {
         SimpleTypeInformation<?> meta = origpkgs.meta(i);
-        if (i == llcol && classLabelIndex != null) {
+        if(i == llcol && classLabelIndex != null) {
           reps.add(TypeUtil.CLASSLABEL);
         }
-        if (i == llcol && externalIdIndex != null) {
+        if(i == llcol && externalIdIndex != null) {
           // TODO: special type for external ID?
           reps.add(TypeUtil.STRING);
         }
@@ -146,12 +169,12 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
       for(int j = 0; j < origpkgs.dataLength(); j++) {
         for(int i = 0; i < origpkgs.metaLength(); i++) {
           Object d = origpkgs.data(j, i);
-          if (i == llcol) {
+          if(i == llcol) {
             LabelList ll = (LabelList) d;
-            if (classLabelIndex != null) {
+            if(classLabelIndex != null) {
               data.add(ll.get(classLabelIndex));
             }
-            if (externalIdIndex != null) {
+            if(externalIdIndex != null) {
               data.add(ll.get(externalIdIndex));
             }
             // TODO: remove also from ll?
@@ -237,13 +260,15 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @apiviz.exclude
    */
   public static abstract class Parameterizer extends AbstractParameterizer {
-    Database database = null;
+    protected Database database = null;
 
-    Integer classLabelIndex = null;
+    protected Integer classLabelIndex = null;
 
-    Class<? extends ClassLabel> classLabelClass = null;
+    protected Class<? extends ClassLabel> classLabelClass = null;
 
-    Integer externalIdIndex = null;
+    protected Integer externalIdIndex = null;
+
+    protected List<ObjectFilter> filters;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -275,6 +300,13 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
       final ObjectParameter<Database> dbParam = new ObjectParameter<Database>(DATABASE_ID, Database.class, HashmapDatabase.class);
       if(config.grab(dbParam)) {
         database = dbParam.instantiateClass(config);
+      }
+    }
+
+    protected void configFilters(Parameterization config) {
+      final ObjectListParameter<ObjectFilter> filterParam = new ObjectListParameter<ObjectFilter>(FILTERS_ID, ObjectFilter.class, true);
+      if(config.grab(filterParam)) {
+        filters = filterParam.instantiateClasses(config);
       }
     }
   }

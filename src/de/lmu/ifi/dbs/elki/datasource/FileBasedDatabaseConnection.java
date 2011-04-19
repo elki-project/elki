@@ -3,9 +3,11 @@ package de.lmu.ifi.dbs.elki.datasource;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -36,13 +38,14 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param classLabelClass the association of occurring class labels
    * @param externalIdIndex the index of the label to be used as external id,
    *        can be null
+   * @param filters Filters, can be null
    * @param parser the parser to provide a database
    * @param startid the first object ID to use, can be null
    * @param seed a seed for randomly shuffling the rows of the database
    * @param in the input stream to parse from.
    */
-  public FileBasedDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, Parser parser, Integer startid, Long seed, InputStream in) {
-    super(database, classLabelIndex, classLabelClass, externalIdIndex, parser, startid, seed);
+  public FileBasedDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<ObjectFilter> filters, Parser parser, Integer startid, Long seed, InputStream in) {
+    super(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser, startid, seed);
     this.in = in;
   }
 
@@ -56,7 +59,8 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
   public static class Parameterizer extends InputStreamDatabaseConnection.Parameterizer {
     protected InputStream inputStream;
 
-    @Override    protected void makeOptions(Parameterization config) {
+    @Override
+    protected void makeOptions(Parameterization config) {
       // Add the input file first, for usability reasons.
       final FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(inputParam)) {
@@ -74,7 +78,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
 
     @Override
     protected FileBasedDatabaseConnection makeInstance() {
-      return new FileBasedDatabaseConnection(database, classLabelIndex, classLabelClass, externalIdIndex, parser, startid, seed, inputStream);
+      return new FileBasedDatabaseConnection(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser, startid, seed, inputStream);
     }
   }
 }
