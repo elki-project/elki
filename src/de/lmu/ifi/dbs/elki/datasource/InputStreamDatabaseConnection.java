@@ -2,18 +2,18 @@ package de.lmu.ifi.dbs.elki.datasource;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -100,12 +100,13 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
    * @param classLabelClass the association of occurring class labels
    * @param externalIdIndex the index of the label to be used as external id,
    *        can be null
+   * @param filters Filters to use
    * @param parser the parser to provide a database
    * @param startid the first object ID to use, can be null
    * @param seed a seed for randomly shuffling the rows of the database
    */
-  public InputStreamDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, Parser parser, Integer startid, Long seed) {
-    super(database, classLabelIndex, classLabelClass, externalIdIndex);
+  public InputStreamDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<ObjectFilter> filters, Parser parser, Integer startid, Long seed) {
+    super(database, classLabelIndex, classLabelClass, externalIdIndex, filters);
     this.parser = parser;
     this.startid = startid;
     this.seed = seed;
@@ -189,6 +190,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
       configSeed(config);
       configStartid(config);
       configDatabase(config);
+      configFilters(config);
     }
 
     protected void configParser(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
@@ -214,7 +216,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
 
     @Override
     protected InputStreamDatabaseConnection makeInstance() {
-      return new InputStreamDatabaseConnection(database, classLabelIndex, classLabelClass, externalIdIndex, parser, startid, seed);
+      return new InputStreamDatabaseConnection(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser, startid, seed);
     }
   }
 }
