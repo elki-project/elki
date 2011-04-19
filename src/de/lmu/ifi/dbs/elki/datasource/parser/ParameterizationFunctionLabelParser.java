@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Provides a parser for parsing one point per line, attributes separated by
- * whitespace. The parser transforms each point into a parametrization function.
+ * whitespace. The parser transforms each point into a parameterization function.
  * Several labels may be given per point. A label must not be parseable as
  * double (or float). Lines starting with &quot;#&quot; will be ignored.
  * 
@@ -50,20 +50,21 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
     int dimensionality = -1;
-    List<Object> folded = new ArrayList<Object>();
+    List<Object> vectors = new ArrayList<Object>();
+    List<Object> labels = new ArrayList<Object>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
           List<Double> attributes = new ArrayList<Double>(entries.size());
-          LabelList labels = new LabelList();
+          LabelList labellist = new LabelList();
           for(String entry : entries) {
             try {
               Double attribute = Double.valueOf(entry);
               attributes.add(attribute);
             }
             catch(NumberFormatException e) {
-              labels.add(entry);
+              labellist.add(entry);
             }
           }
 
@@ -74,8 +75,8 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + attributes.size() + " != " + dimensionality);
           }
 
-          folded.add(new ParameterizationFunction(Util.convertToDoubles(attributes)));
-          folded.add(labels);
+          vectors.add(new ParameterizationFunction(Util.convertToDoubles(attributes)));
+          labels.add(labellist);
         }
       }
     }
@@ -84,9 +85,12 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
     }
 
     BundleMeta meta = new BundleMeta();
+    List<List<Object>> columns = new ArrayList<List<Object>>(2);
     meta.add(getTypeInformation(dimensionality));
+    columns.add(vectors);
     meta.add(TypeUtil.LABELLIST);
-    return new MultipleObjectsBundle(meta, folded);
+    columns.add(labels);
+    return new MultipleObjectsBundle(meta, columns);
   }
 
   protected VectorFieldTypeInformation<ParameterizationFunction> getTypeInformation(int dimensionality) {

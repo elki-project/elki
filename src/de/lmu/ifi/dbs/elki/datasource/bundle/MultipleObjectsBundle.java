@@ -21,19 +21,32 @@ public class MultipleObjectsBundle implements ObjectBundle {
   /**
    * Storing the real contents.
    */
-  private List<Object> folded;
+  private List<List<Object>> columns;
 
   /**
    * Constructor.
    * 
    * @param meta Meta data contained.
-   * @param folded Contents to wrap. Should be n times the object data.
+   * @param columns Content in columns
    */
-  public MultipleObjectsBundle(BundleMeta meta, List<Object> folded) {
+  public MultipleObjectsBundle(BundleMeta meta, List<List<Object>> columns) {
     super();
     this.meta = meta;
-    this.folded = folded;
-    assert (this.folded.size() % this.meta.size() == 0);
+    this.columns = columns;
+    if(this.columns.size() != this.meta.size()) {
+      throw new AbortException("Meta size and columns do not agree!");
+    }
+    int len = -1;
+    for(List<Object> col : columns) {
+      if(len < 0) {
+        len = col.size();
+      }
+      else {
+        if(col.size() != len) {
+          throw new AbortException("Column lengths do not agree.");
+        }
+      }
+    }
   }
 
   @Override
@@ -56,12 +69,17 @@ public class MultipleObjectsBundle implements ObjectBundle {
     if(rnum < 0 || rnum >= meta.size()) {
       throw new ArrayIndexOutOfBoundsException();
     }
-    return folded.get(onum * meta.size() + rnum);
+    return columns.get(rnum).get(onum);
   }
 
   @Override
   public int dataLength() {
-    return folded.size() / meta.size();
+    try {
+      return columns.get(0).size();
+    }
+    catch(IndexOutOfBoundsException e) {
+      return 0;
+    }
   }
 
   /**
@@ -75,16 +93,17 @@ public class MultipleObjectsBundle implements ObjectBundle {
       throw new AbortException("Invalid number of attributes in 'append'.");
     }
     for(int i = 0; i < data.length; i++) {
-      folded.add(data[i]);
+      columns.get(i).add(data[i]);
     }
   }
 
   /**
-   * Get the folded objects list. Use with caution!
+   * Get the raw objects columns. Use with caution!
    * 
-   * @return the folded objects list
+   * @param i column number
+   * @return the ith column
    */
-  public List<Object> getFolded() {
-    return folded;
+  public List<Object> getColumn(int i) {
+    return columns.get(i);
   }
 }

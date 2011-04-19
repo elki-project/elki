@@ -72,7 +72,8 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
     int dimensionality = -1;
-    List<Object> folded = new ArrayList<Object>();
+    List<Object> vectors = new ArrayList<Object>();
+    List<Object> labels = new ArrayList<Object>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
@@ -83,8 +84,8 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
           else if(dimensionality != objectAndLabels.getFirst().getDimensionality()) {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + objectAndLabels.getFirst().getDimensionality() + " != " + dimensionality);
           }
-          folded.add(objectAndLabels.first);
-          folded.add(objectAndLabels.second);
+          vectors.add(objectAndLabels.first);
+          labels.add(objectAndLabels.second);
         }
       }
     }
@@ -93,9 +94,12 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     }
 
     BundleMeta meta = new BundleMeta();
+    List<List<Object>> columns = new ArrayList<List<Object>>(2);
     meta.add(getTypeInformation(dimensionality));
+    columns.add(vectors);
     meta.add(TypeUtil.LABELLIST);
-    return new MultipleObjectsBundle(meta, folded);
+    columns.add(labels);
+    return new MultipleObjectsBundle(meta, columns);
   }
 
   @Override

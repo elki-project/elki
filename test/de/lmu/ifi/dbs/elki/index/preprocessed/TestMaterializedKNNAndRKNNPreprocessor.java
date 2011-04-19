@@ -111,7 +111,9 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     System.out.println();
     BundleMeta meta = new BundleMeta();
     meta.add(rep.getDataTypeInformation());
-    DBIDs deletions = db.insert(new MultipleObjectsBundle(meta , insertions));
+    List<List<Object>> columns = new ArrayList<List<Object>>(1);
+    columns.add(insertions);
+    DBIDs deletions = db.insert(new MultipleObjectsBundle(meta , columns));
     
     // test queries
     testQueries(rep, lin_knn_query, lin_rknn_query, preproc_knn_query, preproc_rknn_query);
