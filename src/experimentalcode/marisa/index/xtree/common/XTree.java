@@ -1,6 +1,7 @@
 package experimentalcode.marisa.index.xtree.common;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -84,11 +85,9 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
 
   /**
    * Performs necessary operations after deleting the specified object.
-   * 
-   * @param o the object to be deleted
    */
   @Override
-  protected void postDelete(O o) {
+  protected void postDelete(DBID id) {
     // do nothing
   }
 
