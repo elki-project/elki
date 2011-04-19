@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of objects handled by this Algorithm
- * @param <R> the type of result to retrieve from this Algorithm
+ * @param <R> Algorithm result type
  */
 public abstract class AbstractAlgorithm<O, R extends Result> implements Algorithm<R> {
   /**
@@ -29,6 +29,18 @@ public abstract class AbstractAlgorithm<O, R extends Result> implements Algorith
   protected AbstractAlgorithm() {
     super();
   }
+
+  /**
+   * The run method encapsulated in measure of runtime. An extending class needs
+   * not to take care of runtime itself.
+   * 
+   * @param data the data to run the query on
+   * @return the Result computed by this algorithm
+   * @throws IllegalStateException if the algorithm has not been initialized
+   *         properly (e.g. the setParameters(String[]) method has been failed
+   *         to be called).
+   */
+  protected abstract R runInTime(Database data) throws IllegalStateException;
 
   /**
    * Calls the runInTime()-method of extending classes. Measures and prints the
@@ -52,34 +64,22 @@ public abstract class AbstractAlgorithm<O, R extends Result> implements Algorith
   }
 
   /**
+   * Get the input type restriction used for negotiating the data query.
+   * 
+   * @return Type restriction
+   */
+  @Override
+  public abstract TypeInformation getInputTypeRestriction();
+
+  /**
    * Get a data query.
    * 
    * @param database Database to process
    * @return Data query
    */
-  protected Relation<O> getRelation(Database database) {
-    TypeInformation restriction = getInputTypeRestriction();
-    return database.getRelation(restriction);
+  protected final Relation<O> getRelation(Database database) {
+    return database.getRelation(getInputTypeRestriction());
   }
-
-  /**
-   * Get the input type restriction used for negotiating the data query.
-   * 
-   * @return Type restriction
-   */
-  public abstract TypeInformation getInputTypeRestriction();
-
-  /**
-   * The run method encapsulated in measure of runtime. An extending class needs
-   * not to take care of runtime itself.
-   * 
-   * @param data the data to run the query on
-   * @return the Result computed by this algorithm
-   * @throws IllegalStateException if the algorithm has not been initialized
-   *         properly (e.g. the setParameters(String[]) method has been failed
-   *         to be called).
-   */
-  protected abstract R runInTime(Database data) throws IllegalStateException;
 
   /**
    * Get the (STATIC) logger for this class.

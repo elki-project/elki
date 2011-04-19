@@ -11,10 +11,9 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -82,13 +81,9 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
    */
   @Override
   protected HistogramResult<DoubleVector> runInTime(Database database) throws IllegalStateException {
-    Relation<O> dataQuery = getRelation(database);
-    // local copy, not entirely necessary. I just like control, guaranteed
-    // sequences and stable+efficient array index -> id lookups.
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(dataQuery.getDBIDs());
-    final int size = ids.size();
-
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(dataQuery, getDistanceFunction(), size);
+    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
+    final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, dataQuery.size());
 
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");
@@ -101,17 +96,17 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", size, logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", dataQuery.size(), logger) : null;
 
     MeanVariance mv = new MeanVariance();
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBID i1 : clus.getIDs()) {
-        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, size);
-        double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
+        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, dataQuery.size());
+        double result = ROC.computeROCAUCDistanceResult(dataQuery.size(), clus, knn);
 
         mv.put(result);
-        hist.aggregate(result, 1. / size);
+        hist.aggregate(result, 1. / dataQuery.size());
 
         if(progress != null) {
           progress.incrementProcessed(logger);
@@ -123,7 +118,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     }
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<DoubleVector>(size);
+    Collection<DoubleVector> res = new ArrayList<DoubleVector>(dataQuery.size());
     for(Pair<Double, Double> pair : hist) {
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond() });
       res.add(row);

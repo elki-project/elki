@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -46,7 +45,7 @@ public class EvaluationStep implements WorkflowStep {
   public void runEvaluators(HierarchicalResult r, Database db) {
     // Run evaluation helpers
     if(evaluators != null) {
-      new Evaluation(db, r.getHierarchy(), evaluators).update(r);
+      new Evaluation(db, evaluators).update(r);
     }
     this.result = r;
   }
@@ -68,23 +67,16 @@ public class EvaluationStep implements WorkflowStep {
     private List<Evaluator> evaluators;
 
     /**
-     * Result hierarchy.
-     */
-    private ResultHierarchy hierarchy;
-
-    /**
      * Constructor.
      * 
      * @param database Database
-     * @param hierarchy Result Hierarchy
      * @param evaluators Evaluators
      */
-    public Evaluation(Database database, ResultHierarchy hierarchy, List<Evaluator> evaluators) {
+    public Evaluation(Database database, List<Evaluator> evaluators) {
       this.database = database;
-      this.hierarchy = hierarchy;
       this.evaluators = evaluators;
 
-      hierarchy.addResultListener(this);
+      database.getHierarchy().addResultListener(this);
     }
 
     /**
@@ -94,10 +86,10 @@ public class EvaluationStep implements WorkflowStep {
      */
     public void update(Result r) {
       for(Evaluator evaluator : evaluators) {
-        /*if(normalizationUndo) {
-          evaluator.setNormalization(normalization);
-        }*/
-        evaluator.processResult(database, r, hierarchy);
+        /*
+         * if(normalizationUndo) { evaluator.setNormalization(normalization); }
+         */
+        evaluator.processResult(database, r);
       }
     }
 

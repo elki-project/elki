@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.uses ResultWindow oneway
  */
-public class ResultVisualizer implements ResultHandler<HierarchicalResult> {
+public class ResultVisualizer implements ResultHandler {
   // TODO: move title/maxdim parameters into a layouter class.
   
   /**
@@ -89,9 +89,9 @@ public class ResultVisualizer implements ResultHandler<HierarchicalResult> {
   }
 
   @Override
-  public void processResult(final Database db, final HierarchicalResult result) {
-    ResultUtil.ensureClusteringResult(db, result);
-    ResultUtil.ensureSelectionResult(db, result);
+  public void processResult(final Database db, final Result result) {
+    ResultUtil.ensureClusteringResult(db, db);
+    ResultUtil.ensureSelectionResult(db, db);
 
     final VisualizerContext context = manager.newContext(db, result);
 

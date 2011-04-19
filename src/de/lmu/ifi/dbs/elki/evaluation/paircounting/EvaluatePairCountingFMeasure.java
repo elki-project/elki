@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -74,7 +73,7 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
   }
 
   @Override
-  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs == null || crs.size() < 1) {
       // logger.warning("No clustering results found - nothing to evaluate!");
@@ -103,7 +102,7 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
       double fmeasure = PairCountingFMeasure.fMeasure(countedPairs.first, countedPairs.second, countedPairs.third, 1.0);
       ArrayList<Vector> s = new ArrayList<Vector>(4);
       s.add(new Vector(new double[] { fmeasure, inboth, infirst, insecond }));
-      hierarchy.add(c, new ScoreResult(s));
+      db.getHierarchy().add(c, new ScoreResult(s));
     }
   }
 

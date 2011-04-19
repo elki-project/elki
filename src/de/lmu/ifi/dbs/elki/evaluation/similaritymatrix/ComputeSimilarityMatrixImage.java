@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -195,7 +194,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   }
 
   @Override
-  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result) {
     boolean nonefound = true;
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
@@ -203,7 +202,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
-      hierarchy.add(or, computeSimilarityMatrixImage(db, or.iter(db.getDBIDs())));
+      db.getHierarchy().add(or, computeSimilarityMatrixImage(db, or.iter(db.getDBIDs())));
       // Process them only once.
       orderings.remove(or);
       nonefound = false;
@@ -214,7 +213,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     for(IterableResult<?> ir : iterables) {
       Iterator<DBID> iter = getDBIDIterator(ir);
       if(iter != null) {
-        hierarchy.add(ir, computeSimilarityMatrixImage(db, iter));
+        db.getHierarchy().add(ir, computeSimilarityMatrixImage(db, iter));
         nonefound = false;
       }
     }
@@ -222,7 +221,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Iterator<DBID> iter = or.iter(db.getDBIDs());
-      hierarchy.add(or, computeSimilarityMatrixImage(db, iter));
+      db.getHierarchy().add(or, computeSimilarityMatrixImage(db, iter));
       nonefound = false;
     }
 
@@ -233,7 +232,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       for(Database database : iter) {
         // Get an arbitrary representation
         Relation<Object> rep = database.getRelation(TypeUtil.ANY);
-        hierarchy.add(db, computeSimilarityMatrixImage(database, rep.iterDBIDs()));
+        db.getHierarchy().add(db, computeSimilarityMatrixImage(database, rep.iterDBIDs()));
       }
     }
   }

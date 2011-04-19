@@ -62,7 +62,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   /**
    * The full result object
    */
-  private HierarchicalResult result;
+  private Result result;
 
   /**
    * The event listeners for this context.
@@ -113,7 +113,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * @param factories Visualizer Factories to use
    * @param hideVisualizers Pattern to hide visualizers
    */
-  public VisualizerContext(Database database, HierarchicalResult result, StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerContext(Database database, Result result, StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
     super();
     this.database = database;
     this.result = result;
@@ -153,7 +153,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @return result object
    */
-  public HierarchicalResult getResult() {
+  public Result getResult() {
     return result;
   }
 
@@ -163,7 +163,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * @return hierarchy object
    */
   public ResultHierarchy getHierarchy() {
-    return getResult().getHierarchy();
+    return getDatabase().getHierarchy();
   }
 
   /**

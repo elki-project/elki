@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -147,7 +146,7 @@ public class JudgeOutlierScores implements Evaluator {
   }
 
   @Override
-  public void processResult(Database db, Result result, ResultHierarchy hierarchy) {
+  public void processResult(Database db, Result result) {
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if(ors == null || ors.size() <= 0) {
       // logger.warning("No results found for "+JudgeOutlierScores.class.getSimpleName());
@@ -159,7 +158,7 @@ public class JudgeOutlierScores implements Evaluator {
     ids.removeDBIDs(outlierIds);
 
     for(OutlierResult or : ors) {
-      hierarchy.add(or, computeScore(ids, outlierIds, db, or));
+      db.getHierarchy().add(or, computeScore(ids, outlierIds, db, or));
     }
   }
 

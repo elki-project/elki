@@ -3,21 +3,19 @@ package de.lmu.ifi.dbs.elki.result;
 import de.lmu.ifi.dbs.elki.database.Database;
 
 /**
- * A dummy result handler that discards the actual result, for use in benchmarks.
+ * A dummy result handler that discards the actual result, for use in
+ * benchmarks.
  * 
  * @author Erich Schubert
- *
- * @param <O> Object class
- * @param <R> Result class
  */
-public class DiscardResultHandler<O, R extends Result> implements ResultHandler<R> {
+public class DiscardResultHandler implements ResultHandler {
   /**
    * Default constructor.
    */
   public DiscardResultHandler() {
     // empty constructor
   }
-  
+
   /**
    * Process the result... by discarding
    * 
@@ -25,7 +23,7 @@ public class DiscardResultHandler<O, R extends Result> implements ResultHandler<
    * @param result discarded
    */
   @Override
-  public void processResult(Database db, R result) {
+  public void processResult(Database db, Result result) {
     // discard the result.
   }
 }
