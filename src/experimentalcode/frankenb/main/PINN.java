@@ -104,7 +104,7 @@ public class PINN extends AbstractApplication {
     Log.info("Calculating ROC ...");
 
     BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
-    rocComputer.processResult(dataBase, result, totalResult.getHierarchy());
+    rocComputer.processResult(dataBase, result);
 
     this.outputFile.mkdirs();
     ResultWriter resultWriter = getResultWriter(this.outputFile);

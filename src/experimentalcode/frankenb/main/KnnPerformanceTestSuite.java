@@ -198,7 +198,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
 
       OutlierResult result = algorithm.run(database);
-      rocComputer.processResult(database, result, totalResult.getHierarchy());
+      rocComputer.processResult(database, result);
 
       tmpDirectory.mkdirs();
       ResultWriter resultWriter = getResultWriter(tmpDirectory);
