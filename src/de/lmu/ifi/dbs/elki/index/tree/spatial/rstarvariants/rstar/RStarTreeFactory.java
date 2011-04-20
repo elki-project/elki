@@ -31,8 +31,8 @@ public class RStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRSta
   }
 
   @Override
-  public RStarTree<O> instantiate(Relation<O> representation) {
-    return new RStarTree<O>(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public RStarTree<O> instantiate(Relation<O> relation) {
+    return new RStarTree<O>(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
   
   /**

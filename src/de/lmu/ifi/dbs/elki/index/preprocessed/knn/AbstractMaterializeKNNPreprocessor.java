@@ -55,12 +55,12 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
   /**
    * Constructor.
    * 
-   * @param representation
-   * @param distanceFunction
-   * @param k
+   * @param relation Relation
+   * @param distanceFunction Distance function
+   * @param k k
    */
-  public AbstractMaterializeKNNPreprocessor(Relation<O> representation, DistanceFunction<? super O, D> distanceFunction, int k) {
-    super(representation);
+  public AbstractMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+    super(relation);
     this.k = k;
     this.distanceFunction = distanceFunction;
     this.distanceQuery = distanceFunction.instantiate(relation);
@@ -190,7 +190,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
     }
 
     @Override
-    abstract public AbstractMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> representation);
+    abstract public AbstractMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> relation);
 
     /**
      * Get the distance function.

@@ -41,6 +41,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   /**
    * Constructor.
    * 
+   * @param relation Relation indexed
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -48,8 +49,8 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public FlatRStarTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public FlatRStarTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**

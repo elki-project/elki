@@ -55,12 +55,12 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   /**
    * Constructor
    * 
-   * @param representation Representation to preprocess
+   * @param relation Relation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> representation, DistanceFunction<? super O, D> distanceFunction, int k) {
-    super(representation, distanceFunction, k);
+  public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+    super(relation, distanceFunction, k);
     preprocess();
   }
 
@@ -175,8 +175,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
 
     @Override
-    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instantiate(Relation<NumberVector<?, ?>> representation) {
-      SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E>(representation, distanceFunction, k);
+    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instantiate(Relation<NumberVector<?, ?>> relation) {
+      SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E>(relation, distanceFunction, k);
       return instance;
     }
 

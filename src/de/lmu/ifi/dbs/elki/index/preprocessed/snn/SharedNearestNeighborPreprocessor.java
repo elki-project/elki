@@ -74,8 +74,8 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
    * @param numberOfNeighbors Number of neighbors
    * @param distanceFunction Distance function
    */
-  public SharedNearestNeighborPreprocessor(Relation<O> representation, int numberOfNeighbors, DistanceFunction<O, D> distanceFunction) {
-    super(representation);
+  public SharedNearestNeighborPreprocessor(Relation<O> relation, int numberOfNeighbors, DistanceFunction<O, D> distanceFunction) {
+    super(relation);
     this.numberOfNeighbors = numberOfNeighbors;
     this.distanceFunction = distanceFunction;
   }
@@ -205,8 +205,8 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     }
 
     @Override
-    public SharedNearestNeighborPreprocessor<O, D> instantiate(Relation<O> representation) {
-      return new SharedNearestNeighborPreprocessor<O, D>(representation, numberOfNeighbors, distanceFunction);
+    public SharedNearestNeighborPreprocessor<O, D> instantiate(Relation<O> relation) {
+      return new SharedNearestNeighborPreprocessor<O, D>(relation, numberOfNeighbors, distanceFunction);
     }
 
     /**

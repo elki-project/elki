@@ -38,11 +38,11 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector<?, ?>> extends Lo
     /**
      * Instantiate the index for a given database.
      * 
-     * @param representation Representation to use
+     * @param relation Relation to use
      * 
      * @return Index
      */
     @Override
-    public I instantiate(Relation<NV> representation);
+    public I instantiate(Relation<NV> relation);
   }
 }

@@ -61,12 +61,12 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Constructor.
    * 
-   * @param representation
-   * @param alpha
-   * @param k
+   * @param relation Relation in use
+   * @param alpha Alpha value
+   * @param k k value
    */
-  public HiSCPreferenceVectorIndex(Relation<V> representation, double alpha, int k) {
-    super(representation);
+  public HiSCPreferenceVectorIndex(Relation<V> relation, double alpha, int k) {
+    super(relation);
     this.alpha = alpha;
     this.k = k;
   }
@@ -131,16 +131,16 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Determines the preference vector according to the specified neighbor ids.
    * 
-   * @param rep the database storing the objects
+   * @param relation the database storing the objects
    * @param id the id of the object for which the preference vector should be
    *        determined
    * @param neighborIDs the ids of the neighbors
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Relation<V> rep, DBID id, DBIDs neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVector(Relation<V> relation, DBID id, DBIDs neighborIDs, StringBuffer msg) {
     // variances
-    double[] variances = DatabaseUtil.variances(rep, rep.get(id), neighborIDs);
+    double[] variances = DatabaseUtil.variances(relation, relation.get(id), neighborIDs);
 
     // preference vector
     BitSet preferenceVector = new BitSet(variances.length);
@@ -240,15 +240,15 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     }
 
     @Override
-    public HiSCPreferenceVectorIndex<V> instantiate(Relation<V> representation) {
+    public HiSCPreferenceVectorIndex<V> instantiate(Relation<V> relation) {
       final int usek;
       if(k == null) {
-        usek = 3 * DatabaseUtil.dimensionality(representation);
+        usek = 3 * DatabaseUtil.dimensionality(relation);
       }
       else {
         usek = k;
       }
-      return new HiSCPreferenceVectorIndex<V>(representation, alpha, usek);
+      return new HiSCPreferenceVectorIndex<V>(relation, alpha, usek);
     }
 
     /**
