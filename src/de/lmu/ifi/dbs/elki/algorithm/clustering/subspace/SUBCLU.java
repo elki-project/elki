@@ -276,7 +276,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * given subspace. If parameter {@code ids} is null DBSCAN will be applied to
    * the whole database.
    * 
-   * @param rep the database holding the objects to run DBSCAN on
+   * @param relation the database holding the objects to run DBSCAN on
    * @param ids the IDs of the database defining the partition to run DBSCAN on
    *        - if this parameter is null DBSCAN will be applied to the whole
    *        database
@@ -286,19 +286,19 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * @throws UnableToComplyException in case of problems during the creation of
    *         the database partition
    */
-  private List<Cluster<Model>> runDBSCAN(Relation<V> rep, DBIDs ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
+  private List<Cluster<Model>> runDBSCAN(Relation<V> relation, DBIDs ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
     // distance function
     distanceFunction.setSelectedDimensions(subspace.getDimensions());
 
     ProxyDatabase proxy;
     if(ids == null) {
       // TODO: in this case, we might want to use an index - the proxy below will prevent this!
-      ids = rep.getDBIDs();
+      ids = relation.getDBIDs();
     }
     
     proxy = new ProxyDatabase(ids);
-    Relation<V> prep = ProxyView.wrap(proxy, ids, rep);
-    proxy.addRepresentation(prep);
+    Relation<V> prep = ProxyView.wrap(proxy, ids, relation);
+    proxy.addRelation(prep);
 
     DBSCAN<V, DoubleDistance> dbscan = new DBSCAN<V, DoubleDistance>(distanceFunction, epsilon, minpts);
     // run DBSCAN

@@ -154,18 +154,18 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
    * @param stepprog Progress logger
    * @return result
    */
-  protected Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database database, Relation<O> rep, StepProgress stepprog) {
+  protected Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
     KNNQuery<O, D> knnComp;
     KNNQuery<O, D> knnReach;
     if(comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
       // We need each neighborhood twice - use "HEAVY" flag.
-      knnComp = database.getKNNQuery(rep, comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+      knnComp = database.getKNNQuery(relation, comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
       // No optimized kNN query - use a preprocessor!
       if(knnComp == null) {
         if(stepprog != null) {
           stepprog.beginStep(1, "Materializing neighborhoods with respect to reference neighborhood distance function.", logger);
         }
-        MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(rep, comparisonDistanceFunction, kcomp);
+        MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, comparisonDistanceFunction, kcomp);
         database.addIndex(preproc);
         knnComp = preproc.getKNNQuery(comparisonDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE);
       }
@@ -180,8 +180,8 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       if(stepprog != null) {
         stepprog.beginStep(1, "Not materializing distance functions, since we request each DBID once only.", logger);
       }
-      knnComp = database.getKNNQuery(rep, comparisonDistanceFunction, kreach);
-      knnReach = database.getKNNQuery(rep, reachabilityDistanceFunction, kcomp);
+      knnComp = database.getKNNQuery(relation, comparisonDistanceFunction, kreach);
+      knnReach = database.getKNNQuery(relation, reachabilityDistanceFunction, kcomp);
     }
     return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnComp, knnReach);
   }
@@ -192,11 +192,11 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   @Override
   protected OutlierResult runInTime(Database database) throws IllegalStateException {
     final double sqrt2 = Math.sqrt(2.0);
-    Relation<O> rep = getRelation(database);
+    Relation<O> relation = getRelation(database);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
 
-    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, rep, stepprog);
+    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, relation, stepprog);
     KNNQuery<O, D> knnComp = pair.getFirst();
     KNNQuery<O, D> knnReach = pair.getSecond();
 
@@ -215,7 +215,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         stepprog.beginStep(3, "Computing pdists", logger);
       }
       FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", database.size(), logger) : null;
-      for(DBID id : rep.iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         List<DistanceResultPair<D>> neighbors = knnReach.getKNNForDBID(id, kreach);
         double sqsum = 0.0;
         // use first kref neighbors as reference set
@@ -246,7 +246,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       }
 
       FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", database.size(), logger) : null;
-      for(DBID id : rep.iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         List<DistanceResultPair<D>> neighbors = knnComp.getKNNForDBID(id, kcomp);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
@@ -286,7 +286,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       }
 
       FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", database.size(), logger) : null;
-      for(DBID id : rep.iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         loops.put(id, ErrorFunctions.erf((plofs.get(id) - 1) / (nplof * sqrt2)));
 
         if(progressLOOPs != null) {

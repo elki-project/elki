@@ -46,7 +46,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
   /**
    * The representations we have.
    */
-  final protected List<Relation<?>> representations;
+  final protected List<Relation<?>> relations;
 
   /**
    * Our DBID representation
@@ -61,19 +61,19 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
   public ProxyDatabase(DBIDs ids) {
     super();
     this.ids = ids;
-    this.representations = new java.util.Vector<Relation<?>>();
+    this.relations = new java.util.Vector<Relation<?>>();
     this.idrep = new DBIDView(this, this.ids);
-    this.representations.add(idrep);
+    this.relations.add(idrep);
     this.addChildResult(idrep);
   }
 
   /**
    * Add a new representation.
    * 
-   * @param rep Representation to add.
+   * @param relation Representation to add.
    */
-  public void addRepresentation(Relation<?> rep) {
-    this.representations.add(rep);
+  public void addRelation(Relation<?> relation) {
+    this.relations.add(relation);
   }
 
   @Override
@@ -121,9 +121,9 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
   @Override
   public <O> Relation<O> getRelation(TypeInformation restriction, Object... hints) throws NoSupportedDataTypeException {
     // Get first match
-    for(Relation<?> rep : representations) {
-      if(restriction.isAssignableFromType(rep.getDataTypeInformation())) {
-        return (Relation<O>) rep;
+    for(Relation<?> relation : relations) {
+      if(restriction.isAssignableFromType(relation.getDataTypeInformation())) {
+        return (Relation<O>) relation;
       }
     }
     throw new NoSupportedDataTypeException(restriction);

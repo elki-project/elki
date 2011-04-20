@@ -41,8 +41,8 @@ public interface SimilarityFunction<O, D extends Distance<?>> extends Parameteri
   /**
    * Instantiate with a representation to get the actual similarity query.
    * 
-   * @param rep Representation to use
+   * @param relation Representation to use
    * @return Actual distance query.
    */
-  public <T extends O> SimilarityQuery<T, D> instantiate(Relation<T> rep);
+  public <T extends O> SimilarityQuery<T, D> instantiate(Relation<T> relation);
 }

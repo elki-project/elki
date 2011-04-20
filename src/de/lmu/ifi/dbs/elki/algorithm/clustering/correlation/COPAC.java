@@ -221,7 +221,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
         DBIDs partids = pair.getValue();
         ProxyDatabase proxy = new ProxyDatabase(partids);
         Relation<V> partition = ProxyView.wrap(proxy, partids, database);
-        proxy.addRepresentation(partition);
+        proxy.addRelation(partition);
         
         ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = getPartitionAlgorithm(query);
         if(logger.isVerbose()) {

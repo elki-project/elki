@@ -49,5 +49,5 @@ public interface SpatialPrimitiveDistanceFunction<V extends FeatureVector<?, ?>,
   D centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2);
   
   @Override
-  public <T extends V> SpatialDistanceQuery<T, D> instantiate(Relation<T> rep);
+  public <T extends V> SpatialDistanceQuery<T, D> instantiate(Relation<T> relation);
 }

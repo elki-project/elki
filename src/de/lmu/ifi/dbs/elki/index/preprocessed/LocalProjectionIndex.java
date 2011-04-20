@@ -41,11 +41,11 @@ public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends Pr
     /**
      * Instantiate the index for a given database.
      * 
-     * @param rep Representation to use
+     * @param relation Relation to use
      * 
      * @return Index
      */
     @Override
-    public I instantiate(Relation<V> representaion);
+    public I instantiate(Relation<V> relation);
   }
 }
