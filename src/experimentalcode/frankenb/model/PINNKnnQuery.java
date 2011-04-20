@@ -103,7 +103,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   }
 
   @Override
-  public Relation<? extends NumberVector<?, ?>> getRepresentation() {
+  public Relation<? extends NumberVector<?, ?>> getRelation() {
     return dataBase;
   }
 }

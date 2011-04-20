@@ -90,7 +90,7 @@ public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
   }
 
   @Override
-  public Relation<? extends O> getRepresentation() {
+  public Relation<? extends O> getRelation() {
     return dataBase;
   }
 }
