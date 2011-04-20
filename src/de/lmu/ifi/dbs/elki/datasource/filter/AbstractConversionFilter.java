@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
   /**
    * A standard implementation of the filter process. First of all, all suitable
-   * representations are found. Then (if {@link #prepareStart()} returns true),
+   * representations are found. Then (if {@link #prepareStart} returns true),
    * the data is processed read-only in a first pass.
    * 
    * In the main pass, each object is then filtered using
@@ -89,13 +89,13 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
   /**
    * Get the output type from the input type after conversion.
    * 
-   * @param input type restriction
+   * @param in input type restriction
    * @return output type restriction
    */
   abstract protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<I> in);
 
   /**
-   * Return "true" when the normalization needs initialization
+   * Return "true" when the normalization needs initialization (two-pass filtering!)
    * 
    * @param in Input type information
    * @return true or false

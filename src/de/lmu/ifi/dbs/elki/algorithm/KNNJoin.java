@@ -107,7 +107,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     SpatialIndex<V, N, E> index = indexes.iterator().next();
     SpatialPrimitiveDistanceFunction<V, D> distFunction = (SpatialPrimitiveDistanceFunction<V, D>) getDistanceFunction();
     DistanceQuery<V, D> distq = getDistanceQuery(database);
-    Relation<? extends V> dataQuery = distq.getRepresentation();
+    Relation<? extends V> dataQuery = distq.getRelation();
 
     DBIDs ids = dataQuery.getDBIDs();
 

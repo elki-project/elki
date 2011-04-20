@@ -111,11 +111,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
   @Override
   protected void preprocess() {
-    if(rep == null || rep.size() == 0) {
+    if(relation == null || relation.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
@@ -127,10 +127,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
     try {
       long start = System.currentTimeMillis();
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", rep.size(), logger) : null;
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), logger) : null;
 
       // only one epsilon value specified
-      int dim = DatabaseUtil.dimensionality(rep);
+      int dim = DatabaseUtil.dimensionality(relation);
       if(epsilon.length == 1 && dim != 1) {
         DoubleDistance eps = epsilon[0];
         epsilon = new DoubleDistance[dim];
@@ -138,9 +138,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       }
 
       // epsilons as string
-      RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(rep, dim);
+      RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(relation, dim);
 
-      for(Iterator<DBID> it = rep.iterDBIDs(); it.hasNext();) {
+      for(Iterator<DBID> it = relation.iterDBIDs(); it.hasNext();) {
         StringBuffer msg = new StringBuffer();
         final DBID id = it.next();
 
@@ -168,7 +168,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
           }
         }
 
-        BitSet preferenceVector = determinePreferenceVector(rep, allNeighbors, msg);
+        BitSet preferenceVector = determinePreferenceVector(relation, allNeighbors, msg);
         storage.put(id, preferenceVector);
 
         if(logger.isDebugging()) {
@@ -201,7 +201,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Determines the preference vector according to the specified neighbor ids.
    * 
-   * @param rep the database storing the objects
+   * @param relation the database storing the objects
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector
@@ -225,7 +225,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Determines the preference vector with the apriori strategy.
    * 
-   * @param rep the database storing the objects
+   * @param relation the database storing the objects
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector

@@ -343,10 +343,10 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      */
     public void run(Database db, DistanceQuery<O, D> distanceQuery) {
       this.db = db;
-      this.data = distanceQuery.getRepresentation();
+      this.data = distanceQuery.getRelation();
       this.classRep = db.getRelation(TypeUtil.CLASSLABEL);
       this.labelRep = db.getRelation(TypeUtil.LABELLIST);
-      this.dim = DatabaseUtil.dimensionality(distanceQuery.getRepresentation());
+      this.dim = DatabaseUtil.dimensionality(distanceQuery.getRelation());
       this.distanceQuery = distanceQuery;
       this.updateK(k);
 

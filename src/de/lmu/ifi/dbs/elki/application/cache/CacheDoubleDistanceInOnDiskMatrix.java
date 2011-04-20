@@ -97,7 +97,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
     DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distance);
 
     int matrixsize = 0;
-    for(DBID id : distanceQuery.getRepresentation().iterDBIDs()) {
+    for(DBID id : distanceQuery.getRelation().iterDBIDs()) {
       matrixsize = Math.max(matrixsize, id.getIntegerID() + 1);
       if(id.getIntegerID() < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
@@ -112,8 +112,8 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
       throw new AbortException("Error creating output matrix.", e);
     }
 
-    for(DBID id1 : distanceQuery.getRepresentation().iterDBIDs()) {
-      for(DBID id2 : distanceQuery.getRepresentation().iterDBIDs()) {
+    for(DBID id1 : distanceQuery.getRelation().iterDBIDs()) {
+      for(DBID id2 : distanceQuery.getRelation().iterDBIDs()) {
         if(id2.getIntegerID() >= id1.getIntegerID()) {
           double d = distanceQuery.distance(id1, id2).doubleValue();
           if(debugExtraCheckSymmetry) {

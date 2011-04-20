@@ -13,27 +13,27 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
  * 
  * @author Erich Schubert
  *
- * @param <O> Object type
+ * @param <O> Object type stored in the index
  */
 public abstract class AbstractIndex<O> implements Index<O> {
   /**
    * The representation we are bound to.
    */
-  protected final Relation<O> rep;
+  protected final Relation<O> relation;
   
   /**
    * Constructor.
    *
-   * @param rep Representation
+   * @param relation Relation indexed
    */
-  public AbstractIndex(Relation<O> rep) {
+  public AbstractIndex(Relation<O> relation) {
     super();
-    this.rep = rep;
+    this.relation = relation;
   }
   
   @Override
-  public Relation<O> getRepresentation() {
-    return rep;
+  public Relation<O> getRelation() {
+    return relation;
   }
 
   @Override

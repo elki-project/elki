@@ -57,9 +57,9 @@ public interface Index<O> extends Result {
   public void deleteAll(DBIDs ids);
 
   /**
-   * Get the indexed representation.
+   * Get the indexed relation.
    * 
-   * @return Representation this index is bound to
+   * @return Relation this index is bound to
    */
-  public Relation<O> getRepresentation();
+  public Relation<O> getRelation();
 }

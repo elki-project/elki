@@ -25,11 +25,11 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   /**
    * Constructor.
    * 
-   * @param rep Data to query
+   * @param relation Data to query
    * @param distanceQuery Distance function to use
    */
-  public LinearScanKNNQuery(Relation<? extends O> reo, DistanceQuery<O, D> distanceQuery) {
-    super(reo, distanceQuery);
+  public LinearScanKNNQuery(Relation<? extends O> relation, DistanceQuery<O, D> distanceQuery) {
+    super(relation, distanceQuery);
   }
 
   @Override

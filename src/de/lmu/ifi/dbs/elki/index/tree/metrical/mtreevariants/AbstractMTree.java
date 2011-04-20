@@ -161,8 +161,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
-    return new MetricalIndexKNNQuery<O, S>(rep, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
+    return new MetricalIndexKNNQuery<O, S>(relation, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
@@ -182,8 +182,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
-    return new MetricalIndexKNNQuery<O, S>(rep, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
+    return new MetricalIndexKNNQuery<O, S>(relation, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
@@ -202,8 +202,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
-    return new MetricalIndexRangeQuery<O, S>(rep, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
+    return new MetricalIndexRangeQuery<O, S>(relation, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
@@ -223,8 +223,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
     MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
-    return new MetricalIndexRangeQuery<O, S>(rep, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
+    return new MetricalIndexRangeQuery<O, S>(relation, idx, dq);
   }
 
   /**

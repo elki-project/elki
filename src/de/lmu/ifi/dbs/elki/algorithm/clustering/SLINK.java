@@ -119,18 +119,18 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   protected Result runInTime(Database database) {
     DistanceQuery<O, D> distQuery = getDistanceQuery(database);
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
-    WritableRecordStore store = DataStoreUtil.makeRecordStorage(distQuery.getRepresentation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
+    WritableRecordStore store = DataStoreUtil.makeRecordStorage(distQuery.getRelation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
     pi = store.getStorage(0, DBID.class);
     lambda = store.getStorage(1, distCls);
     // Temporary storage for m.
-    WritableDataStore<D> m = DataStoreUtil.makeStorage(distQuery.getRepresentation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
+    WritableDataStore<D> m = DataStoreUtil.makeStorage(distQuery.getRelation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", distQuery.getRepresentation().size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", distQuery.getRelation().size(), logger) : null;
     // has to be an array for monotonicity reasons!
-    ModifiableDBIDs processedIDs = DBIDUtil.newArray(distQuery.getRepresentation().size());
+    ModifiableDBIDs processedIDs = DBIDUtil.newArray(distQuery.getRelation().size());
 
     // apply the algorithm
-    for(DBID id : distQuery.getRepresentation().iterDBIDs()) {
+    for(DBID id : distQuery.getRelation().iterDBIDs()) {
       step1(id);
       step2(id, processedIDs, distQuery, m);
       step3(id, processedIDs, m);
@@ -154,8 +154,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     BasicResult result = null;
 
     // Build clusters identified by their target object
-    int minc = minclusters != null ? minclusters : distQuery.getRepresentation().size();
-    result = extractClusters(distQuery.getRepresentation().getDBIDs(), pi, lambda, minc);
+    int minc = minclusters != null ? minclusters : distQuery.getRelation().size();
+    result = extractClusters(distQuery.getRelation().getDBIDs(), pi, lambda, minc);
 
     result.addChildResult(new AnnotationFromDataStore<DBID>("SLINK pi", "slink-order", SLINK_PI, pi));
     result.addChildResult(new AnnotationFromDataStore<Distance<?>>("SLINK lambda", "slink-order", SLINK_LAMBDA, lambda));
@@ -260,7 +260,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   /**
    * Extract all clusters from the pi-lambda-representation.
    * 
-   * @param rep Database
+   * @param ids Object ids to process
    * @param pi Pi store
    * @param lambda Lambda store
    * @param minclusters Minimum number of clusters to extract
@@ -432,7 +432,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   /**
    * Extract all clusters from the pi-lambda-representation.
    * 
-   * @param rep Database
+   * @param ids Object ids to process
    * @param pi Pi store
    * @param lambda Lambda store
    * @param minclusters Minimum number of clusters to extract

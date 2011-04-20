@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * algorithms.
  * 
  * @author Erich Schubert
- * @param <V> Vector type
+ * @param <O> Vector type
  */
 @Title("Dummy Algorithm")
 @Description("The algorithm executes a euclidena 10NN query on all data points, and can be used in unit testing")

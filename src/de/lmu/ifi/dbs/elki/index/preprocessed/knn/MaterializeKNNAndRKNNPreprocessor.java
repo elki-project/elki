@@ -64,10 +64,10 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
 
   @Override
   protected void preprocess() {
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT, List.class);
-    materialized_RkNN = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT, Set.class);
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors and reverse k nearest neighbors (k=" + k + ")", rep.size(), getLogger()) : null;
-    materializeKNNAndRKNNs(DBIDUtil.ensureArray(rep.getDBIDs()), progress);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, List.class);
+    materialized_RkNN = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, Set.class);
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors and reverse k nearest neighbors (k=" + k + ")", relation.size(), getLogger()) : null;
+    materializeKNNAndRKNNs(DBIDUtil.ensureArray(relation.getDBIDs()), progress);
   }
 
   /**
@@ -142,7 +142,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    */
   private ArrayDBIDs updateKNNsAndRkNNs(DBIDs ids) {
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
-    DBIDs oldids = DBIDUtil.difference(rep.getDBIDs(), ids);
+    DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for(DBID id1 : oldids) {
       List<DistanceResultPair<D>> kNNs = storage.get(id1);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
@@ -296,7 +296,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         }
       }
     }
-    return new PreprocessorRKNNQuery<O, S>(rep, (MaterializeKNNAndRKNNPreprocessor<O, S>) this);
+    return new PreprocessorRKNNQuery<O, S>(relation, (MaterializeKNNAndRKNNPreprocessor<O, S>) this);
   }
 
   @SuppressWarnings("unchecked")
@@ -313,7 +313,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         }
       }
     }
-    return new PreprocessorRKNNQuery<O, S>(rep, (MaterializeKNNAndRKNNPreprocessor<O, S>) this);
+    return new PreprocessorRKNNQuery<O, S>(relation, (MaterializeKNNAndRKNNPreprocessor<O, S>) this);
   }
 
   @Override

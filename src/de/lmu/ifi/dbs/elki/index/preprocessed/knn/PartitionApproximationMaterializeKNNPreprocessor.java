@@ -69,14 +69,14 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O, D> distanceQuery = rep.getDatabase().getDistanceQuery(rep, distanceFunction);
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
     MeanVariance ksize = new MeanVariance();
     if(logger.isVerbose()) {
       logger.verbose("Approximating nearest neighbor lists to database objects");
     }
 
-    ArrayDBIDs aids = DBIDUtil.ensureArray(rep.getDBIDs());
+    ArrayDBIDs aids = DBIDUtil.ensureArray(relation.getDBIDs());
     int minsize = (int) Math.floor(aids.size() / partitions);
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, logger) : null;

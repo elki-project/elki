@@ -66,11 +66,11 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O, D> distanceQuery = rep.getDatabase().getDistanceQuery(rep, distanceFunction);
+    DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
 
-    MetricalIndex<O, D, N, E> index = getMetricalIndex(rep);
+    MetricalIndex<O, D, N, E> index = getMetricalIndex(relation);
 
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
     MeanVariance pagesize = new MeanVariance();
     MeanVariance ksize = new MeanVariance();
     if(getLogger().isVerbose()) {

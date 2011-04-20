@@ -112,7 +112,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
     FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", relation.size(), logger) : null;
 
-    for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
+    for(DBID id : distFunc.getRelation().iterDBIDs()) {
       List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
       int nsize = neighbors.size() - 1;
       // skip the point itself

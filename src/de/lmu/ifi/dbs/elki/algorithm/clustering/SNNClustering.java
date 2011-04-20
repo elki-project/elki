@@ -131,7 +131,7 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<O
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(dataQuery.size());
     if(dataQuery.size() >= minpts) {
-      for(DBID id : snnInstance.getRepresentation().iterDBIDs()) {
+      for(DBID id : snnInstance.getRelation().iterDBIDs()) {
         if(!processedIDs.contains(id)) {
           expandCluster(snnInstance, id, objprog, clusprog);
           if(processedIDs.size() == dataQuery.size() && noise.size() == 0) {
@@ -145,7 +145,7 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<O
       }
     }
     else {
-      for(DBID id : snnInstance.getRepresentation().iterDBIDs()) {
+      for(DBID id : snnInstance.getRelation().iterDBIDs()) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), logger);
@@ -179,7 +179,7 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<O
    */
   protected List<DBID> findSNNNeighbors(SimilarityQuery<O, IntegerDistance> snnInstance, DBID queryObject) {
     List<DBID> neighbors = new LinkedList<DBID>();
-    for(DBID id : snnInstance.getRepresentation().iterDBIDs()) {
+    for(DBID id : snnInstance.getRelation().iterDBIDs()) {
       if(snnInstance.similarity(queryObject, id).compareTo(epsilon) >= 0) {
         neighbors.add(id);
       }
@@ -253,7 +253,7 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<O
         clusprog.setProcessed(numClusters, logger);
       }
 
-      if(processedIDs.size() == snnInstance.getRepresentation().size() && noise.size() == 0) {
+      if(processedIDs.size() == snnInstance.getRelation().size() && noise.size() == 0) {
         break;
       }
     }

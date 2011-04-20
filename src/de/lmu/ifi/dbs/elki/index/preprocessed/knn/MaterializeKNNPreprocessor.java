@@ -87,9 +87,9 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    */
   @Override
   protected void preprocess() {
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(rep.getDBIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
 
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
@@ -184,7 +184,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    */
   private ArrayDBIDs updateKNNsAfterInsertion(DBIDs ids) {
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
-    DBIDs oldids = DBIDUtil.difference(rep.getDBIDs(), ids);
+    DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for(DBID id1 : oldids) {
       List<DistanceResultPair<D>> kNNs = storage.get(id1);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
@@ -220,7 +220,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   private ArrayDBIDs updateKNNsAfterDeletion(DBIDs ids) {
     TreeSetModifiableDBIDs idsSet = DBIDUtil.newTreeSet(ids);
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
-    for(DBID id1 : rep.getDBIDs()) {
+    for(DBID id1 : relation.getDBIDs()) {
       List<DistanceResultPair<D>> kNNs = storage.get(id1);
       for(DistanceResultPair<D> kNN : kNNs) {
         if(idsSet.contains(kNN.second)) {

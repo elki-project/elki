@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * parameters for dynamic instantiation.
  * 
  * @author Elke Achtert
- * @param <O> the type of DatabaseObject as element of the database
  * 
  * @apiviz.landmark
  * @apiviz.has DataQuery oneway - - provides

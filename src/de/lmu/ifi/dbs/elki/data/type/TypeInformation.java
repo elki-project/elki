@@ -15,9 +15,9 @@ public interface TypeInformation {
   public boolean isAssignableFromType(TypeInformation type);
 
   /**
-   * Test whether this type is assignable from another type.
+   * Test whether this type is assignable from a given object instance.
    * 
-   * @param type Other type
+   * @param other Other object
    * @return true when the other type is an acceptable instance.
    */
   public boolean isAssignableFrom(Object other);

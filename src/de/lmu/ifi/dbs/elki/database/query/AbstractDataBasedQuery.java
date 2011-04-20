@@ -30,7 +30,7 @@ public abstract class AbstractDataBasedQuery<O> implements DatabaseQuery {
    * 
    * @return data query instance
    */
-  public Relation<? extends O> getRepresentation() {
+  public Relation<? extends O> getRelation() {
     return rep;
   }
 }

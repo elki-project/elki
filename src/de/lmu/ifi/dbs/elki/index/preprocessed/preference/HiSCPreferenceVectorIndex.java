@@ -73,20 +73,20 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
   @Override
   protected void preprocess() {
-    if(rep == null || rep.size() <= 0) {
+    if(relation == null || relation.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
     StringBuffer msg = new StringBuffer();
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", rep.size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), logger) : null;
 
-    KNNQuery<V, DoubleDistance> knnQuery = rep.getDatabase().getKNNQuery(rep, EuclideanDistanceFunction.STATIC, k);
+    KNNQuery<V, DoubleDistance> knnQuery = relation.getDatabase().getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
 
-    Iterator<DBID> it = rep.iterDBIDs();
+    Iterator<DBID> it = relation.iterDBIDs();
     while(it.hasNext()) {
       DBID id = it.next();
 
@@ -105,7 +105,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         //}
       }
 
-      BitSet preferenceVector = determinePreferenceVector(rep, id, knnIDs, msg);
+      BitSet preferenceVector = determinePreferenceVector(relation, id, knnIDs, msg);
       storage.put(id, preferenceVector);
 
       if(progress != null) {

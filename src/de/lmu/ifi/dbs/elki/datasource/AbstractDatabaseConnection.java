@@ -219,7 +219,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   /**
    * Get the logger for this database connection.
    * 
-   * @return
+   * @return Logger
    */
   protected abstract Logging getLogger();
 

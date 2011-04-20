@@ -15,15 +15,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * dependencies quantitatively adapted to the original space.
  *
  * @author Arthur Zimek
+ * 
  * @param <O> object type
  */
 public interface Normalization<O> extends ObjectFilter, Parameterizable {
   /**
-   * Performs a normalization on a list of database objects and their associations.
+   * Performs a normalization on a database object bundle.
    *
-   * @param objectAndAssociationsList the list of database objects and their associations
-   * @return a list of normalized database objects and their associations corresponding
-   *         to the given list
+   * @param objects the database objects package
+   * @return modified object bundle
    * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
    *                                     suitable to normalization
    */

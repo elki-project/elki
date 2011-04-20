@@ -185,7 +185,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
         return null;
       }
     }
-    return new LinearScanKNNQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery);
+    return new LinearScanKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
   }
 
   @Override
@@ -226,7 +226,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
         return null;
       }
     }
-    return new LinearScanRangeQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery);
+    return new LinearScanRangeQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
   }
 
   @Override
@@ -277,7 +277,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
       }
     }
     KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
-    return new LinearScanRKNNQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery, knnQuery, maxk);
+    return new LinearScanRKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery, knnQuery, maxk);
   }
 
   @SuppressWarnings("unused")

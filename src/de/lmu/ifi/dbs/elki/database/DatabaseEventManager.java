@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -139,7 +138,7 @@ public class DatabaseEventManager {
    * DataStoreEvent.Type.INSERT)}.
    * 
    * @param insertions the objects that have been inserted
-   * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
+   * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
   public void fireObjectsInserted(DBIDs insertions) {
@@ -151,7 +150,7 @@ public class DatabaseEventManager {
    * DataStoreEvent.Type.INSERT)}.
    * 
    * @param insertion the object that has been inserted
-   * @see #fireObjectsChanged(DBIDs, DataStoreEvent.Type)
+   * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
   public void fireObjectInserted(DBID insertion) {
@@ -163,7 +162,7 @@ public class DatabaseEventManager {
    * DataStoreEvent.Type.UPDATE)}.
    * 
    * @param updates the objects that have been updated
-   * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
+   * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#UPDATE
    */
   public void fireObjectsUpdated(DBIDs updates) {
@@ -175,7 +174,7 @@ public class DatabaseEventManager {
    * DataStoreEvent.Type.DELETE)}.
    * 
    * @param deletions the objects that have been removed
-   * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
+   * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
   protected void fireObjectsRemoved(DBIDs deletions) {
@@ -187,7 +186,7 @@ public class DatabaseEventManager {
    * DataStoreEvent.Type.DELETE)}.
    * 
    * @param deletion the object that has been removed
-   * @see #fireObjectsChanged(Collection, DataStoreEvent.Type)
+   * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
   protected void fireObjectRemoved(DBID deletion) {

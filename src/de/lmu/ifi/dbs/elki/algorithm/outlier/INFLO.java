@@ -120,7 +120,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // density
     WritableDataStore<Double> density = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     // init knns and rnns
-    for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
+    for(DBID id : distFunc.getRelation().iterDBIDs()) {
       knns.put(id, DBIDUtil.newArray());
       rnns.put(id, DBIDUtil.newArray());
     }
@@ -172,7 +172,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // IF Object is pruned INFLO=1.0
     MinMax<Double> inflominmax = new MinMax<Double>();
     WritableDataStore<Double> inflos = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
+    for(DBID id : distFunc.getRelation().iterDBIDs()) {
       if(!pruned.contains(id)) {
         ModifiableDBIDs knn = knns.get(id);
         ModifiableDBIDs rnn = rnns.get(id);
