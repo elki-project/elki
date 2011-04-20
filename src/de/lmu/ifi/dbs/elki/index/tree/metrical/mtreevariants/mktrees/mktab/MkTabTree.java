@@ -39,6 +39,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   /**
    * Constructor.
    * 
+   * @param relation Relation indexed
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -46,8 +47,8 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @param distanceFunction Distance function
    * @param k_max Maximum value for k
    */
-  public MkTabTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
+  public MkTabTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
   }
 
   /**
@@ -63,8 +64,9 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @throws UnsupportedOperationException since insertion of single objects is
    *         not supported
    */
+  @SuppressWarnings("unused")
   @Override
-  public void insert(DBID id, @SuppressWarnings("unused") O object) {
+  public void insert(DBID id, O object) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 

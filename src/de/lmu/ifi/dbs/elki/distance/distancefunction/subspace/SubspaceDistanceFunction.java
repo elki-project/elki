@@ -78,8 +78,8 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
     public SubspaceDistance distance(DBID id1, DBID id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
-      V o1 = rep.get(id1);
-      V o2 = rep.get(id2);
+      V o1 = relation.get(id1);
+      V o2 = relation.get(id2);
       return distance(o1, o2, pca1, pca2);
     }
 

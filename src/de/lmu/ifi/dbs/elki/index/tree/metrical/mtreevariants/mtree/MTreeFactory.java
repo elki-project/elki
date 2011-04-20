@@ -31,8 +31,8 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
   }
 
   @Override
-  public MTree<O, D> instantiate(Relation<O> representation) {
-    return new MTree<O, D>(representation, fileName, pageSize, cacheSize, distanceFunction.instantiate(representation), distanceFunction);
+  public MTree<O, D> instantiate(Relation<O> relation) {
+    return new MTree<O, D>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction);
   }
 
   /**

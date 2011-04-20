@@ -18,10 +18,10 @@ public abstract class AbstractDistanceQuery<O, D extends Distance<D>> extends Ab
   /**
    * Constructor.
    * 
-   * @param rep Representation to use.
+   * @param relation Relation to use.
    */
-  public AbstractDistanceQuery(Relation<? extends O> rep) {
-    super(rep);
+  public AbstractDistanceQuery(Relation<? extends O> relation) {
+    super(relation);
   }
 
   /**

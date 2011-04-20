@@ -13,16 +13,16 @@ public abstract class AbstractDataBasedQuery<O> implements DatabaseQuery {
   /**
    * The data to use for this query
    */
-  final protected Relation<? extends O> rep;
+  final protected Relation<? extends O> relation;
 
   /**
    * Database this query works on.
    * 
-   * @param rep Representation
+   * @param relation Representation
    */
-  public AbstractDataBasedQuery(Relation<? extends O> rep) {
+  public AbstractDataBasedQuery(Relation<? extends O> relation) {
     super();
-    this.rep = rep;
+    this.relation = relation;
   }
 
   /**
@@ -31,6 +31,6 @@ public abstract class AbstractDataBasedQuery<O> implements DatabaseQuery {
    * @return data query instance
    */
   public Relation<? extends O> getRelation() {
-    return rep;
+    return relation;
   }
 }

@@ -71,8 +71,8 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, N>, N extends Numbe
   }
 
   @Override
-  public MkAppTree<O, D, N> instantiate(Relation<O> representation) {
-    return new MkAppTree<O, D, N>(representation, fileName, pageSize, cacheSize, distanceFunction.instantiate(representation), distanceFunction, k_max, p, log);
+  public MkAppTree<O, D, N> instantiate(Relation<O> relation) {
+    return new MkAppTree<O, D, N>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction, k_max, p, log);
   }
 
   /**

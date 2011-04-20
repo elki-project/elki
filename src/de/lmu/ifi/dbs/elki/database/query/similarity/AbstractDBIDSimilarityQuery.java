@@ -16,10 +16,10 @@ public abstract class AbstractDBIDSimilarityQuery<O, D extends Distance<D>> exte
   /**
    * Constructor.
    * 
-   * @param rep Representation to use.
+   * @param relation Relation to use.
    */
-  public AbstractDBIDSimilarityQuery(Relation<? extends O> rep) {
-    super(rep);
+  public AbstractDBIDSimilarityQuery(Relation<? extends O> relation) {
+    super(relation);
   }
 
   @SuppressWarnings("unused")

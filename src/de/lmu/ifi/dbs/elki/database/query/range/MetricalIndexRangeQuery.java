@@ -27,12 +27,12 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
   /**
    * Constructor.
    * 
-   * @param rep Representation to use
+   * @param relation Relation to use
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexRangeQuery(Relation<? extends O> rep, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
-    super(rep, distanceQuery);
+  public MetricalIndexRangeQuery(Relation<? extends O> relation, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+    super(relation, distanceQuery);
     this.index = index;
   }
 
@@ -44,7 +44,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
   @Override
   public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
     // TODO: do this in the DB layer, we might have a better index?
-    return getRangeForObject(rep.get(id), range);
+    return getRangeForObject(relation.get(id), range);
   }
 
   @SuppressWarnings("unused")

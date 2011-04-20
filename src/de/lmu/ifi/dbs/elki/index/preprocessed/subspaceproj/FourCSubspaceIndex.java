@@ -59,14 +59,14 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
   /**
    * Full constructor.
    * 
-   * @param rep
-   * @param epsilon
+   * @param relation Relation
+   * @param epsilon Epsilon value
    * @param rangeQueryDistanceFunction
-   * @param minpts
-   * @param pca
+   * @param minpts MinPts value
+   * @param pca PCA runner
    */
-  public FourCSubspaceIndex(Relation<V> rep, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V, ?> pca) {
-    super(rep, epsilon, rangeQueryDistanceFunction, minpts);
+  public FourCSubspaceIndex(Relation<V> relation, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V, ?> pca) {
+    super(relation, epsilon, rangeQueryDistanceFunction, minpts);
     this.pca = pca;
   }
 
@@ -138,8 +138,8 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
     }
 
     @Override
-    public FourCSubspaceIndex<V, D> instantiate(Relation<V> representation) {
-      return new FourCSubspaceIndex<V, D>(representation, epsilon, rangeQueryDistanceFunction, minpts, pca);
+    public FourCSubspaceIndex<V, D> instantiate(Relation<V> relation) {
+      return new FourCSubspaceIndex<V, D>(relation, epsilon, rangeQueryDistanceFunction, minpts, pca);
     }
 
     /**

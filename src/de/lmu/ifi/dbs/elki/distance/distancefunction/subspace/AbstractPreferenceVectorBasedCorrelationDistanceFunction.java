@@ -94,8 +94,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     public PreferenceVectorBasedCorrelationDistance distance(DBID id1, DBID id2) {
       BitSet preferenceVector1 = index.getPreferenceVector(id1);
       BitSet preferenceVector2 = index.getPreferenceVector(id2);
-      V v1 = rep.get(id1);
-      V v2 = rep.get(id2);
+      V v1 = relation.get(id1);
+      V v2 = relation.get(id2);
       return correlationDistance(v1, v2, preferenceVector1, preferenceVector2);
     }
 
@@ -147,7 +147,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *         to the given preference vector
      */
     public double weightedDistance(DBID id1, DBID id2, BitSet weightVector) {
-      return weightedDistance(rep.get(id1), rep.get(id2), weightVector);
+      return weightedDistance(relation.get(id1), relation.get(id2), weightVector);
     }
 
     /**
@@ -160,8 +160,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *         to the preference vector of the first data vector
      */
     public double weightedPrefereneceVectorDistance(DBID id1, DBID id2) {
-      final V v1 = rep.get(id1);
-      final V v2 = rep.get(id2);
+      final V v1 = relation.get(id1);
+      final V v2 = relation.get(id2);
       double d1 = weightedDistance(v1, v2, index.getPreferenceVector(id1));
       double d2 = weightedDistance(v2, v1, index.getPreferenceVector(id2));
       return Math.max(d1, d2);

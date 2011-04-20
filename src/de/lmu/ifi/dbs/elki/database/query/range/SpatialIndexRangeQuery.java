@@ -35,13 +35,13 @@ public class SpatialIndexRangeQuery<O extends NumberVector<?, ?>, D extends Dist
   /**
    * Constructor.
    * 
-   * @param rep Representation to use
+   * @param relation Relation to use
    * @param index Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public SpatialIndexRangeQuery(Relation<? extends O> rep, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    super(rep, distanceQuery);
+  public SpatialIndexRangeQuery(Relation<? extends O> relation, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
+    super(relation, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;
   }
@@ -53,7 +53,7 @@ public class SpatialIndexRangeQuery<O extends NumberVector<?, ?>, D extends Dist
 
   @Override
   public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
-    return getRangeForObject(rep.get(id), range);
+    return getRangeForObject(relation.get(id), range);
   }
 
   @SuppressWarnings("unused")

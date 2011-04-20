@@ -41,11 +41,11 @@ public interface SubspaceProjectionIndex<NV extends NumberVector<?, ?>, P extend
     /**
      * Instantiate the index for a given database.
      * 
-     * @param rep Representation
+     * @param relation Relation
      * 
      * @return Index
      */
     @Override
-    public I instantiate(Relation<NV> rep);
+    public I instantiate(Relation<NV> relation);
   }
 }

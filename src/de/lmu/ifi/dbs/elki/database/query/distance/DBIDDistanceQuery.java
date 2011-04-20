@@ -24,11 +24,11 @@ public class DBIDDistanceQuery<D extends Distance<D>> extends AbstractDatabaseDi
   /**
    * Constructor.
    * 
-   * @param rep Database to use.
+   * @param relation Database to use.
    * @param distanceFunction Our distance function
    */
-  public DBIDDistanceQuery(Relation<DBID> rep, DBIDDistanceFunction<D> distanceFunction) {
-    super(rep);
+  public DBIDDistanceQuery(Relation<DBID> relation, DBIDDistanceFunction<D> distanceFunction) {
+    super(relation);
     this.distanceFunction = distanceFunction;
   }
 

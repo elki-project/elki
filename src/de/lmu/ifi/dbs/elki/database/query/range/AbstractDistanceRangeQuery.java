@@ -27,10 +27,11 @@ public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> exten
   /**
    * Constructor.
    * 
-   * @param rep Database
+   * @param relation Relation
+   * @param distanceQuery Distance query
    */
-  public AbstractDistanceRangeQuery(Relation<? extends O> rep, DistanceQuery<O, D> distanceQuery) {
-    super(rep);
+  public AbstractDistanceRangeQuery(Relation<? extends O> relation, DistanceQuery<O, D> distanceQuery) {
+    super(relation);
     this.distanceQuery = distanceQuery;
   }
 

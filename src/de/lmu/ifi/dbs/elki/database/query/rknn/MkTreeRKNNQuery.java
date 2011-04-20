@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree
+ * @apiviz.uses AbstractMkTree
  */
 public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery<O, D> {
   /**
@@ -28,12 +28,12 @@ public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery
   /**
    * Constructor.
    *
-   * @param rep Representation to use
+   * @param relation Relation to use
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MkTreeRKNNQuery(Relation<? extends O> rep, AbstractMkTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
-    super(rep, distanceQuery);
+  public MkTreeRKNNQuery(Relation<? extends O> relation, AbstractMkTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+    super(relation, distanceQuery);
     this.index = index;
   }
 

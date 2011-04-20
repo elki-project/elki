@@ -43,14 +43,15 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
   /**
    * Constructor.
    * 
+   * @param relation Relation indexed
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    */
-  public MTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
-    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public MTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
+    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
   }
 
   /**

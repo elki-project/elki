@@ -22,30 +22,30 @@ public class PrimitiveSimilarityQuery<O, D extends Distance<D>> extends Abstract
   /**
    * Constructor.
    * 
-   * @param rep Representation to use.
+   * @param relation Relation to use.
    * @param similarityFunction Our similarity function
    */
-  public PrimitiveSimilarityQuery(Relation<? extends O> rep, PrimitiveSimilarityFunction<? super O, D> similarityFunction) {
-    super(rep);
+  public PrimitiveSimilarityQuery(Relation<? extends O> relation, PrimitiveSimilarityFunction<? super O, D> similarityFunction) {
+    super(relation);
     this.similarityFunction = similarityFunction;
   }
 
   @Override
   public D similarity(DBID id1, DBID id2) {
-    O o1 = rep.get(id1);
-    O o2 = rep.get(id2);
+    O o1 = relation.get(id1);
+    O o2 = relation.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
   public D similarity(O o1, DBID id2) {
-    O o2 = rep.get(id2);
+    O o2 = relation.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
   public D similarity(DBID id1, O o2) {
-    O o1 = rep.get(id1);
+    O o1 = relation.get(id1);
     return similarity(o1, o2);
   }
 
