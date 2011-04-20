@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * and a cache of precomputed distances between the database objects.
  * 
  * @author Elke Achtert
- * @param <O> object type
+ * 
  * @param <D> distance type
  */
 public class DistanceParsingResult<D extends Distance<D>> {
@@ -51,7 +51,7 @@ public class DistanceParsingResult<D extends Distance<D>> {
   /**
    * Get the objects
    * 
-   * @return
+   * @return the objects bundle
    */
   public MultipleObjectsBundle getObjects() {
     return objects;

@@ -350,7 +350,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
           KNNHeap<D> knns_p = new KNNHeap<D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance());
           knns_p.add(new DistanceResultPair<D>(dist_pq, ((LeafEntry) q).getDBID()));
-          O obj = rep.get(p.getDBID());
+          O obj = relation.get(p.getDBID());
           doKNNQuery(obj, distanceFunction, knns_p);
 
           if(knns_p.size() < k_max) {
@@ -366,7 +366,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     }
     // directory node
     else {
-      O obj = rep.get(((LeafEntry) q).getDBID());
+      O obj = relation.get(((LeafEntry) q).getDBID());
       List<DistanceEntry<D, RdKNNEntry<D, N>>> entries = getSortedEntries(node, obj, distanceFunction);
       for(DistanceEntry<D, RdKNNEntry<D, N>> distEntry : entries) {
         RdKNNEntry<D, N> entry = distEntry.getEntry();

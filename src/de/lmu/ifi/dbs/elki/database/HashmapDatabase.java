@@ -54,7 +54,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * 
  * @author Arthur Zimek
  * @author Erich Schubert
- * @param <O> the type of DatabaseObject as element of the database
  * 
  * @apiviz.landmark
  * @apiviz.composedOf DatabaseEventManager
@@ -182,7 +181,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       // FIXME: support bulk...
       for(Index<?> index : indexes) {
         for(int i = 0; i < targets.length; i++) {
-          if(index.getRepresentation() == targets[i]) {
+          if(index.getRelation() == targets[i]) {
             @SuppressWarnings("unchecked")
             final Index<Object> oindex = (Index<Object>) index;
             oindex.insert(newid, objpackages.data(j, i));
@@ -230,7 +229,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     // insert into indexes
     for(Index<?> index : indexes) {
       for(int i = 0; i < targets.length; i++) {
-        if(index.getRepresentation() == targets[i]) {
+        if(index.getRelation() == targets[i]) {
           @SuppressWarnings("unchecked")
           final Index<Object> oindex = (Index<Object>) index;
           oindex.insert(newid, objpackage.data(i));
@@ -281,7 +280,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
    * Add a new representation for the given meta.
    * 
    * @param meta meta data
-   * @return
+   * @return new representation
    */
   private Relation<?> addNewRepresentation(SimpleTypeInformation<?> meta) {
     @SuppressWarnings("unchecked")
@@ -462,7 +461,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index<?> idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
-        if(idx.getRepresentation() == objQuery) {
+        if(idx.getRelation() == objQuery) {
           KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceFunction, hints);
           if(q != null) {
             return q;
@@ -489,7 +488,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index<?> idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
-        if(idx.getRepresentation() == distanceQuery.getRepresentation()) {
+        if(idx.getRelation() == distanceQuery.getRelation()) {
           KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceQuery, hints);
           if(q != null) {
             return q;
@@ -504,7 +503,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
         return null;
       }
     }
-    return new LinearScanKNNQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery);
+    return new LinearScanKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
   }
 
   @Override
@@ -515,7 +514,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index<?> idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
-        if(idx.getRepresentation() == objQuery) {
+        if(idx.getRelation() == objQuery) {
           RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceFunction, hints);
           if(q != null) {
             return q;
@@ -542,7 +541,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index<?> idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
-        if(idx.getRepresentation() == distanceQuery.getRepresentation()) {
+        if(idx.getRelation() == distanceQuery.getRelation()) {
           RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceQuery, hints);
           if(q != null) {
             return q;
@@ -557,7 +556,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
         return null;
       }
     }
-    return new LinearScanRangeQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery);
+    return new LinearScanRangeQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
   }
 
   @Override
@@ -568,7 +567,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index<?> idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
-        if(idx.getRepresentation() == objQuery) {
+        if(idx.getRelation() == objQuery) {
           RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceFunction, hints);
           if(q != null) {
             return q;
@@ -600,7 +599,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index<?> idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
-        if(idx.getRepresentation() == distanceQuery.getRepresentation()) {
+        if(idx.getRelation() == distanceQuery.getRelation()) {
           RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceQuery, hints);
           if(q != null) {
             return q;
@@ -620,7 +619,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       }
     }
     KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
-    return new LinearScanRKNNQuery<O, D>(distanceQuery.getRepresentation(), distanceQuery, knnQuery, maxk);
+    return new LinearScanRKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery, knnQuery, maxk);
   }
 
   @Override

@@ -205,11 +205,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   /**
    * Returns the id of the start object for the run method.
    * 
-   * @param rep the database storing the objects
+   * @param relation the database relation storing the objects
    * @return the id of the start object for the run method
    */
-  private DBID getStartObject(Relation<NV> database) {
-    Iterator<DBID> it = database.iterDBIDs();
+  private DBID getStartObject(Relation<NV> relation) {
+    Iterator<DBID> it = relation.iterDBIDs();
     if(!it.hasNext()) {
       return null;
     }

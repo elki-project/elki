@@ -57,8 +57,8 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
       }
     }
     AbstractMkTreeUnified<O, S, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
-    return new MkTreeRKNNQuery<O, S>(rep, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
+    return new MkTreeRKNNQuery<O, S>(relation, idx, dq);
   }
 
   @SuppressWarnings("unchecked")
@@ -78,8 +78,8 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
       }
     }
     AbstractMkTreeUnified<O, S, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(rep);
-    return new MkTreeRKNNQuery<O, S>(rep, idx, dq);
+    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
+    return new MkTreeRKNNQuery<O, S>(relation, idx, dq);
   }
   
   /**

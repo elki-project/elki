@@ -79,20 +79,20 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
   @Override
   protected DataStore<Double> computeOutlierScores(Database database, DistanceQuery<O, D> distFunc, D neighborhoodSize) {
     // maximum number of objects in the D-neighborhood of an outlier
-    int m = (int) ((distFunc.getRepresentation().size()) * (1 - p));
+    int m = (int) ((distFunc.getRelation().size()) * (1 - p));
 
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(distFunc.getRepresentation().getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     if(logger.isVerbose()) {
       logger.verbose("computing outlier flag");
     }
 
-    FiniteProgress progressOFlags = logger.isVerbose() ? new FiniteProgress("DBOutlier for objects", distFunc.getRepresentation().size(), logger) : null;
+    FiniteProgress progressOFlags = logger.isVerbose() ? new FiniteProgress("DBOutlier for objects", distFunc.getRelation().size(), logger) : null;
     int counter = 0;
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, m, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(knnQuery != null) {
-      for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
+      for(DBID id : distFunc.getRelation().iterDBIDs()) {
         counter++;
         final List<DistanceResultPair<D>> knns = knnQuery.getKNNForDBID(id, m);
         if(logger.isDebugging()) {
@@ -113,9 +113,9 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     }
     else {
       // range query for each object. stop if m objects are found
-      for(DBID id : distFunc.getRepresentation().iterDBIDs()) {
+      for(DBID id : distFunc.getRelation().iterDBIDs()) {
         counter++;
-        Iterator<DBID> iterator = distFunc.getRepresentation().iterDBIDs();
+        Iterator<DBID> iterator = distFunc.getRelation().iterDBIDs();
         int count = 0;
         while(iterator.hasNext() && count < m) {
           DBID currentID = iterator.next();

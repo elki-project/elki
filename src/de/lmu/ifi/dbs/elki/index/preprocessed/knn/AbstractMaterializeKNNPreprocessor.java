@@ -63,7 +63,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
     super(representation);
     this.k = k;
     this.distanceFunction = distanceFunction;
-    this.distanceQuery = distanceFunction.instantiate(rep);
+    this.distanceQuery = distanceFunction.instantiate(relation);
   }
 
   /**
@@ -112,7 +112,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
         }
       }
     }
-    return new PreprocessorKNNQuery<O, S>(rep, (MaterializeKNNPreprocessor<O, S>) this);
+    return new PreprocessorKNNQuery<O, S>(relation, (MaterializeKNNPreprocessor<O, S>) this);
   }
 
   @SuppressWarnings("unchecked")
@@ -129,7 +129,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
         }
       }
     }
-    return new PreprocessorKNNQuery<O, S>(rep, (MaterializeKNNPreprocessor<O, S>) this);
+    return new PreprocessorKNNQuery<O, S>(relation, (MaterializeKNNPreprocessor<O, S>) this);
   }
 
   /**

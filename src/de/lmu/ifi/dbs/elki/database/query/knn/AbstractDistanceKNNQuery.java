@@ -23,10 +23,11 @@ public abstract class AbstractDistanceKNNQuery<O, D extends Distance<D>> extends
   /**
    * Constructor.
    * 
-   * @param rep Database
+   * @param relation Relation to query
+   * @param distanceQuery Distance query used
    */
-  public AbstractDistanceKNNQuery(Relation<? extends O> rep, DistanceQuery<O, D> distanceQuery) {
-    super(rep);
+  public AbstractDistanceKNNQuery(Relation<? extends O> relation, DistanceQuery<O, D> distanceQuery) {
+    super(relation);
     this.distanceQuery = distanceQuery;
   }
 

@@ -94,5 +94,5 @@ public interface DistanceQuery<O, D extends Distance<?>> extends DatabaseQuery {
    * 
    * @return data query in use
    */
-  public abstract Relation<? extends O> getRepresentation();
+  public abstract Relation<? extends O> getRelation();
 }

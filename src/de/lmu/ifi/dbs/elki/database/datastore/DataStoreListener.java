@@ -13,7 +13,6 @@ import java.util.EventListener;
  * 
  * @see DataStore
  * @see DataStoreEvent
- * @param <T> the data type as element of the {@link DataStore}
  */
 public interface DataStoreListener extends EventListener {
   /**

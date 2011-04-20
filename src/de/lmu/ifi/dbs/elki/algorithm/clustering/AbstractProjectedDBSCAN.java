@@ -319,7 +319,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
         }
       }
 
-      if(processedIDs.size() == distFunc.getRepresentation().size() && noise.size() == 0) {
+      if(processedIDs.size() == distFunc.getRelation().size() && noise.size() == 0) {
         break;
       }
     }

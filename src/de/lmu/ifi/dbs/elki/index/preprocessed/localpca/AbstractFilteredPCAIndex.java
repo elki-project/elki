@@ -60,7 +60,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
    * Preprocessing step.
    */
   protected void preprocess() {
-    if(rep == null || rep.size() <= 0) {
+    if(relation == null || relation.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
@@ -70,16 +70,16 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
       return;
     }
 
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Performing local PCA", rep.size(), getLogger()) : null;
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Performing local PCA", relation.size(), getLogger()) : null;
 
     // TODO: use a bulk operation?
-    for(DBID id : rep.iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id);
 
-      PCAFilteredResult pcares = pca.processQueryResult(objects, rep);
+      PCAFilteredResult pcares = pca.processQueryResult(objects, relation);
 
       storage.put(id, pcares);
 

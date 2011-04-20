@@ -122,14 +122,14 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     }
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceQuery(database), epsilon);
 
-    int size = rangeQuery.getRepresentation().size();
+    int size = rangeQuery.getRelation().size();
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", size, logger) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("OPTICS Clusterorder", "optics-clusterorder");
     heap = new UpdatableHeap<ClusterOrderEntry<D>>();
 
-    for(DBID id : rangeQuery.getRepresentation().iterDBIDs()) {
+    for(DBID id : rangeQuery.getRelation().iterDBIDs()) {
       if(!processedIDs.contains(id)) {
         expandClusterOrder(clusterOrder, database, rangeQuery, id, progress);
       }

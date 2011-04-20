@@ -7,7 +7,6 @@ package de.lmu.ifi.dbs.elki.data.type;
  * 
  * @param <T> Java type we represent.
  */
-// TODO: add caching for get() method
 public class SimpleTypeInformation<T> implements TypeInformation {
   /**
    * The restriction class we represent.
@@ -33,12 +32,6 @@ public class SimpleTypeInformation<T> implements TypeInformation {
     return cls;
   }
 
-  /**
-   * Test whether this type is assignable from another type.
-   * 
-   * @param type Other type
-   * @return true when the other type is accepted as subtype.
-   */
   @Override
   public boolean isAssignableFromType(TypeInformation type) {
     if(!(type instanceof SimpleTypeInformation)) {
@@ -48,12 +41,6 @@ public class SimpleTypeInformation<T> implements TypeInformation {
     return cls.isAssignableFrom(simpleType.getRestrictionClass());
   }
 
-  /**
-   * Test whether this type is assignable from another type.
-   * 
-   * @param type Other type
-   * @return true when the other type is an acceptable instance.
-   */
   @Override
   public boolean isAssignableFrom(Object other) {
     return cls.isInstance(other);

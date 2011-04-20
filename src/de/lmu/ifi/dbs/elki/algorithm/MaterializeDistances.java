@@ -56,12 +56,12 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
   @Override
   protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceQuery(database);
-    int size = distFunc.getRepresentation().size();
+    int size = distFunc.getRelation().size();
 
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);
 
-    for(DBID id1 : distFunc.getRepresentation().iterDBIDs()) {
-      for(DBID id2 : distFunc.getRepresentation().iterDBIDs()) {
+    for(DBID id1 : distFunc.getRelation().iterDBIDs()) {
+      for(DBID id2 : distFunc.getRelation().iterDBIDs()) {
         // skip inverted pairs
         if(id2.compareTo(id1) > 0) {
           continue;

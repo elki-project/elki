@@ -66,15 +66,15 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O, D> distanceQuery = rep.getDatabase().getDistanceQuery(rep, distanceFunction);
+    DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
 
-    Collection<SpatialIndex<O, N, E>> indexes = ResultUtil.filterResults(rep, SpatialIndex.class);
+    Collection<SpatialIndex<O, N, E>> indexes = ResultUtil.filterResults(relation, SpatialIndex.class);
     if(indexes.size() != 1) {
       throw new AbortException(SpatialApproximationMaterializeKNNPreprocessor.class.getSimpleName() + " found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
     SpatialIndex<O, N, E> index = indexes.iterator().next();
 
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
     MeanVariance pagesize = new MeanVariance();
     MeanVariance ksize = new MeanVariance();
     if(getLogger().isVerbose()) {

@@ -246,7 +246,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     // find the leaf node containing o
-    double[] values = getValues(rep.get(id));
+    double[] values = getValues(relation.get(id));
     HyperBoundingBox mbr = new HyperBoundingBox(values, values);
     TreeIndexPath<E> deletionPath = findPathToObject(getRootPath(), mbr, id);
     if(deletionPath == null) {

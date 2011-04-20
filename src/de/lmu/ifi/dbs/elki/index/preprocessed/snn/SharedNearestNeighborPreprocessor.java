@@ -70,7 +70,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
   /**
    * Constructor.
    * 
-   * @param rep Database to use
+   * @param relation Database to use
    * @param numberOfNeighbors Number of neighbors
    * @param distanceFunction Distance function
    */
@@ -87,11 +87,11 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     if(getLogger().isVerbose()) {
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, SetDBIDs.class);
-    KNNQuery<O, D> knnquery = rep.getDatabase().getKNNQuery(rep, distanceFunction, numberOfNeighbors);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, SetDBIDs.class);
+    KNNQuery<O, D> knnquery = relation.getDatabase().getKNNQuery(relation, distanceFunction, numberOfNeighbors);
 
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", rep.size(), getLogger()) : null;
-    for(DBID id : rep.iterDBIDs()) {
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), getLogger()) : null;
+    for(DBID id : relation.iterDBIDs()) {
       TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
       List<DistanceResultPair<D>> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors);
       for(int i = 0; i < kNN.size(); i++) {

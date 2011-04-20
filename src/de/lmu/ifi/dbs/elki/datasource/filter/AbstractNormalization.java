@@ -13,7 +13,8 @@ import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
  * Abstract super class for all normalizations.
  * 
  * @author Elke Achtert
- * @param <O> object type
+ * 
+ * @param <O> Object type processed
  */
 public abstract class AbstractNormalization<O> extends AbstractConversionFilter<O, O> implements Normalization<O> {
   /**
@@ -46,14 +47,6 @@ public abstract class AbstractNormalization<O> extends AbstractConversionFilter<
     return normalized;
   }
 
-  /**
-   * Get the output type from the input type after conversion.
-   * 
-   * Default implementation: keep type.
-   * 
-   * @param input type restriction
-   * @return output type restriction
-   */
   @Override
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
     return in;

@@ -77,31 +77,31 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
    * Preprocessing step.
    */
   protected void preprocess() {
-    if(rep == null || rep.size() <= 0) {
+    if(relation == null || relation.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     if(storage != null) {
       // Preprocessor was already run.
       return;
     }
-    storage = DataStoreUtil.makeStorage(rep.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
     long start = System.currentTimeMillis();
-    RangeQuery<NV, D> rangeQuery = rep.getDatabase().getRangeQuery(rep, rangeQueryDistanceFunction);
+    RangeQuery<NV, D> rangeQuery = relation.getDatabase().getRangeQuery(relation, rangeQueryDistanceFunction);
 
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), rep.size(), getLogger()) : null;
-    for(DBID id : rep.iterDBIDs()) {
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
+    for(DBID id : relation.iterDBIDs()) {
       List<DistanceResultPair<D>> neighbors = rangeQuery.getRangeForDBID(id, epsilon);
 
       final P pres;
       if(neighbors.size() >= minpts) {
-        pres = computeProjection(id, neighbors, rep);
+        pres = computeProjection(id, neighbors, relation);
       }
       else {
         DistanceResultPair<D> firstQR = neighbors.get(0);
         neighbors = new ArrayList<DistanceResultPair<D>>();
         neighbors.add(firstQR);
-        pres = computeProjection(id, neighbors, rep);
+        pres = computeProjection(id, neighbors, relation);
       }
       storage.put(id, pres);
 
@@ -139,7 +139,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
    * 
    * @param id the given point
    * @param neighbors the neighbors as query results of the given point
-   * @param rep the database for which the preprocessing is performed
+   * @param relation the database for which the preprocessing is performed
    * 
    * @return local subspace projection
    */

@@ -65,5 +65,5 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * 
    * @return data query in use
    */
-  public abstract Relation<? extends O> getRepresentation();
+  public abstract Relation<? extends O> getRelation();
 }

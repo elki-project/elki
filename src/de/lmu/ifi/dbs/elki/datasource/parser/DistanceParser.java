@@ -9,10 +9,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  *
  * @author Arthur Zimek
  * 
- * @apiviz.landmark
  * @apiviz.uses DistanceParsingResult oneway - - «create»
  * 
- * @param <O> object type
  * @param <D> distance type
  */
 public interface DistanceParser<D extends Distance<D>> {

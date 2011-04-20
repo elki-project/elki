@@ -109,7 +109,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   @Override
   protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceQuery(database));
-    final int size = rangeQuery.getRepresentation().size();
+    final int size = rangeQuery.getRelation().size();
 
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", size, logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
@@ -117,7 +117,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(size);
     if(size >= minpts) {
-      for(DBID id : rangeQuery.getRepresentation().iterDBIDs()) {
+      for(DBID id : rangeQuery.getRelation().iterDBIDs()) {
         if(!processedIDs.contains(id)) {
           expandCluster(database, rangeQuery, id, objprog, clusprog);
         }
@@ -131,7 +131,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       }
     }
     else {
-      for(DBID id : rangeQuery.getRepresentation().iterDBIDs()) {
+      for(DBID id : rangeQuery.getRelation().iterDBIDs()) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), logger);
@@ -220,7 +220,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
         }
       }
 
-      if(processedIDs.size() == rangeQuery.getRepresentation().size() && noise.size() == 0) {
+      if(processedIDs.size() == rangeQuery.getRelation().size() && noise.size() == 0) {
         break;
       }
 

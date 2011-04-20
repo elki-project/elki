@@ -67,8 +67,8 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
       return null;
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(rep);
-    return new SpatialIndexKNNQuery<O, D>(rep, this, dq, df);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return new SpatialIndexKNNQuery<O, D>(relation, this, dq, df);
   }
 
   @Override
@@ -81,8 +81,8 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
       return null;
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(rep);
-    return new SpatialIndexKNNQuery<O, D>(rep, this, dq, df);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return new SpatialIndexKNNQuery<O, D>(relation, this, dq, df);
   }
 
   @Override
@@ -94,8 +94,8 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
       return null;
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(rep);
-    return new SpatialIndexRangeQuery<O, D>(rep, this, dq, df);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return new SpatialIndexRangeQuery<O, D>(relation, this, dq, df);
   }
 
   @Override
@@ -108,8 +108,8 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
       return null;
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(rep);
-    return new SpatialIndexRangeQuery<O, D>(rep, this, dq, df);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return new SpatialIndexRangeQuery<O, D>(relation, this, dq, df);
   }
 
   /**
