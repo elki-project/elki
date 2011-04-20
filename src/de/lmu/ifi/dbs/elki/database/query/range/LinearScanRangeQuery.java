@@ -28,17 +28,17 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
   /**
    * Constructor.
    * 
-   * @param rep Data to query
+   * @param relation Data to query
    * @param distanceQuery Distance function to use
    */
-  public LinearScanRangeQuery(Relation<? extends O> rep, DistanceQuery<O, D> distanceQuery) {
-    super(rep, distanceQuery);
+  public LinearScanRangeQuery(Relation<? extends O> relation, DistanceQuery<O, D> distanceQuery) {
+    super(relation, distanceQuery);
   }
 
   @Override
   public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    for(DBID currentID : rep.iterDBIDs()) {
+    for(DBID currentID : relation.iterDBIDs()) {
       D currentDistance = distanceQuery.distance(id, currentID);
       if(currentDistance.compareTo(range) <= 0) {
         result.add(new DistanceResultPair<D>(currentDistance, currentID));
@@ -58,7 +58,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
   @Override
   public List<DistanceResultPair<D>> getRangeForObject(O obj, D range) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    for(DBID currentID : rep.iterDBIDs()) {
+    for(DBID currentID : relation.iterDBIDs()) {
       D currentDistance = distanceQuery.distance(currentID, obj);
       if(currentDistance.compareTo(range) <= 0) {
         result.add(new DistanceResultPair<D>(currentDistance, currentID));

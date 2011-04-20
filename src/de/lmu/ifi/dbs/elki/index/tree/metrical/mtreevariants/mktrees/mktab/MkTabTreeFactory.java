@@ -31,8 +31,8 @@ public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   }
 
   @Override
-  public MkTabTree<O, D> instantiate(Relation<O> representation) {
-    return new MkTabTree<O, D>(representation, fileName, pageSize, cacheSize, distanceFunction.instantiate(representation), distanceFunction, k_max);
+  public MkTabTree<O, D> instantiate(Relation<O> relation) {
+    return new MkTabTree<O, D>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction, k_max);
   }
 
   /**

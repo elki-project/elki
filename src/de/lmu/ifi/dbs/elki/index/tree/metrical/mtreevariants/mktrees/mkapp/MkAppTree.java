@@ -64,6 +64,9 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
   private boolean log;
 
   /**
+   * Constructor.
+   * 
+   * @param relation Relation indexed
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -73,8 +76,8 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @param p Parameter p
    * @param log Logspace flag
    */
-  public MkAppTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
-    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public MkAppTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
+    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
     this.k_max = k_max;
     this.p = p;
     this.log = log;

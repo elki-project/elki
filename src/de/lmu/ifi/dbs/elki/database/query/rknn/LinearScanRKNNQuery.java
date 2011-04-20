@@ -35,13 +35,13 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
   /**
    * Constructor.
    * 
-   * @param rep Database to query
+   * @param relation Relation to query
    * @param distanceQuery Distance function to use
    * @param knnQuery kNN query to use.
    * @param maxk k to use
    */
-  public LinearScanRKNNQuery(Relation<? extends O> rep, DistanceQuery<O, D> distanceQuery, KNNQuery<O, D> knnQuery, Integer maxk) {
-    super(rep, distanceQuery);
+  public LinearScanRKNNQuery(Relation<? extends O> relation, DistanceQuery<O, D> distanceQuery, KNNQuery<O, D> knnQuery, Integer maxk) {
+    super(relation, distanceQuery);
     this.knnQuery = knnQuery;
   }
 
@@ -49,7 +49,7 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
   public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k) {
     ArrayList<DistanceResultPair<D>> rNNlist = new ArrayList<DistanceResultPair<D>>();
     
-    ArrayDBIDs allIDs = DBIDUtil.ensureArray(rep.getDBIDs());
+    ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
     List<List<DistanceResultPair<D>>> kNNLists = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
@@ -78,7 +78,7 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
       rNNList.add(new ArrayList<DistanceResultPair<D>>());
     }
 
-    ArrayDBIDs allIDs = DBIDUtil.ensureArray(rep.getDBIDs());
+    ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;

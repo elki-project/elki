@@ -100,8 +100,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
         return new DoubleDistance(Double.POSITIVE_INFINITY);
       }
 
-      V v1 = rep.get(id1);
-      V v2 = rep.get(id2);
+      V v1 = relation.get(id1);
+      V v2 = relation.get(id2);
       Vector v1Mv2 = v1.getColumnVector().minus(v2.getColumnVector());
       Vector v2Mv1 = v2.getColumnVector().minus(v1.getColumnVector());
 

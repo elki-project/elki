@@ -52,14 +52,14 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
   /**
    * Constructor.
    * 
-   * @param rep
-   * @param epsilon
-   * @param rangeQueryDistanceFunction
-   * @param minpts
-   * @param delta
+   * @param relation Relation
+   * @param epsilon Epsilon value
+   * @param rangeQueryDistanceFunction range query distance
+   * @param minpts Minpts parameter
+   * @param delta Delta value
    */
-  public PreDeConSubspaceIndex(Relation<V> rep, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, double delta) {
-    super(rep, epsilon, rangeQueryDistanceFunction, minpts);
+  public PreDeConSubspaceIndex(Relation<V> relation, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, double delta) {
+    super(relation, epsilon, rangeQueryDistanceFunction, minpts);
     this.delta = delta;
   }
 
@@ -186,8 +186,8 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
     }
 
     @Override
-    public PreDeConSubspaceIndex<V, D> instantiate(Relation<V> rep) {
-      return new PreDeConSubspaceIndex<V, D>(rep, epsilon, rangeQueryDistanceFunction, minpts, delta);
+    public PreDeConSubspaceIndex<V, D> instantiate(Relation<V> relation) {
+      return new PreDeConSubspaceIndex<V, D>(relation, epsilon, rangeQueryDistanceFunction, minpts, delta);
     }
 
     /**

@@ -34,13 +34,13 @@ public class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distan
   /**
    * Constructor.
    * 
-   * @param rep Representation to use
+   * @param relation Relation to use
    * @param index Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public SpatialIndexKNNQuery(Relation<? extends O> rep, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    super(rep, distanceQuery);
+  public SpatialIndexKNNQuery(Relation<? extends O> relation, SpatialIndex<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
+    super(relation, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;
   }
@@ -52,7 +52,7 @@ public class SpatialIndexKNNQuery<O extends NumberVector<?, ?>, D extends Distan
 
   @Override
   public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
-    return getKNNForObject(rep.get(id), k);
+    return getKNNForObject(relation.get(id), k);
   }
   
   @Override

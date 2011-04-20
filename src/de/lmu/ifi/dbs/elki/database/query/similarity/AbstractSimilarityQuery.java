@@ -18,10 +18,10 @@ public abstract class AbstractSimilarityQuery<O, D extends Distance<D>> extends 
   /**
    * Constructor.
    * 
-   * @param rep Representation to use.
+   * @param relation Relation to use.
    */
-  public AbstractSimilarityQuery(Relation<? extends O> rep) {
-    super(rep);
+  public AbstractSimilarityQuery(Relation<? extends O> relation) {
+    super(relation);
   }
 
   /**

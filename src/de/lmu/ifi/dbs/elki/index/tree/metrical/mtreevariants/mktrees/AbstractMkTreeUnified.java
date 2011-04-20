@@ -39,6 +39,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
   /**
    * Constructor.
    * 
+   * @param relation Relation indexed
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -46,8 +47,8 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    * @param distanceFunction Distance function
    * @param k_max Maximum value for k
    */
-  public AbstractMkTreeUnified(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public AbstractMkTreeUnified(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
     this.k_max = k_max;
   }
 

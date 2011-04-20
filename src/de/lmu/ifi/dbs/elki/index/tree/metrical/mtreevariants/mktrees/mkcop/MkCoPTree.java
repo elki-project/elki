@@ -64,6 +64,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, N>, N extends Number> exte
   /**
    * Constructor.
    * 
+   * @param relation Relation indexed
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -71,8 +72,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @param distanceFunction Distance function
    * @param k_max Maximum value of k supported
    */
-  public MkCoPTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(representation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public MkCoPTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
     this.k_max = k_max;
     // init log k
     log_k = new double[k_max];

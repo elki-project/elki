@@ -27,12 +27,12 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
   /**
    * Constructor.
    *
-   * @param rep Representation to use
+   * @param relation Relation to use
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexKNNQuery(Relation<? extends O> rep, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
-    super(rep, distanceQuery);
+  public MetricalIndexKNNQuery(Relation<? extends O> relation, MetricalIndex<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+    super(relation, distanceQuery);
     this.index = index;
   }
 
@@ -44,7 +44,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
   @Override
   public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
     // TODO: do this in the DB layer, we might have a better index?
-    return getKNNForObject(rep.get(id), k);
+    return getKNNForObject(relation.get(id), k);
   }
 
   @SuppressWarnings("unused")

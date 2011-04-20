@@ -23,11 +23,11 @@ public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?>, D exte
   final protected SpatialPrimitiveDistanceFunction<? super V, D> distanceFunction;
   
   /**
-   * @param rep Representation to use
+   * @param relation Representation to use
    * @param distanceFunction Distance function to use
    */
-  public SpatialPrimitiveDistanceQuery(Relation<? extends V> rep, SpatialPrimitiveDistanceFunction<? super V, D> distanceFunction) {
-    super(rep, distanceFunction);
+  public SpatialPrimitiveDistanceQuery(Relation<? extends V> relation, SpatialPrimitiveDistanceFunction<? super V, D> distanceFunction) {
+    super(relation, distanceFunction);
     this.distanceFunction = distanceFunction;
   }
 
@@ -48,7 +48,7 @@ public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?>, D exte
 
   @Override
   public D minDist(HyperBoundingBox mbr, DBID id) {
-    return distanceFunction.minDist(mbr, rep.get(id));
+    return distanceFunction.minDist(mbr, relation.get(id));
   }
 
   @Override

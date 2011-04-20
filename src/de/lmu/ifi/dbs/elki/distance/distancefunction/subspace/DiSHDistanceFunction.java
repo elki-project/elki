@@ -120,7 +120,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
       BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();
       inverseCommonPreferenceVector.flip(0, dim);
 
-      return new PreferenceVectorBasedCorrelationDistance(DatabaseUtil.dimensionality(rep), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
+      return new PreferenceVectorBasedCorrelationDistance(DatabaseUtil.dimensionality(relation), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
     }
   }
 

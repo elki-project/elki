@@ -25,30 +25,30 @@ public class PrimitiveDistanceQuery<O, D extends Distance<D>> extends AbstractDi
   /**
    * Constructor.
    * 
-   * @param rep Representation to use.
+   * @param relation Representation to use.
    * @param distanceFunction Our distance function
    */
-  public PrimitiveDistanceQuery(Relation<? extends O> rep, PrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    super(rep);
+  public PrimitiveDistanceQuery(Relation<? extends O> relation, PrimitiveDistanceFunction<? super O, D> distanceFunction) {
+    super(relation);
     this.distanceFunction = distanceFunction;
   }
 
   @Override
   public D distance(DBID id1, DBID id2) {
-    O o1 = rep.get(id1);
-    O o2 = rep.get(id2);
+    O o1 = relation.get(id1);
+    O o2 = relation.get(id2);
     return distance(o1, o2);
   }
 
   @Override
   public D distance(O o1, DBID id2) {
-    O o2 = rep.get(id2);
+    O o2 = relation.get(id2);
     return distance(o1, o2);
   }
 
   @Override
   public D distance(DBID id1, O o2) {
-    O o1 = rep.get(id1);
+    O o1 = relation.get(id1);
     return distance(o1, o2);
   }
 

@@ -35,7 +35,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   @Override
   public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
     KNNHeap<D> heap = new KNNHeap<D>(k);
-    for(DBID candidateID : rep.iterDBIDs()) {
+    for(DBID candidateID : relation.iterDBIDs()) {
       heap.add(new DistanceResultPair<D>(distanceQuery.distance(id, candidateID), candidateID));
     }
     return heap.toSortedArrayList();
@@ -51,12 +51,12 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
     if(PrimitiveDistanceQuery.class.isAssignableFrom(distanceQuery.getClass())) {
       // The distance is computed on arbitrary vectors, we can reduce object
       // loading by working on the actual vectors.
-      for(DBID candidateID : rep.iterDBIDs()) {
-        O candidate = rep.get(candidateID);
+      for(DBID candidateID : relation.iterDBIDs()) {
+        O candidate = relation.get(candidateID);
         Integer index = -1;
         for(DBID id : ids) {
           index++;
-          O object = rep.get(id);
+          O object = relation.get(id);
           KNNHeap<D> heap = heaps.get(index);
           heap.add(new DistanceResultPair<D>(distanceQuery.distance(object, candidate), candidateID));
         }
@@ -64,7 +64,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
     }
     else {
       // The distance is computed on database IDs
-      for(DBID candidateID : rep.iterDBIDs()) {
+      for(DBID candidateID : relation.iterDBIDs()) {
         Integer index = -1;
         for(DBID id : ids) {
           index++;
@@ -84,8 +84,8 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   @Override
   public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
     KNNHeap<D> heap = new KNNHeap<D>(k);
-    for(DBID candidateID : rep.iterDBIDs()) {
-      O candidate = rep.get(candidateID);
+    for(DBID candidateID : relation.iterDBIDs()) {
+      O candidate = relation.get(candidateID);
       heap.add(new DistanceResultPair<D>(distanceQuery.distance(obj, candidate), candidateID));
     }
     return heap.toSortedArrayList();

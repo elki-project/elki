@@ -31,8 +31,8 @@ public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   }
 
   @Override
-  public MkMaxTree<O, D> instantiate(Relation<O> representation) {
-    return new MkMaxTree<O, D>(representation, fileName, pageSize, cacheSize, distanceFunction.instantiate(representation), distanceFunction, k_max);
+  public MkMaxTree<O, D> instantiate(Relation<O> relation) {
+    return new MkMaxTree<O, D>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction, k_max);
   }
 
   /**

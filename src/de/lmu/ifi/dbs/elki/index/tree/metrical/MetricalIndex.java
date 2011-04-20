@@ -27,12 +27,13 @@ public abstract class MetricalIndex<O, D extends Distance<D>, N extends Metrical
   /**
    * Constructor.
    * 
+   * @param relation Relation in use
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
    */
-  public MetricalIndex(Relation<O> representation, String fileName, int pageSize, long cacheSize) {
-    super(representation, fileName, pageSize, cacheSize);
+  public MetricalIndex(Relation<O> relation, String fileName, int pageSize, long cacheSize) {
+    super(relation, fileName, pageSize, cacheSize);
   }
 
   /**

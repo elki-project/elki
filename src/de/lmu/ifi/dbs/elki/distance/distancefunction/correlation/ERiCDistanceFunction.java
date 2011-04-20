@@ -222,8 +222,8 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     public BitDistance distance(DBID id1, DBID id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
-      V v1 = rep.get(id1);
-      V v2 = rep.get(id2);
+      V v1 = relation.get(id1);
+      V v2 = relation.get(id2);
       return parent.distance(v1, v2, pca1, pca2);
     }
   }

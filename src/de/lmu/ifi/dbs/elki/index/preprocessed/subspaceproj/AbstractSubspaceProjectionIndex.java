@@ -61,13 +61,13 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
   /**
    * Constructor.
    *
-   * @param rep Representation
+   * @param relation Relation
    * @param epsilon Maximum Epsilon
    * @param rangeQueryDistanceFunction range query
    * @param minpts Minpts
    */
-  public AbstractSubspaceProjectionIndex(Relation<NV> rep, D epsilon, DistanceFunction<NV, D> rangeQueryDistanceFunction, int minpts) {
-    super(rep);
+  public AbstractSubspaceProjectionIndex(Relation<NV> relation, D epsilon, DistanceFunction<NV, D> rangeQueryDistanceFunction, int minpts) {
+    super(relation);
     this.epsilon = epsilon;
     this.rangeQueryDistanceFunction = rangeQueryDistanceFunction;
     this.minpts = minpts;
@@ -184,7 +184,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
     }
 
     @Override
-    public abstract I instantiate(Relation<NV> rep);
+    public abstract I instantiate(Relation<NV> relation);
 
     @Override
     public TypeInformation getInputTypeRestriction() {

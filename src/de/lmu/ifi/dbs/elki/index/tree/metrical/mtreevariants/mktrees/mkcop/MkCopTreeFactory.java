@@ -46,8 +46,8 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, N>, N extends Numbe
   }
 
   @Override
-  public MkCoPTree<O, D, N> instantiate(Relation<O> representation) {
-    return new MkCoPTree<O, D, N>(representation, fileName, pageSize, cacheSize, distanceFunction.instantiate(representation), distanceFunction, k_max);
+  public MkCoPTree<O, D, N> instantiate(Relation<O> relation) {
+    return new MkCoPTree<O, D, N>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction, k_max);
   }
 
   /**

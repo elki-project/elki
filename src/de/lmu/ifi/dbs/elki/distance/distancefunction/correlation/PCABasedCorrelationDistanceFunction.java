@@ -108,8 +108,8 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
     public PCACorrelationDistance distance(DBID id1, DBID id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
-      V dv1 = rep.get(id1);
-      V dv2 = rep.get(id2);
+      V dv1 = relation.get(id1);
+      V dv2 = relation.get(id2);
 
       int correlationDistance = correlationDistance(pca1, pca2, dv1.getDimensionality());
       double euclideanDistance = euclideanDistance(dv1, dv2);
