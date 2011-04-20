@@ -1,11 +1,10 @@
 /**
  * <p>Parsers for different file formats and data types.</p>
  * 
- * <p>The general use-case for any parser is to create
- * {@link de.lmu.ifi.dbs.elki.data.DatabaseObject}s out of an
+ * <p>The general use-case for any parser is to create objects out of an
  * {@link java.io.InputStream} (e.g. by reading a data file).
- * The {@link de.lmu.ifi.dbs.elki.data.DatabaseObject}s are packed in a
- * {@link de.lmu.ifi.dbs.elki.datasource.parser.ParsingResult}-Object which,
+ * The objects are packed in a
+ * {@link de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle} which,
  * in turn, is used by a {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection}-Object
  * to create a {@link de.lmu.ifi.dbs.elki.database.Database}
  * containing the corresponding objects.</p>
