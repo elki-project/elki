@@ -74,21 +74,21 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   /**
    * Constructor.
    * 
-   * @param rep Representation
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
-   * @param bulk
-   * @param bulkLoadStrategy
-   * @param insertionCandidates
-   * @param k_max
-   * @param distanceFunction
+   * @param relation Relation
+   * @param fileName File name
+   * @param pageSize Page size
+   * @param cacheSize Cache size
+   * @param bulk Bulk flag
+   * @param bulkLoadStrategy bulk loading strategy
+   * @param insertionCandidates Insertion candidates limit
+   * @param k_max max k
+   * @param distanceFunction distance function
    */
-  public RdKNNTree(Relation<O> rep, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
-    super(rep, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public RdKNNTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
-    this.distanceQuery = distanceFunction.instantiate(rep);
+    this.distanceQuery = distanceFunction.instantiate(relation);
   }
 
   /**

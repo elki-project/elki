@@ -56,12 +56,12 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   /**
    * Constructor
    * 
-   * @param representation Representation to preprocess
+   * @param relation Relation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MetricalIndexApproximationMaterializeKNNPreprocessor(Relation<O> representation, DistanceFunction<? super O, D> distanceFunction, int k) {
-    super(representation, distanceFunction, k);
+  public MetricalIndexApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+    super(relation, distanceFunction, k);
   }
 
   @Override
@@ -135,13 +135,13 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * Do some (limited) type checking, then cast the database into a spatial
    * database.
    * 
-   * @param rep Database
-   * @return Spatial database.
+   * @param relation Database
+   * @return Metrical index
    * @throws IllegalStateException when the cast fails.
    */
-  private MetricalIndex<O, D, N, E> getMetricalIndex(Relation<O> rep) throws IllegalStateException {
+  private MetricalIndex<O, D, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
     Class<MetricalIndex<O, D, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndex.class);
-    ArrayList<MetricalIndex<O, D, N, E>> indexes = ResultUtil.filterResults(rep.getDatabase(), mcls);
+    ArrayList<MetricalIndex<O, D, N, E>> indexes = ResultUtil.filterResults(relation.getDatabase(), mcls);
     // FIXME: check we got the right the representation
     if(indexes.size() == 1) {
       return indexes.get(0);
@@ -193,8 +193,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     }
 
     @Override
-    public MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instantiate(Relation<O> representation) {
-      MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E>(representation, distanceFunction, k);
+    public MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instantiate(Relation<O> relation) {
+      MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E>(relation, distanceFunction, k);
       return instance;
     }
 

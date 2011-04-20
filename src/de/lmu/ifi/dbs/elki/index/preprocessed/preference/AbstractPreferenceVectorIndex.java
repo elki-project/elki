@@ -23,8 +23,8 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
    * 
    * @param rep Database to use
    */
-  public AbstractPreferenceVectorIndex(Relation<NV> representation) {
-    super(representation);
+  public AbstractPreferenceVectorIndex(Relation<NV> relation) {
+    super(relation);
   }
 
   /**
@@ -50,7 +50,7 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
    */
   public static abstract class Factory<V extends NumberVector<?, ?>, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I>, Parameterizable {
     @Override
-    public abstract I instantiate(Relation<V> representation);
+    public abstract I instantiate(Relation<V> relation);
 
     @Override
     public TypeInformation getInputTypeRestriction() {

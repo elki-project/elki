@@ -32,8 +32,8 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
   }
 
   @Override
-  public FlatRStarTree<O> instantiate(Relation<O> representation) {
-    return new FlatRStarTree<O>(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public FlatRStarTree<O> instantiate(Relation<O> relation) {
+    return new FlatRStarTree<O>(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**

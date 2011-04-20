@@ -56,26 +56,26 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   /**
    * Constructor with preprocessing step.
    * 
-   * @param rep Representation to preprocess
+   * @param relation Relation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MaterializeKNNPreprocessor(Relation<O> rep, DistanceFunction<? super O, D> distanceFunction, int k) {
-    this(rep, distanceFunction, k, true);
+  public MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+    this(relation, distanceFunction, k, true);
   }
   
   /**
    * Constructor.
    * 
-   * @param rep Representation to preprocess
+   * @param relation Relation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  protected MaterializeKNNPreprocessor(Relation<O> rep, DistanceFunction<? super O, D> distanceFunction, int k, boolean preprocess) {
-    super(rep, distanceFunction, k);
+  protected MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, boolean preprocess) {
+    super(relation, distanceFunction, k);
     // take a linear scan to ensure that the query is "up to date" in case of
     // dynamic updates
-    this.knnQuery = new LinearScanKNNQuery<O, D>(rep, distanceQuery);
+    this.knnQuery = new LinearScanKNNQuery<O, D>(relation, distanceQuery);
     
     if (preprocess) {
       preprocess();
@@ -393,8 +393,8 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     }
 
     @Override
-    public MaterializeKNNPreprocessor<O, D> instantiate(Relation<O> representation) {
-      MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<O, D>(representation, distanceFunction, k);
+    public MaterializeKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
+      MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<O, D>(relation, distanceFunction, k);
       return instance;
     }
 

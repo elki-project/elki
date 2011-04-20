@@ -96,14 +96,13 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Constructor.
    * 
-   * @param representation
-   * @param representation
-   * @param epsilon
-   * @param minpts
-   * @param strategy
+   * @param relation Relation to use
+   * @param epsilon Epsilon value
+   * @param minpts MinPts value
+   * @param strategy Strategy
    */
-  public DiSHPreferenceVectorIndex(Relation<V> representation, DoubleDistance[] epsilon, int minpts, Strategy strategy) {
-    super(representation);
+  public DiSHPreferenceVectorIndex(Relation<V> relation, DoubleDistance[] epsilon, int minpts, Strategy strategy) {
+    super(relation);
     this.epsilon = epsilon;
     this.minpts = minpts;
     this.strategy = strategy;
@@ -391,17 +390,17 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * Initializes the dimension selecting distancefunctions to determine the
    * preference vectors.
    * 
-   * @param rep the database storing the objects
+   * @param relation the database storing the objects
    * @param dimensionality the dimensionality of the objects
    * @return the dimension selecting distancefunctions to determine the
    *         preference vectors
    * @throws ParameterException
    */
-  private RangeQuery<V, DoubleDistance>[] initRangeQueries(Relation<V> rep, int dimensionality) throws ParameterException {
+  private RangeQuery<V, DoubleDistance>[] initRangeQueries(Relation<V> relation, int dimensionality) throws ParameterException {
     Class<RangeQuery<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
     RangeQuery<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {
-      rangeQueries[d] = rep.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(rep, new DimensionSelectingDistanceFunction(d + 1)));
+      rangeQueries[d] = relation.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(relation, new DimensionSelectingDistanceFunction(d + 1)));
     }
     return rangeQueries;
   }
@@ -523,8 +522,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     }
 
     @Override
-    public DiSHPreferenceVectorIndex<V> instantiate(Relation<V> representation) {
-      return new DiSHPreferenceVectorIndex<V>(representation, epsilon, minpts, strategy);
+    public DiSHPreferenceVectorIndex<V> instantiate(Relation<V> relation) {
+      return new DiSHPreferenceVectorIndex<V>(relation, epsilon, minpts, strategy);
     }
 
     /**

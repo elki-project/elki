@@ -106,6 +106,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   /**
    * Constructor
    * 
+   * @param relation Relation indexed
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
@@ -113,8 +114,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public AbstractRStarTree(Relation<O> representation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy);
+  public AbstractRStarTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy);
     this.insertionCandidates = insertionCandidates;
   }
 

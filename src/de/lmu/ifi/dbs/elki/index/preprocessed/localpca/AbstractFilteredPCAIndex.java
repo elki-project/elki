@@ -48,11 +48,11 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
   /**
    * Constructor.
    * 
-   * @param representation Representation to use
+   * @param relation Relation to use
    * @param pca PCA runner to use
    */
-  public AbstractFilteredPCAIndex(Relation<NV> representation, PCAFilteredRunner<? super NV, DoubleDistance> pca) {
-    super(representation);
+  public AbstractFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner<? super NV, DoubleDistance> pca) {
+    super(relation);
     this.pca = pca;
   }
 
@@ -156,7 +156,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
     }
 
     @Override
-    public abstract I instantiate(Relation<NV> representation);
+    public abstract I instantiate(Relation<NV> relation);
 
     @Override
     public TypeInformation getInputTypeRestriction() {

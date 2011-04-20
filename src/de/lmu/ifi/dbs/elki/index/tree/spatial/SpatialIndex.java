@@ -45,15 +45,15 @@ public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends Spati
   /**
    * Constructor.
    * 
-   * @param representation Representation
+   * @param relation Relation indexed
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
    * @param bulk bulk flag
    * @param bulkLoadStrategy bulk load strategy
    */
-  public SpatialIndex(Relation<O> representation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy) {
-    super(representation, fileName, pageSize, cacheSize);
+  public SpatialIndex(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy) {
+    super(relation, fileName, pageSize, cacheSize);
     this.bulk = bulk;
     this.bulkLoadStrategy = bulkLoadStrategy;
   }

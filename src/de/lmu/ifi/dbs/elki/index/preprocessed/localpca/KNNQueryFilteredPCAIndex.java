@@ -125,10 +125,10 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
     }
 
     @Override
-    public KNNQueryFilteredPCAIndex<V> instantiate(Relation<V> representation) {
+    public KNNQueryFilteredPCAIndex<V> instantiate(Relation<V> relation) {
       // TODO: set bulk flag, once the parent class supports bulk.
-      KNNQuery<V, DoubleDistance> knnquery = representation.getDatabase().getKNNQuery(representation, pcaDistanceFunction, k);
-      return new KNNQueryFilteredPCAIndex<V>(representation, pca, knnquery, k);
+      KNNQuery<V, DoubleDistance> knnquery = relation.getDatabase().getKNNQuery(relation, pcaDistanceFunction, k);
+      return new KNNQueryFilteredPCAIndex<V>(relation, pca, knnquery, k);
     }
 
     /**

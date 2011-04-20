@@ -31,8 +31,8 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
   }
 
   @Override
-  public DeLiCluTree<O> instantiate(Relation<O> representation) {
-    return new DeLiCluTree<O>(representation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public DeLiCluTree<O> instantiate(Relation<O> relation) {
+    return new DeLiCluTree<O>(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**

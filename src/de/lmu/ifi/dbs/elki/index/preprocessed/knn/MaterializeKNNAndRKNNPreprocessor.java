@@ -54,12 +54,12 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
   /**
    * Constructor.
    * 
-   * @param representation Representation to process
+   * @param relation Relation to process
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MaterializeKNNAndRKNNPreprocessor(Relation<O> representation, DistanceFunction<? super O, D> distanceFunction, int k) {
-    super(representation, distanceFunction, k);
+  public MaterializeKNNAndRKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+    super(relation, distanceFunction, k);
   }
 
   @Override
@@ -351,8 +351,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     }
 
     @Override
-    public MaterializeKNNAndRKNNPreprocessor<O, D> instantiate(Relation<O> representation) {
-      MaterializeKNNAndRKNNPreprocessor<O, D> instance = new MaterializeKNNAndRKNNPreprocessor<O, D>(representation, distanceFunction, k);
+    public MaterializeKNNAndRKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
+      MaterializeKNNAndRKNNPreprocessor<O, D> instance = new MaterializeKNNAndRKNNPreprocessor<O, D>(relation, distanceFunction, k);
       return instance;
     }
 

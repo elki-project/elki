@@ -55,13 +55,13 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
   /**
    * Constructor
    * 
-   * @param representation Representation to process
+   * @param relation Relation to process
    * @param distanceFunction the distance function to use
    * @param k query k
    * @param partitions Number of partitions
    */
-  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> representation, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
-    super(representation, distanceFunction, k);
+  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
+    super(relation, distanceFunction, k);
     this.partitions = partitions;
     // preprocess now
     preprocess();
@@ -182,8 +182,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
     }
 
     @Override
-    public PartitionApproximationMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> representation) {
-      PartitionApproximationMaterializeKNNPreprocessor<O, D> instance = new PartitionApproximationMaterializeKNNPreprocessor<O, D>(representation, distanceFunction, k, partitions);
+    public PartitionApproximationMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
+      PartitionApproximationMaterializeKNNPreprocessor<O, D> instance = new PartitionApproximationMaterializeKNNPreprocessor<O, D>(relation, distanceFunction, k, partitions);
       return instance;
     }
 

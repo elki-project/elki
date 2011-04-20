@@ -117,10 +117,10 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
     }
 
     @Override
-    public RangeQueryFilteredPCAIndex<V> instantiate(Relation<V> representation) {
+    public RangeQueryFilteredPCAIndex<V> instantiate(Relation<V> relation) {
       // TODO: set bulk flag, once the parent class supports bulk.
-      RangeQuery<V, DoubleDistance> rangequery = representation.getDatabase().getRangeQuery(representation, pcaDistanceFunction);
-      return new RangeQueryFilteredPCAIndex<V>(representation, pca, rangequery, epsilon);
+      RangeQuery<V, DoubleDistance> rangequery = relation.getDatabase().getRangeQuery(relation, pcaDistanceFunction);
+      return new RangeQueryFilteredPCAIndex<V>(relation, pca, rangequery, epsilon);
     }
 
     /**
