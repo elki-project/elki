@@ -168,7 +168,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
   /**
    * The database holding the objects.
    */
-  private Relation<ParameterizationFunction> rep;
+  private Relation<ParameterizationFunction> relation;
 
   /**
    * Constructor.
@@ -193,20 +193,20 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    */
   @Override
   protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
-    rep = getRelation(database);
+    relation = getRelation(database);
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("DB size: ").append(rep.size());
+      msg.append("DB size: ").append(relation.size());
       msg.append("\nmin Dim: ").append(minDim);
       logger.verbose(msg.toString());
     }
 
     try {
-      processedIDs = DBIDUtil.newHashSet(rep.size());
-      noiseDim = rep.get(rep.iterDBIDs().next()).getDimensionality();
+      processedIDs = DBIDUtil.newHashSet(relation.size());
+      noiseDim = relation.get(relation.iterDBIDs().next()).getDimensionality();
 
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", rep.size(), logger) : null;
-      Clustering<Model> result = doRun(rep, progress);
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", relation.size(), logger) : null;
+      Clustering<Model> result = doRun(relation, progress);
       if(progress != null) {
         progress.ensureCompleted(logger);
       }
@@ -350,7 +350,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
       else if(noiseIDs.size() >= minPts) {
         // TODO: use different class/model for noise, even when LES was
         // computed?
-        LinearEquationSystem les = runDerivator(rep, dim - 1, noiseIDs);
+        LinearEquationSystem les = runDerivator(relation, dim - 1, noiseIDs);
         Cluster<Model> c = new Cluster<Model>(noiseIDs, new LinearEquationModel(les));
         res.addCluster(c);
         processedIDs.addAll(noiseIDs);
@@ -470,7 +470,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     ProxyDatabase proxy = new ProxyDatabase(ids);
     VectorFieldTypeInformation<ParameterizationFunction> type = VectorFieldTypeInformation.get(ParameterizationFunction.class, basis.getColumnDimensionality());
     MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<ParameterizationFunction>(proxy, type, ids);
-    proxy.addRepresentation(prep);
+    proxy.addRelation(prep);
     
     // Project
     for(DBID id : ids) {
@@ -720,7 +720,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     int dim = database.get(ids.iterator().next()).getRowVector().getRowPackedCopy().length;
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
-    proxy.addRepresentation(prep);
+    proxy.addRelation(prep);
 
     // Project
     for(DBID id : ids) {
@@ -785,7 +785,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     int dim = database.get(ids.iterator().next()).getRowVector().getRowPackedCopy().length;
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
-    proxy.addRepresentation(prep);
+    proxy.addRelation(prep);
 
     // Project
     for(DBID id : ids) {

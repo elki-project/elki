@@ -133,7 +133,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   /**
    * The main representation
    */
-  Relation<?> rep;
+  Relation<?> relation;
 
   /**
    * The plot to draw onto
@@ -161,16 +161,16 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param name Name
    * @param context Context
    * @param result Result
-   * @param rep Representation to use
+   * @param relation Relation to use
    * @param factory Factory
    * @param stack Stack
    */
-  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> rep, VisFactory factory, Object stack) {
+  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory, Object stack) {
     super();
     this.name = name;
     this.context = context;
     this.result = result;
-    this.rep = rep;
+    this.relation = relation;
     this.factory = factory;
     this.stack = stack;
   }
@@ -181,7 +181,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param name Name
    * @param context Context
    * @param result Result
-   * @param rep Representation
+   * @param relation Representation
    * @param factory Factory
    * @param stack Stack
    * @param proj Projection
@@ -189,7 +189,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param width Width
    * @param height Height
    */
-  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> rep, VisFactory factory, Object stack, Projection proj, SVGPlot svgp, double width, double height) {
+  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory, Object stack, Projection proj, SVGPlot svgp, double width, double height) {
     super();
     this.name = name;
     this.context = context;
@@ -197,7 +197,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     this.factory = factory;
     this.stack = stack;
     this.proj = proj;
-    this.rep = rep;
+    this.relation = relation;
     this.svgp = svgp;
     this.width = width;
     this.height = height;
@@ -233,7 +233,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
 
   @SuppressWarnings("unchecked")
   public <R extends Relation<?>> R getRelation() {
-    return (R) rep;
+    return (R) relation;
   }
 
   public SVGPlot getPlot() {

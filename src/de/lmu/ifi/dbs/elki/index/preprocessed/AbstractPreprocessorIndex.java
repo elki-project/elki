@@ -23,8 +23,8 @@ public abstract class AbstractPreprocessorIndex<O, R> extends AbstractIndex<O> {
   /**
    * Constructor.
    */
-  public AbstractPreprocessorIndex(Relation<O> rep) {
-    super(rep);
+  public AbstractPreprocessorIndex(Relation<O> relation) {
+    super(relation);
   }
 
   /**

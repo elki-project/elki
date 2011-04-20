@@ -622,8 +622,8 @@ public final class DatabaseUtil {
    *         database
    */
   public static SortedSet<ClassLabel> getClassLabels(Database database) {
-    final Relation<ClassLabel> rep = database.getRelation(TypeUtil.CLASSLABEL);
-    return getClassLabels(rep);
+    final Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
+    return getClassLabels(relation);
   }
 
   /**
@@ -714,13 +714,13 @@ public final class DatabaseUtil {
    * @return found cluster or it throws an exception.
    */
   public static ArrayModifiableDBIDs getObjectsByLabelMatch(Database database, Pattern name_pattern) {
-    Relation<String> rep = guessObjectLabelRepresentation(database);
+    Relation<String> relation = guessObjectLabelRepresentation(database);
     if(name_pattern == null) {
       return DBIDUtil.newArray();
     }
     ArrayModifiableDBIDs ret = DBIDUtil.newArray();
-    for(DBID objid : rep.iterDBIDs()) {
-      if(name_pattern.matcher(rep.get(objid)).matches()) {
+    for(DBID objid : relation.iterDBIDs()) {
+      if(name_pattern.matcher(relation.get(objid)).matches()) {
         ret.add(objid);
       }
     }

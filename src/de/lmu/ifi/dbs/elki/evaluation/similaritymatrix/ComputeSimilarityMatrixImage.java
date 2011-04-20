@@ -231,8 +231,8 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       Iterable<Database> iter = ResultUtil.filteredResults(result, Database.class);
       for(Database database : iter) {
         // Get an arbitrary representation
-        Relation<Object> rep = database.getRelation(TypeUtil.ANY);
-        db.getHierarchy().add(db, computeSimilarityMatrixImage(database, rep.iterDBIDs()));
+        Relation<Object> relation = database.getRelation(TypeUtil.ANY);
+        db.getHierarchy().add(db, computeSimilarityMatrixImage(database, relation.iterDBIDs()));
       }
     }
   }

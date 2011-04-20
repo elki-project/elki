@@ -135,8 +135,8 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> rep) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(rep, this);
+  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
   /**

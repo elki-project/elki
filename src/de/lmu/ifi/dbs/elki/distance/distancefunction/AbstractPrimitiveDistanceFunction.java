@@ -42,11 +42,11 @@ public abstract class AbstractPrimitiveDistanceFunction<O, D extends Distance<D>
   /**
    * Instantiate with a database to get the actual distance query.
    * 
-   * @param rep Representation
+   * @param relation Representation
    * @return Actual distance query.
    */
   @Override
-  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> rep) {
-    return new PrimitiveDistanceQuery<T, D>(rep, this);
+  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> relation) {
+    return new PrimitiveDistanceQuery<T, D>(relation, this);
   }
 }

@@ -87,7 +87,7 @@ public abstract class TreeIndexFactory<O, I extends TreeIndex<O, ?, ?>> implemen
   }
 
   @Override
-  abstract public I instantiate(Relation<O> representation);
+  abstract public I instantiate(Relation<O> relation);
 
   /**
    * Parameterization class.

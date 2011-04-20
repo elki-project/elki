@@ -87,7 +87,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
   /**
    * The database we visualize
    */
-  private Relation<NV> rep;
+  private Relation<NV> relation;
 
   /**
    * The clustering we visualize
@@ -105,7 +105,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     super(task);
     this.curves = curves;
     this.bins = bins;
-    this.rep = task.getRelation();
+    this.relation = task.getRelation();
     this.clustering = task.getGenerics(KEY_CLUSTERING, Clustering.class);
   }
 
@@ -126,7 +126,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
     // Creating histograms
     MinMax<Double> minmax = new MinMax<Double>();
-    final double frac = 1. / rep.size();
+    final double frac = 1. / relation.size();
     final int cols = numc + 1;
     AggregatingHistogram<double[], double[]> histogram = new AggregatingHistogram<double[], double[]>(bins, -.5, .5, new AggregatingHistogram.Adapter<double[], double[]>() {
       @Override
@@ -150,7 +150,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
         inc[clusterID + 1] = frac;
         for(DBID id : cluster.getIDs()) {
           try {
-            double pos = proj.fastProjectDataToRenderSpace(rep.get(id)) / Projection.SCALE;
+            double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
             histogram.aggregate(pos, inc);
           }
           catch(ObjectNotFoundException e) {
@@ -163,8 +163,8 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     // Actual data distribution.
     double[] inc = new double[cols];
     inc[0] = frac;
-    for(DBID id : rep.iterDBIDs()) {
-      double pos = proj.fastProjectDataToRenderSpace(rep.get(id)) / Projection.SCALE;
+    for(DBID id : relation.iterDBIDs()) {
+      double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
       histogram.aggregate(pos, inc);
     }
     // for scaling, get the maximum occurring value in the bins:
@@ -182,7 +182,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, true, false, context.getStyleLibrary());
 
       // draw axes that are non-trivial
-      final int dimensionality = DatabaseUtil.dimensionality(rep);
+      final int dimensionality = DatabaseUtil.dimensionality(relation);
       double orig = proj.fastProjectScaledToRender(new Vector(dimensionality));
       for(int d = 0; d < dimensionality; d++) {
         Vector v = new Vector(dimensionality);
@@ -355,19 +355,19 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
     @Override
     public void addVisualizers(VisualizerContext context, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
-      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
+      Iterator<Relation<? extends NumberVector<?, ?>>> rels = VisualizerUtil.iterateVectorFieldRepresentations(result);
+      for(Relation<? extends NumberVector<?, ?>> rel : IterableUtil.fromIterator(rels)) {
         // register self
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), rep, this, P1DHistogramVisualizer.class);
+        final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), rel, this, P1DHistogramVisualizer.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-        context.addVisualizer(rep, task);
+        context.addVisualizer(rel, task);
       }
       ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
-        Iterator<Relation<? extends NumberVector<?, ?>>> reps2 = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
-        for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps2)) {
+        Iterator<Relation<? extends NumberVector<?, ?>>> rels2 = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+        for(Relation<? extends NumberVector<?, ?>> rel2 : IterableUtil.fromIterator(rels2)) {
           // register self
-          final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), rep, this, P1DHistogramVisualizer.class);
+          final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), rel2, this, P1DHistogramVisualizer.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           task.put(KEY_CLUSTERING, c);
           context.addVisualizer(c, task);

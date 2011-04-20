@@ -74,7 +74,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
   /**
    * The representations we have.
    */
-  protected final List<Relation<?>> representations;
+  protected final List<Relation<?>> relations;
 
   /**
    * IDs of this database
@@ -109,9 +109,9 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
   public HashmapDatabase(Collection<IndexFactory<?, ?>> indexFactories) {
     super();
     this.ids = DBIDUtil.newTreeSet();
-    this.representations = new java.util.Vector<Relation<?>>();
+    this.relations = new java.util.Vector<Relation<?>>();
     this.idrep = new DBIDView(this, this.ids);
-    this.representations.add(idrep);
+    this.relations.add(idrep);
     this.addChildResult(idrep);
     this.indexes = new java.util.Vector<Index<?>>();
 
@@ -172,8 +172,8 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
           continue;
         }
         @SuppressWarnings("unchecked")
-        final Relation<Object> rep = (Relation<Object>) targets[i];
-        rep.set(newid, objpackages.data(j, i));
+        final Relation<Object> relation = (Relation<Object>) targets[i];
+        relation.set(newid, objpackages.data(j, i));
       }
       newids.add(newid);
 
@@ -218,12 +218,12 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     // insert object into representations
     for(int i = 0; i < targets.length; i++) {
       @SuppressWarnings("unchecked")
-      final Relation<Object> rep = (Relation<Object>) targets[i];
+      final Relation<Object> relation = (Relation<Object>) targets[i];
       // Skip the DBID we used above
-      if((Object) rep == idrep) {
+      if((Object) relation == idrep) {
         continue;
       }
-      rep.set(newid, objpackage.data(i));
+      relation.set(newid, objpackage.data(i));
     }
 
     // insert into indexes
@@ -253,23 +253,22 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     // align representations.
     Relation<?>[] targets = new Relation<?>[pack.metaLength()];
     {
-      BitSet used = new BitSet(representations.size());
+      BitSet used = new BitSet(relations.size());
       for(int i = 0; i < targets.length; i++) {
         SimpleTypeInformation<?> meta = pack.meta(i);
         // TODO: aggressively try to match exact metas first?
         // Try to match unused representations only
-        for(int j = used.nextClearBit(0); j >= 0 && j < representations.size(); j = used.nextClearBit(j + 1)) {
-          Relation<?> rep = representations.get(j);
-          if(rep.getDataTypeInformation().isAssignableFromType(meta)) {
-            targets[i] = rep;
+        for(int j = used.nextClearBit(0); j >= 0 && j < relations.size(); j = used.nextClearBit(j + 1)) {
+          Relation<?> relation = relations.get(j);
+          if(relation.getDataTypeInformation().isAssignableFromType(meta)) {
+            targets[i] = relation;
             used.set(j);
             break;
           }
         }
         if(targets[i] == null) {
-          Relation<?> rep = addNewRepresentation(meta);
-          targets[i] = rep;
-          used.set(representations.size() - 1);
+          targets[i] = addNewRepresentation(meta);
+          used.set(relations.size() - 1);
         }
       }
     }
@@ -285,20 +284,20 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
   private Relation<?> addNewRepresentation(SimpleTypeInformation<?> meta) {
     @SuppressWarnings("unchecked")
     SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
-    Relation<?> rep = new MaterializedRelation<Object>(this, ometa, ids);
-    representations.add(rep);
-    getHierarchy().add(this, rep);
+    Relation<?> relation = new MaterializedRelation<Object>(this, ometa, ids);
+    relations.add(relation);
+    getHierarchy().add(this, relation);
     // Try to add indexes where appropriate
     for(IndexFactory<?, ?> factory : indexFactories) {
       if(factory.getInputTypeRestriction().isAssignableFromType(meta)) {
         @SuppressWarnings("unchecked")
         final IndexFactory<Object, ?> ofact = (IndexFactory<Object, ?>) factory;
         @SuppressWarnings("unchecked")
-        final Relation<Object> orep = (Relation<Object>) rep;
+        final Relation<Object> orep = (Relation<Object>) relation;
         addIndex(ofact.instantiate(orep));
       }
     }
-    return rep;
+    return relation;
   }
 
   /**
@@ -363,10 +362,10 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     // Remove id
     ids.remove(id);
     // Remove from all representations.
-    for(Relation<?> rep : representations) {
+    for(Relation<?> relation : relations) {
       // ID has already been removed, and this would loop...
-      if(rep != idrep) {
-        rep.delete(id);
+      if(relation != idrep) {
+        relation.delete(id);
       }
     }
     restoreID(id);
@@ -384,8 +383,8 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     try {
       // Build an object package
       SingleObjectBundle ret = new SingleObjectBundle();
-      for(Relation<?> rep : representations) {
-        ret.append(rep.getDataTypeInformation(), rep.get(id));
+      for(Relation<?> relation : relations) {
+        ret.append(relation.getDataTypeInformation(), relation.get(id));
       }
       return ret;
     }
@@ -427,9 +426,9 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
   @Override
   public <O> Relation<O> getRelation(TypeInformation restriction, Object... hints) throws NoSupportedDataTypeException {
     // Get first match
-    for(Relation<?> rep : representations) {
-      if(restriction.isAssignableFromType(rep.getDataTypeInformation())) {
-        return (Relation<O>) rep;
+    for(Relation<?> relation : relations) {
+      if(restriction.isAssignableFromType(relation.getDataTypeInformation())) {
+        return (Relation<O>) relation;
       }
     }
     throw new NoSupportedDataTypeException(restriction);

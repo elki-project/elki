@@ -80,13 +80,13 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
   /**
    * Constructor.
    * 
-   * @param representation Representation
+   * @param relation Representation
    * @param fileName file name
    * @param pageSize page size
    * @param cacheSize cache size
    */
-  public TreeIndex(Relation<O> representation, String fileName, int pageSize, long cacheSize) {
-    super(representation);
+  public TreeIndex(Relation<O> relation, String fileName, int pageSize, long cacheSize) {
+    super(relation);
     this.fileName = fileName;
     this.pageSize = pageSize;
     this.cacheSize = cacheSize;

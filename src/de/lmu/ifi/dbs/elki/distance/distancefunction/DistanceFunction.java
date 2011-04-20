@@ -50,8 +50,8 @@ public interface DistanceFunction<O, D extends Distance<?>> extends Parameteriza
   /**
    * Instantiate with a database to get the actual distance query.
    * 
-   * @param rep The representation to use
+   * @param relation The representation to use
    * @return Actual distance query.
    */
-  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> rep);
+  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> relation);
 }
