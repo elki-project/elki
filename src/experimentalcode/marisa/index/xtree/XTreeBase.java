@@ -17,8 +17,10 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -27,6 +29,7 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -35,14 +38,8 @@ import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
 import experimentalcode.marisa.index.xtree.util.SquareEuclideanDistanceFunction;
 import experimentalcode.marisa.index.xtree.util.XSplitter;
@@ -122,107 +119,34 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   protected int overlap_type = DATA_OVERLAP;
 
-  /**
-   * OptionID for {@link #MIN_ENTRIES_PARAMETER}
-   */
-  public static final OptionID MIN_ENTRIES_ID = OptionID.getOrCreateOptionID("xtree.min_entry_fraction", "The fraction (in [0,1]) of maximally allowed page entries which is to be be used as minimum number of page entries");
-
-  /**
-   * OptionID for {@link #MIN_FANOUT_PARAMETER}
-   */
-  public static final OptionID MIN_FANOUT_ID = OptionID.getOrCreateOptionID("xtree.min_fanout_fraction", "The fraction (in [0,1]) of maximally allowed directory page entries which is to be tolerated as minimum number of directory page entries for minimum overlap splits");
-
-  /**
-   * OptionID for {@link #REINSERT_PARAMETER}
-   */
-  public static final OptionID REINSERT_ID = OptionID.getOrCreateOptionID("xtree.reinsert_fraction", "The fraction (in [0,1]) of entries to be reinserted instead of performing a split");
-
-  /**
-   * OptionID for {@link #MAX_OVERLAP_PARAMETER}
-   */
-  public static final OptionID MAX_OVERLAP_ID = OptionID.getOrCreateOptionID("xtree.max_overlap_fraction", "The fraction (in [0,1]) of allowed entry overlaps. Overlap type specified in xtree.overlap_type");
-
-  /**
-   * OptionID for {@link #OVERLAP_TYPE_PARAMETER}
-   */
-  public static final OptionID OVERLAP_TYPE_ID = OptionID.getOrCreateOptionID("xtree.overlap_type", "How to calculate the maximum overlap? Options: \"DataOverlap\" = {ratio of data objects in the overlapping region}, \"VolumeOverlap\" = {(overlap volume) / (volume 1 + volume 2)}");
-
-  /**
-   * Parameter for minimum number of entries per page; defaults to
-   * <code>.4</code> times the number of maximum entries.
-   */
-  private final DoubleParameter MIN_ENTRIES_PARAMETER = new DoubleParameter(MIN_ENTRIES_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.OPEN), 0.4);
-
-  /**
-   * Parameter for minimum number of entries per directory page when going for a
-   * minimum overlap split; defaults to <code>.3</code> times the number of
-   * maximum entries.
-   */
-  private final DoubleParameter MIN_FANOUT_PARAMETER = new DoubleParameter(MIN_FANOUT_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.3);
-
-  /**
-   * Parameter for the number of re-insertions to be performed instead of doing
-   * a split; defaults to <code>.3</code> times the number of maximum entries.
-   */
-  private final DoubleParameter REINSERT_PARAMETER = new DoubleParameter(REINSERT_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.OPEN), 0.3);
-
-  /**
-   * Parameter for the maximally allowed overlap. Defaults to <code>.2</code>.
-   */
-  private final DoubleParameter MAX_OVERLAP_PARAMETER = new DoubleParameter(MAX_OVERLAP_ID, new IntervalConstraint(0, IntervalBoundary.OPEN, 1, IntervalBoundary.CLOSE), 0.2);
-
-  /**
-   * Parameter for defining the overlap type to be used for the maximum overlap
-   * test. Available options:
-   * <dl>
-   * <dt><code>DataOverlap</code></dt>
-   * <dd>The overlap is the ratio of total data objects in the overlapping
-   * region.</dd>
-   * <dt><code>VolumeOverlap</code></dt>
-   * <dd>The overlap is the fraction of the overlapping region of the two
-   * original mbrs:<br>
-   * <code>(overlap volume of mbr 1 and mbr 2) / (volume of mbr 1 + volume of mbr 2)</code>
-   * <br>
-   * This option is faster than <code>DataOverlap</code>, however, it may result
-   * in a tree structure which is not optimally adapted to the indexed data.</dd>
-   * </dl>
-   * Defaults to <code>VolumeOverlap</code>.
-   */
-  private final StringParameter OVERLAP_TYPE_PARAMETER = new StringParameter(OVERLAP_TYPE_ID, new EqualStringConstraint(new String[] { "DataOverlap", "VolumeOverlap" }), "VolumeOverlap");
-
   public static final int QUEUE_INIT = 50;
 
-  /*
-   * Creates a new RTree.
+  /**
+   * Constructor.
+   *
+   * @param relation
+   * @param fileName
+   * @param pageSize
+   * @param cacheSize
+   * @param bulk
+   * @param bulkLoadStrategy
+   * @param insertionCandidates
+   * @param relativeMinEntries
+   * @param relativeMinFanout
+   * @param reinsert_fraction
+   * @param max_overlap
+   * @param overlap_type
    */
-  public XTreeBase(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    if(config.grab(MIN_ENTRIES_PARAMETER)) {
-      relativeMinEntries = MIN_ENTRIES_PARAMETER.getValue();
-    }
-    if(config.grab(MIN_FANOUT_PARAMETER)) {
-      relativeMinFanout = MIN_FANOUT_PARAMETER.getValue();
-    }
-    if(config.grab(REINSERT_PARAMETER)) {
-      reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
-    }
-    if(config.grab(MAX_OVERLAP_PARAMETER)) {
-      max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
-    }
-    if(config.grab(OVERLAP_TYPE_PARAMETER)) {
-      String mOType = OVERLAP_TYPE_PARAMETER.getValue();
-      if(mOType.equals("DataOverlap")) {
-        overlap_type = DATA_OVERLAP;
-      }
-      else if(mOType.equals("VolumeOverlap")) {
-        overlap_type = VOLUME_OVERLAP;
-      }
-      else {
-        config.reportError(new WrongParameterValueException("Wrong input parameter for overlap type '" + mOType + "'"));
-      }
-    }
+  public XTreeBase(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+    this.relativeMinEntries = relativeMinEntries;
+    this.relativeMinFanout = relativeMinFanout;
+    this.reinsert_fraction = reinsert_fraction;
+    this.max_overlap = max_overlap;
+    this.overlap_type = overlap_type;
   }
+
+
 
   /**
    * Returns true if in the specified node an overflow occurred, false
@@ -337,7 +261,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    * @param objects the data objects to be indexed
    */
   @Override
-  protected void bulkLoad(List<O> objects) {
+  protected void bulkLoad(ArrayDBIDs ids, List<O> objects) {
     throw new UnsupportedOperationException("Bulk Load not supported for XTree");
   }
 

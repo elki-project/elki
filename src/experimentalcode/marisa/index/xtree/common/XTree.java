@@ -2,13 +2,14 @@ package experimentalcode.marisa.index.xtree.common;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XTreeBase;
 
@@ -33,14 +34,26 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(XTree.class);
-  
+
   /**
-   * Creates a new XStar-Tree with default parameters.
+   * Constructor.
+   *
+   * @param relation
+   * @param fileName
+   * @param pageSize
+   * @param cacheSize
+   * @param bulk
+   * @param bulkLoadStrategy
+   * @param insertionCandidates
+   * @param relativeMinEntries
+   * @param relativeMinFanout
+   * @param reinsert_fraction
+   * @param max_overlap
+   * @param overlap_type
    */
-  public XTree(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // this.debug = true;
+  public XTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+    // TODO Auto-generated constructor stub
   }
 
   /**
@@ -52,8 +65,8 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
   }
 
   @Override
-  protected SpatialEntry createNewLeafEntry(O o) {
-    return new SpatialLeafEntry(o.getID(), getValues(o));
+  protected SpatialEntry createNewLeafEntry(DBID id, O o) {
+    return new SpatialLeafEntry(id, getValues(o));
   }
 
   @Override

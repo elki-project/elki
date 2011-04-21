@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -76,7 +77,7 @@ public class KNNTests {
     DataInputStream in = new DataInputStream(fis);
     int stop = 10000;
     for(int i = 0; (in.available() != 0) && i < stop; i++) {
-      queries.add(XTreeTests.readNext(in, i, xt.getDimensionality()));
+      queries.add(DBIDUtil.importInteger(i), XTreeTests.readNext(in, xt.getDimensionality()));
     }
     in.close();
     fis.close();

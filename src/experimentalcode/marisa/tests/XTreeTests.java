@@ -9,6 +9,7 @@ import java.util.Date;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import experimentalcode.marisa.index.xtree.common.XTree;
@@ -35,7 +36,7 @@ public class XTreeTests {
 
     // init xTree
     SerializedParameterization config = new SerializedParameterization(split);
-    XTree<DoubleVector> xTree = new XTree<DoubleVector>(config);
+    XTree<DoubleVector> xTree = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
 
     FileInputStream fis = new FileInputStream(csvInputFile);
@@ -48,7 +49,7 @@ public class XTreeTests {
     for(int i = 0; (in.available() != 0); i++) {
       if(i == stop)
         break;
-      xTree.insert(readNext(in, i));
+      xTree.insert(DBIDUtil.importInteger(i), readNext(in));
       if(i % 1000 == 0)
         System.out.println("Inserted " + i + " elements: " + (((double) i) / 1000000) + "% in " + ((double) (System.currentTimeMillis() - t1)) / 60000 + " minutes");
     }
@@ -59,7 +60,7 @@ public class XTreeTests {
     return xTree;
   }
 
-  public static DoubleVector readNext(DataInputStream in, int id) throws NumberFormatException, IOException {
+  public static DoubleVector readNext(DataInputStream in) throws NumberFormatException, IOException {
     String[] d = null;
     double[] coords = null;
     int dimension;
@@ -71,12 +72,10 @@ public class XTreeTests {
     for(int i = 0; i < dimension; i++) {
       coords[i] = Double.valueOf(d[i]);
     }
-    DoubleVector dv = new DoubleVector(coords);
-    dv.setID(DBIDUtil.importInteger(id));
-    return dv;
+    return new DoubleVector(coords);
   }
 
-  public static DoubleVector readNext(DataInputStream in, int id, int dim) throws NumberFormatException, IOException {
+  public static DoubleVector readNext(DataInputStream in, int dim) throws NumberFormatException, IOException {
     String[] d = null;
     double[] coords = null;
     int dimension;
@@ -91,9 +90,7 @@ public class XTreeTests {
     for(int i = 0; i < dim; i++) {
       coords[i] = Double.valueOf(d[i]);
     }
-    DoubleVector dv = new DoubleVector(coords);
-    dv.setID(DBIDUtil.importInteger(id));
-    return dv;
+    return new DoubleVector(coords);
   }
 
   public static XTree<DoubleVector> loadXTree() throws ParameterException {
@@ -101,7 +98,7 @@ public class XTreeTests {
     // String outputFile = "15DUniformXTree_default_mO1";
     String[] split = ("-treeindex.file C:/WORK/Theseus/Experimente/xtrees/" + outputFile + " " + "-treeindex.cachesize " + CACHE_SIZE).split("\\s");
     SerializedParameterization config = new SerializedParameterization(Arrays.asList(split));
-    XTree<DoubleVector> xt = new XTree<DoubleVector>(config);
+    XTree<DoubleVector> xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
     xt.initializeFromFile();
     return xt;
@@ -110,7 +107,7 @@ public class XTreeTests {
   public static XTree<DoubleVector> loadXTree(String xtFilename) throws ParameterException {
     String[] split = ("-treeindex.file " + xtFilename + " " + "-treeindex.cachesize " + CACHE_SIZE).split("\\s");
     SerializedParameterization config = new SerializedParameterization(Arrays.asList(split));
-    XTree<DoubleVector> xt = new XTree<DoubleVector>(config);
+    XTree<DoubleVector> xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
     xt.initializeFromFile();
     return xt;
@@ -123,7 +120,7 @@ public class XTreeTests {
 
     // init xTree
     SerializedParameterization config = new SerializedParameterization(split);
-    XTree<DoubleVector> xTree = new XTree<DoubleVector>(config);
+    XTree<DoubleVector> xTree = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
 
     FileInputStream fis = new FileInputStream(csvInputFile);
@@ -136,7 +133,7 @@ public class XTreeTests {
         throw new RuntimeException("numInstances = " + numInstances + " is too large for this framework! Can only deal with at most " + Integer.MAX_VALUE + " entries");
       if(i == numInstances)
         break;
-      xTree.insert(readNext(in, (int) i));
+      xTree.insert(DBIDUtil.importInteger((int)i), readNext(in));
       if(verbose && i % 1000 == 0)
         System.out.println("Inserted " + i + " elements: " + (((double) i) / 1000000) + "% in " + ((double) (System.currentTimeMillis() - t1)) / 60000 + " minutes");
     }
