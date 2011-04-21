@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
  * 
  * @author Erich Schubert
  */
-public interface SharedNearestNeighborIndex<O> extends Index<O> {
+public interface SharedNearestNeighborIndex<O> extends Index {
   /**
    * Get the precomputed nearest neighbors
    * 

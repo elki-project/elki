@@ -95,7 +95,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
   /**
    * Indexes
    */
-  final List<Index<?>> indexes;
+  final List<Index> indexes;
 
   /**
    * Index factories
@@ -114,7 +114,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     this.idrep = new DBIDView(this, this.ids);
     this.relations.add(idrep);
     this.addChildResult(idrep);
-    this.indexes = new java.util.Vector<Index<?>>();
+    this.indexes = new java.util.Vector<Index>();
 
     // Add indexes.
     this.indexFactories = new java.util.Vector<IndexFactory<?, ?>>();
@@ -131,7 +131,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
   }
 
   @Override
-  public void addIndex(Index<?> index) {
+  public void addIndex(Index index) {
     this.indexes.add(index);
     // TODO: actually add index to the representation used?
     this.addChildResult(index);
@@ -178,14 +178,12 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       }
       newids.add(newid);
 
-      // insert into indexes
+      // Notify indexes of insertions
       // FIXME: support bulk...
-      for(Index<?> index : indexes) {
+      for(Index index : indexes) {
         for(int i = 0; i < targets.length; i++) {
           if(index.getRelation() == targets[i]) {
-            @SuppressWarnings("unchecked")
-            final Index<Object> oindex = (Index<Object>) index;
-            oindex.insert(newid, objpackages.data(j, i));
+            index.insert(newid);
           }
         }
       }
@@ -228,12 +226,10 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     }
 
     // insert into indexes
-    for(Index<?> index : indexes) {
+    for(Index index : indexes) {
       for(int i = 0; i < targets.length; i++) {
         if(index.getRelation() == targets[i]) {
-          @SuppressWarnings("unchecked")
-          final Index<Object> oindex = (Index<Object>) index;
-          oindex.insert(newid, objpackage.data(i));
+          index.insert(newid);
         }
       }
     }
@@ -315,7 +311,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       return null;
     }
     // remove from all indexes
-    for(Index<?> index : indexes) {
+    for(Index index : indexes) {
       index.delete(id);
     }
     // remove from db
@@ -345,7 +341,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       doDelete(id);
     }
     // Remove from indexes
-    for(Index<?> index : indexes) {
+    for(Index index : indexes) {
       index.deleteAll(ids);
     }
     // fire deletion event
@@ -459,7 +455,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       throw new AbortException("kNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<?> idx = indexes.get(i);
+      Index idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
         if(idx.getRelation() == objQuery) {
           KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceFunction, hints);
@@ -486,7 +482,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       throw new AbortException("kNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<?> idx = indexes.get(i);
+      Index idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
         if(idx.getRelation() == distanceQuery.getRelation()) {
           KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceQuery, hints);
@@ -512,7 +508,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       throw new AbortException("Range query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<?> idx = indexes.get(i);
+      Index idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
         if(idx.getRelation() == objQuery) {
           RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceFunction, hints);
@@ -539,7 +535,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       throw new AbortException("Range query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<?> idx = indexes.get(i);
+      Index idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
         if(idx.getRelation() == distanceQuery.getRelation()) {
           RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceQuery, hints);
@@ -565,7 +561,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<?> idx = indexes.get(i);
+      Index idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
         if(idx.getRelation() == objQuery) {
           RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceFunction, hints);
@@ -597,7 +593,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
     for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index<?> idx = indexes.get(i);
+      Index idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
         if(idx.getRelation() == distanceQuery.getRelation()) {
           RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceQuery, hints);

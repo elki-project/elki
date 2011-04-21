@@ -28,7 +28,7 @@ public interface IndexBasedDistanceFunction<O, D extends Distance<D>> extends Di
    * @param <T> Object type
    * @param <D> Distance type
    */
-  public static interface Instance<T, I extends Index<T>, D extends Distance<D>> extends DistanceQuery<T, D> {
+  public static interface Instance<T, I extends Index, D extends Distance<D>> extends DistanceQuery<T, D> {
     /**
      * Get the index used.
      * 

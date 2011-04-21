@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -130,15 +129,13 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   /**
    * Performs a bulk load on this RTree with the specified data. Is called by
    * the constructor and should be overwritten by subclasses if necessary.
-   * 
-   * @param objects the data objects to be indexed
    */
   @Override
-  protected void bulkLoad(ArrayDBIDs ids, List<O> objects) {
-    super.bulkLoad(ids, objects);
+  protected void bulkLoad(DBIDs ids) {
+    super.bulkLoad(ids);
 
     // adjust all knn distances
-    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(objects.size());
+    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
     for(DBID id : ids) {
       knnLists.put(id, new KNNHeap<D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance()));
     }
@@ -501,12 +498,10 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
   /**
    * Creates a new leaf entry representing the specified data object.
-   * 
-   * @param object the data object to be represented by the new entry
    */
   @Override
-  protected RdKNNEntry<D, N> createNewLeafEntry(DBID id, O object) {
-    return new RdKNNLeafEntry<D, N>(id, getValues(object), distanceQuery.getDistanceFactory().undefinedDistance());
+  protected RdKNNEntry<D, N> createNewLeafEntry(DBID id) {
+    return new RdKNNLeafEntry<D, N>(id, getValues(id), distanceQuery.getDistanceFactory().undefinedDistance());
   }
 
   /**

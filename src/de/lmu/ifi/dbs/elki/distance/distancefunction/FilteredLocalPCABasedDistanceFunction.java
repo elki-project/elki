@@ -35,7 +35,7 @@ public interface FilteredLocalPCABasedDistanceFunction<O extends NumberVector<?,
    * @param <I> Index type
    * @param <D> Distance type
    */
-  public static interface Instance<T extends NumberVector<?, ?>, I extends Index<T>, D extends Distance<D>> extends IndexBasedDistanceFunction.Instance<T, I, D> {
+  public static interface Instance<T extends NumberVector<?, ?>, I extends Index, D extends Distance<D>> extends IndexBasedDistanceFunction.Instance<T, I, D> {
     // No additional restrictions
   }
 }

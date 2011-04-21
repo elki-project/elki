@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <I> index type
  * @param <D> distance type
  */
-public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index<?>, R, D extends Distance<D>> implements IndexBasedSimilarityFunction<O, D> {
+public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index, R, D extends Distance<D>> implements IndexBasedSimilarityFunction<O, D> {
   /**
    * Parameter to specify the preprocessor to be used.
    * <p>
@@ -74,7 +74,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index<?>
    * @param <I> Index type
    * @param <D> Distance result type
    */
-  abstract public static class Instance<O, I extends Index<?>, R, D extends Distance<D>> extends AbstractDBIDSimilarityQuery<O, D> implements IndexBasedSimilarityFunction.Instance<O, I, D> {
+  abstract public static class Instance<O, I extends Index, R, D extends Distance<D>> extends AbstractDBIDSimilarityQuery<O, D> implements IndexBasedSimilarityFunction.Instance<O, I, D> {
     /**
      * Parent index
      */

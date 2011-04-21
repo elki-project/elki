@@ -297,7 +297,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
    * @param index
    */
   @Override
-  public void addIndex(Index<?> index) {
+  public void addIndex(Index index) {
     throw new UnsupportedOperationException("FIXME: Proxy databases currently do not yet allow indexes.");
   }
 

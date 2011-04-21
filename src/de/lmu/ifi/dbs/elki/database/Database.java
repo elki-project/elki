@@ -298,7 +298,7 @@ public interface Database extends HierarchicalResult {
    * 
    * @param index Index to add
    */
-  public void addIndex(Index<?> index);
+  public void addIndex(Index index);
 
   /**
    * Adds a listener for the <code>DataStoreEvent</code> posted after the

@@ -57,8 +57,8 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
   }
 
   @Override
-  protected SpatialEntry createNewLeafEntry(DBID id, O o) {
-    return new SpatialLeafEntry(id, getValues(o));
+  protected SpatialEntry createNewLeafEntry(DBID id) {
+    return new SpatialLeafEntry(id, getValues(id));
   }
 
   @Override

@@ -5,8 +5,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
@@ -96,15 +96,12 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   /**
    * Performs a bulk load on this RTree with the specified data. Is called by
    * the constructor and should be overwritten by subclasses if necessary.
-   * 
-   * @param objects the data objects to be indexed
    */
   @Override
-  protected void bulkLoad(ArrayDBIDs ids, List<O> objects) {
-    assert(ids.size() == objects.size());
-    List<SpatialPair<DBID, O>> spatialObjects = new ArrayList<SpatialPair<DBID, O>>(objects.size());
-    for (int i = 0; i < ids.size(); i++) {
-      spatialObjects.add(new SpatialPair<DBID, O>(ids.get(i), objects.get(i)));
+  protected void bulkLoad(DBIDs ids) {
+    List<SpatialPair<DBID, O>> spatialObjects = new ArrayList<SpatialPair<DBID, O>>(ids.size());
+    for (DBID id : ids) {
+      spatialObjects.add(new SpatialPair<DBID, O>(id, relation.get(id)));
     }
     // create leaf nodes
     // noinspection PointlessArithmeticExpression
@@ -211,8 +208,8 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   }
 
   @Override
-  protected SpatialEntry createNewLeafEntry(DBID id, O o) {
-    return new SpatialLeafEntry(id, getValues(o));
+  protected SpatialEntry createNewLeafEntry(DBID id) {
+    return new SpatialLeafEntry(id, getValues(id));
   }
 
   @Override

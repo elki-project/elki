@@ -12,8 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <O> Database Object type
  */
-public interface RangeIndex<O> extends Index<O> {
-
+public interface RangeIndex<O> extends Index {
   /**
    * Get a range query object for the given distance function and k.
    * 

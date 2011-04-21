@@ -69,7 +69,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
     }
 
     // find the leaf node containing o
-    double[] values = getValues(o);
+    double[] values = getValues(id);
     HyperBoundingBox mbr = new HyperBoundingBox(values, values);
     TreeIndexPath<DeLiCluEntry> pathToObject = findPathToObject(getRootPath(), mbr, id);
 
@@ -185,12 +185,10 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
 
   /**
    * Creates a new leaf entry representing the specified data object.
-   * 
-   * @param object the data object to be represented by the new entry
    */
   @Override
-  protected DeLiCluEntry createNewLeafEntry(DBID id, O object) {
-    return new DeLiCluLeafEntry(id, getValues(object));
+  protected DeLiCluEntry createNewLeafEntry(DBID id) {
+    return new DeLiCluLeafEntry(id, getValues(id));
   }
 
   /**

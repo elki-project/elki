@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
  * @param <V> Vector type
  * @param <P> Projection result type
  */
-public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends ProjectionResult> extends Index<V> {
+public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends ProjectionResult> extends Index {
   /**
    * Get the precomputed local projection for a particular object ID.
    * 

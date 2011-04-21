@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.index;
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -15,10 +12,8 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @author Elke Achtert
  * 
  * @apiviz.landmark
- * 
- * @param <O> the type of objects to be stored in the index
  */
-public interface Index<O> extends Result {
+public interface Index extends Result {
   /**
    * Get the underlying page file (or a proxy), for access counts.
    * 
@@ -29,17 +24,17 @@ public interface Index<O> extends Result {
   /**
    * Inserts the specified object into this index.
    * 
-   * @param object the object to be inserted
+   * @param id the object to be inserted
    */
-  public void insert(DBID id, O object);
+  public void insert(DBID id);
 
   /**
    * Inserts the specified objects into this index. If a bulk load mode is
    * implemented, the objects are inserted in one bulk.
    * 
-   * @param objects the objects to be inserted
+   * @param ids the objects to be inserted
    */
-  public void insertAll(ArrayDBIDs ids, List<O> objects);
+  public void insertAll(DBIDs ids);
 
   /**
    * Deletes the specified object from this index.
@@ -61,5 +56,5 @@ public interface Index<O> extends Result {
    * 
    * @return Relation this index is bound to
    */
-  public Relation<O> getRelation();
+  public Relation<?> getRelation();
 }
