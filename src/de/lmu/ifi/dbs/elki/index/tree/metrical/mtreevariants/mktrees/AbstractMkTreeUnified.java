@@ -59,8 +59,8 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    * <p/>
    * <p>
    * Calls for each object
-   * {@link AbstractMTree#insertAll(ArrayDBIDs,boolean)
-   * AbstractMTree.insert(object, false)}. After insertion a batch knn query is
+   * {@link AbstractMTree#insert(DBID,O,boolean)
+   * AbstractMTree.insert(id, object, false)}. After insertion a batch knn query is
    * performed and the knn distances are adjusted.
    * <p/>
    */

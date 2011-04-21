@@ -21,7 +21,7 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
   /**
    * Constructor.
    * 
-   * @param rep Database to use
+   * @param relation Relation to use
    */
   public AbstractPreferenceVectorIndex(Relation<NV> relation) {
     super(relation);

@@ -69,9 +69,8 @@ public final class TypeUtil {
   public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class);
 
   /**
-   * Make a type array
+   * Make a type array easily.
    * 
-   * @param <T> Base type
    * @param ts Types
    * @return array
    */
