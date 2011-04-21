@@ -4,7 +4,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -35,7 +34,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  *
  * @param <V> 
  */
-public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
   /**
    * logger
    */
@@ -54,7 +53,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
   /**
    * Our predicate to obtain the neighbors
    */
-  NeighborSetPredicate.Factory<DatabaseObject> npredf = null;
+  NeighborSetPredicate.Factory<Object> npredf = null;
 
   /**
    * dims Parameter
@@ -72,7 +71,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
    * @param npredf
    * @param dims
    */
-  public MeanMultipleAttributes(Factory<DatabaseObject> npredf, List<Integer> dims) {
+  public MeanMultipleAttributes(Factory<Object> npredf, List<Integer> dims) {
     super();
     this.npredf = npredf;
     this.dims = dims;
@@ -84,7 +83,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
   }
 
   @Override
-  public OutlierResult run(Database<V> database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
 
     final NeighborSetPredicate npred = npredf.instantiate(database);
     Matrix hMatrix = new Matrix(dims.size(),database.size());
@@ -148,7 +147,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
    * 
    */
   public static <V extends NumberVector<?, ?>> MeanMultipleAttributes<V> parameterize(Parameterization config) {
-    final NeighborSetPredicate.Factory<DatabaseObject> npredf = getNeighborPredicate(config);
+    final NeighborSetPredicate.Factory<Object> npredf = getNeighborPredicate(config);
     final List<Integer> dims = getDims(config);
     if(config.hasErrors()) {
       return null;
@@ -161,8 +160,8 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
    * @param config
    * @return
    */
-  public static NeighborSetPredicate.Factory<DatabaseObject> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>> param = new ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
+  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
+    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }

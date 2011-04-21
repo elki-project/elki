@@ -6,7 +6,6 @@ import org.apache.commons.math.stat.descriptive.rank.Median;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -37,7 +36,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  *
  * @param <V>
  */
-public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
   /**
    * logger
    */
@@ -56,7 +55,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
   /**
    * Our predicate to obtain the neighbors
    */
-  NeighborSetPredicate.Factory<DatabaseObject> npredf = null;
+  NeighborSetPredicate.Factory<Object> npredf = null;
 
   /**
    * dims Parameter
@@ -74,7 +73,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
    * @param npredf
    * @param dims
    */
-  public MedianMultipleAttributes(Factory<DatabaseObject> npredf, List<Integer> dims) {
+  public MedianMultipleAttributes(Factory<Object> npredf, List<Integer> dims) {
     super();
     this.npredf = npredf;
     this.dims = dims;
@@ -86,7 +85,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
   }
 
   @Override
-  public OutlierResult run(Database<V> database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     final NeighborSetPredicate npred = npredf.instantiate(database);
     Matrix hMatrix = new Matrix(dims.size(),database.size());
     Matrix hMeansMatrix = new Matrix(dims.size(),1);
@@ -154,7 +153,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
    * 
    */
   public static <V extends NumberVector<?, ?>> MedianMultipleAttributes<V> parameterize(Parameterization config) {
-    final NeighborSetPredicate.Factory<DatabaseObject> npredf = getNeighborPredicate(config);
+    final NeighborSetPredicate.Factory<Object> npredf = getNeighborPredicate(config);
     final List<Integer> dims = getDims(config);
     if(config.hasErrors()) {
       return null;
@@ -167,8 +166,8 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
    * @param config
    * @return
    */
-  public static NeighborSetPredicate.Factory<DatabaseObject> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>> param = new ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
+  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
+    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
@@ -185,7 +184,4 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
     }
     return null;
   }
-
 }
- 
-

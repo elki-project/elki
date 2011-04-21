@@ -8,7 +8,6 @@ import org.apache.commons.math.stat.descriptive.rank.Median;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -38,7 +37,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * 
  * @param <V>
  */
-public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -52,7 +51,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
   /**
    * Our predicate to obtain the neighbors
    */
-  NeighborSetPredicate.Factory<DatabaseObject> npredf = null;
+  NeighborSetPredicate.Factory<Object> npredf = null;
 
   /**
    * 
@@ -86,7 +85,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * 
    * @param distanceFunction
    */
-  protected TrimmedMeanApproach(double p, int z, NeighborSetPredicate.Factory<DatabaseObject> npredf) {
+  protected TrimmedMeanApproach(double p, int z, NeighborSetPredicate.Factory<Object> npredf) {
     this.p = p;
     this.z = z;
     this.npredf = npredf;
@@ -199,7 +198,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * @return
    */
   public static <V extends NumberVector<V, ?>> TrimmedMeanApproach<V> parameterize(Parameterization config) {
-    final NeighborSetPredicate.Factory<DatabaseObject> npred = getNeighborPredicate(config);
+    final NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
     final double p = getParameterP(config);
     final int z = getParameterZ(config);
     if(config.hasErrors()) {
@@ -241,8 +240,8 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * @param config
    * @return
    */
-  public static NeighborSetPredicate.Factory<DatabaseObject> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>> param = new ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
+  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
+    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
