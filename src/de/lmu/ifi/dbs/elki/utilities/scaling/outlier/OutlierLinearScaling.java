@@ -99,6 +99,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     this.max = max;
     this.usemean = usemean;
     this.nozeros = nozeros;
+    this.factor = (max - min);
   }
 
   @Override
