@@ -126,13 +126,14 @@ public class TestIndexStructures implements JUnit4Test {
    * 
    * @throws ParameterException
    */
-  /*
-   * @Test public void testXTree() throws ParameterException {
-   * ListParameterization xtreeparams = new ListParameterization();
-   * xtreeparams.addParameter(HashmapDatabase, XTreeFactory.class);
-   * xtreeparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
-   * testFileBasedDatabaseConnection(xtreeparams, SpatialIndexKNNQuery.class, SpatialIndexRangeQuery.class); }
-   */
+//  @Test
+//  public void testXTree() throws ParameterException {
+//    ListParameterization xtreeparams = new ListParameterization();
+//    xtreeparams.addParameter(HashmapDatabase.INDEX_ID, XTreeFactory.class);
+//    xtreeparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
+//    testFileBasedDatabaseConnection(xtreeparams, SpatialIndexKNNQuery.class, SpatialIndexRangeQuery.class);
+//  }
+
   /**
    * Actual test routine.
    * 
