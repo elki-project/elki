@@ -59,7 +59,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<String, Clu
    * @param database The database to process
    */
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     Relation<String> dataQuery = DatabaseUtil.guessClassLabelRepresentation(database);
 
     HashMap<String, ModifiableDBIDs> labelmap = new HashMap<String, ModifiableDBIDs>();

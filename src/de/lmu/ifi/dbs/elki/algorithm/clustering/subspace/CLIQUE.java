@@ -143,7 +143,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Performs the CLIQUE algorithm on the given database.
    */
   @Override
-  protected Clustering<SubspaceModel<V>> runInTime(Database database) throws IllegalStateException {
+  public Clustering<SubspaceModel<V>> run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     // 1. Identification of subspaces that contain clusters
     // TODO: use step logging.

@@ -83,7 +83,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    * database.
    */
   @Override
-  protected KNNDistanceOrderResult<D> runInTime(Database database) throws IllegalStateException {
+  public KNNDistanceOrderResult<D> run(Database database) throws IllegalStateException {
     final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);

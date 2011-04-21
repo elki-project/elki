@@ -66,7 +66,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     final int size = dataQuery.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(dataQuery);

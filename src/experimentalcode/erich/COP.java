@@ -119,7 +119,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> data = getRelation(database);
     KNNQuery<V, D> knnQuery = database.getKNNQuery(data, getDistanceFunction(), k + 1);
 

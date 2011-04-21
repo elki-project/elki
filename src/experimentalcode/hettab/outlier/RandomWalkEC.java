@@ -115,7 +115,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> relation = getRelation(database);
     
     final NeighborSetPredicate npred = npredf.instantiate(relation);

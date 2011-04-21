@@ -115,7 +115,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * Performs the k-means algorithm on the given database.
    */
   @Override
-  protected Clustering<MeanModel<V>> runInTime(Database database) throws IllegalStateException {
+  public Clustering<MeanModel<V>> run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     
     final Random random;

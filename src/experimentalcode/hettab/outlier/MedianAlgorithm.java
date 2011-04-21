@@ -115,7 +115,7 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     //
     WritableDataStore<Double> gi = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     //

@@ -156,7 +156,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O,
    * calling {@code #doRunInTime(Database)}.
    */
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress("LOF", 3) : null;
     Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, stepprog);
     KNNQuery<O, D> kNNRefer = pair.getFirst();

@@ -143,7 +143,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
   }
 
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     
     FiniteProgress objprog = getLogger().isVerbose() ? new FiniteProgress("Processing objects", dataQuery.size(), getLogger()) : null;

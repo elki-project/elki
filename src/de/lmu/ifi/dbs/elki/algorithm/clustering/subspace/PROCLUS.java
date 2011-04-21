@@ -120,7 +120,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * 
    */
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     try {
       Relation<V> dataQuery = this.getRelation(database);
       DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);

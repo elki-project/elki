@@ -121,7 +121,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * Performs the SOD algorithm on the given database.
    */
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(dataQuery);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", database.size(), logger) : null;

@@ -129,7 +129,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    *         DependencyDerivator
    */
   @Override
-  public CorrelationAnalysisSolution<V> runInTime(Database db) throws IllegalStateException {
+  public CorrelationAnalysisSolution<V> run(Database db) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(db);
     if(logger.isVerbose()) {
       logger.verbose("retrieving database objects...");

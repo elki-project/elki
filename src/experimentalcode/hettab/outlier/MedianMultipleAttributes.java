@@ -86,7 +86,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+  public OutlierResult run(Database<V> database) throws IllegalStateException {
     final NeighborSetPredicate npred = npredf.instantiate(database);
     Matrix hMatrix = new Matrix(dims.size(),database.size());
     Matrix hMeansMatrix = new Matrix(dims.size(),1);

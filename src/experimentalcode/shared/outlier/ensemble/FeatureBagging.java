@@ -160,7 +160,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<O> relation = getRelation(database);
     int dbdim = DatabaseUtil.dimensionality(relation);
     int mindim = dbdim / 2;

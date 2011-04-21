@@ -77,7 +77,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     MinMax<Double> mm = new MinMax<Double>();
     // resulting scores

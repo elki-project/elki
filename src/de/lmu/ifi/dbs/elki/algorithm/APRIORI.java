@@ -104,7 +104,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
    * @return the AprioriResult learned by this APRIORI
    */
   @Override
-  protected AprioriResult runInTime(Database database) throws IllegalStateException {
+  public AprioriResult run(Database database) throws IllegalStateException {
     Relation<BitVector> dataQuery = getRelation(database);
     Map<BitSet, Integer> support = new Hashtable<BitSet, Integer>();
     List<BitSet> solution = new ArrayList<BitSet>();

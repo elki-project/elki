@@ -192,7 +192,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
    * Performs the CASH algorithm on the given database.
    */
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     relation = getRelation(database);
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();

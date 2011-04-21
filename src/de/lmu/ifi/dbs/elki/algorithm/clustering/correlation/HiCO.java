@@ -127,7 +127,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   }
 
   @Override
-  protected ClusterOrderResult<PCACorrelationDistance> runInTime(Database database) throws IllegalStateException {
+  public ClusterOrderResult<PCACorrelationDistance> run(Database database) throws IllegalStateException {
     return optics.run(database);
   }
 

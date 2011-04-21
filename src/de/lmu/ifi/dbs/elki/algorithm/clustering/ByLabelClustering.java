@@ -101,7 +101,7 @@ public class ByLabelClustering extends AbstractAlgorithm<String, Clustering<Mode
    * @param database The database to process
    */
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     Relation<String> dataQuery = DatabaseUtil.guessClassLabelRepresentation(database);
 
     HashMap<String, ModifiableDBIDs> labelMap = multiple ? multipleAssignment(dataQuery) : singleAssignment(dataQuery);

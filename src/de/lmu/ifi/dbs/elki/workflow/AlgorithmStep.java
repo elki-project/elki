@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -23,6 +24,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  */
 public class AlgorithmStep implements WorkflowStep {
   /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(AlgorithmStep.class);
+
+  /**
    * Holds the algorithm to run.
    */
   private List<Algorithm<Result>> algorithms;
@@ -34,7 +40,7 @@ public class AlgorithmStep implements WorkflowStep {
 
   /**
    * Constructor.
-   *
+   * 
    * @param algorithms
    */
   public AlgorithmStep(List<Algorithm<Result>> algorithms) {
@@ -52,7 +58,14 @@ public class AlgorithmStep implements WorkflowStep {
     result = new BasicResult("Algorithm Step", "main");
     result.addChildResult(database);
     for(Algorithm<Result> algorithm : algorithms) {
+      long start = System.currentTimeMillis();
       Result res = algorithm.run(database);
+      long end = System.currentTimeMillis();
+      if(logger.isVerbose()) {
+        long elapsedTime = end - start;
+        logger.verbose(algorithm.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
+
+      }
       if(res != null) {
         result.addChildResult(res);
       }

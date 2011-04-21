@@ -88,7 +88,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
    * Runs the algorithm in the timed evaluation part.
    */
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     final DistanceQuery<O, D> distanceQuery = getDistanceQuery(database);
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 

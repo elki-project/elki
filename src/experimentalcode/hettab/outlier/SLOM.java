@@ -84,7 +84,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * 
    */
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
 
     WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);

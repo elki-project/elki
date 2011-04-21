@@ -114,7 +114,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     // Use an array list of object IDs for fast random access by an offset
     ArrayDBIDs objids = DBIDUtil.ensureArray(database.getDBIDs());

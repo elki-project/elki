@@ -116,7 +116,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected Result runInTime(Database database) {
+  public Result run(Database database) {
     DistanceQuery<O, D> distQuery = getDistanceQuery(database);
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
     WritableRecordStore store = DataStoreUtil.makeRecordStorage(distQuery.getRelation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);

@@ -84,7 +84,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
   }
 
   @Override
-  protected OutlierResult runInTime(Database<V> database) throws IllegalStateException {
+  public OutlierResult run(Database<V> database) throws IllegalStateException {
 
     final NeighborSetPredicate npred = npredf.instantiate(database);
     Matrix hMatrix = new Matrix(dims.size(),database.size());

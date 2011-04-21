@@ -121,7 +121,7 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<O
    * Performs the SNN clustering algorithm on the given database.
    */
   @Override
-  protected Clustering<Model> runInTime(Database database) {
+  public Clustering<Model> run(Database database) {
     final Relation<O> dataQuery = getRelation(database);
     SimilarityQuery<O, IntegerDistance> snnInstance = similarityFunction.instantiate(dataQuery);
 

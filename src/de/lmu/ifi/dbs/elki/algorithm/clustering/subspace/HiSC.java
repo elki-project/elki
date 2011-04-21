@@ -67,7 +67,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
   }
 
   @Override
-  protected ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> runInTime(Database database) throws IllegalStateException {
+  public ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> run(Database database) throws IllegalStateException {
     return optics.run(database);
   }
 

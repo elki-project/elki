@@ -137,7 +137,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * for all models.
    */
   @Override
-  protected Clustering<EMModel<V>> runInTime(Database database) throws IllegalStateException {
+  public Clustering<EMModel<V>> run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
 
     if(dataQuery.size() == 0) {
