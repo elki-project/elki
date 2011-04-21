@@ -20,9 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of objects handled by this Algorithm
- * @param <R> Algorithm result type
  */
-public abstract class AbstractAlgorithm<O, R extends Result> implements Algorithm<R> {
+public abstract class AbstractAlgorithm<O> implements Algorithm {
   /**
    * Constructor.
    */
@@ -31,7 +30,7 @@ public abstract class AbstractAlgorithm<O, R extends Result> implements Algorith
   }
 
   @Override
-  public abstract R run(Database data) throws IllegalStateException;
+  public abstract Result run(Database data) throws IllegalStateException;
 
   /**
    * Get the input type restriction used for negotiating the data query.

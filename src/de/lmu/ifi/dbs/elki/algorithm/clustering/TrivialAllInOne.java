@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Trivial all-in-one clustering")
 @Description("Returns a 'tivial' clustering which just considers all points to be one big cluster.")
-public class TrivialAllInOne extends AbstractAlgorithm<Object, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class TrivialAllInOne extends AbstractAlgorithm<Object> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */

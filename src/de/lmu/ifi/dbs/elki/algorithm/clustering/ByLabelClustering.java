@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  */
 @Title("Clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
-public class ByLabelClustering extends AbstractAlgorithm<String, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class ByLabelClustering extends AbstractAlgorithm<String> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */

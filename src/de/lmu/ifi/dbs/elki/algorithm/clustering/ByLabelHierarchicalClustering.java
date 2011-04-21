@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Hierarchical clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
-public class ByLabelHierarchicalClustering extends AbstractAlgorithm<String, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class ByLabelHierarchicalClustering extends AbstractAlgorithm<String> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */

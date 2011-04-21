@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @param <O>
  */
-public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O, OutlierResult> {
+public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O> {
   /**
    * The logger for this class.
    */
@@ -58,7 +58,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O, 
    * Key: {@code -algorithm}
    * </p>
    */
-  private final ObjectParameter<Algorithm<Result>> ALGORITHM_PARAM = new ObjectParameter<Algorithm<Result>>(OptionID.ALGORITHM, OutlierAlgorithm.class);
+  private final ObjectParameter<Algorithm> ALGORITHM_PARAM = new ObjectParameter<Algorithm>(OptionID.ALGORITHM, OutlierAlgorithm.class);
 
   /**
    * Parameter to specify a scaling function to use.
@@ -71,7 +71,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O, 
   /**
    * Holds the algorithm to run.
    */
-  private Algorithm<Result> algorithm;
+  private Algorithm algorithm;
 
   /**
    * Scaling function to use
@@ -141,7 +141,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O, 
   @Override
   public TypeInformation getInputTypeRestriction() {
     try {
-      return ((AbstractAlgorithm<?, ?>) algorithm).getInputTypeRestriction();
+      return ((AbstractAlgorithm<?>) algorithm).getInputTypeRestriction();
     }
     catch(ClassCastException e) {
       return TypeUtil.ANY;
