@@ -42,15 +42,20 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
   /**
    * Keeps the currently set database.
    */
-  private Relation<V> database;
+  private Database database;
+  
+  /**
+   * Relation we use
+   */
+  private Relation<V> relation;
 
   /**
-   * The row ids corresponding to the currently set {@link #database}.
+   * The row ids corresponding to the currently set {@link #relation}.
    */
   private int[] rowIDs;
 
   /**
-   * The column ids corresponding to the currently set {@link #database}.
+   * The column ids corresponding to the currently set {@link #relation}.
    */
   private int[] colIDs;
 
@@ -80,20 +85,20 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
   @Override
   public
   final Clustering<M> run(Database database) throws IllegalStateException {
-    this.database = getRelation(database);
-    if(this.database == null || this.database.size() == 0) {
+    this.relation = getRelation(database);
+    if(this.relation == null || this.relation.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     // FIXME: move this into subclasses!
     this.result = new Clustering<M>("Biclustering", "biclustering");
-    colIDs = new int[DatabaseUtil.dimensionality(this.database)];
+    colIDs = new int[DatabaseUtil.dimensionality(this.relation)];
     for(int i = 0; i < colIDs.length; i++) {
       colIDs[i] = i + 1;
     }
-    rowIDs = new int[this.database.size()];
+    rowIDs = new int[this.relation.size()];
     {
       int i = 0;
-      for(DBID id : this.database.iterDBIDs()) {
+      for(DBID id : this.relation.iterDBIDs()) {
         rowIDs[i] = id.getIntegerID();
         i++;
       }
@@ -166,7 +171,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
   protected Bicluster<V> defineBicluster(BitSet rows, BitSet cols) {
     int[] rowIDs = rowsBitsetToIDs(rows);
     int[] colIDs = colsBitsetToIDs(cols);
-    return new Bicluster<V>(rowIDs, colIDs, getDatabase());
+    return new Bicluster<V>(rowIDs, colIDs, relation);
   }
 
   /**
@@ -274,7 +279,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    *         <code>database.get(rowIDs[row]).getValue(colIDs[col])</code>
    */
   protected double valueAt(int row, int col) {
-    return getDatabase().get(DBIDUtil.importInteger(rowIDs[row])).doubleValue(colIDs[col]);
+    return relation.get(DBIDUtil.importInteger(rowIDs[row])).doubleValue(colIDs[col]);
   }
 
   /**
@@ -359,7 +364,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * 
    * @return database
    */
-  public Relation<V> getDatabase() {
+  public Database getDatabase() {
     return database;
   }
 }
