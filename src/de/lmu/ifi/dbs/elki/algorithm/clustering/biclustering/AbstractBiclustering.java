@@ -367,4 +367,13 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
   public Database getDatabase() {
     return database;
   }
+
+  /**
+   * Getter for the relation.
+   * 
+   * @return relation
+   */
+  public Relation<V> getRelation() {
+    return relation;
+  }
 }
