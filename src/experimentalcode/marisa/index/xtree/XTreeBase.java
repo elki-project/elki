@@ -17,8 +17,8 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -257,11 +257,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    * 
    * Performs a bulk load on this XTree with the specified data. Is called by
    * the constructor and should be overwritten by subclasses if necessary.
-   * 
-   * @param objects the data objects to be indexed
    */
   @Override
-  protected void bulkLoad(ArrayDBIDs ids, List<O> objects) {
+  protected void bulkLoad(DBIDs ids) {
     throw new UnsupportedOperationException("Bulk Load not supported for XTree");
   }
 
