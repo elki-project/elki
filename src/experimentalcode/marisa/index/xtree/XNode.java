@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -173,7 +173,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
     // the following causes a null pointer -- something is obviously missing
     // entries = (E[]) java.lang.reflect.Array.newInstance(eclass, capacity);
     if(isLeaf) {
-      entries = (E[]) new SpatialLeafEntry[capacity];
+      entries = (E[]) new SpatialPointLeafEntry[capacity];
     }
     else {
       entries = (E[]) new XDirectoryEntry[capacity];
@@ -194,7 +194,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
       }
       catch(NullPointerException e) {
         if(isLeaf) {
-          s = (E) new SpatialLeafEntry();
+          s = (E) new SpatialPointLeafEntry();
         }
         else {
           s = (E) new XDirectoryEntry();
@@ -314,7 +314,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
   protected void integrityCheckParameters(N parent, int index) {
     // test if mbr is correctly set
     E entry = parent.getEntry(index);
-    HyperBoundingBox mbr = mbr();
+    HyperBoundingBox mbr = getMBR();
 
     if(entry.getMBR() == null && mbr == null) {
       return;

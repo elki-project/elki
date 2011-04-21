@@ -1,7 +1,7 @@
 package experimentalcode.marisa.index.xtree.common;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XNode;
@@ -40,7 +40,7 @@ public class XTreeNode extends XNode<SpatialEntry, XTreeNode> {
    */
   @Override
   protected XTreeNode createNewLeafNode(int capacity) {
-    return new XTreeNode(getFile(), capacity, true, SpatialLeafEntry.class);
+    return new XTreeNode(getFile(), capacity, true, SpatialPointLeafEntry.class);
   }
 
   /**

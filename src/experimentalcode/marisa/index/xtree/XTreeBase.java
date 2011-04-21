@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
@@ -511,7 +511,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      SpatialLeafEntry sl = new SpatialLeafEntry(DBIDUtil.importInteger(0), new double[object.getDimensionality()]);
+      SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[object.getDimensionality()]);
       while(baos.size() <= pageSize) {
         sl.writeExternal(oos);
         oos.flush();
@@ -956,7 +956,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   @SuppressWarnings("unchecked")
   protected void reInsert(N node, int level, TreeIndexPath<E> path) {
 
-    HyperBoundingBox mbr = node.mbr();
+    HyperBoundingBox mbr = node.getMBR();
     SquareEuclideanDistanceFunction distFunction = new SquareEuclideanDistanceFunction();
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
@@ -1047,7 +1047,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     if(!hasOverflow(parent) && // no overflow treatment
     (parent.getPageID() == getRootEntry().getEntryID() || // is root
     // below: no changes in the MBR
-    subtree.getLastPathComponent().getEntry().getMBR().contains(((SpatialLeafEntry) entry).getValues()))) {
+    subtree.getLastPathComponent().getEntry().getMBR().contains(((SpatialPointLeafEntry) entry).getValues()))) {
       return; // no need to adapt subtree
     }
 
@@ -1258,8 +1258,8 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     file.writePage(newNode);
     if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot + " " + oldRoot.mbr() + " " + oldRootEntry.getMBR();
-      msg += "\nchild2 " + newNode + " " + newNode.mbr() + " " + newNodeEntry.getMBR();
+      msg += "\nchild1 " + oldRoot + " " + oldRoot.getMBR() + " " + oldRootEntry.getMBR();
+      msg += "\nchild2 " + newNode + " " + newNode.getMBR() + " " + newNodeEntry.getMBR();
       msg += "\n";
       getLogger().debugFine(msg);
     }

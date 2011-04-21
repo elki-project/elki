@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -66,12 +66,12 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
 
   @Override
   protected SpatialEntry createNewLeafEntry(DBID id) {
-    return new SpatialLeafEntry(id, getValues(id));
+    return new SpatialPointLeafEntry(id, getValues(id));
   }
 
   @Override
   protected SpatialEntry createNewDirectoryEntry(XTreeNode node) {
-    return new XDirectoryEntry(node.getPageID(), node.mbr());
+    return new XDirectoryEntry(node.getPageID(), node.getMBR());
   }
 
   /**
@@ -82,7 +82,7 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
    */
   @Override
   protected XTreeNode createNewLeafNode(int capacity) {
-    return new XTreeNode(file, capacity, true, SpatialLeafEntry.class);
+    return new XTreeNode(file, capacity, true, SpatialPointLeafEntry.class);
   }
 
   /**
