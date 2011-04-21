@@ -471,7 +471,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
       // logger.verbose("\tmaskMatrix() finished. (" +
       // (System.currentTimeMillis() - t) + ")");
       // t = System.currentTimeMillis();
-      BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<V>(rowsBitsetToIDs(currentRows), colsBitsetToIDs(currentCols), getDatabase());
+      BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<V>(rowsBitsetToIDs(currentRows), colsBitsetToIDs(currentCols), getRelation());
       bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
       addBiclusterToResult(bicluster);
 
