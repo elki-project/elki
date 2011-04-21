@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -91,18 +92,19 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
     final DistanceQuery<O, D> distanceQuery = getDistanceQuery(database);
+    Relation<? extends O> dataQuery = distanceQuery.getRelation();
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     if(logger.isVerbose()) {
       logger.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
-    FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size(), logger) : null;
+    FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", dataQuery.size(), logger) : null;
 
     double maxweight = 0;
 
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
-    WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : distanceQuery.getRelation().iterDBIDs()) {
       // compute sum of the distances to the k nearest neighbors
 

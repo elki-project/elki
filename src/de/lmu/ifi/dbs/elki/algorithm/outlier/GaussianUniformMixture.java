@@ -117,7 +117,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
   public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     // Use an array list of object IDs for fast random access by an offset
-    ArrayDBIDs objids = DBIDUtil.ensureArray(database.getDBIDs());
+    ArrayDBIDs objids = DBIDUtil.ensureArray(dataQuery.getDBIDs());
     // A bit set to flag objects as anomalous, none at the beginning
     BitSet bits = new BitSet(objids.size());
     // Positive masked collection
@@ -127,7 +127,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     // resulting scores
     WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     // compute loglikelihood
-    double logLike = database.size() * logml + loglikelihoodNormal(normalObjs, dataQuery);
+    double logLike = dataQuery.size() * logml + loglikelihoodNormal(normalObjs, dataQuery);
     // logger.debugFine("normalsize   " + normalObjs.size() + " anormalsize  " +
     // anomalousObjs.size() + " all " + (anomalousObjs.size() +
     // normalObjs.size()));

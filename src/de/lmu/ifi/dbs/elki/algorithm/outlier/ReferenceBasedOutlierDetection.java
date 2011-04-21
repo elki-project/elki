@@ -128,7 +128,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     DistanceQuery<V, D> distFunc = database.getDistanceQuery(dataQuery, distanceFunction);
     Collection<V> refPoints = refp.getReferencePoints(dataQuery);
 
-    DBIDs ids = database.getDBIDs();
+    DBIDs ids = dataQuery.getDBIDs();
     // storage of distance/score values.
     WritableDataStore<Double> rbod_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
     // compute density for one reference point, to initialize the first density
@@ -159,7 +159,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     }
     // compute maximum density
     double maxDensity = 0.0;
-    for(DBID id : database.getDBIDs()) {
+    for(DBID id : dataQuery.iterDBIDs()) {
       double dens = rbod_score.get(id);
       if(dens > maxDensity) {
         maxDensity = dens;

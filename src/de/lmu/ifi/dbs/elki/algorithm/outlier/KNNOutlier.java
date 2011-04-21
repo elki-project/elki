@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -92,15 +93,16 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
     final DistanceQuery<O, D> distanceQuery = getDistanceQuery(database);
+    Relation<? extends O> dataQuery = distanceQuery.getRelation();
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     if(logger.isVerbose()) {
       logger.verbose("Computing the kNN outlier degree (distance to the k nearest neighbor)");
     }
-    FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", database.size(), logger) : null;
+    FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", dataQuery.size(), logger) : null;
 
     double maxodegree = 0;
-    WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
     for(DBID id : distanceQuery.getRelation().iterDBIDs()) {
       // distance to the kth nearest neighbor
