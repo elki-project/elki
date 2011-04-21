@@ -6,8 +6,8 @@ import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -250,8 +250,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   }
 
   @Override
-  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override

@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -97,7 +98,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<O> relation = database.getRelation(getInputTypeRestriction());
+    Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k);
 
@@ -153,8 +154,8 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return getDistanceFunction().getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
   @Override

@@ -135,8 +135,8 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override

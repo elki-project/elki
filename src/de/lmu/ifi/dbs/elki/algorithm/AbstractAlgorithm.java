@@ -38,7 +38,7 @@ public abstract class AbstractAlgorithm<O> implements Algorithm {
    * @return Type restriction
    */
   @Override
-  public abstract TypeInformation getInputTypeRestriction();
+  public abstract TypeInformation[] getInputTypeRestriction();
 
   /**
    * Get a data query.
@@ -47,7 +47,7 @@ public abstract class AbstractAlgorithm<O> implements Algorithm {
    * @return Data query
    */
   protected final Relation<O> getRelation(Database database) {
-    return database.getRelation(getInputTypeRestriction());
+    return database.getRelation(getInputTypeRestriction()[0]);
   }
 
   /**

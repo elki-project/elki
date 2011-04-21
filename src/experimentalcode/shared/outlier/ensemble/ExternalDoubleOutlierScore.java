@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -271,7 +271,7 @@ public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<O> implemen
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return SimpleTypeInformation.get(Object.class);
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.ANY);
   }
 }

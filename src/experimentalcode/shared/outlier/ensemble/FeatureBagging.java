@@ -243,7 +243,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 }

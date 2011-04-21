@@ -67,4 +67,15 @@ public final class TypeUtil {
    * Sparse float vector field.
    */
   public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class);
+
+  /**
+   * Make a type array
+   * 
+   * @param <T> Base type
+   * @param ts Types
+   * @return array
+   */
+  public static final TypeInformation[] array(TypeInformation... ts) {
+    return ts;
+  }
 }

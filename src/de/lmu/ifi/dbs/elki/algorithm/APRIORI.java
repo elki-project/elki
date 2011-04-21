@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -272,8 +272,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
   }
 
   @Override
-  public VectorFieldTypeInformation<BitVector> getInputTypeRestriction() {
-    return TypeUtil.BIT_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
   }
   
   @Override

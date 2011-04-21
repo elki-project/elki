@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -306,11 +307,15 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
+  public TypeInformation[] getInputTypeRestriction() {
+    final TypeInformation type;
     if(reachabilityDistanceFunction.equals(comparisonDistanceFunction)) {
-      return reachabilityDistanceFunction.getInputTypeRestriction();
+      type = reachabilityDistanceFunction.getInputTypeRestriction();
     }
-    return new CombinedTypeInformation(reachabilityDistanceFunction.getInputTypeRestriction(), comparisonDistanceFunction.getInputTypeRestriction());
+    else {
+      type = new CombinedTypeInformation(reachabilityDistanceFunction.getInputTypeRestriction(), comparisonDistanceFunction.getInputTypeRestriction());
+    }
+    return TypeUtil.array(type);
   }
 
   @Override

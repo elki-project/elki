@@ -163,15 +163,12 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<O> {
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
+  public TypeInformation[] getInputTypeRestriction() {
     TypeInformation[] trs = new TypeInformation[algorithms.size()];
     for (int i = 0; i < trs.length; i++) {
-      try {
-        trs[i] = ((AbstractAlgorithm<?>)algorithms.get(i)).getInputTypeRestriction();
-      } catch (ClassCastException e) {
-        trs[i] = TypeUtil.ANY;
-      }
+      // FIXME: only allow single-input algorithms?
+      trs[i] = algorithms.get(i).getInputTypeRestriction()[0];
     }
-    return new CombinedTypeInformation(trs);
+    return TypeUtil.array(new CombinedTypeInformation(trs));
   }
 }

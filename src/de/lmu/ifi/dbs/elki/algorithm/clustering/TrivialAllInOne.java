@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -50,8 +50,8 @@ public class TrivialAllInOne extends AbstractAlgorithm<Object> implements Cluste
   }
 
   @Override
-  public SimpleTypeInformation<Object> getInputTypeRestriction() {
-    return TypeUtil.ANY;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.ANY);
   }
 
   @Override

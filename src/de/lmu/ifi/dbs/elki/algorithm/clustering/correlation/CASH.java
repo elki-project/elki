@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
@@ -797,8 +799,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> implements
   }
 
   @Override
-  public VectorFieldTypeInformation<? super ParameterizationFunction> getInputTypeRestriction() {
-    return VectorFieldTypeInformation.get(ParameterizationFunction.class);
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(VectorFieldTypeInformation.get(ParameterizationFunction.class));
   }
 
   @Override

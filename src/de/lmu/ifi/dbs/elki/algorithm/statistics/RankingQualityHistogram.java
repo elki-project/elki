@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -81,7 +82,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
    */
   @Override
   public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
-    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
+    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, dataQuery.size());
 
@@ -129,8 +130,8 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return getDistanceFunction().getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
   
   @Override

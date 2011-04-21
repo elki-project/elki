@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -198,8 +199,8 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
   }
 
   @Override
-  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

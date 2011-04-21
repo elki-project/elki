@@ -5,8 +5,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -94,8 +94,8 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
   }
 
   @Override
-  public VectorFieldTypeInformation<? super V> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override

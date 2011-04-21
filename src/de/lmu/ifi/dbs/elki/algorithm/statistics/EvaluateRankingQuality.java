@@ -97,7 +97,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    */
   @Override
   public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
-    final Relation<V> relation = database.getRelation(getInputTypeRestriction());
+    final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, relation.size());
 
@@ -161,8 +161,8 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return new CombinedTypeInformation(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(new CombinedTypeInformation(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   @Override

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -79,8 +80,8 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return getDistanceFunction().getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
   /**

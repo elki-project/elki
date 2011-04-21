@@ -126,8 +126,8 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
   
   @Override

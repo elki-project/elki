@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
@@ -556,8 +557,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return getDistanceFunction().getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
   @Override

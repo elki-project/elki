@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -124,8 +125,8 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return getDistanceFunction().getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
   @Override

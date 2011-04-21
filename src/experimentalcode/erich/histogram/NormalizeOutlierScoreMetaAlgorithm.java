@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -139,12 +138,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O> 
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    try {
-      return ((AbstractAlgorithm<?>) algorithm).getInputTypeRestriction();
-    }
-    catch(ClassCastException e) {
-      return TypeUtil.ANY;
-    }
+  public TypeInformation[] getInputTypeRestriction() {
+    return algorithm.getInputTypeRestriction();
   }
 }

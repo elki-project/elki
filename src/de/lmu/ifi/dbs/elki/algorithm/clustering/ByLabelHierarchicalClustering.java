@@ -109,8 +109,8 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<String> imp
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.GUESSED_LABEL;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.GUESSED_LABEL);
   }
 
   @Override

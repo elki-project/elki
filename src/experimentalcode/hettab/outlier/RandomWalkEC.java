@@ -308,7 +308,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 }
