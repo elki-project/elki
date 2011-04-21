@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -10,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
@@ -18,10 +18,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex
- * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction
+ * @apiviz.uses SpatialIndex
+ * @apiviz.uses SpatialPrimitiveDistanceFunction
  */
-public class SpatialIndexRangeQuery<O extends NumberVector<?, ?>, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
+public class SpatialIndexRangeQuery<O extends SpatialComparable, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
   /**
    * The index to use
    */

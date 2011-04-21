@@ -69,8 +69,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
     }
 
     // find the leaf node containing o
-    double[] values = getValues(id);
-    HyperBoundingBox mbr = new HyperBoundingBox(values, values);
+    HyperBoundingBox mbr = relation.get(id).getMBR();
     TreeIndexPath<DeLiCluEntry> pathToObject = findPathToObject(getRootPath(), mbr, id);
 
     if(pathToObject == null) {
@@ -188,7 +187,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
    */
   @Override
   protected DeLiCluEntry createNewLeafEntry(DBID id) {
-    return new DeLiCluLeafEntry(id, getValues(id));
+    return new DeLiCluLeafEntry(id, relation.get(id));
   }
 
   /**
@@ -198,7 +197,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
    */
   @Override
   protected DeLiCluEntry createNewDirectoryEntry(DeLiCluNode node) {
-    return new DeLiCluDirectoryEntry(node.getPageID(), node.mbr(), node.hasHandled(), node.hasUnhandled());
+    return new DeLiCluDirectoryEntry(node.getPageID(), node.getMBR(), node.hasHandled(), node.hasUnhandled());
   }
 
   /**

@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -47,16 +47,16 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
   @Override
   public double getMin(int dimension) {
-    return mbr().getMin(dimension);
+    return getMBR().getMin(dimension);
   }
 
   @Override
   public double getMax(int dimension) {
-    return mbr().getMax(dimension);
+    return getMBR().getMax(dimension);
   }
 
   @Override
-  public HyperBoundingBox mbr() {
+  public HyperBoundingBox getMBR() {
     E firstEntry = getEntry(0);
     if(firstEntry == null) {
       return null;
@@ -91,7 +91,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param entry the entry representing this node
    */
   public void adjustEntry(E entry) {
-    entry.setMBR(mbr());
+    entry.setMBR(getMBR());
   }
 
   /**
@@ -263,7 +263,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   protected void integrityCheckParameters(N parent, int index) {
     // test if mbr is correctly set
     E entry = parent.getEntry(index);
-    HyperBoundingBox mbr = mbr();
+    HyperBoundingBox mbr = getMBR();
 
     if(entry.getMBR() == null && mbr == null) {
       return;
@@ -309,9 +309,9 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     // TODO: do we need to write/read the capacity?
     final int capacity = in.readInt();
     if(isLeaf) {
-      entries = (E[]) new SpatialLeafEntry[capacity];
+      entries = (E[]) new SpatialPointLeafEntry[capacity];
       for(int i = 0; i < numEntries; i++) {
-        SpatialLeafEntry s = new SpatialLeafEntry();
+        SpatialPointLeafEntry s = new SpatialPointLeafEntry();
         s.readExternal(in);
         entries[i] = (E) s;
       }

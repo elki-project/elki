@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -58,12 +58,12 @@ public class RStarTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O,
 
   @Override
   protected SpatialEntry createNewLeafEntry(DBID id) {
-    return new SpatialLeafEntry(id, getValues(id));
+    return new SpatialPointLeafEntry(id, relation.get(id));
   }
 
   @Override
   protected SpatialEntry createNewDirectoryEntry(RStarTreeNode node) {
-    return new SpatialDirectoryEntry(node.getPageID(), node.mbr());
+    return new SpatialDirectoryEntry(node.getPageID(), node.getMBR());
   }
 
   /**

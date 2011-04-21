@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 
 /**
  * Defines the requirements for a leaf entry in an DeLiClu-Tree node.
@@ -10,7 +11,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
  *
  * @author Elke Achtert 
  */
-public class DeLiCluLeafEntry extends SpatialLeafEntry implements DeLiCluEntry {
+public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEntry {
   private static final long serialVersionUID = 1;
 
   /**
@@ -38,8 +39,8 @@ public class DeLiCluLeafEntry extends SpatialLeafEntry implements DeLiCluEntry {
    * @param id     the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  public DeLiCluLeafEntry(DBID id, double[] values) {
-    super(id, values);
+  public DeLiCluLeafEntry(DBID id, NumberVector<?,?> vector) {
+    super(id, vector);
     this.hasHandled = false;
     this.hasUnhandled = true;
   }

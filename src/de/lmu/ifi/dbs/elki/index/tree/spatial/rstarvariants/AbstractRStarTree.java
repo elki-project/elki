@@ -32,11 +32,12 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -68,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
+public abstract class AbstractRStarTree<O extends SpatialComparable, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */
@@ -244,8 +245,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     // find the leaf node containing o
-    double[] values = getValues(id);
-    HyperBoundingBox mbr = new HyperBoundingBox(values, values);
+    HyperBoundingBox mbr = relation.get(id).getMBR();
     TreeIndexPath<E> deletionPath = findPathToObject(getRootPath(), mbr, id);
     if(deletionPath == null) {
       return false;
@@ -470,7 +470,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      SpatialLeafEntry sl = new SpatialLeafEntry(DBIDUtil.importInteger(0), new double[object.getDimensionality()]);
+      SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[object.getDimensionality()]);
       while(baos.size() <= pageSize) {
         sl.writeExternal(oos);
         oos.flush();
@@ -763,8 +763,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @return a double array consisting of the values of the specified real
    *         vector
    */
-  protected double[] getValues(DBID id) {
-    O object = relation.get(id);
+  @Deprecated
+  protected double[] getValues(NumberVector<?, ?> object) {
     int dim = object.getDimensionality();
     double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {
@@ -1161,7 +1161,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   @SuppressWarnings("unchecked")
   protected void reInsert(N node, int level, TreeIndexPath<E> path) {
-    HyperBoundingBox mbr = node.mbr();
+    HyperBoundingBox mbr = node.getMBR();
     EuclideanDistanceFunction distFunction = EuclideanDistanceFunction.STATIC;
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
@@ -1389,8 +1389,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     file.writePage(newNode);
     if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot + " " + oldRoot.mbr() + " " + oldRootEntry.getMBR();
-      msg += "\nchild2 " + newNode + " " + newNode.mbr() + " " + newNodeEntry.getMBR();
+      msg += "\nchild1 " + oldRoot + " " + oldRoot.getMBR() + " " + oldRootEntry.getMBR();
+      msg += "\nchild2 " + newNode + " " + newNode.getMBR() + " " + newNodeEntry.getMBR();
       msg += "\n";
       getLogger().debugFine(msg);
     }

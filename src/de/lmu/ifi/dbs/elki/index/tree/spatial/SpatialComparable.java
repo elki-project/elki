@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+
 /**
  * Defines the required methods needed for comparison of spatial objects.
  *
@@ -30,4 +32,11 @@ public interface SpatialComparable {
    * @return the maximum coordinate at the specified dimension
    */
   double getMax(int dimension);
+  
+  /**
+   * Get the objects complete MBR.
+   * 
+   * @return Object MBR
+   */
+  HyperBoundingBox getMBR();
 }

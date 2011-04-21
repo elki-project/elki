@@ -6,17 +6,18 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 
 /**
  * Distance query for spatial distance functions
  * @author Erich Schubert
  *
- * @apiviz.uses de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction
+ * @apiviz.uses SpatialPrimitiveDistanceFunction
  * 
  * @param <V> Vector type to use
  * @param <D> Distance result type
  */
-public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?>, D extends Distance<D>> extends PrimitiveDistanceQuery<V, D> implements SpatialDistanceQuery<V, D> {
+public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?> & SpatialComparable, D extends Distance<D>> extends PrimitiveDistanceQuery<V, D> implements SpatialDistanceQuery<V, D> {
   /**
    * The distance function we use.
    */
