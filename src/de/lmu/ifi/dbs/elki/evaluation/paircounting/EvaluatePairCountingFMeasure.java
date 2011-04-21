@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -53,7 +52,7 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
   /**
    * Reference algorithm.
    */
-  private Algorithm<?> referencealg;
+  private ClusteringAlgorithm<?> referencealg;
 
   /**
    * Apply special handling to noise "clusters".
@@ -66,7 +65,7 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
    * @param referencealg Reference clustering
    * @param noiseSpecialHandling Noise handling flag
    */
-  public EvaluatePairCountingFMeasure(Algorithm<?> referencealg, boolean noiseSpecialHandling) {
+  public EvaluatePairCountingFMeasure(ClusteringAlgorithm<?> referencealg, boolean noiseSpecialHandling) {
     super();
     this.referencealg = referencealg;
     this.noiseSpecialHandling = noiseSpecialHandling;
@@ -130,7 +129,7 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    protected Algorithm< ?> referencealg = null;
+    protected ClusteringAlgorithm< ?> referencealg = null;
 
     protected boolean noiseSpecialHandling = false;
 

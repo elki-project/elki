@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 
 /**
@@ -8,8 +9,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses OutlierResult
+ * @apiviz.has OutlierResult
  */
-public interface OutlierAlgorithm extends Algorithm<OutlierResult> {
-  // Empty
+public interface OutlierAlgorithm extends Algorithm {
+  @Override
+  OutlierResult run(Database database) throws IllegalStateException;
 }

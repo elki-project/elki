@@ -23,10 +23,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * </p>
  * 
  * @author Arthur Zimek
- * 
- * @param <R> Result type
  */
-public interface Algorithm<R extends Result> extends Parameterizable {
+public interface Algorithm extends Parameterizable {
   /**
    * Runs the algorithm.
    * 
@@ -36,7 +34,7 @@ public interface Algorithm<R extends Result> extends Parameterizable {
    *         properly (e.g. the setParameters(String[]) method has been failed
    *         to be called).
    */
-  R run(Database database) throws IllegalStateException;
+  Result run(Database database) throws IllegalStateException;
 
   /**
    * Get the input type restriction used for negotiating the data query.

@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * 
  * @param <C> Clustering type
  */
-public interface ClusteringAlgorithm<C extends Clustering<? extends Model>> extends Algorithm<C> {
+public interface ClusteringAlgorithm<C extends Clustering<? extends Model>> extends Algorithm {
   @Override
   C run(Database database) throws IllegalStateException;
 }

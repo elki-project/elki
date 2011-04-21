@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Ernst
  */
-public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Result> {
+public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> {
   /**
    * The logger for this class.
    */

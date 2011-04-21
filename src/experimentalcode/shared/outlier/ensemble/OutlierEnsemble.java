@@ -43,7 +43,7 @@ import experimentalcode.shared.outlier.ensemble.voting.EnsembleVoting;
  * 
  * @param <O> object type
  */
-public class OutlierEnsemble<O> extends AbstractAlgorithm<O, OutlierResult> {
+public class OutlierEnsemble<O> extends AbstractAlgorithm<O> {
   /**
    * The logger for this class.
    */
@@ -52,12 +52,12 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<O, OutlierResult> {
   /**
    * Parameter for the individual algorithms
    */
-  private ObjectListParameter<Algorithm<Result>> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm<Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private ObjectListParameter<Algorithm> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * The actual algorithms
    */
-  private List<Algorithm<Result>> algorithms;
+  private List<Algorithm> algorithms;
 
   /**
    * Voting strategy to use in the ensemble.
@@ -107,7 +107,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<O, OutlierResult> {
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
     {
       FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, logger) : null;
-      for(Algorithm<Result> alg : algorithms) {
+      for(Algorithm alg : algorithms) {
         Result res = alg.run(database);
         for(OutlierResult ors : ResultUtil.getOutlierResults(res)) {
           results.add(ors);
@@ -167,7 +167,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<O, OutlierResult> {
     TypeInformation[] trs = new TypeInformation[algorithms.size()];
     for (int i = 0; i < trs.length; i++) {
       try {
-        trs[i] = ((AbstractAlgorithm<?, ?>)algorithms.get(i)).getInputTypeRestriction();
+        trs[i] = ((AbstractAlgorithm<?>)algorithms.get(i)).getInputTypeRestriction();
       } catch (ClassCastException e) {
         trs[i] = TypeUtil.ANY;
       }

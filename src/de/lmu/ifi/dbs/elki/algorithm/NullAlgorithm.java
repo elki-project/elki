@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Null Algorithm")
 @Description("Algorithm which does nothing, just return a null object.")
-public class NullAlgorithm extends AbstractAlgorithm<Object, Result> {
+public class NullAlgorithm extends AbstractAlgorithm<Object> {
   /**
    * The logger for this class.
    */

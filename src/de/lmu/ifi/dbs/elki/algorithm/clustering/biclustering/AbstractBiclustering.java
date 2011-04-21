@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
  *        columns relate to the attribute values of these objects
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M extends Bicluster<V>> extends AbstractAlgorithm<V, Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M extends Bicluster<V>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * Keeps the currently set database.
    */

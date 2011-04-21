@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -15,9 +14,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
- * @param <R> result type
  */
-public interface Classifier<O, L extends ClassLabel, R extends Result> extends Algorithm<R>, Parameterizable {
+public interface Classifier<O, L extends ClassLabel> extends Algorithm, Parameterizable {
   /**
    * Performs the training. Sets available labels.
    * 

@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
+public abstract class AbstractDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O> {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_ID}
    */

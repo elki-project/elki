@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Dummy Algorithm")
 @Description("The algorithm executes a euclidena 10NN query on all data points, and can be used in unit testing")
-public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgorithm<O, Result> {
+public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgorithm<O> {
   /**
    * The logger for this class.
    */

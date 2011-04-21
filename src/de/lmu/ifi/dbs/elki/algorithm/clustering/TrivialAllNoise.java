@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Trivial all-noise clustering")
 @Description("Returns a 'trivial' clustering which just considers all points as noise points.")
-public class TrivialAllNoise extends AbstractAlgorithm<Object, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class TrivialAllNoise extends AbstractAlgorithm<Object> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */

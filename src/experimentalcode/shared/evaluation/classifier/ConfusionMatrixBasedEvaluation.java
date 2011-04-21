@@ -4,7 +4,6 @@ import java.io.PrintStream;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
 import experimentalcode.shared.algorithm.classifier.Classifier;
 import experimentalcode.shared.evaluation.classifier.procedure.EvaluationProcedure;
 
@@ -14,7 +13,7 @@ import experimentalcode.shared.evaluation.classifier.procedure.EvaluationProcedu
  *
  * @author Arthur Zimek
  */
-public class ConfusionMatrixBasedEvaluation<O, L extends ClassLabel, C extends Classifier<O, L, Result>> extends AbstractClassifierEvaluation<O, L, C> {
+public class ConfusionMatrixBasedEvaluation<O, L extends ClassLabel, C extends Classifier<O, L>> extends AbstractClassifierEvaluation<O, L, C> {
     /**
      * Holds the confusion matrix.
      */

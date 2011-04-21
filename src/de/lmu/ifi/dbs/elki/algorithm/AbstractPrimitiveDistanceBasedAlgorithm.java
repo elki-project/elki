@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O, R> {
+public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend

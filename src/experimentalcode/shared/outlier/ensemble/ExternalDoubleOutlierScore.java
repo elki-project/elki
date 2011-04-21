@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @param <O> Database object type
  */
-public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */

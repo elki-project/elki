@@ -31,7 +31,7 @@ public class AlgorithmStep implements WorkflowStep {
   /**
    * Holds the algorithm to run.
    */
-  private List<Algorithm<Result>> algorithms;
+  private List<Algorithm> algorithms;
 
   /**
    * The algorithm output
@@ -43,7 +43,7 @@ public class AlgorithmStep implements WorkflowStep {
    * 
    * @param algorithms
    */
-  public AlgorithmStep(List<Algorithm<Result>> algorithms) {
+  public AlgorithmStep(List<Algorithm> algorithms) {
     super();
     this.algorithms = algorithms;
   }
@@ -57,7 +57,7 @@ public class AlgorithmStep implements WorkflowStep {
   public HierarchicalResult runAlgorithms(Database database) {
     result = new BasicResult("Algorithm Step", "main");
     result.addChildResult(database);
-    for(Algorithm<Result> algorithm : algorithms) {
+    for(Algorithm algorithm : algorithms) {
       long start = System.currentTimeMillis();
       Result res = algorithm.run(database);
       long end = System.currentTimeMillis();
@@ -93,13 +93,13 @@ public class AlgorithmStep implements WorkflowStep {
     /**
      * Holds the algorithm to run.
      */
-    protected List<Algorithm<Result>> algorithms;
+    protected List<Algorithm> algorithms;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // parameter algorithm
-      final ObjectListParameter<Algorithm<Result>> ALGORITHM_PARAM = new ObjectListParameter<Algorithm<Result>>(OptionID.ALGORITHM, Algorithm.class);
+      final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
       if(config.grab(ALGORITHM_PARAM)) {
         algorithms = ALGORITHM_PARAM.instantiateClasses(config);
       }
