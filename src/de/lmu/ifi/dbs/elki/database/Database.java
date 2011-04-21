@@ -6,8 +6,6 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -16,6 +14,8 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Database specifies the requirements for any database implementation. Note
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.has Index oneway - - manages
  * @apiviz.uses DataStoreListener oneway - - invokes
  */
-public interface Database extends HierarchicalResult, Parameterizable {
+public interface Database extends HierarchicalResult {
   /**
    * Inserts the given objects and their associations into the database.
    * 
