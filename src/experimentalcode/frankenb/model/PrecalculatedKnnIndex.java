@@ -5,11 +5,9 @@ package experimentalcode.frankenb.model;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -57,12 +55,12 @@ public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
   }
 
   @Override
-  public void insert(DBID id, O object) {
+  public void insert(DBID id) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void insertAll(ArrayDBIDs ids, List<O> objects) {
+  public void insertAll(DBIDs ids) {
     //throw new UnsupportedOperationException();
   }
 

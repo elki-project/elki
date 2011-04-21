@@ -3,10 +3,7 @@
  */
 package experimentalcode.frankenb.model;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -46,7 +43,7 @@ public class PINNKnnIndex implements KNNIndex<NumberVector<?, ?>> {
   }
 
   @Override
-  public void insert(DBID id, NumberVector<?, ?> object) {
+  public void insert(DBID id) {
     // TODO Auto-generated method stub
     
   }
@@ -60,7 +57,7 @@ public class PINNKnnIndex implements KNNIndex<NumberVector<?, ?>> {
   
 
   @Override
-  public void insertAll(ArrayDBIDs ids, List<NumberVector<?, ?>> objects) {
+  public void insertAll(DBIDs ids) {
     // TODO Auto-generated method stub
     
   }
