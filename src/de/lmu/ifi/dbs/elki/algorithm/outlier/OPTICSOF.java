@@ -90,7 +90,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, minpts);
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distQuery);
-    DBIDs ids = database.getDBIDs();
+    DBIDs ids = dataQuery.getDBIDs();
 
     WritableDataStore<List<DistanceResultPair<D>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDataStore<Double> coreDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);

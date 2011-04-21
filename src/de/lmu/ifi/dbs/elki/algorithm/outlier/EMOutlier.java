@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -71,11 +72,12 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
    */
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
+    Relation<V> relation = getRelation(database);
     Clustering<EMModel<V>> emresult = emClustering.run(database);
 
     double globmax = 0.0;
-    WritableDataStore<Double> emo_score = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-    for(DBID id : database.getDBIDs()) {
+    WritableDataStore<Double> emo_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    for(DBID id : relation.getDBIDs()) {
       double maxProb = Double.POSITIVE_INFINITY;
       double[] probs = emClustering.getProbClusterIGivenX(id);
       for(double prob : probs) {

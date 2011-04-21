@@ -114,7 +114,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       }
     }
 
-    WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     // calculate the sparsity coefficient
     for(Vector<IntIntPair> sub : Rk) {
       DBIDs ids = computeSubspace(sub, ranges);

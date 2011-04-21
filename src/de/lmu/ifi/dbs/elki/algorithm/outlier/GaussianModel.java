@@ -81,7 +81,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     Relation<V> dataQuery = getRelation(database);
     MinMax<Double> mm = new MinMax<Double>();
     // resulting scores
-    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
 
     // Compute mean and covariance Matrix
     V mean = DatabaseUtil.centroid(dataQuery);
@@ -108,7 +108,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     final OutlierScoreMeta meta;
     if(invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
-      for(DBID id : database.getDBIDs()) {
+      for(DBID id : dataQuery.iterDBIDs()) {
         oscores.put(id, (max - oscores.get(id)) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);

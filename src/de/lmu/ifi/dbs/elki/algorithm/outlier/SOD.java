@@ -124,9 +124,9 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(dataQuery);
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", database.size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", dataQuery.size(), logger) : null;
     int processed = 0;
-    WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
+    WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     DoubleMinMax minmax = new DoubleMinMax();
     for(Iterator<DBID> iter = dataQuery.iterDBIDs(); iter.hasNext();) {
       DBID queryObject = iter.next();

@@ -210,12 +210,12 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     }
 
     // Probabilistic distances
-    WritableDataStore<Double> pdists = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> pdists = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     {// computing PRDs
       if(stepprog != null) {
         stepprog.beginStep(3, "Computing pdists", logger);
       }
-      FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", database.size(), logger) : null;
+      FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", relation.size(), logger) : null;
       for(DBID id : relation.iterDBIDs()) {
         List<DistanceResultPair<D>> neighbors = knnReach.getKNNForDBID(id, kreach);
         double sqsum = 0.0;
@@ -239,14 +239,14 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       }
     }
     // Compute PLOF values.
-    WritableDataStore<Double> plofs = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> plofs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     MeanVariance mvplof = new MeanVariance();
     {// compute LOOP_SCORE of each db object
       if(stepprog != null) {
         stepprog.beginStep(4, "Computing PLOF", logger);
       }
 
-      FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", database.size(), logger) : null;
+      FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), logger) : null;
       for(DBID id : relation.iterDBIDs()) {
         List<DistanceResultPair<D>> neighbors = knnComp.getKNNForDBID(id, kcomp);
         MeanVariance mv = new MeanVariance();
@@ -280,13 +280,13 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     }
 
     // Compute final LoOP values.
-    WritableDataStore<Double> loops = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> loops = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     {// compute LOOP_SCORE of each db object
       if(stepprog != null) {
         stepprog.beginStep(5, "Computing LoOP scores", logger);
       }
 
-      FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", database.size(), logger) : null;
+      FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), logger) : null;
       for(DBID id : relation.iterDBIDs()) {
         loops.put(id, ErrorFunctions.erf((plofs.get(id) - 1) / (nplof * sqrt2)));
 

@@ -227,13 +227,13 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
     if(stepprog != null) {
       stepprog.beginStep(2, "Computing LRDs.", logger);
     }
-    WritableDataStore<Double> lrds = computeLRDs(database.getDBIDs(), kNNReach);
+    WritableDataStore<Double> lrds = computeLRDs(kNNReach.getRelation().getDBIDs(), kNNReach);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", logger);
     }
-    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(database.getDBIDs(), lrds, kNNRefer);
+    Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(kNNRefer.getRelation().getDBIDs(), lrds, kNNRefer);
     WritableDataStore<Double> lofs = lofsAndMax.getFirst();
     // track the maximum value for normalization.
     MinMax<Double> lofminmax = lofsAndMax.getSecond();
