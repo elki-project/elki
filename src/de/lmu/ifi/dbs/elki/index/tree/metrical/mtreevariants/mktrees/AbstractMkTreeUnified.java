@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -65,29 +64,28 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    * <p/>
    */
   @Override
-  public final void insertAll(ArrayDBIDs ids, List<O> objects) {
-    if(objects.isEmpty()) {
+  public final void insertAll(DBIDs ids) {
+    if(ids.isEmpty()) {
       return;
     }
-    assert(ids.size() == objects.size());
 
     if(getLogger().isDebugging()) {
-      getLogger().debugFine("insert " + objects + "\n");
+      getLogger().debugFine("insert " + ids + "\n");
     }
 
     if(!initialized) {
-      initialize(objects.get(0));
+      initialize(relation.get(ids.iterator().next()));
     }
 
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
 
     // insert sequentially
-    for (int i = 0; i < ids.size(); i++) {
+    for (DBID id : ids) {
       // create knnList for the object
-      knnLists.put(ids.get(i), new KNNHeap<D>(k_max, getDistanceFactory().infiniteDistance()));
+      knnLists.put(id, new KNNHeap<D>(k_max, getDistanceFactory().infiniteDistance()));
 
       // insert the object
-      super.insert(ids.get(i), objects.get(i), false);
+      super.insert(id, relation.get(id), false);
     }
 
     // do batch nn

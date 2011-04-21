@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
  * 
  * @param <NV> Vector type
  */
-public interface PreferenceVectorIndex<NV extends NumberVector<?, ?>> extends Index<NV> {
+public interface PreferenceVectorIndex<NV extends NumberVector<?, ?>> extends Index {
   /**
    * Get the precomputed preference vector for a particular object ID.
    * 

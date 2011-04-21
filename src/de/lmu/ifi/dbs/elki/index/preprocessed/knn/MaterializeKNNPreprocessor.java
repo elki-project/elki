@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.landmark
  * @apiviz.has DistanceFunction
  * @apiviz.has KNNQuery
  * @apiviz.has KNNListener
@@ -117,12 +116,12 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   }
 
   @Override
-  public final void insert(DBID id, O object) {
+  public final void insert(DBID id) {
     objectsInserted(id);
   }
 
   @Override
-  public void insertAll(ArrayDBIDs ids, List<O> objects) {
+  public void insertAll(DBIDs ids) {
     objectsInserted(ids);
   }
 

@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.index;
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -15,7 +12,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
  *
  * @param <O> Object type stored in the index
  */
-public abstract class AbstractIndex<O> implements Index<O> {
+public abstract class AbstractIndex<O> implements Index {
   /**
    * The representation we are bound to.
    */
@@ -51,13 +48,13 @@ public abstract class AbstractIndex<O> implements Index<O> {
 
   @SuppressWarnings("unused")
   @Override
-  public void insert(DBID id, O object) {
+  public void insert(DBID id) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
   @SuppressWarnings("unused")
   @Override
-  public void insertAll(ArrayDBIDs id, List<O> objects) {
+  public void insertAll(DBIDs ids) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 

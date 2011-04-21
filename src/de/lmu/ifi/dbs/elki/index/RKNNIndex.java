@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <O> Database Object type
  */
-public interface RKNNIndex<O> extends Index<O> {
+public interface RKNNIndex<O> extends Index {
   /**
    * Get a KNN query object for the given distance function and k.
    * 

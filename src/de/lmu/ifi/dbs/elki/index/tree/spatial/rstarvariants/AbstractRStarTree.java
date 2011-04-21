@@ -13,7 +13,6 @@ import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -122,21 +121,21 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   /**
    * Inserts the specified reel vector object into this index.
    * 
-   * @param object the vector to be inserted
+   * @param id the object id that was inserted
    */
   @Override
-  public final void insert(DBID id, O object) {
+  public final void insert(DBID id) {
     if(getLogger().isDebugging()) {
       getLogger().debug("insert object " + id + "\n");
     }
 
     if(!initialized) {
-      initialize(object);
+      initialize(relation.get(id));
     }
 
     reinsertions.clear();
 
-    E entry = createNewLeafEntry(id, object);
+    E entry = createNewLeafEntry(id);
     preInsert(entry);
     insertLeafEntry(entry);
 
@@ -152,20 +151,18 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param objects the objects to be inserted
    */
   @Override
-  public final void insertAll(ArrayDBIDs ids, List<O> objects) {
+  public final void insertAll(DBIDs ids) {
     // empty input file
-    if(objects.isEmpty() || (objects.size() == 1 && (objects.get(0) == null || objects.get(0).getDimensionality() == 0))) {
+    if(ids.isEmpty() || (ids.size() == 1)) {
       // FIXME: abusing this empty-insert for re-loading an on-disk tree is an
       // ugly hack.
       initializeFromFile();
       return;
     }
 
-    assert (ids.size() == objects.size());
-
     if(bulk && !initialized) {
-      initialize(objects.get(0));
-      bulkLoad(ids, objects);
+      initialize(relation.get(ids.iterator().next()));
+      bulkLoad(ids);
       if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append(" height  = ").append(height).append("\n");
@@ -175,10 +172,10 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
     else {
       if(!initialized) {
-        initialize(objects.get(0));
+        initialize(relation.get(ids.iterator().next()));
       }
-      for(int i = 0; i < ids.size(); i++) {
-        insert(ids.get(i), objects.get(i));
+      for(DBID id : ids) {
+        insert(id);
       }
     }
 
@@ -247,7 +244,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     // find the leaf node containing o
-    double[] values = getValues(relation.get(id));
+    double[] values = getValues(id);
     HyperBoundingBox mbr = new HyperBoundingBox(values, values);
     TreeIndexPath<E> deletionPath = findPathToObject(getRootPath(), mbr, id);
     if(deletionPath == null) {
@@ -691,7 +688,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
       // insert data
       for(Pair<DBID, O> o : partition) {
-        leafNode.addLeafEntry(createNewLeafEntry(o.getFirst(), o.getSecond()));
+        leafNode.addLeafEntry(createNewLeafEntry(o.getFirst()));
       }
 
       // write to file
@@ -766,7 +763,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @return a double array consisting of the values of the specified real
    *         vector
    */
-  protected double[] getValues(O object) {
+  protected double[] getValues(DBID id) {
+    O object = relation.get(id);
     int dim = object.getDimensionality();
     double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {
@@ -820,20 +818,17 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   /**
    * Performs a bulk load on this RTree with the specified data. Is called by
    * the constructor.
-   * 
-   * @param objects the data objects to be indexed
    */
-  abstract protected void bulkLoad(ArrayDBIDs ids, List<O> objects);
+  abstract protected void bulkLoad(DBIDs ids);
 
   /**
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
    * 
    * @param id the object id
-   * @param object the data object to be represented by the new entry
    * @return the newly created leaf entry
    */
-  abstract protected E createNewLeafEntry(DBID id, O object);
+  abstract protected E createNewLeafEntry(DBID id);
 
   /**
    * Creates a new directory entry representing the specified node.

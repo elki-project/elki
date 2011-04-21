@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <I> the type of Index used
  * @param <D> the type of Distance used
  */
-public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index<O>, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> implements IndexBasedDistanceFunction<O, D> {
+public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> implements IndexBasedDistanceFunction<O, D> {
   /**
    * Parameter to specify the preprocessor to be used.
    * <p>
@@ -52,7 +52,7 @@ public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index<O>, 
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<O, I extends Index<O>, D extends Distance<D>, F extends DistanceFunction<? super O, D>> extends AbstractDatabaseDistanceQuery<O, D> implements IndexBasedDistanceFunction.Instance<O, I, D> {
+  abstract public static class Instance<O, I extends Index, D extends Distance<D>, F extends DistanceFunction<? super O, D>> extends AbstractDatabaseDistanceQuery<O, D> implements IndexBasedDistanceFunction.Instance<O, I, D> {
     /**
      * Index we use
      */

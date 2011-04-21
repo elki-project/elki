@@ -1,10 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -56,31 +54,30 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
 
   /**
    * Inserts the specified object into this M-Tree by calling
-   * {@link AbstractMTree#insert(DBID,O,boolean)
+   * {@link AbstractMTree#insert
    * AbstractMTree.insert(id, object, false)}.
    * 
    * @param object the object to be inserted
    */
   @Override
-  public void insert(DBID id, O object) {
-    this.insert(id, object, false);
+  public void insert(DBID id) {
+    this.insert(id, relation.get(id), false);
   }
 
   /**
    * Inserts the specified objects into this M-Tree sequentially since a bulk
    * load method is not implemented so far. Calls for each object
-   * {@link AbstractMTree#insert(DBID,O,boolean)
+   * {@link AbstractMTree#insert
    * AbstractMTree.insert(id, object, false)}.
    */
   // todo: bulk load method
   @Override
-  public void insertAll(ArrayDBIDs ids, List<O> objects) {
-    if (objects.isEmpty()) {
+  public void insertAll(DBIDs ids) {
+    if (ids.isEmpty()) {
       return;
     }
-    assert(ids.size() == objects.size());
-    for (int i = 0; i < ids.size(); i++) {
-      insert(ids.get(i), objects.get(i), false);
+    for (DBID id : ids) {
+      insert(id, relation.get(id), false);
     }
 
     if(extraIntegrityChecks) {

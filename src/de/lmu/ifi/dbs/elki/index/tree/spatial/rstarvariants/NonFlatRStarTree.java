@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
@@ -104,22 +104,18 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
   /**
    * Performs a bulk load on this RTree with the specified data. Is called by
    * the constructor and should be overwritten by subclasses if necessary.
-   * 
-   * @param objects the data objects to be indexed
    */
   @Override
-  protected void bulkLoad(ArrayDBIDs ids, List<O> objects) {
+  protected void bulkLoad(DBIDs ids) {
     StringBuffer msg = new StringBuffer();
 
-    assert (ids.size() == objects.size());
-    List<SpatialPair<DBID, O>> spatialObjects = new ArrayList<SpatialPair<DBID, O>>(objects.size());
-    for(int i = 0; i < ids.size(); i++) {
-      spatialObjects.add(new SpatialPair<DBID, O>(ids.get(i), objects.get(i)));
+    List<SpatialPair<DBID, O>> spatialObjects = new ArrayList<SpatialPair<DBID, O>>(ids.size());
+    for (DBID id : ids) {
+      spatialObjects.add(new SpatialPair<DBID, O>(id, relation.get(id)));
     }
 
     // root is leaf node
-    double size = objects.size();
-    if(size / (leafCapacity - 1.0) <= 1) {
+    if(ids.size() / (leafCapacity - 1.0) <= 1) {
       N root = createNewLeafNode(leafCapacity);
       root.setPageID(getRootEntry().getEntryID());
       file.writePage(root);
@@ -220,7 +216,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
       if(object instanceof SpatialPair) {
         SpatialPair<?, ?> pair = (SpatialPair<?, ?>) object;
         if(pair.first instanceof DBID && pair.second instanceof NumberVector) {
-          root.addLeafEntry(createNewLeafEntry((DBID) pair.first, (O) pair.second));
+          root.addLeafEntry(createNewLeafEntry((DBID) pair.first));
           continue;
         }
         throw new AbortException("Unexpected spatial comparable encountered.");

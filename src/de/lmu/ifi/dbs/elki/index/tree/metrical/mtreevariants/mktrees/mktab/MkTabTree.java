@@ -66,7 +66,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @SuppressWarnings("unused")
   @Override
-  public void insert(DBID id, O object) {
+  public void insert(DBID id) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 

@@ -33,7 +33,7 @@ public interface IndexBasedSimilarityFunction<O, D extends Distance<D>> extends 
    * @param <T> Object type
    * @param <D> Distance type
    */
-  public static interface Instance<T, I extends Index<?>, D extends Distance<D>> extends SimilarityQuery<T, D> {
+  public static interface Instance<T, I extends Index, D extends Distance<D>> extends SimilarityQuery<T, D> {
     /**
      * Get the index used.
      * 

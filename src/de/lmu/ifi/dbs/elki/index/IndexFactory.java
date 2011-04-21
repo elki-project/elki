@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <V> Input object type
  * @param <I> Index type
  */
-public interface IndexFactory<V, I extends Index<?>> extends Parameterizable {
+public interface IndexFactory<V, I extends Index> extends Parameterizable {
   /**
    * Sets the database in the distance function of this index (if existing).
    * 

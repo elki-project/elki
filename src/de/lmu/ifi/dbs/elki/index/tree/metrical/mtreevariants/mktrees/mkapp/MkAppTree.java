@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -88,7 +87,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    */
   @SuppressWarnings("unused")
   @Override
-  public void insert(DBID id, O object) {
+  public void insert(DBID id) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -106,30 +105,28 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @param objects the object to be inserted
    */
   @Override
-  public void insertAll(ArrayDBIDs ids, List<O> objects) {
-    if (objects.isEmpty()) {
+  public void insertAll(DBIDs ids) {
+    if (ids.isEmpty()) {
       return;
     }
     
-    assert(ids.size() == objects.size());
-    
     if(logger.isDebugging()) {
-      logger.debugFine("insert " + objects + "\n");
+      logger.debugFine("insert " + ids + "\n");
     }
 
     if(!initialized) {
-      initialize(objects.get(0));
+      initialize(relation.get(ids.iterator().next()));
     }
 
     Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
 
     // insert
-    for(int i = 0; i < ids.size(); i++) {
+    for(DBID id : ids) {
       // create knnList for the object
-      knnHeaps.put(ids.get(i), new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
+      knnHeaps.put(id, new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
 
       // insert the object
-      super.insert(ids.get(i), objects.get(i), false);
+      super.insert(id, relation.get(id), false);
     }
 
     // do batch nn

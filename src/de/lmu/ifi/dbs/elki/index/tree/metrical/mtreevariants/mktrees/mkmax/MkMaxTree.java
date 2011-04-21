@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -71,8 +70,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @param object the object to be inserted
    */
   @Override
-  public void insert(DBID id, O object) {
-    this.insert(id, object, true);
+  public void insert(DBID id) {
+    this.insert(id, relation.get(id), true);
   }
 
   /**
