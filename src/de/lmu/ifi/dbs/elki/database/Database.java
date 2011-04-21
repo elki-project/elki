@@ -152,10 +152,7 @@ public interface Database extends HierarchicalResult, Parameterizable {
    * @param distanceFunction Distance function
    * @param hints Optimizer hints
    * @return KNN Query object
-   * 
-   * @deprecated This will be moved to QueryUtil
    */
-  @Deprecated
   <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
@@ -198,10 +195,7 @@ public interface Database extends HierarchicalResult, Parameterizable {
    * @param distanceFunction Distance function
    * @param hints Optimizer hints
    * @return KNN Query object
-   * 
-   * @deprecated This will be moved to QueryUtil
    */
-  @Deprecated
   <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
@@ -244,10 +238,7 @@ public interface Database extends HierarchicalResult, Parameterizable {
    * @param distanceFunction Distance function
    * @param hints Optimizer hints
    * @return KNN Query object
-   * 
-   * @deprecated This will be moved to QueryUtil
    */
-  @Deprecated
   <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
