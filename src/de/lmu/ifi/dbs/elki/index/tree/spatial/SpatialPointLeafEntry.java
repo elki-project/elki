@@ -5,17 +5,18 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
 
 /**
- * Represents an entry in a leaf node of a spatial index.
- * A SpatialLeafEntry consists of an id (representing the unique id of the
- * underlying data object) and the values of the underlying data object.
- *
- * @author Elke Achtert 
+ * Represents an entry in a leaf node of a spatial index. A SpatialLeafEntry
+ * consists of an id (representing the unique id of the underlying data object)
+ * and the values of the underlying data object.
+ * 
+ * @author Elke Achtert
  */
-public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry {
+public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialEntry {
   private static final long serialVersionUID = 1;
 
   /**
@@ -26,19 +27,34 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
   /**
    * Empty constructor for serialization purposes.
    */
-  public SpatialLeafEntry() {
+  public SpatialPointLeafEntry() {
     super();
   }
 
   /**
    * Constructs a new LeafEntry object with the given parameters.
-   *
-   * @param id     the unique id of the underlying data object
+   * 
+   * @param id the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  public SpatialLeafEntry(DBID id, double[] values) {
+  public SpatialPointLeafEntry(DBID id, double[] values) {
     super(id);
     this.values = values;
+  }
+
+  /**
+   * Constructor from number vector
+   *
+   * @param id Object id
+   * @param vector Number vector
+   */
+  public SpatialPointLeafEntry(DBID id, NumberVector<?, ?> vector) {
+    super(id);
+    int dim = vector.getDimensionality();
+    this.values = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = vector.doubleValue(i + 1);
+    }
   }
 
   /**
@@ -51,7 +67,7 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
 
   /**
    * Throws an UnsupportedOperationException
-   *
+   * 
    * @throws UnsupportedOperationException thrown, since this is a leaf
    */
   @Override
@@ -82,7 +98,7 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
 
   /**
    * Returns the values of the underlying data object of this entry.
-   *
+   * 
    * @return the values of the underlying data object of this entry
    */
   public double[] getValues() {
@@ -92,7 +108,7 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
   /**
    * Calls the super method and writes the values of this entry to the specified
    * stream.
-   *
+   * 
    * @param out the stream to write the object to
    * @throws java.io.IOException Includes any I/O exceptions that may occur
    */
@@ -106,18 +122,19 @@ public class SpatialLeafEntry extends AbstractLeafEntry implements SpatialEntry 
   }
 
   /**
-   * Calls the super method and reads the values of this entry from the specified
-   * input stream.
-   *
+   * Calls the super method and reads the values of this entry from the
+   * specified input stream.
+   * 
    * @param in the stream to read data from in order to restore the object
-   * @throws java.io.IOException    if I/O errors occur
-   * @throws ClassNotFoundException If the class for an object being restored cannot be found.
+   * @throws java.io.IOException if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being restored
+   *         cannot be found.
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     values = new double[in.readInt()];
-    for(int d = 0; d<values.length;d++) {
+    for(int d = 0; d < values.length; d++) {
       values[d] = in.readDouble();
     }
   }

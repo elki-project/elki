@@ -1,17 +1,18 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Defines the requirements for objects that can be indexed by a Spatial Index,
  * which are spatial nodes or data objects.
- *
- * @author Elke Achtert 
+ * 
+ * @author Elke Achtert
  */
 public class SpatialPair<K, V extends SpatialComparable> extends Pair<K, V> implements SpatialComparable {
   /**
    * Constructor: bundle a key and a spatial comparable
-   *
+   * 
    * @param key key
    * @param spatial spatial value
    */
@@ -32,5 +33,10 @@ public class SpatialPair<K, V extends SpatialComparable> extends Pair<K, V> impl
   @Override
   public double getMax(int dimension) {
     return second.getMax(dimension);
+  }
+
+  @Override
+  public HyperBoundingBox getMBR() {
+    return second.getMBR();
   }
 }

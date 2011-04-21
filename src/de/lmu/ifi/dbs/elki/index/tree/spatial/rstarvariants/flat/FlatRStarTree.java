@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -209,12 +209,12 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
 
   @Override
   protected SpatialEntry createNewLeafEntry(DBID id) {
-    return new SpatialLeafEntry(id, getValues(id));
+    return new SpatialPointLeafEntry(id, relation.get(id));
   }
 
   @Override
   protected SpatialEntry createNewDirectoryEntry(FlatRStarTreeNode node) {
-    return new SpatialDirectoryEntry(node.getPageID(), node.mbr());
+    return new SpatialDirectoryEntry(node.getPageID(), node.getMBR());
   }
 
   @Override

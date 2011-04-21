@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -17,7 +18,7 @@ import java.io.ObjectOutput;
  * @param <D> Distance type
  * @param <N> Number type
  */
-public class RdKNNLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends SpatialLeafEntry implements RdKNNEntry<D, N> {
+public class RdKNNLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends SpatialPointLeafEntry implements RdKNNEntry<D, N> {
   private static final long serialVersionUID = 1;
 
   /**
@@ -39,8 +40,8 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, N>, N extends Number> ex
    * @param values the values of the underlying data object
    * @param knnDistance the knn distance of the underlying data object
    */
-  public RdKNNLeafEntry(DBID id, double[] values, D knnDistance) {
-    super(id, values);
+  public RdKNNLeafEntry(DBID id, NumberVector<?, ?> vector, D knnDistance) {
+    super(id, vector);
     this.knnDistance = knnDistance;
   }
 

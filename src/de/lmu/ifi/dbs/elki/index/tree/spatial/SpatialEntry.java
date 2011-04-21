@@ -14,6 +14,7 @@ public interface SpatialEntry extends Entry, SpatialComparable {
    *
    * @return the MBR of the underlying spatial object of this entry
    */
+  @Override
   public HyperBoundingBox getMBR();
 
   /**

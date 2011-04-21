@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.database.query.distance;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 
 /**
  * Query interface for spatial distance queries.
@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public interface SpatialDistanceQuery<V extends FeatureVector<?, ?>, D extends Distance<D>> extends DistanceQuery<V, D> {
+public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Distance<D>> extends DistanceQuery<V, D> {
   /**
    * Computes the minimum distance between the given MBR and the FeatureVector
    * object according to this distance function.

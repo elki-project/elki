@@ -501,7 +501,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    */
   @Override
   protected RdKNNEntry<D, N> createNewLeafEntry(DBID id) {
-    return new RdKNNLeafEntry<D, N>(id, getValues(id), distanceQuery.getDistanceFactory().undefinedDistance());
+    return new RdKNNLeafEntry<D, N>(id, relation.get(id), distanceQuery.getDistanceFactory().undefinedDistance());
   }
 
   /**
@@ -511,7 +511,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    */
   @Override
   protected RdKNNEntry<D, N> createNewDirectoryEntry(RdKNNNode<D, N> node) {
-    return new RdKNNDirectoryEntry<D, N>(node.getPageID(), node.mbr(), node.kNNDistance());
+    return new RdKNNDirectoryEntry<D, N>(node.getPageID(), node.getMBR(), node.kNNDistance());
   }
 
   /**

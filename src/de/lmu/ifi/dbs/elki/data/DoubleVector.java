@@ -329,4 +329,11 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   public int getByteSize(DoubleVector vec) {
     return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
   }
+
+  @Override
+  public HyperBoundingBox getMBR() {
+    double[] vals = new double[values.length];
+    System.arraycopy(values, 0, vals, 0, values.length);
+    return new HyperBoundingBox(vals, vals);
+  }
 }

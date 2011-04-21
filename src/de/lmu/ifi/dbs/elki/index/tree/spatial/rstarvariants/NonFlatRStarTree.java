@@ -227,7 +227,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends A
     }
 
     // set root mbr
-    getRootEntry().setMBR(root.mbr());
+    getRootEntry().setMBR(root.getMBR());
 
     // write to file
     file.writePage(root);

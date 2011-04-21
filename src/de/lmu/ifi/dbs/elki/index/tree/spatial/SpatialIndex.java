@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -11,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.SpatialIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.SpatialIndexRangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -31,7 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class SpatialIndex<O extends NumberVector<?, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> implements RangeIndex<O>, KNNIndex<O> {
+public abstract class SpatialIndex<O extends SpatialComparable, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> implements RangeIndex<O>, KNNIndex<O> {
   /**
    * If true, a bulk load will be performed.
    */

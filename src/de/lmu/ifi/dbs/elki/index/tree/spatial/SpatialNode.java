@@ -28,5 +28,6 @@ public interface SpatialNode<N extends SpatialNode<N,E>, E extends SpatialEntry>
    *
    * @return the MBR of this spatial object
    */
-  HyperBoundingBox mbr();
+  @Override
+  HyperBoundingBox getMBR();
 }

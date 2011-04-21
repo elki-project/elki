@@ -6,8 +6,8 @@ package de.lmu.ifi.dbs.elki.data;
  * @author Arthur Zimek
  * @param <V> the concrete type of this AbstractNumberVector
  * @param <N> the type of number, this AbstractNumberVector consists of (i.e., a
- *        AbstractNumberVector {@code v} of type {@code V} and dimensionality {@code d}
- *        is an element of {@code N}<sup>{@code d}</sup>)
+ *        AbstractNumberVector {@code v} of type {@code V} and dimensionality
+ *        {@code d} is an element of {@code N}<sup>{@code d}</sup>)
  */
 public abstract class AbstractNumberVector<V extends AbstractNumberVector<? extends V, N>, N extends Number> implements NumberVector<V, N> {
   /**
@@ -17,16 +17,16 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
   public final static String ATTRIBUTE_SEPARATOR = " ";
 
   /**
-   * An Object obj is equal to this AbstractNumberVector if it is an instance of the
-   * same runtime class and is of the identical dimensionality and the values of
-   * this AbstractNumberVector are equal to the values of obj in all dimensions,
-   * respectively.
+   * An Object obj is equal to this AbstractNumberVector if it is an instance of
+   * the same runtime class and is of the identical dimensionality and the
+   * values of this AbstractNumberVector are equal to the values of obj in all
+   * dimensions, respectively.
    * 
    * @param obj another Object
    * @return true if the specified Object is an instance of the same runtime
    *         class and is of the identical dimensionality and the values of this
-   *         AbstractNumberVector are equal to the values of obj in all dimensions,
-   *         respectively
+   *         AbstractNumberVector are equal to the values of obj in all
+   *         dimensions, respectively
    */
   @SuppressWarnings("unchecked")
   @Override
@@ -44,26 +44,24 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
     }
   }
 
-  /**
-   * Get Minimum - implementation of the SpatialComparable interface
-   * 
-   * @return the value at the specified dimension
-   * @see #doubleValue(int)
-   */
   @Override
   public double getMin(int dimension) {
     return doubleValue(dimension);
   }
 
-  /**
-   * Get Maximum - implementation of the SpatialComparable interface
-   * 
-   * @return the value at the specified dimension
-   * @see #doubleValue(int)
-   */
   @Override
   public double getMax(int dimension) {
     return doubleValue(dimension);
+  }
+
+  @Override
+  public HyperBoundingBox getMBR() {
+    final int dim = getDimensionality();
+    final double[] values = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = doubleValue(i + 1);
+    }
+    return new HyperBoundingBox(values, values);
   }
 
   @Override

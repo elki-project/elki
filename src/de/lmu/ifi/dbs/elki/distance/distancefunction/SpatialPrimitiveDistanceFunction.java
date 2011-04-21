@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 
 /**
  * API for a spatial primitive distance function.
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public interface SpatialPrimitiveDistanceFunction<V extends FeatureVector<?, ?>, D extends Distance<D>> extends PrimitiveDistanceFunction<V, D> {
+public interface SpatialPrimitiveDistanceFunction<V extends SpatialComparable, D extends Distance<D>> extends PrimitiveDistanceFunction<V, D> {
   /**
    * Computes the minimum distance between the given MBR and the FeatureVector
    * object according to this distance function.
