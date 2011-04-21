@@ -2,7 +2,6 @@ package experimentalcode.hettab.outlier;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -41,7 +40,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
 @Title("SLOM: a new measure for local spatial outliers")
 @Description("spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
 @Reference(authors = "Sanjay Chawla and  Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 2005", url = "http://rp-www.cs.usyd.edu.au/~chawlarg/papers/KAIS_online.pdf")
-public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -54,7 +53,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   /**
    * Our predicate to obtain the neighbors
    */
-  NeighborSetPredicate.Factory<DatabaseObject> npredf = null;
+  NeighborSetPredicate.Factory<Object> npredf = null;
   /**
    * Parameter to specify the non spatial distance function to use
    */
@@ -74,7 +73,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * 
    * @param config
    */
-  protected SLOM(NeighborSetPredicate.Factory<DatabaseObject> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
+  protected SLOM(NeighborSetPredicate.Factory<Object> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
     super();
     this.npredf = npred ;
     this.nonSpatialDistanceFunction = nonSpatialDistanceFunction;
@@ -185,7 +184,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @return SLOM Outlier Algorithm
    */
   public static <V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> SLOM<V, D> parameterize(Parameterization config) {
-    NeighborSetPredicate.Factory<DatabaseObject> npred = getNeighborPredicate(config);
+    NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
     PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction = getNonSpatialDistanceFunction(config);
     if(config.hasErrors()) {
       return null;
@@ -199,8 +198,8 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    * @param config
    * @return
    */
-  public static NeighborSetPredicate.Factory<DatabaseObject> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>> param = new ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
+  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
+    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
@@ -220,5 +219,4 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     }
     return null;
   }
-
 }

@@ -4,7 +4,6 @@ import org.apache.commons.math.stat.descriptive.rank.Median;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -33,7 +32,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  *
  * @param <V>
  */
-public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V, OutlierResult> implements OutlierAlgorithm<V, OutlierResult> {
+public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -47,7 +46,7 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
   /**
    * Our predicate to obtain the neighbors
    */
-  NeighborSetPredicate.Factory<DatabaseObject> npredf = null;
+  NeighborSetPredicate.Factory<Object> npredf = null;
 
   /**
    * 
@@ -72,7 +71,7 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
    * @param npredf
    * @param z
    */
-  public MedianAlgorithm(Factory<DatabaseObject> npredf, int z) {
+  public MedianAlgorithm(Factory<Object> npredf, int z) {
     super();
     this.npredf = npredf;
     this.z = z;
@@ -85,7 +84,7 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
    * @return
    */
   public static <V extends NumberVector<V, ?>> MedianAlgorithm<V> parameterize(Parameterization config) {
-    final NeighborSetPredicate.Factory<DatabaseObject> npred = getNeighborPredicate(config);
+    final NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
     final int y = getParameterY(config);
     if(config.hasErrors()) {
       return null;
@@ -106,8 +105,8 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
    * @param config
    * @return
    */
-  public static NeighborSetPredicate.Factory<DatabaseObject> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>> param = new ObjectParameter<NeighborSetPredicate.Factory<DatabaseObject>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
+  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
+    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
     if(config.grab(param)) {
       return param.instantiateClass(config);
     }
