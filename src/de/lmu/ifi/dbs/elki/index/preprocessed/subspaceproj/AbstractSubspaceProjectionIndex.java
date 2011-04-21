@@ -143,7 +143,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
    * 
    * @return local subspace projection
    */
-  protected abstract P computeProjection(DBID id, List<DistanceResultPair<D>> neighbors, Relation<NV> database);
+  protected abstract P computeProjection(DBID id, List<DistanceResultPair<D>> neighbors, Relation<NV> relation);
 
   /**
    * Factory class

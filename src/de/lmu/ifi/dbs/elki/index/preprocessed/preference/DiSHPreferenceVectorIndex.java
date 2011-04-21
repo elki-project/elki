@@ -207,11 +207,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
    * 
    * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
-   * 
    */
-  private BitSet determinePreferenceVector(Relation<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+  private BitSet determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
     if(strategy.equals(Strategy.APRIORI)) {
-      return determinePreferenceVectorByApriori(database, neighborIDs, msg);
+      return determinePreferenceVectorByApriori(relation, neighborIDs, msg);
     }
     else if(strategy.equals(Strategy.MAX_INTERSECTION)) {
       return determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
@@ -233,13 +232,13 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    * 
    */
-  private BitSet determinePreferenceVectorByApriori(Relation<V> database, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+  private BitSet determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
     int dimensionality = neighborIDs.length;
 
     // database for apriori
     Database apriori_db = new HashmapDatabase();
     SimpleTypeInformation<?> bitmeta = VectorFieldTypeInformation.get(BitVector.class, dimensionality);
-    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
+    for(Iterator<DBID> it = relation.iterDBIDs(); it.hasNext();) {
       DBID id = it.next();
       Bit[] bits = new Bit[dimensionality];
       boolean allFalse = true;

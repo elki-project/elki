@@ -65,8 +65,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
   /**
    * Inserts the specified object into this MkMax-Tree by calling
-   * {@link AbstractMTree#insertAll(ArrayDBIDs,boolean)
-   * AbstractMTree.insert(object, true)}.
+   * {@link AbstractMTree#insert(DBID,O,boolean)
+   * AbstractMTree.insert(id, object, true)}.
    * 
    * @param object the object to be inserted
    */

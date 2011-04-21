@@ -56,8 +56,8 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
 
   /**
    * Inserts the specified object into this M-Tree by calling
-   * {@link AbstractMTree#insertAll(ArrayDBIDs,boolean)
-   * AbstractMTree.insert(object, false)}.
+   * {@link AbstractMTree#insert(DBID,O,boolean)
+   * AbstractMTree.insert(id, object, false)}.
    * 
    * @param object the object to be inserted
    */
@@ -69,8 +69,8 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
   /**
    * Inserts the specified objects into this M-Tree sequentially since a bulk
    * load method is not implemented so far. Calls for each object
-   * {@link AbstractMTree#insertAll(ArrayDBIDs,boolean)
-   * AbstractMTree.insert(object, false)}.
+   * {@link AbstractMTree#insert(DBID,O,boolean)
+   * AbstractMTree.insert(id, object, false)}.
    */
   // todo: bulk load method
   @Override
