@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -37,6 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  */
 public final class ClassGenericsUtil {
+  /**
+   * Static logger to use.
+   */
+  private static final Logging logger = Logging.getLogger(ClassGenericsUtil.class);
+
   /**
    * Name for a static "parameterize" factory method.
    */
@@ -164,6 +171,26 @@ public final class ClassGenericsUtil {
   }
 
   /**
+   * Get a parameterizer for the given class.
+   * 
+   * @param c Class
+   * @return Parameterizer or null.
+   */
+  public static Parameterizer getParameterizer(Class<?> c) {
+    for(Class<?> inner : c.getDeclaredClasses()) {
+      if(Parameterizer.class.isAssignableFrom(inner)) {
+        try {
+          return inner.asSubclass(Parameterizer.class).newInstance();
+        }
+        catch(Exception e) {
+          logger.warning("Non-usable Parameterizer in class: " + c.getName());
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
    * Instantiate a parameterizable class. When using this, consider using
    * {@link Parameterization#descend}!
    * 
@@ -183,17 +210,11 @@ public final class ClassGenericsUtil {
       throw new UnsupportedOperationException("Trying to instantiate 'null' class!");
     }
     // Try a V3 parameterization class
-    for(Class<?> inner : c.getDeclaredClasses()) {
-      if(AbstractParameterizer.class.isAssignableFrom(inner)) {
-        try {
-          AbstractParameterizer par = inner.asSubclass(AbstractParameterizer.class).newInstance();
-          final Object instance = par.make(config);
-          return r.cast(instance);
-        }
-        catch(InstantiationException e) {
-          // continue. Probably non-public
-        }
-      }
+    Parameterizer par = getParameterizer(c);
+    // TODO: API good?
+    if(par != null && par instanceof AbstractParameterizer) {
+      final Object instance = ((AbstractParameterizer) par).make(config);
+      return r.cast(instance);
     }
     // Try a V2 static parameterization method
     try {

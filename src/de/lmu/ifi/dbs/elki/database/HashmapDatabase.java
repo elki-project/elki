@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 
@@ -62,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @apiviz.composedOf DBIDs
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
-public class HashmapDatabase extends AbstractHierarchicalResult implements Database {
+public class HashmapDatabase extends AbstractHierarchicalResult implements Database, Parameterizable {
   /**
    * Parameter to specify the indexes to use.
    * <p>

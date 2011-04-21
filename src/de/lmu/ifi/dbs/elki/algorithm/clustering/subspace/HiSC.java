@@ -75,7 +75,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> {
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
-  
+
   @Override
   protected Logging getLogger() {
     return logger;
@@ -83,9 +83,9 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> {
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
@@ -95,6 +95,10 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter alphaP = new DoubleParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), HiSCPreferenceVectorIndex.Factory.DEFAULT_ALPHA);
+      double alpha = 0.0;
+      if(config.grab(alphaP)) {
+        alpha = alphaP.getValue();
+      }
 
       // Configure OPTICS
       ListParameterization opticsParameters = new ListParameterization();
@@ -104,11 +108,11 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> {
       opticsParameters.addParameter(OPTICS.MINPTS_ID, 2);
       // distance function
       opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, HiSCDistanceFunction.class);
-      opticsParameters.addParameter(HiSCDistanceFunction.EPSILON_ID, alphaP.getValue());
+      opticsParameters.addParameter(HiSCDistanceFunction.EPSILON_ID, alpha);
       // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
       // preprocessor
       opticsParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, HiSCPreferenceVectorIndex.Factory.class);
-      opticsParameters.addParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, alphaP.getValue());
+      opticsParameters.addParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, alpha);
 
       ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
       chain.errorsTo(config);

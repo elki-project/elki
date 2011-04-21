@@ -156,7 +156,10 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> {
       super.makeOptions(config);
 
       IntParameter muP = new IntParameter(MU_ID, new GreaterConstraint(0));
-      config.grab(muP);
+      int mu = -1;
+      if (config.grab(muP)) {
+        mu = muP.getValue();
+      }
 
       IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0), true);
       config.grab(kP);
@@ -172,7 +175,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> {
       ListParameterization opticsParameters = new ListParameterization();
       // epsilon and minpts
       opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
-      opticsParameters.addParameter(OPTICS.MINPTS_ID, muP.getValue());
+      opticsParameters.addParameter(OPTICS.MINPTS_ID, mu);
       // distance function
       opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class);
       // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);

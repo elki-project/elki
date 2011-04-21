@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -169,6 +170,12 @@ public class DocumentParameters {
       FutureTask<?> instantiator = new FutureTask<Object>(new Runnable() {
         @Override
         public void run() {
+          // Try a V3 style parameterizer first.
+          Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
+          if (par != null) {
+            par.configure(track);
+            return;
+          }
           try {
             Object instance = ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
             for(Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
@@ -206,7 +213,7 @@ public class DocumentParameters {
         throw new RuntimeException(e);
       }
       catch(java.util.concurrent.ExecutionException e) {
-        de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating " + cls.getName());
+        de.lmu.ifi.dbs.elki.logging.LoggingUtil.warning("Error instantiating " + cls.getName(), e.getCause());
         /*
          * es.shutdownNow(); if(e.getCause() instanceof RuntimeException) {
          * throw (RuntimeException) e.getCause(); } throw new

@@ -633,7 +633,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imp
 
       configDiSHDistance(config, epsilon, mu);
 
-      configOPTICS(config, muP.getValue(), dishDistance);
+      configOPTICS(config, mu, dishDistance);
     }
 
     public void configDiSHDistance(Parameterization config, double epsilon, int minpts) {

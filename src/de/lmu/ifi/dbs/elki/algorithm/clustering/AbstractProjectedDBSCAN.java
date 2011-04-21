@@ -361,7 +361,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
 
     protected LocallyWeightedDistanceFunction<V> outerdist;
 
-    protected Integer minpts;
+    protected int minpts = -1;
 
     protected Integer lambda;
 
