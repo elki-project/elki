@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class NonFlatRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
+public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
   /**
    * Constructor.
    * 
