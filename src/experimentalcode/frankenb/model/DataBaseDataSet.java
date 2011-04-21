@@ -25,25 +25,16 @@ public class DataBaseDataSet implements IDataSet {
     this.dataBase = dataBase;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#get(int)
-   */
   @Override
   public NumberVector<?, ?> get(int id) {
     return dataBase.get(DBIDUtil.importInteger(id));
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getDimensionality()
-   */
   @Override
   public int getDimensionality() {
     return DatabaseUtil.dimensionality(dataBase);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getIDs()
-   */
   @Override
   public Iterable<Integer> getIDs() {
     return new Iterable<Integer>() {
@@ -75,20 +66,13 @@ public class DataBaseDataSet implements IDataSet {
     };
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getSize()
-   */
   @Override
   public int getSize() {
     return dataBase.size();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getOriginalDataSet()
-   */
   @Override
   public IDataSet getOriginal() {
     return this;
   }
-
 }

@@ -20,8 +20,10 @@ import experimentalcode.frankenb.log.Log;
 public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
 
   private final DynamicBPlusTree<Integer, DistanceList> resultTree;
+  private Relation<O> relation;
 
-  protected PrecalculatedKnnQuery(DynamicBPlusTree<Integer, DistanceList> resultTree) {
+  protected PrecalculatedKnnQuery(Relation<O> relation, DynamicBPlusTree<Integer, DistanceList> resultTree) {
+    this.relation = relation;
     this.resultTree = resultTree;
   }
 
@@ -91,6 +93,6 @@ public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
 
   @Override
   public Relation<? extends O> getRelation() {
-    return dataBase;
+    return relation;
   }
 }

@@ -7,7 +7,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -36,8 +40,10 @@ import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage
 public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
 
   private DynamicBPlusTree<Integer, DistanceList> resultTree;
+  private Relation<O> relation;
 
-  public PrecalculatedKnnIndex(DynamicBPlusTree<Integer, DistanceList> resultTree) {
+  public PrecalculatedKnnIndex(Relation<O> relation, DynamicBPlusTree<Integer, DistanceList> resultTree) {
+    this.relation = relation;
     this.resultTree = resultTree;
   }
   
@@ -50,37 +56,23 @@ public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.index.Index#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject
-   * )
-   */
   @Override
-  public void insert(O object) {
+  public void insert(DBID id, O object) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void insert(List<O> objects) {
+  public void insertAll(ArrayDBIDs ids, List<O> objects) {
     //throw new UnsupportedOperationException();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.index.Index#delete(de.lmu.ifi.dbs.elki.data.DatabaseObject
-   * )
-   */
   @Override
-  public boolean delete(O object) {
+  public boolean delete(DBID id) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void delete(List<O> objects) {
+  public void deleteAll(DBIDs ids) {
     throw new UnsupportedOperationException();
   }
 
@@ -104,8 +96,8 @@ public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Database<O> database, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    return (KNNQuery<O, D>) new PrecalculatedKnnQuery<O>(this.resultTree);
+  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    return (KNNQuery<O, D>) new PrecalculatedKnnQuery<O>(this.relation, this.resultTree);
   }
 
   /*
@@ -118,8 +110,8 @@ public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Database<O> database, DistanceQuery<O, D> distanceQuery, Object... hints) {
-    return (KNNQuery<O, D>) new PrecalculatedKnnQuery<O>(this.resultTree);
+  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    return (KNNQuery<O, D>) new PrecalculatedKnnQuery<O>(this.relation, this.resultTree);
   }
 
   public static class Factory<O, D extends Distance<D>> implements IndexFactory<O, KNNIndex<O>> {
@@ -185,8 +177,17 @@ public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
 
     @Override
     public PrecalculatedKnnIndex<O> instantiate(Relation<O> database) {
-      return new PrecalculatedKnnIndex<O>(resultTree);
+      return new PrecalculatedKnnIndex<O>(database, resultTree);
     }
 
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return TypeUtil.ANY;
+    }
+  }
+
+  @Override
+  public Relation<O> getRelation() {
+    return this.relation;
   }
 }

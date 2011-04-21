@@ -5,11 +5,13 @@ package experimentalcode.frankenb.main;
 
 import java.io.File;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -86,19 +88,21 @@ public class PINN extends AbstractApplication {
   public void run() throws UnableToComplyException {
     Log.info("Reading database ...");
     final Database dataBase = databaseConnection.getDatabase();
+    Relation<NumberVector<?, ?>> relation = dataBase.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     Log.info("Projecting ...");
-    IDataSet dataSet = randomProjection.project(new DataBaseDataSet(dataBase));
+    final DataBaseDataSet dataset = new DataBaseDataSet(relation);
+    IDataSet dataSet = randomProjection.project(dataset);
 
     Log.info("Creating KD-Tree ...");
     KDTree tree = new KDTree(dataSet);
 
-    PINNKnnIndex index = new PINNKnnIndex(tree, kFactor);
+    PINNKnnIndex index = new PINNKnnIndex(relation, tree, kFactor);
     dataBase.addIndex(index);
 
     Log.info("Running LOF ...");
 
-    AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = new LOF<NumberVector<?, ?>, DoubleDistance>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
+    OutlierAlgorithm algorithm = new LOF<NumberVector<?, ?>, DoubleDistance>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
     OutlierResult result = algorithm.run(dataBase);
 
     Log.info("Calculating ROC ...");

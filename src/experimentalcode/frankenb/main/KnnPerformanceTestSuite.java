@@ -9,15 +9,16 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -105,13 +106,13 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
   new PerformanceTest(new LDOF<NumberVector<?, ?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 10)), new PerformanceTest(new LDOF<NumberVector<?, ?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 20)), new PerformanceTest(new LDOF<NumberVector<?, ?>, DoubleDistance>(EuclideanDistanceFunction.STATIC, 45)), };
 
   private static class PerformanceTest {
-    private final AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm;
+    private final OutlierAlgorithm algorithm;
 
-    public PerformanceTest(AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm) {
+    public PerformanceTest(OutlierAlgorithm algorithm) {
       this.algorithm = algorithm;
     }
 
-    public AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> getAlgorithm() {
+    public OutlierAlgorithm getAlgorithm() {
       return this.algorithm;
     }
   }
@@ -174,7 +175,8 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
 
     DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(new BufferedDiskBackedDataStorage(resultDirectory), (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)), new ConstantSizeIntegerSerializer(), new DistanceListSerializer());
 
-    PrecalculatedKnnIndex<NumberVector<?, ?>> index = new PrecalculatedKnnIndex<NumberVector<?, ?>>(resultTree);
+    Relation<NumberVector<?, ?>> relation = null;
+    PrecalculatedKnnIndex<NumberVector<?, ?>> index = new PrecalculatedKnnIndex<NumberVector<?, ?>>(relation, resultTree);
     database.addIndex(index);
 
     File outputFolder = new File(inputFolder, "results");
@@ -184,7 +186,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
 
     Log.info("Processing results ...");
     for(PerformanceTest performanceTest : PERFORMANCE_TESTS) {
-      AbstractAlgorithm<NumberVector<?, ?>, OutlierResult> algorithm = performanceTest.getAlgorithm();
+      OutlierAlgorithm algorithm = performanceTest.getAlgorithm();
       String targetFileName = createResultFileName(performanceTest, outputFolder);
       Log.info(String.format("%s (%s) ...", algorithm.getClass().getSimpleName(), targetFileName));
 
