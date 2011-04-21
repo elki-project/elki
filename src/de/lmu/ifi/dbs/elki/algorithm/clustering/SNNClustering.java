@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -270,8 +271,8 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<O
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return similarityFunction.getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(similarityFunction.getInputTypeRestriction());
   }
 
   @Override

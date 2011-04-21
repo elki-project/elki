@@ -264,8 +264,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
   
   @Override

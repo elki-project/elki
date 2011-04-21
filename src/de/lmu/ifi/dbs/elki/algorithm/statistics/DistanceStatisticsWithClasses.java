@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -108,7 +109,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
    */
   @Override
   public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
-    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
+    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<O, D> distFunc = database.getDistanceQuery(dataQuery, getDistanceFunction());
     
     // determine binning ranges.
@@ -338,8 +339,8 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return getDistanceFunction().getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
   @Override

@@ -43,7 +43,7 @@ public class NullAlgorithm extends AbstractAlgorithm<Object> {
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.ANY;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.ANY);
   }
 }

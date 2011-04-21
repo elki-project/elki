@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -84,7 +85,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    */
   @Override
   public KNNDistanceOrderResult<D> run(Database database) throws IllegalStateException {
-    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
+    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
@@ -103,8 +104,8 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return getDistanceFunction().getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
   @Override

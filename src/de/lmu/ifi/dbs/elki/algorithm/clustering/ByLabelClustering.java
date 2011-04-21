@@ -173,8 +173,8 @@ public class ByLabelClustering extends AbstractAlgorithm<String> implements Clus
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.GUESSED_LABEL;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.GUESSED_LABEL);
   }
 
   @Override

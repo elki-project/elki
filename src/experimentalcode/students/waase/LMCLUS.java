@@ -391,7 +391,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> {
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 }

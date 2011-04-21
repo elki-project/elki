@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
@@ -336,11 +337,15 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
+  public TypeInformation[] getInputTypeRestriction() {
+    final TypeInformation type;
     if(reachabilityDistanceFunction.equals(neighborhoodDistanceFunction)) {
-      return reachabilityDistanceFunction.getInputTypeRestriction();
+      type = reachabilityDistanceFunction.getInputTypeRestriction();
     }
-    return new CombinedTypeInformation(neighborhoodDistanceFunction.getInputTypeRestriction(), reachabilityDistanceFunction.getInputTypeRestriction());
+    else {
+      type = new CombinedTypeInformation(neighborhoodDistanceFunction.getInputTypeRestriction(), reachabilityDistanceFunction.getInputTypeRestriction());
+    }
+    return TypeUtil.array(type);
   }
 
   @Override
@@ -357,42 +362,42 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
      * The database.
      */
     private final Database database;
-  
+
     /**
      * The result of the run of the {@link LOF} algorithm.
      */
     private OutlierResult result;
-  
+
     /**
      * The kNN query w.r.t. the reference neighborhood distance.
      */
     private final KNNQuery<O, D> kNNRefer;
-  
+
     /**
      * The kNN query w.r.t. the reachability distance.
      */
     private final KNNQuery<O, D> kNNReach;
-  
+
     /**
      * The RkNN query w.r.t. the reference neighborhood distance.
      */
     private RKNNQuery<O, D> rkNNRefer;
-  
+
     /**
      * The rkNN query w.r.t. the reachability distance.
      */
     private RKNNQuery<O, D> rkNNReach;
-  
+
     /**
      * The LRD values of the objects.
      */
     private final WritableDataStore<Double> lrds;
-  
+
     /**
      * The LOF values of the objects.
      */
     private final WritableDataStore<Double> lofs;
-  
+
     /**
      * Encapsulates information generated during a run of the {@link LOF}
      * algorithm.
@@ -411,49 +416,49 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
       this.lrds = lrds;
       this.lofs = lofs;
     }
-  
+
     /**
      * @return the database
      */
     public Database getDatabase() {
       return database;
     }
-  
+
     /**
      * @return the kNN query w.r.t. the reference neighborhood distance
      */
     public KNNQuery<O, D> getKNNRefer() {
       return kNNRefer;
     }
-  
+
     /**
      * @return the kNN query w.r.t. the reachability distance
      */
     public KNNQuery<O, D> getKNNReach() {
       return kNNReach;
     }
-  
+
     /**
      * @return the LRD values of the objects
      */
     public WritableDataStore<Double> getLrds() {
       return lrds;
     }
-  
+
     /**
      * @return the LOF values of the objects
      */
     public WritableDataStore<Double> getLofs() {
       return lofs;
     }
-  
+
     /**
      * @return the result of the run of the {@link LOF} algorithm
      */
     public OutlierResult getResult() {
       return result;
     }
-  
+
     /**
      * Sets the RkNN query w.r.t. the reference neighborhood distance.
      * 
@@ -462,21 +467,21 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
     public void setRkNNRefer(RKNNQuery<O, D> rkNNRefer) {
       this.rkNNRefer = rkNNRefer;
     }
-  
+
     /**
      * @return the RkNN query w.r.t. the reference neighborhood distance
      */
     public RKNNQuery<O, D> getRkNNRefer() {
       return rkNNRefer;
     }
-  
+
     /**
      * @return the RkNN query w.r.t. the reachability distance
      */
     public RKNNQuery<O, D> getRkNNReach() {
       return rkNNReach;
     }
-  
+
     /**
      * Sets the RkNN query w.r.t. the reachability distance.
      * 

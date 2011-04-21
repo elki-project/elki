@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -58,8 +59,8 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
   }
 
   @Override
-  public VectorFieldTypeInformation<? super O> getInputTypeRestriction() {
-    return EuclideanDistanceFunction.STATIC.getInputTypeRestriction();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(EuclideanDistanceFunction.STATIC.getInputTypeRestriction());
   }
 
   @Override
