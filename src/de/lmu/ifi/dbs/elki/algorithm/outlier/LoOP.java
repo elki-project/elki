@@ -190,7 +190,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
    * Performs the LoOP algorithm on the given database.
    */
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     final double sqrt2 = Math.sqrt(2.0);
     Relation<O> relation = getRelation(database);
 

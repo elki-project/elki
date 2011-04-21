@@ -129,7 +129,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
   }
 
   @Override
-  protected Result runInTime(@SuppressWarnings("unused") Database database) throws IllegalStateException {
+  public Result run(@SuppressWarnings("unused") Database database) throws IllegalStateException {
     // TODO Implement sensible default behavior.
     return null;
   }

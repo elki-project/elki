@@ -92,7 +92,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, R
   }
 
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     try {
       return runLMCLUS(database, maxLMDim.getValue(), samplingLevel.getValue(), sensivityThreshold.getValue());
     }

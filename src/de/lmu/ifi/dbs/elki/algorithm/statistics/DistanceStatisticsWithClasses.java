@@ -107,7 +107,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
    * Iterates over all points in the database.
    */
   @Override
-  protected HistogramResult<DoubleVector> runInTime(Database database) throws IllegalStateException {
+  public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
     final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
     final DistanceQuery<O, D> distFunc = database.getDistanceQuery(dataQuery, getDistanceFunction());
     

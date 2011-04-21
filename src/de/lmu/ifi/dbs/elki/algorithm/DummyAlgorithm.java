@@ -42,7 +42,7 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
    * Iterates over all points in the database.
    */
   @Override
-  protected Result runInTime(Database database) throws IllegalStateException {
+  public Result run(Database database) throws IllegalStateException {
     // Bind to the database
     Relation<O> relation = getRelation(database);
     DistanceQuery<O, DoubleDistance> distQuery = database.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);

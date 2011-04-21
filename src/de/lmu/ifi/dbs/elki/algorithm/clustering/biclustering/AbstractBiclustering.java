@@ -56,7 +56,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
 
   /**
    * Keeps the result. A new ResultObject is assigned when the method
-   * {@link #runInTime(Database)} is called.
+   * {@link #run(Database)} is called.
    */
   private Clustering<M> result;
 
@@ -78,7 +78,8 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * 
    */
   @Override
-  protected final Clustering<M> runInTime(Database database) throws IllegalStateException {
+  public
+  final Clustering<M> run(Database database) throws IllegalStateException {
     this.database = getRelation(database);
     if(this.database == null || this.database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
@@ -111,14 +112,14 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * operations like on a data matrix.
    * <p/>
    * This method is supposed to be called only from the method
-   * {@link #runInTime(Database)}.
+   * {@link #run(Database)}.
    * <p/>
    * If a bicluster is to be appended to the result, the methods
    * {@link #defineBicluster(BitSet,BitSet)} and
    * {@link #addBiclusterToResult(Bicluster)} should be used.
    * 
    * @throws IllegalStateException if the properties are not set properly (e.g.
-   *         method is not called from method {@link #runInTime(Database)}, but
+   *         method is not called from method {@link #run(Database)}, but
    *         directly)
    */
   protected abstract void biclustering() throws IllegalStateException;

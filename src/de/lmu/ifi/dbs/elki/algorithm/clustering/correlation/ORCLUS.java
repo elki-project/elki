@@ -116,7 +116,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
    * Performs the ORCLUS algorithm on the given database.
    */
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     try {
       Relation<V> dataQuery = this.getRelation(database);
       DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);

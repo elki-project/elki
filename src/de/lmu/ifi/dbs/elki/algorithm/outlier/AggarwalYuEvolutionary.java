@@ -115,7 +115,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    * Performs the EAFOD algorithm on the given database.
    */
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     final int dbsize = dataQuery.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(dataQuery);

@@ -95,7 +95,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O, 
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Result innerresult = algorithm.run(database);
 
     OutlierResult or = getOutlierResult(innerresult);

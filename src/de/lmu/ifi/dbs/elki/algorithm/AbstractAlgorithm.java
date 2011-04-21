@@ -30,38 +30,8 @@ public abstract class AbstractAlgorithm<O, R extends Result> implements Algorith
     super();
   }
 
-  /**
-   * The run method encapsulated in measure of runtime. An extending class needs
-   * not to take care of runtime itself.
-   * 
-   * @param data the data to run the query on
-   * @return the Result computed by this algorithm
-   * @throws IllegalStateException if the algorithm has not been initialized
-   *         properly (e.g. the setParameters(String[]) method has been failed
-   *         to be called).
-   */
-  protected abstract R runInTime(Database data) throws IllegalStateException;
-
-  /**
-   * Calls the runInTime()-method of extending classes. Measures and prints the
-   * runtime and, in case of an index based database, the I/O costs of this
-   * method.
-   * 
-   * @param database the database to run the algorithm on
-   * @return the Result computed by this algorithm
-   */
   @Override
-  public final R run(Database database) throws IllegalStateException {
-    long start = System.currentTimeMillis();
-    R res = runInTime(database);
-    long end = System.currentTimeMillis();
-    if(getLogger().isVerbose()) {
-      long elapsedTime = end - start;
-      getLogger().verbose(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
-
-    }
-    return res;
-  }
+  public abstract R run(Database data) throws IllegalStateException;
 
   /**
    * Get the input type restriction used for negotiating the data query.

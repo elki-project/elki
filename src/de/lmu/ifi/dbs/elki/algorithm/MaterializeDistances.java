@@ -54,7 +54,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
    * Iterates over all points in the database.
    */
   @Override
-  protected CollectionResult<CTriple<DBID, DBID, Double>> runInTime(Database database) throws IllegalStateException {
+  public CollectionResult<CTriple<DBID, DBID, Double>> run(Database database) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = getDistanceQuery(database);
     int size = distFunc.getRelation().size();
 

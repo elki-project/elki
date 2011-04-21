@@ -141,7 +141,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * Performs the SUBCLU algorithm on the given database.
    */
   @Override
-  protected Clustering<SubspaceModel<V>> runInTime(Database database) throws IllegalStateException {
+  public Clustering<SubspaceModel<V>> run(Database database) throws IllegalStateException {
     try {
       Relation<V> dataQuery = getRelation(database);
       int dimensionality = DatabaseUtil.dimensionality(dataQuery);

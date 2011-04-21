@@ -119,7 +119,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * 
    */
   @Override
-  protected ClusterOrderResult<D> runInTime(Database database) throws IllegalStateException {
+  public ClusterOrderResult<D> run(Database database) throws IllegalStateException {
     Collection<DeLiCluTree<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTree.class);
     if(indexes.size() != 1) {
       throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes, expected exactly one.");

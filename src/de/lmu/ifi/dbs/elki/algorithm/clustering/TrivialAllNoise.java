@@ -41,7 +41,7 @@ public class TrivialAllNoise extends AbstractAlgorithm<Object, Clustering<Model>
    * @param database The database to process
    */
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     Clustering<Model> result = new Clustering<Model>("All-in-noise trivial Clustering", "allinnoise-clustering");
     Cluster<Model> c = new Cluster<Model>(database.getDBIDs(), true, ClusterModel.CLUSTER);
     result.addCluster(c);

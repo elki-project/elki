@@ -80,7 +80,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
    * Run the algorithm.
    */
   @Override
-  protected HistogramResult<DoubleVector> runInTime(Database database) throws IllegalStateException {
+  public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
     final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction());
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, dataQuery.size());

@@ -107,7 +107,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<O> relation = database.getRelation(getInputTypeRestriction());
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 

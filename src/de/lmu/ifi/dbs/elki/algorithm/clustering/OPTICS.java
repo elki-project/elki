@@ -115,7 +115,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * 
    */
   @Override
-  protected ClusterOrderResult<D> runInTime(Database database) {
+  public ClusterOrderResult<D> run(Database database) {
     // Default value is infinite distance
     if(epsilon == null) {
       epsilon = getDistanceFunction().getDistanceFactory().infiniteDistance();

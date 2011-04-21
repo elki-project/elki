@@ -107,7 +107,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * Performs the DBSCAN algorithm on the given database.
    */
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceQuery(database));
     final int size = rangeQuery.getRelation().size();
 

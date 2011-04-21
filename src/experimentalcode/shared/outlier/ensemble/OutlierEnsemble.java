@@ -101,7 +101,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<O, OutlierResult> {
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     int num = algorithms.size();
     // Run inner outlier algorithms
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);

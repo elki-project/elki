@@ -153,7 +153,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected Clustering<Model> runInTime(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     if(logger.isVerbose()) {
       logger.verbose("Running COPAC on db size = " + dataQuery.size() + " with dimensionality = " + DatabaseUtil.dimensionality(dataQuery));

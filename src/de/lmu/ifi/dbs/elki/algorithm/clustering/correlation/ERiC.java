@@ -94,7 +94,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * Performs the ERiC algorithm on the given database.
    */
   @Override
-  protected Clustering<CorrelationModel<V>> runInTime(Database database) throws IllegalStateException {
+  public Clustering<CorrelationModel<V>> run(Database database) throws IllegalStateException {
     Relation<V> dataQuery = getRelation(database);
     int dimensionality = DatabaseUtil.dimensionality(dataQuery);
 

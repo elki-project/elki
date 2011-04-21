@@ -33,7 +33,7 @@ public class NullAlgorithm extends AbstractAlgorithm<Object, Result> {
    * Iterates over all points in the database.
    */
   @Override
-  protected Result runInTime(@SuppressWarnings("unused") Database database) throws IllegalStateException {
+  public Result run(@SuppressWarnings("unused") Database database) throws IllegalStateException {
     return null;
   }
   

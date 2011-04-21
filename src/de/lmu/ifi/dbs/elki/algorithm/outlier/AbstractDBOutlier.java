@@ -63,7 +63,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * 
    */
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Relation<O> relation = database.getRelation(getInputTypeRestriction());
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 

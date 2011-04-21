@@ -182,7 +182,7 @@ public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<O, OutlierR
   }
 
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
     Pattern colSep = Pattern.compile(AbstractParser.WHITESPACE_PATTERN);

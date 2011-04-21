@@ -70,7 +70,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V
    * Runs the algorithm in the timed evaluation part.
    */
   @Override
-  protected OutlierResult runInTime(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) throws IllegalStateException {
     Clustering<EMModel<V>> emresult = emClustering.run(database);
 
     double globmax = 0.0;

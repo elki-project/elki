@@ -96,7 +96,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * Run the algorithm.
    */
   @Override
-  protected HistogramResult<DoubleVector> runInTime(Database database) throws IllegalStateException {
+  public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction());
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, relation.size());
