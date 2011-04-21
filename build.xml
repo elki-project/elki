@@ -89,23 +89,23 @@
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
 	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
-		<exclude name="experimentalcode/arthur/fractaldimension/**" />
 		<exclude name="experimentalcode/attenberger/**" />
+		<exclude name="experimentalcode/erich/gearth/**" />
+		<exclude name="experimentalcode/erich/newdblayer/**" />
 		<exclude name="experimentalcode/demel/**" />
 		<exclude name="experimentalcode/frankenb/**" />
 		<exclude name="experimentalcode/franz/**" />
 		<exclude name="experimentalcode/hettab/**" />
-		<exclude name="experimentalcode/ivascu/**" />
+		<exclude name="experimentalcode/josse/**" />
 		<exclude name="experimentalcode/marisa/**" />
+		<exclude name="experimentalcode/missbichler/**" />
 		<exclude name="experimentalcode/moennig/**" />
-		<exclude name="experimentalcode/sascha/**" />
 		<exclude name="experimentalcode/shared/kernelbased/**" />
 		<exclude name="experimentalcode/shared/guidraft1/**" />
 		<exclude name="experimentalcode/shared/converter/bibtex/**" />
-		<exclude name="experimentalcode/simon/**" />
+		<exclude name="experimentalcode/students/**" />
 		<exclude name="experimentalcode/thomas/**" />
 		<exclude name="experimentalcode/tobias/**" />
-		<exclude name="experimentalcode/zankl/**" />
 	</patternset>
 	<!-- Code not to be release -->
 	<patternset id="exclude.release">
