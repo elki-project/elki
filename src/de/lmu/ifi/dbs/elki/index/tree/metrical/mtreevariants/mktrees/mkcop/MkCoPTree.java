@@ -107,7 +107,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, N>, N extends Number> exte
     }
 
     if(!initialized) {
-      initialize(relation.get(ids.iterator().next()));
+      final DBID id = ids.iterator().next();
+      final O object = relation.get(id);
+      initialize(createNewLeafEntry(id, object, distanceFunction.getDistanceFactory().nullDistance()));
     }
 
     Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
@@ -212,9 +214,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * Determines the maximum and minimum number of entries in a node.
    */
   @Override
-  protected void initializeCapacities(@SuppressWarnings("unused") O object) {
-    D dummyDistance = getDistanceQuery().nullDistance();
-    int distanceSize = dummyDistance.externalizableSize();
+  protected void initializeCapacities(MkCoPEntry<D, N> exampleLeaf) {
+    int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;

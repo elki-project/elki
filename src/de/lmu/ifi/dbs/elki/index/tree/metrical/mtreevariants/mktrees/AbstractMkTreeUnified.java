@@ -74,7 +74,9 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
     }
 
     if(!initialized) {
-      initialize(relation.get(ids.iterator().next()));
+      final DBID id = ids.iterator().next();
+      final O object = relation.get(id);
+      initialize(createNewLeafEntry(id, object, distanceFunction.getDistanceFactory().nullDistance()));
     }
 
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();

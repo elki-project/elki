@@ -261,8 +261,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   }
 
   @Override
-  protected void initializeCapacities(O object) {
-    int dimensionality = object.getDimensionality();
+  protected void initializeCapacities(RdKNNEntry<D, N> exampleLeaf) {
+    int dimensionality = exampleLeaf.getDimensionality();
     D dummyDistance = distanceQuery.getDistanceFactory().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 

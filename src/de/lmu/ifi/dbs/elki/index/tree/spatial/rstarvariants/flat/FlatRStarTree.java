@@ -134,7 +134,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   }
 
   @Override
-  protected void createEmptyRoot(O object) {
+  protected void createEmptyRoot(SpatialEntry exampleLeaf) {
     root = createNewDirectoryNode(dirCapacity);
     root.setPageID(getRootEntry().getEntryID());
 
@@ -142,7 +142,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
     file.setNextPageID(getRootEntry().getEntryID() + 1);
     FlatRStarTreeNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
-    HyperBoundingBox mbr = new HyperBoundingBox(new double[object.getDimensionality()], new double[object.getDimensionality()]);
+    HyperBoundingBox mbr = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
     // noinspection unchecked
     root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getPageID(), mbr));
 

@@ -130,13 +130,15 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       getLogger().debug("insert object " + id + "\n");
     }
 
+    // Wrap entry as leaf
+    E entry = createNewLeafEntry(id);
+    
     if(!initialized) {
-      initialize(relation.get(id));
+      initialize(entry);
     }
 
     reinsertions.clear();
 
-    E entry = createNewLeafEntry(id);
     preInsert(entry);
     insertLeafEntry(entry);
 
@@ -161,8 +163,10 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       return;
     }
 
+    // Make an example leaf
+    E exampleLeaf = createNewLeafEntry(ids.iterator().next());
     if(bulk && !initialized) {
-      initialize(relation.get(ids.iterator().next()));
+      initialize(exampleLeaf );
       bulkLoad(ids);
       if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
@@ -173,7 +177,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
     else {
       if(!initialized) {
-        initialize(relation.get(ids.iterator().next()));
+        initialize(exampleLeaf);
       }
       for(DBID id : ids) {
         insert(id);
@@ -464,13 +468,13 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   }
 
   @Override
-  protected void initializeCapacities(O object) {
+  protected void initializeCapacities(E exampleLeaf) {
     /* Simulate the creation of a leaf page to get the page capacity */
     try {
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[object.getDimensionality()]);
+      SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[exampleLeaf.getDimensionality()]);
       while(baos.size() <= pageSize) {
         sl.writeExternal(oos);
         oos.flush();
@@ -488,7 +492,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      HyperBoundingBox hb = new HyperBoundingBox(new double[object.getDimensionality()], new double[object.getDimensionality()]);
+      HyperBoundingBox hb = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
       SpatialDirectoryEntry sl = new SpatialDirectoryEntry(0, hb);
       while(baos.size() <= pageSize) {
         sl.writeExternal(oos);
