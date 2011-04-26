@@ -7,7 +7,6 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -59,7 +58,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
   @Override
   public Database getDatabase() {
     VectorFieldTypeInformation<DoubleVector> type = VectorFieldTypeInformation.get(DoubleVector.class, dim);
-    List<Object> vectors = new ArrayList<Object>(size);
+    List<DoubleVector> vectors = new ArrayList<DoubleVector>(size);
 
     // Setup random generator
     final Random rand;
@@ -76,13 +75,8 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
       vectors.add(factory.randomInstance(rand));
     }
 
-    // Build a bundle
-    BundleMeta meta = new BundleMeta();
-    meta.add(type);
-    List<List<?>> columns = new ArrayList<List<?>>(1);
-    columns.add(vectors);
     try {
-      database.insert(new MultipleObjectsBundle(meta, columns));
+      database.insert(MultipleObjectsBundle.makeSimple(type, vectors));
     }
     catch(UnableToComplyException e) {
       logger.exception(e);

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.datasource.bundle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -100,6 +101,18 @@ public class MultipleObjectsBundle implements ObjectBundle {
   }
 
   /**
+   * Helper to add a single column to the bundle.
+   * 
+   * @param <V> Object type
+   * @param type Type information
+   * @param data Data to add
+   */
+  public <V> void appendColumn(SimpleTypeInformation<? super V> type, List<? extends V> data) {
+    meta.add(type);
+    columns.add(data);
+  }
+
+  /**
    * Get the raw objects columns. Use with caution!
    * 
    * @param i column number
@@ -107,5 +120,34 @@ public class MultipleObjectsBundle implements ObjectBundle {
    */
   public List<?> getColumn(int i) {
     return columns.get(i);
+  }
+
+  /**
+   * Helper to add a single column to the bundle.
+   * 
+   * @param <V> Object type
+   * @param type Type information
+   * @param data Data to add
+   */
+  public static <V> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V> type, List<? extends V> data) {
+    BundleMeta meta = new BundleMeta(type);
+    List<List<?>> columns = new ArrayList<List<?>>(1);
+    columns.add(data);
+    return new MultipleObjectsBundle(meta, columns);
+  }
+
+  /**
+   * Helper to add a single column to the bundle.
+   * 
+   * @param <V> Object type
+   * @param type Type information
+   * @param data Data to add
+   */
+  public static <V1, V2> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V1> type1, List<? extends V1> data1, SimpleTypeInformation<? super V2> type2, List<? extends V2> data2) {
+    BundleMeta meta = new BundleMeta(type1, type2);
+    List<List<?>> columns = new ArrayList<List<?>>(2);
+    columns.add(data1);
+    columns.add(data2);
+    return new MultipleObjectsBundle(meta, columns);
   }
 }

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.datasource.bundle;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 
@@ -30,5 +31,14 @@ public class BundleMeta extends ArrayList<SimpleTypeInformation<?>> {
    */
   public BundleMeta(int initialCapacity) {
     super(initialCapacity);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param types
+   */
+  public BundleMeta(SimpleTypeInformation<?>... types) {
+    super(Arrays.asList(types));
   }
 }
