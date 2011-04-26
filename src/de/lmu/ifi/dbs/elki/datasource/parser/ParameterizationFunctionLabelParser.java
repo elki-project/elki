@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -50,8 +49,8 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
     int dimensionality = -1;
-    List<Object> vectors = new ArrayList<Object>();
-    List<Object> labels = new ArrayList<Object>();
+    List<ParameterizationFunction> vectors = new ArrayList<ParameterizationFunction>();
+    List<LabelList> labels = new ArrayList<LabelList>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
@@ -84,13 +83,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    BundleMeta meta = new BundleMeta();
-    List<List<?>> columns = new ArrayList<List<?>>(2);
-    meta.add(getTypeInformation(dimensionality));
-    columns.add(vectors);
-    meta.add(TypeUtil.LABELLIST);
-    columns.add(labels);
-    return new MultipleObjectsBundle(meta, columns);
+    return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, labels);
   }
 
   protected VectorFieldTypeInformation<ParameterizationFunction> getTypeInformation(int dimensionality) {

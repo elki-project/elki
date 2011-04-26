@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
@@ -57,17 +56,14 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
 
-    BundleMeta meta = new BundleMeta(2);
-    meta.add(SimpleTypeInformation.get(PolygonsObject.class));
-    meta.add(TypeUtil.LABELLIST);
-
-    List<Object> folded = new ArrayList<Object>();
+    List<PolygonsObject> polys = new ArrayList<PolygonsObject>();
+    List<LabelList> labels = new ArrayList<LabelList>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           Pair<PolygonsObject, LabelList> objectAndLabels = parseLine(line);
-          folded.add(objectAndLabels.first);
-          folded.add(objectAndLabels.second);
+          polys.add(objectAndLabels.first);
+          labels.add(objectAndLabels.second);
         }
       }
     }
@@ -75,7 +71,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new MultipleObjectsBundle(meta, folded);
+    return MultipleObjectsBundle.makeSimple(SimpleTypeInformation.get(PolygonsObject.class), polys, TypeUtil.LABELLIST, labels);
   }
 
   /**

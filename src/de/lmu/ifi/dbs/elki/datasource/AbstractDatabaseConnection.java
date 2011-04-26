@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -141,34 +140,29 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
     }
 
     // Prepare bundle for expansion
-    BundleMeta reps = new BundleMeta(origpkgs.metaLength() + 2);
-    List<List<?>> columns = new ArrayList<List<?>>(origpkgs.metaLength() + 2);
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     // Adjust representations: label transformation
     for(int i = 0; i < origpkgs.metaLength(); i++) {
       SimpleTypeInformation<?> meta = origpkgs.meta(i);
       // Skip non-label columns
       if(meta.getRestrictionClass() != LabelList.class) {
-        reps.add(meta);
-        columns.add(origpkgs.getColumn(i));
+        bundle.appendColumn(meta, origpkgs.getColumn(i));
         continue;
       }
       // We split the label column into up to three parts
       List<Object> clscol = null;
       if(classLabelIndex != null) {
-        reps.add(TypeUtil.CLASSLABEL);
         clscol = new ArrayList<Object>(origpkgs.dataLength());
-        columns.add(clscol);
+        bundle.appendColumn(TypeUtil.CLASSLABEL, clscol);
       }
       List<Object> eidcol = null;
       if(externalIdIndex != null) {
-        // TODO: special type for external ID?
-        reps.add(TypeUtil.STRING);
         eidcol = new ArrayList<Object>(origpkgs.dataLength());
-        columns.add(eidcol);
+        // TODO: special type for external ID?
+        bundle.appendColumn(TypeUtil.STRING, eidcol);
       }
       List<Object> lblcol = new ArrayList<Object>(origpkgs.dataLength());
-      reps.add(meta);
-      columns.add(lblcol);
+      bundle.appendColumn(meta, lblcol);
 
       // Split the column
       for(Object obj : origpkgs.getColumn(i)) {
@@ -213,7 +207,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
         }
       }
     }
-    return new MultipleObjectsBundle(reps, columns);
+    return bundle;
   }
 
   /**

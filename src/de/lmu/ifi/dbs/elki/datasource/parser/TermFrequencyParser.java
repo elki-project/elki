@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -113,8 +112,8 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   public MultipleObjectsBundle parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
-    List<Object> vectors = new ArrayList<Object>();
-    List<Object> lblc = new ArrayList<Object>();
+    List<SparseFloatVector> vectors = new ArrayList<SparseFloatVector>();
+    List<LabelList> lblc = new ArrayList<LabelList>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
@@ -129,16 +128,9 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
     }
     // Set maximum dimensionality
     for(int i = 0; i < vectors.size(); i ++) {
-      SparseFloatVector vec = (SparseFloatVector) vectors.get(i);
-      vec.setDimensionality(maxdim);
+      vectors.get(i).setDimensionality(maxdim);
     }
-    BundleMeta meta = new BundleMeta();
-    List<List<?>> columns = new ArrayList<List<?>>(2);
-    meta.add(getTypeInformation(maxdim));
-    columns.add(vectors);
-    meta.add(TypeUtil.LABELLIST);
-    columns.add(lblc);
-    return new MultipleObjectsBundle(meta, columns);
+    return MultipleObjectsBundle.makeSimple(getTypeInformation(maxdim), vectors, TypeUtil.LABELLIST, lblc);
   }
 
   @Override

@@ -28,7 +28,8 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * Constructor.
    */
   public MultipleObjectsBundle() {
-    this(new BundleMeta(), new ArrayList<List<?>>());
+    this.meta = new BundleMeta();
+    this.columns = new ArrayList<List<?>>();
   }
 
   /**
@@ -37,6 +38,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * @param meta Meta data contained.
    * @param columns Content in columns
    */
+  @Deprecated
   public MultipleObjectsBundle(BundleMeta meta, List<List<?>> columns) {
     super();
     this.meta = meta;
@@ -110,11 +112,10 @@ public class MultipleObjectsBundle implements ObjectBundle {
   /**
    * Helper to add a single column to the bundle.
    * 
-   * @param <V> Object type
    * @param type Type information
    * @param data Data to add
    */
-  public <V> void appendColumn(SimpleTypeInformation<? super V> type, List<? extends V> data) {
+  public void appendColumn(SimpleTypeInformation<?> type, List<?> data) {
     meta.add(type);
     columns.add(data);
   }
@@ -137,10 +138,9 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * @param data Data to add
    */
   public static <V> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V> type, List<? extends V> data) {
-    BundleMeta meta = new BundleMeta(type);
-    List<List<?>> columns = new ArrayList<List<?>>(1);
-    columns.add(data);
-    return new MultipleObjectsBundle(meta, columns);
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+    bundle.appendColumn(type, data);
+    return bundle;
   }
 
   /**
@@ -151,10 +151,9 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * @param data Data to add
    */
   public static <V1, V2> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V1> type1, List<? extends V1> data1, SimpleTypeInformation<? super V2> type2, List<? extends V2> data2) {
-    BundleMeta meta = new BundleMeta(type1, type2);
-    List<List<?>> columns = new ArrayList<List<?>>(2);
-    columns.add(data1);
-    columns.add(data2);
-    return new MultipleObjectsBundle(meta, columns);
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+    bundle.appendColumn(type1, data1);
+    bundle.appendColumn(type2, data2);
+    return bundle;
   }
 }
