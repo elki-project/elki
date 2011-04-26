@@ -9,6 +9,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -19,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.OneItemIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne;
 
 /**
  * Utilities for handling result objects
@@ -261,9 +263,15 @@ public class ResultUtil {
   public static <O> void ensureClusteringResult(final Database db, final HierarchicalResult result) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     if(clusterings.size() == 0) {
-      ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
-      Clustering<Model> c = split.run(db);
-      addChildResult(db, c);
+      try {
+        ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
+        Clustering<Model> c = split.run(db);
+        addChildResult(db, c);
+      }
+      catch(NoSupportedDataTypeException e) {
+        Clustering<Model> c = (new TrivialAllInOne()).run(db);
+        addChildResult(db, c);
+      }
     }
   }
 
