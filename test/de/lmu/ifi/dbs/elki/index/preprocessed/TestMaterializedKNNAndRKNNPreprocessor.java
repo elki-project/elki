@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -100,7 +99,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     testQueries(rep, lin_knn_query, lin_rknn_query, preproc_knn_query, preproc_rknn_query);
 
     // insert new objects
-    List<Object> insertions = new ArrayList<Object>();
+    List<DoubleVector> insertions = new ArrayList<DoubleVector>();
     DoubleVector o = DatabaseUtil.assumeVectorField(rep).getFactory();
     Random random = new Random(seed);
     for(int i = 0; i < updatesize; i++) {
@@ -109,12 +108,8 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     }
     System.out.println("Insert " + insertions);
     System.out.println();
-    BundleMeta meta = new BundleMeta();
-    meta.add(rep.getDataTypeInformation());
-    List<List<?>> columns = new ArrayList<List<?>>(1);
-    columns.add(insertions);
-    DBIDs deletions = db.insert(new MultipleObjectsBundle(meta , columns));
-    
+    DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rep.getDataTypeInformation(), insertions));
+
     // test queries
     testQueries(rep, lin_knn_query, lin_rknn_query, preproc_knn_query, preproc_rknn_query);
 
@@ -142,7 +137,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
         System.out.println("PRE kNN " + pre_knn);
       }
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
-      for (int j = 0; j < lin_knn.size(); j++) {
+      for(int j = 0; j < lin_knn.size(); j++) {
         assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).getID().equals(pre_knn.get(j).getID()));
         assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).getDistance().equals(pre_knn.get(j).getDistance()));
       }
@@ -158,7 +153,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
         System.out.println();
       }
       assertEquals("rkNN sizes do not agree.", lin_rknn.size(), pre_rknn.size());
-      for (int j = 0; j < lin_rknn.size(); j++) {
+      for(int j = 0; j < lin_rknn.size(); j++) {
         assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).getID().equals(pre_rknn.get(j).getID()));
         assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).getDistance().equals(pre_rknn.get(j).getDistance()));
       }

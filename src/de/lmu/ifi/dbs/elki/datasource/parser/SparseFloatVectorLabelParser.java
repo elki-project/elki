@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -119,8 +118,8 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     dimensionality = -1;
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
-    List<Object> vectors = new ArrayList<Object>();
-    List<Object> lblc = new ArrayList<Object>();
+    List<SparseFloatVector> vectors = new ArrayList<SparseFloatVector>();
+    List<LabelList> lblc = new ArrayList<LabelList>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
@@ -135,16 +134,9 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     }
     // Set maximum dimensionality
     for(int i = 0; i < vectors.size(); i++) {
-      SparseFloatVector vec = (SparseFloatVector) vectors.get(i);
-      vec.setDimensionality(dimensionality);
+      vectors.get(i).setDimensionality(dimensionality);
     }
-    BundleMeta meta = new BundleMeta();
-    List<List<?>> columns = new ArrayList<List<?>>(2);
-    meta.add(getTypeInformation(dimensionality));
-    columns.add(vectors);
-    meta.add(TypeUtil.LABELLIST);
-    columns.add(lblc);
-    return new MultipleObjectsBundle(meta, columns);
+    return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, lblc);
   }
 
   @Override

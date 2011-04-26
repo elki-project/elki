@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -51,15 +51,15 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<Object> vectors = new ArrayList<Object>();
-    List<Object> labels = new ArrayList<Object>();
+    List<BitVector> vectors = new ArrayList<BitVector>();
+    List<LabelList> labels = new ArrayList<LabelList>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
           // TODO: use more efficient storage right away?
           List<Bit> attributes = new ArrayList<Bit>();
-          List<String> ll = new ArrayList<String>();
+          LabelList ll = new LabelList();
           for(String entry : entries) {
             try {
               Bit attribute = Bit.valueOf(entry);
@@ -85,13 +85,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
     catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
-    BundleMeta meta = new BundleMeta();
-    List<List<?>> columns = new ArrayList<List<?>>(2);
-    meta.add(getTypeInformation(dimensionality));
-    columns.add(vectors);
-    meta.add(TypeUtil.LABELLIST);
-    columns.add(labels);
-    return new MultipleObjectsBundle(meta, columns);
+    return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, labels);
   }
 
   protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {

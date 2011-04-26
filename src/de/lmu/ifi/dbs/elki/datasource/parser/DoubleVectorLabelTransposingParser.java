@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -88,20 +87,14 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<Object> vectors = new ArrayList<Object>();
-    List<Object> lblc = new ArrayList<Object>();
+    List<DoubleVector> vectors = new ArrayList<DoubleVector>();
+    List<LabelList> lblc = new ArrayList<LabelList>();
     for(int i = 0; i < data.length; i++) {
       DoubleVector featureVector = new DoubleVector(data[i]);
       vectors.add(featureVector);
       lblc.add(labels[i]);
     }
-    BundleMeta meta = new BundleMeta();
-    List<List<?>> columns = new ArrayList<List<?>>(2);
-    meta.add(getTypeInformation(dimensionality));
-    columns.add(vectors);
-    meta.add(TypeUtil.LABELLIST);
-    columns.add(lblc);
-    return new MultipleObjectsBundle(meta, columns);
+    return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, lblc);
   }
 
   @Override

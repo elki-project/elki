@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -137,12 +136,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
       logger.debugFine("add to objectAndLabelsList");
     }
 
-    List<Object> objects = new ArrayList<Object>(ids);
-    BundleMeta meta = new BundleMeta(1);
-    meta.add(TypeUtil.DBID);
-    List<List<?>> columns = new ArrayList<List<?>>(1);
-    columns.add(objects);
-    return new DistanceParsingResult<D>(new MultipleObjectsBundle(meta, columns), distanceCache);
+    List<DBID> objects = new ArrayList<DBID>(ids);
+    return new DistanceParsingResult<D>(MultipleObjectsBundle.makeSimple(TypeUtil.DBID, objects), distanceCache);
   }
 
   /**

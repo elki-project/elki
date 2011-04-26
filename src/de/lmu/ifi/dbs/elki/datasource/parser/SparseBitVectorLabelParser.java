@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -53,8 +52,8 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<Object> vectors = new ArrayList<Object>();
-    List<Object> lblc = new ArrayList<Object>();
+    List<BitVector> vectors = new ArrayList<BitVector>();
+    List<LabelList> lblc = new ArrayList<LabelList>();
     try {
       List<BitSet> bitSets = new ArrayList<BitSet>();
       List<LabelList> allLabels = new ArrayList<LabelList>();
@@ -83,7 +82,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
       dimensionality++;
       for(int i = 0; i < bitSets.size(); i++) {
         BitSet bitSet = bitSets.get(i);
-        List<String> labels = allLabels.get(i);
+        LabelList labels = allLabels.get(i);
         vectors.add(new BitVector(bitSet, dimensionality));
         lblc.add(labels);
       }
@@ -91,13 +90,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
     catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
-    BundleMeta meta = new BundleMeta();
-    List<List<?>> columns = new ArrayList<List<?>>(2);
-    meta.add(getTypeInformation(dimensionality));
-    columns.add(vectors);
-    meta.add(TypeUtil.LABELLIST);
-    columns.add(lblc);
-    return new MultipleObjectsBundle(meta, columns);
+    return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, lblc);
   }
 
   protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {
