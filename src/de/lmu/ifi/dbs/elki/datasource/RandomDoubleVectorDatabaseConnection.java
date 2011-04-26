@@ -79,7 +79,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     // Build a bundle
     BundleMeta meta = new BundleMeta();
     meta.add(type);
-    List<List<Object>> columns = new ArrayList<List<Object>>(1);
+    List<List<?>> columns = new ArrayList<List<?>>(1);
     columns.add(vectors);
     try {
       database.insert(new MultipleObjectsBundle(meta, columns));

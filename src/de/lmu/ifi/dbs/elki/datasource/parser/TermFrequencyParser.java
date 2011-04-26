@@ -133,7 +133,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
       vec.setDimensionality(maxdim);
     }
     BundleMeta meta = new BundleMeta();
-    List<List<Object>> columns = new ArrayList<List<Object>>(2);
+    List<List<?>> columns = new ArrayList<List<?>>(2);
     meta.add(getTypeInformation(maxdim));
     columns.add(vectors);
     meta.add(TypeUtil.LABELLIST);

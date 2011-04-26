@@ -140,7 +140,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     List<Object> objects = new ArrayList<Object>(ids);
     BundleMeta meta = new BundleMeta(1);
     meta.add(TypeUtil.DBID);
-    List<List<Object>> columns = new ArrayList<List<Object>>(1);
+    List<List<?>> columns = new ArrayList<List<?>>(1);
     columns.add(objects);
     return new DistanceParsingResult<D>(new MultipleObjectsBundle(meta, columns), distanceCache);
   }

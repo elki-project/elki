@@ -32,10 +32,11 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
     }
 
     BundleMeta meta = new BundleMeta();
-    List<List<Object>> columns = new ArrayList<List<Object>>(objects.metaLength());
+    List<List<?>> columns = new ArrayList<List<?>>(objects.metaLength());
     for(int r = 0; r < objects.metaLength(); r++) {
       SimpleTypeInformation<?> type = objects.meta(r);
-      List<Object> column = objects.getColumn(r);
+      @SuppressWarnings("unchecked")
+      final List<Object> column = (List<Object>) objects.getColumn(r);
       if(!getInputTypeRestriction().isAssignableFromType(type)) {
         meta.add(type);
         columns.add(column);
