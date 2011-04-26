@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -38,8 +39,6 @@ import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
 import experimentalcode.marisa.index.xtree.util.SquareEuclideanDistanceFunction;
 import experimentalcode.marisa.index.xtree.util.XSplitter;
@@ -56,7 +55,7 @@ import experimentalcode.marisa.utils.PriorityQueue;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
+public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
   /**
    * If <code>true</code>, the expensive call of
    * {@link #calculateOverlapIncrease(List, SpatialEntry, HyperBoundingBox)} is
@@ -246,7 +245,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   }
 
   @Override
-  protected void createEmptyRoot(@SuppressWarnings("unused") O object) {
+  protected void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
     N root = createNewLeafNode(leafCapacity);
     file.writePage(root);
     setHeight(1);
@@ -389,7 +388,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     num_elements++;
   }
 
-  public boolean initializeTree(O dataObject) {
+  public boolean initializeTree(E dataObject) {
     super.initialize(dataObject);
     return true;
   }
@@ -505,13 +504,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   }
 
   @Override
-  protected void initializeCapacities(O object) {
+  protected void initializeCapacities(E exampleLeaf) {
     /* Simulate the creation of a leaf page to get the page capacity */
     try {
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[object.getDimensionality()]);
+      SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[exampleLeaf.getDimensionality()]);
       while(baos.size() <= pageSize) {
         sl.writeExternal(oos);
         oos.flush();
@@ -529,7 +528,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      HyperBoundingBox hb = new HyperBoundingBox(new double[object.getDimensionality()], new double[object.getDimensionality()]);
+      HyperBoundingBox hb = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
       XDirectoryEntry xl = new XDirectoryEntry(0, hb);
       while(baos.size() <= pageSize) {
         xl.writeExternal(oos);
@@ -576,7 +575,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       leafMinimum = 2;
     }
 
-    dimensionality = object.getDimensionality();
+    dimensionality = exampleLeaf.getDimensionality();
 
     if(getLogger().isVerbose()) {
       getLogger().verbose("Directory Capacity:  " + (dirCapacity - 1) + "\nDirectory minimum: " + dirMinimum + "\nLeaf Capacity:     " + (leafCapacity - 1) + "\nLeaf Minimum:      " + leafMinimum + "\nminimum fanout: " + min_fanout);
