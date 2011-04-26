@@ -1,10 +1,8 @@
 package de.lmu.ifi.dbs.elki.datasource.filter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -30,23 +28,23 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
     if(objects.dataLength() == 0) {
       return objects;
     }
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
 
-    BundleMeta meta = new BundleMeta();
-    List<List<?>> columns = new ArrayList<List<?>>(objects.metaLength());
     for(int r = 0; r < objects.metaLength(); r++) {
-      SimpleTypeInformation<?> type = objects.meta(r);
+      @SuppressWarnings("unchecked")
+      SimpleTypeInformation<Object> type = (SimpleTypeInformation<Object>) objects.meta(r);
       @SuppressWarnings("unchecked")
       final List<Object> column = (List<Object>) objects.getColumn(r);
       if(!getInputTypeRestriction().isAssignableFromType(type)) {
-        meta.add(type);
-        columns.add(column);
+        bundle.appendColumn(type, column);
         continue;
       }
       // Get the replacement type information
       @SuppressWarnings("unchecked")
       final SimpleTypeInformation<I> castType = (SimpleTypeInformation<I>) type;
-      meta.add(convertedType(castType));
-      columns.add(column);
+      @SuppressWarnings("unchecked")
+      final List<O> castColumn = (List<O>) column;
+      bundle.appendColumn(convertedType(castType), castColumn);
       
       // When necessary, perform an initialization scan
       if(prepareStart(castType)) {
@@ -63,10 +61,10 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
         @SuppressWarnings("unchecked")
         final I obj = (I) column.get(i);
         final O normalizedObj = filterSingleObject(obj);
-        column.set(i, normalizedObj);
+        castColumn.set(i, normalizedObj);
       }
     }
-    return new MultipleObjectsBundle(meta, columns);
+    return bundle;
   }
 
   /**

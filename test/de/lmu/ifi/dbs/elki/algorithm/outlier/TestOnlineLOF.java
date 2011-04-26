@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
@@ -17,7 +16,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -104,18 +102,14 @@ public class TestOnlineLOF implements JUnit4Test {
     OutlierResult result = lof.run(db);
 
     // insert new objects
-    ArrayList<Object> insertions = new ArrayList<Object>();
+    ArrayList<DoubleVector> insertions = new ArrayList<DoubleVector>();
     DoubleVector o = DatabaseUtil.assumeVectorField(rep).getFactory();
     Random random = new Random(seed);
     for(int i = 0; i < size; i++) {
       DoubleVector obj = o.randomInstance(random);
       insertions.add(obj);
     }
-    BundleMeta meta = new BundleMeta();
-    meta.add(rep.getDataTypeInformation());
-    List<List<?>> columns = new ArrayList<List<?>>(1);
-    columns.add(insertions);
-    DBIDs deletions = db.insert(new MultipleObjectsBundle(meta , columns));
+    DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rep.getDataTypeInformation(), insertions));
 
     // delete objects
     db.delete(deletions);
