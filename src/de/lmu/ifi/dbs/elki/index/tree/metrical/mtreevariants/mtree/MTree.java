@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -94,12 +93,11 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
   }
 
   @Override
-  protected void initializeCapacities(O object) {
-    D dummyDistance = getDistanceFactory().nullDistance();
-    int distanceSize = dummyDistance.externalizableSize();
+  protected void initializeCapacities(MTreeEntry<D> exampleLeaf) {
+    int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
 
-    // simulate object writing to get the size of an object
-    int featuresize = 4 * ((FeatureVector<?,?>)object).getDimensionality();
+    // FIXME: simulate a proper feature size!
+    int featuresize = 0; //DatabaseUtil.dimensionality(relation);
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;

@@ -95,7 +95,7 @@ public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends Ab
   }
 
   @Override
-  protected void createEmptyRoot(@SuppressWarnings("unused") O object) {
+  protected void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
     N root = createNewLeafNode(leafCapacity);
     file.writePage(root);
     setHeight(1);

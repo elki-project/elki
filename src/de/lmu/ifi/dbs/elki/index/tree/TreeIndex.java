@@ -174,13 +174,13 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
   /**
    * Initializes the index.
    * 
-   * @param object an object that will be stored in the index
+   * @param exampleLeaf an object that will be stored in the index
    */
-  protected final void initialize(O object) {
+  protected final void initialize(E exampleLeaf) {
     // determine minimum and maximum entries in a node
     // todo verbose flag as parameter
     // initializeCapacities(object, true);
-    initializeCapacities(object);
+    initializeCapacities(exampleLeaf);
 
     // init the file
     if(fileName == null) {
@@ -196,7 +196,7 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
     }
 
     // create empty root
-    createEmptyRoot(object);
+    createEmptyRoot(exampleLeaf);
 
     if(getLogger().isDebugging()) {
       StringBuffer msg = new StringBuffer();
@@ -234,16 +234,16 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
   /**
    * Determines the maximum and minimum number of entries in a node.
    * 
-   * @param object an object that will be stored in the index
+   * @param exampleLeaf an object that will be stored in the index
    */
-  abstract protected void initializeCapacities(O object);
+  abstract protected void initializeCapacities(E exampleLeaf);
 
   /**
    * Creates an empty root node and writes it to file.
    * 
-   * @param object an object that will be stored in the index
+   * @param exampleLeaf an object that will be stored in the index
    */
-  abstract protected void createEmptyRoot(O object);
+  abstract protected void createEmptyRoot(E exampleLeaf);
 
   /**
    * Creates an entry representing the root node.

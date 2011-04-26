@@ -88,7 +88,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   public final boolean delete(DBID id) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
-  
+
   /**
    * Throws an UnsupportedOperationException since deletion of objects is not
    * yet supported by an M-Tree.
@@ -313,7 +313,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     }
 
     if(!initialized) {
-      initialize(object);
+      initialize(createNewLeafEntry(id, object, distanceFunction.getDistanceFactory().nullDistance()));
     }
 
     // choose subtree for insertion
@@ -349,7 +349,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   }
 
   @Override
-  protected final void createEmptyRoot(@SuppressWarnings("unused") O object) {
+  protected final void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
     N root = createNewLeafNode(leafCapacity);
     file.writePage(root);
   }
@@ -672,6 +672,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
   /**
    * Creates a new leaf entry representing the specified data object.
+   * 
    * @param id TODO
    * @param object the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of

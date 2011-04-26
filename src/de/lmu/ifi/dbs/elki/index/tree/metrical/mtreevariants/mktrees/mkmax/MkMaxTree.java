@@ -285,9 +285,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
 
   @Override
-  protected void initializeCapacities(@SuppressWarnings("unused") O object) {
-    D dummyDistance = getDistanceQuery().nullDistance();
-    int distanceSize = dummyDistance.externalizableSize();
+  protected void initializeCapacities(MkMaxEntry<D> exampleLeaf) {
+    int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
