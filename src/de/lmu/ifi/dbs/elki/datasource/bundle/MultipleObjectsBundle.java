@@ -26,6 +26,13 @@ public class MultipleObjectsBundle implements ObjectBundle {
 
   /**
    * Constructor.
+   */
+  public MultipleObjectsBundle() {
+    this(new BundleMeta(), new ArrayList<List<?>>());
+  }
+
+  /**
+   * Constructor.
    * 
    * @param meta Meta data contained.
    * @param columns Content in columns

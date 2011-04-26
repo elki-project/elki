@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser;
@@ -131,22 +132,21 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
       // Add DBIDs
       // TODO: make this a "filter"?
       if(startid != null) {
-        BundleMeta meta = new BundleMeta();
-        meta.add(TypeUtil.DBID);
-        for(int j = 0; j < objects.metaLength(); j++) {
-          meta.add(objects.meta(j));
-        }
-        List<Object> ids = new ArrayList<Object>(objects.dataLength());
+        MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+        List<DBID> ids = new ArrayList<DBID>(objects.dataLength());
         for(int i = 0; i < objects.dataLength(); i++) {
           ids.add(DBIDUtil.importInteger(startid + i));
         }
-        ArrayList<List<?>> columns = new ArrayList<List<?>>(meta.size());
-        columns.add(ids);
+        bundle.appendColumn(TypeUtil.DBID, ids);
+        // copy other columns
         for(int j = 0; j < objects.metaLength(); j++) {
-          columns.add(objects.getColumn(j));
+          @SuppressWarnings("unchecked")
+          final SimpleTypeInformation<Object> cmeta = (SimpleTypeInformation<Object>) objects.meta(j);
+          @SuppressWarnings("unchecked")
+          final List<Object> ccol = (List<Object>) objects.getColumn(j);
+          bundle.appendColumn(cmeta, ccol);
         }
-        // Replace result package
-        objects = new MultipleObjectsBundle(meta, columns);
+        objects = bundle;
       }
 
       if(logger.isDebugging()) {
