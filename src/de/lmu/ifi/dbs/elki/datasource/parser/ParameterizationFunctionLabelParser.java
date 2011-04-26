@@ -85,7 +85,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
     }
 
     BundleMeta meta = new BundleMeta();
-    List<List<Object>> columns = new ArrayList<List<Object>>(2);
+    List<List<?>> columns = new ArrayList<List<?>>(2);
     meta.add(getTypeInformation(dimensionality));
     columns.add(vectors);
     meta.add(TypeUtil.LABELLIST);

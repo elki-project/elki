@@ -21,7 +21,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
   /**
    * Storing the real contents.
    */
-  private List<List<Object>> columns;
+  private List<List<?>> columns;
 
   /**
    * Constructor.
@@ -29,7 +29,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * @param meta Meta data contained.
    * @param columns Content in columns
    */
-  public MultipleObjectsBundle(BundleMeta meta, List<List<Object>> columns) {
+  public MultipleObjectsBundle(BundleMeta meta, List<List<?>> columns) {
     super();
     this.meta = meta;
     this.columns = columns;
@@ -37,7 +37,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
       throw new AbortException("Meta size and columns do not agree!");
     }
     int len = -1;
-    for(List<Object> col : columns) {
+    for(List<?> col : columns) {
       if(len < 0) {
         len = col.size();
       }
@@ -93,7 +93,9 @@ public class MultipleObjectsBundle implements ObjectBundle {
       throw new AbortException("Invalid number of attributes in 'append'.");
     }
     for(int i = 0; i < data.length; i++) {
-      columns.get(i).add(data[i]);
+      @SuppressWarnings("unchecked")
+      final List<Object> col = (List<Object>) columns.get(i);
+      col.add(data[i]);
     }
   }
 
@@ -103,7 +105,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * @param i column number
    * @return the ith column
    */
-  public List<Object> getColumn(int i) {
+  public List<?> getColumn(int i) {
     return columns.get(i);
   }
 }

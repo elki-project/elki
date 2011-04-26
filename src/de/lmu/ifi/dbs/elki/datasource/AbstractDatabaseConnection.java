@@ -142,7 +142,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
 
     // Prepare bundle for expansion
     BundleMeta reps = new BundleMeta(origpkgs.metaLength() + 2);
-    List<List<Object>> columns = new ArrayList<List<Object>>(origpkgs.metaLength() + 2);
+    List<List<?>> columns = new ArrayList<List<?>>(origpkgs.metaLength() + 2);
     // Adjust representations: label transformation
     for(int i = 0; i < origpkgs.metaLength(); i++) {
       SimpleTypeInformation<?> meta = origpkgs.meta(i);

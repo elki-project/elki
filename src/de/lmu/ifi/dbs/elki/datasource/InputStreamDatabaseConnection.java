@@ -140,7 +140,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
         for(int i = 0; i < objects.dataLength(); i++) {
           ids.add(DBIDUtil.importInteger(startid + i));
         }
-        ArrayList<List<Object>> columns = new ArrayList<List<Object>>(meta.size());
+        ArrayList<List<?>> columns = new ArrayList<List<?>>(meta.size());
         columns.add(ids);
         for(int j = 0; j < objects.metaLength(); j++) {
           columns.add(objects.getColumn(j));
