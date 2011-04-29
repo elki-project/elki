@@ -3,6 +3,8 @@ package experimentalcode.hettab.outlier;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -10,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -84,16 +87,16 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
    */
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
-
-    WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    Relation<V> relation = getRelation(database);
+    WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
   
-    final NeighborSetPredicate npred = npredf.instantiate(database);
+    final NeighborSetPredicate npred = npredf.instantiate(relation);
 
     // calculate D-Tilde
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       double sum = 0;
       double maxDist = 0;
 
@@ -102,7 +105,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
         if(id.getIntegerID() == neighbor.getIntegerID()) {
           continue;
         }
-        double dist = nonSpatialDistanceFunction.distance(database.get(id), database.get(neighbor)).doubleValue();
+        double dist = nonSpatialDistanceFunction.distance(relation.get(id), relation.get(neighbor)).doubleValue();
         if(maxDist < dist) {
           maxDist = dist;
         }
@@ -115,7 +118,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     // compute average modified distance of id neighborhood and id it's self
     // compute average modified distance of only id neighborhood
 
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       double avgPlus = 0;
       double avg = 0;
 
@@ -137,7 +140,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     }
 
     // compute beta
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       double beta = 0;
       final DBIDs  neighbors= npred.getNeighborDBIDs(id);
       for(DBID neighbor : neighbors) {
@@ -155,8 +158,8 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     }
 
     MinMax<Double> minmax = new MinMax<Double>();
-    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : database) {
+    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    for(DBID id : relation.getDBIDs()) {
       double slom = betaList.get(id) * modifiedDistance.get(id);
       sloms.put(id, slom);
       minmax.put(slom);
@@ -218,5 +221,10 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
       return param.instantiateClass(config);
     }
     return null;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 }
