@@ -1,10 +1,15 @@
 package experimentalcode.hettab.outlier;
 
+
+
 import org.apache.commons.math.stat.descriptive.rank.Median;
+
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -12,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -115,14 +121,15 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
 
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
-    //
-    WritableDataStore<Double> gi = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    //
-    WritableDataStore<Double> hi = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    //
-    final NeighborSetPredicate npred = npredf.instantiate(database);
+    
+    Relation<V> relation = getRelation(database);
+    WritableDataStore<Double> gi = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> hi = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    
+    
+    final NeighborSetPredicate npred = npredf.instantiate(relation);
 
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       //
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       int size = neighbors.size();
@@ -131,25 +138,25 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
       int i = 0;
       // calculate and store mean
       for(DBID n : neighbors) {
-        fi[i] = database.get(n).doubleValue(z);
+        fi[i] = relation.get(n).doubleValue(z);
         i++;
       }
       double median = m.evaluate(fi);
       gi.put(id, median);
       // store hi
-      hi.put(id, database.get(id).doubleValue(z) - median);
+      hi.put(id, relation.get(id).doubleValue(z) - median);
     }
     // calculate mean and variance
     MeanVariance mv = new MeanVariance();
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       mv.put(hi.get(id));
     }
     double mean = mv.getMean();
     double variance = mv.getSampleVariance();
 
     MinMax<Double> minmax = new MinMax<Double>();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    for(DBID id : database) {
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    for(DBID id : relation.getDBIDs()) {
       double score = Math.abs((hi.get(id) - mean) / variance);
       minmax.put(score);
       scores.put(id, score);
@@ -163,6 +170,11 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
 }
