@@ -7,6 +7,8 @@ import org.apache.commons.math.stat.descriptive.rank.Median;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -14,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -86,19 +89,20 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
 
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
-    final NeighborSetPredicate npred = npredf.instantiate(database);
-    Matrix hMatrix = new Matrix(dims.size(),database.size());
+    Relation<V> relation = getRelation(database);
+    final NeighborSetPredicate npred = npredf.instantiate(relation);
+    Matrix hMatrix = new Matrix(dims.size(),relation.size());
     Matrix hMeansMatrix = new Matrix(dims.size(),1);
-    double dbSize = database.size();
+    double dbSize = relation.size();
      
     int i = 0 ;
     for(Integer dim : dims){
         int j = 0 ;
         //h mean for each dim
         double hMeans = 0 ;
-         for(DBID id : database){
+         for(DBID id : relation.getDBIDs()){
             // f value
-            double f = database.get(id).doubleValue(dim);
+            double f = relation.get(id).doubleValue(dim);
             DBIDs neighbors = npred.getNeighborDBIDs(id);
             int nSize = neighbors.size() ;
             //g value 
@@ -106,7 +110,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
             Median m = new Median();
             int k = 0 ;
             for(DBID n : neighbors){
-                 g[k] = database.get(n).doubleValue(dim);
+                 g[k] = relation.get(n).doubleValue(dim);
                  k++;
             }
             double gm = m.evaluate(g) ;
@@ -127,9 +131,9 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
     Matrix invSigma = sigma.inverse() ;
        
     MinMax<Double> minmax = new MinMax<Double>();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     i = 0 ;
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       Matrix h_i = hMatrix.getColumn(i).minus(hMeansMatrix) ;
       Matrix h_iT = h_i.transpose();
       Matrix m = h_iT.times(invSigma);
@@ -183,5 +187,12 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
       return param.getValue();
     }
     return null;
+  }
+  /**
+   * 
+   */
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 }
