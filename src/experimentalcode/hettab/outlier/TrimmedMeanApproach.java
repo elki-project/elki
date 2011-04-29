@@ -9,6 +9,8 @@ import org.apache.commons.math.stat.descriptive.rank.Median;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -16,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -96,17 +99,17 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    */
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
+    Relation<V> relation = getRelation(database);
+    WritableDataStore<Double> tMeans = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
 
-    WritableDataStore<Double> tMeans = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> error = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-
-    final NeighborSetPredicate npred = npredf.instantiate(database);
+    final NeighborSetPredicate npred = npredf.instantiate(relation);
 
     // calculate Trimmed mean
-    Matrix tMeanMatrix = new Matrix(database.size(), 1);
-    Matrix Y = new Matrix(database.size(), 1);
-    for(DBID id : database) {
+    Matrix tMeanMatrix = new Matrix(relation.size(), 1);
+    Matrix Y = new Matrix(relation.size(), 1);
+    for(DBID id : relation.getDBIDs()) {
       final DBIDs neighbors = npred.getNeighborDBIDs(id);
       int size = neighbors.size();
       double[] zi = new double[size];
@@ -114,7 +117,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
       int i = 0;
       double tmean = 0;
       for(DBID n : neighbors) {
-        ziList.add(database.get(n).doubleValue(z));
+        ziList.add(relation.get(n).doubleValue(z));
         i++;
       }
       Collections.sort(ziList);
@@ -124,18 +127,18 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
       tmean = StatUtils.mean(zi, (int) (p * size), (int) (size - 2 * p * size));
       tMeans.put(id, tmean);
       tMeanMatrix.set(i, 0, tmean);
-      Y.set(i, 0, database.get(id).doubleValue(z));
+      Y.set(i, 0, relation.get(id).doubleValue(z));
     }
 
     // Estimate error by removing spatial trend and dependence
-    Matrix E = new Matrix(1, database.size());
-    Matrix I = Matrix.unitMatrix(database.size());
-    Matrix W = new Matrix(database.size(), database.size());
+    Matrix E = new Matrix(1, relation.size());
+    Matrix I = Matrix.unitMatrix(relation.size());
+    Matrix W = new Matrix(relation.size(), relation.size());
     int k = 0;
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       int l = 0;
-      for(DBID n : database) {
+      for(DBID n : relation.getDBIDs()) {
         if(neighbors.contains(n) && n.getIntegerID() != id.getIntegerID()) {
           W.set(k, l, (double) 1 / neighbors.size());
         }
@@ -157,9 +160,9 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
 
     // calculate median_i
     int m = 0;
-    double[] ei = new double[database.size()];
+    double[] ei = new double[relation.size()];
     Median median = new Median();
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       error.put(id, E.get(m, 0));
       ei[m] = E.get(m, 0);
       m++;
@@ -169,8 +172,8 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
     // calculate MAD
     double MAD;
     m = 0;
-    double[] temp = new double[database.size()];
-    for(DBID id : database) {
+    double[] temp = new double[relation.size()];
+    for(DBID id : relation.getDBIDs()) {
       temp[m] = Math.abs(error.get(id) - median_i);
       m++;
     }
@@ -179,7 +182,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
     // calculate score
     MinMax<Double> minmax = new MinMax<Double>();
     m = 0;
-    for(DBID id : database) {
+    for(DBID id : relation.getDBIDs()) {
       double score = temp[m] * 0.6745 / MAD;
       scores.put(id, score);
       minmax.put(score);
@@ -254,6 +257,11 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
   @Override
   protected Logging getLogger() {
     return logger;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
 }
