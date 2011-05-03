@@ -47,7 +47,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
    * @param filters
    */
   public RandomDoubleVectorDatabaseConnection(Database database, int dim, int size, Long seed, List<ObjectFilter> filters) {
-    super(database, null, null, null, filters);
+    super(database, filters);
     this.dim = dim;
     this.size = size;
     this.seed = seed;

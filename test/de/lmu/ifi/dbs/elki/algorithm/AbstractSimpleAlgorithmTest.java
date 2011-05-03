@@ -72,6 +72,7 @@ public abstract class AbstractSimpleAlgorithmTest {
   protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params) {
     org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
+    
     List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
     params.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
     params.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
