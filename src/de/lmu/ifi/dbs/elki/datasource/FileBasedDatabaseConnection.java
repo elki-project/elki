@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
@@ -33,17 +32,12 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * Constructor.
    * 
    * @param database the instance of the database
-   * @param classLabelIndex the index of the label to be used as class label,
-   *        can be null
-   * @param classLabelClass the association of occurring class labels
-   * @param externalIdIndex the index of the label to be used as external id,
-   *        can be null
    * @param filters Filters, can be null
    * @param parser the parser to provide a database
    * @param in the input stream to parse from.
    */
-  public FileBasedDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<ObjectFilter> filters, Parser parser, InputStream in) {
-    super(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser);
+  public FileBasedDatabaseConnection(Database database, List<ObjectFilter> filters, Parser parser, InputStream in) {
+    super(database, filters, parser);
     this.in = in;
   }
 
@@ -76,7 +70,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
 
     @Override
     protected FileBasedDatabaseConnection makeInstance() {
-      return new FileBasedDatabaseConnection(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser, inputStream);
+      return new FileBasedDatabaseConnection(database, filters, parser, inputStream);
     }
   }
 }

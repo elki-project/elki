@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -10,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex.Factory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -35,7 +39,10 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
   public void testPreDeConResults() throws ParameterException {
     // Additional input parameters
     ListParameterization inp = new ListParameterization();
-    inp.addParameter(FileBasedDatabaseConnection.CLASS_LABEL_INDEX_ID, 1);
+    List<Class<?>> filters = Arrays.asList(new Class<?>[] { ClassLabelFilter.class });
+    inp.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
+    inp.addParameter(ClassLabelFilter.CLASS_LABEL_INDEX_ID, 1);
+    // FIXME: makeSimpleDatabase currently does also add FILTERS, this doesn't work.
     Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp);
 
     ListParameterization params = new ListParameterization();
@@ -66,7 +73,7 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
   @Test
   public void testPreDeConSubspaceOverlapping() throws ParameterException {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     // PreDeCon
@@ -76,7 +83,7 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
     params.addParameter(Factory.DELTA_ID, 0.04);
     PreDeCon<DoubleVector> predecon = ClassGenericsUtil.parameterizeOrAbort(PreDeCon.class, params);
     testParameterizationOk(params);
-  
+
     // run PredeCon on database
     Clustering<Model> result = predecon.run(db);
     testFMeasure(db, result, 0.6470817);

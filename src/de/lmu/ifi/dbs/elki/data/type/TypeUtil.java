@@ -69,6 +69,13 @@ public final class TypeUtil {
   public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class);
 
   /**
+   * External ID type
+   * 
+   * FIXME: Don't use String here!
+   */
+  public static final SimpleTypeInformation<String> EXTERNALID = SimpleTypeInformation.get(String.class);
+
+  /**
    * Make a type array easily.
    * 
    * @param ts Types

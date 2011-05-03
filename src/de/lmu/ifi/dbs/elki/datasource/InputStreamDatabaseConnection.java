@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.datasource;
 import java.io.InputStream;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
@@ -57,16 +56,11 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
    * Constructor.
    * 
    * @param database the instance of the database
-   * @param classLabelIndex the index of the label to be used as class label,
-   *        can be null
-   * @param classLabelClass the association of occurring class labels
-   * @param externalIdIndex the index of the label to be used as external id,
-   *        can be null
    * @param filters Filters to use
    * @param parser the parser to provide a database
    */
-  public InputStreamDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<ObjectFilter> filters, Parser parser) {
-    super(database, classLabelIndex, classLabelClass, externalIdIndex, filters);
+  public InputStreamDatabaseConnection(Database database, List<ObjectFilter> filters, Parser parser) {
+    super(database, filters);
     this.parser = parser;
   }
 
@@ -114,8 +108,6 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configParser(config, Parser.class, DoubleVectorLabelParser.class);
-      configClassLabel(config);
-      configExternalId(config);
       configDatabase(config);
       configFilters(config);
     }
@@ -129,7 +121,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
 
     @Override
     protected InputStreamDatabaseConnection makeInstance() {
-      return new InputStreamDatabaseConnection(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser);
+      return new InputStreamDatabaseConnection(database, filters, parser);
     }
   }
 }
