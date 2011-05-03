@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -9,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
@@ -87,7 +91,9 @@ public class TestKNNJoin implements JUnit4Test {
    */
   void doKNNJoin(ListParameterization inputparams) throws ParameterException {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
-    inputparams.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
+    List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
+    inputparams.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
+    inputparams.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
 
     // get database
     FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);

@@ -40,12 +40,10 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    *        can be null
    * @param filters Filters, can be null
    * @param parser the parser to provide a database
-   * @param startid the first object ID to use, can be null
-   * @param seed a seed for randomly shuffling the rows of the database
    * @param in the input stream to parse from.
    */
-  public FileBasedDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<ObjectFilter> filters, Parser parser, Integer startid, Long seed, InputStream in) {
-    super(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser, startid, seed);
+  public FileBasedDatabaseConnection(Database database, Integer classLabelIndex, Class<? extends ClassLabel> classLabelClass, Integer externalIdIndex, List<ObjectFilter> filters, Parser parser, InputStream in) {
+    super(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser);
     this.in = in;
   }
 
@@ -78,7 +76,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
 
     @Override
     protected FileBasedDatabaseConnection makeInstance() {
-      return new FileBasedDatabaseConnection(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser, startid, seed, inputStream);
+      return new FileBasedDatabaseConnection(database, classLabelIndex, classLabelClass, externalIdIndex, filters, parser, inputStream);
     }
   }
 }
