@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -43,16 +45,16 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * Keeps the currently set database.
    */
   private Database database;
-  
+
   /**
    * Relation we use
    */
-  private Relation<V> relation;
+  protected Relation<V> relation;
 
   /**
    * The row ids corresponding to the currently set {@link #relation}.
    */
-  private int[] rowIDs;
+  private ArrayModifiableDBIDs rowIDs;
 
   /**
    * The column ids corresponding to the currently set {@link #relation}.
@@ -83,8 +85,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * 
    */
   @Override
-  public
-  final Clustering<M> run(Database database) throws IllegalStateException {
+  public final Clustering<M> run(Database database) throws IllegalStateException {
     this.relation = getRelation(database);
     if(this.relation == null || this.relation.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
@@ -95,14 +96,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
     for(int i = 0; i < colIDs.length; i++) {
       colIDs[i] = i + 1;
     }
-    rowIDs = new int[this.relation.size()];
-    {
-      int i = 0;
-      for(DBID id : this.relation.iterDBIDs()) {
-        rowIDs[i] = id.getIntegerID();
-        i++;
-      }
-    }
+    rowIDs = DBIDUtil.newArray(this.relation.getDBIDs());
     biclustering();
     return result;
   }
@@ -151,12 +145,10 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * @param rows
    * @return integer row ids
    */
-  protected int[] rowsBitsetToIDs(BitSet rows) {
-    int[] rowIDs = new int[rows.cardinality()];
-    int rowsIndex = 0;
+  protected ArrayDBIDs rowsBitsetToIDs(BitSet rows) {
+    ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray(rows.cardinality());
     for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-      rowIDs[rowsIndex] = this.rowIDs[i];
-      rowsIndex++;
+      rowIDs.add(this.rowIDs.get(i));
     }
     return rowIDs;
   }
@@ -169,7 +161,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * @return a bicluster as given by the included rows and columns
    */
   protected Bicluster<V> defineBicluster(BitSet rows, BitSet cols) {
-    int[] rowIDs = rowsBitsetToIDs(rows);
+    ArrayDBIDs rowIDs = rowsBitsetToIDs(rows);
     int[] colIDs = colsBitsetToIDs(cols);
     return new Bicluster<V>(rowIDs, colIDs, relation);
   }
@@ -201,7 +193,27 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * @param comp a Comparator suitable to the type of <code>properties</code>
    */
   protected <P> void sortRows(int from, int to, List<P> properties, Comparator<P> comp) {
-    sort(rowIDs, from, to, properties, comp);
+    if(from >= to) {
+      throw new IllegalArgumentException("Parameter from (=" + from + ") >= parameter to (=" + to + ")");
+    }
+    if(from < 0) {
+      throw new IllegalArgumentException("Parameter from (=" + from + ") < 0");
+    }
+    if(to > rowIDs.size()) {
+      throw new IllegalArgumentException("Parameter to (=" + to + ") > array length (=" + rowIDs.size() + ")");
+    }
+    if(properties.size() != to - from) {
+      throw new IllegalArgumentException("Length of properties (=" + properties.size() + ") does not conform specified length (=" + (to - from) + ")");
+    }
+    List<Pair<DBID, P>> pairs = new ArrayList<Pair<DBID, P>>(to - from);
+    for(int i = 0; i < properties.size(); i++) {
+      pairs.add(new Pair<DBID, P>(rowIDs.get(i + from), properties.get(i)));
+    }
+    Collections.sort(pairs, new PairUtil.CompareBySecond<DBID, P>(comp));
+
+    for(int i = from; i < to; i++) {
+      rowIDs.set(i, pairs.get(i - from).getFirst());
+    }
   }
 
   /**
@@ -223,45 +235,26 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * @param comp a Comparator suitable to the type of <code>properties</code>
    */
   protected <P> void sortCols(int from, int to, List<P> properties, Comparator<P> comp) {
-    sort(colIDs, from, to, properties, comp);
-  }
-
-  /**
-   * Sorts an array based on specified properties. The array of ids is sorted
-   * within the range from index <code>from</code> (inclusively) to index
-   * <code>to</code> (exclusively) according to the specified
-   * <code>properties</code> and Comparator. The List of properties must be of
-   * size <code>to - from</code> and reflect the properties corresponding to ids
-   * <code>ids[from]</code> to <code>ids[to-1]</code>.
-   * 
-   * @param <P> the type of <code>properties</code> suitable to the comparator
-   * @param ids the ids to sort
-   * @param from begin of range to be sorted (inclusively)
-   * @param to end of range to be sorted (exclusively)
-   * @param properties the properties to sort the ids according to
-   * @param comp a Comparator suitable to the type of <code>properties</code>
-   */
-  private <P> void sort(int[] ids, int from, int to, List<P> properties, Comparator<P> comp) {
     if(from >= to) {
       throw new IllegalArgumentException("Parameter from (=" + from + ") >= parameter to (=" + to + ")");
     }
     if(from < 0) {
       throw new IllegalArgumentException("Parameter from (=" + from + ") < 0");
     }
-    if(to > ids.length) {
-      throw new IllegalArgumentException("Parameter to (=" + to + ") > array length (=" + ids.length + ")");
+    if(to > colIDs.length) {
+      throw new IllegalArgumentException("Parameter to (=" + to + ") > array length (=" + colIDs.length + ")");
     }
     if(properties.size() != to - from) {
       throw new IllegalArgumentException("Length of properties (=" + properties.size() + ") does not conform specified length (=" + (to - from) + ")");
     }
     List<Pair<Integer, P>> pairs = new ArrayList<Pair<Integer, P>>(to - from);
     for(int i = 0; i < properties.size(); i++) {
-      pairs.add(new Pair<Integer, P>(ids[i + from], properties.get(i)));
+      pairs.add(new Pair<Integer, P>(colIDs[i + from], properties.get(i)));
     }
     Collections.sort(pairs, new PairUtil.CompareBySecond<Integer, P>(comp));
 
     for(int i = from; i < to; i++) {
-      ids[i] = pairs.get(i - from).getFirst();
+      colIDs[i] = pairs.get(i - from).getFirst();
     }
   }
 
@@ -279,7 +272,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    *         <code>database.get(rowIDs[row]).getValue(colIDs[col])</code>
    */
   protected double valueAt(int row, int col) {
-    return relation.get(DBIDUtil.importInteger(rowIDs[row])).doubleValue(colIDs[col]);
+    return relation.get(rowIDs.get(row)).doubleValue(colIDs[col]);
   }
 
   /**
@@ -347,7 +340,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * @return the number of rows of the data matrix
    */
   protected int getRowDim() {
-    return this.rowIDs.length;
+    return this.rowIDs.size();
   }
 
   /**
