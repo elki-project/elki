@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -9,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
@@ -37,7 +41,9 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, UNITTEST + "hierarchical-2d.ascii");
-    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
+    List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
+    params.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
+    params.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
     params.addParameter(HashmapDatabase.INDEX_ID, DeLiCluTreeFactory.class);
     params.addParameter(DeLiCluTreeFactory.PAGE_SIZE_ID, 1000);
     params.addParameter(DeLiClu.XI_ID, 0.038);

@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -71,7 +72,9 @@ public abstract class AbstractSimpleAlgorithmTest {
   protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params) {
     org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
-    params.addParameter(FileBasedDatabaseConnection.IDSTART_ID, 1);
+    List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
+    params.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
+    params.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
     FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
 
     testParameterizationOk(params);
