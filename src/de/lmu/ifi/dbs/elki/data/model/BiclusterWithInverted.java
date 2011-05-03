@@ -1,12 +1,15 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * This code was factored out of the Bicluster class, since not all biclusters
@@ -20,13 +23,26 @@ public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Biclus
   /**
    * The ids of inverted rows.
    */
-  private int[] invertedRows;
+  private ArrayModifiableDBIDs invertedRows;
 
   /**
    * @param rowIDs Row IDs
    * @param colIDs Col IDs
    * @param database Database
    */
+  public BiclusterWithInverted(ArrayDBIDs rowIDs, int[] colIDs, Relation<V> database) {
+    super(rowIDs, colIDs, database);
+  }
+
+  /**
+   * @param rowIDs Row IDs
+   * @param colIDs Col IDs
+   * @param database Database
+   * 
+   * @deprecated Use DBIDs, not integer indexes!
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public BiclusterWithInverted(int[] rowIDs, int[] colIDs, Relation<V> database) {
     super(rowIDs, colIDs, database);
   }
@@ -36,9 +52,8 @@ public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Biclus
    * 
    * @param invertedRows the ids of the inverted rows
    */
-  public void setInvertedRows(int[] invertedRows) {
-    this.invertedRows = new int[invertedRows.length];
-    System.arraycopy(invertedRows, 0, this.invertedRows, 0, invertedRows.length);
+  public void setInvertedRows(DBIDs invertedRows) {
+    this.invertedRows = DBIDUtil.newArray(invertedRows);
   }
 
   /**
@@ -46,10 +61,8 @@ public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Biclus
    * 
    * @return a copy of the inverted column IDs.
    */
-  public int[] getInvertedRows() {
-    int[] columnIDs = new int[invertedRows.length];
-    System.arraycopy(invertedRows, 0, columnIDs, 0, invertedRows.length);
-    return columnIDs;
+  public DBIDs getInvertedRows() {
+    return DBIDUtil.makeUnmodifiable(invertedRows);
   }
 
   /**
@@ -60,7 +73,7 @@ public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Biclus
   public void sortIDs() {
     super.sortIDs();
     if(this.invertedRows != null) {
-      Arrays.sort(this.invertedRows);
+      Collections.sort(this.invertedRows);
     }
   }
 
@@ -71,7 +84,7 @@ public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Biclus
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
     if(this.invertedRows != null) {
-      out.commentPrintLn("inverted rows (row IDs): " + FormatUtil.format(this.invertedRows));
+      out.commentPrintLn("inverted rows (row IDs): " + this.invertedRows.toString());
     }
   }
 }

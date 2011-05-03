@@ -1,12 +1,15 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayStaticDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -23,7 +26,7 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
   /**
    * The ids of the rows included in the bicluster.
    */
-  private int[] rowIDs;
+  private ArrayDBIDs rowIDs;
 
   /**
    * The ids of the rows included in the bicluster.
@@ -42,8 +45,28 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
    * @param colIDs the ids of the columns included in the bicluster
    * @param database the database this bicluster is defined for
    */
-  public Bicluster(int[] rowIDs, int[] colIDs, Relation<V> database) {
+  public Bicluster(ArrayDBIDs rowIDs, int[] colIDs, Relation<V> database) {
     this.rowIDs = rowIDs;
+    this.colIDs = colIDs;
+    this.database = database;
+  }
+
+  /**
+   * Defines a new bicluster for given parameters.
+   * 
+   * @param rowIDs the ids of the rows included in the bicluster
+   * @param colIDs the ids of the columns included in the bicluster
+   * @param database the database this bicluster is defined for
+   * 
+   * @deprecated Use DBIDs, not integers!
+   */
+  @Deprecated
+  public Bicluster(int[] rowIDs, int[] colIDs, Relation<V> database) {
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(rowIDs.length);
+    for (int rowid : rowIDs) {
+      ids.add(DBIDUtil.importInteger(rowid));
+    }
+    this.rowIDs = ids;
     this.colIDs = colIDs;
     this.database = database;
   }
@@ -52,7 +75,10 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
    * Sorts the row and column ids in ascending order.
    */
   public void sortIDs() {
-    Arrays.sort(this.rowIDs);
+    if(!(this.rowIDs instanceof ModifiableDBIDs)) {
+      this.rowIDs = DBIDUtil.newArray(this.rowIDs);
+    }
+    Collections.sort(this.rowIDs);
     Arrays.sort(this.colIDs);
   }
 
@@ -65,7 +91,7 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
    *         bicluster
    */
   public int size() {
-    return rowIDs.length;
+    return rowIDs.size();
   }
 
   /**
@@ -88,7 +114,7 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
       @Override
       @SuppressWarnings("synthetic-access")
       public V next() {
-        return database.get(DBIDUtil.importInteger(rowIDs[++index]));
+        return database.get(rowIDs.get(++index));
       }
 
       @Override
@@ -106,7 +132,7 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
    * @return a DBIDs for the row IDs included in this Bicluster
    */
   public DBIDs getDatabaseObjectGroup() {
-    return new IntegerArrayStaticDBIDs(this.rowIDs);
+    return this.rowIDs;
   }
 
   /**
@@ -140,7 +166,7 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
     out.commentPrintLn("Serialization class: " + this.getClass().getName());
     out.commentPrintLn("Cluster size: " + size());
     out.commentPrintLn("Cluster dimensions: " + colIDs.length);
-    out.commentPrintLn("Included row IDs: " + FormatUtil.format(rowIDs));
+    out.commentPrintLn("Included row IDs: " + rowIDs.toString());
     out.commentPrintLn("Included column IDs: " + FormatUtil.format(colIDs));
   }
 }
