@@ -106,7 +106,8 @@ public interface Database extends HierarchicalResult {
    * @return Object representation
    */
   // TODO: add
-  //<O> Collection<DataQuery<O>> getObjectQueries(TypeInformation restriction, Object... hints);
+  // <O> Collection<DataQuery<O>> getObjectQueries(TypeInformation restriction,
+  // Object... hints);
 
   /**
    * Get the distance query for a particular distance function.
@@ -265,8 +266,7 @@ public interface Database extends HierarchicalResult {
    * Returns the DatabaseObject represented by the specified id.
    * 
    * @param id the id of the Object to be obtained from the Database
-   * @return Object the Object represented by to the specified id in the
-   *         Database
+   * @return Bundle containing the objects' data
    * @throws ObjectNotFoundException when the DBID was not found.
    */
   SingleObjectBundle getBundle(DBID id) throws ObjectNotFoundException;
@@ -275,12 +275,11 @@ public interface Database extends HierarchicalResult {
    * Returns the DatabaseObject represented by the specified id.
    * 
    * @param id the id of the Object to be obtained from the Database
-   * @return Object the Object represented by to the specified id in the
-   *         Database
+   * @return Bundle containing the object data
    * @throws ObjectNotFoundException when the DBID was not found.
    */
   // TODO: add
-  //PackagedObjects getBundles(DBIDs id) throws ObjectNotFoundException;
+  //MultipleObjectsBundle getBundles(DBIDs id) throws ObjectNotFoundException;
 
   /**
    * Returns a list comprising all IDs currently in use.
