@@ -14,11 +14,14 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
+import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -81,7 +84,10 @@ public class TextWriter {
   static {
     TextWriterObjectInline trivialwriter = new TextWriterObjectInline();
     writers.insertHandler(Object.class, new TextWriterObjectComment());
-    writers.insertHandler(FeatureVector.class, new TextWriterObjectInline());
+    writers.insertHandler(Pair.class, new TextWriterPair());
+    writers.insertHandler(DoubleDoublePair.class, new TextWriterDoubleDoublePair());
+    writers.insertHandler(Triple.class, new TextWriterTriple());
+    writers.insertHandler(FeatureVector.class, trivialwriter);
     // these object can be serialized inline with toString()
     writers.insertHandler(String.class, trivialwriter);
     writers.insertHandler(Double.class, trivialwriter);
@@ -94,9 +100,8 @@ public class TextWriter {
     writers.insertHandler(Distance.class, trivialwriter);
     writers.insertHandler(SimpleClassLabel.class, trivialwriter);
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
-    writers.insertHandler(Pair.class, new TextWriterPair());
-    writers.insertHandler(DoubleDoublePair.class, new TextWriterDoubleDoublePair());
-    writers.insertHandler(Triple.class, new TextWriterTriple());
+    writers.insertHandler(LabelList.class, trivialwriter);
+    writers.insertHandler(DBID.class, trivialwriter);
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
   }
@@ -105,34 +110,35 @@ public class TextWriter {
    * Writes a header providing information concerning the underlying database
    * and the specified parameter-settings.
    * 
-   * @param db to retrieve meta information from
    * @param out the print stream where to write
    * @param sr the settings to be written into the header
    */
-  protected void printSettings(Database db, TextWriterStream out, List<SettingsResult> sr) {
+  protected void printSettings(TextWriterStream out, List<SettingsResult> sr) {
     out.commentPrintSeparator();
-    out.commentPrintLn("Settings and meta information:");
-    out.commentPrintLn("db size = " + db.size());
-    try {
-      int dimensionality = 1; //FIXME: DatabaseUtil.dimensionality(db);
-      out.commentPrintLn("db dimensionality = " + dimensionality);
-    }
-    catch(UnsupportedOperationException e) {
-      // dimensionality is unsupported - do nothing
-    }
-    out.commentPrintLn("");
+    out.commentPrintLn("Settings:");
 
     if(sr != null) {
       for(SettingsResult settings : sr) {
         Object last = null;
         for(Pair<Object, Parameter<?, ?>> setting : settings.getSettings()) {
+          if(last != null) {
+            out.commentPrintLn("");
+          }
           if(setting.first != last && setting.first != null) {
-            if(last != null) {
-              out.commentPrintLn("");
+            String name;
+            try {
+              if(setting.first instanceof Class) {
+                name = ((Class<?>) setting.first).getName();
+              }
+              else {
+                name = setting.first.getClass().getName();
+              }
+              if(ClassParameter.class.isInstance(setting.first)) {
+                name = ((ClassParameter<?>) setting.first).getValue().getName();
+              }
             }
-            String name = setting.first.getClass().getName();
-            if(ClassParameter.class.isInstance(setting.first)) {
-              name = ((ClassParameter<?>) setting.first).getValue().getName();
+            catch(NullPointerException e) {
+              name = "[null]";
             }
             out.commentPrintLn(name);
             last = setting.first;
@@ -250,20 +256,26 @@ public class TextWriter {
       throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
     }
     // Write settings preamble
-    printSettings(db, out, rs);
+    printSettings(out, rs);
     // Write data
     owriter.writeObject(out, null, r);
     out.flush();
   }
 
-  private void printObject(TextWriterStream out, Object obj, List<Pair<String, Object>> anns) throws UnableToComplyException, IOException {
+  private void printObject(TextWriterStream out, SingleObjectBundle bundle, List<Pair<String, Object>> anns) throws UnableToComplyException, IOException {
     // Write database element itself.
-    {
+    for(int i = 0; i < bundle.metaLength(); i++) {
+      Object obj = bundle.data(i);
       TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
       if(owriter == null) {
         throw new UnableToComplyException("No handler for database object itself: " + obj.getClass().getSimpleName());
       }
-      owriter.writeObject(out, null, obj);
+      String lbl = null;
+      // TODO: ugly compatibility hack...
+      if(TypeUtil.DBID.isAssignableFromType(bundle.meta(i))) {
+        lbl = "ID";
+      }
+      owriter.writeObject(out, lbl, obj);
     }
 
     // print the annotations
@@ -300,7 +312,7 @@ public class TextWriter {
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStream(outStream, writers);
 
-    printSettings(db, out, sr);
+    printSettings(out, sr);
     // print group information...
     if(group instanceof TextWriteable) {
       TextWriterWriterInterface<?> writer = out.getWriterFor(group);
@@ -331,19 +343,16 @@ public class TextWriter {
         // shoulnd't really happen?
         continue;
       }
-      Object obj = null; // FIXME: db.get(objID);
-      if(obj == null) {
-        continue;
-      }
+      SingleObjectBundle obj = db.getBundle(objID);
       // do we have annotations to print?
-      List<Pair<String, Object>> objs = new ArrayList<Pair<String, Object>>();
+      List<Pair<String, Object>> anns = new ArrayList<Pair<String, Object>>();
       if(ra != null) {
         for(AnnotationResult<?> a : ra) {
-          objs.add(new Pair<String, Object>(a.getAssociationID().getLabel(), a.getValueFor(objID)));
+          anns.add(new Pair<String, Object>(a.getAssociationID().getLabel(), a.getValueFor(objID)));
         }
       }
       // print the object with its annotations.
-      printObject(out, obj, objs);
+      printObject(out, obj, anns);
     }
     out.commentPrintSeparator();
     out.flush();
@@ -357,7 +366,7 @@ public class TextWriter {
     }
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStream(outStream, writers);
-    printSettings(db, out, sr);
+    printSettings(out, sr);
 
     if(mr != null) {
       // TODO: this is an ugly hack!
