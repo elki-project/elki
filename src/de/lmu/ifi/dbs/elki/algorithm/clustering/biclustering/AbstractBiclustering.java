@@ -274,6 +274,16 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
   protected double valueAt(int row, int col) {
     return relation.get(rowIDs.get(row)).doubleValue(colIDs[col]);
   }
+  
+  /**
+   * Get the DBID of a certain row
+   * 
+   * @param row Row number
+   * @return DBID of this row
+   */
+  protected DBID getRowDBID(int row) {
+    return rowIDs.get(row);
+  }
 
   /**
    * Provides the mean value for a row on a set of columns. The columns are
