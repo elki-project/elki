@@ -121,10 +121,10 @@ public class TextWriter {
       for(SettingsResult settings : sr) {
         Object last = null;
         for(Pair<Object, Parameter<?, ?>> setting : settings.getSettings()) {
-          if(last != null) {
-            out.commentPrintLn("");
-          }
           if(setting.first != last && setting.first != null) {
+            if(last != null) {
+              out.commentPrintLn("");
+            }
             String name;
             try {
               if(setting.first instanceof Class) {
