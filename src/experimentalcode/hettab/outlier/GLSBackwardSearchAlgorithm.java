@@ -1,5 +1,6 @@
 package experimentalcode.hettab.outlier;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -32,6 +34,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -164,28 +167,40 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> relation = getRelation(database);
-    HashSet<DBID> outliers = new HashSet<DBID>();
+    
+    HashMap<DBID,SingleObjectBundle> outliers = new HashMap<DBID,SingleObjectBundle>();
     System.out.println(beta);
     //
-    Pair<DBID,Double> candidate = getCandidate(database);
+    Pair<DBID,Double> candidate = getCandidate(relation,database);
     while(candidate.second>alpha){
-      outliers.add(candidate.first);
+      outliers.put(candidate.first, database.getBundle(candidate.first));
       database.delete(candidate.first);
-      candidate = getCandidate(database);
-      System.out.println(candidate);
+      candidate = getCandidate(relation , database);
     }
     
-    
+    //add removed Objects to database
+    Collection<DBID> ids = outliers.keySet();
+    for(DBID id : ids){
+      try {
+        database.insert(outliers.get(id));
+      }
+      catch(UnableToComplyException e) {
+        logger.verbose("insert removed Objects failed");
+      }
+    }
+     
+    relation = getRelation(database);
+    System.out.println(relation.size());
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : relation.getDBIDs()){
-      if(outliers.contains(id)){
+      if(outliers.containsKey(id)){
         scores.put(id, 1.0);
       }
       else{
         scores.put(id, 0.0);
       }
     }
-    
+    System.out.println(relation.getDBIDs());
     //
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("GLSSODBackward", "GLSSODbackward-outlier",GLSBS_SCORE, scores);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.1, Double.POSITIVE_INFINITY, 0);
@@ -198,11 +213,10 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * @param outlier
    */
   //TODO test
-  private Pair<DBID, Double> getCandidate(Database database) {
-    Relation<V> relation = getRelation(database);
-    DistanceQuery<V, D> query = database.getDistanceQuery(relation, spatialDistanceFunction, k);
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(query, DataStoreFactory.HINT_STATIC);
+  private Pair<DBID, Double> getCandidate(Relation<V> relation , Database database) {
     
+    
+    KNNQuery<V, D> knnQuery = database.getKNNQuery(relation , spatialDistanceFunction, k); 
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
 
     // init F,X,Z
@@ -256,7 +270,6 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     // Estimate the parameter beta
     Matrix b = X.transpose().times(F.transpose());
     b = b.times(F.times(X));
-    System.out.println(b);
     b = b.inverse();
     b = b.times(X.transpose());
     b = b.times(F.transpose());
