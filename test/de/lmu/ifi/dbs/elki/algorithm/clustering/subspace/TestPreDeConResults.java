@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -12,7 +9,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex.Factory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -39,11 +35,10 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
   public void testPreDeConResults() throws ParameterException {
     // Additional input parameters
     ListParameterization inp = new ListParameterization();
-    List<Class<?>> filters = Arrays.asList(new Class<?>[] { ClassLabelFilter.class });
-    inp.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
     inp.addParameter(ClassLabelFilter.CLASS_LABEL_INDEX_ID, 1);
+    Class<?>[] filters = new Class<?>[] { ClassLabelFilter.class };
     // FIXME: makeSimpleDatabase currently does also add FILTERS, this doesn't work.
-    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp);
+    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp, filters);
 
     ListParameterization params = new ListParameterization();
     // PreDeCon

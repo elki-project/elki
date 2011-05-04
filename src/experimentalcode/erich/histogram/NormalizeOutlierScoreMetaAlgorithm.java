@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @param <O>
  */
-public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<O> {
+public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<OutlierResult> {
   /**
    * The logger for this class.
    */

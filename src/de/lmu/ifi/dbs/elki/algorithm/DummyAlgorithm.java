@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Dummy Algorithm")
 @Description("The algorithm executes a euclidena 10NN query on all data points, and can be used in unit testing")
-public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgorithm<O> {
+public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgorithm<Result> {
   /**
    * The logger for this class.
    */
@@ -40,12 +40,13 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
   }
 
   /**
-   * Iterates over all points in the database.
+   * Run the algorithm.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @return Null result
    */
-  @Override
-  public Result run(Database database) throws IllegalStateException {
-    // Bind to the database
-    Relation<O> relation = getRelation(database);
+  public Result run(Database database, Relation<O> relation) {
     DistanceQuery<O, DoubleDistance> distQuery = database.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
     KNNQuery<O, DoubleDistance> knnQuery = database.getKNNQuery(distQuery, 10);
 

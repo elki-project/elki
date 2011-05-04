@@ -89,22 +89,20 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
   /**
    * Runs the algorithm in the timed evaluation part.
    */
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    final DistanceQuery<O, D> distanceQuery = getDistanceQuery(database);
-    Relation<? extends O> dataQuery = distanceQuery.getRelation();
+  public OutlierResult run(Database database, Relation<O> relation) {
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     if(logger.isVerbose()) {
       logger.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
-    FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", dataQuery.size(), logger) : null;
+    FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", relation.size(), logger) : null;
 
     double maxweight = 0;
 
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
-    WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : distanceQuery.getRelation().iterDBIDs()) {
       // compute sum of the distances to the k nearest neighbors
 

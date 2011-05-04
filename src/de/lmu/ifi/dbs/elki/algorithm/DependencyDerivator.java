@@ -124,25 +124,24 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * Computes quantitatively linear dependencies among the attributes of the
    * given database based on a linear correlation PCA.
    * 
-   * @param db the database to run this DependencyDerivator on
+   * @param database the database to run this DependencyDerivator on
+   * @param relation the relation to use
    * @return the CorrelationAnalysisSolution computed by this
    *         DependencyDerivator
    */
-  @Override
-  public CorrelationAnalysisSolution<V> run(Database db) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(db);
+  public CorrelationAnalysisSolution<V> run(Database database, Relation<V> relation) throws IllegalStateException {
     if(logger.isVerbose()) {
       logger.verbose("retrieving database objects...");
     }
-    V centroidDV = DatabaseUtil.centroid(dataQuery);
+    V centroidDV = DatabaseUtil.centroid(relation);
     DBIDs ids;
     if(this.sampleSize > 0) {
       if(randomsample) {
-        ids = DBIDUtil.randomSample(dataQuery.getDBIDs(), this.sampleSize, 1);
+        ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, 1);
       }
       else {
-        DistanceQuery<V, D> distanceQuery = db.getDistanceQuery(dataQuery, getDistanceFunction());
-        List<DistanceResultPair<D>> queryResults = db.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
+        DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+        List<DistanceResultPair<D>> queryResults = database.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
         ModifiableDBIDs tids = DBIDUtil.newHashSet(this.sampleSize);
         for(DistanceResultPair<D> qr : queryResults) {
           tids.add(qr.getID());
@@ -152,10 +151,10 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       }
     }
     else {
-      ids = dataQuery.getDBIDs();
+      ids = relation.getDBIDs();
     }
 
-    return generateModel(dataQuery, ids, centroidDV);
+    return generateModel(relation, ids, centroidDV);
   }
 
   /**

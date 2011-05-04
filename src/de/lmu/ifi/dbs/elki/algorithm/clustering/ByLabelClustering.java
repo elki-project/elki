@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  */
 @Title("Clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
-public class ByLabelClustering extends AbstractAlgorithm<String> implements ClusteringAlgorithm<Clustering<Model>> {
+public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -94,17 +93,15 @@ public class ByLabelClustering extends AbstractAlgorithm<String> implements Clus
   public ByLabelClustering() {
     this(false, null);
   }
-
+  
   /**
    * Run the actual clustering algorithm.
    * 
    * @param database The database to process
+   * @param relation The data input we use
    */
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    Relation<String> dataQuery = DatabaseUtil.guessClassLabelRepresentation(database);
-
-    HashMap<String, ModifiableDBIDs> labelMap = multiple ? multipleAssignment(dataQuery) : singleAssignment(dataQuery);
+  public Clustering<Model> run(Database database, Relation<?> relation) {
+    HashMap<String, ModifiableDBIDs> labelMap = multiple ? multipleAssignment(relation) : singleAssignment(relation);
 
     Clustering<Model> result = new Clustering<Model>("By Label Clustering", "bylabel-clustering");
     for(Entry<String, ModifiableDBIDs> entry : labelMap.entrySet()) {
@@ -125,11 +122,11 @@ public class ByLabelClustering extends AbstractAlgorithm<String> implements Clus
    * @param data the database storing the objects
    * @return a mapping of labels to ids
    */
-  private HashMap<String, ModifiableDBIDs> singleAssignment(Relation<String> data) {
+  private HashMap<String, ModifiableDBIDs> singleAssignment(Relation<?> data) {
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
     for(DBID id : data.iterDBIDs()) {
-      String label = data.get(id);
+      String label = data.get(id).toString();
       assign(labelMap, label, id);
     }
     return labelMap;
@@ -142,11 +139,11 @@ public class ByLabelClustering extends AbstractAlgorithm<String> implements Clus
    * @param data the database storing the objects
    * @return a mapping of labels to ids
    */
-  private HashMap<String, ModifiableDBIDs> multipleAssignment(Relation<String> data) {
+  private HashMap<String, ModifiableDBIDs> multipleAssignment(Relation<?> data) {
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
     for(DBID id : data.iterDBIDs()) {
-      String[] labels = data.get(id).split(" ");
+      String[] labels = data.get(id).toString().split(" ");
       for(String label : labels) {
         assign(labelMap, label, id);
       }

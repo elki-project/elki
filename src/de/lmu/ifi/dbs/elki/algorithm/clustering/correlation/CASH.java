@@ -78,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the hough transform.")
 @Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
-public class CASH extends AbstractAlgorithm<ParameterizationFunction> implements ClusteringAlgorithm<Clustering<Model>> {
+public class CASH extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -191,11 +191,15 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> implements
   }
 
   /**
-   * Performs the CASH algorithm on the given database.
+   * Run CASH on the relation.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @return
+   * @throws IllegalStateException
    */
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    relation = getRelation(database);
+  public Clustering<Model> run(Database database, Relation<ParameterizationFunction> relation) throws IllegalStateException {
+    this.relation = relation;
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();
       msg.append("DB size: ").append(relation.size());

@@ -22,21 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<O> {
-  /**
-   * Parameter to specify the distance function to determine the distance
-   * between database objects, must extend
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
-   * <p>
-   * Key: {@code -algorithm.distancefunction}
-   * </p>
-   * <p>
-   * Default value:
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
-   * </p>
-   */
-  protected final ObjectParameter<PrimitiveDistanceFunction<O,D>> DISTANCE_FUNCTION_PARAM = new ObjectParameter<PrimitiveDistanceFunction<O, D>>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
-
+public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<R> {
   /**
    * Holds the instance of the distance function specified by
    * {@link #DISTANCE_FUNCTION_PARAM}.

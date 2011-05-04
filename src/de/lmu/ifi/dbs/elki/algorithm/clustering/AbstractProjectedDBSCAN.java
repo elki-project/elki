@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<Model>> {
+public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V extends NumberVector<V, ?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -143,24 +143,21 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
     this.lambda = lambda;
   }
 
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
-    
-    FiniteProgress objprog = getLogger().isVerbose() ? new FiniteProgress("Processing objects", dataQuery.size(), getLogger()) : null;
+  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
+    FiniteProgress objprog = getLogger().isVerbose() ? new FiniteProgress("Processing objects", relation.size(), getLogger()) : null;
     IndefiniteProgress clusprog = getLogger().isVerbose() ? new IndefiniteProgress("Number of clusters", getLogger()) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
-    processedIDs = DBIDUtil.newHashSet(dataQuery.size());
+    processedIDs = DBIDUtil.newHashSet(relation.size());
 
-    LocallyWeightedDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(dataQuery);
+    LocallyWeightedDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(relation);
     RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
 
-    if(dataQuery.size() >= minpts) {
-      for(DBID id : dataQuery.iterDBIDs()) {
+    if(relation.size() >= minpts) {
+      for(DBID id : relation.iterDBIDs()) {
         if(!processedIDs.contains(id)) {
           expandCluster(distFunc, rangeQuery, id, objprog, clusprog);
-          if(processedIDs.size() == dataQuery.size() && noise.size() == 0) {
+          if(processedIDs.size() == relation.size() && noise.size() == 0) {
             break;
           }
         }
@@ -171,7 +168,7 @@ public abstract class AbstractProjectedDBSCAN<V extends NumberVector<V, ?>> exte
       }
     }
     else {
-      for(DBID id : dataQuery.iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), getLogger());

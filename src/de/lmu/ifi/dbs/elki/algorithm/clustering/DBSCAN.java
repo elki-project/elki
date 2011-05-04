@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -107,10 +108,9 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   /**
    * Performs the DBSCAN algorithm on the given database.
    */
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceQuery(database));
-    final int size = rangeQuery.getRelation().size();
+  public Clustering<Model> run(Database database, Relation<O> relation) {
+    RangeQuery<O, D> rangeQuery = database.getRangeQuery(relation, getDistanceFunction());
+    final int size = relation.size();
 
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", size, logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;

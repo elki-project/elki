@@ -84,13 +84,19 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     this.minpts = minpts;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<O> dataQuery = getRelation(database);
-    DistanceQuery<O, D> distQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
+  /**
+   * Perform OPTICS-based outlier detection.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @return
+   * @throws IllegalStateException
+   */
+  public OutlierResult run(Database database, Relation<O> relation) throws IllegalStateException {
+    DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, minpts);
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distQuery);
-    DBIDs ids = dataQuery.getDBIDs();
+    DBIDs ids = relation.getDBIDs();
 
     WritableDataStore<List<DistanceResultPair<D>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDataStore<Double> coreDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
@@ -99,7 +105,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     // Pass 1
     // N_minpts(id) and core-distance(id)
 
-    for(DBID id : dataQuery.iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       List<DistanceResultPair<D>> minptsNeighbours = knnQuery.getKNNForDBID(id, minpts);
       D d = minptsNeighbours.get(minptsNeighbours.size() - 1).getDistance();
       nMinPts.put(id, minptsNeighbours);
@@ -110,7 +116,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     // Pass 2
     WritableDataStore<List<Double>> reachDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    for(DBID id : dataQuery.iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       List<Double> core = new ArrayList<Double>();
       double lrd = 0;
       for(DistanceResultPair<D> neighPair : nMinPts.get(id)) {
@@ -129,7 +135,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     // Pass 3
     MinMax<Double> ofminmax = new MinMax<Double>();
     WritableDataStore<Double> ofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : dataQuery.iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double of = 0;
       for(DistanceResultPair<D> pair : nMinPts.get(id)) {
         DBID idN = pair.getID();

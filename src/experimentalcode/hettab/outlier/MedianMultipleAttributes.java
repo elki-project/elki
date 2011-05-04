@@ -39,7 +39,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  *
  * @param <V>
  */
-public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
+public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * logger
    */
@@ -87,9 +87,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Abst
     return logger;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> relation = getRelation(database);
+  public OutlierResult run(Database database, Relation<V> relation) {
     final NeighborSetPredicate npred = npredf.instantiate(relation);
     Matrix hMatrix = new Matrix(dims.size(),relation.size());
     Matrix hMeansMatrix = new Matrix(dims.size(),1);

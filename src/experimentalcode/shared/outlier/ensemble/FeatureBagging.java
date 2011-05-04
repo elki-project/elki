@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Feature Bagging for Outlier Detection")
 @Reference(title = "Feature Bagging for Outlier Detection", authors = "A. Lazarevic, V. Kumar", booktitle = "Proc. of the 11th ACM SIGKDD international conference on Knowledge discovery in data mining", url = "http://dx.doi.org/10.1145/1081870.1081891")
-public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O> implements OutlierAlgorithm {
+public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -158,10 +158,8 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
     }
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<O> relation = getRelation(database);
-    int dbdim = DatabaseUtil.dimensionality(relation);
+  public OutlierResult run(Database database, Relation<O> relation) throws IllegalStateException {
+    final int dbdim = DatabaseUtil.dimensionality(relation);
     int mindim = dbdim / 2;
     int maxdim = dbdim - 1;
 

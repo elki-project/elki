@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 @Title("Gaussian Model Outlier Detection")
 @Description("Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.")
-public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
+public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -76,26 +76,24 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     this.invert = invert;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
+  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
     MinMax<Double> mm = new MinMax<Double>();
     // resulting scores
-    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
 
     // Compute mean and covariance Matrix
-    V mean = DatabaseUtil.centroid(dataQuery);
+    V mean = DatabaseUtil.centroid(relation);
     // debugFine(mean.toString());
-    Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(dataQuery, mean);
+    Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(relation, mean);
     // debugFine(covarianceMatrix.toString());
     Matrix covarianceTransposed = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
 
     // Normalization factors for Gaussian PDF
-    final double fakt = (1.0 / (Math.sqrt(Math.pow(2 * Math.PI, DatabaseUtil.dimensionality(dataQuery)) * covarianceMatrix.det())));
+    final double fakt = (1.0 / (Math.sqrt(Math.pow(2 * Math.PI, DatabaseUtil.dimensionality(relation)) * covarianceMatrix.det())));
 
     // for each object compute Mahalanobis distance
-    for(DBID id : dataQuery.iterDBIDs()) {
-      V x = dataQuery.get(id);
+    for(DBID id : relation.iterDBIDs()) {
+      V x = relation.get(id);
       Vector x_minus_mean = x.minus(mean).getColumnVector();
       // Gaussian PDF
       final double mDist = x_minus_mean.transposeTimes(covarianceTransposed).times(x_minus_mean).get(0, 0);
@@ -108,7 +106,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     final OutlierScoreMeta meta;
     if(invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
-      for(DBID id : dataQuery.iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         oscores.put(id, (max - oscores.get(id)) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);

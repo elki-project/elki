@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
-public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
+public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -120,22 +120,18 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   /**
    * Performs the SOD algorithm on the given database.
    */
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
-    SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(dataQuery);
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", dataQuery.size(), logger) : null;
-    int processed = 0;
-    WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
+  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
+    SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(relation);
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), logger) : null;
+    WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     DoubleMinMax minmax = new DoubleMinMax();
-    for(Iterator<DBID> iter = dataQuery.iterDBIDs(); iter.hasNext();) {
+    for(Iterator<DBID> iter = relation.iterDBIDs(); iter.hasNext();) {
       DBID queryObject = iter.next();
-      processed++;
       if(progress != null) {
-        progress.setProcessed(processed, logger);
+        progress.incrementProcessed(logger);
       }
-      DBIDs knnList = getKNN(dataQuery, snnInstance, queryObject).asDBIDs();
-      SODModel<V> model = new SODModel<V>(dataQuery, knnList, alpha, dataQuery.get(queryObject));
+      DBIDs knnList = getKNN(relation, snnInstance, queryObject).asDBIDs();
+      SODModel<V> model = new SODModel<V>(relation, knnList, alpha, relation.get(queryObject));
       sod_models.put(queryObject, model);
       minmax.put(model.getSod());
     }

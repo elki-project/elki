@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -22,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Trivial all-noise clustering")
 @Description("Returns a 'trivial' clustering which just considers all points as noise points.")
-public class TrivialAllNoise extends AbstractAlgorithm<Object> implements ClusteringAlgorithm<Clustering<Model>> {
+public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -36,14 +37,8 @@ public class TrivialAllNoise extends AbstractAlgorithm<Object> implements Cluste
     super();
   }
 
-  /**
-   * Run the actual clustering algorithm.
-   * 
-   * @param database The database to process
-   */
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    DBIDs ids = database.getRelation(getInputTypeRestriction()[0]).getDBIDs();
+  public Clustering<Model> run(Database database, Relation<?> relation) {
+    final DBIDs ids = relation.getDBIDs();
     Clustering<Model> result = new Clustering<Model>("All-in-noise trivial Clustering", "allinnoise-clustering");
     Cluster<Model> c = new Cluster<Model>(ids, true, ClusterModel.CLUSTER);
     result.addCluster(c);

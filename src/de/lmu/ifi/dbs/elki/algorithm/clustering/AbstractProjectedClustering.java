@@ -22,9 +22,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * and {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS}.
  * 
  * @author Elke Achtert
+ * 
+ * @param <R> the result we return
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class AbstractProjectedClustering<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<Model>> {
+public abstract class AbstractProjectedClustering<R extends Clustering<Model>, V extends NumberVector<V, ?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.

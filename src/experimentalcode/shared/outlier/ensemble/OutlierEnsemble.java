@@ -43,7 +43,7 @@ import experimentalcode.shared.outlier.ensemble.voting.EnsembleVoting;
  * 
  * @param <O> object type
  */
-public class OutlierEnsemble<O> extends AbstractAlgorithm<O> {
+public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
   /**
    * The logger for this class.
    */

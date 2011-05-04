@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Null Algorithm")
 @Description("Algorithm which does nothing, just return a null object.")
-public class NullAlgorithm extends AbstractAlgorithm<Object> {
+public class NullAlgorithm extends AbstractAlgorithm<Result> {
   /**
    * The logger for this class.
    */
@@ -29,9 +29,6 @@ public class NullAlgorithm extends AbstractAlgorithm<Object> {
     super();
   }
 
-  /**
-   * Iterates over all points in the database.
-   */
   @Override
   public Result run(@SuppressWarnings("unused") Database database) throws IllegalStateException {
     return null;
@@ -44,6 +41,6 @@ public class NullAlgorithm extends AbstractAlgorithm<Object> {
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.ANY);
+    return TypeUtil.array();
   }
 }

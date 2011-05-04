@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -82,17 +81,18 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
   /**
    * Provides an order of the kNN-distances for all objects within the specified
    * database.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @return Result
    */
-  @Override
-  public KNNDistanceOrderResult<D> run(Database database) throws IllegalStateException {
-    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
+  public KNNDistanceOrderResult<D> run(Database database, Relation<O> relation) {
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     final Random random = new Random();
-    List<D> knnDistances = new ArrayList<D>();
-    for(Iterator<DBID> iter = dataQuery.iterDBIDs(); iter.hasNext();) {
-      DBID id = iter.next();
+    List<D> knnDistances = new ArrayList<D>(relation.size());
+    for(DBID id : relation.iterDBIDs()) {
       if(random.nextDouble() < percentage) {
         final List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
         final int last = Math.min(k - 1, neighbors.size() - 1);

@@ -36,7 +36,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  *
  * @param <V>
  */
-public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
+public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -117,10 +117,7 @@ public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends AbstractAl
     return null;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    
-    Relation<V> relation = getRelation(database);
+  public OutlierResult run(Database database, Relation<V> relation) {
     WritableDataStore<Double> means = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     

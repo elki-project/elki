@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 @Title("APRIORI: Algorithm for Mining Association Rules")
 @Description("Searches for frequent itemsets")
 @Reference(authors = "R. Agrawal, R. Srikant", title = "Fast Algorithms for Mining Association Rules in Large Databases", booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", url = "http://www.acm.org/sigmod/vldb/conf/1994/P487.PDF")
-public class APRIORI extends AbstractAlgorithm<BitVector> {
+public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   /**
    * The logger for this class.
    */
@@ -101,18 +101,17 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
    * Performs the APRIORI algorithm on the given database.
    * 
    * @param database the Database to run APRIORI on
+   * @param relation the Relation to process
    * @return the AprioriResult learned by this APRIORI
    */
-  @Override
-  public AprioriResult run(Database database) throws IllegalStateException {
-    Relation<BitVector> dataQuery = getRelation(database);
+  public AprioriResult run(Database database, Relation<BitVector> relation) throws IllegalStateException {
     Map<BitSet, Integer> support = new Hashtable<BitSet, Integer>();
     List<BitSet> solution = new ArrayList<BitSet>();
-    final int size = dataQuery.size();
+    final int size = relation.size();
     if(size > 0) {
       int dim;
       try {
-        dim = DatabaseUtil.dimensionality(dataQuery);
+        dim = DatabaseUtil.dimensionality(relation);
       }
       catch(UnsupportedOperationException e) {
         dim = 0;
@@ -124,7 +123,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
       }
       while(candidates.length > 0) {
         StringBuffer msg = new StringBuffer();
-        BitSet[] frequentItemsets = frequentItemsets(support, candidates, dataQuery);
+        BitSet[] frequentItemsets = frequentItemsets(support, candidates, relation);
         if(logger.isVerbose()) {
           msg.append("\ncandidates").append(Arrays.asList(candidates));
           msg.append("\nfrequentItemsets").append(Arrays.asList(frequentItemsets));

@@ -112,33 +112,29 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   }
 
   /**
-   * Performs the k-means algorithm on the given database.
+   * Run k-means
+   * 
+   * @param database Database
+   * @param relation relation to use
+   * @return result
+   * @throws IllegalStateException
    */
-  @Override
-  public Clustering<MeanModel<V>> run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
-    
-    final Random random;
-    if(this.seed != null) {
-      random = new Random(this.seed);
-    }
-    else {
-      random = new Random();
-    }
-    if(dataQuery.size() > 0) {
+  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+    final Random random = (this.seed != null) ? new Random(this.seed) : new Random();
+    if(relation.size() > 0) {
       // needs normalization to ensure the randomly generated means
       // are in the same range as the vectors in the database
       // XXX perhaps this can be done more conveniently?
-      V randomBase = dataQuery.get(dataQuery.iterDBIDs().next());
+      V randomBase = relation.get(relation.iterDBIDs().next());
       EmptyParameterization parameters = new EmptyParameterization();
       Class<AttributeWiseMinMaxNormalization<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(AttributeWiseMinMaxNormalization.class);
       AttributeWiseMinMaxNormalization<V> normalization = parameters.tryInstantiate(cls);
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
-      List<V> list = new ArrayList<V>(dataQuery.size());
-      for(DBID id : dataQuery.getDBIDs()) {
-        list.add(dataQuery.get(id));
+      List<V> list = new ArrayList<V>(relation.size());
+      for(DBID id : relation.getDBIDs()) {
+        list.add(relation.get(id));
       }
       normalization.normalize(list);
       List<V> means = new ArrayList<V>(k);
@@ -157,7 +153,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
           means.add(randomVector);
         }
       }
-      clusters = sort(means, dataQuery);
+      clusters = sort(means, relation);
       boolean changed = true;
       int iteration = 1;
       while(changed) {
@@ -165,8 +161,8 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
           logger.verbose("iteration " + iteration);
         }
         oldMeans = new ArrayList<V>(means);
-        means = means(clusters, means, dataQuery);
-        clusters = sort(means, dataQuery);
+        means = means(clusters, means, relation);
+        clusters = sort(means, relation);
         changed = !means.equals(oldMeans);
         iteration++;
 

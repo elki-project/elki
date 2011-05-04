@@ -109,8 +109,8 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
    */
   @Override
   public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
-    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<O, D> distFunc = database.getDistanceQuery(dataQuery, getDistanceFunction());
+    final Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
+    final DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     
     // determine binning ranges.
     DoubleMinMax gminmax = new DoubleMinMax();
@@ -133,11 +133,11 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     // Histogram
     final AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> histogram;
     if(exact) {
-      gminmax = exactMinMax(dataQuery, distFunc);
+      gminmax = exactMinMax(relation, distFunc);
       histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
     }
     else if(sampling) {
-      gminmax = sampleMinMax(dataQuery, distFunc);
+      gminmax = sampleMinMax(relation, distFunc);
       histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
     }
     else {
@@ -210,7 +210,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     }
     long bnum = inum + onum;
     // Note: when full sampling is added, this assertion won't hold anymore.
-    assert (bnum == dataQuery.size() * (dataQuery.size() - 1));
+    assert (bnum == relation.size() * (relation.size() - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
     for(Pair<Double, Pair<Long, Long>> ppair : histogram) {

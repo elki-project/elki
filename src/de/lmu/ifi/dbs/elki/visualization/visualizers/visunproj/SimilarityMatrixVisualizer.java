@@ -84,7 +84,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisualization {
     final double hlsize = scale * zoom * iratio / size;
     final double vlsize = scale * zoom / size;
     int i = 0;
-    final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(result.getDatabase());
+    final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(result.getRelation().getDatabase());
     for(DBID id : result.getIDs()) {
       String label = lrep.get(id);
       if(label != null) {

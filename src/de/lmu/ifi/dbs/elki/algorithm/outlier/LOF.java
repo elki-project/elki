@@ -91,7 +91,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url = "http://dx.doi.org/10.1145/342009.335388")
-public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O> implements OutlierAlgorithm {
+public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -156,10 +156,9 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
    * Performs the Generalized LOF_SCORE algorithm on the given database by
    * calling {@code #doRunInTime(Database)}.
    */
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database, Relation<O> relation) {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress("LOF", 3) : null;
-    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, stepprog);
+    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(relation, stepprog);
     KNNQuery<O, D> kNNRefer = pair.getFirst();
     KNNQuery<O, D> kNNReach = pair.getSecond();
     return doRunInTime(database, kNNRefer, kNNReach, stepprog).getResult();
@@ -172,10 +171,9 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
    * @param stepprog the progress logger
    * @return the kNN queries for the algorithm
    */
-  private Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database database, StepProgress stepprog) {
-    Relation<O> dataQuery = getRelation(database);
+  private Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Relation<O> relation, StepProgress stepprog) {
     // "HEAVY" flag for knnReach since it is used more than once
-    KNNQuery<O, D> knnReach = database.getKNNQuery(dataQuery, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O, D> knnReach = relation.getDatabase().getKNNQuery(relation, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(knnReach == null) {
       if(stepprog != null) {
@@ -186,8 +184,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
           stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", logger);
         }
       }
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(dataQuery, reachabilityDistanceFunction, k);
-      database.addIndex(preproc);
+      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, reachabilityDistanceFunction, k);
+      relation.getDatabase().addIndex(preproc);
       knnReach = preproc.getKNNQuery(reachabilityDistanceFunction, k);
     }
 
@@ -198,7 +196,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O>
     }
     else {
       // do not materialize the first neighborhood, since it is used only once
-      knnRefer = database.getKNNQuery(dataQuery, neighborhoodDistanceFunction, k);
+      knnRefer = relation.getDatabase().getKNNQuery(relation, neighborhoodDistanceFunction, k);
     }
 
     return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnRefer, knnReach);

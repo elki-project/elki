@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -112,25 +113,27 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   }
 
   /**
-   * Performs the OPTICS algorithm on the given database.
+   * Run OPTICS on the database.
    * 
+   * @param database Database
+   * @param relation Relation
+   * @return Result
    */
-  @Override
-  public ClusterOrderResult<D> run(Database database) {
+  public ClusterOrderResult<D> run(Database database, Relation<O> relation) {
     // Default value is infinite distance
     if(epsilon == null) {
       epsilon = getDistanceFunction().getDistanceFactory().infiniteDistance();
     }
-    RangeQuery<O, D> rangeQuery = database.getRangeQuery(getDistanceQuery(database), epsilon);
+    RangeQuery<O, D> rangeQuery = database.getRangeQuery(relation, getDistanceFunction(), epsilon);
 
-    int size = rangeQuery.getRelation().size();
+    int size = relation.size();
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", size, logger) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("OPTICS Clusterorder", "optics-clusterorder");
     heap = new UpdatableHeap<ClusterOrderEntry<D>>();
 
-    for(DBID id : rangeQuery.getRelation().iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       if(!processedIDs.contains(id)) {
         expandClusterOrder(clusterOrder, database, rangeQuery, id, progress);
       }
@@ -143,7 +146,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
         logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
         ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
-        OPTICSXi.extractClusters(distanceClusterOrder, getRelation(database), ixi, minpts);
+        OPTICSXi.extractClusters(distanceClusterOrder, relation, ixi, minpts);
       }
       else {
         logger.verbose("Xi cluster extraction only supported for number distances!");
