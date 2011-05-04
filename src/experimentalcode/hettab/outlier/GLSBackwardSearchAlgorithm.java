@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
+ * GLSBackwardSearchAlgorithm provides the GLS-SOD Algorithm, an Algorithm to detect
+ * Spatial Outlier
  * 
  * @author Ahmed Hettab
  * 
@@ -180,16 +182,18 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     HashMap<DBID,SingleObjectBundle> outliers = new HashMap<DBID,SingleObjectBundle>();
     //
     Pair<DBID,Double> candidate = getCandidate(relation,database);
+    
     int outlierNumber = 0 ;
-    while(candidate.second>alpha && m>outlierNumber){
+    while(candidate.second > alpha && m > outlierNumber){
+      outlierNumber ++ ;
       outliers.put(candidate.first, database.getBundle(candidate.first));
       database.delete(candidate.first);
       candidate = getCandidate(relation , database);
-      outlierNumber ++ ;
     }
     
     //add removed Objects to database
     Collection<DBID> ids = outliers.keySet();
+    System.out.println(ids);
     for(DBID id : ids){
       try {
         database.insert(outliers.get(id));
@@ -199,10 +203,10 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       }
     }
      
-    relation = getRelation(database);
+    Relation<V> db = getRelation(database);
     System.out.println(relation.size());
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : relation.getDBIDs()){
+    for(DBID id : db.getDBIDs()){
       if(outliers.containsKey(id)){
         scores.put(id, 1.0);
       }
