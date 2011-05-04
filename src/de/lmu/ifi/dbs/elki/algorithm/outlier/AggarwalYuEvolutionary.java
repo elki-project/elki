@@ -112,17 +112,15 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
   }
 
   /**
-   * Performs the EAFOD algorithm on the given database.
+   * Performs the evolutionary algorithm on the given database.
    */
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
-    final int dbsize = dataQuery.size();
-    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(dataQuery);
+  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
+    final int dbsize = relation.size();
+    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 
-    Collection<Individuum> individuums = (new EvolutionarySearch(dataQuery, ranges, m, seed)).run();
+    Collection<Individuum> individuums = (new EvolutionarySearch(relation, ranges, m, seed)).run();
 
-    WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     for(Individuum ind : individuums) {
       DBIDs ids = computeSubspaceForGene(ind.getGene(), ranges);
       double sparsityC = sparsity(ids.size(), dbsize, k);
@@ -135,7 +133,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : dataQuery.iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       Double val = outlierScore.get(id);
       if(val == null) {
         outlierScore.put(id, 0.0);

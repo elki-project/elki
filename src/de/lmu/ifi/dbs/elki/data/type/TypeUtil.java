@@ -44,7 +44,7 @@ public final class TypeUtil {
    * accepted by
    * {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil#guessClassLabelRepresentation}
    */
-  public static final TypeInformation GUESSED_LABEL = new CombinedTypeInformation(LABELLIST, CLASSLABEL, STRING);
+  public static final TypeInformation GUESSED_LABEL = new AlternativeTypeInformation(LABELLIST, CLASSLABEL, STRING);
 
   /**
    * Input type for algorithms that require number vector fields.

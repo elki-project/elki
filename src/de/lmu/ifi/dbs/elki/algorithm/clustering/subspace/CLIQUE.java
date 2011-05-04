@@ -75,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")
 @Description("Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality.")
 @Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", url = "http://dx.doi.org/10.1145/276304.276314")
-public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
+public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -142,16 +142,14 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> i
   /**
    * Performs the CLIQUE algorithm on the given database.
    */
-  @Override
-  public Clustering<SubspaceModel<V>> run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
+  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
     // 1. Identification of subspaces that contain clusters
     // TODO: use step logging.
     if(logger.isVerbose()) {
       logger.verbose("*** 1. Identification of subspaces that contain clusters ***");
     }
     SortedMap<Integer, List<CLIQUESubspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, List<CLIQUESubspace<V>>>();
-    List<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(dataQuery);
+    List<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(relation);
     dimensionToDenseSubspaces.put(0, denseSubspaces);
     if(logger.isVerbose()) {
       logger.verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
@@ -162,9 +160,9 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> i
       }
     }
 
-    int dimensionality = DatabaseUtil.dimensionality(dataQuery);
+    int dimensionality = DatabaseUtil.dimensionality(relation);
     for(int k = 2; k <= dimensionality && !denseSubspaces.isEmpty(); k++) {
-      denseSubspaces = findDenseSubspaces(dataQuery, denseSubspaces);
+      denseSubspaces = findDenseSubspaces(relation, denseSubspaces);
       dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
       if(logger.isVerbose()) {
         logger.verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
@@ -193,7 +191,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> i
 
       for(Pair<Subspace<V>, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
         Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(modelAndCluster.second);
-        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, DatabaseUtil.centroid(dataQuery, modelAndCluster.second)));
+        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, DatabaseUtil.centroid(relation, modelAndCluster.second)));
         newCluster.setName("cluster_" + numClusters++);
         result.addCluster(newCluster);
       }

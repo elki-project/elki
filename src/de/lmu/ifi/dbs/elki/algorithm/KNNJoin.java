@@ -94,9 +94,8 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    *         found or the specified distance function is not an instance of
    *         {@link SpatialPrimitiveDistanceFunction}.
    */
-  @Override
   @SuppressWarnings("unchecked")
-  public DataStore<KNNList<D>> run(Database database) throws IllegalStateException {
+  public DataStore<KNNList<D>> run(Database database, Relation<V> relation) throws IllegalStateException {
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
@@ -104,19 +103,19 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     if(indexes.size() != 1) {
       throw new AbortException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
+    // FIXME: Ensure were looking at the right relation!
     SpatialIndex<V, N, E> index = indexes.iterator().next();
     SpatialPrimitiveDistanceFunction<V, D> distFunction = (SpatialPrimitiveDistanceFunction<V, D>) getDistanceFunction();
-    DistanceQuery<V, D> distq = getDistanceQuery(database);
-    Relation<? extends V> dataQuery = distq.getRelation();
+    DistanceQuery<V, D> distq = database.getDistanceQuery(relation, distFunction);
 
-    DBIDs ids = dataQuery.getDBIDs();
+    DBIDs ids = relation.getDBIDs();
 
     WritableDataStore<KNNHeap<D>> knnHeaps = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, KNNHeap.class);
 
     try {
       // data pages of s
       List<E> ps_candidates = index.getLeaves();
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), dataQuery.size(), logger) : null;
+      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), logger) : null;
       IndefiniteProgress pageprog = logger.isVerbose() ? new IndefiniteProgress("Number of processed data pages", logger) : null;
       if(logger.isDebugging()) {
         logger.debugFine("# ps = " + ps_candidates.size());

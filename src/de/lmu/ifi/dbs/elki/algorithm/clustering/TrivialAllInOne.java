@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Trivial all-in-one clustering")
 @Description("Returns a 'tivial' clustering which just considers all points to be one big cluster.")
-public class TrivialAllInOne extends AbstractAlgorithm<Object> implements ClusteringAlgorithm<Clustering<Model>> {
+public class TrivialAllInOne extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -37,14 +38,8 @@ public class TrivialAllInOne extends AbstractAlgorithm<Object> implements Cluste
     super();
   }
 
-  /**
-   * Run the actual clustering algorithm.
-   * 
-   * @param database The database to process
-   */
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    DBIDs ids = database.getRelation(getInputTypeRestriction()[0]).getDBIDs();
+  public Clustering<Model> run(Database database, Relation<?> relation) {
+    final DBIDs ids = relation.getDBIDs();
     Clustering<Model> result = new Clustering<Model>("All-in-one trivial Clustering", "allinone-clustering");
     Cluster<Model> c = new Cluster<Model>(ids, ClusterModel.CLUSTER);
     result.addCluster(c);

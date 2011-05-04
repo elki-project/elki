@@ -77,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
-public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
+public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -140,14 +140,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imp
   /**
    * Performs the DiSH algorithm on the given database.
    */
-  @Override
-  public Clustering<SubspaceModel<V>> run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
+  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
     // Instantiate DiSH distance (and thus run the preprocessor)
     if(logger.isVerbose()) {
       logger.verbose("*** Run DiSH preprocessor.");
     }
-    DiSHDistanceFunction.Instance<V> dishDistanceQuery = dishDistance.instantiate(dataQuery);
+    DiSHDistanceFunction.Instance<V> dishDistanceQuery = dishDistance.instantiate(relation);
     // Configure and run OPTICS.
     if(logger.isVerbose()) {
       logger.verbose("*** Run OPTICS algorithm.");
@@ -163,7 +161,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imp
     if(logger.isVerbose()) {
       logger.verbose("*** Compute Clusters.");
     }
-    return computeClusters(dataQuery, opticsResult, dishDistanceQuery);
+    return computeClusters(relation, opticsResult, dishDistanceQuery);
   }
 
   /**

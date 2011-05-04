@@ -41,6 +41,5 @@ public interface Algorithm extends Parameterizable {
    * 
    * @return Type restriction
    */
-  // TODO: this is only appropriate for single-input algorithms!
   public TypeInformation[] getInputTypeRestriction();
 }

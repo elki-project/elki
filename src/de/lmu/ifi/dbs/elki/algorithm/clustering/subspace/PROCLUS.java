@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304188")
 // TODO: make the generics reflect the SubspaceModel
-public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<V> {
+public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<Clustering<Model>, V> {
   /**
    * The logger for this class.
    */
@@ -117,112 +117,103 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
   /**
    * Performs the PROCLUS algorithm on the given database.
-   * 
    */
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    try {
-      Relation<V> dataQuery = this.getRelation(database);
-      DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
-      RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
-      final Random random = new Random();
-      if(seed != null) {
-        random.setSeed(seed);
+  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
+    DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
+    RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
+    final Random random = new Random();
+    if(seed != null) {
+      random.setSeed(seed);
+    }
+
+    if(DatabaseUtil.dimensionality(relation) < l) {
+      throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + DatabaseUtil.dimensionality(relation) + " < " + l + ")");
+    }
+
+    // TODO: use a StepProgress!
+    // initialization phase
+    if(logger.isVerbose()) {
+      logger.verbose("1. Initialization phase...");
+    }
+    int sampleSize = Math.min(relation.size(), k_i * k);
+    DBIDs sampleSet = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, random.nextLong());
+
+    int medoidSize = Math.min(relation.size(), m_i * k);
+    DBIDs medoids = greedy(distFunc, sampleSet, medoidSize, random);
+
+    if(logger.isDebugging()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\n");
+      msg.append("sampleSize ").append(sampleSize).append("\n");
+      msg.append("sampleSet ").append(sampleSet).append("\n");
+      msg.append("medoidSize ").append(medoidSize).append("\n");
+      msg.append("m ").append(medoids).append("\n");
+      logger.debugFine(msg.toString());
+    }
+
+    // iterative phase
+    if(logger.isVerbose()) {
+      logger.verbose("2. Iterative phase...");
+    }
+    double bestObjective = Double.POSITIVE_INFINITY;
+    ModifiableDBIDs m_best = null;
+    ModifiableDBIDs m_bad = null;
+    ModifiableDBIDs m_current = initialSet(medoids, k, random);
+
+    if(logger.isDebugging()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\n");
+      msg.append("m_c ").append(m_current).append("\n");
+      logger.debugFine(msg.toString());
+    }
+
+    IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Current number of clusters:", logger) : null;
+
+    Map<DBID, PROCLUSCluster> clusters = null;
+    int loops = 0;
+    while(loops < 10) {
+      Map<DBID, Set<Integer>> dimensions = findDimensions(m_current, relation, distFunc, rangeQuery);
+      clusters = assignPoints(dimensions, relation);
+      double objectiveFunction = evaluateClusters(clusters, dimensions, relation);
+
+      if(objectiveFunction < bestObjective) {
+        // restart counting loops
+        loops = 0;
+        bestObjective = objectiveFunction;
+        m_best = m_current;
+        m_bad = computeBadMedoids(clusters, (int) (relation.size() * 0.1 / k));
       }
 
-      if(DatabaseUtil.dimensionality(dataQuery) < l) {
-        throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + DatabaseUtil.dimensionality(dataQuery) + " < " + l + ")");
-      }
-
-      // TODO: use a StepProgress!
-      // initialization phase
-      if(logger.isVerbose()) {
-        logger.verbose("1. Initialization phase...");
-      }
-      int sampleSize = Math.min(dataQuery.size(), k_i * k);
-      DBIDs sampleSet = DBIDUtil.randomSample(dataQuery.getDBIDs(), sampleSize, random.nextLong());
-
-      int medoidSize = Math.min(dataQuery.size(), m_i * k);
-      DBIDs medoids = greedy(distFunc, sampleSet, medoidSize, random);
-
-      if(logger.isDebugging()) {
-        StringBuffer msg = new StringBuffer();
-        msg.append("\n");
-        msg.append("sampleSize ").append(sampleSize).append("\n");
-        msg.append("sampleSet ").append(sampleSet).append("\n");
-        msg.append("medoidSize ").append(medoidSize).append("\n");
-        msg.append("m ").append(medoids).append("\n");
-        logger.debugFine(msg.toString());
-      }
-
-      // iterative phase
-      if(logger.isVerbose()) {
-        logger.verbose("2. Iterative phase...");
-      }
-      double bestObjective = Double.POSITIVE_INFINITY;
-      ModifiableDBIDs m_best = null;
-      ModifiableDBIDs m_bad = null;
-      ModifiableDBIDs m_current = initialSet(medoids, k, random);
-
-      if(logger.isDebugging()) {
-        StringBuffer msg = new StringBuffer();
-        msg.append("\n");
-        msg.append("m_c ").append(m_current).append("\n");
-        logger.debugFine(msg.toString());
-      }
-
-      IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Current number of clusters:", logger) : null;
-
-      Map<DBID, PROCLUSCluster> clusters = null;
-      int loops = 0;
-      while(loops < 10) {
-        Map<DBID, Set<Integer>> dimensions = findDimensions(m_current, dataQuery, distFunc, rangeQuery);
-        clusters = assignPoints(dimensions, dataQuery);
-        double objectiveFunction = evaluateClusters(clusters, dimensions, dataQuery);
-
-        if(objectiveFunction < bestObjective) {
-          // restart counting loops
-          loops = 0;
-          bestObjective = objectiveFunction;
-          m_best = m_current;
-          m_bad = computeBadMedoids(clusters, (int) (dataQuery.size() * 0.1 / k));
-        }
-
-        m_current = computeM_current(medoids, m_best, m_bad, random);
-        loops++;
-        if(cprogress != null) {
-          cprogress.setProcessed(clusters.size(), logger);
-        }
-      }
-
+      m_current = computeM_current(medoids, m_best, m_bad, random);
+      loops++;
       if(cprogress != null) {
-        cprogress.setCompleted(logger);
+        cprogress.setProcessed(clusters.size(), logger);
       }
-
-      // refinement phase
-      if(logger.isVerbose()) {
-        logger.verbose("3. Refinement phase...");
-      }
-
-      List<Pair<V, Set<Integer>>> dimensions = findDimensions(new ArrayList<PROCLUSCluster>(clusters.values()), dataQuery);
-      List<PROCLUSCluster> finalClusters = finalAssignment(dimensions, dataQuery);
-
-      // build result
-      int numClusters = 1;
-      Clustering<Model> result = new Clustering<Model>("ProClus clustering", "proclus-clustering");
-      for(PROCLUSCluster c : finalClusters) {
-        Cluster<Model> cluster = new Cluster<Model>(c.objectIDs);
-        cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.getDimensions()), c.centroid));
-        cluster.setName("cluster_" + numClusters++);
-
-        result.addCluster(cluster);
-      }
-      return result;
     }
-    catch(Exception e) {
-      e.printStackTrace();
-      throw new IllegalStateException(e);
+
+    if(cprogress != null) {
+      cprogress.setCompleted(logger);
     }
+
+    // refinement phase
+    if(logger.isVerbose()) {
+      logger.verbose("3. Refinement phase...");
+    }
+
+    List<Pair<V, Set<Integer>>> dimensions = findDimensions(new ArrayList<PROCLUSCluster>(clusters.values()), relation);
+    List<PROCLUSCluster> finalClusters = finalAssignment(dimensions, relation);
+
+    // build result
+    int numClusters = 1;
+    Clustering<Model> result = new Clustering<Model>("ProClus clustering", "proclus-clustering");
+    for(PROCLUSCluster c : finalClusters) {
+      Cluster<Model> cluster = new Cluster<Model>(c.objectIDs);
+      cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.getDimensions()), c.centroid));
+      cluster.setName("cluster_" + numClusters++);
+
+      result.addCluster(cluster);
+    }
+    return result;
   }
 
   /**
@@ -738,17 +729,17 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
      * The ids of the objects belonging to this cluster.
      */
     ModifiableDBIDs objectIDs;
-  
+
     /**
      * The correlated dimensions of this cluster.
      */
     Set<Integer> dimensions;
-  
+
     /**
      * The centroids of this cluster along each dimension.
      */
     V centroid;
-  
+
     /**
      * Provides a new cluster with the specified parameters.
      * 
@@ -761,7 +752,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       this.dimensions = dimensions;
       this.centroid = centroid;
     }
-  
+
     @Override
     public String toString() {
       StringBuffer result = new StringBuffer();
@@ -777,11 +768,11 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
         result.append(d);
       }
       result.append("]");
-  
+
       result.append("\nCentroid: ").append(centroid);
       return result.toString();
     }
-  
+
     /**
      * Returns the correlated dimensions of this cluster as BitSet.
      * 

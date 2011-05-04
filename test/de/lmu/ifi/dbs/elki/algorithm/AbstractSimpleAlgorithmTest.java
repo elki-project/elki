@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -69,12 +70,18 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param params Extra parameters
    * @return Database
    */
-  protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params) {
+  protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
     org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
     
-    List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
-    params.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
+    List<Class<?>> filterlist = new ArrayList<Class<?>>();
+    filterlist.add(FixedDBIDsFilter.class);
+    if (filters != null) {
+      for (Class<?> filter : filters) {
+        filterlist.add(filter);
+      }
+    }
+    params.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filterlist);
     params.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
     FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
 
@@ -93,7 +100,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @return Database
    */
   protected <T> Database makeSimpleDatabase(String filename, int expectedSize) {
-    return makeSimpleDatabase(filename, expectedSize, new ListParameterization());
+    return makeSimpleDatabase(filename, expectedSize, new ListParameterization(), null);
   }
 
   /**

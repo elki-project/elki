@@ -65,11 +65,10 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
     super(k, phi);
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
-    final int size = dataQuery.size();
-    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(dataQuery);
+  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
+    final int dimensionality = DatabaseUtil.dimensionality(relation);
+    final int size = relation.size();
+    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 
     ArrayList<Vector<IntIntPair>> Rk;
     // Build a list of all subspaces
@@ -78,7 +77,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       Rk = new ArrayList<Vector<IntIntPair>>();
       // Set of all dim*phi ranges
       ArrayList<IntIntPair> q = new ArrayList<IntIntPair>();
-      for(int i = 1; i <= DatabaseUtil.dimensionality(dataQuery); i++) {
+      for(int i = 1; i <= dimensionality; i++) {
         for(int j = 1; j <= phi; j++) {
           IntIntPair s = new IntIntPair(i, j);
           q.add(s);
@@ -114,7 +113,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       }
     }
 
-    WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
     // calculate the sparsity coefficient
     for(Vector<IntIntPair> sub : Rk) {
       DBIDs ids = computeSubspace(sub, ranges);
@@ -130,7 +129,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       }
     }
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : dataQuery.iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       Double val = sparsity.get(id);
       if(val == null) {
         sparsity.put(id, 0.0);
@@ -150,9 +149,9 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier.Parameterizer {

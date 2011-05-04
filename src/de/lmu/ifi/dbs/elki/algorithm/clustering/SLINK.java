@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -116,9 +117,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * Performs the SLINK algorithm on the given database.
    */
   @SuppressWarnings("unchecked")
-  @Override
-  public Result run(Database database) {
-    DistanceQuery<O, D> distQuery = getDistanceQuery(database);
+  public Result run(Database database, Relation<O> relation) {
+    DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
     WritableRecordStore store = DataStoreUtil.makeRecordStorage(distQuery.getRelation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
     pi = store.getStorage(0, DBID.class);

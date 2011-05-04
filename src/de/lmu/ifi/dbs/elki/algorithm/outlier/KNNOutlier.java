@@ -90,19 +90,17 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
   /**
    * Runs the algorithm in the timed evaluation part.
    */
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    final DistanceQuery<O, D> distanceQuery = getDistanceQuery(database);
-    Relation<? extends O> dataQuery = distanceQuery.getRelation();
+  public OutlierResult run(Database database, Relation<O> relation) {
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     if(logger.isVerbose()) {
       logger.verbose("Computing the kNN outlier degree (distance to the k nearest neighbor)");
     }
-    FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", dataQuery.size(), logger) : null;
+    FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), logger) : null;
 
     double maxodegree = 0;
-    WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
     for(DBID id : distanceQuery.getRelation().iterDBIDs()) {
       // distance to the kth nearest neighbor

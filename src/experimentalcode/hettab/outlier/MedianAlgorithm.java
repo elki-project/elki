@@ -38,7 +38,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  *
  * @param <V>
  */
-public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
+public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -119,10 +119,7 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
     return null;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    
-    Relation<V> relation = getRelation(database);
+  public OutlierResult run(Database database, Relation<V> relation){
     WritableDataStore<Double> gi = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> hi = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     

@@ -40,7 +40,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * 
  * @param <V>
  */
-public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
+public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -96,12 +96,12 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
 
   /**
    * 
+   * @param database
+   * @param relation
+   * @return
    */
-  @Override
   //TODO implements step Neighborhood
-  //
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> relation = getRelation(database);
+  public OutlierResult run(Database database, Relation<V> relation) {
     WritableDataStore<Double> tMeans = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
@@ -265,5 +265,4 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
-
 }

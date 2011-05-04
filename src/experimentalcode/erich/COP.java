@@ -118,9 +118,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     this.dependencyDerivator = dependencyDerivator;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> data = getRelation(database);
+  public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {
     KNNQuery<V, D> knnQuery = database.getKNNQuery(data, getDistanceFunction(), k + 1);
 
     DBIDs ids = data.getDBIDs();

@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger P., A. Zimek", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
-public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<Model>> {
+public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -152,22 +152,20 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
    * Performs the COPAC algorithm on the given database.
    */
   @SuppressWarnings("unchecked")
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
+  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
     if(logger.isVerbose()) {
-      logger.verbose("Running COPAC on db size = " + dataQuery.size() + " with dimensionality = " + DatabaseUtil.dimensionality(dataQuery));
+      logger.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + DatabaseUtil.dimensionality(relation));
     }
 
-    partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D>) partitionDistanceFunction.instantiate(dataQuery);
+    partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D>) partitionDistanceFunction.instantiate(relation);
     LocalProjectionIndex<V, ?> preprocin = partitionDistanceQuery.getIndex();
 
     // partitioning
     Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
-    FiniteProgress partitionProgress = logger.isVerbose() ? new FiniteProgress("Partitioning", dataQuery.size(), logger) : null;
+    FiniteProgress partitionProgress = logger.isVerbose() ? new FiniteProgress("Partitioning", relation.size(), logger) : null;
     int processed = 1;
 
-    for(DBID id : dataQuery.iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       Integer corrdim = preprocin.getLocalProjection(id).getCorrelationDimension();
 
       if(!partitionMap.containsKey(corrdim)) {
@@ -197,30 +195,30 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
       pmap.put(ent.getKey(), ent.getValue());
     }
     // running partition algorithm
-    return runPartitionAlgorithm(dataQuery, pmap, partitionDistanceQuery);
+    return runPartitionAlgorithm(relation, pmap, partitionDistanceQuery);
   }
 
   /**
    * Runs the partition algorithm and creates the result.
    * 
-   * @param database the database to run this algorithm on
+   * @param relation the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    * @param query The preprocessor based query function
    */
-  private Clustering<Model> runPartitionAlgorithm(Relation<V> database, Map<Integer, DBIDs> partitionMap, DistanceQuery<V, D> query) {
+  private Clustering<Model> runPartitionAlgorithm(Relation<V> relation, Map<Integer, DBIDs> partitionMap, DistanceQuery<V, D> query) {
     Clustering<Model> result = new Clustering<Model>("COPAC clustering", "copac-clustering");
 
     // TODO: use an extra finite progress for the partitions?
     for(Entry<Integer, DBIDs> pair : partitionMap.entrySet()) {
       // noise partition
-      if(pair.getKey() == DatabaseUtil.dimensionality(database)) {
+      if(pair.getKey() == DatabaseUtil.dimensionality(relation)) {
         // Make a Noise cluster
         result.addCluster(new Cluster<Model>(pair.getValue(), true, ClusterModel.CLUSTER));
       }
       else {
         DBIDs partids = pair.getValue();
         ProxyDatabase proxy = new ProxyDatabase(partids);
-        Relation<V> partition = ProxyView.wrap(proxy, partids, database);
+        Relation<V> partition = ProxyView.wrap(proxy, partids, relation);
         proxy.addRelation(partition);
         
         ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = getPartitionAlgorithm(query);

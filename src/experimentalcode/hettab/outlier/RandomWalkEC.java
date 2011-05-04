@@ -114,10 +114,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
     this.c = c;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> relation = getRelation(database);
-    
+  public OutlierResult run(Database database, Relation<V> relation) {
     final NeighborSetPredicate npred = npredf.instantiate(relation);
     DistanceQuery<V, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     WritableDataStore<Matrix> similarityVectors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Matrix.class);

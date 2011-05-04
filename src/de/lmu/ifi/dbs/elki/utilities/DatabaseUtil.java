@@ -39,27 +39,27 @@ public final class DatabaseUtil {
   /**
    * Get the dimensionality of a database
    * 
-   * @param dataQuery data query
+   * @param relation relation
    * @return Vector field type information
    */
-  public static <V extends FeatureVector<?, ?>> VectorFieldTypeInformation<V> assumeVectorField(Relation<V> dataQuery) {
+  public static <V extends FeatureVector<?, ?>> VectorFieldTypeInformation<V> assumeVectorField(Relation<V> relation) {
     try {
-      return ((VectorFieldTypeInformation<V>) dataQuery.getDataTypeInformation());
+      return ((VectorFieldTypeInformation<V>) relation.getDataTypeInformation());
     }
     catch(Exception e) {
-      throw new UnsupportedOperationException("Expected a vector field, got type information: " + dataQuery.getDataTypeInformation().toString());
+      throw new UnsupportedOperationException("Expected a vector field, got type information: " + relation.getDataTypeInformation().toString());
     }
   }
 
   /**
    * Get the dimensionality of a database
    * 
-   * @param dataQuery data query
+   * @param relation relation
    * @return Database dimensionality
    */
-  public static int dimensionality(Relation<? extends FeatureVector<?, ?>> dataQuery) {
+  public static int dimensionality(Relation<? extends FeatureVector<?, ?>> relation) {
     try {
-      return ((VectorFieldTypeInformation<? extends FeatureVector<?, ?>>) dataQuery.getDataTypeInformation()).dimensionality();
+      return ((VectorFieldTypeInformation<? extends FeatureVector<?, ?>>) relation.getDataTypeInformation()).dimensionality();
     }
     catch(Exception e) {
       return -1;
@@ -72,21 +72,21 @@ public final class DatabaseUtil {
    * must be instance of <code>NumberVector</code>.
    * 
    * @param <V> Vector type
-   * @param dataQuery the data query
+   * @param relation the relation
    * @param ids the ids of the objects
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> dataQuery, DBIDs ids) {
+  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> relation, DBIDs ids) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
 
-    int dim = dimensionality(dataQuery);
+    int dim = dimensionality(relation);
     double[] centroid = new double[dim];
 
     for(DBID id : ids) {
-      V o = dataQuery.get(id);
+      V o = relation.get(id);
       for(int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.doubleValue(j);
       }
@@ -96,7 +96,7 @@ public final class DatabaseUtil {
       centroid[i] /= size;
     }
 
-    return assumeVectorField(dataQuery).getFactory().newInstance(centroid);
+    return assumeVectorField(relation).getFactory().newInstance(centroid);
   }
 
   /**

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -17,20 +18,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 
 /**
- * <p>
  * Algorithm to materialize all the distances in a data set.
- * </p>
  * 
- * <p>
  * The result can then be used with the DoubleDistanceParser and
  * MultipleFileInput to use cached distances.
- * </p>
  * 
- * <p>
  * Symmetry is assumed.
- * </p>
  * 
- * @author Erich Schubert
  * @param <O> Object type
  * @param <D> Distance type
  */
@@ -54,15 +48,14 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
   /**
    * Iterates over all points in the database.
    */
-  @Override
-  public CollectionResult<CTriple<DBID, DBID, Double>> run(Database database) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = getDistanceQuery(database);
-    int size = distFunc.getRelation().size();
+  public CollectionResult<CTriple<DBID, DBID, Double>> run(Database database, Relation<O> relation) {
+    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    final int size = relation.size();
 
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);
 
-    for(DBID id1 : distFunc.getRelation().iterDBIDs()) {
-      for(DBID id2 : distFunc.getRelation().iterDBIDs()) {
+    for(DBID id1 : relation.iterDBIDs()) {
+      for(DBID id2 : relation.iterDBIDs()) {
         // skip inverted pairs
         if(id2.compareTo(id1) > 0) {
           continue;

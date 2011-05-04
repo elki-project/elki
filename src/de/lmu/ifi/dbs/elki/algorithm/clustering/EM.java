@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 @Title("EM-Clustering: Clustering by Expectation Maximization")
 @Description("Provides k Gaussian mixtures maximizing the probability of the given data")
 @Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", title = "Maximum Likelihood from Incomplete Data via the EM algorithm", booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", url = "http://www.jstor.org/stable/2984875")
-public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<EMModel<V>>> {
+public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -135,24 +135,25 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imple
    * points exhibiting the highest probability to belong to this cluster. But
    * still, the database objects hold associated the complete probability-vector
    * for all models.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @return Result
    */
-  @Override
-  public Clustering<EMModel<V>> run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
-
-    if(dataQuery.size() == 0) {
+  public Clustering<EMModel<V>> run(Database database, Relation<V> relation) {
+    if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
     // initial models
     if(logger.isVerbose()) {
       logger.verbose("initializing " + k + " models");
     }
-    List<V> means = initialMeans(dataQuery);
+    List<V> means = initialMeans(relation);
     List<Matrix> covarianceMatrices = new ArrayList<Matrix>(k);
     List<Double> normDistrFactor = new ArrayList<Double>(k);
     List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
     List<Double> clusterWeights = new ArrayList<Double>(k);
-    probClusterIGivenX = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
+    probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
     int dimensionality = means.get(0).getDimensionality();
     for(int i = 0; i < k; i++) {
@@ -172,7 +173,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imple
         logger.debugFine(msg.toString());
       }
     }
-    double emNew = assignProbabilitiesToInstances(dataQuery, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+    double emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
 
     // iteration unless no change
     if(logger.isVerbose()) {
@@ -199,26 +200,26 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imple
       }
 
       // weights and means
-      for(DBID id : dataQuery.iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         double[] clusterProbabilities = probClusterIGivenX.get(id);
 
         for(int i = 0; i < k; i++) {
           sumOfClusterProbabilities[i] += clusterProbabilities[i];
-          V summand = dataQuery.get(id).multiplicate(clusterProbabilities[i]);
+          V summand = relation.get(id).multiplicate(clusterProbabilities[i]);
           V currentMeanSum = meanSums.get(i).plus(summand);
           meanSums.set(i, currentMeanSum);
         }
       }
-      final int n = dataQuery.size();
+      final int n = relation.size();
       for(int i = 0; i < k; i++) {
         clusterWeights.set(i, sumOfClusterProbabilities[i] / n);
         V newMean = meanSums.get(i).multiplicate(1 / sumOfClusterProbabilities[i]);
         means.set(i, newMean);
       }
       // covariance matrices
-      for(DBID id : dataQuery.iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         double[] clusterProbabilities = probClusterIGivenX.get(id);
-        V instance = dataQuery.get(id);
+        V instance = relation.get(id);
         for(int i = 0; i < k; i++) {
           V difference = instance.minus(means.get(i));
           covarianceMatrices.get(i).plusEquals(difference.getColumnVector().times(difference.getRowVector()).times(clusterProbabilities[i]));
@@ -232,7 +233,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imple
         invCovMatr.set(i, covarianceMatrices.get(i).inverse());
       }
       // reassign probabilities
-      emNew = assignProbabilitiesToInstances(dataQuery, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+      emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
     }
     while(Math.abs(em - emNew) > delta);
 
@@ -247,7 +248,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imple
     }
 
     // provide a hard clustering
-    for(DBID id : dataQuery.iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double[] clusterProbabilities = probClusterIGivenX.get(id);
       int maxIndex = 0;
       double currentMax = 0.0;

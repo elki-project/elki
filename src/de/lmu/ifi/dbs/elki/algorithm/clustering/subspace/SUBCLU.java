@@ -31,10 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
@@ -66,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("SUBCLU: Density connected Subspace Clustering")
 @Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. SUBCLU delivers for each subspace the same clusters DBSCAN would have found, when applied to this subspace seperately.")
 @Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
-public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
+public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -140,124 +138,114 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> i
   /**
    * Performs the SUBCLU algorithm on the given database.
    */
-  @Override
-  public Clustering<SubspaceModel<V>> run(Database database) throws IllegalStateException {
-    try {
-      Relation<V> dataQuery = getRelation(database);
-      int dimensionality = DatabaseUtil.dimensionality(dataQuery);
+  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+    final int dimensionality = DatabaseUtil.dimensionality(relation);
 
-      StepProgress stepprog = logger.isVerbose() ? new StepProgress(dimensionality) : null;
+    StepProgress stepprog = logger.isVerbose() ? new StepProgress(dimensionality) : null;
 
-      // Generate all 1-dimensional clusters
-      if(stepprog != null) {
-        stepprog.beginStep(1, "Generate all 1-dimensional clusters.", logger);
+    // Generate all 1-dimensional clusters
+    if(stepprog != null) {
+      stepprog.beginStep(1, "Generate all 1-dimensional clusters.", logger);
+    }
+
+    // mapping of dimensionality to set of subspaces
+    HashMap<Integer, List<Subspace<V>>> subspaceMap = new HashMap<Integer, List<Subspace<V>>>();
+
+    // list of 1-dimensional subspaces containing clusters
+    List<Subspace<V>> s_1 = new ArrayList<Subspace<V>>();
+    subspaceMap.put(0, s_1);
+
+    // mapping of subspaces to list of clusters
+    TreeMap<Subspace<V>, List<Cluster<Model>>> clusterMap = new TreeMap<Subspace<V>, List<Cluster<Model>>>(new Subspace.DimensionComparator());
+
+    for(int d = 0; d < dimensionality; d++) {
+      Subspace<V> currentSubspace = new Subspace<V>(d);
+      List<Cluster<Model>> clusters = runDBSCAN(relation, null, currentSubspace);
+
+      if(logger.isDebuggingFiner()) {
+        StringBuffer msg = new StringBuffer();
+        msg.append("\n").append(clusters.size()).append(" clusters in subspace ").append(currentSubspace.dimensonsToString()).append(": \n");
+        for(Cluster<Model> cluster : clusters) {
+          msg.append("      " + cluster.getIDs() + "\n");
+        }
+        logger.debugFiner(msg.toString());
       }
 
-      // mapping of dimensionality to set of subspaces
-      HashMap<Integer, List<Subspace<V>>> subspaceMap = new HashMap<Integer, List<Subspace<V>>>();
+      if(!clusters.isEmpty()) {
+        s_1.add(currentSubspace);
+        clusterMap.put(currentSubspace, clusters);
+      }
+    }
 
-      // list of 1-dimensional subspaces containing clusters
-      List<Subspace<V>> s_1 = new ArrayList<Subspace<V>>();
-      subspaceMap.put(0, s_1);
+    // Generate (d+1)-dimensional clusters from d-dimensional clusters
+    for(int d = 0; d < dimensionality - 1; d++) {
+      if(stepprog != null) {
+        stepprog.beginStep(d + 2, "Generate " + (d + 2) + "-dimensional clusters from " + (d + 1) + "-dimensional clusters.", logger);
+      }
 
-      // mapping of subspaces to list of clusters
-      TreeMap<Subspace<V>, List<Cluster<Model>>> clusterMap = new TreeMap<Subspace<V>, List<Cluster<Model>>>(new Subspace.DimensionComparator());
-
-      for(int d = 0; d < dimensionality; d++) {
-        Subspace<V> currentSubspace = new Subspace<V>(d);
-        List<Cluster<Model>> clusters = runDBSCAN(dataQuery, null, currentSubspace);
-
-        if(logger.isDebuggingFiner()) {
-          StringBuffer msg = new StringBuffer();
-          msg.append("\n").append(clusters.size()).append(" clusters in subspace ").append(currentSubspace.dimensonsToString()).append(": \n");
-          for(Cluster<Model> cluster : clusters) {
-            msg.append("      " + cluster.getIDs() + "\n");
+      List<Subspace<V>> subspaces = subspaceMap.get(d);
+      if(subspaces == null || subspaces.isEmpty()) {
+        if(stepprog != null) {
+          for(int dim = d + 1; dim < dimensionality - 1; dim++) {
+            stepprog.beginStep(dim + 2, "Generation of" + (dim + 2) + "-dimensional clusters not applicable, because no more " + (d + 2) + "-dimensional subspaces found.", logger);
           }
-          logger.debugFiner(msg.toString());
+        }
+        break;
+      }
+
+      List<Subspace<V>> candidates = generateSubspaceCandidates(subspaces);
+      List<Subspace<V>> s_d = new ArrayList<Subspace<V>>();
+
+      for(Subspace<V> candidate : candidates) {
+        Subspace<V> bestSubspace = bestSubspace(subspaces, candidate, clusterMap);
+        if(logger.isDebuggingFine()) {
+          logger.debugFine("best subspace of " + candidate.dimensonsToString() + ": " + bestSubspace.dimensonsToString());
+        }
+
+        List<Cluster<Model>> bestSubspaceClusters = clusterMap.get(bestSubspace);
+        List<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>();
+        for(Cluster<Model> cluster : bestSubspaceClusters) {
+          List<Cluster<Model>> candidateClusters = runDBSCAN(relation, cluster.getIDs(), candidate);
+          if(!candidateClusters.isEmpty()) {
+            clusters.addAll(candidateClusters);
+          }
+        }
+
+        if(logger.isDebuggingFine()) {
+          StringBuffer msg = new StringBuffer();
+          msg.append(clusters.size() + " cluster(s) in subspace " + candidate + ": \n");
+          for(Cluster<Model> c : clusters) {
+            msg.append("      " + c.getIDs() + "\n");
+          }
+          logger.debugFine(msg.toString());
         }
 
         if(!clusters.isEmpty()) {
-          s_1.add(currentSubspace);
-          clusterMap.put(currentSubspace, clusters);
+          s_d.add(candidate);
+          clusterMap.put(candidate, clusters);
         }
       }
 
-      // Generate (d+1)-dimensional clusters from d-dimensional clusters
-      for(int d = 0; d < dimensionality - 1; d++) {
-        if(stepprog != null) {
-          stepprog.beginStep(d + 2, "Generate " + (d + 2) + "-dimensional clusters from " + (d + 1) + "-dimensional clusters.", logger);
-        }
-
-        List<Subspace<V>> subspaces = subspaceMap.get(d);
-        if(subspaces == null || subspaces.isEmpty()) {
-          if(stepprog != null) {
-            for(int dim = d + 1; dim < dimensionality - 1; dim++) {
-              stepprog.beginStep(dim + 2, "Generation of" + (dim + 2) + "-dimensional clusters not applicable, because no more " + (d + 2) + "-dimensional subspaces found.", logger);
-            }
-          }
-          break;
-        }
-
-        List<Subspace<V>> candidates = generateSubspaceCandidates(subspaces);
-        List<Subspace<V>> s_d = new ArrayList<Subspace<V>>();
-
-        for(Subspace<V> candidate : candidates) {
-          Subspace<V> bestSubspace = bestSubspace(subspaces, candidate, clusterMap);
-          if(logger.isDebuggingFine()) {
-            logger.debugFine("best subspace of " + candidate.dimensonsToString() + ": " + bestSubspace.dimensonsToString());
-          }
-
-          List<Cluster<Model>> bestSubspaceClusters = clusterMap.get(bestSubspace);
-          List<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>();
-          for(Cluster<Model> cluster : bestSubspaceClusters) {
-            List<Cluster<Model>> candidateClusters = runDBSCAN(dataQuery, cluster.getIDs(), candidate);
-            if(!candidateClusters.isEmpty()) {
-              clusters.addAll(candidateClusters);
-            }
-          }
-
-          if(logger.isDebuggingFine()) {
-            StringBuffer msg = new StringBuffer();
-            msg.append(clusters.size() + " cluster(s) in subspace " + candidate + ": \n");
-            for(Cluster<Model> c : clusters) {
-              msg.append("      " + c.getIDs() + "\n");
-            }
-            logger.debugFine(msg.toString());
-          }
-
-          if(!clusters.isEmpty()) {
-            s_d.add(candidate);
-            clusterMap.put(candidate, clusters);
-          }
-        }
-
-        if(!s_d.isEmpty()) {
-          subspaceMap.put(d + 1, s_d);
-        }
-      }
-
-      // build result
-      int numClusters = 1;
-      result = new Clustering<SubspaceModel<V>>("SUBCLU clustering", "subclu-clustering");
-      for(Subspace<V> subspace : clusterMap.descendingKeySet()) {
-        List<Cluster<Model>> clusters = clusterMap.get(subspace);
-        for(Cluster<Model> cluster : clusters) {
-          Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getIDs());
-          newCluster.setModel(new SubspaceModel<V>(subspace, DatabaseUtil.centroid(dataQuery, cluster.getIDs())));
-          newCluster.setName("cluster_" + numClusters++);
-          result.addCluster(newCluster);
-        }
-      }
-
-      if(stepprog != null) {
-        stepprog.setCompleted(logger);
+      if(!s_d.isEmpty()) {
+        subspaceMap.put(d + 1, s_d);
       }
     }
-    catch(ParameterException e) {
-      throw new IllegalStateException(e);
+
+    // build result
+    int numClusters = 1;
+    result = new Clustering<SubspaceModel<V>>("SUBCLU clustering", "subclu-clustering");
+    for(Subspace<V> subspace : clusterMap.descendingKeySet()) {
+      List<Cluster<Model>> clusters = clusterMap.get(subspace);
+      for(Cluster<Model> cluster : clusters) {
+        Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getIDs());
+        newCluster.setModel(new SubspaceModel<V>(subspace, DatabaseUtil.centroid(relation, cluster.getIDs())));
+        newCluster.setName("cluster_" + numClusters++);
+        result.addCluster(newCluster);
+      }
     }
-    catch(UnableToComplyException e) {
-      throw new IllegalStateException(e);
+
+    if(stepprog != null) {
+      stepprog.setCompleted(logger);
     }
     return result;
   }
@@ -282,20 +270,18 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> i
    *        database
    * @param subspace the subspace to run DBSCAN on
    * @return the clustering result of the DBSCAN run
-   * @throws ParameterException in case of wrong parameter-setting
-   * @throws UnableToComplyException in case of problems during the creation of
-   *         the database partition
    */
-  private List<Cluster<Model>> runDBSCAN(Relation<V> relation, DBIDs ids, Subspace<V> subspace) throws ParameterException, UnableToComplyException {
+  private List<Cluster<Model>> runDBSCAN(Relation<V> relation, DBIDs ids, Subspace<V> subspace) {
     // distance function
     distanceFunction.setSelectedDimensions(subspace.getDimensions());
 
     ProxyDatabase proxy;
     if(ids == null) {
-      // TODO: in this case, we might want to use an index - the proxy below will prevent this!
+      // TODO: in this case, we might want to use an index - the proxy below
+      // will prevent this!
       ids = relation.getDBIDs();
     }
-    
+
     proxy = new ProxyDatabase(ids);
     Relation<V> prep = ProxyView.wrap(proxy, ids, relation);
     proxy.addRelation(prep);

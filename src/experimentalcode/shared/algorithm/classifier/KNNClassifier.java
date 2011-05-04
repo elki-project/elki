@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
-public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> extends DistanceBasedClassifier<O, D, L> {
+public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> extends DistanceBasedClassifier<O, D, L, Result> {
   /**
    * The logger for this class.
    */

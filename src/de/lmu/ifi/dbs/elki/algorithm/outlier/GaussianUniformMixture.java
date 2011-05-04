@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("Gaussian-Uniform Mixture Model Outlier Detection")
 @Description("Fits a mixture model consisting of a Gaussian and a uniform distribution to the data.")
 @Reference(prefix = "Generalization using the likelihood gain as outlier score of", authors = "Eskin, Eleazar", title = "Anomaly detection over noisy data using learned probability distributions", booktitle = "Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000)")
-public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
+public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -113,11 +113,9 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     this.c = c;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
+  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
     // Use an array list of object IDs for fast random access by an offset
-    ArrayDBIDs objids = DBIDUtil.ensureArray(dataQuery.getDBIDs());
+    ArrayDBIDs objids = DBIDUtil.ensureArray(relation.getDBIDs());
     // A bit set to flag objects as anomalous, none at the beginning
     BitSet bits = new BitSet(objids.size());
     // Positive masked collection
@@ -125,9 +123,9 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     // Positive masked collection
     DBIDs anomalousObjs = new MaskedDBIDs(objids, bits, false);
     // resulting scores
-    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(dataQuery.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     // compute loglikelihood
-    double logLike = dataQuery.size() * logml + loglikelihoodNormal(normalObjs, dataQuery);
+    double logLike = relation.size() * logml + loglikelihoodNormal(normalObjs, relation);
     // logger.debugFine("normalsize   " + normalObjs.size() + " anormalsize  " +
     // anomalousObjs.size() + " all " + (anomalousObjs.size() +
     // normalObjs.size()));
@@ -139,7 +137,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
       // Change mask to make the current object anomalous
       bits.set(i);
       // Compute new likelihoods
-      double currentLogLike = normalObjs.size() * logml + loglikelihoodNormal(normalObjs, dataQuery) + anomalousObjs.size() * logl + loglikelihoodAnomalous(anomalousObjs);
+      double currentLogLike = normalObjs.size() * logml + loglikelihoodNormal(normalObjs, relation) + anomalousObjs.size() * logl + loglikelihoodAnomalous(anomalousObjs);
 
       // Get the actual object id
       DBID curid = objids.get(i);

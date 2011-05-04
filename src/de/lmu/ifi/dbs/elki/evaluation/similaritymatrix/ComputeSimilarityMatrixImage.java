@@ -10,7 +10,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -97,13 +96,12 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * Compute the actual similarity image.
    * 
-   * @param database Database
+   * @param relation Relation
    * @param iter DBID iterator
    * @return result object
    */
-  private SimilarityMatrix computeSimilarityMatrixImage(Database database, Iterator<DBID> iter) {
-    Relation<O> dataQuery = database.getRelation(distanceFunction.getInputTypeRestriction());
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(dataQuery.size());
+  private SimilarityMatrix computeSimilarityMatrixImage(Relation<O> relation, Iterator<DBID> iter) {
+    ArrayModifiableDBIDs order = DBIDUtil.newArray(relation.size());
     while(iter.hasNext()) {
       Object o = iter.next();
       if(!(o instanceof DBID)) {
@@ -113,10 +111,10 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
         order.add((DBID) o);
       }
     }
-    if(order.size() != database.size()) {
+    if(order.size() != relation.size()) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    DistanceQuery<O, ? extends NumberDistance<?, ?>> dq = distanceFunction.instantiate(dataQuery);
+    DistanceQuery<O, ? extends NumberDistance<?, ?>> dq = distanceFunction.instantiate(relation);
     final int size = order.size();
 
     // When the logging is in the outer loop, it's just 2*size (providing enough
@@ -174,7 +172,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       prog.ensureCompleted(logger);
     }
 
-    return new SimilarityMatrix(img, database, order);
+    return new SimilarityMatrix(img, relation, order);
   }
 
   /**
@@ -202,7 +200,8 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
-      db.getHierarchy().add(or, computeSimilarityMatrixImage(db, or.iter(db.getDBIDs())));
+      Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
+      db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, or.iter(relation.getDBIDs())));
       // Process them only once.
       orderings.remove(or);
       nonefound = false;
@@ -213,15 +212,17 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     for(IterableResult<?> ir : iterables) {
       Iterator<DBID> iter = getDBIDIterator(ir);
       if(iter != null) {
-        db.getHierarchy().add(ir, computeSimilarityMatrixImage(db, iter));
+        Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
+        db.getHierarchy().add(ir, computeSimilarityMatrixImage(relation, iter));
         nonefound = false;
       }
     }
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      Iterator<DBID> iter = or.iter(db.getDBIDs());
-      db.getHierarchy().add(or, computeSimilarityMatrixImage(db, iter));
+      Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
+      Iterator<DBID> iter = or.iter(relation.getDBIDs());
+      db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, iter));
       nonefound = false;
     }
 
@@ -231,8 +232,8 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       Iterable<Database> iter = ResultUtil.filteredResults(result, Database.class);
       for(Database database : iter) {
         // Get an arbitrary representation
-        Relation<Object> relation = database.getRelation(TypeUtil.ANY);
-        db.getHierarchy().add(db, computeSimilarityMatrixImage(database, relation.iterDBIDs()));
+        Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction());
+        db.getHierarchy().add(db, computeSimilarityMatrixImage(relation, relation.iterDBIDs()));
       }
     }
   }
@@ -251,7 +252,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     /**
      * The database
      */
-    Database database;
+    Relation<?> relation;
 
     /**
      * The database IDs used
@@ -273,10 +274,10 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
      * 
      * @param img Image data
      */
-    public SimilarityMatrix(RenderedImage img, Database database, ArrayDBIDs ids) {
+    public SimilarityMatrix(RenderedImage img, Relation<?> relation, ArrayDBIDs ids) {
       super();
       this.img = img;
-      this.database = database;
+      this.relation = relation;
       this.ids = ids;
     }
 
@@ -301,12 +302,12 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     }
 
     /**
-     * Get the database
+     * Get the relation
      * 
-     * @return the database
+     * @return the relation
      */
-    public Database getDatabase() {
-      return database;
+    public Relation<?> getRelation() {
+      return relation;
     }
 
     /**

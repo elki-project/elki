@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 @Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")
 @Description("Algorithm to find correlation clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggrawal, P. S. Yu", title = "Finding Generalized Projected Clusters in High Dimensional Spaces", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", url = "http://dx.doi.org/10.1145/342009.335383")
-public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<V> {
+public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<Clustering<Model>, V> {
   /**
    * The logger for this class.
    */
@@ -115,23 +115,21 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   /**
    * Performs the ORCLUS algorithm on the given database.
    */
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
     try {
-      Relation<V> dataQuery = this.getRelation(database);
       DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
       // current dimensionality associated with each seed
-      int dim_c = DatabaseUtil.dimensionality(dataQuery);
+      int dim_c = DatabaseUtil.dimensionality(relation);
 
       if(dim_c < l) {
         throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + dim_c + " < " + l + ")");
       }
 
       // current number of seeds
-      int k_c = Math.min(dataQuery.size(), k_i * k);
+      int k_c = Math.min(relation.size(), k_i * k);
 
       // pick k0 > k points from the database
-      List<ORCLUSCluster> clusters = initialSeeds(dataQuery, k_c);
+      List<ORCLUSCluster> clusters = initialSeeds(relation, k_c);
 
       double beta = StrictMath.exp(-StrictMath.log((double) dim_c / (double) l) * StrictMath.log(1 / alpha) / StrictMath.log((double) k_c / (double) k));
 
@@ -143,12 +141,12 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
         }
 
         // find partitioning induced by the seeds of the clusters
-        assign(dataQuery, distFunc, clusters);
+        assign(relation, distFunc, clusters);
 
         // determine current subspace associated with each cluster
         for(ORCLUSCluster cluster : clusters) {
           if(cluster.objectIDs.size() > 0) {
-            cluster.basis = findBasis(dataQuery, distFunc, cluster, dim_c);
+            cluster.basis = findBasis(relation, distFunc, cluster, dim_c);
           }
         }
 
@@ -156,9 +154,9 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
         // each seed
         k_c = (int) Math.max(k, k_c * alpha);
         dim_c = (int) Math.max(l, dim_c * beta);
-        merge(dataQuery, distFunc, clusters, k_c, dim_c, cprogress);
+        merge(relation, distFunc, clusters, k_c, dim_c, cprogress);
       }
-      assign(dataQuery, distFunc, clusters);
+      assign(relation, distFunc, clusters);
 
       if(cprogress != null) {
         cprogress.setProcessed(clusters.size());

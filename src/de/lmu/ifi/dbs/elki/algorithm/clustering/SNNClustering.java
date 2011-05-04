@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("SNN: Shared Nearest Neighbor Clustering")
 @Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters 'minPts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
 @Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", booktitle = "Proc. of SIAM Data Mining (SDM), 2003", url = "http://www.siam.org/meetings/sdm03/proceedings/sdm03_05.pdf")
-public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<O> implements ClusteringAlgorithm<Clustering<Model>> {
+public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -119,23 +119,25 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<O
   }
 
   /**
-   * Performs the SNN clustering algorithm on the given database.
+   * Perform SNN clustering
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @return Result
    */
-  @Override
-  public Clustering<Model> run(Database database) {
-    final Relation<O> dataQuery = getRelation(database);
-    SimilarityQuery<O, IntegerDistance> snnInstance = similarityFunction.instantiate(dataQuery);
+  public Clustering<Model> run(Database database, Relation<O> relation) {
+    SimilarityQuery<O, IntegerDistance> snnInstance = similarityFunction.instantiate(relation);
 
-    FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("SNNClustering", dataQuery.size(), logger) : null;
+    FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("SNNClustering", relation.size(), logger) : null;
     IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
-    processedIDs = DBIDUtil.newHashSet(dataQuery.size());
-    if(dataQuery.size() >= minpts) {
+    processedIDs = DBIDUtil.newHashSet(relation.size());
+    if(relation.size() >= minpts) {
       for(DBID id : snnInstance.getRelation().iterDBIDs()) {
         if(!processedIDs.contains(id)) {
           expandCluster(snnInstance, id, objprog, clusprog);
-          if(processedIDs.size() == dataQuery.size() && noise.size() == 0) {
+          if(processedIDs.size() == relation.size() && noise.size() == 0) {
             break;
           }
         }

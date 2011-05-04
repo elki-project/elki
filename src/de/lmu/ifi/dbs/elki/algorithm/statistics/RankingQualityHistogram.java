@@ -77,14 +77,9 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     this.numbins = numbins;
   }
 
-  /**
-   * Run the algorithm.
-   */
-  @Override
-  public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
-    final Relation<O> dataQuery = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(dataQuery, getDistanceFunction());
-    final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, dataQuery.size());
+  public HistogramResult<DoubleVector> run(Database database, Relation<O> relation) {
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
 
     if(logger.isVerbose()) {
       logger.verbose("Preprocessing clusters...");
@@ -97,17 +92,17 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", dataQuery.size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), logger) : null;
 
     MeanVariance mv = new MeanVariance();
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBID i1 : clus.getIDs()) {
-        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, dataQuery.size());
-        double result = ROC.computeROCAUCDistanceResult(dataQuery.size(), clus, knn);
+        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, relation.size());
+        double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         mv.put(result);
-        hist.aggregate(result, 1. / dataQuery.size());
+        hist.aggregate(result, 1. / relation.size());
 
         if(progress != null) {
           progress.incrementProcessed(logger);
@@ -119,7 +114,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     }
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<DoubleVector>(dataQuery.size());
+    Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
     for(Pair<Double, Double> pair : hist) {
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond() });
       res.add(row);

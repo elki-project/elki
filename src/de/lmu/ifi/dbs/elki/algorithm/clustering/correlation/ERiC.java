@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("ERiC: Exploring Relationships among Correlation Clusters")
 @Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " + "a hierarchy that allows multiple inheritance from the correlation clustering result.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", title = "On Exploring Complex Relationships of Correlation Clusters", booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
-public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>> {
+public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -93,10 +93,8 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imp
   /**
    * Performs the ERiC algorithm on the given database.
    */
-  @Override
-  public Clustering<CorrelationModel<V>> run(Database database) throws IllegalStateException {
-    Relation<V> dataQuery = getRelation(database);
-    int dimensionality = DatabaseUtil.dimensionality(dataQuery);
+  public Clustering<CorrelationModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+    final int dimensionality = DatabaseUtil.dimensionality(relation);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
 
@@ -112,7 +110,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V> imp
     if(stepprog != null) {
       stepprog.beginStep(2, "Extract correlation clusters", logger);
     }
-    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, dataQuery, dimensionality);
+    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality);
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
       for(Integer corrDim : clusterMap.keySet()) {

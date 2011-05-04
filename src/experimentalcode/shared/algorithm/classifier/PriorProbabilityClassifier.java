@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("Prior Probability Classifier")
 @Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")
-public class PriorProbabilityClassifier<O, L extends ClassLabel> extends AbstractClassifier<O, L> {
+public class PriorProbabilityClassifier<O, L extends ClassLabel> extends AbstractClassifier<O, L, Result> {
   /**
    * The logger for this class.
    */

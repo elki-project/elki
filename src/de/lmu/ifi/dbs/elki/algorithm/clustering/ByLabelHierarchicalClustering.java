@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Hierarchical clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
-public class ByLabelHierarchicalClustering extends AbstractAlgorithm<String> implements ClusteringAlgorithm<Clustering<Model>> {
+public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -57,15 +56,13 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<String> imp
    * Run the actual clustering algorithm.
    * 
    * @param database The database to process
+   * @param relation The data input to use
    */
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
-    Relation<String> dataQuery = DatabaseUtil.guessClassLabelRepresentation(database);
-
+  public Clustering<Model> run(Database database, Relation<?> relation) throws IllegalStateException {
     HashMap<String, ModifiableDBIDs> labelmap = new HashMap<String, ModifiableDBIDs>();
     
-    for(DBID id : dataQuery.iterDBIDs()) {
-      String label = dataQuery.get(id);
+    for(DBID id : relation.iterDBIDs()) {
+      String label = relation.get(id).toString();
 
       if(labelmap.containsKey(label)) {
         labelmap.get(label).add(id);

@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V>
  * @param <D>
  */
-public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<V> implements OutlierAlgorithm {
+public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -120,6 +120,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * The parameter k
    */
   private int k;
+  
   /**
    * Parameter to specify the k nearest neighbor
    */
@@ -175,9 +176,13 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     return logger;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<V> relation = getRelation(database);
+  /**
+   * 
+   * @param database
+   * @param relation
+   * @return
+   */
+  public OutlierResult run(Database database, Relation<V> relation) {
     
     HashMap<DBID,SingleObjectBundle> outliers = new HashMap<DBID,SingleObjectBundle>();
     //
@@ -203,10 +208,9 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       }
     }
      
-    Relation<V> db = getRelation(database);
     System.out.println(relation.size());
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : db.getDBIDs()){
+    for(DBID id : relation.getDBIDs()){
       if(outliers.containsKey(id)){
         scores.put(id, 1.0);
       }
@@ -241,7 +245,6 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     for(DBID id : relation.getDBIDs()) {
       int j = 0;
 
-      
       // remove id from his neighborhood
       List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
       double neighborhodSize;
@@ -414,6 +417,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
     return 0;
   }
+  
   /**
    * Get the m parameter
    * 

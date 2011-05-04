@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
  *        columns relate to the attribute values of these objects
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M extends Bicluster<V>> extends AbstractAlgorithm<V> implements ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M extends Bicluster<V>> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * Keeps the currently set database.
    */
@@ -84,9 +84,8 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * {@link #biclustering()} by an inheriting biclustering approach.
    * 
    */
-  @Override
-  public final Clustering<M> run(Database database) throws IllegalStateException {
-    this.relation = getRelation(database);
+  public final Clustering<M> run(Database database, Relation<V> relation) throws IllegalStateException {
+    this.relation = relation;
     if(this.relation == null || this.relation.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
