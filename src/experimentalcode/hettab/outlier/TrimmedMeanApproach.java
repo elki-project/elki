@@ -63,20 +63,20 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
   private static final OptionID P_ID = OptionID.getOrCreateOptionID("trimmed.p", "the highest and lowest p precent");
 
   /**
-   * 
+   * the parameter p
    */
   private double p;
 
   /**
    * 
-   * Holds the Z value
+   * Holds the y value
    */
-  private static final OptionID Z_ID = OptionID.getOrCreateOptionID("position.y", "the position of y attribut");
+  private static final OptionID Y_ID = OptionID.getOrCreateOptionID("position.y", "the position of y attribut");
 
   /**
    * Holds the position of z attribute
    */
-  private int z;
+  private int y;
 
   /**
    * The association id to associate the TR_SCORE of an object for the TR
@@ -88,9 +88,9 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * 
    * @param distanceFunction
    */
-  protected TrimmedMeanApproach(double p, int z, NeighborSetPredicate.Factory<Object> npredf) {
+  protected TrimmedMeanApproach(double p, int y, NeighborSetPredicate.Factory<Object> npredf) {
     this.p = p;
-    this.z = z;
+    this.y = y;
     this.npredf = npredf;
   }
 
@@ -98,6 +98,8 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * 
    */
   @Override
+  //TODO implements step Neighborhood
+  //
   public OutlierResult run(Database database) throws IllegalStateException {
     Relation<V> relation = getRelation(database);
     WritableDataStore<Double> tMeans = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
@@ -117,7 +119,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
       int i = 0;
       double tmean = 0;
       for(DBID n : neighbors) {
-        ziList.add(relation.get(n).doubleValue(z));
+        ziList.add(relation.get(n).doubleValue(y));
         i++;
       }
       Collections.sort(ziList);
@@ -127,7 +129,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
       tmean = StatUtils.mean(zi, (int) (p * size), (int) (size - 2 * p * size));
       tMeans.put(id, tmean);
       tMeanMatrix.set(i, 0, tmean);
-      Y.set(i, 0, relation.get(id).doubleValue(z));
+      Y.set(i, 0, relation.get(id).doubleValue(y));
     }
 
     // Estimate error by removing spatial trend and dependence
@@ -203,11 +205,11 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
   public static <V extends NumberVector<V, ?>> TrimmedMeanApproach<V> parameterize(Parameterization config) {
     final NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
     final double p = getParameterP(config);
-    final int z = getParameterZ(config);
+    final int y = getParameterY(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new TrimmedMeanApproach<V>(p, z, npred);
+    return new TrimmedMeanApproach<V>(p, y, npred);
   }
 
   /**
@@ -230,8 +232,8 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * @param config Parameterization
    * @return z parameter
    */
-  protected static int getParameterZ(Parameterization config) {
-    final IntParameter param = new IntParameter(Z_ID);
+  protected static int getParameterY(Parameterization config) {
+    final IntParameter param = new IntParameter(Y_ID);
     if(config.grab(param)) {
       return param.getValue();
     }

@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
@@ -119,6 +118,15 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * The parameter k
    */
   private int k;
+  /**
+   * Parameter to specify the k nearest neighbor
+   */
+  public static final OptionID M_ID = OptionID.getOrCreateOptionID("glsbs.m", "the number of outliers to be detected");
+
+  /**
+   * The parameter k
+   */
+  private int m;
   
   /**
    * Parameter to specify the vector of trend parameters
@@ -143,7 +151,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * @param alpha
    * @param k
    */
-  public GLSBackwardSearchAlgorithm(int x1, int x2, int y,List<Integer> beta , PrimitiveDistanceFunction<V, D> spatialDistanceFunction, int k, double alpha) {
+  public GLSBackwardSearchAlgorithm(int x1, int x2, int y,List<Integer> beta , PrimitiveDistanceFunction<V, D> spatialDistanceFunction, int k, double alpha , int m) {
     super();
     this.y = y;
     this.x1 = x1;
@@ -152,6 +160,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     this.k = k;
     this.beta = beta ;
     this.spatialDistanceFunction = spatialDistanceFunction;
+    this.m = m ;
   }
 
   @Override
@@ -169,13 +178,14 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     Relation<V> relation = getRelation(database);
     
     HashMap<DBID,SingleObjectBundle> outliers = new HashMap<DBID,SingleObjectBundle>();
-    System.out.println(beta);
     //
     Pair<DBID,Double> candidate = getCandidate(relation,database);
-    while(candidate.second>alpha){
+    int outlierNumber = 0 ;
+    while(candidate.second>alpha && m>outlierNumber){
       outliers.put(candidate.first, database.getBundle(candidate.first));
       database.delete(candidate.first);
       candidate = getCandidate(relation , database);
+      outlierNumber ++ ;
     }
     
     //add removed Objects to database
@@ -227,7 +237,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     for(DBID id : relation.getDBIDs()) {
       int j = 0;
 
-      // use only DBID
+      
       // remove id from his neighborhood
       List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
       double neighborhodSize;
@@ -323,11 +333,12 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     final int y = getParameterY(config);
     final List<Integer> beta = getParameterBeta(config);
     final int k = getParameterK(config);
+    final int m = getParameterM(config);
     PrimitiveDistanceFunction<V, D> spatialDistanceFunction = getSpatialDistanceFunction(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new GLSBackwardSearchAlgorithm<V, D>(x1, x2, y,beta, spatialDistanceFunction, k, alpha);
+    return new GLSBackwardSearchAlgorithm<V, D>(x1, x2, y,beta, spatialDistanceFunction, k, alpha,m);
   }
 
   /**
@@ -398,6 +409,19 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       return param.getValue();
     }
     return 0;
+  }
+  /**
+   * Get the m parameter
+   * 
+   * @param config Parameterization
+   * @return m parameter
+   */
+  protected static int getParameterM(Parameterization config) {
+    final IntParameter param = new IntParameter(M_ID);
+    if(config.grab(param)) {
+      return param.getValue();
+    }
+    return 1;
   }
 
   /**
