@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 
@@ -107,7 +109,7 @@ class TopologicalSplit<E extends SpatialEntry> {
    * @param minEntries number of minimum entries in the node to be split
    */
   private void chooseSplitAxis(List<E> entries, int minEntries) {
-    int dim = entries.get(0).getMBR().getDimensionality();
+    int dim = entries.get(0).getDimensionality();
 
     maxSorting = new ArrayList<E>(entries);
     minSorting = new ArrayList<E>(entries);
@@ -125,19 +127,19 @@ class TopologicalSplit<E extends SpatialEntry> {
       final SpatialComparator compMax = new SpatialComparator(i, SpatialComparator.MAX);
       Collections.sort(maxSorting, compMax);
 
-      HyperBoundingBox mbr_min_left = minSorting.get(0).getMBR();
-      HyperBoundingBox mbr_min_right = minSorting.get(minSorting.size() - 1).getMBR();
-      HyperBoundingBox mbr_max_left = maxSorting.get(0).getMBR();
-      HyperBoundingBox mbr_max_right = maxSorting.get(maxSorting.size() - 1).getMBR();
+      SpatialComparable mbr_min_left = minSorting.get(0);
+      SpatialComparable mbr_min_right = minSorting.get(minSorting.size() - 1);
+      SpatialComparable mbr_max_left = maxSorting.get(0);
+      SpatialComparable mbr_max_right = maxSorting.get(maxSorting.size() - 1);
 
       for(int k = 1; k < entries.size() - minEntries; k++) {
 
-        mbr_min_left = mbr_min_left.union(minSorting.get(k).getMBR());
-        mbr_min_right = mbr_min_right.union(minSorting.get(minSorting.size() - 1 - k).getMBR());
-        mbr_max_left = mbr_max_left.union(maxSorting.get(k).getMBR());
-        mbr_max_right = mbr_max_right.union(maxSorting.get(maxSorting.size() - 1 - k).getMBR());
+        mbr_min_left = SpatialUtil.union(mbr_min_left, minSorting.get(k));
+        mbr_min_right = SpatialUtil.union(mbr_min_right, minSorting.get(minSorting.size() - 1 - k));
+        mbr_max_left = SpatialUtil.union(mbr_max_left, maxSorting.get(k));
+        mbr_max_right = SpatialUtil.union(mbr_max_right, maxSorting.get(maxSorting.size() - 1 - k));
         if(k >= minEntries - 1) {
-          currentPerimeter += mbr_min_left.perimeter() + mbr_min_right.perimeter() + mbr_max_left.perimeter() + mbr_max_right.perimeter();
+          currentPerimeter += SpatialUtil.perimeter(mbr_min_left) + SpatialUtil.perimeter(mbr_min_right) + SpatialUtil.perimeter(mbr_max_left) + SpatialUtil.perimeter(mbr_max_right);
         }
       }
       if(currentPerimeter < minSurface) {
@@ -175,22 +177,26 @@ class TopologicalSplit<E extends SpatialEntry> {
       // test the sorting with respect to the minimal values
       HyperBoundingBox mbr1 = mbr(minSorting, 0, minEntries + i);
       HyperBoundingBox mbr2 = mbr(minSorting, minEntries + i, numEntries);
-      double currentOverlap = mbr1.overlap(mbr2);
-      if(currentOverlap < minOverlap || (currentOverlap == minOverlap && (mbr1.volume() + mbr2.volume()) < volume)) {
+      double currentOverlap = SpatialUtil.overlap(mbr1, mbr2);
+      double vol1 = SpatialUtil.volume(mbr1);
+      double vol2 = SpatialUtil.volume(mbr2);
+      if(currentOverlap < minOverlap || (currentOverlap == minOverlap && (vol1 + vol2) < volume)) {
         minOverlap = currentOverlap;
         splitPoint = minEntries + i;
         bestSorting = SpatialComparator.MIN;
-        volume = mbr1.volume() + mbr2.volume();
+        volume = vol1 + vol2;
       }
       // test the sorting with respect to the maximal values
       mbr1 = mbr(maxSorting, 0, minEntries + i);
       mbr2 = mbr(maxSorting, minEntries + i, numEntries);
-      currentOverlap = mbr1.overlap(mbr2);
-      if(currentOverlap < minOverlap || (currentOverlap == minOverlap && (mbr1.volume() + mbr2.volume()) < volume)) {
+      currentOverlap = SpatialUtil.overlap(mbr1, mbr2);
+      vol1 = SpatialUtil.volume(mbr1);
+      vol2 = SpatialUtil.volume(mbr2);
+      if(currentOverlap < minOverlap || (currentOverlap == minOverlap && (vol1 + vol2) < volume)) {
         minOverlap = currentOverlap;
         splitPoint = minEntries + i;
         bestSorting = SpatialComparator.MAX;
-        volume = mbr1.volume() + mbr2.volume();
+        volume = vol1 + vol2;
       }
     }
   }
@@ -205,16 +211,16 @@ class TopologicalSplit<E extends SpatialEntry> {
    * @return the mbr of the specified nodes
    */
   private HyperBoundingBox mbr(final List<E> entries, final int from, final int to) {
-    double[] min = new double[entries.get(from).getMBR().getDimensionality()];
-    double[] max = new double[entries.get(from).getMBR().getDimensionality()];
+    double[] min = new double[entries.get(from).getDimensionality()];
+    double[] max = new double[entries.get(from).getDimensionality()];
 
     for(int d = 1; d <= min.length; d++) {
-      min[d - 1] = entries.get(from).getMBR().getMin(d);
-      max[d - 1] = entries.get(from).getMBR().getMax(d);
+      min[d - 1] = entries.get(from).getMin(d);
+      max[d - 1] = entries.get(from).getMax(d);
     }
 
     for(int i = from + 1; i < to; i++) {
-      HyperBoundingBox currMBR = entries.get(i).getMBR();
+      SpatialComparable currMBR = entries.get(i);
       for(int d = 1; d <= min.length; d++) {
         if(min[d - 1] > currMBR.getMin(d)) {
           min[d - 1] = currMBR.getMin(d);

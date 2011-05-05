@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import java.util.BitSet;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
@@ -55,7 +55,7 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
   }
 
   @Override
-  public DoubleDistance minDist(HyperBoundingBox mbr, NumberVector<?, ?> v) {
+  public DoubleDistance minDist(SpatialComparable mbr, NumberVector<?, ?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -90,7 +90,7 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
   // }
 
   @Override
-  public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  public DoubleDistance mbrDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
@@ -120,7 +120,7 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
   }
 
   @Override
-  public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }

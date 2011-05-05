@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.elki.database.query.distance;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 
 /**
  * Query interface for spatial distance queries.
@@ -23,7 +22,7 @@ public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Dis
    * @return the minimum distance between the given MBR and the FeatureVector
    *         object according to this distance function
    */
-  D minDist(HyperBoundingBox mbr, V v);
+  D minDist(SpatialComparable mbr, V v);
 
   /**
    * Computes the minimum distance between the given MBR and the FeatureVector
@@ -34,7 +33,7 @@ public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Dis
    * @return the minimum distance between the given MBR and the FeatureVector
    *         object according to this distance function
    */
-  D minDist(HyperBoundingBox mbr, DBID id);
+  D minDist(SpatialComparable mbr, DBID id);
 
   /**
    * Computes the distance between the two given MBRs according to this
@@ -45,7 +44,7 @@ public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Dis
    * @return the distance between the two given MBRs according to this
    *         distance function
    */
-  D distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2);
+  D mbrDist(SpatialComparable mbr1, SpatialComparable mbr2);
 
   /**
    * Computes the distance between the centroids of the two given MBRs
@@ -56,5 +55,5 @@ public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Dis
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
    */
-  D centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2);
+  D centerDistance(SpatialComparable mbr1, SpatialComparable mbr2);
 }

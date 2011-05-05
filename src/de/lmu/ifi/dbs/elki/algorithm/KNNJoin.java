@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -129,7 +128,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       int processedPages = 0;
       boolean up = true;
       for(E pr_entry : pr_candidates) {
-        HyperBoundingBox pr_mbr = pr_entry.getMBR();
         N pr = index.getNode(pr_entry);
         D pr_knn_distance = distq.infiniteDistance();
         if(logger.isDebugging()) {
@@ -142,8 +140,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
         if(up) {
           for(E ps_entry : ps_candidates) {
-            HyperBoundingBox ps_mbr = ps_entry.getMBR();
-            D distance = distFunction.distance(pr_mbr, ps_mbr);
+            D distance = distFunction.mbrDist(pr_entry, ps_entry);
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = index.getNode(ps_entry);
@@ -156,8 +153,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         else {
           for(int s = ps_candidates.size() - 1; s >= 0; s--) {
             E ps_entry = ps_candidates.get(s);
-            HyperBoundingBox ps_mbr = ps_entry.getMBR();
-            D distance = distFunction.distance(pr_mbr, ps_mbr);
+            D distance = distFunction.mbrDist(pr_entry, ps_entry);
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = index.getNode(ps_entry);

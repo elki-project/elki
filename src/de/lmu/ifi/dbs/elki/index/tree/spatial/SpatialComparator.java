@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
 import java.util.Comparator;
 
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+
 /**
  * Compares objects of type SpatialComparable.
  * 

@@ -13,6 +13,8 @@ import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -32,7 +34,6 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -197,8 +198,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   protected void insertLeafEntry(E entry) {
     lastInsertedEntry = entry;
     // choose subtree for insertion
-    HyperBoundingBox mbr = entry.getMBR();
-    TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
+    TreeIndexPath<E> subtree = choosePath(getRootPath(), entry, 1);
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
@@ -222,8 +222,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   protected void insertDirectoryEntry(E entry, int level) {
     lastInsertedEntry = entry;
     // choose node for insertion of o
-    HyperBoundingBox mbr = entry.getMBR();
-    TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
+    TreeIndexPath<E> subtree = choosePath(getRootPath(), entry, level);
     if(getLogger().isDebugging()) {
       getLogger().debugFine("subtree " + subtree);
     }
@@ -249,8 +248,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
 
     // find the leaf node containing o
-    HyperBoundingBox mbr = relation.get(id).getMBR();
-    TreeIndexPath<E> deletionPath = findPathToObject(getRootPath(), mbr, id);
+    O obj = relation.get(id);
+    TreeIndexPath<E> deletionPath = findPathToObject(getRootPath(), obj, id);
     if(deletionPath == null) {
       return false;
     }
@@ -317,7 +316,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {
-        D distance = distanceFunction.minDist(node.getEntry(i).getMBR(), object);
+        D distance = distanceFunction.minDist(node.getEntry(i), object);
         if(distance.compareTo(epsilon) <= 0) {
           if(node.isLeaf()) {
             LeafEntry entry = (LeafEntry) node.getEntry(i);
@@ -569,7 +568,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry.getMBR(), object);
+          D distance = distanceFunction.minDist(entry, object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry) entry).getDBID()));
@@ -581,7 +580,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry.getMBR(), object);
+          D distance = distanceFunction.minDist(entry, object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             pq.addNode(new DefaultHeapNode<D, Integer>(distance, entry.getEntryID()));
@@ -646,7 +645,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @return the path to the leaf entry of the specified subtree that represents
    *         the data object with the specified mbr and id
    */
-  protected TreeIndexPath<E> findPathToObject(TreeIndexPath<E> subtree, HyperBoundingBox mbr, DBID id) {
+  protected TreeIndexPath<E> findPathToObject(TreeIndexPath<E> subtree, SpatialComparable mbr, DBID id) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
@@ -658,7 +657,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     // directory node
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        if(node.getEntry(i).getMBR().intersects(mbr)) {
+        if(SpatialUtil.intersects(node.getEntry(i), mbr)) {
           TreeIndexPath<E> childSubtree = subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
           TreeIndexPath<E> path = findPathToObject(childSubtree, mbr, id);
           if(path != null) {
@@ -725,7 +724,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      D minDist = distanceFunction.minDist(entry.getMBR(), q);
+      D minDist = distanceFunction.minDist(entry, q);
       result.add(new DistanceEntry<D, E>(entry, minDist, i));
     }
 
@@ -749,7 +748,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       E entry = node.getEntry(i);
       D minMinDist = distanceQuery.getDistanceFactory().infiniteDistance();
       for(DBID id : ids) {
-        D minDist = distanceQuery.minDist(entry.getMBR(), id);
+        D minDist = distanceQuery.minDist(entry, id);
         minMinDist = DistanceUtil.min(minDist, minMinDist);
       }
       result.add(new DistanceEntry<D, E>(entry, minMinDist, i));
@@ -852,7 +851,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @return the child of <code>node</code> containing <code>mbr</code> with the
    *         minimum volume or <code>null</code> if none exists
    */
-  protected TreeIndexPathComponent<E> containedTest(N node, HyperBoundingBox mbr) {
+  protected TreeIndexPathComponent<E> containedTest(N node, SpatialComparable mbr) {
     E containingEntry = null;
     int index = -1;
     double cEVol = Double.NaN;
@@ -860,15 +859,15 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     for(int i = 0; i < node.getNumEntries(); i++) {
       ei = node.getEntry(i);
       // skip test on pairwise overlaps
-      if(ei.getMBR().contains(mbr)) {
+      if(SpatialUtil.contains(ei, mbr)) {
         if(containingEntry == null) {
           containingEntry = ei;
           index = i;
         }
         else {
-          double tempVol = ei.getMBR().volume();
+          double tempVol = SpatialUtil.volume(ei);
           if(Double.isNaN(cEVol)) { // calculate volume of currently best
-            cEVol = containingEntry.getMBR().volume();
+            cEVol = SpatialUtil.volume(containingEntry);
           }
           // take containing node with lowest volume
           if(tempVol < cEVol) {
@@ -892,7 +891,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    *        indicates leaf-level)
    * @return the path of the appropriate subtree to insert the given mbr
    */
-  protected TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, HyperBoundingBox mbr, int level) {
+  protected TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, SpatialComparable mbr, int level) {
     if(getLogger().isDebuggingFiner()) {
       getLogger().debugFiner("node " + subtree + ", level " + level);
     }
@@ -952,14 +951,14 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @return the path information of the entry with the least enlargement if the
    *         given mbr would be inserted into
    */
-  private TreeIndexPathComponent<E> getLeastEnlargement(N node, HyperBoundingBox mbr) {
+  private TreeIndexPathComponent<E> getLeastEnlargement(N node, SpatialComparable mbr) {
     Enlargement<E> min = null;
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      double volume = entry.getMBR().volume();
-      HyperBoundingBox newMBR = entry.getMBR().union(mbr);
-      double inc = newMBR.volume() - volume;
+      double volume = SpatialUtil.volume(entry);
+      HyperBoundingBox newMBR = SpatialUtil.union(entry, mbr);
+      double inc = SpatialUtil.volume(newMBR) - volume;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry, i), volume, inc, 0);
 
       if(min == null || min.compareTo(enlargement) > 0) {
@@ -980,25 +979,25 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @return the path information of the entry which needs least overlap
    *         enlargement if the given mbr would be inserted into
    */
-  protected TreeIndexPathComponent<E> getChildWithLeastOverlap(N node, HyperBoundingBox mbr) {
+  protected TreeIndexPathComponent<E> getChildWithLeastOverlap(N node, SpatialComparable mbr) {
     Enlargement<E> min = null;
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry_i = node.getEntry(i);
-      HyperBoundingBox newMBR = union(mbr, entry_i.getMBR());
+      HyperBoundingBox newMBR = union(mbr, entry_i);
 
       double currOverlap = 0;
       double newOverlap = 0;
       for(int k = 0; k < node.getNumEntries(); k++) {
         if(i != k) {
           E entry_k = node.getEntry(k);
-          currOverlap += entry_i.getMBR().overlap(entry_k.getMBR());
-          newOverlap += newMBR.overlap(entry_k.getMBR());
+          currOverlap += SpatialUtil.overlap(entry_i, entry_k);
+          newOverlap += SpatialUtil.overlap(newMBR, entry_k);
         }
       }
 
-      double volume = entry_i.getMBR() == null ? 0 : entry_i.getMBR().volume();
-      double inc_volume = newMBR.volume() - volume;
+      double volume = entry_i.getMBR() == null ? 0 : SpatialUtil.volume(entry_i);
+      double inc_volume = SpatialUtil.volume(newMBR) - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, i), volume, inc_volume, inc_overlap);
 
@@ -1020,38 +1019,38 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @return the path information of the entry which needs least overlap
    *         enlargement if the given mbr would be inserted into
    */
-  protected TreeIndexPathComponent<E> getChildWithLeastOverlapFast(N node, HyperBoundingBox mbr) {
+  protected TreeIndexPathComponent<E> getChildWithLeastOverlapFast(N node, SpatialComparable mbr) {
     Enlargement<E> min = null;
 
     TopBoundedHeap<FCPair<Double, E>> entriesToTest = new TopBoundedHeap<FCPair<Double, E>>(insertionCandidates, Collections.reverseOrder());
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry_i = node.getEntry(i);
-      HyperBoundingBox newMBR = union(mbr, entry_i.getMBR());
-      double volume = entry_i.getMBR() == null ? 0 : entry_i.getMBR().volume();
-      double inc_volume = newMBR.volume() - volume;
+      HyperBoundingBox newMBR = union(mbr, entry_i);
+      double volume = entry_i.getMBR() == null ? 0 : SpatialUtil.volume(entry_i);
+      double inc_volume = SpatialUtil.volume(newMBR) - volume;
       entriesToTest.add(new FCPair<Double, E>(inc_volume, entry_i));
     }
 
     while(!entriesToTest.isEmpty()) {
       E entry_i = entriesToTest.poll().getSecond();
       int index = -1;
-      HyperBoundingBox newMBR = union(mbr, entry_i.getMBR());
+      HyperBoundingBox newMBR = union(mbr, entry_i);
 
       double currOverlap = 0;
       double newOverlap = 0;
       for(int k = 0; k < node.getNumEntries(); k++) {
         E entry_k = node.getEntry(k);
         if(entry_i != entry_k) {
-          currOverlap += entry_i.getMBR().overlap(entry_k.getMBR());
-          newOverlap += newMBR.overlap(entry_k.getMBR());
+          currOverlap += SpatialUtil.overlap(entry_i, entry_k);
+          newOverlap += SpatialUtil.overlap(newMBR, entry_k);
         }
         else {
           index = k;
         }
       }
 
-      double volume = entry_i.getMBR() == null ? 0 : entry_i.getMBR().volume();
-      double inc_volume = newMBR.volume() - volume;
+      double volume = entry_i.getMBR() == null ? 0 : SpatialUtil.volume(entry_i);
+      double inc_volume = SpatialUtil.volume(newMBR) - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, index), volume, inc_volume, inc_overlap);
 
@@ -1071,19 +1070,19 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @param mbr2 the second MBR
    * @return the union of the two specified MBRs
    */
-  protected HyperBoundingBox union(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  protected HyperBoundingBox union(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1 == null && mbr2 == null) {
       return null;
     }
     if(mbr1 == null) {
-      // getMin() and getMax() clone - intentionally
-      return new HyperBoundingBox(mbr2.getMin(), mbr2.getMax());
+      // Clone - intentionally
+      return new HyperBoundingBox(mbr2);
     }
     if(mbr2 == null) {
-      // getMin() and getMax() clone - intentionally
-      return new HyperBoundingBox(mbr1.getMin(), mbr1.getMax());
+      // Clone - intentionally
+      return new HyperBoundingBox(mbr1);
     }
-    return mbr1.union(mbr2);
+    return SpatialUtil.union(mbr1, mbr2);
   }
 
   /**
@@ -1173,7 +1172,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     // in decreasing order to their distances
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      DoubleDistance dist = distFunction.centerDistance(mbr, entry.getMBR());
+      DoubleDistance dist = distFunction.centerDistance(mbr, entry);
       reInsertEntries[i] = new DistanceEntry<DoubleDistance, E>(entry, dist, i);
     }
     Arrays.sort(reInsertEntries, Collections.reverseOrder());
@@ -1271,7 +1270,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       if(!node.getPageID().equals(getRootEntry().getEntryID())) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         int index = subtree.getLastPathComponent().getIndex();
-        lastInsertedEntry = node.adjustEntryIncremental(parent.getEntry(index), lastInsertedEntry.getMBR());
+        lastInsertedEntry = node.adjustEntryIncremental(parent.getEntry(index), lastInsertedEntry);
         // node.adjustEntry(parent.getEntry(index));
         // write changes in parent to file
         file.writePage(parent);

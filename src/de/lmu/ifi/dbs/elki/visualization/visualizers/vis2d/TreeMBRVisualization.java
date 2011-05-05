@@ -6,8 +6,9 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -126,14 +127,14 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
    * @param depth Current depth
    */
   private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<NV, ? extends N, E> rtree, E entry, int depth) {
-    HyperBoundingBox mbr = entry.getMBR();
+    SpatialComparable mbr = entry;
 
     if(fill) {
-      Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, new Vector(mbr.getMin()), new Vector(mbr.getMax()));
+      Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, new Vector(SpatialUtil.getMin(mbr)), new Vector(SpatialUtil.getMax(mbr)));
       layer.appendChild(r);
     }
     else {
-      Element r = SVGHyperCube.drawFrame(svgp, proj, new Vector(mbr.getMin()), new Vector(mbr.getMax()));
+      Element r = SVGHyperCube.drawFrame(svgp, proj, new Vector(SpatialUtil.getMin(mbr)), new Vector(SpatialUtil.getMax(mbr)));
       SVGUtil.setCSSClass(r, INDEX + depth);
       layer.appendChild(r);
     }

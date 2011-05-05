@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
 
 /**
@@ -13,8 +14,11 @@ public interface SpatialEntry extends Entry, SpatialComparable {
    * Returns the MBR of the underlying spatial object of this entry.
    *
    * @return the MBR of the underlying spatial object of this entry
+   * 
+   * @deprecated SpatialComparable interface should provide this access.
    */
   @Override
+  @Deprecated
   public HyperBoundingBox getMBR();
 
   /**
