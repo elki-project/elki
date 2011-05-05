@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
@@ -314,14 +315,14 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
   protected void integrityCheckParameters(N parent, int index) {
     // test if mbr is correctly set
     E entry = parent.getEntry(index);
-    HyperBoundingBox mbr = getMBR();
+    HyperBoundingBox mbr = computeMBR();
 
-    if(entry.getMBR() == null && mbr == null) {
+    if(/*entry.getMBR() == null && */ mbr == null) {
       return;
     }
-    if(!entry.getMBR().equals(mbr)) {
+    if(!SpatialUtil.equals(entry, mbr)) {
       String soll = mbr.toString();
-      String ist = entry.getMBR().toString();
+      String ist = (new HyperBoundingBox(entry)).toString();
       throw new RuntimeException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
     if(isSuperNode() && isLeaf) {

@@ -71,7 +71,7 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
 
   @Override
   protected SpatialEntry createNewDirectoryEntry(XTreeNode node) {
-    return new XDirectoryEntry(node.getPageID(), node.getMBR());
+    return new XDirectoryEntry(node.getPageID(), node.computeMBR());
   }
 
   /**

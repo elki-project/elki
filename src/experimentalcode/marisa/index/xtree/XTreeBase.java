@@ -954,8 +954,6 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
   @Override
   @SuppressWarnings("unchecked")
   protected void reInsert(N node, int level, TreeIndexPath<E> path) {
-
-    HyperBoundingBox mbr = node.getMBR();
     SquareEuclideanDistanceFunction distFunction = new SquareEuclideanDistanceFunction();
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
@@ -965,7 +963,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     // in decreasing order to their distances
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      DoubleDistance dist = distFunction.centerDistance(mbr, entry);
+      DoubleDistance dist = distFunction.centerDistance(node, entry);
       // DoubleDistance dist = distFunction.maxDist(entry.getMBR(), centroid);
       // DoubleDistance dist = distFunction.centerDistance(entry.getMBR(),
       // centroid);
@@ -1109,10 +1107,10 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
         else {
           N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
           E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
-          HyperBoundingBox mbr = e.getMBR();
+          HyperBoundingBox mbr = new HyperBoundingBox(e);
           node.adjustEntry(e);
 
-          if(!mbr.equals(e.getMBR())) { // MBR has changed
+          if(!SpatialUtil.equals(mbr, e)) { // MBR has changed
             // write changes in parent to file
             file.writePage(parent);
             adjustTree(subtree.getParentPath());
@@ -1183,11 +1181,11 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       if(node.getPageID() != getRootEntry().getEntryID()) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
-        HyperBoundingBox mbr = e.getMBR();
+        HyperBoundingBox mbr = new HyperBoundingBox(e);
         node.adjustEntry(e);
 
         if(node.isLeaf() || // we already know that mbr is extended
-        !mbr.equals(e.getMBR())) { // MBR has changed
+        !SpatialUtil.equals(mbr, e)) { // MBR has changed
           // write changes in parent to file
           file.writePage(parent);
           adjustTree(subtree.getParentPath());
@@ -1255,8 +1253,8 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     file.writePage(newNode);
     if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot + " " + oldRoot.getMBR() + " " + oldRootEntry.getMBR();
-      msg += "\nchild2 " + newNode + " " + newNode.getMBR() + " " + newNodeEntry.getMBR();
+      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRoot) + " " + new HyperBoundingBox(oldRootEntry);
+      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNode) + " " + new HyperBoundingBox(newNodeEntry);
       msg += "\n";
       getLogger().debugFine(msg);
     }
