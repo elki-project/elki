@@ -5,14 +5,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -22,14 +25,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Handle results by serving them via a web server to mapping applications.
  * 
  * @author Erich Schubert
  */
-public class MapServerResultHandler implements ResultHandler<Result> {
+public class MapServerResultHandler implements ResultHandler {
   /**
    * Polygon input file parameter
    * <p>
@@ -45,6 +47,11 @@ public class MapServerResultHandler implements ResultHandler<Result> {
    * </p>
    */
   public static final OptionID POLYGONS_FILE_ID = OptionID.getOrCreateOptionID("mapserver.polygonfile", "File name containing the polygons.");
+
+  /**
+   * Type information for polygons.
+   */
+  private static final SimpleTypeInformation<PolygonsObject> polytype = SimpleTypeInformation.get(PolygonsObject.class);
 
   /**
    * The parser instance.
@@ -77,11 +84,11 @@ public class MapServerResultHandler implements ResultHandler<Result> {
     // Build a map for the main database, using external IDs
     Map<String, DBID> lblmap = new HashMap<String, DBID>(db.size() * 2);
     {
-      Relation<String> olq = db.getObjectLabelQuery();
-      Relation<String> eidq = db.getExternalIdQuery();
-      for(DBID id : db) {
+      Relation<?> olq = db.getRelation(TypeUtil.GUESSED_LABEL);
+      Relation<String> eidq = db.getRelation(TypeUtil.EXTERNALID);
+      for(DBID id : olq.iterDBIDs()) {
         if(olq != null) {
-          String label = olq.get(id);
+          String label = olq.get(id).toString();
           if(label != null) {
             lblmap.put(label, id);
           }
@@ -106,10 +113,25 @@ public class MapServerResultHandler implements ResultHandler<Result> {
         throw new AbortException("Error loading polygon data file.");
       }
       MultipleObjectsBundle polys = polygonParser.parse(in);
-      // Build reverse map
-      for(Pair<PolygonsObject, List<String>> pair : polys.getObjectAndLabelList()) {
-        for(String lbl : pair.getSecond()) {
-          polymap.put(lbl, pair.first);
+      int llc = -1;
+      int poc = -1;
+      for(int j = 0; j < polys.metaLength(); j++) {
+        if(llc < 0 && TypeUtil.LABELLIST.isAssignableFromType(polys.meta(j))) {
+          llc = j;
+        }
+        else if(poc < 0 && polytype.isAssignableFromType(polys.meta(j))) {
+          poc = j;
+        }
+      }
+      if(llc < 0 || poc < 0) {
+        LoggingUtil.warning("Polygon input not as expected!");
+      }
+      else {
+        // Build reverse map
+        for(int j = 0; j < polys.dataLength(); j++) {
+          for(String lbl : (LabelList) polys.data(j, llc)) {
+            polymap.put(lbl, (PolygonsObject) polys.data(j, poc));
+          }
         }
       }
     }

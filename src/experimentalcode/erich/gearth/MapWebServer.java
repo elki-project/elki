@@ -15,7 +15,7 @@ import com.sun.net.httpserver.HttpServer;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -105,25 +105,17 @@ public class MapWebServer {
     }
     DBID id = lblmap.get(query);
     if(id != null) {
-      // Add metadata.
-      DatabaseObjectMetadata meta = metaq.get(id);
-      if(meta.externalId != null) {
-        re.append("\"eid\":\"" + jsonEscapeString(meta.externalId) + "\",");
-      }
-      if(meta.objectlabel != null) {
-        re.append("\"label\":\"" + jsonEscapeString(meta.objectlabel) + "\",");
-      }
-      if(meta.classlabel != null) {
-        re.append("\"class\":\"" + jsonEscapeString(meta.classlabel.toString()) + "\",");
-      }
-      // Add attributes
-      DatabaseObject obj = db.get(id);
-      if(obj != null) {
-        re.append("\"data\":\"" + jsonEscapeString(obj.toString()) + "\",");
-      }
+      bundleToJSON(re, id);
     }
 
     re.append("\"query\":\"" + jsonEscapeString(query) + "\"");
+  }
+
+  protected void bundleToJSON(StringBuffer re, DBID id) {
+    SingleObjectBundle bundle = db.getBundle(id);
+    for(int j = 0; j < bundle.metaLength(); j++) {
+      re.append("\"" + jsonEscapeString(bundle.meta(j).toString()) + "\":\"" + jsonEscapeString(bundle.data(j).toString()) + "\",");
+    }
   }
 
   protected void resultToJSON(StringBuffer re, String name) {
@@ -177,7 +169,6 @@ public class MapWebServer {
     }
     if(cur instanceof OutlierResult) {
       re.append("\"scores\":[");
-      Relation<DatabaseObjectMetadata> mq = db.getMetadataQuery();
       OutlierResult or = (OutlierResult) cur;
       AnnotationResult<Double> scores = or.getScores();
       Iterator<DBID> iter = or.getOrdering().iter(db.getDBIDs()).iterator();
@@ -185,18 +176,7 @@ public class MapWebServer {
         DBID id = iter.next();
         re.append("{");
         re.append("\"dbid\":\"").append(id.toString()).append("\",");
-        DatabaseObjectMetadata meta = mq.get(id);
-        if(mq != null) {
-          if(meta.externalId != null) {
-            re.append("\"eid\":\"").append(meta.externalId).append("\",");
-          }
-          if(meta.objectlabel != null) {
-            re.append("\"label\":\"").append(meta.objectlabel).append("\",");
-          }
-          if(meta.classlabel != null) {
-            re.append("\"class\":\"").append(meta.classlabel.toString()).append("\",");
-          }
-        }
+        bundleToJSON(re, id);
         final Double val = scores.getValueFor(id);
         if(val != null) {
           re.append("\"score\":\"").append(val).append("\"");
