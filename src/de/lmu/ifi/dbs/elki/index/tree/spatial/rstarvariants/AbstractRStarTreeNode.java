@@ -105,7 +105,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param entry the entry representing this node
    */
   public void adjustEntry(E entry) {
-    entry.setMBR(computeMBR());
+    ((SpatialDirectoryEntry)entry).setMBR(computeMBR());
   }
 
   /**
@@ -118,7 +118,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @return the MBR of the new Node
    */
   public E adjustEntryIncremental(E entry, SpatialComparable responsibleMBR) {
-    entry.setMBR(SpatialUtil.union(entry, responsibleMBR));
+    ((SpatialDirectoryEntry)entry).setMBR(SpatialUtil.union(entry, responsibleMBR));
     return entry;
   }
 

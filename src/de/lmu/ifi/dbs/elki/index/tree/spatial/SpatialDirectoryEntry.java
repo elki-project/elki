@@ -70,7 +70,6 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    * 
    * @param mbr the MBR to be set
    */
-  @Override
   public void setMBR(HyperBoundingBox mbr) {
     this.mbr = mbr;
   }
