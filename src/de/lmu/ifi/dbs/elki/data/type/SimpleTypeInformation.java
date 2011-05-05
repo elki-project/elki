@@ -71,6 +71,6 @@ public class SimpleTypeInformation<T> implements TypeInformation {
 
   @Override
   public String toString() {
-    return "type=" + getRestrictionClass().getSimpleName();
+    return getRestrictionClass().getSimpleName();
   }
 }

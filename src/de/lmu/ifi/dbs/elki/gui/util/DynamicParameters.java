@@ -49,7 +49,7 @@ public class DynamicParameters {
   /**
    * Pseudo-value used in dropdowns for options that have a default value
    */
-  public static final String STRING_USE_DEFAULT = "(use default)";
+  public static final String STRING_USE_DEFAULT = "Default:";
 
   /**
    * Pseudo-value used in options that are optional, to unset.
@@ -121,8 +121,13 @@ public class DynamicParameters {
     for(Pair<Object, Parameter<?, ?>> p : track.getAllParameters()) {
       Parameter<?, ?> option = p.getSecond();
       String value = null;
-      if(option.isDefined() && !option.tookDefaultValue()) {
-        value = option.getValueAsString();
+      if(option.isDefined()) {
+        if(option.tookDefaultValue()) {
+          value = DynamicParameters.STRING_USE_DEFAULT + " " + option.getDefaultValueAsString();
+        }
+        else {
+          value = option.getValueAsString();
+        }
       }
       if(value == null) {
         if(option instanceof Flag) {
@@ -146,7 +151,7 @@ public class DynamicParameters {
       }
       if(value != "") {
         try {
-          if(!option.isValid(value)) {
+          if(!option.tookDefaultValue() && !option.isValid(value)) {
             bits.set(BIT_INVALID);
           }
         }
@@ -193,8 +198,8 @@ public class DynamicParameters {
     for(Node t : parameters) {
       if(t.param != null) {
         if(t.param instanceof RemainingOptions) {
-          for (String str : t.value.split(" ")) {
-            if (str.length() > 0) {
+          for(String str : t.value.split(" ")) {
+            if(str.length() > 0) {
               p.add(str);
             }
           }
@@ -205,7 +210,7 @@ public class DynamicParameters {
           }
         }
         else if(t.value != null && t.value.length() > 0) {
-          if(t.value != STRING_USE_DEFAULT && t.value != STRING_OPTIONAL) {
+          if(!t.value.startsWith(STRING_USE_DEFAULT) && t.value != STRING_OPTIONAL) {
             p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
             p.add(t.value);
           }
