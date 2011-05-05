@@ -1,21 +1,14 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -38,26 +31,22 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
    */
   @Test
   public void testDeLiCluResults() throws ParameterException {
-    // Setup algorithm
+    ListParameterization indexparams = new ListParameterization();
+    // We need a special index for this algorithm:
+    indexparams.addParameter(HashmapDatabase.INDEX_ID, DeLiCluTreeFactory.class);
+    indexparams.addParameter(DeLiCluTreeFactory.PAGE_SIZE_ID, 1000);
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710, indexparams, null);
+    
+    // Setup actual algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, UNITTEST + "hierarchical-2d.ascii");
-    List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
-    params.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
-    params.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
-    params.addParameter(HashmapDatabase.INDEX_ID, DeLiCluTreeFactory.class);
-    params.addParameter(DeLiCluTreeFactory.PAGE_SIZE_ID, 1000);
-    params.addParameter(DeLiClu.XI_ID, 0.038);
     params.addParameter(DeLiClu.MINPTS_ID, 18);
-    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
-    Database db = dbconn.getDatabase();
-    org.junit.Assert.assertEquals("Database size does not match.", 710, db.size());
-
-    DeLiClu<DoubleVector, DoubleDistance> deliclu = ClassGenericsUtil.parameterizeOrAbort(DeLiClu.class, params);
+    params.addParameter(OPTICSXi.XI_ID, 0.038);
+    params.addParameter(OPTICSXi.XIALG_ID, DeLiClu.class);
+    OPTICSXi<DoubleDistance> opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
     testParameterizationOk(params);
 
     // run DeLiClu on database
-    ClusterOrderResult<DoubleDistance> result = deliclu.run(db);
-    Clustering<?> clustering = findSingleClustering(result);
+    Clustering<?> clustering = opticsxi.run(db);
     testFMeasure(db, clustering, 0.87406257);
     testClusterSizes(clustering, new int[] { 109, 121, 210, 270 });
   }

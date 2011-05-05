@@ -71,7 +71,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
    * Runs the algorithm in the timed evaluation part.
    */
   public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
-    Clustering<EMModel<V>> emresult = emClustering.run(database);
+    Clustering<EMModel<V>> emresult = emClustering.run(database, relation);
 
     double globmax = 0.0;
     WritableDataStore<Double> emo_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);

@@ -15,23 +15,18 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -49,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("OPTICS: Density-Based Hierarchical Clustering")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
 @Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304187")
-public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
+public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> implements OPTICSTypeAlgorithm<D> {
   /**
    * The logger for this class.
    */
@@ -68,11 +63,6 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("optics.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
   /**
-   * Parameter to specify the steepness threshold.
-   */
-  public static final OptionID XI_ID = OptionID.getOrCreateOptionID("optics.xi", "Threshold for the steepness requirement.");
-
-  /**
    * Hold the value of {@link #EPSILON_ID}.
    */
   private D epsilon;
@@ -81,11 +71,6 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * Holds the value of {@link #MINPTS_ID}.
    */
   private int minpts;
-
-  /**
-   * Holds the value of {@link #XI_ID}.
-   */
-  private double ixi;
 
   /**
    * Holds a set of processed ids.
@@ -103,13 +88,11 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * @param distanceFunction Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts value
-   * @param xi Xi value
    */
-  public OPTICS(DistanceFunction<? super O, D> distanceFunction, D epsilon, int minpts, double xi) {
+  public OPTICS(DistanceFunction<? super O, D> distanceFunction, D epsilon, int minpts) {
     super(distanceFunction);
     this.epsilon = epsilon;
     this.minpts = minpts;
-    this.ixi = 1.0 - xi;
   }
 
   /**
@@ -140,17 +123,6 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     }
     if(progress != null) {
       progress.ensureCompleted(logger);
-    }
-
-    if(ixi < 1.) {
-      if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
-        logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
-        ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
-        OPTICSXi.extractClusters(distanceClusterOrder, relation, ixi, minpts);
-      }
-      else {
-        logger.verbose("Xi cluster extraction only supported for number distances!");
-      }
     }
 
     return clusterOrder;
@@ -194,6 +166,16 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   }
 
   @Override
+  public int getMinPts() {
+    return minpts;
+  }
+  
+  @Override
+  public D getDistanceFactory() {
+    return getDistanceFunction().getDistanceFactory();
+  }
+
+  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
@@ -215,8 +197,6 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
     protected int minpts = 0;
 
-    protected double xi = 0.0;
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -229,17 +209,11 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }
-
-      DoubleParameter xiP = new DoubleParameter(XI_ID, true);
-      xiP.addConstraint(new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
-      if(config.grab(xiP)) {
-        xi = xiP.getValue();
-      }
     }
 
     @Override
     protected OPTICS<O, D> makeInstance() {
-      return new OPTICS<O, D>(distanceFunction, epsilon, minpts, xi);
+      return new OPTICS<O, D>(distanceFunction, epsilon, minpts);
     }
   }
 }

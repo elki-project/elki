@@ -102,7 +102,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
     if(stepprog != null) {
       stepprog.beginStep(1, "Preprocessing local correlation dimensionalities and partitioning data", logger);
     }
-    Clustering<Model> copacResult = copacAlgorithm.run(database);
+    Clustering<Model> copacResult = copacAlgorithm.run(database, relation);
 
     DistanceQuery<V, IntegerDistance> query = copacAlgorithm.getPartitionDistanceQuery();
 
