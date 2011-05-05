@@ -991,12 +991,12 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       for(int k = 0; k < node.getNumEntries(); k++) {
         if(i != k) {
           E entry_k = node.getEntry(k);
-          currOverlap += SpatialUtil.overlap(entry_i, entry_k);
-          newOverlap += SpatialUtil.overlap(newMBR, entry_k);
+          currOverlap += SpatialUtil.relativeOverlap(entry_i, entry_k);
+          newOverlap += SpatialUtil.relativeOverlap(newMBR, entry_k);
         }
       }
 
-      double volume = entry_i.getMBR() == null ? 0 : SpatialUtil.volume(entry_i);
+      double volume = /* entry_i.getMBR() == null ? 0 : */ SpatialUtil.volume(entry_i);
       double inc_volume = SpatialUtil.volume(newMBR) - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, i), volume, inc_volume, inc_overlap);
@@ -1026,7 +1026,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry_i = node.getEntry(i);
       HyperBoundingBox newMBR = union(mbr, entry_i);
-      double volume = entry_i.getMBR() == null ? 0 : SpatialUtil.volume(entry_i);
+      double volume = /* entry_i.getMBR() == null ? 0 : */ SpatialUtil.volume(entry_i);
       double inc_volume = SpatialUtil.volume(newMBR) - volume;
       entriesToTest.add(new FCPair<Double, E>(inc_volume, entry_i));
     }
@@ -1041,15 +1041,15 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       for(int k = 0; k < node.getNumEntries(); k++) {
         E entry_k = node.getEntry(k);
         if(entry_i != entry_k) {
-          currOverlap += SpatialUtil.overlap(entry_i, entry_k);
-          newOverlap += SpatialUtil.overlap(newMBR, entry_k);
+          currOverlap += SpatialUtil.relativeOverlap(entry_i, entry_k);
+          newOverlap += SpatialUtil.relativeOverlap(newMBR, entry_k);
         }
         else {
           index = k;
         }
       }
 
-      double volume = entry_i.getMBR() == null ? 0 : SpatialUtil.volume(entry_i);
+      double volume = /* entry_i.getMBR() == null ? 0 : */ SpatialUtil.volume(entry_i);
       double inc_volume = SpatialUtil.volume(newMBR) - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, index), volume, inc_volume, inc_overlap);
@@ -1164,7 +1164,6 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    */
   @SuppressWarnings("unchecked")
   protected void reInsert(N node, int level, TreeIndexPath<E> path) {
-    HyperBoundingBox mbr = node.getMBR();
     EuclideanDistanceFunction distFunction = EuclideanDistanceFunction.STATIC;
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
@@ -1172,7 +1171,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     // in decreasing order to their distances
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      DoubleDistance dist = distFunction.centerDistance(mbr, entry);
+      DoubleDistance dist = distFunction.centerDistance(node, entry);
       reInsertEntries[i] = new DistanceEntry<DoubleDistance, E>(entry, dist, i);
     }
     Arrays.sort(reInsertEntries, Collections.reverseOrder());
@@ -1392,8 +1391,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     file.writePage(newNode);
     if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot + " " + oldRoot.getMBR() + " " + oldRootEntry.getMBR();
-      msg += "\nchild2 " + newNode + " " + newNode.getMBR() + " " + newNodeEntry.getMBR();
+      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRoot) + " " + new HyperBoundingBox(oldRootEntry);
+      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNode) + " " + new HyperBoundingBox(newNodeEntry);
       msg += "\n";
       getLogger().debugFine(msg);
     }

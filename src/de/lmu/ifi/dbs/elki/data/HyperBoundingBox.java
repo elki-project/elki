@@ -10,7 +10,6 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
-
 /**
  * HyperBoundingBox represents a hyperrectangle in the multidimensional space.
  * 
@@ -56,14 +55,14 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
 
   /**
    * Constructor, cloning an existing spatial object.
-   *
+   * 
    * @param other Object to clone
    */
   public HyperBoundingBox(SpatialComparable other) {
     final int dim = other.getDimensionality();
     this.min = new double[dim];
     this.max = new double[dim];
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       this.min[i] = other.getMin(i);
       this.max[i] = other.getMax(i);
     }
@@ -221,10 +220,5 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
     for(int i = 0; i < max.length; i++) {
       max[i] = in.readDouble();
     }
-  }
-
-  @Override
-  public HyperBoundingBox getMBR() {
-    return this;
   }
 }

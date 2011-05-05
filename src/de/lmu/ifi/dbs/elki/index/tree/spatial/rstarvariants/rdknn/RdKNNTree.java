@@ -400,7 +400,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         RdKNNDirectoryEntry<D, N> entry = (RdKNNDirectoryEntry<D, N>) node.getEntry(i);
-        D minDist = distanceQuery.minDist(entry.getMBR(), oid);
+        D minDist = distanceQuery.minDist(entry, oid);
         if(minDist.compareTo(entry.getKnnDistance()) <= 0) {
           doReverseKNN(file.readPage(entry.getEntryID()), oid, result);
         }
@@ -433,7 +433,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         RdKNNDirectoryEntry<D, N> entry = (RdKNNDirectoryEntry<D, N>) node.getEntry(i);
         ModifiableDBIDs candidates = DBIDUtil.newArray();
         for(DBID id : ids) {
-          D minDist = distanceQuery.minDist(entry.getMBR(), id);
+          D minDist = distanceQuery.minDist(entry, id);
           if(minDist.compareTo(entry.getKnnDistance()) <= 0) {
             candidates.add(id);
           }
@@ -511,7 +511,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    */
   @Override
   protected RdKNNEntry<D, N> createNewDirectoryEntry(RdKNNNode<D, N> node) {
-    return new RdKNNDirectoryEntry<D, N>(node.getPageID(), node.getMBR(), node.kNNDistance());
+    return new RdKNNDirectoryEntry<D, N>(node.getPageID(), node.computeMBR(), node.kNNDistance());
   }
 
   /**

@@ -58,14 +58,6 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
   }
 
   /**
-   * @return a MBR consisting of the values array
-   */
-  @Override
-  public HyperBoundingBox getMBR() {
-    return new HyperBoundingBox(values, values);
-  }
-
-  /**
    * Throws an UnsupportedOperationException
    * 
    * @throws UnsupportedOperationException thrown, since this is a leaf

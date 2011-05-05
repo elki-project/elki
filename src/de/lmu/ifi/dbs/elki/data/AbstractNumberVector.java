@@ -55,16 +55,6 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
   }
 
   @Override
-  public HyperBoundingBox getMBR() {
-    final int dim = getDimensionality();
-    final double[] values = new double[dim];
-    for(int i = 0; i < dim; i++) {
-      values[i] = doubleValue(i + 1);
-    }
-    return new HyperBoundingBox(values, values);
-  }
-
-  @Override
   public byte byteValue(int dimension) {
     return (byte) longValue(dimension);
   }

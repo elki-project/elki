@@ -196,6 +196,5 @@ public class TestIndexStructures implements JUnit4Test {
         i++;
       }
     }
-
   }
 }

@@ -49,16 +49,28 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
   @Override
   public double getMin(int dimension) {
-    return getMBR().getMin(dimension);
+    double min = getEntry(0).getMin(dimension);
+    for(int i = 1; i < getNumEntries(); i++) {
+      min = Math.min(min, getEntry(i).getMin(dimension));
+    }
+    return min;
   }
 
   @Override
   public double getMax(int dimension) {
-    return getMBR().getMax(dimension);
+    double max = getEntry(0).getMax(dimension);
+    for(int i = 1; i < getNumEntries(); i++) {
+      max = Math.min(max, getEntry(i).getMax(dimension));
+    }
+    return max;
   }
 
-  @Override
-  public HyperBoundingBox getMBR() {
+  /**
+   * Recomputing the MBR is rather expensive.
+   * 
+   * @return MBR
+   */
+  public HyperBoundingBox computeMBR() {
     E firstEntry = getEntry(0);
     if(firstEntry == null) {
       return null;
@@ -93,23 +105,26 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param entry the entry representing this node
    */
   public void adjustEntry(E entry) {
-    entry.setMBR(getMBR());
+    entry.setMBR(computeMBR());
   }
 
   /**
-   * Adjusts the parameters of the entry representing this node. Only applicable if one
-   * object was inserted or the size of an existing node increased.
+   * Adjusts the parameters of the entry representing this node. Only applicable
+   * if one object was inserted or the size of an existing node increased.
+   * 
    * @param entry the entry representing this node
-   * @param responsibleMBR the MBR of the object or node which is responsible for the call of the method
+   * @param responsibleMBR the MBR of the object or node which is responsible
+   *        for the call of the method
    * @return the MBR of the new Node
    */
-  public E adjustEntryIncremental(E entry, SpatialComparable responsibleMBR){
-      entry.setMBR(SpatialUtil.union(entry, responsibleMBR));
-      return entry;
+  public E adjustEntryIncremental(E entry, SpatialComparable responsibleMBR) {
+    entry.setMBR(SpatialUtil.union(entry, responsibleMBR));
+    return entry;
   }
 
-  /**   * Initializes a reinsert operation. Deletes all entries in this node and adds
-   * all entries from start index on to this node's children.
+  /**
+   * * Initializes a reinsert operation. Deletes all entries in this node and
+   * adds all entries from start index on to this node's children.
    * 
    * @param start the start index of the entries that will be reinserted
    * @param reInsertEntries the array of entries to be reinserted
@@ -265,14 +280,14 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   protected void integrityCheckParameters(N parent, int index) {
     // test if mbr is correctly set
     E entry = parent.getEntry(index);
-    HyperBoundingBox mbr = getMBR();
+    HyperBoundingBox mbr = computeMBR();
 
-    if(entry.getMBR() == null && mbr == null) {
+    if(/* entry.getMBR() == null && */mbr == null) {
       return;
     }
-    if(!entry.getMBR().equals(mbr)) {
+    if(!SpatialUtil.equals(entry, mbr)) {
       String soll = mbr.toString();
-      String ist = entry.getMBR().toString();
+      String ist = new HyperBoundingBox(entry).toString();
       throw new RuntimeException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
   }

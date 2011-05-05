@@ -214,7 +214,7 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
 
   @Override
   protected SpatialEntry createNewDirectoryEntry(FlatRStarTreeNode node) {
-    return new SpatialDirectoryEntry(node.getPageID(), node.getMBR());
+    return new SpatialDirectoryEntry(node.getPageID(), node.computeMBR());
   }
 
   @Override
