@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Ahmed Hettab
  * 
- * @param <V>
- * @param <D>
+ * @param <V> DatabaseObject to use
+ * @param <D> Distance function to use
  */
 public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

@@ -87,13 +87,13 @@ public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends AbstractAl
    * @param config
    * @return
    */
-  public static <V extends NumberVector<V, ?>> MedianAlgorithm<V> parameterize(Parameterization config) {
+  public static <V extends NumberVector<V, ?>> ScatterplotOutlier<V> parameterize(Parameterization config) {
     final NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
     final int y = getParameterY(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new MedianAlgorithm<V>(npred, y);
+    return new ScatterplotOutlier<V>(npred, y);
   }
 
   protected static int getParameterY(Parameterization config) {
