@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -227,7 +228,7 @@ public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends Ab
     }
 
     // set root mbr
-    getRootEntry().setMBR(root.computeMBR());
+    ((SpatialDirectoryEntry)getRootEntry()).setMBR(root.computeMBR());
 
     // write to file
     file.writePage(root);

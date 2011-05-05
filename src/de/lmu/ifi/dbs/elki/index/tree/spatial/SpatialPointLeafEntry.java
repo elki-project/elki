@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
@@ -55,16 +54,6 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
     for(int i = 0; i < dim; i++) {
       values[i] = vector.doubleValue(i + 1);
     }
-  }
-
-  /**
-   * Throws an UnsupportedOperationException
-   * 
-   * @throws UnsupportedOperationException thrown, since this is a leaf
-   */
-  @Override
-  public void setMBR(@SuppressWarnings("unused") HyperBoundingBox mbr) {
-    throw new UnsupportedOperationException("This entry is a leaf entry!");
   }
 
   @Override
