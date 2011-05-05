@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XNode;
@@ -161,7 +163,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       maxSecond[i] = pqUBSecond[i].firstPriority();
     }
     ModifiableHyperBoundingBox mbr2 = new ModifiableHyperBoundingBox(minSecond, maxSecond);
-    double surfaceSum = mbr1.perimeter() + mbr2.perimeter();
+    double surfaceSum = SpatialUtil.perimeter(mbr1) + SpatialUtil.perimeter(mbr2);
 
     // generate the other distributions and file the surface sums
     for(int limit = minEntries; limit < maxEntries; limit++) {
@@ -169,7 +171,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       add2MBR(entrySorting, pqUBFirst, pqLBFirst, limit);
       // shrink entry at position entrySorting[limit] from second MBR:
       removeFromMBR(pqUBSecond, pqLBSecond, limit, mbr2);
-      surfaceSum += mbr1.perimeter() + mbr2.perimeter();
+      surfaceSum += SpatialUtil.perimeter(mbr1) + SpatialUtil.perimeter(mbr2);
     }
 
     return surfaceSum;
@@ -238,7 +240,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @param index the index in the sorting referencing the entry to be added
    */
   private void add2MBR(Integer[] entrySorting, double[] ub, double[] lb, int index) {
-    HyperBoundingBox currMBR = this.entries.get(entrySorting[index]).getMBR();
+    SpatialComparable currMBR = this.entries.get(entrySorting[index]);
     double min, max;
     for(int d = 1; d <= currMBR.getDimensionality(); d++) {
       max = currMBR.getMax(d);
@@ -271,7 +273,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @param index the index in the sorting referencing the entry to be added
    */
   private void add2MBR(Integer[] entrySorting, PriorityQueue<Integer>[] pqUB, PriorityQueue<Integer>[] pqLB, int index) {
-    HyperBoundingBox currMBR = this.entries.get(entrySorting[index]).getMBR();
+    SpatialComparable currMBR = this.entries.get(entrySorting[index]);
     double min, max;
     for(int d = 1; d <= currMBR.getDimensionality(); d++) {
       max = currMBR.getMax(d);
@@ -328,12 +330,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
      */
     public int compare(Integer o1, Integer o2) {
       if(lb) {
-        d1 = entries.get(o1).getMBR().getMin(dimension + 1);
-        d2 = entries.get(o2).getMBR().getMin(dimension + 1);
+        d1 = entries.get(o1).getMin(dimension + 1);
+        d2 = entries.get(o2).getMin(dimension + 1);
       }
       else {
-        d1 = entries.get(o1).getMBR().getMax(dimension + 1);
-        d2 = entries.get(o2).getMBR().getMax(dimension + 1);
+        d1 = entries.get(o1).getMax(dimension + 1);
+        d2 = entries.get(o2).getMax(dimension + 1);
       }
       // ignore NaN case
       return (d1 > d2 ? 1 : (d1 < d2 ? -1 : 0));
@@ -503,12 +505,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
             optVolume = Double.NaN;
           }
           else if(xVolume == optXVolume) {
-            double vol = mbr1.volume();
-            vol += mbr2.volume();
+            double vol = SpatialUtil.volume(mbr1);
+            vol += SpatialUtil.volume(mbr2);
             if(Double.isNaN(optVolume)) {
               // calculate when necessary
-              optVolume = optMBRs[0].volume();
-              optVolume += optMBRs[1].volume();
+              optVolume = SpatialUtil.volume(optMBRs[0]);
+              optVolume += SpatialUtil.volume(optMBRs[1]);
             }
             if(vol < optVolume) {
               optXVolume = xVolume;
@@ -529,8 +531,8 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
         }
         else { // strategy == VOLUME_OVERLAP
           if(Double.isNaN(optVolume)) {
-            optVolume = optMBRs[0].volume();
-            optVolume += optMBRs[1].volume();
+            optVolume = SpatialUtil.volume(optMBRs[0]);
+            optVolume += SpatialUtil.volume(optMBRs[1]);
           }
           pastOverlap = optXVolume / optVolume;
           if(tree.get_max_overlap() < pastOverlap) {
@@ -717,10 +719,10 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return the mbr of the specified nodes
    */
   private HyperBoundingBox mbr(final Integer[] entries, final int from, final int to) {
-    double[] min = new double[this.entries.get(entries[from]).getMBR().getDimensionality()];
-    double[] max = new double[this.entries.get(entries[from]).getMBR().getDimensionality()];
+    double[] min = new double[this.entries.get(entries[from]).getDimensionality()];
+    double[] max = new double[this.entries.get(entries[from]).getDimensionality()];
 
-    HyperBoundingBox currMBR = this.entries.get(entries[from]).getMBR();
+    SpatialComparable currMBR = this.entries.get(entries[from]);
 
     for(int d = 1; d <= min.length; d++) {
       min[d - 1] = currMBR.getMin(d);
@@ -728,7 +730,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     }
 
     for(int i = from + 1; i < to; i++) {
-      currMBR = this.entries.get(entries[i]).getMBR();
+      currMBR = this.entries.get(entries[i]);
       for(int d = 1; d <= min.length; d++) {
         if(min[d - 1] > currMBR.getMin(d)) {
           min[d - 1] = currMBR.getMin(d);
@@ -825,7 +827,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     for(ET2 entry : entries) {
       if(entry.isLeafEntry()) {
         numOf[0]++;
-        if(mbr.intersects(entry.getMBR())) {
+        if(SpatialUtil.intersects(mbr, entry)) {
           numOf[1]++;
         }
       }

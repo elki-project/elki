@@ -1,7 +1,7 @@
 package experimentalcode.marisa.index.xtree;
 
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
 
 public interface SplitHistorySpatialEntry extends Entry, SpatialComparable {

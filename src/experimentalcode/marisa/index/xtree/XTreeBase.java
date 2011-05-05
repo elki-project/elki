@@ -17,6 +17,8 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -30,7 +32,6 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -605,7 +606,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    *         <code>mbr</code>
    */
   @Override
-  protected TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, HyperBoundingBox mbr, int level) {
+  protected TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, SpatialComparable mbr, int level) {
     if(getLogger().isDebuggingFiner()) {
       getLogger().debugFiner("node " + subtree + ", level " + level);
     }
@@ -645,8 +646,8 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     List<E> entries = node.getChildren();
     for(Iterator<E> iterator = entries.iterator(); iterator.hasNext(); index++) {
       E child = iterator.next();
-      HyperBoundingBox childMBR = child.getMBR();
-      HyperBoundingBox testMBR = childMBR.union(mbr);
+      SpatialComparable childMBR = child;
+      HyperBoundingBox testMBR = SpatialUtil.union(childMBR, mbr);
       double pairwiseOverlapInc;
       if(isLeafContainer) {
         pairwiseOverlapInc = calculateOverlapIncrease(entries, child, testMBR);
@@ -665,19 +666,19 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
           // choose the one with the minimum volume increase.
           // If there are also multiple entries with the same volume increase
           // choose the one with the minimum volume.
-          volume = childMBR.volume();
+          volume = SpatialUtil.volume(childMBR);
           if(Double.isInfinite(volume) || Double.isNaN(volume)) {
             throw new IllegalStateException("an entry's MBR is too large to calculate its volume: " + volume + "; \nplease re-scale your data s.t. it can be dealt with");
           }
-          tempVolume = testMBR.volume();
+          tempVolume = SpatialUtil.volume(testMBR);
           if(Double.isInfinite(tempVolume) || Double.isNaN(tempVolume)) {
             throw new IllegalStateException("an entry's MBR is too large to calculate its volume: " + tempVolume + "; \nplease re-scale your data s.t. it can be dealt with");
           }
           double volumeInc = tempVolume - volume;
 
           if(Double.isNaN(optVolumeInc)) { // has not yet been calculated
-            optVolume = optEntry.getEntry().getMBR().volume();
-            optVolumeInc = optTestMBR.volume() - optVolume;
+            optVolume = SpatialUtil.volume(optEntry.getEntry());
+            optVolumeInc = SpatialUtil.volume(optTestMBR) - optVolume;
           }
           if(volumeInc < optVolumeInc) {
             optVolumeInc = volumeInc;
@@ -731,9 +732,8 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    * @param testMBR extended MBR of <code>ei</code>
    * @return
    */
-  private double calculateOverlapIncrease(List<E> entries, E ei, HyperBoundingBox testMBR) {
-
-    ModifiableHyperBoundingBox eiMBR = new ModifiableHyperBoundingBox(ei.getMBR());
+  private double calculateOverlapIncrease(List<E> entries, E ei, SpatialComparable testMBR) {
+    ModifiableHyperBoundingBox eiMBR = new ModifiableHyperBoundingBox(ei);
     ModifiableHyperBoundingBox testMBRModifiable = new ModifiableHyperBoundingBox(testMBR);
 
     double[] lb = eiMBR.getMinRef();
@@ -757,7 +757,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
         multiOverlapMult = 1; // is constant for a unchanged dimension
         mOOld = 1; // overlap for old MBR on changed dimensions
         mONew = 1; // overlap on new MBR on changed dimension
-        ModifiableHyperBoundingBox ejMBR = new ModifiableHyperBoundingBox(ej.getMBR());
+        ModifiableHyperBoundingBox ejMBR = new ModifiableHyperBoundingBox(ej);
         lbNext = ejMBR.getMinRef();
         ubNext = ejMBR.getMaxRef();
         for(int i = 0; i < dimensionChanged.length; i++) {
@@ -965,7 +965,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     // in decreasing order to their distances
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      DoubleDistance dist = distFunction.centerDistance(mbr, entry.getMBR());
+      DoubleDistance dist = distFunction.centerDistance(mbr, entry);
       // DoubleDistance dist = distFunction.maxDist(entry.getMBR(), centroid);
       // DoubleDistance dist = distFunction.centerDistance(entry.getMBR(),
       // centroid);
@@ -1031,8 +1031,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
   @Override
   protected void insertLeafEntry(E entry) {
     // choose subtree for insertion
-    HyperBoundingBox mbr = entry.getMBR();
-    TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
+    TreeIndexPath<E> subtree = choosePath(getRootPath(), entry, 1);
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
@@ -1046,7 +1045,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     if(!hasOverflow(parent) && // no overflow treatment
     (parent.getPageID() == getRootEntry().getEntryID() || // is root
     // below: no changes in the MBR
-    subtree.getLastPathComponent().getEntry().getMBR().contains(((SpatialPointLeafEntry) entry).getValues()))) {
+    SpatialUtil.contains(subtree.getLastPathComponent().getEntry(), ((SpatialPointLeafEntry) entry).getValues()))) {
       return; // no need to adapt subtree
     }
 
@@ -1064,8 +1063,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
   @Override
   protected void insertDirectoryEntry(E entry, int level) {
     // choose node for insertion of o
-    HyperBoundingBox mbr = entry.getMBR();
-    TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
+    TreeIndexPath<E> subtree = choosePath(getRootPath(), entry, level);
     if(getLogger().isDebugging()) {
       getLogger().debugFine("subtree " + subtree);
     }
@@ -1078,7 +1076,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     if(!hasOverflow(parent) && // no overflow treatment
     (parent.getPageID() == getRootEntry().getEntryID() || // is root
     // below: no changes in the MBR
-    subtree.getLastPathComponent().getEntry().getMBR().contains(entry.getMBR()))) {
+    SpatialUtil.contains(subtree.getLastPathComponent().getEntry(), entry))) {
       return; // no need to adapt subtree
     }
 
@@ -1320,7 +1318,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry.getMBR(), object);
+          D distance = distanceFunction.minDist(entry, object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry)entry).getDBID()));
@@ -1332,7 +1330,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry.getMBR(), object);
+          D distance = distanceFunction.minDist(entry, object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             pq.add(distance, entry.getEntryID());
