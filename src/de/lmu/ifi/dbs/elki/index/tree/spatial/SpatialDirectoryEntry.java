@@ -43,11 +43,6 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
   }
 
   @Override
-  public HyperBoundingBox getMBR() {
-    return mbr;
-  }
-
-  @Override
   public int getDimensionality() {
     return mbr.getDimensionality();
   }

@@ -7,7 +7,8 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  * 
  * @author Erich Schubert
  */
-// IMPORTANT NOTE: when editing this class, bear in mind that the dimension numbers start at 1!
+// IMPORTANT NOTE: when editing this class, bear in mind that the dimension
+// numbers start at 1!
 public final class SpatialUtil {
   /**
    * Returns a clone of the minimum hyper point.
@@ -38,12 +39,11 @@ public final class SpatialUtil {
   }
 
   /**
-   * Returns true if this HyperBoundingBox and the given HyperBoundingBox
-   * intersect, false otherwise.
+   * Returns true if the two SpatialComparables intersect, false otherwise.
    * 
-   * @param box the HyperBoundingBox to be tested for intersection
-   * @return true if this HyperBoundingBox and the given HyperBoundingBox
-   *         intersect, false otherwise
+   * @param box1 the first SpatialComparable
+   * @param box2 the first SpatialComparable
+   * @return true if the SpatialComparables intersect, false otherwise
    */
   public static boolean intersects(SpatialComparable box1, SpatialComparable box2) {
     final int dim = box1.getDimensionality();
@@ -109,7 +109,7 @@ public final class SpatialUtil {
   }
 
   /**
-   * Computes the volume of this HyperBoundingBox
+   * Computes the volume of this SpatialComparable
    * 
    * @return the volume of this SpatialComparable
    */
@@ -137,16 +137,15 @@ public final class SpatialUtil {
   }
 
   /**
-   * Computes the volume of the overlapping box between this HyperBoundingBox
-   * and the given HyperBoundingBox and return the relation between the volume
-   * of the overlapping box and the volume of both HyperBoundingBoxes.
+   * Computes the volume of the overlapping box between two SpatialComparables
+   * and return the relation between the volume of the overlapping box and the
+   * volume of both SpatialComparable.
    * 
-   * @param box the HyperBoundingBox for which the intersection volume with this
-   *        HyperBoundingBox should be computed
-   * @return the relation between the volume of the overlapping box and the
-   *         volume of this HyperBoundingBox and the given HyperBoundingBox
+   * @param box1 the first SpatialComparable
+   * @param box2 the second SpatialComparable
+   * @return the overlap volume in relation to the singular volumes.
    */
-  public static double overlap(SpatialComparable box1, SpatialComparable box2) {
+  public static double relativeOverlap(SpatialComparable box1, SpatialComparable box2) {
     final int dim = box1.getDimensionality();
     if(dim != box2.getDimensionality()) {
       throw new IllegalArgumentException("This HyperBoundingBox and the given HyperBoundingBox need same dimensionality");
@@ -177,10 +176,10 @@ public final class SpatialUtil {
   }
 
   /**
-   * Computes the union HyperBoundingBox of this HyperBoundingBox and the given
-   * HyperBoundingBox.
+   * Computes the union HyperBoundingBox of two SpatialComparables.
    * 
-   * @param box the HyperBoundingBox to be united with this HyperBoundingBox
+   * @param box1 the first SpatialComparable
+   * @param box2 the second SpatialComparable
    * @return the union HyperBoundingBox of this HyperBoundingBox and the given
    *         HyperBoundingBox
    */
@@ -216,12 +215,12 @@ public final class SpatialUtil {
   }
 
   /**
-   * Returns the centroid of the specified values of this HyperBoundingBox.
+   * Returns the centroid of the specified values of this SpatialComparable.
    * 
    * @param obj Spatial object to process
    * @param start the start dimension to be considered
    * @param end the end dimension to be considered
-   * @return the centroid of the specified values of this HyperBoundingBox
+   * @return the centroid of the specified values of this SpatialComparable
    */
   public static double[] centroid(SpatialComparable obj, int start, int end) {
     double[] centroid = new double[end - start + 1];
@@ -229,5 +228,27 @@ public final class SpatialUtil {
       centroid[d - start + 1] = (obj.getMax(d + 1) + obj.getMin(d + 1)) / 2.0;
     }
     return centroid;
+  }
+
+  /**
+   * Test two SpatialComparables for equality.
+   * 
+   * @param box1 First bounding box
+   * @param box2 Second bounding box
+   * @return
+   */
+  public static boolean equals(SpatialComparable box1, SpatialComparable box2) {
+    if(box1.getDimensionality() != box2.getDimensionality()) {
+      return false;
+    }
+    for(int i = 1; i <= box1.getDimensionality(); i++) {
+      if(box1.getMin(i) != box2.getMin(i)) {
+        return false;
+      }
+      if(box1.getMax(i) != box2.getMax(i)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

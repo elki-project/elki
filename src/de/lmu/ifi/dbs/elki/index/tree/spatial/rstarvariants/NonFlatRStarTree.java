@@ -227,7 +227,7 @@ public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends Ab
     }
 
     // set root mbr
-    getRootEntry().setMBR(root.getMBR());
+    getRootEntry().setMBR(root.computeMBR());
 
     // write to file
     file.writePage(root);

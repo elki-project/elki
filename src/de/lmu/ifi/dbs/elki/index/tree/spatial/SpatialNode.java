@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.Node;
 
@@ -16,19 +15,5 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
  * @param <E> Entry type
  */
 public interface SpatialNode<N extends SpatialNode<N,E>, E extends SpatialEntry> extends Node<N,E>, SpatialComparable {
-  /**
-   * Returns the dimensionality of this spatial object.
-   *
-   * @return the dimensionality of this spatial object
-   */
-  @Override
-  int getDimensionality();
-
-  /**
-   * Computes and returns the MBR of this spatial object.
-   *
-   * @return the MBR of this spatial object
-   */
-  @Override
-  HyperBoundingBox getMBR();
+  // No additional methods.
 }

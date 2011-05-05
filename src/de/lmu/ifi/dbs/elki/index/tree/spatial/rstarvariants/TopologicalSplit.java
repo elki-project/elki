@@ -177,7 +177,7 @@ class TopologicalSplit<E extends SpatialEntry> {
       // test the sorting with respect to the minimal values
       HyperBoundingBox mbr1 = mbr(minSorting, 0, minEntries + i);
       HyperBoundingBox mbr2 = mbr(minSorting, minEntries + i, numEntries);
-      double currentOverlap = SpatialUtil.overlap(mbr1, mbr2);
+      double currentOverlap = SpatialUtil.relativeOverlap(mbr1, mbr2);
       double vol1 = SpatialUtil.volume(mbr1);
       double vol2 = SpatialUtil.volume(mbr2);
       if(currentOverlap < minOverlap || (currentOverlap == minOverlap && (vol1 + vol2) < volume)) {
@@ -189,7 +189,7 @@ class TopologicalSplit<E extends SpatialEntry> {
       // test the sorting with respect to the maximal values
       mbr1 = mbr(maxSorting, 0, minEntries + i);
       mbr2 = mbr(maxSorting, minEntries + i, numEntries);
-      currentOverlap = SpatialUtil.overlap(mbr1, mbr2);
+      currentOverlap = SpatialUtil.relativeOverlap(mbr1, mbr2);
       vol1 = SpatialUtil.volume(mbr1);
       vol2 = SpatialUtil.volume(mbr2);
       if(currentOverlap < minOverlap || (currentOverlap == minOverlap && (vol1 + vol2) < volume)) {

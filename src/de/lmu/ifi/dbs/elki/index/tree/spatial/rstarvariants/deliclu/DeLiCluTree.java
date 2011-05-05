@@ -196,7 +196,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
    */
   @Override
   protected DeLiCluEntry createNewDirectoryEntry(DeLiCluNode node) {
-    return new DeLiCluDirectoryEntry(node.getPageID(), node.getMBR(), node.hasHandled(), node.hasUnhandled());
+    return new DeLiCluDirectoryEntry(node.getPageID(), node.computeMBR(), node.hasHandled(), node.hasUnhandled());
   }
 
   /**

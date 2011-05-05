@@ -11,21 +11,11 @@ import de.lmu.ifi.dbs.elki.index.tree.Entry;
  */
 public interface SpatialEntry extends Entry, SpatialComparable {
   /**
-   * Returns the MBR of the underlying spatial object of this entry.
-   *
-   * @return the MBR of the underlying spatial object of this entry
-   * 
-   * @deprecated SpatialComparable interface should provide this access.
-   */
-  @Override
-  @Deprecated
-  public HyperBoundingBox getMBR();
-
-  /**
    * Sets the MBR of this entry. This method is only supported, if this entry is
    * a directory entry.
    *
    * @param mbr the MBR to be set
    */
+  // TODO: move into directory entry API.
   public void setMBR(HyperBoundingBox mbr);
 }
