@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;

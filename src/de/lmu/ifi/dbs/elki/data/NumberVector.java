@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 

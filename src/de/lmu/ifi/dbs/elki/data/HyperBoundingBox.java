@@ -7,6 +7,7 @@ import java.io.ObjectOutput;
 import java.text.NumberFormat;
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 
@@ -15,8 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @author Elke Achtert
  */
-// TODO: shouldn't this be generalized to Number?
-public class HyperBoundingBox implements Externalizable {
+public class HyperBoundingBox implements SpatialComparable, Externalizable {
   /**
    * Serial version
    */
@@ -55,10 +55,28 @@ public class HyperBoundingBox implements Externalizable {
   }
 
   /**
+   * Constructor, cloning an existing spatial object.
+   *
+   * @param other Object to clone
+   */
+  public HyperBoundingBox(SpatialComparable other) {
+    final int dim = other.getDimensionality();
+    this.min = new double[dim];
+    this.max = new double[dim];
+    for (int i = 0; i < dim; i++) {
+      this.min[i] = other.getMin(i);
+      this.max[i] = other.getMax(i);
+    }
+  }
+
+  /**
    * Returns a clone of the minimum hyper point.
    * 
    * @return the minimum hyper point
+   * 
+   * @deprecated Use SpatialUtil.getMin(mbr)?
    */
+  @Deprecated
   public double[] getMin() {
     return min.clone();
   }
@@ -72,6 +90,7 @@ public class HyperBoundingBox implements Externalizable {
    * @return the coordinate at the specified dimension of the minimum hyper
    *         point
    */
+  @Override
   public double getMin(int dimension) {
     return min[dimension - 1];
   }
@@ -80,7 +99,10 @@ public class HyperBoundingBox implements Externalizable {
    * Returns a clone of the maximum hyper point.
    * 
    * @return the maximum hyper point
+   * 
+   * @deprecated Use SpatialUtil.getMin(mbr)?
    */
+  @Deprecated
   public double[] getMax() {
     return max.clone();
   }
@@ -94,6 +116,7 @@ public class HyperBoundingBox implements Externalizable {
    * @return the coordinate at the specified dimension of the maximum hyper
    *         point
    */
+  @Override
   public double getMax(int dimension) {
     return max[dimension - 1];
   }
@@ -103,193 +126,9 @@ public class HyperBoundingBox implements Externalizable {
    * 
    * @return the dimensionality of this HyperBoundingBox
    */
+  @Override
   public int getDimensionality() {
     return min.length;
-  }
-
-  /**
-   * Returns true if this HyperBoundingBox and the given HyperBoundingBox
-   * intersect, false otherwise.
-   * 
-   * @param box the HyperBoundingBox to be tested for intersection
-   * @return true if this HyperBoundingBox and the given HyperBoundingBox
-   *         intersect, false otherwise
-   */
-  public boolean intersects(HyperBoundingBox box) {
-    if(this.getDimensionality() != box.getDimensionality()) {
-      throw new IllegalArgumentException("This HyperBoundingBox and the given HyperBoundingBox need same dimensionality");
-    }
-
-    boolean intersect = true;
-    for(int i = 0; i < min.length; i++) {
-      if(this.min[i] > box.max[i] || this.max[i] < box.min[i]) {
-        intersect = false;
-        break;
-      }
-    }
-    return intersect;
-  }
-
-  /**
-   * Returns true if this HyperBoundingBox contains the given HyperBoundingBox,
-   * false otherwise.
-   * 
-   * @param box the HyperBoundingBox to be tested for containment
-   * @return true if this HyperBoundingBox contains the given HyperBoundingBox,
-   *         false otherwise
-   */
-  public boolean contains(HyperBoundingBox box) {
-    if(this.getDimensionality() != box.getDimensionality()) {
-      throw new IllegalArgumentException("This HyperBoundingBox and the given HyperBoundingBox need same dimensionality");
-    }
-
-    boolean contains = true;
-    for(int i = 0; i < min.length; i++) {
-      if(this.min[i] > box.min[i] || this.max[i] < box.max[i]) {
-        contains = false;
-        break;
-      }
-    }
-    return contains;
-  }
-
-  /**
-   * Returns true if this HyperBoundingBox contains the given point, false
-   * otherwise.
-   * 
-   * @param point the point to be tested for containment
-   * @return true if this HyperBoundingBox contains the given point, false
-   *         otherwise
-   */
-  public boolean contains(double[] point) {
-    if(this.getDimensionality() != point.length) {
-      throw new IllegalArgumentException("This HyperBoundingBox and the given point need same dimensionality");
-    }
-
-    boolean contains = true;
-    for(int i = 0; i < min.length; i++) {
-      if(this.min[i] > point[i] || this.max[i] < point[i]) {
-        contains = false;
-        break;
-      }
-    }
-    return contains;
-  }
-
-  /**
-   * Computes the volume of this HyperBoundingBox
-   * 
-   * @return the volume of this HyperBoundingBox
-   */
-  public double volume() {
-    double vol = 1;
-    for(int i = 0; i < min.length; i++) {
-      vol *= max[i] - min[i];
-    }
-    return vol;
-  }
-
-  /**
-   * Computes the perimeter of this HyperBoundingBox.
-   * 
-   * @return the perimeter of this HyperBoundingBox
-   */
-  public double perimeter() {
-    double perimeter = 0;
-    for(int i = 0; i < min.length; i++) {
-      perimeter += max[i] - min[i];
-    }
-    return perimeter;
-  }
-
-  /**
-   * Computes the volume of the overlapping box between this HyperBoundingBox
-   * and the given HyperBoundingBox and return the relation between the volume
-   * of the overlapping box and the volume of both HyperBoundingBoxes.
-   * 
-   * @param box the HyperBoundingBox for which the intersection volume with this
-   *        HyperBoundingBox should be computed
-   * @return the relation between the volume of the overlapping box and the
-   *         volume of this HyperBoundingBox and the given HyperBoundingBox
-   */
-  public double overlap(HyperBoundingBox box) {
-    if(this.getDimensionality() != box.getDimensionality()) {
-      throw new IllegalArgumentException("This HyperBoundingBox and the given HyperBoundingBox need same dimensionality");
-    }
-
-    // the maximal and minimal value of the overlap box.
-    double omax, omin;
-
-    // the overlap volume
-    double overlap = 1.0;
-
-    for(int i = 0; i < min.length; i++) {
-      // The maximal value of that overlap box in the current
-      // dimension is the minimum of the max values.
-      omax = Math.min(max[i], box.max[i]);
-      // The minimal value is the maximum of the min values.
-      omin = Math.max(min[i], box.min[i]);
-
-      // if omax <= omin in any dimension, the overlap box has a volume of zero
-      if(omax <= omin) {
-        return 0.0;
-      }
-
-      overlap *= omax - omin;
-    }
-
-    return overlap / (volume() + box.volume());
-  }
-
-  /**
-   * Computes the union HyperBoundingBox of this HyperBoundingBox and the given
-   * HyperBoundingBox.
-   * 
-   * @param box the HyperBoundingBox to be united with this HyperBoundingBox
-   * @return the union HyperBoundingBox of this HyperBoundingBox and the given
-   *         HyperBoundingBox
-   */
-  public HyperBoundingBox union(HyperBoundingBox box) {
-    if(this.getDimensionality() != box.getDimensionality()) {
-      throw new IllegalArgumentException("This HyperBoundingBox and the given HyperBoundingBox need same dimensionality");
-    }
-
-    double[] min = new double[this.min.length];
-    double[] max = new double[this.max.length];
-
-    for(int i = 0; i < this.min.length; i++) {
-      min[i] = Math.min(this.min[i], box.min[i]);
-      max[i] = Math.max(this.max[i], box.max[i]);
-    }
-    return new HyperBoundingBox(min, max);
-  }
-
-  /**
-   * Returns the centroid of this HyperBoundingBox.
-   * 
-   * @return the centroid of this HyperBoundingBox
-   */
-  public double[] centroid() {
-    double[] centroid = new double[getDimensionality()];
-    for(int d = 0; d < getDimensionality(); d++) {
-      centroid[d] = (max[d] + min[d]) / 2.0;
-    }
-    return centroid;
-  }
-
-  /**
-   * Returns the centroid of the specified values of this HyperBoundingBox.
-   * 
-   * @param start the start dimension to be considered
-   * @param end the end dimension to be considered
-   * @return the centroid of the specified values of this HyperBoundingBox
-   */
-  public double[] centroid(int start, int end) {
-    double[] centroid = new double[end - start + 1];
-    for(int d = start - 1; d < end; d++) {
-      centroid[d - start + 1] = (max[d] + min[d]) / 2.0;
-    }
-    return centroid;
   }
 
   /**
@@ -382,5 +221,10 @@ public class HyperBoundingBox implements Externalizable {
     for(int i = 0; i < max.length; i++) {
       max[i] = in.readDouble();
     }
+  }
+
+  @Override
+  public HyperBoundingBox getMBR() {
+    return this;
   }
 }

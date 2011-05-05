@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -305,7 +306,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
         }
         else {
           ids = interval.getIDs();
-          basis_dim_minus_1 = determineBasis(interval.centroid());
+          basis_dim_minus_1 = determineBasis(SpatialUtil.centroid(interval));
         }
 
         if(ids.size() != 0) {

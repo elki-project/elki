@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+
 /**
  * MBR class allowing modifications (as opposed to {@link HyperBoundingBox}).
  * 
@@ -28,8 +31,8 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    * 
    * @param hbb existing hyperboundingbox
    */
-  public ModifiableHyperBoundingBox(HyperBoundingBox hbb) {
-    super(hbb.min.clone(), hbb.max.clone());
+  public ModifiableHyperBoundingBox(SpatialComparable hbb) {
+    super(SpatialUtil.getMin(hbb), SpatialUtil.getMax(hbb));
   }
 
   /**

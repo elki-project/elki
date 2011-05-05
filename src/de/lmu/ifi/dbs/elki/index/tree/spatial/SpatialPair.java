@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**

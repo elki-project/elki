@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -69,8 +68,8 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
     }
 
     // find the leaf node containing o
-    HyperBoundingBox mbr = relation.get(id).getMBR();
-    TreeIndexPath<DeLiCluEntry> pathToObject = findPathToObject(getRootPath(), mbr, id);
+    O obj = relation.get(id);
+    TreeIndexPath<DeLiCluEntry> pathToObject = findPathToObject(getRootPath(), obj, id);
 
     if(pathToObject == null) {
       return null;

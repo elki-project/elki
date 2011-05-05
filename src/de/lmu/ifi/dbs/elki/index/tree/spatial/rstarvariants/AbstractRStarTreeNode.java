@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -61,13 +63,13 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     if(firstEntry == null) {
       return null;
     }
-    int dim = firstEntry.getMBR().getDimensionality();
+    int dim = firstEntry.getDimensionality();
     // Note: we deliberately get a cloned copy here, since we will modify it.
-    double[] min = firstEntry.getMBR().getMin();
-    double[] max = firstEntry.getMBR().getMax();
+    double[] min = SpatialUtil.getMin(firstEntry);
+    double[] max = SpatialUtil.getMax(firstEntry);
 
     for(int i = 1; i < getNumEntries(); i++) {
-      HyperBoundingBox mbr = getEntry(i).getMBR();
+      SpatialComparable mbr = getEntry(i);
       for(int d = 1; d <= dim; d++) {
         if(min[d - 1] > mbr.getMin(d)) {
           min[d - 1] = mbr.getMin(d);
@@ -82,7 +84,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
   @Override
   public int getDimensionality() {
-    return getEntry(0).getMBR().getDimensionality();
+    return getEntry(0).getDimensionality();
   }
 
   /**
@@ -101,8 +103,8 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param responsibleMBR the MBR of the object or node which is responsible for the call of the method
    * @return the MBR of the new Node
    */
-  public E adjustEntryIncremental(E entry, HyperBoundingBox responsibleMBR){
-      entry.setMBR(entry.getMBR().union(responsibleMBR));
+  public E adjustEntryIncremental(E entry, SpatialComparable responsibleMBR){
+      entry.setMBR(SpatialUtil.union(entry, responsibleMBR));
       return entry;
   }
 

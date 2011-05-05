@@ -5,6 +5,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -111,7 +112,7 @@ public class CASHIntervalSplit {
       }
 
       if(f_min - f_max > ParameterizationFunction.DELTA) {
-        throw new IllegalArgumentException("Houston, we have a problem: f_min > f_max! " + "\nf_min[" + FormatUtil.format(interval.centroid()) + "] = " + f_min + "\nf_max[" + FormatUtil.format(interval.centroid()) + "] = " + f_max + "\nf " + database.get(id));
+        throw new IllegalArgumentException("Houston, we have a problem: f_min > f_max! " + "\nf_min[" + FormatUtil.format(SpatialUtil.centroid(interval)) + "] = " + f_min + "\nf_max[" + FormatUtil.format(SpatialUtil.centroid(interval)) + "] = " + f_max + "\nf " + database.get(id));
       }
 
       if(f_min <= d_max && f_max >= d_min) {

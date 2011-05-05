@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -130,14 +131,14 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
     }
 
     if(extremumType.equals(ExtremumType.CONSTANT)) {
-      double[] centroid = interval.centroid();
+      double[] centroid = SpatialUtil.centroid(interval);
       return new HyperBoundingBox(centroid, centroid);
     }
 
     double[] alpha_min = new double[dim - 1];
     double[] alpha_max = new double[dim - 1];
 
-    if(interval.contains(alphaExtremum)) {
+    if(SpatialUtil.contains(interval, alphaExtremum)) {
       if(extremumType.equals(ExtremumType.MINIMUM)) {
         alpha_min = alphaExtremum;
         for(int d = dim - 2; d >= 0; d--) {
@@ -185,7 +186,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
     System.arraycopy(alpha_extreme, 0, alpha_extreme_r, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_c, 0, alpha_extreme.length);
 
-    double[] centroid = interval.centroid();
+    double[] centroid = SpatialUtil.centroid(interval);
     for(int i = 0; i < n; i++) {
       alpha_extreme_l[i] = centroid[i];
       alpha_extreme_r[i] = centroid[i];

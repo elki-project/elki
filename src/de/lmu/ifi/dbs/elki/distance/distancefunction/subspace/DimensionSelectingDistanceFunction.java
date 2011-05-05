@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -61,7 +61,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   }
 
   @Override
-  public DoubleDistance minDist(HyperBoundingBox mbr, NumberVector<?, ?> v) {
+  public DoubleDistance minDist(SpatialComparable mbr, NumberVector<?, ?> v) {
     if(dim > mbr.getDimensionality() || dim > v.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString() + "\n  dimension: " + dim);
     }
@@ -89,7 +89,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
    */
 
   @Override
-  public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  public DoubleDistance mbrDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
@@ -113,7 +113,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   }
 
   @Override
-  public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
