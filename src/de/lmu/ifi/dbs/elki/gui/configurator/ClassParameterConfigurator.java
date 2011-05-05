@@ -44,7 +44,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
     // For parameters with a default value, offer using the default
     // For optional parameters, offer not specifying them.
     if(cp.hasDefaultValue()) {
-      value.addItem(DynamicParameters.STRING_USE_DEFAULT);
+      value.addItem(DynamicParameters.STRING_USE_DEFAULT + " " + cp.getDefaultValueAsString());
     }
     else if(cp.isOptional()) {
       value.addItem(DynamicParameters.STRING_OPTIONAL);
@@ -95,7 +95,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
   @Override
   public String getUserInput() {
     String val = (String) value.getSelectedItem();
-    if(val == DynamicParameters.STRING_USE_DEFAULT) {
+    if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
       return null;
     }
     if(val == DynamicParameters.STRING_OPTIONAL) {

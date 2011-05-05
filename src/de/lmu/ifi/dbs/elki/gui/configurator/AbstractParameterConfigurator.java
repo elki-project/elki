@@ -65,7 +65,7 @@ public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> i
       if(param.isDefined() && param.tookDefaultValue() && !(param instanceof Flag)) {
         // TODO: better icon for default value?
         icon = new JLabel(StockIcon.getStockIcon(StockIcon.DIALOG_INFORMATION));
-        icon.setToolTipText("Default value");
+        icon.setToolTipText("Default value: "+param.getDefaultValueAsString());
       }
       else {
         icon = new JLabel();

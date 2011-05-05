@@ -213,7 +213,7 @@ public class ParameterTable extends JTable {
           // For parameters with a default value, offer using the default
           // For optional parameters, offer not specifying them.
           if(cp.hasDefaultValue()) {
-            comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT);
+            comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + " " + cp.getDefaultValueAsString());
           }
           else if(cp.isOptional()) {
             comboBox.addItem(DynamicParameters.STRING_OPTIONAL);
@@ -414,7 +414,7 @@ public class ParameterTable extends JTable {
      * Modified popup
      * 
      * @author Erich Schubert
-     *
+     * 
      * @apiviz.exclude
      */
     class SuperPopup extends BasicComboPopup {
@@ -489,8 +489,13 @@ public class ParameterTable extends JTable {
             combo.addItem(name);
           }
         }
-        if(option.isDefined() && !option.tookDefaultValue()) {
-          textfield.setText(option.getValueAsString());
+        if(option.isDefined()) {
+          if(option.tookDefaultValue()) {
+            textfield.setText(DynamicParameters.STRING_USE_DEFAULT + " " + option.getDefaultValueAsString());
+          }
+          else {
+            textfield.setText(option.getValueAsString());
+          }
         }
         else {
           textfield.setText("");
