@@ -156,7 +156,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
     Class<OPTICS<V, PreferenceVectorBasedCorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
     OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = null;
     optics = opticsconfig.tryInstantiate(cls);
-    ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database);
+    ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database, relation);
 
     if(logger.isVerbose()) {
       logger.verbose("*** Compute Clusters.");
@@ -658,7 +658,6 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       ListParameterization opticsParameters = new ListParameterization();
       opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
       opticsParameters.addParameter(OPTICS.MINPTS_ID, minpts);
-      opticsParameters.addParameter(OPTICS.XI_ID, 0.0);
       // Configure OPTICS. Untracked parameters
       ListParameterization opticsUntrackedParameters = new ListParameterization();
       opticsUntrackedParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, dishDistance);

@@ -1,18 +1,12 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.HiSCDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -44,36 +38,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("Finding Hierarchies of Subspace Clusters")
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Finding Hierarchies of Subspace Clusters", booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
-public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<ClusterOrderResult<PreferenceVectorBasedCorrelationDistance>> {
-  // TODO: make this a subclass of OPTICS.
-
+public class HiSC<V extends NumberVector<V, ?>> extends OPTICS<V, PreferenceVectorBasedCorrelationDistance> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(HiSC.class);
 
   /**
-   * Internal OPTICS instance.
-   */
-  private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
-
-  /**
    * Constructor.
-   * 
-   * @param optics OPTICS to use
+   *
+   * @param distanceFunction HiSC distance function used
    */
-  public HiSC(OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics) {
-    this.optics = optics;
-  }
-
-  @Override
-  public ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> run(Database database) throws IllegalStateException {
-    return optics.run(database);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  public HiSC(HiSCDistanceFunction<V> distanceFunction) {
+    super(distanceFunction, distanceFunction.getDistanceFactory().infiniteDistance(), 2);
   }
 
   @Override
@@ -89,7 +66,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
-    protected OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
+    HiSCDistanceFunction<V> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -100,29 +77,24 @@ public class HiSC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
         alpha = alphaP.getValue();
       }
 
-      // Configure OPTICS
+      // Configure HiSC distance function
       ListParameterization opticsParameters = new ListParameterization();
 
-      // epsilon and minpts
-      opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
-      opticsParameters.addParameter(OPTICS.MINPTS_ID, 2);
       // distance function
-      opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, HiSCDistanceFunction.class);
       opticsParameters.addParameter(HiSCDistanceFunction.EPSILON_ID, alpha);
-      // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
       // preprocessor
       opticsParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, HiSCPreferenceVectorIndex.Factory.class);
       opticsParameters.addParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, alpha);
 
       ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
       chain.errorsTo(config);
-      Class<OPTICS<V, PreferenceVectorBasedCorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
-      optics = chain.tryInstantiate(cls);
+      Class<HiSCDistanceFunction<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(HiSCDistanceFunction.class);
+      distanceFunction = chain.tryInstantiate(cls);
     }
 
     @Override
     protected HiSC<V> makeInstance() {
-      return new HiSC<V>(optics);
+      return new HiSC<V>(distanceFunction);
     }
   }
 }

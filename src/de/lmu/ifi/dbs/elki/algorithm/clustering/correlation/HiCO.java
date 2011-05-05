@@ -1,20 +1,13 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PCABasedCorrelationDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.AbstractDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -49,9 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Mining Hierarchies of Correlation Clusters")
 @Description("Algorithm for detecting hierarchies of correlation clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger, A. Zimek", title = "Mining Hierarchies of Correlation Clusterse", booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06), Vienna, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.35")
-public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<ClusterOrderResult<PCACorrelationDistance>> {
-  // TODO: make this a subclass of OPTICS.
-
+public class HiCO<V extends NumberVector<V, ?>> extends OPTICS<V, PCACorrelationDistance> {
   /**
    * The logger for this class.
    */
@@ -117,23 +108,13 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
   public static final double DEFAULT_ALPHA = 0.85;
 
   /**
-   * Internal OPTICS used by HiCO
+   * Constructor.
+   *
+   * @param distanceFunction Distance function
+   * @param mu Mu parameter
    */
-  private OPTICS<V, PCACorrelationDistance> optics;
-
-  public HiCO(OPTICS<V, PCACorrelationDistance> optics) {
-    super();
-    this.optics = optics;
-  }
-
-  @Override
-  public ClusterOrderResult<PCACorrelationDistance> run(Database database) throws IllegalStateException {
-    return optics.run(database);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  public HiCO(PCABasedCorrelationDistanceFunction distanceFunction, int mu) {
+    super(distanceFunction, distanceFunction.getDistanceFactory().infiniteDistance(), mu);
   }
 
   @Override
@@ -149,51 +130,55 @@ public class HiCO<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
-    protected OPTICS<V, PCACorrelationDistance> optics;
-
+    int mu = -1;
+    
+    PCABasedCorrelationDistanceFunction distance;
+    
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
       IntParameter muP = new IntParameter(MU_ID, new GreaterConstraint(0));
-      int mu = -1;
       if (config.grab(muP)) {
         mu = muP.getValue();
       }
 
       IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0), true);
-      config.grab(kP);
-      final int k = kP.isDefined() ? kP.getValue() : muP.getValue();
+      final int k;
+      if (config.grab(kP)) {
+        k = kP.getValue();
+      } else {
+        k = mu;
+      }
 
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), DEFAULT_DELTA);
-      config.grab(deltaP);
+      double delta = DEFAULT_DELTA;
+      if (config.grab(deltaP)) {
+        delta = deltaP.getValue();
+      }
 
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
-      config.grab(alphaP);
+      double alpha = DEFAULT_ALPHA;
+      if (config.grab(alphaP)) {
+        alpha = alphaP.getValue();
+      }
 
-      // Configure OPTICS
+      // Configure Distance function
       ListParameterization opticsParameters = new ListParameterization();
-      // epsilon and minpts
-      opticsParameters.addParameter(OPTICS.EPSILON_ID, AbstractDistance.INFINITY_PATTERN);
-      opticsParameters.addParameter(OPTICS.MINPTS_ID, mu);
-      // distance function
-      opticsParameters.addParameter(OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class);
-      // opticsParameters.addFlag(PreprocessorHandler.OMIT_PREPROCESSING_ID);
       // preprocessor
       opticsParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, KNNQueryFilteredPCAIndex.Factory.class);
       opticsParameters.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, k);
-      opticsParameters.addParameter(PercentageEigenPairFilter.ALPHA_ID, alphaP.getValue());
-      opticsParameters.addParameter(PCABasedCorrelationDistanceFunction.DELTA_ID, deltaP.getValue());
+      opticsParameters.addParameter(PercentageEigenPairFilter.ALPHA_ID, alpha);
+      opticsParameters.addParameter(PCABasedCorrelationDistanceFunction.DELTA_ID, delta);
 
       ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
       chain.errorsTo(config);
-      Class<OPTICS<V, PCACorrelationDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(OPTICS.class);
-      optics = chain.tryInstantiate(cls);
+      distance = chain.tryInstantiate(PCABasedCorrelationDistanceFunction.class);
     }
 
     @Override
     protected HiCO<V> makeInstance() {
-      return new HiCO<V>(optics);
+      return new HiCO<V>(distance, mu);
     }
   }
 }

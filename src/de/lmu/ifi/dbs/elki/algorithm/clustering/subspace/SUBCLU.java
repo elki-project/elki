@@ -291,7 +291,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     if(logger.isVerbose()) {
       logger.verbose("\nRun DBSCAN on subspace " + subspace.dimensonsToString());
     }
-    Clustering<Model> dbsres = dbscan.run(proxy);
+    Clustering<Model> dbsres = dbscan.run(proxy, prep);
 
     // separate cluster and noise
     List<Cluster<Model>> clusterAndNoise = dbsres.getAllClusters();

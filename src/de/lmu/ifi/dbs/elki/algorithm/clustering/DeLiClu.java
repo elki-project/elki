@@ -18,8 +18,6 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -30,7 +28,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -39,9 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -63,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("DeliClu: Density-Based Hierarchical Clustering")
 @Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_16")
-public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<NV, D, ClusterOrderResult<D>> {
+public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<NV, D, ClusterOrderResult<D>> implements OPTICSTypeAlgorithm<D> {
   /**
    * The logger for this class.
    */
@@ -81,19 +76,9 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   private UpdatableHeap<SpatialObjectPair> heap;
 
   /**
-   * Parameter to specify the steepness threshold.
-   */
-  public static final OptionID XI_ID = OptionID.getOrCreateOptionID("deliclu.xi", "Threshold for the steepness requirement.");
-
-  /**
    * Holds the knnJoin algorithm.
    */
   private KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry> knnJoin;
-
-  /**
-   * Holds the value of {@link #XI_ID}.
-   */
-  private double ixi;
 
   /**
    * Holds the value of {@link #MINPTS_ID}.
@@ -105,13 +90,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * 
    * @param distanceFunction Distance function
    * @param minpts MinPts
-   * @param xi Xi parameter
    */
-  public DeLiClu(DistanceFunction<? super NV, D> distanceFunction, int minpts, double xi) {
+  public DeLiClu(DistanceFunction<? super NV, D> distanceFunction, int minpts) {
     super(distanceFunction);
     this.knnJoin = new KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry>(distanceFunction, minpts);
     this.minpts = minpts;
-    this.ixi = 1.0 - xi;
   }
 
   public ClusterOrderResult<D> run(Database database, Relation<NV> relation) {
@@ -132,7 +115,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     if(logger.isVerbose()) {
       logger.verbose("knnJoin...");
     }
-    DataStore<KNNList<D>> knns = knnJoin.run(database);
+    DataStore<KNNList<D>> knns = knnJoin.run(database, relation);
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("DeLiClu", relation.size(), logger) : null;
     final int size = relation.size();
@@ -182,16 +165,6 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     }
     if(progress != null) {
       progress.ensureCompleted(logger);
-    }
-    if(ixi < 1.) {
-      if(NumberDistance.class.isInstance(getDistanceFunction().getDistanceFactory())) {
-        logger.verbose("Extracting clusters with Xi: " + (1. - ixi));
-        ClusterOrderResult<DoubleDistance> distanceClusterOrder = ClassGenericsUtil.castWithGenericsOrNull(ClusterOrderResult.class, clusterOrder);
-        OPTICSXi.extractClusters(distanceClusterOrder, relation, ixi, minpts);
-      }
-      else {
-        logger.verbose("Xi cluster extraction only supported for number distances!");
-      }
     }
     return clusterOrder;
   }
@@ -347,6 +320,16 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   }
 
   @Override
+  public int getMinPts() {
+    return minpts;
+  }
+
+  @Override
+  public D getDistanceFactory() {
+    return getDistanceFunction().getDistanceFactory();
+  }
+
+  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
@@ -476,8 +459,6 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   public static class Parameterizer<NV extends NumberVector<NV, ?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<NV, D> {
     protected int minpts = 0;
 
-    protected double xi = 0.0;
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -486,17 +467,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }
-
-      DoubleParameter xiP = new DoubleParameter(XI_ID, true);
-      xiP.addConstraint(new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
-      if(config.grab(xiP)) {
-        xi = xiP.getValue();
-      }
     }
 
     @Override
     protected DeLiClu<NV, D> makeInstance() {
-      return new DeLiClu<NV, D>(distanceFunction, minpts, xi);
+      return new DeLiClu<NV, D>(distanceFunction, minpts);
     }
   }
 }

@@ -7,9 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -22,6 +25,12 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyHashmapList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Class to handle OPTICS Xi extraction.
@@ -29,25 +38,73 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarch
  * @author Erich Schubert
  * 
  * @apiviz.has SteepAreaResult
+ * 
+ * @param <N> Number distance used by OPTICS
  */
-// TODO: make non-static
-public class OPTICSXi {
+public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OPTICS.class);
+  private static final Logging logger = Logging.getLogger(OPTICSXi.class);
+
+  /**
+   * Parameter to specify the actual OPTICS algorithm to use.
+   */
+  public static final OptionID XIALG_ID = OptionID.getOrCreateOptionID("opticsxi.algorithm", "The actual OPTICS-type algorithm to use.");
+
+  /**
+   * Parameter to specify the steepness threshold.
+   */
+  public static final OptionID XI_ID = OptionID.getOrCreateOptionID("opticsxi.xi", "Threshold for the steepness requirement.");
+
+  /**
+   * The actual algorithm we use.
+   */
+  OPTICSTypeAlgorithm<N> optics;
+
+  /**
+   * Xi parameter
+   */
+  double xi;
+
+  /**
+   * Constructor.
+   * 
+   * @param optics OPTICS algorithm to use
+   * @param xi Xi value
+   */
+  public OPTICSXi(OPTICSTypeAlgorithm<N> optics, double xi) {
+    super();
+    this.optics = optics;
+    this.xi = xi;
+  }
+
+  public Clustering<OPTICSModel> run(Database database, Relation<?> relation) {
+    // TODO: ensure we are using the same relation?
+    ClusterOrderResult<N> opticsresult = optics.run(database);
+
+    if(!NumberDistance.class.isInstance(optics.getDistanceFactory())) {
+      logger.verbose("Xi cluster extraction only supported for number distances!");
+      return null;
+    }
+
+    if(logger.isVerbose()) {
+      logger.verbose("Extracting clusters with Xi: " + xi);
+    }
+    return extractClusters(opticsresult, relation, 1.0 - xi, optics.getMinPts());
+  }
 
   /**
    * Extract clusters from a cluster order result.
    * 
    * @param <N> distance type
    * @param clusterOrderResult cluster order result
-   * @param database Database
+   * @param relation Relation
    * @param ixi Parameter 1 - Xi
    * @param minpts Parameter minPts
    */
   // TODO: resolve handling of the last point in the cluster order
-  public static <N extends NumberDistance<N, ?>> void extractClusters(ClusterOrderResult<N> clusterOrderResult, Relation<?> database, double ixi, int minpts) {
+  private Clustering<OPTICSModel> extractClusters(ClusterOrderResult<N> clusterOrderResult, Relation<?> relation, double ixi, int minpts) {
     // TODO: add progress?
     List<ClusterOrderEntry<N>> clusterOrder = clusterOrderResult.getClusterOrder();
     double mib = 0.0;
@@ -57,8 +114,8 @@ public class OPTICSXi {
     List<SteepDownArea> sdaset = new java.util.Vector<SteepDownArea>();
     ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<Cluster<OPTICSModel>>();
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<Cluster<OPTICSModel>>();
-    HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(database.getDBIDs());
-  
+    HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
+
     SteepScanPosition<N> scan = new SteepScanPosition<N>(clusterOrder);
     while(scan.hasNext()) {
       final int curpos = scan.index;
@@ -249,7 +306,9 @@ public class OPTICSXi {
       if(salist != null) {
         clusterOrderResult.addChildResult(new SteepAreaResult(salist));
       }
+      return clustering;
     }
+    return null;
   }
 
   /**
@@ -270,6 +329,16 @@ public class OPTICSXi {
         sda.setMib(Math.max(sda.getMib(), mib));
       }
     }
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return optics.getInputTypeRestriction();
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 
   /**
@@ -544,6 +613,39 @@ public class OPTICSXi {
     @Override
     public Iterator<SteepArea> iterator() {
       return areas.iterator();
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+    protected OPTICSTypeAlgorithm<D> optics;
+
+    protected double xi = 0.0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter xiP = new DoubleParameter(XI_ID, true);
+      xiP.addConstraint(new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
+      if(config.grab(xiP)) {
+        xi = xiP.getValue();
+      }
+
+      ClassParameter<OPTICSTypeAlgorithm<D>> opticsP = new ClassParameter<OPTICSTypeAlgorithm<D>>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICS.class);
+      if(config.grab(opticsP)) {
+        optics = opticsP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected OPTICSXi<D> makeInstance() {
+      return new OPTICSXi<D>(optics, xi);
     }
   }
 }
