@@ -215,7 +215,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   /**
    * Main part of the algorithm. Fast version.
    * 
-   * @param database Database to use
+   * @param relation Relation to use
    * @param k k for kNN queries
    * @param sampleSize Sample size
    * @return result
@@ -577,7 +577,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * 
    * @param database
    * @param relation
-   * @return
+   * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<V> relation) {
     if(sampleSize > 0) {

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -31,8 +30,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -196,10 +195,9 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * 
    * @param database Database
    * @param relation Relation
-   * @return
-   * @throws IllegalStateException
+   * @return Clustering result
    */
-  public Clustering<Model> run(Database database, Relation<ParameterizationFunction> relation) throws IllegalStateException {
+  public Clustering<Model> run(Database database, Relation<ParameterizationFunction> relation) {
     this.relation = relation;
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();
@@ -390,15 +388,15 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * Initializes the heap with the root intervals.
    * 
    * @param heap the heap to be initialized
-   * @param database the database storing the parameterization functions
+   * @param relation the database storing the parameterization functions
    * @param dim the dimensionality of the database
    * @param ids the ids of the database
    */
-  private void initHeap(DefaultHeap<Integer, CASHInterval> heap, Relation<ParameterizationFunction> database, int dim, DBIDs ids) {
-    CASHIntervalSplit split = new CASHIntervalSplit(database, minPts);
+  private void initHeap(DefaultHeap<Integer, CASHInterval> heap, Relation<ParameterizationFunction> relation, int dim, DBIDs ids) {
+    CASHIntervalSplit split = new CASHIntervalSplit(relation, minPts);
 
     // determine minimum and maximum function value of all functions
-    double[] minMax = determineMinMaxDistance(database, dim);
+    double[] minMax = determineMinMaxDistance(relation, dim);
 
     double d_min = minMax[0];
     double d_max = minMax[1];
@@ -467,13 +465,13 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @param dim the dimensionality of the database
    * @param basis the basis defining the subspace
    * @param ids the ids for the new database
-   * @param database the database storing the parameterization functions
+   * @param relation the database storing the parameterization functions
    * @return a dim-1 dimensional database where the objects are projected into
    *         the specified subspace
    * @throws UnableToComplyException if an error according to the database
    *         occurs
    */
-  private MaterializedRelation<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Relation<ParameterizationFunction> database) throws UnableToComplyException {
+  private MaterializedRelation<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Relation<ParameterizationFunction> relation) throws UnableToComplyException {
     ProxyDatabase proxy = new ProxyDatabase(ids);
     VectorFieldTypeInformation<ParameterizationFunction> type = VectorFieldTypeInformation.get(ParameterizationFunction.class, basis.getColumnDimensionality());
     MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<ParameterizationFunction>(proxy, type, ids);
@@ -481,7 +479,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
     
     // Project
     for(DBID id : ids) {
-      ParameterizationFunction f = project(basis, database.get(id));
+      ParameterizationFunction f = project(basis, relation.get(id));
       prep.set(id, f);
     }
 
@@ -625,23 +623,23 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
   /**
    * Returns the set of ids belonging to the specified database.
    * 
-   * @param database the database containing the parameterization functions.
+   * @param relation the database containing the parameterization functions.
    * @return the set of ids belonging to the specified database
    */
-  private ModifiableDBIDs getDatabaseIDs(Relation<ParameterizationFunction> database) {
-    return DBIDUtil.newHashSet(database.getDBIDs());
+  private ModifiableDBIDs getDatabaseIDs(Relation<ParameterizationFunction> relation) {
+    return DBIDUtil.newHashSet(relation.getDBIDs());
   }
 
   /**
    * Determines the minimum and maximum function value of all parameterization
    * functions stored in the specified database.
    * 
-   * @param database the database containing the parameterization functions.
+   * @param relation the database containing the parameterization functions.
    * @param dimensionality the dimensionality of the database
    * @return an array containing the minimum and maximum function value of all
    *         parameterization functions stored in the specified database
    */
-  private double[] determineMinMaxDistance(Relation<ParameterizationFunction> database, int dimensionality) {
+  private double[] determineMinMaxDistance(Relation<ParameterizationFunction> relation, int dimensionality) {
     double[] min = new double[dimensionality - 1];
     double[] max = new double[dimensionality - 1];
     Arrays.fill(max, Math.PI);
@@ -649,12 +647,11 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
 
     double d_min = Double.POSITIVE_INFINITY;
     double d_max = Double.NEGATIVE_INFINITY;
-    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
-      DBID id = it.next();
-      ParameterizationFunction f = database.get(id);
+    for(DBID id : relation.iterDBIDs()) {
+      ParameterizationFunction f = relation.get(id);
       HyperBoundingBox minMax = f.determineAlphaMinMax(box);
-      double f_min = f.function(minMax.getMin());
-      double f_max = f.function(minMax.getMax());
+      double f_min = f.function(SpatialUtil.getMin(minMax));
+      double f_max = f.function(SpatialUtil.getMax(minMax));
 
       d_min = Math.min(d_min, f_min);
       d_max = Math.max(d_max, f_max);
@@ -667,7 +664,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * a distance less then the standard deviation of the derivator model to the
    * model to this model.
    * 
-   * @param database the database containing the parameterization functions
+   * @param relation the database containing the parameterization functions
    * @param interval the interval to build the model
    * @param dim the dimensionality of the database
    * @param ids an empty set to assign the ids
@@ -676,9 +673,9 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    *         occurs
    * @throws ParameterException if the parameter setting is wrong
    */
-  private Matrix runDerivator(Relation<ParameterizationFunction> database, int dim, CASHInterval interval, ModifiableDBIDs ids) throws UnableToComplyException, ParameterException {
+  private Matrix runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs ids) throws UnableToComplyException, ParameterException {
     // build database for derivator
-    Database derivatorDB = buildDerivatorDB(database, interval);
+    Database derivatorDB = buildDerivatorDB(relation, interval);
 
     // set the parameters
     ListParameterization parameters = new ListParameterization();
@@ -697,9 +694,8 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
 
     ids.addDBIDs(interval.getIDs());
     // Search for nearby vectors in original database
-    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
-      DBID id = it.next();
-      DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+    for(DBID id : relation.iterDBIDs()) {
+      DoubleVector v = new DoubleVector(relation.get(id).getColumnVector().getArrayRef());
       DoubleDistance d = df.distance(v, centroid);
       if(d.compareTo(eps) < 0) {
         ids.add(id);
@@ -714,24 +710,24 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * Builds a database for the derivator consisting of the ids in the specified
    * interval.
    * 
-   * @param database the database storing the parameterization functions
+   * @param relation the database storing the parameterization functions
    * @param interval the interval to build the database from
    * @return a database for the derivator consisting of the ids in the specified
    *         interval
    * @throws UnableToComplyException if an error according to the database
    *         occurs
    */
-  private Database buildDerivatorDB(Relation<ParameterizationFunction> database, CASHInterval interval) throws UnableToComplyException {
+  private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, CASHInterval interval) throws UnableToComplyException {
     DBIDs ids = interval.getIDs();
     ProxyDatabase proxy = new ProxyDatabase(ids);
-    int dim = database.get(ids.iterator().next()).getRowVector().getRowPackedCopy().length;
+    int dim = relation.get(ids.iterator().next()).getDimensionality();
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
     proxy.addRelation(prep);
 
     // Project
     for(DBID id : ids) {
-      DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+      DoubleVector v = new DoubleVector(relation.get(id).getColumnVector().getArrayRef());
       prep.set(id, v);
     }
 
@@ -747,15 +743,15 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * a distance less then the standard deviation of the derivator model to the
    * model to this model.
    * 
-   * @param database the database containing the parameterization functions
+   * @param relation the database containing the parameterization functions
    * @param ids the ids to build the model
    * @param dimensionality the dimensionality of the subspace
    * @return a basis of the found subspace
    */
-  private LinearEquationSystem runDerivator(Relation<ParameterizationFunction> database, int dimensionality, DBIDs ids) {
+  private LinearEquationSystem runDerivator(Relation<ParameterizationFunction> relation, int dimensionality, DBIDs ids) {
     try {
       // build database for derivator
-      Database derivatorDB = buildDerivatorDB(database, ids);
+      Database derivatorDB = buildDerivatorDB(relation, ids);
 
       ListParameterization parameters = new ListParameterization();
       parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
@@ -780,23 +776,23 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * Builds a database for the derivator consisting of the ids in the specified
    * interval.
    * 
-   * @param database the database storing the parameterization functions
+   * @param relation the database storing the parameterization functions
    * @param ids the ids to build the database from
    * @return a database for the derivator consisting of the ids in the specified
    *         interval
    * @throws UnableToComplyException if initialization of the database is not
    *         possible
    */
-  private Database buildDerivatorDB(Relation<ParameterizationFunction> database, DBIDs ids) throws UnableToComplyException {
+  private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) throws UnableToComplyException {
     ProxyDatabase proxy = new ProxyDatabase(ids);
-    int dim = database.get(ids.iterator().next()).getRowVector().getRowPackedCopy().length;
+    int dim = relation.get(ids.iterator().next()).getDimensionality();
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
     proxy.addRelation(prep);
 
     // Project
     for(DBID id : ids) {
-      DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+      DoubleVector v = new DoubleVector(relation.get(id).getColumnVector().getArrayRef());
       prep.set(id, v);
     }
 

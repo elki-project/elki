@@ -89,10 +89,9 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
    * 
    * @param database Database
    * @param relation Relation
-   * @return
-   * @throws IllegalStateException
+   * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<O> relation) throws IllegalStateException {
+  public OutlierResult run(Database database, Relation<O> relation) {
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, minpts);
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distQuery);

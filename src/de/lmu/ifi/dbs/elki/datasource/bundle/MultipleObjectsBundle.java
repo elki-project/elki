@@ -146,9 +146,12 @@ public class MultipleObjectsBundle implements ObjectBundle {
   /**
    * Helper to add a single column to the bundle.
    * 
-   * @param <V> Object type
-   * @param type Type information
-   * @param data Data to add
+   * @param <V1> First Object type
+   * @param <V2> Second Object type
+   * @param type1 Type information
+   * @param data1 Data column to add
+   * @param type2 Second Type information
+   * @param data2 Second data column to add
    */
   public static <V1, V2> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V1> type1, List<? extends V1> data1, SimpleTypeInformation<? super V2> type2, List<? extends V2> data2) {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();

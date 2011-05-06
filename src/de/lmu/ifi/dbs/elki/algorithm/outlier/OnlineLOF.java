@@ -92,7 +92,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
    * Get the kNN and rkNN queries for the algorithm.
    * 
-   * @param database Database
+   * @param relaton Data
    * @param stepprog Progress logger
    * @return the kNN and rkNN queries
    */
