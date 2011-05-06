@@ -63,8 +63,8 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
     this.min = new double[dim];
     this.max = new double[dim];
     for(int i = 0; i < dim; i++) {
-      this.min[i] = other.getMin(i);
-      this.max[i] = other.getMax(i);
+      this.min[i] = other.getMin(i + 1);
+      this.max[i] = other.getMax(i + 1);
     }
   }
 
