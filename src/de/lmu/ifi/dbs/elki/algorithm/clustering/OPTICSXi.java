@@ -97,7 +97,6 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
   /**
    * Extract clusters from a cluster order result.
    * 
-   * @param <N> distance type
    * @param clusterOrderResult cluster order result
    * @param relation Relation
    * @param ixi Parameter 1 - Xi

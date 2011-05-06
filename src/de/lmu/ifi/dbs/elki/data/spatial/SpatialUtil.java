@@ -61,11 +61,12 @@ public final class SpatialUtil {
   }
 
   /**
-   * Returns true if this SpatialComparable contains the given
+   * Returns true if the first SpatialComparable contains the second
    * SpatialComparable, false otherwise.
    * 
-   * @param box the SpatialComparable to be tested for containment
-   * @return true if this SpatialComparable contains the given
+   * @param box1 the outer SpatialComparable
+   * @param box2 the inner SpatialComparable
+   * @return true if the first SpatialComparable contains the second
    *         SpatialComparable, false otherwise
    */
   public static boolean contains(SpatialComparable box1, SpatialComparable box2) {
@@ -235,7 +236,7 @@ public final class SpatialUtil {
    * 
    * @param box1 First bounding box
    * @param box2 Second bounding box
-   * @return
+   * @return true when the boxes are equal
    */
   public static boolean equals(SpatialComparable box1, SpatialComparable box2) {
     if(box1.getDimensionality() != box2.getDimensionality()) {

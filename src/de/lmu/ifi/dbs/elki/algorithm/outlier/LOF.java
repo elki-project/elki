@@ -167,7 +167,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   /**
    * Get the kNN queries for the algorithm.
    * 
-   * @param database the database
+   * @param relation the data
    * @param stepprog the progress logger
    * @return the kNN queries for the algorithm
    */
