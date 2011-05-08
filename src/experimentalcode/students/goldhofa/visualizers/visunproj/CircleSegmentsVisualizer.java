@@ -1,6 +1,7 @@
 package experimentalcode.students.goldhofa.visualizers.visunproj;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -15,13 +16,20 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MouseEvent;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -35,6 +43,8 @@ import experimentalcode.students.goldhofa.ClusteringComparisonResult;
 import experimentalcode.students.goldhofa.Color;
 import experimentalcode.students.goldhofa.SegmentID;
 import experimentalcode.students.goldhofa.Segments;
+import experimentalcode.students.goldhofa.visualization.gui.SVGWindow;
+import experimentalcode.students.goldhofa.visualization.visualizers.vis2d.ClusteringComparisonVisualization;
 
 
 /**
@@ -47,7 +57,7 @@ import experimentalcode.students.goldhofa.Segments;
  * 
  * @author Sascha Goldhofer
  */
-public class CircleSegmentsVisualizer extends AbstractVisFactory implements ContextChangeListener {
+public class CircleSegmentsVisualizer extends AbstractVisFactory implements ContextChangeListener, ResultListener {
   
   /**
    * CircleSegments visualizer name
@@ -62,7 +72,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
   /**
    * Segmentation of Clusterings
    */
-  private Segments segments;
+  public Segments segments;
   
   /**
    * Pairsegments
@@ -95,6 +105,37 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
   private Point2D.Double center = new Point2D.Double(0.5, 0.5);
   
   /**
+   * context
+   */
+  public VisualizerContext context;
+  
+  /**
+   * The plot
+   */
+  public SVGPlot svgp;
+  
+  //
+  // SELECTION HELPERS
+  //
+  
+  /**
+   * currently selected objects
+   */
+  public ArrayList<DBIDs> currentSelection = new ArrayList<DBIDs>();
+  /**
+   * currently visible segment labels as <SegmentID, cssClass>
+   */
+  public TreeMap<String, String> selectedSegmentLabels = new TreeMap<String, String>();
+  /**
+   * currently highlighted segment clusters
+   */
+  public ArrayList<Element> selectedSegments = new ArrayList<Element>();
+  
+  //
+  // ---
+  //
+  
+  /**
    * Properties of a Segment
    */
   private static enum Properties {
@@ -123,9 +164,10 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
   /**
    * Color coding of CircleSegments
    */
-  private static enum Colors { BORDER("#FF0073"),
-     HOVER_ALPHA("1.0"), HOVER_INCLUSTER("#008e9e"), HOVER_SELECTION("#73ff00"), HOVER_PAIRED("#4ba600"), HOVER_UNPAIRED("#b20000"),
-     HOVER_SUBSET("#009900"), HOVER_INTERSECTION("#990000");
+  private static enum Colors { BORDER("#FF0073"), CLUSTER_UNPAIRED("#ffffff"),
+    HOVER_ALPHA("1.0"), HOVER_INCLUSTER("#008e9e"), HOVER_SELECTION("#73ff00"), HOVER_PAIRED("#4ba600"), HOVER_UNPAIRED("#b20000"),
+    HOVER_SUBSET("#009900"), HOVER_INTERSECTION("#990000"),
+    SELECTED_SEGMENT("#009900"), SELECTED_BORDER("#000000");
   
     // getter/setter
     String color;  
@@ -134,78 +176,22 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
   }
   
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor
    */
   public CircleSegmentsVisualizer() {
     super();
+    
+    //svgContext = SVGWindow.svgContext;
+    //svgContext.addListener(this);
   }
   
   public void redraw() {
-    
+    //System.out.println("CircleSegments: redraw");
     this.contextChanged(null);
   }
   
   @Override
-  public void contextChanged(ContextChangedEvent e) {
-/*
-    DBIDSelection selContext = context.getSelection();
-    
-    if (selContext != null) {
-      
-      Database<?> database = context.getDatabase();
-      DBIDs selection = selContext.getSelectedIds();
-      
-      //final double linewidth = 3 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
-      
-      NodeList elements = layer.getChildNodes();
-      
-      
-      // TODO for pairs (?)
-      
-      SortedSet<String> selectedSegments = new TreeSet<String>();
-      for (DBID id : selection) {
-
-        selectedSegments.add(segments.getSegmentID(id).toString());        
-      }
-
-      for (int i=0; i<elements.getLength(); i++) {
-        
-        Element current = (Element) elements.item(i);
-
-        if (current.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
-          
-          // Search Element and flag as Selected
-          
-          String currentSegment = current.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
-          
-          if (selectedSegments.contains(currentSegment)) {
-            
-            //System.out.println("select");
-            SVGUtil.addCSSClass(current, CCConstants.CLR_SELECTED_CLASS);
-            current.setAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE, "DBSELECTION");
-
-          } else {
-            
-            SVGUtil.removeCSSClass(current, CCConstants.CLR_SELECTED_CLASS);
-            current.removeAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE);                        
-          }
-        }        
-      }
-      
-        
-        //System.out.println(segments.getSegmentID(i).toString());
-        /*
-        double[] v = proj.fastProjectDataToRenderSpace(database.get(i));
-        Element dot = svgp.svgCircle(v[0], v[1], linewidth);
-        SVGUtil.addCSSClass(dot, MARKER);
-        layer.appendChild(dot);
-        *
-    }
-    
-    //currentSelection = (short)(currentSelection % 32766);
-  */
-  }
+  public void contextChanged(ContextChangedEvent e) {}
   
   
   @Override
@@ -219,21 +205,12 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
     context.addVisualizer(ccr.get(0), task);
   }
-  
- /* 
-  public void init(VisualizerContext context, ClusteringComparisonResult ccr) {
-    super.init(context);
-    
-    
-  }
-  */
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
     
-    VisualizerContext context = task.getContext();
-    SVGPlot svgp = task.getPlot();
-    
+    context = task.getContext();
+    svgp = task.getPlot();
     ccr = task.getResult();
     
     //
@@ -243,8 +220,10 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     this.segments = ccr.getSegments();
     this.layer    = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     
-    //
+    // Listen for context changes
     context.addContextChangeListener(this);
+    // Listen for result changes (Selection changed)
+    context.addResultListener(this);
     
     //
     pairSegments = segments.getSegments();
@@ -292,9 +271,9 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     // Events
     //
     
-    EventListener mouseOver = new MouseOverSegmentCluster();
+    EventListener mouseOver = new MouseOverSegmentCluster(this);
     EventListener mouseOut = new MouseOutSegmentCluster();
-    EventListener mouseClick = new MouseClickSegmentCluster(context, segments);
+    EventListener mouseClick = new MouseClickSegmentCluster(context, segments, this);
     
    
     //
@@ -305,6 +284,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     int refSegment = 0;
     double offsetAngle = 0;
 
+    // ITERATE OVER ALL SEGMENTS
+    
     for (SegmentID id : pairSegments.descendingKeySet()) {
       
       int currentPairCount = pairSegments.get(id);
@@ -313,10 +294,17 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
       double alpha = Properties.CLUSTER_MIN_WIDTH.getValue();
       if (currentPairCount > Properties.PAIR_MIN_COUNT.getValue()) alpha = Properties.ANGLE_PAIR.getValue()*currentPairCount;
 
-      // draw segment for every clustering if clusterID != 0 (unpaired)
+      // ITERATE OVER ALL SEGMENT-CLUSTERS
+      
+      // draw segment for every clustering
+      
       for (int i=0; i<id.size(); i++) {
         
         double currentRadius = i*(Properties.RADIUS_DELTA.getValue()+Properties.CLUSTERING_DISTANCE.getValue())+Properties.RADIUS_INNER.getValue();
+        
+        //
+        // Add border if next cluster of reference clustering
+        //
         
         if ((refSegment != id.get(refClustering)) && refClustering==i) {
           
@@ -330,39 +318,54 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
         }
         
         int cluster = id.get(i);
-        if (cluster != 0) {
+        
+        //
+        // create ring segment
+        //
+        
+        Element segment = getSegment(offsetAngle, center, alpha, currentRadius, currentRadius+Properties.RADIUS_DELTA.getValue()).makeElement(svgp);
+        
+        segment.setAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE, ""+cluster);
+        segment.setAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE, ""+i);
+        segment.setAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE, id.toString());
+        //segment.setAttribute(CCConstants.SEG_PAIRCOUNT_ATTRIBUTE, pairSegments.get(id).toString());
+        //segment.setAttribute(CCConstants.CLR_PAIRCOUNT_ATTRIBUTE, ""+segments.getPairCount(i, cluster));
 
-          //SVGPath segmentPath = getSegment(offsetAngle, center, alpha, currentRadius, currentRadius+radiusDelta);
-          //Element segment = segmentPath.makeElement(svgp);
-          Element segment = getSegment(offsetAngle, center, alpha, currentRadius, currentRadius+Properties.RADIUS_DELTA.getValue()).makeElement(svgp);
-          /*
-          Element segmentShadow = (Element) segment.cloneNode(false);
-          segmentShadow.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#ccc");
-          segmentShadow.setAttribute(SVGConstants.SVG_FILTER_ATTRIBUTE, "url(#shadow)");
-          layer.appendChild(segmentShadow);
-          */
-          
-          segment.setAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE, ""+cluster);
-          segment.setAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE, ""+i);
-          segment.setAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE, id.toString());
-          //segment.setAttribute(CCConstants.SEG_PAIRCOUNT_ATTRIBUTE, pairSegments.get(id).toString());
-          //segment.setAttribute(CCConstants.CLR_PAIRCOUNT_ATTRIBUTE, ""+segments.getPairCount(i, cluster));
-
-          
-          // Mouseevent on segment cluster
-          EventTarget targ = (EventTarget) segment;
-          targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, mouseOver, false);
-          targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, mouseOut, false);
-          targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, mouseClick, false);
-          
-          // Coloring based on clusterID
-          // TODO color coding between rings
-          segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssClr[id.get(i)-1].getName());
-          
-          layer.appendChild(segment);
-        }
+        //
+        // MouseEvents on segment cluster
+        //
+        
+        EventTarget targ = (EventTarget) segment;
+        targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, mouseOver, false);
+        targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, mouseOut, false);
+        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, mouseClick, false);
+        
+        //
+        // Coloring based on clusterID
+        //
+        
+        if (cluster != 0) segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssClr[id.get(i)-1].getName());
+        // if its an unpaired cluster set colour to white 
+        else segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.CLR_UNPAIRED_CLASS);
+        
+        
+        layer.appendChild(segment);
       }
       
+      //
+      // Add a extended strip for each segment to emphasis selection
+      // (makes it easier to track thin segments and their color coding and differentiates them from cluster border lines)
+      //
+      
+      int i = id.size();
+      double currentRadius = i*(Properties.RADIUS_DELTA.getValue()+Properties.CLUSTERING_DISTANCE.getValue())+Properties.RADIUS_INNER.getValue();
+      Element extension = getSegment(offsetAngle, center, alpha, currentRadius, currentRadius+(0.5 - Properties.RADIUS_OUTER.getValue())).makeElement(svgp);
+      extension.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
+      extension.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.CLR_UNPAIRED_CLASS);
+      svgp.putIdElement(CCConstants.SEG_EXTENSION_ID_PREFIX+id.toString(), extension);
+      layer.appendChild(extension);
+      
+      // calculate angle for next segment
       offsetAngle += alpha+Properties.CLUSTER_DISTANCE.getValue();
     }
 
@@ -433,7 +436,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     // CLUSTER HOVER
     CSSClass cluster_hover = new CSSClass(this, CCConstants.CLR_HOVER_CLASS);
     cluster_hover.setStatement(SVGConstants.SVG_FILL_OPACITY_ATTRIBUTE, Colors.HOVER_ALPHA.getColor() );
-    cluster_hover.setStatement(SVGConstants.SVG_CURSOR_TAG, SVGConstants.SVG_POINTER_VALUE );
+    cluster_hover.setStatement(SVGConstants.SVG_CURSOR_TAG, SVGConstants.SVG_POINTER_VALUE+" !important" );
     svgp.addCSSClassOrLogError(cluster_hover);
     
     CSSClass cluster_selection = new CSSClass(this, CCConstants.CLR_HOVER_SELECTION_CLASS);
@@ -454,37 +457,44 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     CSSClass cluster_paired = new CSSClass(this, CCConstants.CLR_HOVER_PAIRED_CLASS);
     cluster_paired.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_PAIRED.getColor()+" !important");
     cluster_paired.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
-    svgp.addCSSClassOrLogError(cluster_paired);    
+    svgp.addCSSClassOrLogError(cluster_paired);
+    
+    // UNPAIRED CLUSTER 
+    CSSClass clusterUnpaired = new CSSClass(this, CCConstants.CLR_UNPAIRED_CLASS);
+    clusterUnpaired.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.CLUSTER_UNPAIRED.getColor());
+    clusterUnpaired.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
+    svgp.addCSSClassOrLogError(clusterUnpaired);
     
     // CLUSTER SELECT
     CSSClass cluster_selected = new CSSClass(this, CCConstants.CLR_SELECTED_CLASS);
-    cluster_selected.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, Colors.HOVER_INCLUSTER.getColor()+" !important");
-    cluster_selected.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.002");
+    cluster_selected.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, Colors.SELECTED_BORDER.getColor()+" !important");
+    cluster_selected.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.003");
     svgp.addCSSClassOrLogError(cluster_selected);
     
-/*   
-    // simple shadow
-    //    <defs>
-    //    <filter id="filter" x="0" y="0">
-    //      <feGaussianBlur stdDeviation="5"/>
-    //      <feOffset dx="5" dy="5"/>
-    //    </filter>
-    //    </defs>
+    // SEGMENT SELECT
+    CSSClass segment_selected = new CSSClass(this, CCConstants.SEG_SELECTED_CLASS);
+    segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_SEGMENT.getColor()+" !important" );
+    svgp.addCSSClassOrLogError(segment_selected);
     
-    Element def = (Element) svgp.getDefs();
-    Element shadow = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_FILTER_TAG);
-    shadow.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, "shadow");
+    //
+    // SELECTION CLASSES
+    // TODO refactor: mixed by classes in ClusteringComparisonVisualization & CCMarkers
+    //
     
-    Element blur = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_FE_GAUSSIAN_BLUR_TAG);
-    blur.setAttribute(SVGConstants.SVG_STD_DEVIATION_ATTRIBUTE, "0.0025");
-    
-    Element offset = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_FE_OFFSET_TAG);
-    offset.setAttribute(SVGConstants.SVG_DY_ATTRIBUTE, "0.003");
-    
-    shadow.appendChild(blur);
-    shadow.appendChild(offset);
-    def.appendChild(shadow);
-*/   
+    // Color classes for differentiation of segments
+    int index = 0;
+    for ( String colorValue : CCConstants.ColorArray) {
+      
+      CSSClass bordercolor = new CSSClass(this, CCConstants.PRE_STROKE_COLOR_CLASS+index);
+      bordercolor.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, colorValue+" !important");
+      svgp.addCSSClassOrLogError(bordercolor);
+      
+      CSSClass fillcolor = new CSSClass(this, CCConstants.PRE_FILL_COLOR_CLASS+index);
+      fillcolor.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, colorValue+" !important");
+      svgp.addCSSClassOrLogError(fillcolor);
+      
+      index++;
+    } 
   }
   
   
@@ -588,6 +598,259 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     
     return path;
   }
+
+  @Override
+  public void resultAdded(Result child, Result parent) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void resultChanged(Result currentResult) {
+    
+    if (currentResult.getLongName() != "Selection") {
+      
+      //System.out.println(" # CircleSegments.resultChanged: "+currentResult.getLongName()+" => ignored");
+      return;
+    }
+
+    // get the current selection
+    DBIDSelection selContext = context.getSelection();
+    
+    if (selContext != null) {
+      
+      // and get all selected DB IDs
+      DBIDs selection = selContext.getSelectedIds();
+      
+      //final double linewidth = 3 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
+      
+      // segments
+      NodeList elements = layer.getChildNodes();
+      
+      
+      // Iterate over IDs and select segments containing object
+      // TODO for pairs (?)
+      
+      // Get List of segments
+      SortedSet<String> selectedSegments = new TreeSet<String>();
+      for (DBID id : selection) {
+        selectedSegments.add(segments.getSegmentID(id).toString());        
+      }
+      
+      // And iterate over segments
+      for (int i=0; i<elements.getLength(); i++) {
+        
+        Element current = (Element) elements.item(i);
+
+        if (current.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
+          
+          // Search Element and flag as Selected
+          
+          String currentSegment = current.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
+          
+          if (selectedSegments.contains(currentSegment)) {
+            
+            //System.out.println("select");
+            SVGUtil.addCSSClass(current, CCConstants.CLR_SELECTED_CLASS);
+            current.setAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE, "DBSELECTION");
+
+          } else {
+            
+            SVGUtil.removeCSSClass(current, CCConstants.CLR_SELECTED_CLASS);
+            current.removeAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE);                        
+          }
+        }        
+      }
+
+        /*
+        double[] v = proj.fastProjectDataToRenderSpace(database.get(i));
+        Element dot = svgp.svgCircle(v[0], v[1], linewidth);
+        SVGUtil.addCSSClass(dot, MARKER);
+        layer.appendChild(dot);
+        */
+    }
+    
+    //currentSelection = (short)(currentSelection % 32766);
+  }
+
+  @Override
+  public void resultRemoved(Result child, Result parent) {
+    // TODO Auto-generated method stub
+    
+  }
+  
+  /**
+   * Get the DB objects of a segmentID.
+   * 
+   * @param selectedSegment   selected segment of a clustering
+   * return                   (paired) objects in segment
+   */
+  public DBIDs getSegmentObjects(SegmentID id) {
+    
+    // retrieve associated objects
+    DBIDs segmentObjects = segments.getDBIDs(id);
+    
+    return segmentObjects;
+  }
+  
+  /**
+   * Select Objects of a single Segment.
+   * 
+   * Currently highlights objects on its own. Requires Scatterplot to be present.
+   * This is a basic selection for highlighting objects. Further analysis is done
+   * by Scatterplot selection tools.
+   * 
+   * @param selectedObjects   Set of objects to highlight in Scatterplot
+   */
+  public void selectObjects(DBIDs selectedObjects) {
+    
+    // remove current Selection
+    //deselectObjects();
+    
+    this.currentSelection.add(selectedObjects);
+    
+    // Iterate over selection and fetch corresponding elements by its id
+    // TODO objectID prefix
+    for (DBID id : selectedObjects) {
+      
+      Element object = svgp.getIdElement(id.toString());
+      SVGUtil.removeCSSClass(object, CCConstants.OBJ_UNSELECTED_CLASS);
+    }
+  }
+  
+  /**
+   * Select Objects of a single Segment and add a specified css class.
+   * 
+   * Currently highlights objects on its own. Requires Scatterplot to be present.
+   * This is a basic selection for highlighting objects. Further analysis is done
+   * by Scatterplot selection tools.
+   * 
+   * @param selectedObjects   Set of objects to highlight in Scatterplot
+   * @param cssClass          the CSS class to apply to selection
+   */
+  public void selectObjects(DBIDs selectedObjects, String cssClass) {
+    
+    // remove current Selection
+    //deselectObjects();
+    
+    this.currentSelection.add(selectedObjects);
+    
+    // Iterate over selection and fetch corresponding elements by its id
+    // TODO objectID prefix
+    for (DBID id : selectedObjects) {
+      
+      Element object = svgp.getIdElement(id.toString());
+      SVGUtil.removeCSSClass(object, CCConstants.OBJ_UNSELECTED_CLASS);
+      SVGUtil.addCSSClass(object, cssClass);
+    }
+  }
+  
+  public void selectSegment(SegmentID segment, String objectCSSClass, String segmentCSSClass) {
+    
+    // get DB objects of segment
+    DBIDs objects = this.getSegmentObjects(segment);
+    // and mark them as selected
+    this.selectObjects(objects, objectCSSClass);
+    // highlight segment in same color
+    Element extension = svgp.getIdElement(CCConstants.SEG_EXTENSION_ID_PREFIX+segment.toString());
+    SVGUtil.addCSSClass(extension, segmentCSSClass);
+    // and add segment to selection list
+    this.selectedSegmentLabels.put(segment.toString(), segmentCSSClass);
+  }
+  
+  /**
+   * Select Objects of multiple Segments resulting in different coloring of DB objects,
+   * representing the different segments.
+   * 
+   * Currently highlights objects on its own. Requires Scatterplot to be present.
+   * This is a basic selection for highlighting objects. Further analysis is done
+   * by Scatterplot selection tools.
+   * 
+   * @param selectedObjects   Set of segments to highlight in Scatterplot
+   */
+  public void selectObjects(ArrayList<SegmentID> selectedSegments) {
+    
+    // if its just one segment use default highlighting
+    if (selectedSegments.size() == 1) {
+      
+      DBIDs selectedObjects = this.getSegmentObjects(selectedSegments.get(0));
+      selectObjects(selectedObjects);
+      return;
+    }
+    
+    // select all segments
+    int index = 0;    
+    for (SegmentID segment : selectedSegments) {
+      selectSegment(segment, CCConstants.PRE_STROKE_COLOR_CLASS+index, CCConstants.PRE_FILL_COLOR_CLASS+index);     
+      index++;
+    }
+  }
+  
+  /**
+   * Get all elements of a segment by its segmentID
+   * 
+   * @param segmentID
+   */
+  public ArrayList<Element> getSegments(SegmentID segmentID) {
+    
+    ArrayList<Element> segment = new ArrayList<Element>();
+    
+    String searchString = segmentID.toString();
+    
+    // iteraters over all nodes (ugly)
+    NodeList clusterSegments = layer.getChildNodes();
+    
+    for (int i=0; i<clusterSegments.getLength(); i++) {
+      
+      Element clusterSegment = (Element) clusterSegments.item(i);
+
+      // collect all Elements of requested Segment
+      if (clusterSegment.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE).compareTo(searchString) == 0) {
+        segment.add(clusterSegment);
+      }
+    }
+    
+    return segment; 
+  }
+  
+  public void deselectObjects() {
+    
+    // if nothing is selected -> abort 
+    if (this.currentSelection == null) return;
+    
+    // else iterate over selection
+    for (DBIDs ids : this.currentSelection) {
+      
+      for (DBID id : ids) {
+      
+        Element object = svgp.getIdElement(id.toString());
+        // and set as unselected, [!!] removing all CSS Classes 
+        //SVGUtil.addCSSClass(object, CCConstants.OBJ_UNSELECTED_CLASS);
+        object.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.OBJ_STANDARD_CLASS);
+        SVGUtil.addCSSClass(object, CCConstants.OBJ_UNSELECTED_CLASS);
+      }
+    }
+    
+    // and clear current selection list
+    this.currentSelection.clear();
+    
+    
+    // TODO: move to "deselectSegments" ?
+    
+    // clear segment labels
+    for(String segmentID : this.selectedSegmentLabels.keySet()) {
+      Element selection = svgp.getIdElement(CCConstants.SEG_EXTENSION_ID_PREFIX+segmentID);
+      SVGUtil.removeCSSClass(selection, this.selectedSegmentLabels.get(segmentID));
+    }
+    this.selectedSegmentLabels.clear();
+    
+    // clear selected segment clusters
+    for (Element elem : this.selectedSegments) {
+      SVGUtil.removeCSSClass(elem, CCConstants.SEG_SELECTED_CLASS);
+    }
+    this.selectedSegments.clear();
+    
+  }
   
   /*
   private void createSegments() {
@@ -669,8 +932,12 @@ class MouseDragAndDrop implements EventListener {
 
 class MouseOverSegmentCluster implements EventListener {
   
-  public MouseOverSegmentCluster() {
+  CircleSegmentsVisualizer cs;
+  
+  public MouseOverSegmentCluster(CircleSegmentsVisualizer cs) {
     super();
+    
+    this.cs = cs;
   }
   
   @Override
@@ -678,8 +945,6 @@ class MouseOverSegmentCluster implements EventListener {
     
     // hovered segment cluster
     Element thisSegmentCluster = (Element) evt.getTarget();
-    SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_HOVER_CLASS);
-    SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_HOVER_SELECTION_CLASS);
     
     // hovered clustering
     int thisClusteringID = Integer.valueOf(thisSegmentCluster.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE)).intValue();
@@ -694,6 +959,66 @@ class MouseOverSegmentCluster implements EventListener {
     String thisSegment = thisSegmentCluster.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
     SegmentID thisSegmentID = new SegmentID(thisSegment);
 
+    
+    //
+    // STANDARD CLUSTER SEGMENT
+    // highlight all ring segments in this clustering and this cluster
+    //
+    
+    if ( ! thisSegmentID.isUnpaired()) {
+      
+      // highlight current hovered ring segment
+      SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_HOVER_CLASS);
+      SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_HOVER_SELECTION_CLASS);
+      
+      // and all corresponding ring Segments
+      for (int i=0; i<segmentClusters.getLength(); i++) {
+        
+        Element ringSegment = (Element) segmentClusters.item(i);
+        // just segments
+        if (ringSegment.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
+          // only this selected clustering
+          if (ringSegment.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE).compareTo(String.valueOf(thisClusteringID)) == 0) {
+            // and same cluster
+            if (ringSegment.getAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE).compareTo(String.valueOf(thisClusterID)) == 0) {
+              
+              // mark as selected
+              SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_CLASS);
+              SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_SELECTION_CLASS);
+            }
+          }
+          
+        }
+      }
+    }
+    //
+    // UNPAIRED SEGMENT
+    // highlight all ring segments in this clustering responsible for unpaired segment
+    //
+    else {
+      
+      // get the paired segments corresponding to the unpaired segment
+      ArrayList<SegmentID> segments = cs.segments.getPairedSegments(thisSegmentID);
+      
+      // and all corresponding ring Segments
+      for (int i=0; i<segmentClusters.getLength(); i++) {
+        
+        Element ringSegment = (Element) segmentClusters.item(i);
+        // just segments
+        if (ringSegment.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
+          
+          SegmentID segment = new SegmentID(ringSegment.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE));
+          if (segments.contains(segment) && ringSegment.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE).compareTo(String.valueOf(thisClusteringID)) == 0) {
+            
+            // mark as selected
+            SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_CLASS);
+            SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_SELECTION_CLASS);
+          }
+        }
+      }
+    }
+    
+    /*
     
     //
     // flag segment clusters as followed:
@@ -770,7 +1095,7 @@ class MouseOverSegmentCluster implements EventListener {
           }
         }
       }
-    }
+    }*/
   }
 }
 
@@ -804,6 +1129,8 @@ class MouseOutSegmentCluster implements EventListener {
  */
 class MouseClickSegmentCluster implements EventListener {
   
+  private CircleSegmentsVisualizer cs;
+  
   private VisualizerContext context;
   private Segments segments;
   private SortedSet<String> selection;
@@ -811,8 +1138,9 @@ class MouseClickSegmentCluster implements EventListener {
   private int selectionID = 0;
   private long lastClick = 0;
   
-  MouseClickSegmentCluster(VisualizerContext context, Segments segments) {
+  MouseClickSegmentCluster(VisualizerContext context, Segments segments, CircleSegmentsVisualizer cs) {
     
+    this.cs = cs;
     this.context = context;
     this.segments = segments;
     this.selection = new TreeSet<String>();
@@ -828,274 +1156,47 @@ class MouseClickSegmentCluster implements EventListener {
     lastClick = time;
     
     // clicked segment cluster
-    Element thisSegmentCluster = (Element) evt.getTarget();
+    Element thisSegmentElement = (Element) evt.getTarget();
     
-    // clicked clustering
-    int thisClusteringID = Integer.valueOf(thisSegmentCluster.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE)).intValue();
+    // Get the segmentID String representation
+    // A segmentID String consists of the cluster id of each clustering,
+    // ordered by clustering and separated by a character. Thus a segment ID describes
+    // the common pairs in all clusterings and cluster.
+    // i.e. clusteringID 0 & clusterID 2, clusteringID 1 & clusterID 0 => segmentID: 2-0
+    String segmentIDString = thisSegmentElement.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
     
-    // clicked clusterID
-    int thisClusterID = Integer.valueOf(thisSegmentCluster.getAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE)).intValue();
-    
-    // List of all segments (and others)
-    NodeList segmentClusters = thisSegmentCluster.getParentNode().getChildNodes();
-    
-    if (dblClick) {
+    // convert String representation to SegmentID
+    SegmentID selectedSegment = new SegmentID(segmentIDString);
+   
+    // check if this segment has unpaired objects in a clustering
+    if (selectedSegment.isUnpaired()) {
       
-      // whole cluster
-      for (int i=0; i<segmentClusters.getLength(); i++) {
-        
-        Element current = (Element) segmentClusters.item(i);
-
-        // just segments
-        if (current.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
-          
-          int currentClusteringID = Integer.valueOf(current.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE)).intValue();
-          int currentClusterID = Integer.valueOf(current.getAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE)).intValue();
-          
-          // element = this clustering
-          if (thisClusteringID == currentClusteringID) {
-            
-            // element = this cluster
-            if (thisClusterID == currentClusterID) {
-              
-              if (thisSegmentCluster.hasAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE)) {
-                
-                // select
-                
-                SVGUtil.addCSSClass(current, CCConstants.CLR_SELECTED_CLASS);
-                current.setAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE, String.valueOf(selectionID));
-                
-                selection.add(current.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE));
-                
-              } else {
-                
-                // deselect
-                
-                SVGUtil.removeCSSClass(current, CCConstants.CLR_SELECTED_CLASS);
-                current.removeAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE);
-                current.removeAttribute(SVGConstants.SVG_STROKE_LINECAP_ATTRIBUTE);
-              }
-            }
-          }
-        }
-      }
+      // segment with an unpaired cluster selected
       
-      if (thisSegmentCluster.hasAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE)) selectionID++;
-        
+      ArrayList<SegmentID> selectedSegments = segments.getPairedSegments(selectedSegment);
+      
+      // deselect old selection
+      cs.deselectObjects();
+      
+      // create selection of segments
+      cs.selectObjects(selectedSegments);
+      
     } else {
-
-      if (thisSegmentCluster.hasAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE)) {
-        
-        // deselect
-        
-        SVGUtil.removeCSSClass(thisSegmentCluster, CCConstants.CLR_SELECTED_CLASS);
-        thisSegmentCluster.removeAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE);
-        
-        selection.remove(thisSegmentCluster.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE));
-        
-      } else {
-        
-        // select
-        
-        SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_SELECTED_CLASS);
-        thisSegmentCluster.setAttribute(CCConstants.CLR_SELECTED_ATTRIBUTE, String.valueOf(selectionID));
-        
-        selection.add(thisSegmentCluster.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE));
-        
-        selectionID++;
-      }
-    }
-
-    /*
-    
-    // Set Objects selected
-    DBIDSelection selContext = context.getSelection();
-    HashSetModifiableDBIDs selectionToModify;
-    
-    selectionToModify = DBIDUtil.newHashSet();
-    
-    /*
-    if(selContext == null) {
-      selectionToModify = DBIDUtil.newHashSet();
-    }
-    else {
-      selectionToModify = DBIDUtil.newHashSet(selContext.getSelectedIds());
-    }
-    *
-    
-    // get Objects in Selection   
-    for (String segment : selection) {
       
-      DBIDs objects = segments.getDBIDs(new SegmentID(segment));
+      // segment with common paired objects selected
       
-      for (DBID id : objects) {
-        
-        selectionToModify.add(id);
-      }
+      // get DBIDs of Segment
+      DBIDs selectedObjects = cs.getSegmentObjects(selectedSegment);
+      
+      // deselect old selection
+      cs.deselectObjects();
+      
+      // and set them as selected
+      cs.selectObjects(selectedObjects);
     }
     
-    context.setSelection(new DBIDSelection(selectionToModify));
-    */
+    // Highlight current Selected segment
+    SVGUtil.addCSSClass(thisSegmentElement, CCConstants.SEG_SELECTED_CLASS);
+    cs.selectedSegments.add(thisSegmentElement);
   }
 }
-  
-/*
-@Deprecated
-class MouseOverSegmentCluster_doitall implements EventListener {
-  
-  private String[] alphaClasses;
-  private TreeMap<Integer, TreeMap<Integer, Integer>> participants;
-  
-  public MouseOverSegmentCluster_doitall(String[] alphaClasses) {
-    super();
-    
-    this.alphaClasses = alphaClasses;
-  }
-  
-  @Override
-  public void handleEvent(Event evt) {
-    
-    participants = new TreeMap<Integer, TreeMap<Integer, Integer>>();
-
-    Element thisSegmentCluster = (Element) evt.getTarget();
-    //SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_HOVER_CLASS); 
-    
-    int thisCluster = Integer.valueOf(thisSegmentCluster.getAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE)).intValue();
-    int thisClustering = Integer.valueOf(thisSegmentCluster.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE)).intValue();
-    String thisSegment = thisSegmentCluster.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
-    SegmentID thisSegmentID = new SegmentID(thisSegment);
-    
-    NodeList segmentClusters = thisSegmentCluster.getParentNode().getChildNodes();
-
-
-    // get all segments of this cluster and flag selected segment clusters
-    for (int i=0; i<segmentClusters.getLength(); i++) {
-      
-      Element current = (Element) segmentClusters.item(i);
-
-      if (current.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
-        
-        int currentClustering = Integer.valueOf(current.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE)).intValue();
-        int currentCluster = Integer.valueOf(current.getAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE)).intValue();
-        
-        // flag all segment clusters matching current cluster of hovered clustering
-        if (currentClustering == thisClustering) {
-          
-          if (currentCluster == thisCluster) {
-
-            SVGUtil.addCSSClass(current, CCConstants.CLR_HOVER_IDENTICAL_CLASS);
-            
-            // get participating cluster and their pair count
-            SegmentID id = new SegmentID(current.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE));
-
-            //
-            // count Pairs in Clusters of selected cluster segments
-            //
-            for (int clusteringID=0; clusteringID<id.size(); clusteringID++) {
-              
-              TreeMap<Integer, Integer> clusterList;
-              
-              // pairs in this segment
-              int pairs = Integer.valueOf(current.getAttribute(CCConstants.SEG_PAIRCOUNT_ATTRIBUTE)).intValue();
-              
-              // cluster of clustering 
-              int clusterID = id.get(clusteringID);
-              
-              if (clusterID != 0) {
-                
-                // add pairs to clustering-cluster list
-                if (participants.containsKey(clusteringID)) {
-                  
-                  clusterList = participants.get(clusteringID);
-                  
-                  if (clusterList.containsKey(clusterID)) {
-                    
-                    int currentPairs = clusterList.get(clusterID);
-                    clusterList.put(clusterID, pairs+currentPairs);
-                    
-                  } else {
-                    
-                    clusterList.put(clusterID, pairs);
-                  }
-                  
-                } else {
-                  
-                  clusterList = new TreeMap<Integer, Integer>();
-                  clusterList.put(clusterID, pairs);
-                  participants.put(clusteringID, clusterList);
-                }
-              }
-            }
-          }
-
-        // flag selected clusters of other clusterings
-        } else {
-          
-          if (thisSegmentID.get(currentClustering) == currentCluster) {
-
-            SVGUtil.addCSSClass(current, CCConstants.CLR_HOVER_SELECTION_CLASS);
-          }                   
-        }
-      }
-    }
-    
-    // flag all clusters participating in selected cluster
-    for (int i=0; i<segmentClusters.getLength(); i++) {
-      
-      Element current = (Element) segmentClusters.item(i);
-      
-      if (current.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
-
-        int currentClustering = Integer.valueOf(current.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE)).intValue();
-        int currentCluster = Integer.valueOf(current.getAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE)).intValue();
-        int currentPaircount = Integer.valueOf(current.getAttribute(CCConstants.CLR_PAIRCOUNT_ATTRIBUTE)).intValue();
-        
-        // flag all segmemt clusters matching cluster of hovered clustering
-        if ((currentClustering != thisClustering)) {
-
-          if (participants.containsKey(currentClustering)) {
-            
-            if(participants.get(currentClustering).containsKey(currentCluster)) {
-              
-              //*
-              SVGUtil.addCSSClass(current, CCConstants.PRE_COLOR_CLASS+(currentClustering*(currentCluster)%(CCConstants.AvailableColors+1)));
-              /*
-              SVGUtil.addCSSClass(current, CCConstants.PRE_COLOR_CLASS+currentClustering);
-              /
-              
-              int currentClusteredPairs = participants.get(currentClustering).get(currentCluster);
-               
-              if (currentClusteredPairs == currentPaircount) {
-                
-                if (participants.get(thisClustering).get(thisCluster) == currentClusteredPairs) {
-                  
-                  SVGUtil.addCSSClass(current, CCConstants.CLR_HOVER_IDENTICAL_CLASS);
-                  
-                } else {
-                  
-                  SVGUtil.addCSSClass(current, CCConstants.CLR_HOVER_SUBSET_CLASS);
-                }
-                
-              } else {
-                
-                double ratio = ((double)currentClusteredPairs / currentPaircount);
-                int alphaID = (int)((ratio*alphaClasses.length));
-                /*
-                if(currentClusteredPairs > currentPaircount) {
-                  
-                  System.out.println(currentClustering+"-"+currentCluster+": currentClusteredPairs: "+currentClusteredPairs+" - currentPaircount:"+currentPaircount);
-                }
-
-                System.out.println(currentClusteredPairs + ":" + currentPaircount + " = "+ratio+" => "+alphaID);
-                *
-                SVGUtil.addCSSClass(current, CCConstants.CLR_HOVER_INTERSECTION_CLASS);
-                SVGUtil.addCSSClass(current, alphaClasses[alphaID]);
-              }
-            }            
-          }
-        }
-      }
-    }
-  }  
-}
-*/

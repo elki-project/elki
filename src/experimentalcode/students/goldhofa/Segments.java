@@ -117,11 +117,70 @@ public class Segments {
     }
   }
   
+  /**
+   * Return to a given segment with unpaired objects, the corresponding segments that result in an unpaired
+   * segment. So, one cluster of a clustering is split by another clustering in multiple segments,
+   * resulting in a segment with unpaired objects, describing the missing pairs between the split cluster / 
+   * between the segments.
+   * 
+   * Basically we compare only two clusterings at once. If those clusterings do not have the whole cluster
+   * in common, we have at least three segments (two cluster), one of them containing the unpaired segment.
+   * A segmentID 3-0, describes a cluster 3 in clustering 1 (index 0) and all clusters 3-x in clustering 2.
+   * So we search for all segments 3-x (0 being a wildcard).
+   *
+   * @param unpairedSegment
+   * @return Segments describing the set of objects that result in an unpaired segment
+   */
+  public ArrayList<SegmentID> getPairedSegments(SegmentID unpairedSegment) {
+    
+    ArrayList<SegmentID> pairedSegments = new ArrayList<SegmentID>();
+    
+    // get the clustering index, with missing object pairs
+    int unpairedClusteringIndex = unpairedSegment.getUnpairedClusteringIndex();
+    
+    // if this is not an unpairedSegment return an empty list
+    // - optional return given segment in list?
+    if (unpairedClusteringIndex <= -1) return pairedSegments;
+    
+    // get size of clusterings / indizes in segment / clusters.length / clusterings.size()
+    int clusteringCount = unpairedSegment.size();
+    
+    // search the segments. Index at "unpairedClustering" being the wildcard.
+    for (SegmentID segment : pairSegments.keySet()) {
+      
+      // if mismatch except at unpaired Clustering index => exclude.
+      boolean match = true;
+      for(int i=0; i<clusteringCount; i++) {
+
+        if (i != unpairedClusteringIndex) {
+          // mismatch
+          if (segment.get(i) != unpairedSegment.get(i)) match = false;
+          // do not add wildcard
+          else if (segment.get(unpairedClusteringIndex) == 0) match = false;
+        }
+      }
+      
+      if (match == true) {
+        // add segment to list
+        pairedSegments.add(segment);
+      }
+    }
+    
+    return pairedSegments;
+  }
+  
+  /**
+   * Retrieve all DB objects of a Segment by its SegmentID. 
+   * 
+   * @param id    SegmentID (Clusterings and their Cluster)
+   * @return      DBIDs contained in SegmentID
+   */
   public DBIDs getDBIDs(SegmentID id) {
     
     ModifiableDBIDs objectIDs = DBIDUtil.newHashSet();
     DBIDs currentIDs;
     
+    // find first clustering
     int startClustering = 0;
     boolean found = false;
     while (found == false) {
@@ -133,17 +192,23 @@ public class Segments {
       }
     }
     
+    // fetch all DB objects of the first clustering and its selected clusterID.
+    // This includes the selection to find.
     currentIDs = clusterings.get(startClustering).getAllClusters().get(id.get(startClustering)-1).getIDs();
+    
+    //System.out.println("   "+startClustering+"-"+(id.get(startClustering)-1)+" has "+currentIDs.size()+" objects");
 
+    // convert basic selection to a modifiable set
     for (DBID dbID : currentIDs) {
       objectIDs.add(dbID);
     }
     
+    // iterate over remaining clusterings and find intersecting objects
     for (int i=startClustering+1; i<id.size(); i++) {
       
-      if (id.get(i) != 0) {        
+      if (id.get(i) != 0) {    
         
-        intersect( objectIDs, i, id.get(i)-1 );
+        objectIDs = intersect( objectIDs, i, id.get(i)-1 );
         
       }/* else {
         
@@ -151,17 +216,34 @@ public class Segments {
       }*/
     }
     
+    //System.out.println("   => intersection has "+objectIDs.size()+" objects");
+    
+    // and return selection
     return objectIDs;
   }
   
-  private DBIDs intersect(DBIDs ids, int clusteringID, int clusterID) {
+  /**
+   * Get intersection of DBIDs and a clusterings cluster
+   * 
+   * @param ids           Current set of IDs
+   * @param clusteringID  id of clustering
+   * @param clusterID     id of clusterings cluster
+   * @return              intersection of common IDs
+   */
+  private ModifiableDBIDs intersect(DBIDs ids, int clusteringID, int clusterID) {
     
+    // new set to store intersections
     ModifiableDBIDs intersection = DBIDUtil.newHashSet();
     
+    // get all IDs of the clusterings cluster
     DBIDs currentIDs = clusterings.get(clusteringID).getAllClusters().get(clusterID).getIDs();
+    
+    //System.out.println("   "+clusteringID+"-"+clusterID+" has "+currentIDs.size()+" objects");
    
+    // iterate over cluster IDs
     for (DBID currentID : currentIDs) {
       
+      // and add them to intersection if contained in selection
       if (ids.contains(currentID)) {
         intersection.add(currentID);
       }

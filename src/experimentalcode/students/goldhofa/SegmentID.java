@@ -19,6 +19,12 @@ public class SegmentID implements Comparable<SegmentID> {
     ids = new ArrayList<Integer>(clusterings);
   }
   
+  /**
+   * Creates a SegmentID by its String representation, extracting
+   * clustering and corresponding clusterIDs.
+   * 
+   * @param segmentID   String representation of SegmentID
+   */
   public SegmentID(String segmentID) {
     
     String[] id = segmentID.split(SEPARATOR);
@@ -41,6 +47,48 @@ public class SegmentID implements Comparable<SegmentID> {
   public int size() {
     
     return ids.size();
+  }
+  
+  /**
+   * Checks if the segment has a cluster with unpaired objects.
+   * Unpaired clusters are represented by "0" (0 = all).
+   * 
+   * @return
+   */
+  public boolean isUnpaired() {
+    
+    for (int id: ids) {
+      if (id == 0) return true;
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Returns the index of the first clustering having an unpaired cluster,
+   * or -1 no unpaired cluster exists.  
+   * 
+   * @return  clustering id or -1
+   */
+  public int getUnpairedClusteringIndex() {
+    
+    int index = 0;
+    for (int id: ids) {
+      if (id == 0) return index;
+      index++;
+    }
+    
+    return -1;
+  }
+  
+  /**
+   * Get the cluster IDs of the segment as array. index representing clustering.
+   * 
+   * @return IDs of cluster by clustering
+   */
+  public ArrayList<Integer> getIDs() {
+    
+    return this.ids;
   }
   
   public int get(int clusteringsIndex) {
