@@ -1,18 +1,17 @@
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
-
 /**
- * A class to answer representation queries using a map.
- * Basically, it is just a wrapper around a regular map.
+ * A class to answer representation queries using a map. Basically, it is just a
+ * wrapper around a regular map.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <T> Representation object type
  */
 public class MapStore<T> implements WritableDataStore<T> {
@@ -36,7 +35,7 @@ public class MapStore<T> implements WritableDataStore<T> {
    */
   public MapStore() {
     super();
-    this.data = new ConcurrentHashMap<DBID, T>();
+    this.data = new HashMap<DBID, T>();
   }
 
   @Override
@@ -46,7 +45,7 @@ public class MapStore<T> implements WritableDataStore<T> {
 
   @Override
   public T put(DBID id, T value) {
-    if (value == null) {
+    if(value == null) {
       return data.remove(id);
     }
     return data.put(id, value);
