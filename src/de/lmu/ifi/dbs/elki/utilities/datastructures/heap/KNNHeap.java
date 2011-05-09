@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -14,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.has KNNList oneway - - serializes to
  *
- * @param <D>
+ * @param <D> distance type
  */
 public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceResultPair<D>> {
   /**
@@ -47,14 +48,13 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
     this(k, null);
   }
 
-  /** {@inheritDoc} */
   @Override
   public ArrayList<DistanceResultPair<D>> toSortedArrayList() {
     ArrayList<DistanceResultPair<D>> list = super.toSortedArrayList();
     Collections.reverse(list);
     return list;
   }
-  
+
   /**
    * Serialize to a {@link KNNList}. This empties the heap!
    * 
@@ -63,7 +63,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
   public KNNList<D> toKNNList() {
     return new KNNList<D>(this, maxdist);
   }
-  
+
   /**
    * Get the K parameter ("maxsize" internally).
    * 
@@ -72,7 +72,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
   public int getK() {
     return super.getMaxSize();
   }
-  
+
   /**
    * Get the distance to the k nearest neighbor, or maxdist otherwise.
    * 
@@ -84,7 +84,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
     }
     return peek().getDistance();
   }
-  
+
   /**
    * Get maximum distance in heap
    */
@@ -93,6 +93,31 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
       return maxdist;
     }
     return peek().getDistance();
+  }
+  
+  /**
+   * @deprecated AVOID: the construction of a result pair may be unnecessary!
+   */
+  @Override
+  @Deprecated
+  public boolean add(DistanceResultPair<D> e) {
+    return super.add(e);
+  }
+
+  /**
+   * Add a distance-id pair to the heap unless the distance is too large.
+   * 
+   * Compared to the super.add() method, this often saves the pair construction.
+   * 
+   * @param distance Distance value
+   * @param id ID number
+   * @return success code
+   */
+  public boolean add(D distance, DBID id) {
+    if (size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
+      return super.add(new DistanceResultPair<D>(distance, id));
+    }
+    return true; /* "success" */
   }
 
   /**

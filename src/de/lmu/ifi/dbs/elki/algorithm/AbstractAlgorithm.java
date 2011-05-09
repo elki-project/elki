@@ -69,7 +69,10 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
       throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
     catch(InvocationTargetException e) {
-      throw new APIViolationException("Invoking the real 'run' method failed.", e);
+      if (e.getTargetException() instanceof RuntimeException) {
+        throw (RuntimeException) e.getTargetException();
+      }
+      throw new APIViolationException("Invoking the real 'run' method failed: "+e.getTargetException().toString(), e.getTargetException());
     }
   }
 

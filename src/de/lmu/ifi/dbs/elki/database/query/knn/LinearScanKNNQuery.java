@@ -35,8 +35,16 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   @Override
   public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
     KNNHeap<D> heap = new KNNHeap<D>(k);
-    for(DBID candidateID : relation.iterDBIDs()) {
-      heap.add(new DistanceResultPair<D>(distanceQuery.distance(id, candidateID), candidateID));
+    if(PrimitiveDistanceQuery.class.isInstance(distanceQuery)) {
+      O obj = relation.get(id);
+      for(DBID candidateID : relation.iterDBIDs()) {
+        heap.add(distanceQuery.distance(obj, candidateID), candidateID);
+      }
+    }
+    else {
+      for(DBID candidateID : relation.iterDBIDs()) {
+        heap.add(distanceQuery.distance(id, candidateID), candidateID);
+      }
     }
     return heap.toSortedArrayList();
   }
@@ -58,7 +66,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
           index++;
           O object = relation.get(id);
           KNNHeap<D> heap = heaps.get(index);
-          heap.add(new DistanceResultPair<D>(distanceQuery.distance(object, candidate), candidateID));
+          heap.add(distanceQuery.distance(object, candidate), candidateID);
         }
       }
     }
@@ -69,7 +77,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
         for(DBID id : ids) {
           index++;
           KNNHeap<D> heap = heaps.get(index);
-          heap.add(new DistanceResultPair<D>(distanceQuery.distance(id, candidateID), candidateID));
+          heap.add(distanceQuery.distance(id, candidateID), candidateID);
         }
       }
     }
@@ -86,7 +94,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
     KNNHeap<D> heap = new KNNHeap<D>(k);
     for(DBID candidateID : relation.iterDBIDs()) {
       O candidate = relation.get(candidateID);
-      heap.add(new DistanceResultPair<D>(distanceQuery.distance(obj, candidate), candidateID));
+      heap.add(distanceQuery.distance(obj, candidate), candidateID);
     }
     return heap.toSortedArrayList();
   }

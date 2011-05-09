@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -207,7 +206,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         DBID s_id = ((LeafEntry) ps.getEntry(j)).getDBID();
 
         D distance = distQ.distance(r_id, s_id);
-        if(knnList.add(new DistanceResultPair<D>(distance, s_id))) {
+        if(knnList.add(distance, s_id)) {
           // set kNN distance of r
           if(infinite) {
             pr_knn_distance = knnList.getMaximumDistance();

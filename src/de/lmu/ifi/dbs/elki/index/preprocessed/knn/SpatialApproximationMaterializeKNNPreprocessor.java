@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -103,12 +102,12 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
           D d = cache.remove(key);
           if(d != null) {
             // consume the previous result.
-            kNN.add(new DistanceResultPair<D>(d, id2));
+            kNN.add(d, id2);
           }
           else {
             // compute new and store the previous result.
             d = distanceQuery.distance(id, id2);
-            kNN.add(new DistanceResultPair<D>(d, id2));
+            kNN.add(d, id2);
             // put it into the cache, but with the keys reversed
             key = DBIDUtil.newPair(id2, id);
             cache.put(key, d);
