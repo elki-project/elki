@@ -9,9 +9,6 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -20,7 +17,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDoubleDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -28,10 +27,15 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -473,6 +477,14 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       }
     }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
+    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+      final DistanceQuery<O, ?> pdq = distanceQuery;
+      @SuppressWarnings("unchecked")
+      final KNNQuery<O, ?> knnQuery = new LinearScanDoubleDistanceKNNQuery<O>(distanceQuery.getRelation(), (DistanceQuery<O, DoubleDistance>) pdq);
+      @SuppressWarnings("unchecked")
+      final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
+      return castQuery;
+    }
     return new LinearScanKNNQuery<O, D>(objQuery, distanceQuery);
   }
 
@@ -498,6 +510,14 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
+    }
+    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+      final DistanceQuery<O, ?> pdq = distanceQuery;
+      @SuppressWarnings("unchecked")
+      final KNNQuery<O, ?> knnQuery = new LinearScanDoubleDistanceKNNQuery<O>(distanceQuery.getRelation(), (PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+      @SuppressWarnings("unchecked")
+      final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
+      return castQuery;
     }
     return new LinearScanKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
   }

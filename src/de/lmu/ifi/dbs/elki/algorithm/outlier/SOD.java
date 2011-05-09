@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
@@ -166,7 +165,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       DBID id = iter.next();
       if(!id.equals(queryObject)) {
         DoubleDistance distance = new DoubleDistance(1.0 / snnInstance.similarity(queryObject, id).doubleValue());
-        kNearestNeighbors.add(new DistanceResultPair<DoubleDistance>(distance, id));
+        kNearestNeighbors.add(distance, id);
       }
     }
     return kNearestNeighbors.toKNNList();

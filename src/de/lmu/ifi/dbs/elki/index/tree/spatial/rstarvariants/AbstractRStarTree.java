@@ -571,7 +571,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
           D distance = distanceFunction.minDist(entry, object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry) entry).getDBID()));
+            knnList.add(distance, ((LeafEntry) entry).getDBID());
             maxDist = knnList.getKNNDistance();
           }
         }
@@ -609,7 +609,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
           // FIXME: objects are NOT accessible by DBID in a plain rtree context!
           D dist_pq = distanceQuery.distance(pid, q);
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(new DistanceResultPair<D>(dist_pq, pid));
+            knns_q.add(dist_pq, pid);
           }
         }
       }

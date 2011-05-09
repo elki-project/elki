@@ -19,7 +19,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
    * Serial version
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * List to keep ties in.
    */

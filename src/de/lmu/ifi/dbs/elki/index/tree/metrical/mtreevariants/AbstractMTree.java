@@ -418,8 +418,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
           if(diff.compareTo(d_k) <= 0) {
             D d3 = distanceQuery.distance(o_j, q);
             if(d3.compareTo(d_k) <= 0) {
-              DistanceResultPair<D> queryResult = new DistanceResultPair<D>(d3, o_j);
-              knnList.add(queryResult);
+              knnList.add(d3, o_j);
               d_k = knnList.getKNNDistance();
             }
           }
@@ -492,8 +491,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
           if(diff.compareTo(d_k) <= 0) {
             D d3 = distanceQuery.distance(o_j, q);
             if(d3.compareTo(d_k) <= 0) {
-              DistanceResultPair<D> queryResult = new DistanceResultPair<D>(d3, o_j);
-              knnList.add(queryResult);
+              knnList.add(d3, o_j);
               d_k = knnList.getKNNDistance();
             }
           }
@@ -568,7 +566,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
           D dist_pq = distanceQuery.distance(p.getRoutingObjectID(), q);
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(new DistanceResultPair<D>(dist_pq, p.getRoutingObjectID()));
+            knns_q.add(dist_pq, p.getRoutingObjectID());
           }
         }
       }
