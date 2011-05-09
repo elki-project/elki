@@ -1319,7 +1319,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
           D distance = distanceFunction.minDist(entry, object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(new DistanceResultPair<D>(distance, ((LeafEntry)entry).getDBID()));
+            knnList.add(distance, ((LeafEntry)entry).getDBID());
             maxDist = knnList.getKNNDistance();
           }
         }
