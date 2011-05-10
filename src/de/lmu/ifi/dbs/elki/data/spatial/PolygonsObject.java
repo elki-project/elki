@@ -1,4 +1,4 @@
-package experimentalcode.erich.gearth;
+package de.lmu.ifi.dbs.elki.data.spatial;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -9,6 +9,7 @@ import java.util.Iterator;
  * 
  * @author Erich Schubert
  */
+// TODO: implement SpatialComparable!
 public class PolygonsObject {
   /**
    * Static (empty) prototype

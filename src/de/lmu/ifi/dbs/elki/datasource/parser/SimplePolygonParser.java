@@ -1,4 +1,4 @@
-package experimentalcode.erich.gearth;
+package de.lmu.ifi.dbs.elki.datasource.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,17 +11,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
+import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
-import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Parser to load polygon data.
+ * Parser to load polygon data (2D and 3D only) from a simple format. One record
+ * per line, points separated by whitespace, numbers separated by colons.
+ * Multiple polygons components can be separated using
+ * {@link #POLYGON_SEPARATOR}.
+ * 
+ * Unparseable parts will be treated as labels.
  * 
  * @author Erich Schubert
  */
