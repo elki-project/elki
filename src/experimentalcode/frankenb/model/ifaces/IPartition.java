@@ -13,15 +13,15 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Florian Frankenberger
  */
 public interface IPartition<V> extends Iterable<Pair<DBID, V>> {
-
   public int getId();
-  
+
   public File getStorageFile();
 
   public void addVector(DBID id, V vector);
 
   public void close() throws IOException;
 
+  @Override
   public Iterator<Pair<DBID, V>> iterator();
 
   public int getSize();
@@ -29,5 +29,4 @@ public interface IPartition<V> extends Iterable<Pair<DBID, V>> {
   public int getDimensionality();
 
   public void copyTo(File file) throws IOException;
-
 }

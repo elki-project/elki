@@ -50,7 +50,6 @@ public class DiskBackedPartition<V extends NumberVector<?, ?>> implements IParti
     
     this.storageFile = storageFile;
   }
-
   
   @Override
   public int getId() {
