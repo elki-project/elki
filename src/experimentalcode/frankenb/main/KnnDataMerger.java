@@ -6,16 +6,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.log.Log;
-import experimentalcode.frankenb.log.LogLevel;
-import experimentalcode.frankenb.log.StdOutLogWriter;
-import experimentalcode.frankenb.log.TraceLevelLogFormatter;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
@@ -44,6 +41,10 @@ import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
  * @author Florian Frankenberger
  */
 public class KnnDataMerger extends AbstractApplication {
+  /**
+   * The logger
+   */
+  private static final Logging logger = Logging.getLogger(KnnDataMerger.class);
 
   /**
    * Parameter that specifies the number of neighbors to keep with respect to
@@ -85,20 +86,14 @@ public class KnnDataMerger extends AbstractApplication {
     this.outdir = outdir;
     this.k = k;
     this.inMemory = inMemory;
-
-    Log.setLogFormatter(new TraceLevelLogFormatter());
-    Log.addLogWriter(new StdOutLogWriter());
-    Log.setFilter(LogLevel.INFO);
   }
 
   @Override
   public void run() throws UnableToComplyException {
     try {
-      Log.info("Start merging data");
-      Log.info();
-      Log.info("using inMemory strategy: " + Boolean.toString(inMemory));
-      Log.info("maximum k to calculate: " + k);
-      Log.info();
+      logger.verbose("Start merging data");
+      logger.verbose("using inMemory strategy: " + Boolean.toString(inMemory));
+      logger.verbose("maximum k to calculate: " + k);
 
       File[] packageDirectories = indir.listFiles(new FilenameFilter() {
 
@@ -131,7 +126,7 @@ public class KnnDataMerger extends AbstractApplication {
         });
 
         if(packageDescriptorCandidates.length > 0) {
-          Log.info("Opening result of " + packageDirectory.getName() + " ...");
+          logger.verbose("Opening result of " + packageDirectory.getName() + " ...");
           File packageDescriptorFile = packageDescriptorCandidates[0];
           PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new BufferedDiskBackedDataStorage(packageDescriptorFile));
 
@@ -140,7 +135,7 @@ public class KnnDataMerger extends AbstractApplication {
             if(!pairing.hasResult())
               throw new UnableToComplyException("Package " + packageDescriptorFile + "/pairing " + pairing + " has no results!");
             DynamicBPlusTree<Integer, DistanceList> result = packageDescriptor.getResultTreeFor(pairing);
-            Log.info(String.format("\tprocessing result of pairing %05d of %05d (%s) - %6.2f%% ...", ++counter, packageDescriptor.getPairings(), pairing, (counter / (float) packageDescriptor.getPairings()) * 100f));
+            logger.verbose(String.format("\tprocessing result of pairing %05d of %05d (%s) - %6.2f%% ...", ++counter, packageDescriptor.getPairings(), pairing, (counter / (float) packageDescriptor.getPairings()) * 100f));
 
             for(Pair<Integer, DistanceList> resultEntry : result) {
               DistanceList distanceList = resultTree.get(resultEntry.first);
@@ -154,17 +149,17 @@ public class KnnDataMerger extends AbstractApplication {
           }
         }
         else {
-          Log.warn("Skipping directory " + packageDirectory + " because the package descriptor could not be found.");
+          logger.warning("Skipping directory " + packageDirectory + " because the package descriptor could not be found.");
         }
       }
 
-      Log.info("result tree items: " + resultTree.getSize());
+      logger.verbose("result tree items: " + resultTree.getSize());
       resultTree.close();
-      Log.info("TestSet has " + testSet.size() + " items");
-      Log.info("Created result tree with " + resultTree.getSize() + " entries.");
+      logger.verbose("TestSet has " + testSet.size() + " items");
+      logger.verbose("Created result tree with " + resultTree.getSize() + " entries.");
     }
     catch(Exception e) {
-      Log.error("Could not merge data", e);
+      logger.error("Could not merge data", e);
     }
 
   }

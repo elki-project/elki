@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
@@ -24,10 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.frankenb.algorithms.projection.RandomProjection;
-import experimentalcode.frankenb.log.Log;
-import experimentalcode.frankenb.log.LogLevel;
-import experimentalcode.frankenb.log.StdOutLogWriter;
-import experimentalcode.frankenb.log.TraceLevelLogFormatter;
 import experimentalcode.frankenb.model.DataBaseDataSet;
 import experimentalcode.frankenb.model.KDTree;
 import experimentalcode.frankenb.model.PINNKnnIndex;
@@ -39,6 +36,10 @@ import experimentalcode.frankenb.model.ifaces.IDataSet;
  * @author Florian Frankenberger
  */
 public class PINN extends AbstractApplication {
+  /**
+   * The logger
+   */
+  private static final Logging logger = Logging.getLogger(PINN.class);
 
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("k", "k for kNN search");
 
@@ -75,34 +76,30 @@ public class PINN extends AbstractApplication {
     this.k = k;
     this.kFactor = kFactor;
     this.outputFile = outputFile;
-
-    Log.setLogFormatter(new TraceLevelLogFormatter());
-    Log.addLogWriter(new StdOutLogWriter());
-    Log.setFilter(LogLevel.DEBUG);
   }
 
   @Override
   public void run() throws UnableToComplyException {
-    Log.info("Reading database ...");
+    logger.verbose("Reading database ...");
     final Database dataBase = databaseConnection.getDatabase();
     Relation<NumberVector<?, ?>> relation = dataBase.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
-    Log.info("Projecting ...");
+    logger.verbose("Projecting ...");
     final DataBaseDataSet dataset = new DataBaseDataSet(relation);
     IDataSet dataSet = randomProjection.project(dataset);
 
-    Log.info("Creating KD-Tree ...");
+    logger.verbose("Creating KD-Tree ...");
     KDTree tree = new KDTree(dataSet);
 
     PINNKnnIndex index = new PINNKnnIndex(relation, tree, kFactor);
     dataBase.addIndex(index);
 
-    Log.info("Running LOF ...");
+    logger.verbose("Running LOF ...");
 
     OutlierAlgorithm algorithm = new LOF<NumberVector<?, ?>, DoubleDistance>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
     OutlierResult result = algorithm.run(dataBase);
 
-    Log.info("Calculating ROC ...");
+    logger.verbose("Calculating ROC ...");
 
     BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
     rocComputer.processResult(dataBase, result);
@@ -113,9 +110,9 @@ public class PINN extends AbstractApplication {
     for(Result aResult : totalResult.getHierarchy().iterDescendants(result)) {
       resultWriter.processResult(dataBase, aResult);
     }
-    Log.info("Writing results to dir " + this.outputFile);
+    logger.verbose("Writing results to dir " + this.outputFile);
 
-    Log.info("Done.");
+    logger.verbose("Done.");
   }
 
   private static ResultWriter getResultWriter(File targetFile) {

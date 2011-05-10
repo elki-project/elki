@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.BufferedDiskBackedPartition;
 import experimentalcode.frankenb.model.PositionedPartition;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
@@ -192,13 +191,13 @@ public class GridPartitioning implements IPartitioning {
       }
 
       dimensionalCuttingPoints.put(dim, cuttingPoints);
-      Log.debug("Cutting points for dimension " + dim + " are: " + cuttingPoints);
+      logger.debug("Cutting points for dimension " + dim + " are: " + cuttingPoints);
 
     }
 
     Map<PartitionPosition, IPartition> partitions = new HashMap<PartitionPosition, IPartition>();
 
-    Log.info("Now populating the partitions ...");
+    logger.verbose("Now populating the partitions ...");
     // now we populate the partitions
     for(Entry<Integer, PartitionPosition> entry : dbEntriesPositions.entrySet()) {
       NumberVector<?, ?> vector = dataSet.getOriginal().get(entry.getKey());
@@ -210,7 +209,7 @@ public class GridPartitioning implements IPartitioning {
       partition.addVector(entry.getKey(), vector);
     }
 
-    Log.info("Actually created partitions: " + partitions.size());
+    logger.verbose("Actually created partitions: " + partitions.size());
     return new ArrayList<IPartition>(partitions.values());
   }
 

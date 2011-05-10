@@ -11,10 +11,14 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.log.Log;
 
 public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
+  /**
+   * The logger
+   */
+  private static final Logging logger = Logging.getLogger(PrecalculatedKnnQuery.class);
 
   private final DynamicBPlusTree<Integer, DistanceList> resultTree;
   private Relation<O> relation;
@@ -46,7 +50,7 @@ public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
       }
       
       if (++requested % 100000 == 0) {
-        Log.debug(String.format("%d distances requested from index", requested));
+        logger.debug(String.format("%d distances requested from index", requested));
       }
       
       return list;

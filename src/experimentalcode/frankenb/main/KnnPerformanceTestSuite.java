@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
@@ -31,10 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import experimentalcode.frankenb.log.Log;
-import experimentalcode.frankenb.log.LogLevel;
-import experimentalcode.frankenb.log.StdOutLogWriter;
-import experimentalcode.frankenb.log.TraceLevelLogFormatter;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
@@ -54,6 +51,10 @@ import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
  * @author Florian Frankenberger
  */
 public class KnnPerformanceTestSuite extends AbstractApplication {
+  /**
+   * The logger
+   */
+  private static final Logging logger = Logging.getLogger(KnnPerformanceTestSuite.class);
 
   private static final PerformanceTest[] PERFORMANCE_TESTS = new PerformanceTest[] {
       // LOF
@@ -132,29 +133,24 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     this.databaseConnection = databaseConnection;
     this.inputFolder = inputFolder;
     this.inMemory = inMemory;
-    
-    Log.setLogFormatter(new TraceLevelLogFormatter());
-    Log.addLogWriter(new StdOutLogWriter());
-    Log.setFilter(LogLevel.DEBUG);
   }
 
   @Override
   public void run() throws UnableToComplyException {
     try {
-      Log.info("Starting performance test");
-      Log.info();
-      Log.info("using inMemory strategy: " + Boolean.toString(inMemory));
+      logger.verbose("Starting performance test");
+      logger.verbose("using inMemory strategy: " + Boolean.toString(inMemory));
 
-      Log.info("Reading database ...");
+      logger.verbose("Reading database ...");
       Database database = databaseConnection.getDatabase();
 
       List<File> resultDirectories = findResultDirectories(this.inputFolder);
       for(File resultDirectory : resultDirectories) {
-        Log.info("Result in " + resultDirectory + " ...");
+        logger.verbose("Result in " + resultDirectory + " ...");
         runTestSuiteFor(database, resultDirectory);
       }
 
-      Log.info("All done.");
+      logger.verbose("All done.");
 
     }
     catch(RuntimeException e) {
@@ -166,7 +162,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
   }
 
   private void runTestSuiteFor(Database database, File inputFolder) throws IOException {
-    Log.info("Opening result tree ...");
+    logger.verbose("Opening result tree ...");
     File resultDirectory = new File(inputFolder, "result.dir");
     File resultData = new File(inputFolder, "result.dat");
 
@@ -181,15 +177,15 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       outputFolder.mkdirs();
     }
 
-    Log.info("Processing results ...");
+    logger.verbose("Processing results ...");
     for(PerformanceTest performanceTest : PERFORMANCE_TESTS) {
       OutlierAlgorithm algorithm = performanceTest.getAlgorithm();
       String targetFileName = createResultFileName(performanceTest, outputFolder);
-      Log.info(String.format("%s (%s) ...", algorithm.getClass().getSimpleName(), targetFileName));
+      logger.verbose(String.format("%s (%s) ...", algorithm.getClass().getSimpleName(), targetFileName));
 
       File targetFile = new File(outputFolder, targetFileName);
       if(targetFile.exists()) {
-        Log.info("\tAlready processed - so skipping.");
+        logger.verbose("\tAlready processed - so skipping.");
         continue;
       }
 
@@ -205,7 +201,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       for(Result aResult : totalResult.getHierarchy().iterDescendants(result)) {
         resultWriter.processResult(database, aResult);
       }
-      Log.info("Writing results to file " + targetFile);
+      logger.verbose("Writing results to file " + targetFile);
 
       new File(tmpDirectory, "default.txt").delete();
       File resultFile = new File(tmpDirectory, "roc.txt");
@@ -235,10 +231,10 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
           sb.append(field.get(performanceTest.getAlgorithm()));
         }
         catch(IllegalArgumentException e) {
-          Log.debug("Can't access field to auto generate folder name", e);
+          logger.debug("Can't access field to auto generate folder name", e);
         }
         catch(IllegalAccessException e) {
-          Log.debug("Can't access field to auto generate folder name", e);
+          logger.debug("Can't access field to auto generate folder name", e);
         }
       }
     }

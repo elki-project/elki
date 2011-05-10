@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.ifaces.IDataStorage;
 
 /**
@@ -159,7 +158,7 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
 
   @Override
   public void close() throws IOException {
-    Log.debug(String.format("Storing %d bytes to source file %s ...", buffer.limit(), this.getSource()));
+    logger.debug(String.format("Storing %d bytes to source file %s ...", buffer.limit(), this.getSource()));
     OutputStream out = null;
     byte[] localBuffer = new byte[2048];
     

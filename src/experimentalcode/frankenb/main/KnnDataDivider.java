@@ -1,11 +1,8 @@
 package experimentalcode.frankenb.main;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -16,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -23,11 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import experimentalcode.frankenb.log.FileLogWriter;
-import experimentalcode.frankenb.log.Log;
-import experimentalcode.frankenb.log.LogLevel;
-import experimentalcode.frankenb.log.StdOutLogWriter;
-import experimentalcode.frankenb.log.TraceLevelLogFormatter;
 import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
@@ -46,6 +39,10 @@ import experimentalcode.frankenb.utils.Utils;
  * @author Florian Frankenberger
  */
 public class KnnDataDivider extends AbstractApplication {
+  /**
+   * The logger
+   */
+  private static final Logging logger = Logging.getLogger(KnnDataDivider.class);
 
   public static final OptionID DIVIDER_ALGORITHM_ID = OptionID.getOrCreateOptionID("algorithm", "A divider algorithm to use");
   
@@ -78,15 +75,11 @@ public class KnnDataDivider extends AbstractApplication {
     this.packageQuantity = packageQuantity;
     this.databaseConnection = databaseConnection;
     this.algorithm = algorithm;
-    
-    Log.setLogFormatter(new TraceLevelLogFormatter());
-    Log.addLogWriter(new StdOutLogWriter());
-    Log.setFilter(LogLevel.DEBUG);
   }
 
   @Override
   public void run() throws UnableToComplyException {
-    FileLogWriter logWriter = null;
+    //FileLogWriter logWriter = null;
     try {
       if (outputDir.isFile()) 
         throw new UnableToComplyException("You need to specify an output directory not a file!");
@@ -94,33 +87,30 @@ public class KnnDataDivider extends AbstractApplication {
         if (!outputDir.mkdirs()) throw new UnableToComplyException("Could not create output directory");
       }
       
-      Log.info();
-      Log.info("cleaning output directory...");
+      logger.verbose("cleaning output directory...");
       clearDirectory(outputDir);
-      Log.info();
       
-      logWriter = appendStatisticsWriter(outputDir);
-      Log.info("knn data divider started @ " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
+      //logWriter = appendStatisticsWriter(outputDir);
+      //logger.verbose("knn data divider started @ " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(new Date().getTime() - Log.getElapsedTime())));
       
-      Log.info("reading database ...");
+      logger.verbose("reading database ...");
       final Database dataBase = databaseConnection.getDatabase();
       Relation<DoubleVector> relation = dataBase.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
       int dim = DatabaseUtil.assumeVectorField(relation).dimensionality();
       long totalCalculationsWithoutApproximation = Utils.sumFormular(relation.size() - 1);
       
-      Log.info(String.format("DB Size: %,d (%d dimensions)", relation.size(), dim));
-      Log.info(String.format("Packages to create: %,8d", packageQuantity));
-      Log.info(String.format("Algorithm used: %s", algorithm.getClass().getSimpleName()));
-      Log.info();
+      logger.verbose(String.format("DB Size: %,d (%d dimensions)", relation.size(), dim));
+      logger.verbose(String.format("Packages to create: %,8d", packageQuantity));
+      logger.verbose(String.format("Algorithm used: %s", algorithm.getClass().getSimpleName()));
       
-      Log.info(String.format("Creating partitions (algorithm used: %s) ...", algorithm.getClass().getSimpleName()));
+      logger.verbose(String.format("Creating partitions (algorithm used: %s) ...", algorithm.getClass().getSimpleName()));
       
       List<PartitionPairing> pairings = this.algorithm.divide(relation, packageQuantity);
       
-      Log.info(String.format("Total partition pairings: %,d", pairings.size()));
+      logger.verbose(String.format("Total partition pairings: %,d", pairings.size()));
       
 
-      Log.info("Counting calculations ...");
+      logger.verbose("Counting calculations ...");
       long totalCalculations = 0;
       for (PartitionPairing pairing: pairings) {
         totalCalculations += pairing.getCalculations();
@@ -129,10 +119,10 @@ public class KnnDataDivider extends AbstractApplication {
       long calculationsPerPackage = (long) Math.ceil(totalCalculations / (double) packageQuantity);
       int expectedPairingsPerPackage = pairings.size() / packageQuantity;
 
-      Log.info(String.format("Total calculations necessary: %,d (%.2f%% of cal. w/ apprx.)", totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f));
-      Log.info(String.format("Calculations per package: about %,d", calculationsPerPackage));
+      logger.verbose(String.format("Total calculations necessary: %,d (%.2f%% of cal. w/ apprx.)", totalCalculations, (totalCalculations / (float) totalCalculationsWithoutApproximation) * 100f));
+      logger.verbose(String.format("Calculations per package: about %,d", calculationsPerPackage));
       
-      Log.info("Sorting pairings ...");
+      logger.verbose("Sorting pairings ...");
       Collections.sort(pairings, new Comparator<PartitionPairing>() {
 
         @Override
@@ -144,7 +134,7 @@ public class KnnDataDivider extends AbstractApplication {
       });
       
       Random random = new Random(System.currentTimeMillis()); 
-      Log.info("Storing packages ...");
+      logger.verbose("Storing packages ...");
       for (int i = 0; i < packageQuantity && !pairings.isEmpty(); ++i) {
         long calculations = 0L;
         
@@ -155,7 +145,7 @@ public class KnnDataDivider extends AbstractApplication {
         int bufferSize = expectedPairingsPerPackage * PackageDescriptor.PAIRING_DATA_SIZE + PackageDescriptor.HEADER_SIZE; 
         PackageDescriptor packageDescriptor = new PackageDescriptor(i + 1, dim, new BufferedDiskBackedDataStorage(packageDescriptorFile, bufferSize));
         
-        Log.info(String.format("Creating package %08d of max. %08d (%s)", i + 1, packageQuantity, packageDescriptorFile.toString()));
+        logger.verbose(String.format("Creating package %08d of max. %08d (%s)", i + 1, packageQuantity, packageDescriptorFile.toString()));
         
         while (!pairings.isEmpty() && calculations < calculationsPerPackage) {
           long calculationsToAdd = calculationsPerPackage - calculations;
@@ -184,10 +174,10 @@ public class KnnDataDivider extends AbstractApplication {
           calculations += pairingToAdd.getCalculations();
           
           packageDescriptor.addPartitionPairing(pairingToAdd);
-          Log.info(String.format("\tAdding %s\t%,16d calculations of at least %,16d", pairingToAdd.toString(), calculations, calculationsPerPackage));
+          logger.verbose(String.format("\tAdding %s\t%,16d calculations of at least %,16d", pairingToAdd.toString(), calculations, calculationsPerPackage));
         }
         
-        Log.info(String.format("\tPackage %08d has now %,d calculations in %,d partitionPairings", i, calculations, packageDescriptor.getPairings()));
+        logger.verbose(String.format("\tPackage %08d has now %,d calculations in %,d partitionPairings", i, calculations, packageDescriptor.getPairings()));
         packageDescriptor.close();
       }
       
@@ -195,11 +185,11 @@ public class KnnDataDivider extends AbstractApplication {
         throw new UnableToComplyException("Pairings was not empty - it contined " + pairings.size() + " pairings that have not been put into a package");
       }
       
-      Log.info(String.format("Created %,d packages - done.", packageQuantity));
+      logger.verbose(String.format("Created %,d packages - done.", packageQuantity));
       
-      if (logWriter != null) {
+      /*if (logWriter != null) {
         logWriter.close();
-      }
+      }*/
     } catch (RuntimeException e) {
       throw e;
     } catch (UnableToComplyException e) {
@@ -209,17 +199,17 @@ public class KnnDataDivider extends AbstractApplication {
     }
   }
 
-  private FileLogWriter appendStatisticsWriter(File outputDir) throws IOException {
+  /*private FileLogWriter appendStatisticsWriter(File outputDir) throws IOException {
     File resultsFolder = new File(outputDir, "results");
     if (!resultsFolder.exists()) {
       resultsFolder.mkdirs();
     }
     File statisticsFile = new File(resultsFolder, "statistics.txt");
-    Log.info("Storing statistics in file " + statisticsFile);
+    logger.verbose("Storing statistics in file " + statisticsFile);
     FileLogWriter fileLogWriter = new FileLogWriter(statisticsFile);
     Log.addLogWriter(fileLogWriter);
     return fileLogWriter;
-  }
+  }*/
   
   private static void clearDirectory(File directory) throws UnableToComplyException {
     for (File file : directory.listFiles()) {

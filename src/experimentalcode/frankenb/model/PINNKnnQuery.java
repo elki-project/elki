@@ -15,8 +15,8 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.log.Log;
 
 /**
  * No description given.
@@ -24,6 +24,10 @@ import experimentalcode.frankenb.log.Log;
  * @author Florian Frankenberger
  */
 public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance> {
+  /**
+   * The logger
+   */
+  private static final Logging logger = Logging.getLogger(PINNKnnQuery.class);
 
   private final Relation<? extends NumberVector<?, ?>> dataBase;
   private final KDTree tree;
@@ -50,7 +54,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
       calculations += tree.getLastMeasure().getCalculations();
       alreadyRequestedIDs.add(id.getIntegerID());
       if (alreadyRequestedIDs.size() == dataBase.size()) {
-        Log.info(String.format("Calculations used: %,d", calculations));
+        logger.verbose(String.format("Calculations used: %,d", calculations));
       }
     }
     
@@ -65,7 +69,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
     }
     
     if (++requested % 100000 == 0) {
-      Log.debug(String.format("%d distances requested from index", requested));
+      logger.debug(String.format("%d distances requested from index", requested));
     }
     
     

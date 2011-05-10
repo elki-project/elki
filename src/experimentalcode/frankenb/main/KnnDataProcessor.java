@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -22,10 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.log.Log;
-import experimentalcode.frankenb.log.LogLevel;
-import experimentalcode.frankenb.log.StdOutLogWriter;
-import experimentalcode.frankenb.log.TraceLevelLogFormatter;
 import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
@@ -58,6 +55,10 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  * @author Florian Frankenberger
  */
 public class KnnDataProcessor extends AbstractApplication {
+  /**
+   * The logger
+   */
+  private static final Logging logger = Logging.getLogger(KnnDataProcessor.class);
 
   /**
    * Parameter that specifies the name of the input file.
@@ -114,10 +115,6 @@ public class KnnDataProcessor extends AbstractApplication {
     this.maxK = maxK;
     this.distanceAlgorithm = distanceAlgorithm;
     this.multiThreaded = multiThreaded;
-
-    Log.setLogFormatter(new TraceLevelLogFormatter());
-    Log.addLogWriter(new StdOutLogWriter());
-    Log.setFilter(LogLevel.INFO);
   }
 
   @Override
@@ -126,14 +123,13 @@ public class KnnDataProcessor extends AbstractApplication {
     final ExecutorService threadPool = Executors.newFixedThreadPool((multiThreaded ? runtime.availableProcessors() : 1));
 
     try {
-      Log.info("started processing");
-      Log.info("multithreaded: " + Boolean.valueOf(multiThreaded));
-      Log.info("maximum k to calculate: " + maxK);
-      Log.info();
-      Log.info(String.format("opening package %s ...", input));
+      logger.verbose("started processing");
+      logger.verbose("multithreaded: " + Boolean.valueOf(multiThreaded));
+      logger.verbose("maximum k to calculate: " + maxK);
+      logger.verbose(String.format("opening package %s ...", input));
       final PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new DiskBackedDataStorage(input));
 
-      Log.info("Verifying package ...");
+      logger.verbose("Verifying package ...");
       packageDescriptor.verify();
 
       totalTasks = 0;
@@ -144,7 +140,7 @@ public class KnnDataProcessor extends AbstractApplication {
 
       List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
 
-      Log.info("Creating tasks ...");
+      logger.verbose("Creating tasks ...");
       List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
       for(final PartitionPairing pairing : packageDescriptor) {
         if(pairing.getPartitionOne().getSize() < 1 || pairing.getPartitionTwo().getSize() < 1) {
@@ -152,7 +148,7 @@ public class KnnDataProcessor extends AbstractApplication {
         }
 
         if(pairing.hasResult()) {
-          Log.info(String.format("Skipping pairing of partition%05d with partition%05d - as it already contains a result", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId()));
+          logger.verbose(String.format("Skipping pairing of partition%05d with partition%05d - as it already contains a result", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId()));
           continue;
         }
 
@@ -163,12 +159,12 @@ public class KnnDataProcessor extends AbstractApplication {
           @Override
           public Boolean call() throws Exception {
             try {
-              Log.info(String.format("Processing pairing %010d of %010d (%010d in package)...", taskId, totalTasks, packageDescriptor.getPairings()));
+              logger.verbose(String.format("Processing pairing %010d of %010d (%010d in package)...", taskId, totalTasks, packageDescriptor.getPairings()));
 
               // heuristic to determine the bucket size based on a tree height
               // of about 21
               int maxKeysPerBucket = (int) Math.max(5, Math.floor(Math.pow(pairing.getEstimatedUniqueIdsAmount(), 1f / 20f)));
-              Log.info(String.format("maxKeysPerBucket in tree are: %,d for %,d items", maxKeysPerBucket, pairing.getEstimatedUniqueIdsAmount()));
+              logger.verbose(String.format("maxKeysPerBucket in tree are: %,d for %,d items", maxKeysPerBucket, pairing.getEstimatedUniqueIdsAmount()));
 
               File tmpDirFile = File.createTempFile("pairing" + taskId, ".dir");
               File tmpDataFile = File.createTempFile("pairing" + taskId, ".dat");
@@ -176,7 +172,7 @@ public class KnnDataProcessor extends AbstractApplication {
               DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(new BufferedDiskBackedDataStorage(tmpDirFile), new DiskBackedDataStorage(tmpDataFile), new ConstantSizeIntegerSerializer(), new DistanceListSerializer(), maxKeysPerBucket);
               Set<Integer> processedIds = new HashSet<Integer>();
 
-              Log.info(String.format("\tPairing %010d: partition%05d (%,d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
+              logger.verbose(String.format("\tPairing %010d: partition%05d (%,d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
 
               IPartition[][] partitionsToProcess = new IPartition[][] { new IPartition[] { pairing.getPartitionOne(), pairing.getPartitionTwo() }, new IPartition[] { pairing.getPartitionTwo(), pairing.getPartitionOne() } };
 
@@ -191,7 +187,7 @@ public class KnnDataProcessor extends AbstractApplication {
                 int counter = 0;
                 for(Pair<Integer, NumberVector<?, ?>> pointOne : partitions[0]) {
                   if(counter++ % 50 == 0) {
-                    Log.info(String.format("\t\tPairing %010d: Processed %,d of %,d items ...", taskId, counter, partitions[0].getSize()));
+                    logger.verbose(String.format("\t\tPairing %010d: Processed %,d of %,d items ...", taskId, counter, partitions[0].getSize()));
                   }
 
                   for(Pair<Integer, NumberVector<?, ?>> pointTwo : partitions[1]) {
@@ -211,11 +207,11 @@ public class KnnDataProcessor extends AbstractApplication {
               resultTree.close();
             }
             catch(Exception e) {
-              Log.error(String.format("Problem in pairing %s: %s", pairing, e.getMessage()), e);
+              logger.error(String.format("Problem in pairing %s: %s", pairing, e.getMessage()), e);
               return false;
             }
             finally {
-              Log.info(String.format("Pairing %d done.", taskId));
+              logger.verbose(String.format("Pairing %d done.", taskId));
             }
             return true;
           }
@@ -226,35 +222,35 @@ public class KnnDataProcessor extends AbstractApplication {
       }
 
       // add all tasks
-      Log.info("Adding all tasks ...");
+      logger.verbose("Adding all tasks ...");
       for(Callable<Boolean> task : tasks) {
         futures.add(threadPool.submit(task));
       }
 
       // wait for all tasks to finish
-      Log.info("Waiting for all tasks to finish ...");
+      logger.verbose("Waiting for all tasks to finish ...");
       for(Future<Boolean> future : futures) {
         future.get();
       }
 
       if(futures.size() > 0) {
-        Log.info(String.format("Calculated and stored %,d distances.", totalItems));
+        logger.verbose(String.format("Calculated and stored %,d distances.", totalItems));
       }
       else {
-        Log.info("Nothing to do - all results have already been calculated");
+        logger.verbose("Nothing to do - all results have already been calculated");
       }
 
     }
     catch(RuntimeException e) {
-      Log.error("Runtime Exception: " + e.getMessage(), e);
+      logger.error("Runtime Exception: " + e.getMessage(), e);
       throw e;
     }
     catch(Exception e) {
-      Log.error("Exception: " + e.getMessage(), e);
+      logger.error("Exception: " + e.getMessage(), e);
       throw new UnableToComplyException(e);
     }
     finally {
-      Log.info("Shutting down thread pool ...");
+      logger.verbose("Shutting down thread pool ...");
       Thread terminationThread = new Thread() {
         public void run() {
           try {
@@ -262,7 +258,7 @@ public class KnnDataProcessor extends AbstractApplication {
           }
           catch(InterruptedException e) {
           }
-          Log.info("Exiting.");
+          logger.verbose("Exiting.");
           System.exit(0);
         }
       };
