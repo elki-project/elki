@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -130,7 +130,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
 
     // @Override
     // TODO: re-enable spatial interfaces
-    public DoubleDistance minDistBROKEN(HyperBoundingBox mbr, V v) {
+    public DoubleDistance minDistBROKEN(SpatialComparable mbr, V v) {
       if(mbr.getDimensionality() != v.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString());
       }
@@ -158,13 +158,13 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
 
     // TODO: Remove?
     // @Override
-    // public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
+    // public DoubleDistance minDist(SpatialComparable mbr, DBID id) {
     // return minDist(mbr, database.get(id));
     // }
 
     // @Override
     // TODO: re-enable spatial interface
-    public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+    public DoubleDistance distance(SpatialComparable mbr1, SpatialComparable mbr2) {
       if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
       }
@@ -192,7 +192,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
 
     // @Override
     // TODO: re-enable spatial interface
-    public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+    public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
       if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of objects\n first argument:  " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
       }
