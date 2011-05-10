@@ -5,8 +5,7 @@ package experimentalcode.frankenb.model.ifaces;
  * 
  * @author Florian Frankenberger
  */
-public interface IPositionedPartition extends IPartition {
-
+public interface IPositionedPartition<V> extends IPartition<V> {
   /**
    * Returns the position associated with this partition. Dimension starts at 1
    * 
@@ -14,5 +13,4 @@ public interface IPositionedPartition extends IPartition {
    * @return
    */
   public int getPosition(int dimension);
-  
 }

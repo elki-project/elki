@@ -3,13 +3,16 @@ package experimentalcode.frankenb.algorithms.projection;
 import java.math.BigInteger;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.DataSet;
-import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IProjection;
 import experimentalcode.frankenb.utils.ZCurve;
 
@@ -18,29 +21,34 @@ import experimentalcode.frankenb.utils.ZCurve;
  * 
  * @author Florian Frankenberger
  */
-public class ZCurveProjection implements IProjection {
+public class ZCurveProjection<V extends NumberVector<V, ?>> implements IProjection<V> {
 
   public ZCurveProjection(Parameterization config) {
   }
-  
+
   @Override
-  public IDataSet project(IDataSet dataSet) throws UnableToComplyException {
+  public Relation<V> project(Relation<V> dataSet) throws UnableToComplyException {
     try {
-      DataSet resultDataSet = new DataSet(dataSet.getOriginal(), 1);
+      SimpleTypeInformation<V> type = new VectorFieldTypeInformation<V>(dataSet.getDataTypeInformation().getRestrictionClass(), 1);
+      Relation<V> resultDataSet = new MaterializedRelation<V>(dataSet.getDatabase(), type, dataSet.getDBIDs());
 
       List<Pair<DBID, BigInteger>> projection = ZCurve.projectToZCurve(dataSet);
-      
-      for (Pair<DBID, BigInteger> pair : projection) {
+
+      V factory = DatabaseUtil.assumeVectorField(dataSet).getFactory();
+
+      for(Pair<DBID, BigInteger> pair : projection) {
         DBID id = pair.first;
         double doubleProjection = pair.second.doubleValue();
-        
-        resultDataSet.add(id, new DoubleVector(new double[] { doubleProjection }));
+
+        resultDataSet.set(id, factory.newInstance(new double[] { doubleProjection }));
       }
-      
+
       return resultDataSet;
-    } catch (RuntimeException e) {
+    }
+    catch(RuntimeException e) {
       throw e;
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       throw new UnableToComplyException(e);
     }
   }

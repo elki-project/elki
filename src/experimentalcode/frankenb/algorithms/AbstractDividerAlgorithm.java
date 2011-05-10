@@ -3,13 +3,10 @@ package experimentalcode.frankenb.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import experimentalcode.frankenb.model.DataBaseDataSet;
 import experimentalcode.frankenb.model.PartitionPairing;
-import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IDividerAlgorithm;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
@@ -25,28 +22,27 @@ import experimentalcode.frankenb.model.ifaces.IProjection;
  * 
  * @author Florian Frankenberger
  */
-public abstract class AbstractDividerAlgorithm implements IDividerAlgorithm {
+public abstract class AbstractDividerAlgorithm<V> implements IDividerAlgorithm<V> {
+  private List<IProjection<V>> projections = new ArrayList<IProjection<V>>();
 
-  private List<IProjection> projections = new ArrayList<IProjection>();
+  private IPartitioning<V> partitioning = null;
 
-  private IPartitioning partitioning = null;
+  private IPartitionPairing<V> pairing = null;
 
-  private IPartitionPairing pairing = null;
-
-  protected void addProjection(IProjection projection) {
+  protected void addProjection(IProjection<V> projection) {
     this.projections.add(projection);
   }
 
-  protected void setPartitioning(IPartitioning partitioning) {
+  protected void setPartitioning(IPartitioning<V> partitioning) {
     this.partitioning = partitioning;
   }
 
-  protected void setPairing(IPartitionPairing pairing) {
+  protected void setPairing(IPartitionPairing<V> pairing) {
     this.pairing = pairing;
   }
 
   @Override
-  public List<PartitionPairing> divide(Relation<? extends NumberVector<?, ?>> dataBase, int packageQuantity) throws UnableToComplyException {
+  public List<PartitionPairing> divide(Relation<V> dataSet, int packageQuantity) throws UnableToComplyException {
     if(partitioning == null) {
       throw new UnableToComplyException("No partitioning strategy has been selected.");
     }
@@ -56,14 +52,13 @@ public abstract class AbstractDividerAlgorithm implements IDividerAlgorithm {
     if(getLogger().isVerbose()) {
       getLogger().verbose("1. projection phase\n");
     }
-    IDataSet dataSet = new DataBaseDataSet(dataBase);
-    for(IProjection projection : projections) {
+    for(IProjection<V> projection : projections) {
       if(getLogger().isVerbose()) {
         getLogger().verbose("projection using [" + projection.getClass().getSimpleName() + "]\n");
       }
       dataSet = projection.project(dataSet);
       if(getLogger().isVerbose()) {
-        getLogger().verbose("dimension reduced to: " + dataSet.getDimensionality() + "\n");
+        //getLogger().verbose("dimension reduced to: " + DatabaseUtil.dimensionality(dataSet) + "\n");
         getLogger().verbose("\n");
       }
     }
@@ -72,7 +67,7 @@ public abstract class AbstractDividerAlgorithm implements IDividerAlgorithm {
       getLogger().verbose("2. partitioning phase\n");
       getLogger().verbose("\tpartitioning using [" + partitioning.getClass().getSimpleName() + "]\n");
     }
-    List<IPartition> partitions = partitioning.makePartitions(dataSet, packageQuantity);
+    List<IPartition<V>> partitions = partitioning.makePartitions(dataSet, packageQuantity);
     if(getLogger().isVerbose()) {
       getLogger().verbose("\n");
     }

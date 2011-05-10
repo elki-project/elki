@@ -16,18 +16,18 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
  * 
  * @author Florian Frankenberger
  */
-public class PINNKnnIndex implements KNNIndex<NumberVector<?, ?>> {
+public class PINNKnnIndex<V extends NumberVector<?, ?>> implements KNNIndex<V> {
 
-  private final KDTree tree;
+  private final KDTree<V> tree;
   private final int kFactor;
-  private Relation<NumberVector<?, ?>> relation;
+  private Relation<V> relation;
   
   /**
    * Constructor for kdtree and kFactor
    * @param tree
    * @param kFactor factor for k to multiply with when searching within the projected space
    */
-  public PINNKnnIndex(Relation<NumberVector<?,?>> relation, KDTree tree, int kFactor) {
+  public PINNKnnIndex(Relation<V> relation, KDTree<V> tree, int kFactor) {
     this.relation = relation;
     this.tree = tree;
     this.kFactor = kFactor;
@@ -78,17 +78,17 @@ public class PINNKnnIndex implements KNNIndex<NumberVector<?, ?>> {
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<NumberVector<?, ?>, D> getKNNQuery(DistanceFunction<? super NumberVector<?, ?>, D> distanceFunction, Object... hints) {
-    return (KNNQuery<NumberVector<?, ?>, D>) new PINNKnnQuery(this.relation, this.tree, this.kFactor);
+  public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceFunction<? super V, D> distanceFunction, Object... hints) {
+    return (KNNQuery<V, D>) new PINNKnnQuery(this.relation, this.tree, this.kFactor);
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<NumberVector<?, ?>, D> getKNNQuery(DistanceQuery<NumberVector<?, ?>, D> distanceQuery, Object... hints) {
-    return (KNNQuery<NumberVector<?, ?>, D>) new PINNKnnQuery(this.relation, this.tree, this.kFactor);
+  public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+    return (KNNQuery<V, D>) new PINNKnnQuery(this.relation, this.tree, this.kFactor);
   }
 
   @Override
-  public Relation<NumberVector<?, ?>> getRelation() {
+  public Relation<V> getRelation() {
     return this.relation;
   }
 }

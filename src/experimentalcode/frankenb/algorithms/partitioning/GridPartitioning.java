@@ -9,38 +9,39 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.frankenb.model.BufferedDiskBackedPartition;
 import experimentalcode.frankenb.model.PositionedPartition;
-import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitioning;
 
 /**
  * This class creates partitions by separating the vector-space rather than the
- * data. The whole vector-space is splitted into grid cells which then form
- * the partitions. If a grid cell remains empty it will not be returned by this
+ * data. The whole vector-space is splitted into grid cells which then form the
+ * partitions. If a grid cell remains empty it will not be returned by this
  * algorithm.
  * <p/>
- * Note: This implementation returns {@link PositionedPartition}s which provide additional
- * information to the pairing algorithm if needed.
+ * Note: This implementation returns {@link PositionedPartition}s which provide
+ * additional information to the pairing algorithm if needed.
  * 
  * @author Florian Frankenberger
  */
-public class GridPartitioning implements IPartitioning {
+public class GridPartitioning<V extends NumberVector<?, ?>> implements IPartitioning<V> {
   /**
    * Logger
    */
   private static final Logging logger = Logging.getLogger(GridPartitioning.class);
 
   public static final OptionID SECTORS_ID = OptionID.getOrCreateOptionID("sectorsperdimension", "Amount of sectors per dimension");
-  
-  private final IntParameter SECTORS_PARAM = new IntParameter(SECTORS_ID, false);    
-  
+
+  private final IntParameter SECTORS_PARAM = new IntParameter(SECTORS_ID, false);
+
   private static class OrderItem implements Comparable<OrderItem> {
 
     DBID dbid;
@@ -142,24 +143,25 @@ public class GridPartitioning implements IPartitioning {
   }
 
   private int sectors = 0;
-  
+
   /**
    * @param config
    */
   public GridPartitioning(Parameterization config) {
-    if (config.grab(SECTORS_PARAM)) {
+    if(config.grab(SECTORS_PARAM)) {
       this.sectors = SECTORS_PARAM.getValue();
-      if (sectors < 1) throw new RuntimeException("Sectors need to be > 0");
+      if(sectors < 1)
+        throw new RuntimeException("Sectors need to be > 0");
     }
   }
 
   @Override
-  public List<IPartition> makePartitions(IDataSet dataSet, int packageQuantity) throws UnableToComplyException {
+  public List<IPartition<V>> makePartitions(Relation<V> dataSet, int packageQuantity) throws UnableToComplyException {
 
-    int itemsPerSectorAndDimension = (int) Math.floor(dataSet.getSize() / (float) sectors);
+    int itemsPerSectorAndDimension = (int) Math.floor(dataSet.size() / (float) sectors);
 
-    int addItemsUntilPartition = dataSet.getSize() % sectors;
-    int actualPartitionQuantity = (int) Math.pow(sectors, dataSet.getDimensionality());
+    int addItemsUntilPartition = dataSet.size() % sectors;
+    int actualPartitionQuantity = (int) Math.pow(sectors, DatabaseUtil.dimensionality(dataSet));
     logger.verbose("Partitions that will be actually created: " + actualPartitionQuantity);
     logger.verbose("Items per partition and dimension (not only per partition!): " + itemsPerSectorAndDimension);
 
@@ -167,9 +169,9 @@ public class GridPartitioning implements IPartitioning {
     logger.verbose("Calculating the partitions dimensions ...");
     Map<DBID, PartitionPosition> dbEntriesPositions = new HashMap<DBID, PartitionPosition>();
     Map<Integer, List<Double>> dimensionalCuttingPoints = new HashMap<Integer, List<Double>>();
-    for(int dim = 1; dim <= dataSet.getDimensionality(); ++dim) {
-      List<OrderItem> dimensionalOrderedItems = new ArrayList<OrderItem>(dataSet.getSize());
-      for(DBID dbid : dataSet.getIDs()) {
+    for(int dim = 1; dim <= DatabaseUtil.dimensionality(dataSet); ++dim) {
+      List<OrderItem> dimensionalOrderedItems = new ArrayList<OrderItem>(dataSet.size());
+      for(DBID dbid : dataSet.iterDBIDs()) {
         dimensionalOrderedItems.add(new OrderItem(dbid, dataSet.get(dbid).doubleValue(dim)));
       }
 
@@ -185,7 +187,7 @@ public class GridPartitioning implements IPartitioning {
         }
         PartitionPosition entryPosition = dbEntriesPositions.get(orderItem.dbid);
         if(entryPosition == null) {
-          entryPosition = new PartitionPosition(new int[dataSet.getDimensionality()]);
+          entryPosition = new PartitionPosition(new int[DatabaseUtil.dimensionality(dataSet)]);
           dbEntriesPositions.put(orderItem.dbid, entryPosition);
         }
         entryPosition.setPosition(dim - 1, position);
@@ -196,22 +198,22 @@ public class GridPartitioning implements IPartitioning {
 
     }
 
-    Map<PartitionPosition, IPartition> partitions = new HashMap<PartitionPosition, IPartition>();
+    Map<PartitionPosition, IPartition<V>> partitions = new HashMap<PartitionPosition, IPartition<V>>();
 
     logger.verbose("Now populating the partitions ...");
     // now we populate the partitions
     for(Entry<DBID, PartitionPosition> entry : dbEntriesPositions.entrySet()) {
-      NumberVector<?, ?> vector = dataSet.getOriginal().get(entry.getKey());
-      IPartition partition = partitions.get(entry.getValue());
+      V vector = dataSet.getOriginal().get(entry.getKey());
+      IPartition<V> partition = partitions.get(entry.getValue());
       if(partition == null) {
-        partition = new PositionedPartition(entry.getValue().getPosition(), new BufferedDiskBackedPartition(partitions.size(), dataSet.getDimensionality()));
+        partition = new PositionedPartition(entry.getValue().getPosition(), new BufferedDiskBackedPartition(partitions.size(), DatabaseUtil.dimensionality(dataSet)));
         partitions.put(entry.getValue(), partition);
       }
       partition.addVector(entry.getKey(), vector);
     }
 
     logger.verbose("Actually created partitions: " + partitions.size());
-    return new ArrayList<IPartition>(partitions.values());
+    return new ArrayList<IPartition<V>>(partitions.values());
   }
 
 }

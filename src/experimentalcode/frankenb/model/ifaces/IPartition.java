@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -13,17 +12,17 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Florian Frankenberger
  */
-public interface IPartition extends Iterable<Pair<DBID, NumberVector<?, ?>>> {
+public interface IPartition<V> extends Iterable<Pair<DBID, V>> {
 
   public int getId();
   
   public File getStorageFile();
 
-  public void addVector(DBID id, NumberVector<?, ?> vector);
+  public void addVector(DBID id, V vector);
 
   public void close() throws IOException;
 
-  public Iterator<Pair<DBID, NumberVector<?, ?>>> iterator();
+  public Iterator<Pair<DBID, V>> iterator();
 
   public int getSize();
 

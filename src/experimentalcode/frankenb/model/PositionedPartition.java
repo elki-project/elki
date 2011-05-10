@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ifaces.IPartition;
@@ -17,12 +16,12 @@ import experimentalcode.frankenb.model.ifaces.IPositionedPartition;
  * 
  * @author Florian Frankenberger
  */
-public class PositionedPartition implements IPositionedPartition {
+public class PositionedPartition<V> implements IPositionedPartition<V> {
 
-  private IPartition partition;
+  private IPartition<V> partition;
   private final int[] position;
 
-  public PositionedPartition(int dimension, IPartition partition) {
+  public PositionedPartition(int dimension, IPartition<V> partition) {
     this.position = new int[dimension];
     for (int i = 0; i < position[dimension]; ++i) {
       this.position[i] = 0;
@@ -31,7 +30,7 @@ public class PositionedPartition implements IPositionedPartition {
     this.partition = partition;
   }  
   
-  public PositionedPartition(int[] position, IPartition partition) {
+  public PositionedPartition(int[] position, IPartition<V> partition) {
     this.position = position;
     this.partition = partition;
   }
@@ -47,7 +46,7 @@ public class PositionedPartition implements IPositionedPartition {
   }
 
   @Override
-  public void addVector(DBID id, NumberVector<?, ?> vector) {
+  public void addVector(DBID id, V vector) {
     this.partition.addVector(id, vector);
   }
 
@@ -57,7 +56,7 @@ public class PositionedPartition implements IPositionedPartition {
   }
 
   @Override
-  public Iterator<Pair<DBID, NumberVector<?, ?>>> iterator() {
+  public Iterator<Pair<DBID, V>> iterator() {
     return this.partition.iterator();
   }
 

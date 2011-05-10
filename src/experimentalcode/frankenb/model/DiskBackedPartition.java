@@ -23,7 +23,7 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  * 
  * @author Florian Frankenberger
  */
-public class DiskBackedPartition implements IPartition {
+public class DiskBackedPartition<V extends NumberVector<?, ?>> implements IPartition<V> {
 
   private int id = 0;
   
@@ -83,7 +83,7 @@ public class DiskBackedPartition implements IPartition {
   }
   
   @Override
-  public void addVector(DBID id, NumberVector<?, ?> vector) {
+  public void addVector(DBID id, V vector) {
     try {
       open();
       long position = storageFile.length();
@@ -113,9 +113,9 @@ public class DiskBackedPartition implements IPartition {
   }
   
   @Override
-  public Iterator<Pair<DBID, NumberVector<?, ?>>> iterator() {
+  public Iterator<Pair<DBID, V>> iterator() {
     open();
-    return new Iterator<Pair<DBID, NumberVector<?, ?>>>() {
+    return new Iterator<Pair<DBID, V>>() {
 
       private int position = 0;
       
@@ -125,7 +125,7 @@ public class DiskBackedPartition implements IPartition {
       }
 
       @Override
-      public Pair<DBID, NumberVector<?, ?>> next() {
+      public Pair<DBID, V> next() {
         if (position > getSize() - 1) 
           throw new IllegalStateException("No more items");
         try {
@@ -138,7 +138,7 @@ public class DiskBackedPartition implements IPartition {
           }
           
           position++;
-          return new Pair<DBID, NumberVector<?, ?>>(id, new DoubleVector(data));
+          return new Pair<DBID, V>(id, new DoubleVector(data));
         } catch (IOException e) {
           throw new IllegalStateException("Could not read from data file", e);
         }
@@ -188,8 +188,8 @@ public class DiskBackedPartition implements IPartition {
     
   }
   
-  public static DiskBackedPartition loadFromFile(File file) throws IOException {
-    return new DiskBackedPartition(0, 0, file);
+  public static <V extends NumberVector<?, ?>> DiskBackedPartition<V> loadFromFile(File file) throws IOException {
+    return new DiskBackedPartition<V>(0, 0, file);
   }
   
 }

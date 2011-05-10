@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -13,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.PositionedPartition;
-import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
 
@@ -26,7 +27,7 @@ import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
  * 
  * @author Florian Frankenberger
  */
-public class NearFieldPartitionPairing implements IPartitionPairing {
+public class NearFieldPartitionPairing<V extends NumberVector<?, ?>> implements IPartitionPairing<V> {
   /**
    * Logger
    */
@@ -68,7 +69,7 @@ public class NearFieldPartitionPairing implements IPartitionPairing {
   }
 
   @Override
-  public List<PartitionPairing> makePairings(IDataSet dataSet, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException {
+  public List<PartitionPairing> makePairings(Relation<V> dataSet, List<IPartition<V>> partitions, int packageQuantity) throws UnableToComplyException {
     //we assume that all positionedPartitions have the same dimensionality
     if (partitions.size() < 1) throw new RuntimeException("Can't work with 0 partitions!");
     
@@ -76,7 +77,7 @@ public class NearFieldPartitionPairing implements IPartitionPairing {
       logger.verbose("Add diagonals: " + Boolean.toString(addDiagonal));
     }
     
-    IPartition prototypePartition = partitions.get(0);
+    IPartition<V> prototypePartition = partitions.get(0);
     checkPartition(prototypePartition);
     
     PositionedPartition prototypePositionedPartition = (PositionedPartition) prototypePartition;
@@ -88,7 +89,7 @@ public class NearFieldPartitionPairing implements IPartitionPairing {
     Arrays.fill(maxValues, Integer.MIN_VALUE);
     
     Map<Position, PositionedPartition> partitionMap = new HashMap<Position, PositionedPartition>();
-    for (IPartition partition : partitions) {
+    for (IPartition<V> partition : partitions) {
       checkPartition(partition);
       
       PositionedPartition positionedPartition = (PositionedPartition) partition;

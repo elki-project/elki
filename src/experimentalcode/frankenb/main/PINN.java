@@ -25,17 +25,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.frankenb.algorithms.projection.RandomProjection;
-import experimentalcode.frankenb.model.DataBaseDataSet;
 import experimentalcode.frankenb.model.KDTree;
 import experimentalcode.frankenb.model.PINNKnnIndex;
-import experimentalcode.frankenb.model.ifaces.IDataSet;
 
 /**
  * A simple PINN implementation used as a comparison.
  * 
  * @author Florian Frankenberger
  */
-public class PINN extends AbstractApplication {
+public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
   /**
    * The logger
    */
@@ -47,7 +45,7 @@ public class PINN extends AbstractApplication {
 
   private final DatabaseConnection databaseConnection;
 
-  private final RandomProjection randomProjection;
+  private final RandomProjection<V> randomProjection;
 
   private final ComputeROCCurve rocComputer;
 
@@ -68,7 +66,7 @@ public class PINN extends AbstractApplication {
    * @param kFactor
    * @param outputFile
    */
-  public PINN(boolean verbose, DatabaseConnection databaseConnection, RandomProjection randomProjection, ComputeROCCurve rocComputer, int k, int kFactor, File outputFile) {
+  public PINN(boolean verbose, DatabaseConnection databaseConnection, RandomProjection<V> randomProjection, ComputeROCCurve rocComputer, int k, int kFactor, File outputFile) {
     super(verbose);
     this.databaseConnection = databaseConnection;
     this.randomProjection = randomProjection;
@@ -82,16 +80,15 @@ public class PINN extends AbstractApplication {
   public void run() throws UnableToComplyException {
     logger.verbose("Reading database ...");
     final Database dataBase = databaseConnection.getDatabase();
-    Relation<NumberVector<?, ?>> relation = dataBase.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<V> dataset = dataBase.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     logger.verbose("Projecting ...");
-    final DataBaseDataSet dataset = new DataBaseDataSet(relation);
-    IDataSet dataSet = randomProjection.project(dataset);
+    Relation<V> dataSet = randomProjection.project(dataset);
 
     logger.verbose("Creating KD-Tree ...");
-    KDTree tree = new KDTree(dataSet);
+    KDTree<V> tree = new KDTree<V>(dataSet);
 
-    PINNKnnIndex index = new PINNKnnIndex(relation, tree, kFactor);
+    PINNKnnIndex<V> index = new PINNKnnIndex<V>(dataset, tree, kFactor);
     dataBase.addIndex(index);
 
     logger.verbose("Running LOF ...");
@@ -130,10 +127,10 @@ public class PINN extends AbstractApplication {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractApplication.Parameterizer {
     private FileBasedDatabaseConnection databaseConnection;
 
-    private RandomProjection randomProjection;
+    private RandomProjection<V> randomProjection;
 
     private ComputeROCCurve rocComputer;
 
@@ -158,7 +155,7 @@ public class PINN extends AbstractApplication {
         this.kFactor = kFactorP.getValue();
       }
 
-      randomProjection = new RandomProjection(config);
+      randomProjection = new RandomProjection<V>(config);
 
       Class<FileBasedDatabaseConnection> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
       databaseConnection = config.tryInstantiate(dbcls);
@@ -166,8 +163,8 @@ public class PINN extends AbstractApplication {
     }
 
     @Override
-    protected PINN makeInstance() {
-      return new PINN(verbose, databaseConnection, randomProjection, rocComputer, k, kFactor, outputFile);
+    protected PINN<V> makeInstance() {
+      return new PINN<V>(verbose, databaseConnection, randomProjection, rocComputer, k, kFactor, outputFile);
     }
   }
 }

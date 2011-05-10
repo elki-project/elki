@@ -1,7 +1,7 @@
 package experimentalcode.frankenb.model.ifaces;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * This is a simple intermediate state of Data in a DataBase.
@@ -10,38 +10,5 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Florian Frankenberger
  */
-public interface IDataSet {
-
-  /**
-   * Returns the object in this data set with the given id
-   * 
-   * @param id
-   * @return
-   */
-  public NumberVector<?, ?> get(DBID id);
-  
-  /**
-   * Returns the number of dimensions in this data set
-   * 
-   * @return
-   */
-  public int getDimensionality();
-  
-  /**
-   * @return
-   */
-  public int getSize();
-  
-  /**
-   * Returns the original dataSet or null if not applicable
-   * @return
-   */
-  public IDataSet getOriginal();
-  
-  /**
-   * Returns an iterable for the IDs
-   * @return
-   */
-  public Iterable<DBID> getIDs();
-
+public interface IDataSet<V> extends Relation<V> {
 }

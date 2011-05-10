@@ -2,6 +2,7 @@ package experimentalcode.frankenb.model.ifaces;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import experimentalcode.frankenb.model.PartitionPairing;
 
@@ -10,20 +11,19 @@ import experimentalcode.frankenb.model.PartitionPairing;
  * 
  * @author Florian Frankenberger
  */
-public interface IPartitionPairing {
-
+public interface IPartitionPairing<V> {
   /**
-   * When called requires you to return a list of PartitionPairings that should be 
-   * calculated on the cluster. The partitions get automatically stored at the
-   * right directories. The package quantity is just a hint for this algorithm and
-   * can be ignored if not needed. If less than packageQuantity PartitionPairings are
-   * returned, only as many as there are PartitionPairings packages get generated.
+   * When called requires you to return a list of PartitionPairings that should
+   * be calculated on the cluster. The partitions get automatically stored at
+   * the right directories. The package quantity is just a hint for this
+   * algorithm and can be ignored if not needed. If less than packageQuantity
+   * PartitionPairings are returned, only as many as there are PartitionPairings
+   * packages get generated.
    * 
    * @param dataSet
    * @param partitions
    * @param packageQuantity
    * @return
    */
-  public List<PartitionPairing> makePairings(IDataSet dataSet, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException;
-  
+  public List<PartitionPairing> makePairings(Relation<V> dataSet, List<IPartition<V>> partitions, int packageQuantity) throws UnableToComplyException;
 }

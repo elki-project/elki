@@ -55,11 +55,11 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  * 
  * @author Florian Frankenberger
  */
-public class KnnDataProcessor extends AbstractApplication {
+public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractApplication {
   /**
    * The logger
    */
-  private static final Logging logger = Logging.getLogger(KnnDataProcessor.class);
+  static final Logging logger = Logging.getLogger(KnnDataProcessor.class);
 
   /**
    * Parameter that specifies the name of the input file.
@@ -95,7 +95,7 @@ public class KnnDataProcessor extends AbstractApplication {
    */
   public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("knn.reachdistfunction", "Distance function to determine the reachability distance between database objects.");
 
-  private final RawDoubleDistance<NumberVector<?, ?>> distanceAlgorithm;
+  private final RawDoubleDistance<V> distanceAlgorithm;
 
   private int totalTasks;
 
@@ -110,7 +110,7 @@ public class KnnDataProcessor extends AbstractApplication {
    * @param distanceAlgorithm
    * @param multiThreaded
    */
-  public KnnDataProcessor(boolean verbose, File input, int maxK, RawDoubleDistance<NumberVector<?, ?>> distanceAlgorithm, boolean multiThreaded) {
+  public KnnDataProcessor(boolean verbose, File input, int maxK, RawDoubleDistance<V> distanceAlgorithm, boolean multiThreaded) {
     super(verbose);
     this.input = input;
     this.maxK = maxK;
@@ -143,7 +143,7 @@ public class KnnDataProcessor extends AbstractApplication {
 
       logger.verbose("Creating tasks ...");
       List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
-      for(final PartitionPairing pairing : packageDescriptor) {
+      for(final PartitionPairing<V> pairing : packageDescriptor) {
         if(pairing.getPartitionOne().getSize() < 1 || pairing.getPartitionTwo().getSize() < 1) {
           throw new UnableToComplyException("Pairing " + pairing + " has 0 items");
         }
@@ -175,7 +175,9 @@ public class KnnDataProcessor extends AbstractApplication {
 
               logger.verbose(String.format("\tPairing %010d: partition%05d (%,d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
 
-              IPartition[][] partitionsToProcess = new IPartition[][] { new IPartition[] { pairing.getPartitionOne(), pairing.getPartitionTwo() }, new IPartition[] { pairing.getPartitionTwo(), pairing.getPartitionOne() } };
+              List<Pair<IPartition<V>,IPartition<V>>> partitionsToProcess = new ArrayList<Pair<IPartition<V>,IPartition<V>>>(2);
+              partitionsToProcess.add(new Pair<IPartition<V>,IPartition<V>>(pairing.getPartitionOne(), pairing.getPartitionTwo()));
+              partitionsToProcess.add(new Pair<IPartition<V>,IPartition<V>>( pairing.getPartitionTwo(), pairing.getPartitionOne()));
 
               // we make two passes here as the calculation is much faster than
               // deserializing the distanceLists all the
@@ -183,15 +185,15 @@ public class KnnDataProcessor extends AbstractApplication {
               // a hash list with the processed pairs has also
               // the drawback of using too much memory - especially when more
               // threads run simultaneously - the memory usage is n^2 per thread
-              for(int i = 0; i < (pairing.isSelfPairing() ? 1 : partitionsToProcess.length); ++i) {
-                IPartition[] partitions = partitionsToProcess[i];
+              for(int i = 0; i < (pairing.isSelfPairing() ? 1 : partitionsToProcess.size()); ++i) {
+                Pair<IPartition<V>,IPartition<V>> partitions = partitionsToProcess.get(i);
                 int counter = 0;
-                for(Pair<DBID, NumberVector<?, ?>> pointOne : partitions[0]) {
+                for(Pair<DBID, V> pointOne : partitions.first) {
                   if(counter++ % 50 == 0) {
-                    logger.verbose(String.format("\t\tPairing %010d: Processed %,d of %,d items ...", taskId, counter, partitions[0].getSize()));
+                    logger.verbose(String.format("\t\tPairing %010d: Processed %,d of %,d items ...", taskId, counter, partitions.first.getSize()));
                   }
 
-                  for(Pair<DBID, NumberVector<?, ?>> pointTwo : partitions[1]) {
+                  for(Pair<DBID, V> pointTwo : partitions.second) {
                     double distance = distanceAlgorithm.doubleDistance(pointOne.getSecond(), pointTwo.getSecond());
                     persistDistance(resultTree, processedIds, pointOne, pointTwo, distance);
                   }
@@ -273,7 +275,7 @@ public class KnnDataProcessor extends AbstractApplication {
     totalItems += items;
   }
 
-  private void persistDistance(DynamicBPlusTree<DBID, DistanceList> resultTree, ModifiableDBIDs processedIds, Pair<DBID, NumberVector<?, ?>> fromPoint, Pair<DBID, NumberVector<?, ?>> toPoint, double distance) throws IOException {
+  private void persistDistance(DynamicBPlusTree<DBID, DistanceList> resultTree, ModifiableDBIDs processedIds, Pair<DBID, V> fromPoint, Pair<DBID, V> toPoint, double distance) throws IOException {
     DistanceList distanceList = null;
     if(processedIds.contains(fromPoint.getFirst())) {
       distanceList = resultTree.get(fromPoint.getFirst());
@@ -293,15 +295,15 @@ public class KnnDataProcessor extends AbstractApplication {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractApplication.Parameterizer {
     File input = null;
-  
+
     int maxK = 0;
-  
+
     boolean multiThreaded = false;
-  
-    private RawDoubleDistance<NumberVector<?, ?>> distanceAlgorithm = null;
-  
+
+    private RawDoubleDistance<V> distanceAlgorithm = null;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -310,20 +312,20 @@ public class KnnDataProcessor extends AbstractApplication {
       if(config.grab(inputP)) {
         input = inputP.getValue();
       }
-  
+
       final IntParameter maxKP = new IntParameter(MAXK_ID, false);
       if(config.grab(maxKP)) {
         maxK = maxKP.getValue();
       }
-  
+
       final Flag multiThreadedP = new Flag(MULTI_THREADING_ID);
       if(config.grab(multiThreadedP)) {
         multiThreaded = multiThreadedP.getValue();
       }
-  
+
       configParameterReachabilityDistanceFunction(config);
     }
-  
+
     /**
      * Grab the reachability distance configuration option.
      * 
@@ -331,15 +333,15 @@ public class KnnDataProcessor extends AbstractApplication {
      * @return Parameter value or null.
      */
     protected void configParameterReachabilityDistanceFunction(Parameterization config) {
-      final ObjectParameter<RawDoubleDistance<NumberVector<?, ?>>> param = new ObjectParameter<RawDoubleDistance<NumberVector<?, ?>>>(REACHABILITY_DISTANCE_FUNCTION_ID, RawDoubleDistance.class, true);
+      final ObjectParameter<RawDoubleDistance<V>> param = new ObjectParameter<RawDoubleDistance<V>>(REACHABILITY_DISTANCE_FUNCTION_ID, RawDoubleDistance.class, true);
       if(config.grab(param)) {
         distanceAlgorithm = param.instantiateClass(config);
       }
     }
-  
+
     @Override
-    protected KnnDataProcessor makeInstance() {
-      return new KnnDataProcessor(verbose, input, maxK, distanceAlgorithm, multiThreaded);
+    protected KnnDataProcessor<V> makeInstance() {
+      return new KnnDataProcessor<V>(verbose, input, maxK, distanceAlgorithm, multiThreaded);
     }
   }
 
