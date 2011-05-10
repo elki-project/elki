@@ -1,6 +1,3 @@
-/*
- * 
- */
 
 package experimentalcode.students.waase;
 
