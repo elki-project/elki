@@ -24,7 +24,6 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  * @author Florian Frankenberger
  */
 public class DiskBackedPartition<V extends NumberVector<?, ?>> implements IPartition<V> {
-
   private int id = 0;
   
   private final File storageFile;

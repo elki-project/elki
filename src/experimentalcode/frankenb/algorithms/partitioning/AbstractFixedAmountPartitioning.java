@@ -2,14 +2,12 @@ package experimentalcode.frankenb.algorithms.partitioning;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.frankenb.model.ifaces.IPartitioning;
 
 /**
  * This abstract class represents a partitioning algorithm with a fixed amount
@@ -26,7 +24,7 @@ public abstract class AbstractFixedAmountPartitioning<V> implements IPartitionin
   /**
    * Parameter that specifies the percentage of deviations
    * <p>
-   * Key: {@code -packages}
+   * Key: {@code -partitions}
    * </p>
    */
   private final IntParameter PARTITIONS_PARAM = new IntParameter(PARTITIONS_ID, false);
@@ -40,13 +38,13 @@ public abstract class AbstractFixedAmountPartitioning<V> implements IPartitionin
   }
 
   @Override
-  public List<DBIDs> makePartitions(Relation<V> dataSet, int packageQuantity) throws UnableToComplyException {
+  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity) throws UnableToComplyException {
     getLogger().verbose("partition quantity: " + partitionQuantity);
 
     return makePartitions(dataSet, packageQuantity, partitionQuantity);
   }
 
-  protected abstract List<DBIDs> makePartitions(Relation<V> dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException;
+  protected abstract List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException;
 
   protected abstract Logging getLogger();
 }

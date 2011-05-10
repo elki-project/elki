@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import experimentalcode.frankenb.algorithms.partitioning.DBIDPartition;
 import experimentalcode.frankenb.model.PartitionPairing;
-import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
 
 /**
@@ -70,7 +70,7 @@ public class CrossPartitionPairing<V> implements IPartitionPairing<V> {
   }
 
   @Override
-  public final List<PartitionPairing> makePairings(Relation<V> dataSet, List<IPartition<V>> partitions, int packageQuantity) throws UnableToComplyException {
+  public final List<PartitionPairing> makePairings(Relation<? extends V> dataSet, List<DBIDPartition> partitions, int packageQuantity) throws UnableToComplyException {
     int deviationMax = (int) (Math.max(1, crossPairingsPercent * (float) partitions.size()) - 1);
     int pairingsTotal = getAmountOfPairings(partitions.size());
     int pairingsRemoved = getAmountOfPairings(partitions.size() - (deviationMax + 1));
@@ -114,7 +114,6 @@ public class CrossPartitionPairing<V> implements IPartitionPairing<V> {
         StringBuilder line2 = new StringBuilder(String.format("%02d", i));
         int acMin = Math.max(0, i - deviationMax);
         for(int j = 0; j < partitions; ++j) {
-
           line1.append("===");
           line2.append("|");
           line2.append(j >= acMin && j <= i ? "XX" : "  ");

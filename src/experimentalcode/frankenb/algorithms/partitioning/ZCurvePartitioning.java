@@ -9,15 +9,13 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.BufferedDiskBackedPartition;
-import experimentalcode.frankenb.model.ifaces.IDataSet;
-import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.utils.ZCurve;
 
 /**
@@ -37,7 +35,7 @@ public class ZCurvePartitioning<V extends NumberVector<?, ?>> extends AbstractFi
   }
   
   @Override
-  protected List<IPartition<V>> makePartitions(Relation<V> dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException {
+  protected List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException {
     try {
       List<Pair<DBID, BigInteger>> projection = ZCurve.projectToZCurve(dataSet);
       
@@ -60,15 +58,15 @@ public class ZCurvePartitioning<V extends NumberVector<?, ?>> extends AbstractFi
       logger.verbose(String.format("Items per partition about: %d", itemsPerPartition));
       
       Iterator<Pair<DBID, BigInteger>> projectionIterator = projection.iterator();
-      List<IPartition<V>> partitions = new ArrayList<IPartition<V>>();
+      List<DBIDPartition> partitions = new ArrayList<DBIDPartition>();
       for (int i = 0; i < partitionQuantity; ++i) {
-        IPartition<V> partition = new BufferedDiskBackedPartition(i, DatabaseUtil.dimensionality(dataSet));
+        ModifiableDBIDs partids = DBIDUtil.newArray(); 
         for (int j = 0; j < itemsPerPartition + (i + 1 < addItemsUntilPartition ? 1 : 0); ++j) {
           DBID id = projectionIterator.next().first;
-          partition.addVector(id, dataSet.getOriginal().get(id));
+          partids.add(id);
         }
-        logger.verbose(String.format("\tCreated partition %d with %d items.", partition.getId(), partition.getSize()));
-        partitions.add(partition);
+        logger.verbose(String.format("\tCreated partition %d with %d items.", i, partids.size()));
+        partitions.add(new DBIDPartition(partids));
       }
       
       return partitions;

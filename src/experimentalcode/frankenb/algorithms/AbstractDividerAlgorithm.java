@@ -6,11 +6,11 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import experimentalcode.frankenb.algorithms.partitioning.DBIDPartition;
+import experimentalcode.frankenb.algorithms.partitioning.IPartitioning;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.ifaces.IDividerAlgorithm;
-import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
-import experimentalcode.frankenb.model.ifaces.IPartitioning;
 import experimentalcode.frankenb.model.ifaces.IProjection;
 
 /**
@@ -67,7 +67,7 @@ public abstract class AbstractDividerAlgorithm<V> implements IDividerAlgorithm<V
       getLogger().verbose("2. partitioning phase\n");
       getLogger().verbose("\tpartitioning using [" + partitioning.getClass().getSimpleName() + "]\n");
     }
-    List<IPartition<V>> partitions = partitioning.makePartitions(dataSet, packageQuantity);
+    List<DBIDPartition> partitions = partitioning.makePartitions(dataSet, packageQuantity);
     if(getLogger().isVerbose()) {
       getLogger().verbose("\n");
     }

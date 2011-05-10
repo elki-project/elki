@@ -1,17 +1,17 @@
 package experimentalcode.frankenb.model;
 
-import experimentalcode.frankenb.model.ifaces.IPartition;
+import experimentalcode.frankenb.algorithms.partitioning.DBIDPartition;
 import experimentalcode.frankenb.utils.Utils;
 
-public class PartitionPairing<V> {
+public class PartitionPairing {
 
-  private final IPartition<V> partitionOne, partitionTwo;
+  private final DBIDPartition partitionOne, partitionTwo;
 
   private int storageId = 0;
 
   private boolean hasResult = false;
 
-  public PartitionPairing(IPartition<V> partitionOne, IPartition<V> partitionTwo) {
+  public PartitionPairing(DBIDPartition partitionOne, DBIDPartition partitionTwo) {
     this.partitionOne = partitionOne;
     this.partitionTwo = partitionTwo;
   }
@@ -30,11 +30,11 @@ public class PartitionPairing<V> {
     return this.storageId;
   }
 
-  public IPartition<V> getPartitionOne() {
+  public DBIDPartition getPartitionOne() {
     return this.partitionOne;
   }
 
-  public IPartition<V> getPartitionTwo() {
+  public DBIDPartition getPartitionTwo() {
     return this.partitionTwo;
   }
 
@@ -89,7 +89,7 @@ public class PartitionPairing<V> {
     if(partitionOne == null || partitionTwo == null) {
       return super.toString();
     }
-    return String.format("[ %05d (%,d) <=> %05d (%,d) ]", partitionOne.getId(), partitionOne.getSize(), partitionTwo.getId(), partitionTwo.getSize());
+    return String.format("[ (%,d) <=> (%,d) ]", partitionOne.getSize(), partitionTwo.getSize());
+    //return String.format("[ %05d (%,d) <=> %05d (%,d) ]", partitionOne.getId(), partitionOne.getSize(), partitionTwo.getId(), partitionTwo.getSize());
   }
-
 }

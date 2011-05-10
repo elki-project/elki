@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
@@ -19,7 +20,7 @@ import experimentalcode.frankenb.utils.FileUtils;
  * 
  * @author Florian Frankenberger
  */
-public class PackageDescriptor implements Iterable<PartitionPairing> {
+public class PackageDescriptor<V> implements Iterable<PartitionPairing> {
 
   private static final String PARTITION_DAT_FILE_FORMAT = "partition%05d.dat";
 
@@ -39,7 +40,7 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
 
   private final File parentDirectory;
 
-  private Set<IPartition> partitions = new HashSet<IPartition>();
+  private Set<IPartition<V>> partitions = new HashSet<IPartition<V>>();
 
   public PackageDescriptor(int id, int dimensionality, IDataStorage dataStorage) throws IOException {
     this.dataStorage = dataStorage;
@@ -87,7 +88,7 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
     return this.dimensionality;
   }
 
-  public synchronized void addPartitionPairing(PartitionPairing pairing) throws IOException {
+  public synchronized void addPartitionPairing(Relation<V> dataSet, PartitionPairing pairing) throws IOException {
     dataStorage.setLength(HEADER_SIZE + (this.pairingsQuantity + 1) * PAIRING_DATA_SIZE);
     long newPosition = HEADER_SIZE + this.pairingsQuantity * PAIRING_DATA_SIZE;
     if(dataStorage.getFilePointer() != newPosition) {

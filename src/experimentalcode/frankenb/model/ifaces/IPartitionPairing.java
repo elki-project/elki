@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import experimentalcode.frankenb.algorithms.partitioning.DBIDPartition;
 import experimentalcode.frankenb.model.PartitionPairing;
 
 /**
@@ -25,5 +26,5 @@ public interface IPartitionPairing<V> {
    * @param packageQuantity
    * @return
    */
-  public List<PartitionPairing> makePairings(Relation<V> dataSet, List<IPartition<V>> partitions, int packageQuantity) throws UnableToComplyException;
+  public List<PartitionPairing> makePairings(Relation<? extends V> dataSet, List<DBIDPartition> partitions, int packageQuantity) throws UnableToComplyException;
 }
