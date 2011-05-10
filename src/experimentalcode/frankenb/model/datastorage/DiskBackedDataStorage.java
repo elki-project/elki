@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model.datastorage;
 
 import java.io.File;
@@ -45,9 +42,6 @@ public class DiskBackedDataStorage implements IDataStorage {
     return buffer;
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#writeBuffer(java.nio.ByteBuffer)
-   */
   @Override
   public void writeBuffer(ByteBuffer buffer) throws IOException {
     long position = this.getFilePointer();
@@ -113,9 +107,6 @@ public class DiskBackedDataStorage implements IDataStorage {
     randomAccessFile.write(buffer);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#write(byte[], int, int)
-   */
   @Override
   public void write(byte[] buffer, int off, int len) throws IOException {
     randomAccessFile.write(buffer, off, len);

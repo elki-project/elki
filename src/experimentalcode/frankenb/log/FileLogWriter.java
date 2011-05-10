@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.log;
 
 import java.io.BufferedOutputStream;
@@ -31,9 +28,6 @@ public class FileLogWriter implements ILogWriter {
         );
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.log.ILogWriter#putLogLine(experimentalcode.frankenb.log.LogLevel, java.lang.String)
-   */
   @Override
   public void putLogLine(LogLevel level, String formattedMessage) {
     writer.println(formattedMessage);

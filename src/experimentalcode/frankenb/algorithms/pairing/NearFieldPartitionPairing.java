@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.algorithms.pairing;
 
 import java.util.ArrayList;
@@ -9,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.PositionedPartition;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
@@ -30,6 +27,10 @@ import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
  * @author Florian Frankenberger
  */
 public class NearFieldPartitionPairing implements IPartitionPairing {
+  /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(NearFieldPartitionPairing.class);
 
   public static final OptionID ADD_DIAGONAL_ID = OptionID.getOrCreateOptionID("adddiagonal", "if false only the direct neighbors will be paired");
   private final Flag ADD_DIAGONAL_PARAM = new Flag(ADD_DIAGONAL_ID);
@@ -41,9 +42,6 @@ public class NearFieldPartitionPairing implements IPartitionPairing {
       this.position = position;
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
       int hash = 0;
@@ -53,9 +51,6 @@ public class NearFieldPartitionPairing implements IPartitionPairing {
       return hash;
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
       if (!(obj instanceof Position)) return false;
@@ -72,15 +67,14 @@ public class NearFieldPartitionPairing implements IPartitionPairing {
     }
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IPartitionPairing#makePairings(experimentalcode.frankenb.model.ifaces.IDataSet, java.util.List, experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage, int)
-   */
   @Override
   public List<PartitionPairing> makePairings(IDataSet dataSet, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException {
     //we assume that all positionedPartitions have the same dimensionality
     if (partitions.size() < 1) throw new RuntimeException("Can't work with 0 partitions!");
     
-    Log.info("Add diagonals: " + Boolean.toString(addDiagonal));
+    if (logger.isVerbose()) {
+      logger.verbose("Add diagonals: " + Boolean.toString(addDiagonal));
+    }
     
     IPartition prototypePartition = partitions.get(0);
     checkPartition(prototypePartition);

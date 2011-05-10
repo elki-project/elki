@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.util.LinkedHashMap;
@@ -26,9 +23,6 @@ public class DataSet implements IDataSet {
     this.dimensionality = newDimensionality;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getOriginalDataSet()
-   */
   @Override
   public IDataSet getOriginal() {
     return this.originalDataSet;
@@ -38,34 +32,22 @@ public class DataSet implements IDataSet {
     this.map.put(id, vector);
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#get(int)
-   */
   @Override
   public NumberVector<?, ?> get(int id) {
     return map.get(id);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getDimensionality()
-   */
   @Override
   public int getDimensionality() {
     return this.dimensionality;
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getSize()
-   */
   @Override
   public int getSize() {
     // TODO Auto-generated method stub
     return map.size();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getIDs()
-   */
   @Override
   public Iterable<Integer> getIDs() {
     return map.keySet();

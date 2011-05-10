@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;

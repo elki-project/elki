@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.log;
 
 /**
@@ -10,9 +7,6 @@ package experimentalcode.frankenb.log;
  */
 public class StdOutLogWriter implements ILogWriter {
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.log.ILogWriter#putLogLine(java.lang.String)
-   */
   @Override
   public void putLogLine(LogLevel level, String formattedMessage) {
     System.out.println(formattedMessage);

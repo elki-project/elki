@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.utils;
 
 import java.math.BigInteger;

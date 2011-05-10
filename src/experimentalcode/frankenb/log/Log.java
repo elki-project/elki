@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.log;
 
 import java.util.ArrayList;

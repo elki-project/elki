@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.io.File;
@@ -54,9 +51,6 @@ public class DiskBackedPartition implements IPartition {
   }
 
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IPartition#getId()
-   */
   @Override
   public int getId() {
     return this.id;
@@ -81,17 +75,11 @@ public class DiskBackedPartition implements IPartition {
     }
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#getStorageFile()
-   */
   @Override
   public File getStorageFile() {
     return this.storageFile;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#addVector(int, de.lmu.ifi.dbs.elki.data.NumberVector)
-   */
   @Override
   public void addVector(int id, NumberVector<?, ?> vector) {
     try {
@@ -114,9 +102,6 @@ public class DiskBackedPartition implements IPartition {
     }
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#close()
-   */
   @Override
   public void close() throws IOException {
     open();
@@ -125,9 +110,6 @@ public class DiskBackedPartition implements IPartition {
     file = null;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#iterator()
-   */
   @Override
   public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator() {
     open();
@@ -168,26 +150,17 @@ public class DiskBackedPartition implements IPartition {
     };
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#getSize()
-   */
   @Override
   public int getSize() {
     open();
     return (int) (this.storageFile.length() / this.recordSize);
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#getDimensionality()
-   */
   @Override
   public int getDimensionality() {
     return this.dimensionality;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#copyToFile(java.io.File)
-   */
   @Override
   public void copyTo(File file) throws IOException {
     close();

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.io.File;
@@ -204,9 +201,6 @@ public class PackageDescriptor implements Iterable<PartitionPairing> {
     this.dataStorage.close();
   }
   
-  /* (non-Javadoc)
-   * @see java.lang.Iterable#iterator()
-   */
   @Override
   public Iterator<PartitionPairing> iterator() {
     try {

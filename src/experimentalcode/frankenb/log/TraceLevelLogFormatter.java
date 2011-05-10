@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.log;
 
 import java.io.PrintWriter;
@@ -15,9 +12,6 @@ import experimentalcode.frankenb.utils.Utils;
  */
 public class TraceLevelLogFormatter implements ILogFormatter {
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.log.ILogFormatter#format(int, java.lang.StackTraceElement, experimentalcode.frankenb.log.LogLevel, java.lang.String)
-   */
   @Override
   public String format(boolean mainThread, int methodDepth, long runTime, StackTraceElement callee, LogLevel level, String message, Throwable t) {
     String formattedMessage = String.format("%s[%s|%s.%s()|%5s]  %s", repeat("\t", methodDepth), Utils.formatRunTime(runTime), simpleClassNameOf(callee.getClassName()), callee.getMethodName(), level.toString(), message);

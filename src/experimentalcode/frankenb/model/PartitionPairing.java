@@ -76,9 +76,6 @@ public class PartitionPairing {
     return totalCalculations;
   }
   
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     if (partitionOne == null || partitionTwo == null) return super.toString();

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model.ifaces;
 
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;

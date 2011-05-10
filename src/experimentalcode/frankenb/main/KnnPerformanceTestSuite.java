@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.main;
 
 import java.io.File;

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.utils;
 
 import java.util.ArrayList;
@@ -13,7 +10,6 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.IntegerVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.ListDataSet;
 import experimentalcode.frankenb.model.ReferenceDataSet;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
@@ -70,7 +66,7 @@ public final class DataSetUtils {
     }
     
     Collections.sort(list);
-    Log.debug(list.toString());
+    //LoggingUtil.debug(list.toString());
     double median;
     if (list.size() == 1) {
       return list.get(0);

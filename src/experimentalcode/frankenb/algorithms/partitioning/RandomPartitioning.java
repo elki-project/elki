@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.BufferedDiskBackedPartition;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IPartition;
@@ -21,6 +21,10 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  * @author Florian
  */
 public class RandomPartitioning extends AbstractFixedAmountPartitioning {
+  /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(RandomPartitioning.class);
 
   public RandomPartitioning(Parameterization config) {
     super(config);
@@ -32,7 +36,7 @@ public class RandomPartitioning extends AbstractFixedAmountPartitioning {
     try {
       int dataEntriesPerPartition = (int)Math.ceil(dataSet.getSize() / (float)partitionQuantity);
       
-      Log.info("each random partition will contain about " + dataEntriesPerPartition + " items");
+      getLogger().verbose("each random partition will contain about " + dataEntriesPerPartition + " items");
       
       Random random = new Random(System.currentTimeMillis());
       List<Integer> candidates = new ArrayList<Integer>();
@@ -61,5 +65,8 @@ public class RandomPartitioning extends AbstractFixedAmountPartitioning {
     
   }
 
-
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
 }

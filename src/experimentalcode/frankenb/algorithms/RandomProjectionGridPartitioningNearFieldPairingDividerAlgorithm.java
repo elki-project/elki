@@ -1,8 +1,6 @@
-/**
- * 
- */
 package experimentalcode.frankenb.algorithms;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import experimentalcode.frankenb.algorithms.pairing.NearFieldPartitionPairing;
 import experimentalcode.frankenb.algorithms.partitioning.GridPartitioning;
@@ -14,6 +12,10 @@ import experimentalcode.frankenb.algorithms.projection.RandomProjection;
  * @author Florian Frankenberger
  */
 public class RandomProjectionGridPartitioningNearFieldPairingDividerAlgorithm extends AbstractDividerAlgorithm {
+  /**
+   * Logger
+   */
+  public static Logging logger = Logging.getLogger(RandomProjectionGridPartitioningNearFieldPairingDividerAlgorithm.class);
 
   public RandomProjectionGridPartitioningNearFieldPairingDividerAlgorithm(Parameterization config) {
     this.addProjection(new RandomProjection(config));
@@ -21,4 +23,8 @@ public class RandomProjectionGridPartitioningNearFieldPairingDividerAlgorithm ex
     this.setPairing(new NearFieldPartitionPairing(config));
   }
 
+  @Override
+  Logging getLogger() {
+    return logger;
+  }
 }

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.util.ArrayList;

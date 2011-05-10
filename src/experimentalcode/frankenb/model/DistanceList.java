@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.util.ArrayList;
@@ -127,17 +124,11 @@ public class DistanceList implements Iterable<Pair<Integer, Double>> {
     return this.distances.size();
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Iterable#iterator()
-   */
   @Override
   public Iterator<Pair<Integer, Double>> iterator() {
     return distances.iterator();
   }
   
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();

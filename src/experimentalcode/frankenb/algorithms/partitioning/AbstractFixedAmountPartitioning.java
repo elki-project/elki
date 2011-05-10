@@ -1,15 +1,12 @@
-/**
- * 
- */
 package experimentalcode.frankenb.algorithms.partitioning;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPartitioning;
@@ -21,7 +18,6 @@ import experimentalcode.frankenb.model.ifaces.IPartitioning;
  * @author Florian Frankenberger
  */
 public abstract class AbstractFixedAmountPartitioning implements IPartitioning {
-
   /**
    * OptionID for {@link #PARTITIONS_PARAM}
    */
@@ -43,16 +39,14 @@ public abstract class AbstractFixedAmountPartitioning implements IPartitioning {
     }    
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.Partitioner#makePairings(de.lmu.ifi.dbs.elki.database.Database, int)
-   */
   @Override
   public List<IPartition> makePartitions(IDataSet dataSet, int packageQuantity) throws UnableToComplyException {
-    Log.info("partition quantity: " + partitionQuantity);
+    getLogger().verbose("partition quantity: " + partitionQuantity);
     
     return makePartitions(dataSet, packageQuantity, partitionQuantity);
   }
   
   protected abstract List<IPartition> makePartitions(IDataSet dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException;
 
+  protected abstract Logging getLogger();
 }

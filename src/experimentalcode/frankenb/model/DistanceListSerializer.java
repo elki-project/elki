@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.io.IOException;
@@ -16,9 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public class DistanceListSerializer implements ByteBufferSerializer<DistanceList> {
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer#fromByteBuffer(java.nio.ByteBuffer)
-   */
   @Override
   public DistanceList fromByteBuffer(ByteBuffer data) throws IOException, UnsupportedOperationException {
     int id = data.getInt();
@@ -34,9 +28,6 @@ public class DistanceListSerializer implements ByteBufferSerializer<DistanceList
     return distanceList;
   }
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer#toByteBuffer(java.nio.ByteBuffer, java.lang.Object)
-   */
   @Override
   public void toByteBuffer(ByteBuffer buffer, DistanceList distanceList) throws IOException, UnsupportedOperationException {
     if (buffer.remaining() < getByteSize(distanceList)) {
@@ -53,9 +44,6 @@ public class DistanceListSerializer implements ByteBufferSerializer<DistanceList
     }
   }
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer#getByteSize(java.lang.Object)
-   */
   @Override
   public int getByteSize(DistanceList distanceList) throws IOException, UnsupportedOperationException {
     //for update purpose we reserve more bytes here then necessary because we know

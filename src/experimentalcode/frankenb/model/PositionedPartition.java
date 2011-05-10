@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.io.File;
@@ -38,73 +35,46 @@ public class PositionedPartition implements IPositionedPartition {
     this.partition = partition;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IPartition#getId()
-   */
   @Override
   public int getId() {
     return this.partition.getId();
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.Partition#getStorageFile()
-   */
   @Override
   public File getStorageFile() {
     return this.partition.getStorageFile();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.Partition#addVector(int, de.lmu.ifi.dbs.elki.data.NumberVector)
-   */
   @Override
   public void addVector(int id, NumberVector<?, ?> vector) {
     this.partition.addVector(id, vector);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.Partition#close()
-   */
   @Override
   public void close() throws IOException {
     this.partition.close();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.Partition#iterator()
-   */
   @Override
   public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator() {
     return this.partition.iterator();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.Partition#getSize()
-   */
   @Override
   public int getSize() {
     return this.partition.getSize();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.Partition#getDimensionality()
-   */
   @Override
   public int getDimensionality() {
     return this.partition.getDimensionality();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.Partition#copyToFile(java.io.File)
-   */
   @Override
   public void copyTo(File file) throws IOException {
     this.partition.copyTo(file);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IPositionedPartition#getPosition(int)
-   */
   @Override
   public int getPosition(int dimension) {
     return this.position[dimension - 1];
@@ -118,9 +88,6 @@ public class PositionedPartition implements IPositionedPartition {
     this.position[dimension - 1] = position;
   }
   
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();

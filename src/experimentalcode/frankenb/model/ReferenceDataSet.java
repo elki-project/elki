@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.util.HashSet;
@@ -26,26 +23,17 @@ public class ReferenceDataSet implements IDataSet {
     this.originalDataSet = originalDataSet;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#get(int)
-   */
   @Override
   public NumberVector<?, ?> get(int id) {
     if (!this.items.contains(id)) return null;
     return this.originalDataSet.get(id);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getDimensionality()
-   */
   @Override
   public int getDimensionality() {
     return this.originalDataSet.getDimensionality();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getSize()
-   */
   @Override
   public int getSize() {
     return this.items.size();
@@ -55,25 +43,16 @@ public class ReferenceDataSet implements IDataSet {
     this.items.add(id);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getOriginal()
-   */
   @Override
   public IDataSet getOriginal() {
     return this.originalDataSet;
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getIDs()
-   */
   @Override
   public Iterable<Integer> getIDs() {
     return items;
   }
   
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();

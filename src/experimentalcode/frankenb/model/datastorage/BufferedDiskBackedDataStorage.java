@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model.datastorage;
 
 import java.io.File;
@@ -11,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.ifaces.IDataStorage;
 
@@ -24,6 +22,10 @@ import experimentalcode.frankenb.model.ifaces.IDataStorage;
  * @author Florian Frankenberger
  */
 public class BufferedDiskBackedDataStorage implements IDataStorage {
+  /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(BufferedDiskBackedDataStorage.class);
 
   private ByteBuffer buffer; 
   private final File source;
@@ -35,17 +37,17 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
   public BufferedDiskBackedDataStorage(File source, int bufferSize) throws IOException {
     this.source = source;
     if (source.exists() && source.length() > 0) {
-      Log.debug(String.format("source file exists: %s", source));
+      logger.debug(String.format("source file exists: %s", source));
       if (source.length() > Integer.MAX_VALUE) throw new IllegalStateException("This class only supports to buffer files up to " + Integer.MAX_VALUE + " bytes");
       readEntireFile();
     } else {
-      Log.debug(String.format("creating new buffer for %s with size %d", source, bufferSize));
+      logger.debug(String.format("creating new buffer for %s with size %d", source, bufferSize));
       buffer = ByteBuffer.allocate(bufferSize);
     }
   }
   
   private void readEntireFile() throws IOException {
-    Log.debug(String.format("copying %d bytes from source file %s into memory ...", source.length(), this.getSource()));
+    logger.debug(String.format("copying %d bytes from source file %s into memory ...", source.length(), this.getSource()));
     
     buffer = ByteBuffer.allocate((int) source.length());
     
@@ -66,9 +68,6 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
     }
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getReadOnlyByteBuffer(long)
-   */
   @Override
   public ByteBuffer getReadOnlyByteBuffer(long size) throws IOException {
     return buffer.duplicate().asReadOnlyBuffer();
@@ -80,97 +79,61 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
     this.buffer.put(src);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#seek(long)
-   */
   @Override
   public void seek(long position) throws IOException {
     buffer.position((int) position);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#readInt()
-   */
   @Override
   public int readInt() throws IOException {
     return buffer.getInt();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#writeInt(int)
-   */
   @Override
   public void writeInt(int i) throws IOException {
     buffer.putInt(i);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#readLong()
-   */
   @Override
   public long readLong() throws IOException {
     return buffer.getLong();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#writeLong(long)
-   */
   @Override
   public void writeLong(long l) throws IOException {
     buffer.putLong(l);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getFilePointer()
-   */
   @Override
   public long getFilePointer() throws IOException {
     return buffer.position();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#readBoolean()
-   */
   @Override
   public boolean readBoolean() throws IOException {
     return buffer.get() > 0;
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#writeBoolean(boolean)
-   */
   @Override
   public void writeBoolean(boolean b) throws IOException {
     buffer.put((byte) (b ? 1 : 0));
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#read(byte[])
-   */
   @Override
   public void read(byte[] aBuffer) throws IOException {
     buffer.get(aBuffer);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#write(byte[])
-   */
   @Override
   public void write(byte[] aBuffer) throws IOException {
     buffer.put(aBuffer);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#write(byte[], int, int)
-   */
   @Override
   public void write(byte[] aBuffer, int off, int len) throws IOException {
     buffer.put(aBuffer, off, len);
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#setLength(long)
-   */
   @Override
   public void setLength(long length) throws IOException {
     if (length > Integer.MAX_VALUE) throw new IllegalStateException("This buffered implementation can only hold " + Integer.MAX_VALUE + " items in memory");
@@ -194,9 +157,6 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
     }
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#close()
-   */
   @Override
   public void close() throws IOException {
     Log.debug(String.format("Storing %d bytes to source file %s ...", buffer.limit(), this.getSource()));
@@ -221,16 +181,8 @@ public class BufferedDiskBackedDataStorage implements IDataStorage {
     }
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getSource()
-   */
   @Override
   public File getSource() throws IOException {
     return this.source;
   }
-
-  
-  
-  
-
 }

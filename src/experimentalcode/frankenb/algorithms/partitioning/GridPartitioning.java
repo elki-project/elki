@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.algorithms.partitioning;
 
 import java.util.ArrayList;
@@ -11,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -35,6 +32,10 @@ import experimentalcode.frankenb.model.ifaces.IPartitioning;
  * @author Florian Frankenberger
  */
 public class GridPartitioning implements IPartitioning {
+  /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(GridPartitioning.class);
 
   public static final OptionID SECTORS_ID = OptionID.getOrCreateOptionID("sectorsperdimension", "Amount of sectors per dimension");
   
@@ -152,13 +153,6 @@ public class GridPartitioning implements IPartitioning {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * experimentalcode.frankenb.model.ifaces.Partitioner#makePartitions(de.lmu
-   * .ifi.dbs.elki.database.Database, int)
-   */
   @Override
   public List<IPartition> makePartitions(IDataSet dataSet, int packageQuantity) throws UnableToComplyException {
 
@@ -166,11 +160,11 @@ public class GridPartitioning implements IPartitioning {
 
     int addItemsUntilPartition = dataSet.getSize() % sectors;
     int actualPartitionQuantity = (int) Math.pow(sectors, dataSet.getDimensionality());
-    Log.info("Partitions that will be actually created: " + actualPartitionQuantity);
-    Log.info("Items per partition and dimension (not only per partition!): " + itemsPerSectorAndDimension);
+    logger.verbose("Partitions that will be actually created: " + actualPartitionQuantity);
+    logger.verbose("Items per partition and dimension (not only per partition!): " + itemsPerSectorAndDimension);
 
     // set the cutting points
-    Log.info("Calculating the partitions dimensions ...");
+    logger.verbose("Calculating the partitions dimensions ...");
     Map<Integer, PartitionPosition> dbEntriesPositions = new HashMap<Integer, PartitionPosition>();
     Map<Integer, List<Double>> dimensionalCuttingPoints = new HashMap<Integer, List<Double>>();
     for(int dim = 1; dim <= dataSet.getDimensionality(); ++dim) {

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.io.File;
@@ -58,9 +55,6 @@ public class BufferedDiskBackedPartition implements IPartition {
     readAll();
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IPartition#getId()
-   */
   @Override
   public int getId() {
     return this.id;
@@ -127,33 +121,21 @@ public class BufferedDiskBackedPartition implements IPartition {
     }
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#getStorageFile()
-   */
   @Override
   public File getStorageFile() {
     return this.storageFile;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#addVector(int, de.lmu.ifi.dbs.elki.data.NumberVector)
-   */
   @Override
   public void addVector(int id, NumberVector<?, ?> vector) {
     this.entries.add(new Pair<Integer, NumberVector<?, ?>>(id, vector));
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#close()
-   */
   @Override
   public void close() throws IOException {
     writeAll();
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#iterator()
-   */
   @Override
   public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator() {
     return new Iterator<Pair<Integer, NumberVector<?, ?>>>() {
@@ -178,25 +160,16 @@ public class BufferedDiskBackedPartition implements IPartition {
     };
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#getSize()
-   */
   @Override
   public int getSize() {
     return entries.size();
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#getDimensionality()
-   */
   @Override
   public int getDimensionality() {
     return this.dimensionality;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.Partition#copyToFile(java.io.File)
-   */
   @Override
   public void copyTo(File file) throws IOException {
     writeAll();

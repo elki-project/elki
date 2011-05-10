@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model.datastorage;
 
 import java.io.File;
@@ -46,9 +43,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     }
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getReadOnlyByteBuffer(long)
-   */
   @Override
   public ByteBuffer getReadOnlyByteBuffer(final long size) throws IOException {
     return randomAccess(
@@ -66,9 +60,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#writeBuffer(java.nio.ByteBuffer)
-   */
   @Override
   public void writeBuffer(final ByteBuffer buffer) throws IOException {
     randomAccess(
@@ -87,18 +78,12 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#seek(long)
-   */
   @Override
   public void seek(long position) throws IOException {
     if (position > this.source.length()) throw new IOException("Can't seek beyond the end of file");
     this.position = position;
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#readInt()
-   */
   @Override
   public int readInt() throws IOException {
     return randomAccess(
@@ -113,9 +98,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#writeInt(int)
-   */
   @Override
   public void writeInt(final int i) throws IOException {
     randomAccess(
@@ -131,9 +113,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );  
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#readLong()
-   */
   @Override
   public long readLong() throws IOException {
     return randomAccess(
@@ -148,9 +127,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );  
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#writeLong(long)
-   */
   @Override
   public void writeLong(final long l) throws IOException {
     randomAccess(
@@ -166,17 +142,11 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getFilePointer()
-   */
   @Override
   public long getFilePointer() throws IOException {
     return this.position;
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#readBoolean()
-   */
   @Override
   public boolean readBoolean() throws IOException {
     return randomAccess(
@@ -191,9 +161,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );  
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#writeBoolean(boolean)
-   */
   @Override
   public void writeBoolean(final boolean b) throws IOException {
     randomAccess(
@@ -209,17 +176,11 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#read(byte[])
-   */
   @Override
   public void read(byte[] buffer) throws IOException {
     throw new UnsupportedOperationException();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#write(byte[])
-   */
   @Override
   public void write(final byte[] buffer) throws IOException {
     randomAccess(
@@ -236,9 +197,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
   }
   
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataStorage#write(byte[], int, int)
-   */
   @Override
   public void write(final byte[] buffer, final int off, final int len) throws IOException {
     randomAccess(
@@ -254,9 +212,6 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );  
   }  
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#setLength(long)
-   */
   @Override
   public void setLength(final long length) throws IOException {
     randomAccess(
@@ -272,17 +227,11 @@ public class HandlerFreeDiskBackedDataStorage implements IDataStorage {
     );   
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#close()
-   */
   @Override
   public void close() throws IOException {
     //not necessary
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.DataStorage#getSource()
-   */
   @Override
   public File getSource() throws IOException {
     return this.source;

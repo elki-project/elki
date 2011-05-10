@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.algorithms.projection;
 
 import java.math.BigInteger;
@@ -25,9 +22,6 @@ public class ZCurveProjection implements IProjection {
   public ZCurveProjection(Parameterization config) {
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IProjection#project(experimentalcode.frankenb.model.ifaces.IDataSet)
-   */
   @Override
   public IDataSet project(IDataSet dataSet) throws UnableToComplyException {
     try {

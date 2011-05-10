@@ -1,17 +1,14 @@
-/**
- * 
- */
 package experimentalcode.frankenb.algorithms.pairing;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.frankenb.algorithms.partitioning.ZCurvePartitioning;
-import experimentalcode.frankenb.log.Log;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 import experimentalcode.frankenb.model.ifaces.IPartition;
@@ -36,6 +33,10 @@ import experimentalcode.frankenb.model.ifaces.IPartitionPairing;
  * @author Florian Frankenberger
  */
 public class SlidingWindowPartitionPairing implements IPartitionPairing {
+  /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(SlidingWindowPartitionPairing.class);
 
   public static final OptionID WINDOW_SIZE_ID = OptionID.getOrCreateOptionID("windowsize", "size of the sliding window (look ahead window)");
   private final IntParameter WINDOW_SIZE_PARAM = new IntParameter(WINDOW_SIZE_ID);
@@ -48,15 +49,12 @@ public class SlidingWindowPartitionPairing implements IPartitionPairing {
     }
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IPartitionPairing#makePairings(experimentalcode.frankenb.model.ifaces.IDataSet, java.util.List, experimentalcode.frankenb.model.ifaces.IPartitionPairingStorage, int)
-   */
   @Override
   public List<PartitionPairing> makePairings(IDataSet dataSet, List<IPartition> partitions, int packageQuantity) throws UnableToComplyException {
-    Log.info("sliding window size: " + windowSize);
+    logger.verbose("sliding window size: " + windowSize);
     
     int totalPairings = ((windowSize + 1) * (partitions.size() - windowSize)) + ((windowSize * (windowSize + 1)) / 2); 
-    Log.info("amount of pairings to create: " + totalPairings);
+    logger.verbose("amount of pairings to create: " + totalPairings);
     
     List<PartitionPairing> result = new ArrayList<PartitionPairing>(totalPairings);
     
@@ -70,5 +68,4 @@ public class SlidingWindowPartitionPairing implements IPartitionPairing {
     
     return result;
   }
-
 }

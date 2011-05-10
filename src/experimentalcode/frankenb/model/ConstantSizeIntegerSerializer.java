@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.nio.ByteBuffer;
@@ -37,9 +34,6 @@ public class ConstantSizeIntegerSerializer implements IConstantSizeByteBufferSer
       return Integer.SIZE / 8;
     }
 
-    /* (non-Javadoc)
-     * @see experimentalcode.frankenb.model.ifaces.ConstantSizeByteBufferSerializer#getConstantByteSize()
-     */
     @Override
     public int getConstantByteSize() {
       return Integer.SIZE / 8;

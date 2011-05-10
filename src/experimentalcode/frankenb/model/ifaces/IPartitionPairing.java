@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model.ifaces;
 
 import java.util.List;

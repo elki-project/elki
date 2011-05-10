@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.frankenb.model;
 
 import java.util.Iterator;
@@ -24,41 +21,26 @@ public class ListDataSet implements IDataSet {
     this.items = list;
   }
   
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#get(int)
-   */
   @Override
   public NumberVector<?, ?> get(int id) {
     return items.get(id);
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getDimensionality()
-   */
   @Override
   public int getDimensionality() {
     return this.dimensionality;
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getSize()
-   */
   @Override
   public int getSize() {
     return items.size();
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getOriginal()
-   */
   @Override
   public IDataSet getOriginal() {
     return this;
   }
 
-  /* (non-Javadoc)
-   * @see experimentalcode.frankenb.model.ifaces.IDataSet#getIDs()
-   */
   @Override
   public Iterable<Integer> getIDs() {
     return new Iterable<Integer>() {
@@ -93,9 +75,6 @@ public class ListDataSet implements IDataSet {
     };
   }
   
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     return items.toString();
