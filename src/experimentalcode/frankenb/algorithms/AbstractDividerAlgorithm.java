@@ -67,7 +67,7 @@ public abstract class AbstractDividerAlgorithm<V> implements IDividerAlgorithm<V
       getLogger().verbose("2. partitioning phase\n");
       getLogger().verbose("\tpartitioning using [" + partitioning.getClass().getSimpleName() + "]\n");
     }
-    List<DBIDPartition> partitions = partitioning.makePartitions(dataSet, packageQuantity);
+    List<DBIDPartition> partitions = partitioning.makePartitions(dataSet);
     if(getLogger().isVerbose()) {
       getLogger().verbose("\n");
     }

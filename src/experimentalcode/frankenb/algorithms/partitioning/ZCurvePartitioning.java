@@ -35,7 +35,7 @@ public class ZCurvePartitioning<V extends NumberVector<?, ?>> extends AbstractFi
   }
   
   @Override
-  protected List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException {
+  protected List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int partitionQuantity) throws UnableToComplyException {
     try {
       List<Pair<DBID, BigInteger>> projection = ZCurve.projectToZCurve(dataSet);
       

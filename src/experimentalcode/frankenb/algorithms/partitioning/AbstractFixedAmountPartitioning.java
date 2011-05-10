@@ -38,13 +38,13 @@ public abstract class AbstractFixedAmountPartitioning<V> implements IPartitionin
   }
 
   @Override
-  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity) throws UnableToComplyException {
+  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet) throws UnableToComplyException {
     getLogger().verbose("partition quantity: " + partitionQuantity);
 
-    return makePartitions(dataSet, packageQuantity, partitionQuantity);
+    return makePartitions(dataSet, partitionQuantity);
   }
 
-  protected abstract List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException;
+  protected abstract List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int partitionQuantity) throws UnableToComplyException;
 
   protected abstract Logging getLogger();
 }

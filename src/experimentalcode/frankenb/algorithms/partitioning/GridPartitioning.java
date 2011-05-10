@@ -157,7 +157,7 @@ public class GridPartitioning<V extends NumberVector<?, ?>> implements IPartitio
   }
 
   @Override
-  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity) throws UnableToComplyException {
+  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet) throws UnableToComplyException {
     int itemsPerSectorAndDimension = (int) Math.floor(dataSet.size() / (float) sectors);
 
     int addItemsUntilPartition = dataSet.size() % sectors;

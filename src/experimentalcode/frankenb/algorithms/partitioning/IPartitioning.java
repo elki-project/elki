@@ -17,9 +17,8 @@ public interface IPartitioning<V> {
    * Creates the partitions
    * 
    * @param dataSet
-   * @param packageQuantity
    * @return a list of partitions
    * @throws UnableToComplyException
    */
-  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity) throws UnableToComplyException;
+  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet) throws UnableToComplyException;
 }

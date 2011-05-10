@@ -34,7 +34,7 @@ public class RandomPartitioning<V> extends AbstractFixedAmountPartitioning<V> {
   }
 
   @Override
-  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int packageQuantity, int partitionQuantity) throws UnableToComplyException {
+  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int partitionQuantity) throws UnableToComplyException {
     try {
       int dataEntriesPerPartition = (int) Math.ceil(dataSet.size() / (float) partitionQuantity);
 
