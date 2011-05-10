@@ -1,4 +1,4 @@
-package experimentalcode.erich.gearth;
+package de.lmu.ifi.dbs.elki.data.spatial;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -6,7 +6,7 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
 
 /**
- * Class representing a simple polygon
+ * Class representing a simple polygon.
  * 
  * @author Erich Schubert
  */

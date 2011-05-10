@@ -13,6 +13,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
+import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
