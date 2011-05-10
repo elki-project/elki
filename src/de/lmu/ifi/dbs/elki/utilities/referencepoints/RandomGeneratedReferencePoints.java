@@ -64,7 +64,7 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
 
   @Override
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
-    Relation<V> database = DatabaseUtil.databaseUglyVectorCast(db);
+    Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
     V factory = DatabaseUtil.assumeVectorField(database).getFactory();
 

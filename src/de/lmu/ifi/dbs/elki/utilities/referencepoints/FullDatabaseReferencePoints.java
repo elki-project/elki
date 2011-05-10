@@ -23,6 +23,6 @@ public class FullDatabaseReferencePoints<O extends NumberVector<? extends O, ?>>
 
   @Override
   public <T extends O> Collection<O> getReferencePoints(Relation<T> db) {
-    return new DatabaseUtil.CollectionFromDatabase<O>(db);
+    return new DatabaseUtil.CollectionFromRelation<O>(db);
   }
 }
