@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities;
 
 import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -526,6 +528,59 @@ public final class DatabaseUtil {
   }
 
   /**
+   * Returns the median of a data set in the given dimension by using a sampling method.
+   * 
+   * @param relation Relation to process
+   * @param ids DBIDs to process
+   * @param dimension Dimensionality
+   * @param numberOfSamples Number of samples to draw
+   * @return Median value
+   */
+  public static <V extends NumberVector<?, ?>> double quickMedian(Relation<V> relation, ArrayDBIDs ids, int dimension, int numberOfSamples) {
+    final int everyNthItem = (int) Math.max(1, Math.floor(ids.size() / (double) numberOfSamples));
+    final double[] vals = new double[numberOfSamples];
+    for(int i = 0; i < numberOfSamples; i++) {
+      final DBID id = ids.get(i * everyNthItem);
+      vals[i] = relation.get(id).doubleValue(dimension);
+    }
+    Arrays.sort(vals);
+    if(vals.length % 2 == 1) {
+      return vals[((vals.length + 1) / 2) - 1];
+    }
+    else {
+      final double v1 = vals[vals.length / 2];
+      final double v2 = vals[(vals.length / 2) - 1];
+      return (v1 + v2) / 2.0;
+    }
+  }
+
+  /**
+   * Returns the median of a data set in the given dimension.
+   * 
+   * @param relation Relation to process
+   * @param ids DBIDs to process
+   * @param dimension Dimensionality
+   * @return Median value
+   */
+  public static <V extends NumberVector<?, ?>> double exactMedian(Relation<V> relation, DBIDs ids, int dimension) {
+    final double[] vals = new double[ids.size()];
+    int i = 0;
+    for (DBID id : ids) {
+      vals[i] = relation.get(id).doubleValue(dimension);
+      i++;
+    }
+    Arrays.sort(vals);
+    if(vals.length % 2 == 1) {
+      return vals[((vals.length + 1) / 2) - 1];
+    }
+    else {
+      final double v1 = vals[vals.length / 2];
+      final double v2 = vals[(vals.length / 2) - 1];
+      return (v1 + v2) / 2.0;
+    }
+  }
+
+  /**
    * Guess a potentially label-like representation.
    * 
    * @param database
@@ -728,11 +783,24 @@ public final class DatabaseUtil {
   }
 
   /**
+   * An ugly vector type cast unavoidable in some situations due to Generics.
+   * 
+   * @param <V> Base vector type
+   * @param <T> Derived vector type (is actually V, too)
+   * @param database Database
+   * @return Database
+   */
+  @SuppressWarnings("unchecked")
+  public static <V extends NumberVector<?, ?>, T extends NumberVector<?, ?>> Relation<V> relationUglyVectorCast(Relation<T> database) {
+    return (Relation<V>) database;
+  }
+
+  /**
    * Iterator class that retrieves the given objects from the database.
    * 
    * @author Erich Schubert
    */
-  public static class DatabaseObjectIterator<O> implements Iterator<O> {
+  public static class RelationObjectIterator<O> implements Iterator<O> {
     /**
      * The real iterator.
      */
@@ -749,7 +817,7 @@ public final class DatabaseUtil {
      * @param iter Original iterator.
      * @param database Database
      */
-    public DatabaseObjectIterator(Iterator<DBID> iter, Relation<? extends O> database) {
+    public RelationObjectIterator(Iterator<DBID> iter, Relation<? extends O> database) {
       super();
       this.iter = iter;
       this.database = database;
@@ -760,7 +828,7 @@ public final class DatabaseUtil {
      * 
      * @param database Database
      */
-    public DatabaseObjectIterator(Relation<? extends O> database) {
+    public RelationObjectIterator(Relation<? extends O> database) {
       super();
       this.database = database;
       this.iter = database.iterDBIDs();
@@ -788,7 +856,7 @@ public final class DatabaseUtil {
    * 
    * @author Erich Schubert
    */
-  public static class CollectionFromDatabase<O> extends AbstractCollection<O> implements Collection<O> {
+  public static class CollectionFromRelation<O> extends AbstractCollection<O> implements Collection<O> {
     /**
      * The database we query
      */
@@ -799,32 +867,19 @@ public final class DatabaseUtil {
      * 
      * @param db Database
      */
-    public CollectionFromDatabase(Relation<? extends O> db) {
+    public CollectionFromRelation(Relation<? extends O> db) {
       super();
       this.db = db;
     }
 
     @Override
     public Iterator<O> iterator() {
-      return new DatabaseUtil.DatabaseObjectIterator<O>(db);
+      return new DatabaseUtil.RelationObjectIterator<O>(db);
     }
 
     @Override
     public int size() {
       return db.size();
     }
-  }
-
-  /**
-   * An ugly vector type cast unavoidable in some situations due to Generics.
-   * 
-   * @param <V> Base vector type
-   * @param <T> Derived vector type (is actually V, too)
-   * @param database Database
-   * @return Database
-   */
-  @SuppressWarnings("unchecked")
-  public static <V extends NumberVector<?, ?>, T extends NumberVector<?, ?>> Relation<V> databaseUglyVectorCast(Relation<T> database) {
-    return (Relation<V>) database;
   }
 }
