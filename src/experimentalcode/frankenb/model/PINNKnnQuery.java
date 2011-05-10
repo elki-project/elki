@@ -50,7 +50,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
     List<DistanceResultPair<DoubleDistance>> list = new ArrayList<DistanceResultPair<DoubleDistance>>();
     
     if (!alreadyRequestedIDs.contains(id.getIntegerID())) {
-      calculations += tree.getLastMeasure().getCalculations();
+      //calculations += tree.getLastMeasure().getCalculations();
       alreadyRequestedIDs.add(id.getIntegerID());
       if (alreadyRequestedIDs.size() == dataBase.size()) {
         logger.verbose(String.format("Calculations used: %,d", calculations));
