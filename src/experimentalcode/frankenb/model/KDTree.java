@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
@@ -39,7 +42,7 @@ public class KDTree {
     final int dimension;
     final Node parent;
     final double splitPoint;
-    final List<Integer> ids = new ArrayList<Integer>();
+    final ArrayModifiableDBIDs ids = DBIDUtil.newArray();
     Node leftChild, rightChild;
     
     Node(Node parent, int dimension, double splitPoint) {
@@ -75,7 +78,7 @@ public class KDTree {
 //    Log.debug("Depth: " + depth);
     int dimension = (depth % dataSet.getDimensionality()) + 1;
 //    Log.debug("Dimension: " + dimension);
-    int medianId = median(dataSet, dimension);
+    DBID medianId = median(dataSet, dimension);
     
     NumberVector<?, ?> medianVector = dataSet.get(medianId);
     double median = medianVector.doubleValue(dimension);
@@ -85,7 +88,7 @@ public class KDTree {
     totalNodes++;
     
     ReferenceDataSet newDataSet = new ReferenceDataSet(dataSet);
-    for (int id : dataSet.getIDs()) {
+    for (DBID id : dataSet.getIDs()) {
         NumberVector<?, ?> vector = dataSet.get(id);
         if (!vector.equals(medianVector)) {
           newDataSet.add(id);
@@ -113,7 +116,7 @@ public class KDTree {
    * @param distanceFunction
    * @return
    */
-  public DistanceList findNearestNeighbors(int id, int k, RawDoubleDistance<NumberVector<?, ?>> distanceFunction) {
+  public DistanceList findNearestNeighbors(DBID id, int k, RawDoubleDistance<NumberVector<?, ?>> distanceFunction) {
     NumberVector<?, ?> vector = this.dataSet.get(id);
     Node node = searchNodeFor(vector, this.root);
     
@@ -131,7 +134,7 @@ public class KDTree {
   }
   
   private void findNeighbors(int k, RawDoubleDistance<NumberVector<?, ?>> distanceFunction, NumberVector<?, ?> queryVector, Node currentNode, DistanceList distanceList, Set<Node> alreadyVisited, Measure measure) {
-    for (int id : currentNode.ids) {
+    for (DBID id : currentNode.ids) {
       double maxDistance = (distanceList.getSize() >= k ? distanceList.getLast().second : Double.POSITIVE_INFINITY);
       double distanceToId = distanceFunction.doubleDistance(queryVector, dataSet.get(id));
       measure.calculations += 1;
@@ -180,16 +183,16 @@ public class KDTree {
     return node;
   }  
   
-  private static int median(IDataSet dataSet, int dimension) {
-    List<Pair<Integer, Double>> items = new ArrayList<Pair<Integer, Double>>();
-    for (int id : dataSet.getIDs()) {
-      items.add(new Pair<Integer, Double>(id, dataSet.get(id).doubleValue(dimension)));
+  private static DBID median(IDataSet dataSet, int dimension) {
+    List<Pair<DBID, Double>> items = new ArrayList<Pair<DBID, Double>>();
+    for (DBID id : dataSet.getIDs()) {
+      items.add(new Pair<DBID, Double>(id, dataSet.get(id).doubleValue(dimension)));
     }
     
-    Collections.sort(items, new Comparator<Pair<Integer, Double>>() {
+    Collections.sort(items, new Comparator<Pair<DBID, Double>>() {
 
       @Override
-      public int compare(Pair<Integer, Double> o1, Pair<Integer, Double> o2) {
+      public int compare(Pair<DBID, Double> o1, Pair<DBID, Double> o2) {
         return o1.second.compareTo(o2.second);
       }
       

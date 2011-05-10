@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 
 /**
@@ -15,7 +16,7 @@ public class DataSet implements IDataSet {
   
   private final IDataSet originalDataSet;
   private final int dimensionality;
-  private Map<Integer, NumberVector<?, ?>> map = new LinkedHashMap<Integer, NumberVector<?, ?>>();
+  private Map<DBID, NumberVector<?, ?>> map = new LinkedHashMap<DBID, NumberVector<?, ?>>();
   
   public DataSet(IDataSet originalDataSet, int newDimensionality) {
     if (originalDataSet == null) throw new RuntimeException("original data set can't be null!");
@@ -28,12 +29,12 @@ public class DataSet implements IDataSet {
     return this.originalDataSet;
   }
   
-  public void add(int id, NumberVector<?, ?> vector) {
+  public void add(DBID id, NumberVector<?, ?> vector) {
     this.map.put(id, vector);
   }
   
   @Override
-  public NumberVector<?, ?> get(int id) {
+  public NumberVector<?, ?> get(DBID id) {
     return map.get(id);
   }
 
@@ -49,7 +50,7 @@ public class DataSet implements IDataSet {
   }
 
   @Override
-  public Iterable<Integer> getIDs() {
+  public Iterable<DBID> getIDs() {
     return map.keySet();
   }
 

@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -27,10 +28,10 @@ public class ZCurveProjection implements IProjection {
     try {
       DataSet resultDataSet = new DataSet(dataSet.getOriginal(), 1);
 
-      List<Pair<Integer, BigInteger>> projection = ZCurve.projectToZCurve(dataSet);
+      List<Pair<DBID, BigInteger>> projection = ZCurve.projectToZCurve(dataSet);
       
-      for (Pair<Integer, BigInteger> pair : projection) {
-        int id = pair.first;
+      for (Pair<DBID, BigInteger> pair : projection) {
+        DBID id = pair.first;
         double doubleProjection = pair.second.doubleValue();
         
         resultDataSet.add(id, new DoubleVector(new double[] { doubleProjection }));

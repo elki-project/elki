@@ -2,10 +2,11 @@ package experimentalcode.frankenb.main;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.HashSet;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
+import experimentalcode.frankenb.model.ConstantSizeIntegerDBIDSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
@@ -111,10 +112,10 @@ public class KnnDataMerger extends AbstractApplication {
       if(resultData.exists())
         resultData.delete();
 
-      DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(new BufferedDiskBackedDataStorage(resultDirectory), (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)), new ConstantSizeIntegerSerializer(), new DistanceListSerializer(), 8);
+      DynamicBPlusTree<DBID, DistanceList> resultTree = new DynamicBPlusTree<DBID, DistanceList>(new BufferedDiskBackedDataStorage(resultDirectory), (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)), new ConstantSizeIntegerDBIDSerializer(), new DistanceListSerializer(), 8);
 
       // open all result files
-      Set<Integer> testSet = new HashSet<Integer>();
+      HashSetModifiableDBIDs testSet = DBIDUtil.newHashSet();
       for(File packageDirectory : packageDirectories) {
         File[] packageDescriptorCandidates = packageDirectory.listFiles(new FilenameFilter() {
 
@@ -132,12 +133,13 @@ public class KnnDataMerger extends AbstractApplication {
 
           int counter = 0;
           for(PartitionPairing pairing : packageDescriptor) {
-            if(!pairing.hasResult())
+            if(!pairing.hasResult()) {
               throw new UnableToComplyException("Package " + packageDescriptorFile + "/pairing " + pairing + " has no results!");
-            DynamicBPlusTree<Integer, DistanceList> result = packageDescriptor.getResultTreeFor(pairing);
+            }
+            DynamicBPlusTree<DBID, DistanceList> result = packageDescriptor.getResultTreeFor(pairing);
             logger.verbose(String.format("\tprocessing result of pairing %05d of %05d (%s) - %6.2f%% ...", ++counter, packageDescriptor.getPairings(), pairing, (counter / (float) packageDescriptor.getPairings()) * 100f));
 
-            for(Pair<Integer, DistanceList> resultEntry : result) {
+            for(Pair<DBID, DistanceList> resultEntry : result) {
               DistanceList distanceList = resultTree.get(resultEntry.first);
               if(distanceList == null) {
                 distanceList = new DistanceList(resultEntry.first, k);

@@ -11,6 +11,8 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 
@@ -81,7 +83,7 @@ public class DiskBackedPartition implements IPartition {
   }
   
   @Override
-  public void addVector(int id, NumberVector<?, ?> vector) {
+  public void addVector(DBID id, NumberVector<?, ?> vector) {
     try {
       open();
       long position = storageFile.length();
@@ -90,7 +92,7 @@ public class DiskBackedPartition implements IPartition {
       file.seek(position);
       
       //first we write the id
-      file.writeInt(id);
+      file.writeInt(id.getIntegerID());
       
       // at this point we assume that all elements have the same
       // dimensionality within a database
@@ -111,9 +113,9 @@ public class DiskBackedPartition implements IPartition {
   }
   
   @Override
-  public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator() {
+  public Iterator<Pair<DBID, NumberVector<?, ?>>> iterator() {
     open();
-    return new Iterator<Pair<Integer, NumberVector<?, ?>>>() {
+    return new Iterator<Pair<DBID, NumberVector<?, ?>>>() {
 
       private int position = 0;
       
@@ -123,12 +125,12 @@ public class DiskBackedPartition implements IPartition {
       }
 
       @Override
-      public Pair<Integer, NumberVector<?, ?>> next() {
+      public Pair<DBID, NumberVector<?, ?>> next() {
         if (position > getSize() - 1) 
           throw new IllegalStateException("No more items");
         try {
           file.seek(position * recordSize);
-          int id = file.readInt();
+          DBID id = DBIDUtil.importInteger(file.readInt());
           
           double[] data = new double[dimensionality];
           for (int k = 0; k < dimensionality; ++k) {
@@ -136,7 +138,7 @@ public class DiskBackedPartition implements IPartition {
           }
           
           position++;
-          return new Pair<Integer, NumberVector<?, ?>>(id, new DoubleVector(data));
+          return new Pair<DBID, NumberVector<?, ?>>(id, new DoubleVector(data));
         } catch (IOException e) {
           throw new IllegalStateException("Could not read from data file", e);
         }

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -42,11 +43,11 @@ public class GridPartitioning implements IPartitioning {
   
   private static class OrderItem implements Comparable<OrderItem> {
 
-    int dbid;
+    DBID dbid;
 
     double value;
 
-    public OrderItem(int dbid, double value) {
+    public OrderItem(DBID dbid, double value) {
       this.dbid = dbid;
       this.value = value;
     }
@@ -59,7 +60,7 @@ public class GridPartitioning implements IPartitioning {
       else if(this.value < o.value) {
         return +1;
       }
-      return Integer.valueOf(dbid).compareTo(o.dbid);
+      return dbid.compareTo(o.dbid);
     }
   }
 
@@ -164,11 +165,11 @@ public class GridPartitioning implements IPartitioning {
 
     // set the cutting points
     logger.verbose("Calculating the partitions dimensions ...");
-    Map<Integer, PartitionPosition> dbEntriesPositions = new HashMap<Integer, PartitionPosition>();
+    Map<DBID, PartitionPosition> dbEntriesPositions = new HashMap<DBID, PartitionPosition>();
     Map<Integer, List<Double>> dimensionalCuttingPoints = new HashMap<Integer, List<Double>>();
     for(int dim = 1; dim <= dataSet.getDimensionality(); ++dim) {
       List<OrderItem> dimensionalOrderedItems = new ArrayList<OrderItem>(dataSet.getSize());
-      for(int dbid : dataSet.getIDs()) {
+      for(DBID dbid : dataSet.getIDs()) {
         dimensionalOrderedItems.add(new OrderItem(dbid, dataSet.get(dbid).doubleValue(dim)));
       }
 
@@ -199,7 +200,7 @@ public class GridPartitioning implements IPartitioning {
 
     logger.verbose("Now populating the partitions ...");
     // now we populate the partitions
-    for(Entry<Integer, PartitionPosition> entry : dbEntriesPositions.entrySet()) {
+    for(Entry<DBID, PartitionPosition> entry : dbEntriesPositions.entrySet()) {
       NumberVector<?, ?> vector = dataSet.getOriginal().get(entry.getKey());
       IPartition partition = partitions.get(entry.getValue());
       if(partition == null) {

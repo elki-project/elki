@@ -3,6 +3,8 @@ package experimentalcode.frankenb.model;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -15,14 +17,14 @@ public class DistanceListSerializer implements ByteBufferSerializer<DistanceList
 
   @Override
   public DistanceList fromByteBuffer(ByteBuffer data) throws IOException, UnsupportedOperationException {
-    int id = data.getInt();
+    DBID id = DBIDUtil.importInteger(data.getInt());
     int k = data.getInt();
     DistanceList distanceList = new DistanceList(id, k);
 
     int items = data.getInt();
 
     for (int i = 0; i < items; ++i) {
-      distanceList.addDistance(data.getInt(), data.getDouble());
+      distanceList.addDistance(DBIDUtil.importInteger(data.getInt()), data.getDouble());
     }
     
     return distanceList;
@@ -34,12 +36,12 @@ public class DistanceListSerializer implements ByteBufferSerializer<DistanceList
       throw new IOException("Can't store DistanceList to file because blocksize is too small");
     }
     
-    buffer.putInt(distanceList.getId());
+    buffer.putInt(distanceList.getId().getIntegerID());
     buffer.putInt(distanceList.getK());
     buffer.putInt(distanceList.getDistances().size());
     
-    for (Pair<Integer, Double> entry : distanceList) {
-      buffer.putInt(entry.getFirst());
+    for (Pair<DBID, Double> entry : distanceList) {
+      buffer.putInt(entry.getFirst().getIntegerID());
       buffer.putDouble(entry.getSecond());
     }
   }

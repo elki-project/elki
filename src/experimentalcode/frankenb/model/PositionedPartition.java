@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 import experimentalcode.frankenb.model.ifaces.IPositionedPartition;
@@ -46,7 +47,7 @@ public class PositionedPartition implements IPositionedPartition {
   }
 
   @Override
-  public void addVector(int id, NumberVector<?, ?> vector) {
+  public void addVector(DBID id, NumberVector<?, ?> vector) {
     this.partition.addVector(id, vector);
   }
 
@@ -56,7 +57,7 @@ public class PositionedPartition implements IPositionedPartition {
   }
 
   @Override
-  public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator() {
+  public Iterator<Pair<DBID, NumberVector<?, ?>>> iterator() {
     return this.partition.iterator();
   }
 

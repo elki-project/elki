@@ -2,15 +2,11 @@ package experimentalcode.frankenb.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.data.IntegerVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ListDataSet;
 import experimentalcode.frankenb.model.ReferenceDataSet;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 
@@ -35,7 +31,7 @@ public final class DataSetUtils {
   public static Pair<IDataSet, IDataSet> split(IDataSet dataSet, int dimension, double position) {
     ReferenceDataSet dataSetLower = new ReferenceDataSet(dataSet.getOriginal());
     ReferenceDataSet dataSetHigher = new ReferenceDataSet(dataSet.getOriginal());
-    for (int id : dataSet.getIDs()) {
+    for (DBID id : dataSet.getIDs()) {
       NumberVector<?, ?> vector = dataSet.get(id);
       if (vector.doubleValue(dimension) < position) {
         dataSetLower.add(id);
@@ -58,7 +54,7 @@ public final class DataSetUtils {
     
     int counter = 0;
     List<Double> list = new ArrayList<Double>();
-    for (int id : dataSet.getIDs()) {
+    for (DBID id : dataSet.getIDs()) {
       if (counter++ % everyNthItem == 0) {
         NumberVector<?, ?> vector = dataSet.get(id);
         list.add(vector.doubleValue(dimension));
@@ -84,27 +80,4 @@ public final class DataSetUtils {
   public static double median(IDataSet dataSet, int dimension) {
     return quickMedian(dataSet, dimension, dataSet.getSize());
   }
-  
-  public static IDataSet createRandomDataSet(int n, int dimensions, int minValue, int maxValue) {
-    Set<NumberVector<?, ?>> usedItems = new HashSet<NumberVector<?, ?>>(n);
-    Random random = new Random(System.currentTimeMillis());
-
-    List<NumberVector<?, ?>> items = new ArrayList<NumberVector<?, ?>>();
-    for (int i = 0; i < n; ++i) {
-      IntegerVector vector = null;
-      do {
-        int[] values = new int[dimensions];
-        for (int j = 0; j < dimensions; ++j) {
-          values[j] = (int)Math.round((random.nextDouble() * (maxValue - minValue)) + minValue);
-        }
-        vector = new IntegerVector(values);
-      } while (usedItems.contains(vector));
-      
-      usedItems.add(vector);
-      items.add(vector);
-    }
-    
-    return new ListDataSet(dimensions, items);
-  }
-  
 }

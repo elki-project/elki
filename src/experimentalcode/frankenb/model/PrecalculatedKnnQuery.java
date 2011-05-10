@@ -5,7 +5,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -45,8 +44,8 @@ public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
         newDistanceList.addAll(distanceList);
         distanceList = newDistanceList;
       }
-      for (Pair<Integer, Double> distance : distanceList) {
-        list.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(distance.second), DBIDUtil.importInteger(distance.first)));
+      for (Pair<DBID, Double> distance : distanceList) {
+        list.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(distance.second), distance.first));
       }
       
       if (++requested % 100000 == 0) {

@@ -1,9 +1,9 @@
 package experimentalcode.frankenb.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 
 /**
@@ -16,7 +16,7 @@ import experimentalcode.frankenb.model.ifaces.IDataSet;
 public class ReferenceDataSet implements IDataSet {
 
   private final IDataSet originalDataSet;
-  private Set<Integer> items = new HashSet<Integer>();
+  private HashSetModifiableDBIDs items = DBIDUtil.newHashSet();
   
   public ReferenceDataSet(IDataSet originalDataSet) {
     if (originalDataSet == null) throw new RuntimeException("original data set can't be null!");
@@ -24,7 +24,7 @@ public class ReferenceDataSet implements IDataSet {
   }
   
   @Override
-  public NumberVector<?, ?> get(int id) {
+  public NumberVector<?, ?> get(DBID id) {
     if (!this.items.contains(id)) return null;
     return this.originalDataSet.get(id);
   }
@@ -39,7 +39,7 @@ public class ReferenceDataSet implements IDataSet {
     return this.items.size();
   }
   
-  public void add(int id) {
+  public void add(DBID id) {
     this.items.add(id);
   }
 
@@ -49,7 +49,7 @@ public class ReferenceDataSet implements IDataSet {
   }
 
   @Override
-  public Iterable<Integer> getIDs() {
+  public Iterable<DBID> getIDs() {
     return items;
   }
   
@@ -58,7 +58,7 @@ public class ReferenceDataSet implements IDataSet {
     StringBuilder sb = new StringBuilder();
     boolean first = true;
     sb.append("{");
-    for (int id : this.getIDs()) {
+    for (DBID id : this.getIDs()) {
       if (first) {
         first = false;
       } else

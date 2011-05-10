@@ -13,6 +13,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ifaces.IPartition;
 
@@ -29,7 +31,7 @@ public class BufferedDiskBackedPartition implements IPartition {
   private final File storageFile;
   private int dimensionality;
   
-  private List<Pair<Integer, NumberVector<?, ?>>> entries = new ArrayList<Pair<Integer, NumberVector<?, ?>>>();
+  private List<Pair<DBID, NumberVector<?, ?>>> entries = new ArrayList<Pair<DBID, NumberVector<?, ?>>>();
   
   public BufferedDiskBackedPartition(int id, int dimensionality) {
     this(id, dimensionality, null);
@@ -74,14 +76,14 @@ public class BufferedDiskBackedPartition implements IPartition {
         
         while (file.getFilePointer() < this.storageFile.length()-1) {
           
-          int id = file.readInt();
+          DBID id = DBIDUtil.importInteger(file.readInt());
           
           double[] data = new double[dimensionality];
           for (int k = 0; k < dimensionality; ++k) {
             data[k] = file.readDouble();
           }
           
-          entries.add(new Pair<Integer, NumberVector<?, ?>>(id, new DoubleVector(data)));
+          entries.add(new Pair<DBID, NumberVector<?, ?>>(id, new DoubleVector(data)));
         }
       } finally {
         if (file != null) {
@@ -101,9 +103,9 @@ public class BufferedDiskBackedPartition implements IPartition {
         file.seek(0);
         file.writeInt(this.id);
         file.writeInt(this.dimensionality);
-        for (Pair<Integer, NumberVector<?, ?>> entry : entries) {
+        for (Pair<DBID, NumberVector<?, ?>> entry : entries) {
           
-          file.writeInt(entry.first);
+          file.writeInt(entry.first.getIntegerID());
           
           for (int k = 0; k < dimensionality; ++k) {
             file.writeDouble(entry.second.doubleValue(k + 1));
@@ -127,8 +129,8 @@ public class BufferedDiskBackedPartition implements IPartition {
   }
   
   @Override
-  public void addVector(int id, NumberVector<?, ?> vector) {
-    this.entries.add(new Pair<Integer, NumberVector<?, ?>>(id, vector));
+  public void addVector(DBID id, NumberVector<?, ?> vector) {
+    this.entries.add(new Pair<DBID, NumberVector<?, ?>>(id, vector));
   }
   
   @Override
@@ -137,8 +139,8 @@ public class BufferedDiskBackedPartition implements IPartition {
   }
   
   @Override
-  public Iterator<Pair<Integer, NumberVector<?, ?>>> iterator() {
-    return new Iterator<Pair<Integer, NumberVector<?, ?>>>() {
+  public Iterator<Pair<DBID, NumberVector<?, ?>>> iterator() {
+    return new Iterator<Pair<DBID, NumberVector<?, ?>>>() {
 
       private int position = 0;
       
@@ -148,7 +150,7 @@ public class BufferedDiskBackedPartition implements IPartition {
       }
 
       @Override
-      public Pair<Integer, NumberVector<?, ?>> next() {
+      public Pair<DBID, NumberVector<?, ?>> next() {
         return entries.get(position++);
       }
 

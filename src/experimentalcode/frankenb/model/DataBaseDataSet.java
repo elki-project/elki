@@ -1,10 +1,7 @@
 package experimentalcode.frankenb.model;
 
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
@@ -23,8 +20,8 @@ public class DataBaseDataSet implements IDataSet {
   }
   
   @Override
-  public NumberVector<?, ?> get(int id) {
-    return dataBase.get(DBIDUtil.importInteger(id));
+  public NumberVector<?, ?> get(DBID id) {
+    return dataBase.get(id);
   }
 
   @Override
@@ -33,34 +30,8 @@ public class DataBaseDataSet implements IDataSet {
   }
 
   @Override
-  public Iterable<Integer> getIDs() {
-    return new Iterable<Integer>() {
-
-      @Override
-      public Iterator<Integer> iterator() {
-        return new Iterator<Integer>() {
-
-          Iterator<DBID> iterator = dataBase.iterDBIDs();
-          
-          @Override
-          public boolean hasNext() {
-            return iterator.hasNext();
-          }
-
-          @Override
-          public Integer next() {
-            return iterator.next().getIntegerID();
-          }
-
-          @Override
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-          
-        };
-      }
-      
-    };
+  public Iterable<DBID> getIDs() {
+    return dataBase.iterDBIDs();
   }
 
   @Override

@@ -3,9 +3,7 @@ package experimentalcode.frankenb.main;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,6 +11,9 @@ import java.util.concurrent.Future;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
+import experimentalcode.frankenb.model.ConstantSizeIntegerDBIDSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
@@ -169,8 +170,8 @@ public class KnnDataProcessor extends AbstractApplication {
               File tmpDirFile = File.createTempFile("pairing" + taskId, ".dir");
               File tmpDataFile = File.createTempFile("pairing" + taskId, ".dat");
 
-              DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(new BufferedDiskBackedDataStorage(tmpDirFile), new DiskBackedDataStorage(tmpDataFile), new ConstantSizeIntegerSerializer(), new DistanceListSerializer(), maxKeysPerBucket);
-              Set<Integer> processedIds = new HashSet<Integer>();
+              DynamicBPlusTree<DBID, DistanceList> resultTree = new DynamicBPlusTree<DBID, DistanceList>(new BufferedDiskBackedDataStorage(tmpDirFile), new DiskBackedDataStorage(tmpDataFile), new ConstantSizeIntegerDBIDSerializer(), new DistanceListSerializer(), maxKeysPerBucket);
+              ModifiableDBIDs processedIds = DBIDUtil.newHashSet();
 
               logger.verbose(String.format("\tPairing %010d: partition%05d (%,d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
 
@@ -185,12 +186,12 @@ public class KnnDataProcessor extends AbstractApplication {
               for(int i = 0; i < (pairing.isSelfPairing() ? 1 : partitionsToProcess.length); ++i) {
                 IPartition[] partitions = partitionsToProcess[i];
                 int counter = 0;
-                for(Pair<Integer, NumberVector<?, ?>> pointOne : partitions[0]) {
+                for(Pair<DBID, NumberVector<?, ?>> pointOne : partitions[0]) {
                   if(counter++ % 50 == 0) {
                     logger.verbose(String.format("\t\tPairing %010d: Processed %,d of %,d items ...", taskId, counter, partitions[0].getSize()));
                   }
 
-                  for(Pair<Integer, NumberVector<?, ?>> pointTwo : partitions[1]) {
+                  for(Pair<DBID, NumberVector<?, ?>> pointTwo : partitions[1]) {
                     double distance = distanceAlgorithm.doubleDistance(pointOne.getSecond(), pointTwo.getSecond());
                     persistDistance(resultTree, processedIds, pointOne, pointTwo, distance);
                   }
@@ -272,7 +273,7 @@ public class KnnDataProcessor extends AbstractApplication {
     totalItems += items;
   }
 
-  private void persistDistance(DynamicBPlusTree<Integer, DistanceList> resultTree, Set<Integer> processedIds, Pair<Integer, NumberVector<?, ?>> fromPoint, Pair<Integer, NumberVector<?, ?>> toPoint, double distance) throws IOException {
+  private void persistDistance(DynamicBPlusTree<DBID, DistanceList> resultTree, ModifiableDBIDs processedIds, Pair<DBID, NumberVector<?, ?>> fromPoint, Pair<DBID, NumberVector<?, ?>> toPoint, double distance) throws IOException {
     DistanceList distanceList = null;
     if(processedIds.contains(fromPoint.getFirst())) {
       distanceList = resultTree.get(fromPoint.getFirst());

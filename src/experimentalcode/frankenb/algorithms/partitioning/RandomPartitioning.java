@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -39,8 +42,8 @@ public class RandomPartitioning extends AbstractFixedAmountPartitioning {
       getLogger().verbose("each random partition will contain about " + dataEntriesPerPartition + " items");
       
       Random random = new Random(System.currentTimeMillis());
-      List<Integer> candidates = new ArrayList<Integer>();
-      for (int dbid : dataSet.getIDs()) {
+      ArrayModifiableDBIDs candidates = DBIDUtil.newArray();
+      for (DBID dbid : dataSet.getIDs()) {
         candidates.add(dbid);
       }
       
@@ -49,7 +52,7 @@ public class RandomPartitioning extends AbstractFixedAmountPartitioning {
         IPartition partition = new BufferedDiskBackedPartition(i, dataSet.getDimensionality());
         for (int j = 0; j < dataEntriesPerPartition; ++j) {
           if (candidates.size() == 0) break;
-          int candidate = candidates.remove(random.nextInt(candidates.size()));
+          DBID candidate = candidates.remove(random.nextInt(candidates.size()));
           partition.addVector(candidate, dataSet.getOriginal().get(candidate));
         }
         partitions.add(partition);

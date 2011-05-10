@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.ifaces.IDataSet;
 
@@ -26,14 +27,14 @@ public class ZCurve {
    * @param dataSet a list of pairs of id and the projected 1D position as BigInteger
    * @return
    */
-  public static List<Pair<Integer, BigInteger>> projectToZCurve(IDataSet dataSet) {
+  public static List<Pair<DBID, BigInteger>> projectToZCurve(IDataSet dataSet) {
     double[] minValues = new double[dataSet.getDimensionality()];
     double[] maxValues = new double[dataSet.getDimensionality()];
     
     Arrays.fill(minValues, Double.POSITIVE_INFINITY);
     Arrays.fill(maxValues, Double.NEGATIVE_INFINITY);
     
-    for (int id : dataSet.getIDs()) {
+    for (DBID id : dataSet.getIDs()) {
       NumberVector<?, ?> vector = dataSet.get(id);
       for (int dim = 0; dim < dataSet.getDimensionality(); ++dim) {
         double dimValue = vector.doubleValue(dim + 1);
@@ -42,8 +43,8 @@ public class ZCurve {
       }
     }
     
-    List<Pair<Integer, BigInteger>> zCurvePositions = new ArrayList<Pair<Integer, BigInteger>>();
-    for (int id : dataSet.getIDs()) {
+    List<Pair<DBID, BigInteger>> zCurvePositions = new ArrayList<Pair<DBID, BigInteger>>();
+    for (DBID id : dataSet.getIDs()) {
       NumberVector<?, ?> vector = dataSet.get(id);
       long[] longValueList = new long[dataSet.getDimensionality()];
       
@@ -71,7 +72,7 @@ public class ZCurve {
       }
       
       BigInteger total = new BigInteger(bytes);
-      zCurvePositions.add(new Pair<Integer, BigInteger>(id, total));
+      zCurvePositions.add(new Pair<DBID, BigInteger>(id, total));
     }    
     
     return zCurvePositions;

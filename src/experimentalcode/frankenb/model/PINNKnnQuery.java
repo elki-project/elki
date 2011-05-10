@@ -8,7 +8,6 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -47,7 +46,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
     NumberVector<?, ?> vector = dataBase.get(id);
     
-    DistanceList projectedDistanceList = tree.findNearestNeighbors(id.getIntegerID(), this.kFactor*k, EuclideanDistanceFunction.STATIC);
+    DistanceList projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor*k, EuclideanDistanceFunction.STATIC);
     List<DistanceResultPair<DoubleDistance>> list = new ArrayList<DistanceResultPair<DoubleDistance>>();
     
     if (!alreadyRequestedIDs.contains(id.getIntegerID())) {
@@ -58,14 +57,14 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
       }
     }
     
-    DistanceList newDistanceList = new DistanceList(id.getIntegerID(), k);
-    for (Pair<Integer, Double> distance : projectedDistanceList) {
-      NumberVector<?, ?> otherVector = dataBase.get(DBIDUtil.importInteger(distance.first));
+    DistanceList newDistanceList = new DistanceList(id, k);
+    for (Pair<DBID, Double> distance : projectedDistanceList) {
+      NumberVector<?, ?> otherVector = dataBase.get(distance.first);
       newDistanceList.addDistance(distance.first, EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector));
     }
     
-    for (Pair<Integer, Double> distance : newDistanceList) {
-      list.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(distance.second), DBIDUtil.importInteger(distance.first)));
+    for (Pair<DBID, Double> distance : newDistanceList) {
+      list.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(distance.second), distance.first));
     }
     
     if (++requested % 100000 == 0) {

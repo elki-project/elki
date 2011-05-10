@@ -3,6 +3,7 @@ package experimentalcode.frankenb.algorithms.projection;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -88,7 +89,7 @@ public class RandomProjection implements IProjection {
       }
     }
 
-    for(int id : dataSet.getIDs()) {
+    for(DBID id : dataSet.getIDs()) {
       DoubleVector result = new DoubleVector(projectionMatrix.times(dataSet.get(id).getColumnVector()));
       projectedDataSet.add(id, result);
     }
