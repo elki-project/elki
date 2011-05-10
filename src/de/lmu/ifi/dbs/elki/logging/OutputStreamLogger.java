@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.lmu.ifi.dbs.elki.logging;
 
 import java.io.IOException;
