@@ -1,17 +1,13 @@
 package experimentalcode.frankenb.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ifaces.IDataSet;
 
 /**
  * No description given.
@@ -28,62 +24,27 @@ public final class DataSetUtils {
    * points with x < position get into one data set and all points >= position
    * get into the other
    * 
-   * @param dataSet
-   * @param dimension
-   * @param position
+   * @param relation Relation to split
+   * @param ids DBIDs to process
+   * @param dimension Dimension to use
+   * @param position Split position
    */
-  public static <V extends NumberVector<?, ?>> Pair<ModifiableDBIDs, ModifiableDBIDs> split(Relation<V> dataSet, DBIDs ids, int dimension, double position) {
-    ModifiableDBIDs dataSetLower = DBIDUtil.newArray();
-    ModifiableDBIDs dataSetHigher = DBIDUtil.newArray();
+  public static <V extends NumberVector<?, ?>> ArrayModifiableDBIDs[] splitAtMedian(Relation<V> relation, DBIDs ids, int dimension, double position) {
+    ArrayModifiableDBIDs dataSetLower = DBIDUtil.newArray((int) (ids.size() * 0.51));
+    ArrayModifiableDBIDs dataSetExact = DBIDUtil.newArray((int) (ids.size() * 0.05));
+    ArrayModifiableDBIDs dataSetHigher = DBIDUtil.newArray((int) (ids.size() * 0.51));
     for(DBID id : ids) {
-      V vector = dataSet.get(id);
-      if(vector.doubleValue(dimension) < position) {
+      double val = relation.get(id).doubleValue(dimension);
+      if(val < position) {
         dataSetLower.add(id);
       }
-      else {
+      else if(val > position) {
         dataSetHigher.add(id);
       }
-    }
-    return new Pair<ModifiableDBIDs, ModifiableDBIDs>(dataSetLower, dataSetHigher);
-  }
-
-  /**
-   * Returns the median of a data set by using a sampling method.
-   * 
-   * @param dataSet
-   * @param dimension
-   * @return
-   */
-  public static <V extends NumberVector<?, ?>> double quickMedian(IDataSet<V> dataSet, int dimension, int numberOfSamples) {
-    int everyNthItem = (int) Math.max(1, Math.floor(dataSet.size() / (double) numberOfSamples));
-
-    int counter = 0;
-    List<Double> list = new ArrayList<Double>();
-    for(DBID id : dataSet.iterDBIDs()) {
-      if(counter++ % everyNthItem == 0) {
-        NumberVector<?, ?> vector = dataSet.get(id);
-        list.add(vector.doubleValue(dimension));
+      else {
+        dataSetExact.add(id);
       }
     }
-
-    Collections.sort(list);
-    // LoggingUtil.debug(list.toString());
-    double median;
-    if(list.size() == 1) {
-      return list.get(0);
-    }
-    else if(list.size() % 2 == 1) {
-      median = list.get(((list.size() + 1) / 2) - 1);
-    }
-    else {
-      double v1 = list.get(list.size() / 2);
-      double v2 = list.get((list.size() / 2) - 1);
-      median = (v1 + v2) / 2.0;
-    }
-    return median;
-  }
-
-  public static <V extends NumberVector<?, ?>> double median(IDataSet<V> dataSet, int dimension) {
-    return quickMedian(dataSet, dimension, dataSet.size());
+    return new ArrayModifiableDBIDs[] { dataSetLower, dataSetExact, dataSetHigher };
   }
 }
