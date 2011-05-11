@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -62,7 +61,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   public MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
     this(relation, distanceFunction, k, true);
   }
-  
+
   /**
    * Constructor.
    * 
@@ -72,11 +71,9 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    */
   protected MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, boolean preprocess) {
     super(relation, distanceFunction, k);
-    // take a linear scan to ensure that the query is "up to date" in case of
-    // dynamic updates
-    this.knnQuery = new LinearScanKNNQuery<O, D>(relation, distanceQuery);
-    
-    if (preprocess) {
+    this.knnQuery = relation.getDatabase().getKNNQuery(distanceQuery, k);
+
+    if(preprocess) {
       preprocess();
     }
   }
@@ -406,8 +403,8 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
      */
     public static class Parameterizer<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
-      protected Factory<O,D> makeInstance() {
-        return new Factory<O,D>(k, distanceFunction);
+      protected Factory<O, D> makeInstance() {
+        return new Factory<O, D>(k, distanceFunction);
       }
     }
   }
