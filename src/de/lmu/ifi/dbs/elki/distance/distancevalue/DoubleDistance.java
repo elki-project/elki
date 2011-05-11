@@ -15,7 +15,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    * The static factory instance
    */
   public final static DoubleDistance FACTORY = new DoubleDistance();
-  
+
   /**
    * The actual value.
    */
@@ -45,12 +45,12 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
 
   @Override
   public DoubleDistance plus(DoubleDistance distance) {
-    return new DoubleDistance(this.getValue() + distance.getValue());
+    return new DoubleDistance(this.value + distance.value);
   }
 
   @Override
   public DoubleDistance minus(DoubleDistance distance) {
-    return new DoubleDistance(this.getValue() - distance.getValue());
+    return new DoubleDistance(this.value - distance.value);
   }
 
   /**
@@ -62,7 +62,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    *         distance
    */
   public DoubleDistance times(DoubleDistance distance) {
-    return new DoubleDistance(this.getValue() * distance.getValue());
+    return new DoubleDistance(this.value * distance.value);
   }
 
   /**
@@ -74,7 +74,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    *         value
    */
   public DoubleDistance times(double lambda) {
-    return new DoubleDistance(this.getValue() * lambda);
+    return new DoubleDistance(this.value * lambda);
   }
 
   /**
@@ -82,7 +82,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeDouble(this.getValue());
+    out.writeDouble(this.value);
   }
 
   /**
@@ -188,5 +188,11 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   @Override
   public Pattern getPattern() {
     return DOUBLE_PATTERN;
+  }
+
+  @Override
+  public int hashCode() {
+    long bits = Double.doubleToLongBits(value);
+    return (int) (bits ^ (bits >>> 32));
   }
 }

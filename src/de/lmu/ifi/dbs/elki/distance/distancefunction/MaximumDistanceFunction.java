@@ -29,25 +29,18 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements R
   
   @Override
   public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
-    if(v1.getDimensionality() != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
-    }
-    double max = 0;
-    for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
-      max = Math.max(d, max);
-    }
-    return new DoubleDistance(max);
+    return new DoubleDistance(doubleDistance(v1, v2));
   }
   
   @Override
   public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    if(v1.getDimensionality() != v2.getDimensionality()) {
+    final int dim1 = v1.getDimensionality();
+    if(dim1 != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
     double max = 0;
-    for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
+    for(int i = 1; i <= dim1; i++) {
+      final double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       max = Math.max(d, max);
     }
     return max;

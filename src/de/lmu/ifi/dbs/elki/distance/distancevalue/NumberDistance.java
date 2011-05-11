@@ -26,7 +26,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    * @return the hash code of the value
    */
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return getValue().hashCode();
   }
 
