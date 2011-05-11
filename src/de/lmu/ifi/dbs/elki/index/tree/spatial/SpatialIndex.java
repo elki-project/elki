@@ -151,7 +151,7 @@ public abstract class SpatialIndex<O extends SpatialComparable, N extends Spatia
    *        between the objects
    * @return a List of List the query results
    */
-  // FIXME: Not yet supported. :-(
+  // FIXME: should query for objects instead!
   public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, final int k, final SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction);
 
   /**

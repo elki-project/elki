@@ -57,7 +57,6 @@ public class SpatialIndexKNNQuery<O extends SpatialComparable, D extends Distanc
   
   @Override
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    // FIXME: supported?
     return index.bulkKNNQueryForIDs(ids, k, distanceFunction);
   }
 

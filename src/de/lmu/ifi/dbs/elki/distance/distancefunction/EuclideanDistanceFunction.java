@@ -32,17 +32,6 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
   /**
    * Provides the Euclidean distance between the given two vectors.
    * 
-   * @return the Euclidean distance between the given two vectors as an instance
-   *         of {@link DoubleDistance DoubleDistance}.
-   */
-  @Override
-  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    return new DoubleDistance(doubleDistance(v1, v2));
-  }
-
-  /**
-   * Provides the Euclidean distance between the given two vectors.
-   * 
    * @return the Euclidean distance between the given two vectors as raw double
    *         value
    */

@@ -63,14 +63,15 @@ public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
    */
   @Override
   public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    if(v1.getDimensionality() != v2.getDimensionality()) {
+    final int dim1 = v1.getDimensionality();
+    if(dim1 != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
 
     double sqrDist = 0;
-    for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double manhattanI = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
-      sqrDist += Math.pow(manhattanI, p);
+    for(int i = 1; i <= dim1; i++) {
+      final double delta = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
+      sqrDist += Math.pow(delta, p);
     }
     return Math.pow(sqrDist, 1.0 / p);
   }
