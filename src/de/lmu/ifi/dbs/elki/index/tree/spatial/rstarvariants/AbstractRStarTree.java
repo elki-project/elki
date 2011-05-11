@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -21,6 +22,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -38,13 +40,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
@@ -133,7 +134,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
 
     // Wrap entry as leaf
     E entry = createNewLeafEntry(id);
-    
+
     if(!initialized) {
       initialize(entry);
     }
@@ -167,7 +168,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     // Make an example leaf
     E exampleLeaf = createNewLeafEntry(ids.iterator().next());
     if(bulk && !initialized) {
-      initialize(exampleLeaf );
+      initialize(exampleLeaf);
       bulkLoad(ids);
       if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
@@ -346,27 +347,26 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     return knnList.toSortedArrayList();
   }
 
-  @SuppressWarnings("unused")
   @Override
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     // FIXME: the current implementation relies on DBID->Object lookups.
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
-    /*
-     * if(k < 1) { throw new
-     * IllegalArgumentException("At least one enumeration has to be requested!"
-     * ); }
-     * 
-     * final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID,
-     * KNNHeap<D>>(ids.size()); for(DBID id : ids) { knnLists.put(id, new
-     * KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
-     * }
-     * 
-     * batchNN(getRoot(), distanceFunction, knnLists);
-     * 
-     * List<List<DistanceResultPair<D>>> result = new
-     * ArrayList<List<DistanceResultPair<D>>>(); for(DBID id : ids) {
-     * result.add(knnLists.get(id).toSortedArrayList()); } return result;
-     */
+    if(k < 1) {
+      throw new IllegalArgumentException("At least one enumeration has to be requested!");
+    }
+
+    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
+    for(DBID id : ids) {
+      knnLists.put(id, new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
+    }
+
+    SpatialPrimitiveDistanceQuery<O, D> distanceQuery = (SpatialPrimitiveDistanceQuery<O, D>) getRelation().getDatabase().getDistanceQuery(getRelation(), distanceFunction);
+    batchNN(getRoot(), distanceQuery, knnLists);
+
+    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>();
+    for(DBID id : ids) {
+      result.add(knnLists.get(id).toSortedArrayList());
+    }
+    return result;
   }
 
   @Override
@@ -601,8 +601,9 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry p = node.getEntry(i);
-        for(DBID q : knnLists.keySet()) {
-          KNNHeap<D> knns_q = knnLists.get(q);
+        for(Entry<DBID, KNNHeap<D>> ent : knnLists.entrySet()) {
+          final DBID q = ent.getKey();
+          final KNNHeap<D> knns_q = ent.getValue();
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           DBID pid = ((LeafEntry) p).getDBID();
@@ -620,8 +621,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       List<DistanceEntry<D, E>> entries = getSortedEntries(node, ids, distanceQuery);
       for(DistanceEntry<D, E> distEntry : entries) {
         D minDist = distEntry.getDistance();
-        for(DBID q : knnLists.keySet()) {
-          KNNHeap<D> knns_q = knnLists.get(q);
+        for(Entry<DBID, KNNHeap<D>> ent : knnLists.entrySet()) {
+          final KNNHeap<D> knns_q = ent.getValue();
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
@@ -719,7 +720,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @param distanceFunction the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, O q, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, O q, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -996,7 +997,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
         }
       }
 
-      double volume = /* entry_i.getMBR() == null ? 0 : */ SpatialUtil.volume(entry_i);
+      double volume = /* entry_i.getMBR() == null ? 0 : */SpatialUtil.volume(entry_i);
       double inc_volume = SpatialUtil.volume(newMBR) - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, i), volume, inc_volume, inc_overlap);
@@ -1026,7 +1027,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry_i = node.getEntry(i);
       HyperBoundingBox newMBR = union(mbr, entry_i);
-      double volume = /* entry_i.getMBR() == null ? 0 : */ SpatialUtil.volume(entry_i);
+      double volume = /* entry_i.getMBR() == null ? 0 : */SpatialUtil.volume(entry_i);
       double inc_volume = SpatialUtil.volume(newMBR) - volume;
       entriesToTest.add(new FCPair<Double, E>(inc_volume, entry_i));
     }
@@ -1049,7 +1050,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
         }
       }
 
-      double volume = /* entry_i.getMBR() == null ? 0 : */ SpatialUtil.volume(entry_i);
+      double volume = /* entry_i.getMBR() == null ? 0 : */SpatialUtil.volume(entry_i);
       double inc_volume = SpatialUtil.volume(newMBR) - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, index), volume, inc_volume, inc_overlap);

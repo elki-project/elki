@@ -44,7 +44,7 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
       List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
       for(DBID currentID : relation.iterDBIDs()) {
         double doubleDistance = rawdist.doubleDistance(qo, relation.get(currentID));
-        if(doubleDistance < epsilon) {
+        if(doubleDistance <= epsilon) {
           result.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(doubleDistance), currentID));
         }
       }
@@ -65,7 +65,7 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
       List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
       for(DBID currentID : relation.iterDBIDs()) {
         double doubleDistance = rawdist.doubleDistance(obj, relation.get(currentID));
-        if(doubleDistance < epsilon) {
+        if(doubleDistance <= epsilon) {
           result.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(doubleDistance), currentID));
         }
       }

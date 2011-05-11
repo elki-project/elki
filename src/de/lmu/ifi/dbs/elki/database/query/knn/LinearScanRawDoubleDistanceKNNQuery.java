@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -62,16 +63,19 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public List<List<DistanceResultPair<DoubleDistance>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    @SuppressWarnings("unchecked")
+    // We have a couple of casts in this implementation to avoid generics hacks.
     final RawDoubleDistance<O> rawdist = (RawDoubleDistance<O>) distanceQuery.getDistanceFunction();
-
-    final List<KNNHeap<DoubleDistance>> heaps = new ArrayList<KNNHeap<DoubleDistance>>(ids.size());
-    // TODO: this array can become quite large...
-    final List<O> objs = new ArrayList<O>(ids.size());
-    for(DBID id : ids) {
-      heaps.add(new KNNHeap<DoubleDistance>(k));
-      objs.add(relation.get(id));
+    final int size = ids.size();
+    final Object[] heaps = new Object[size];
+    // TODO: this array can become quite large - save it?
+    final Object[] objs = new Object[size];
+    Iterator<DBID> iditer = ids.iterator();
+    for(int i = 0; i < size; i++) {
+      DBID id = iditer.next();
+      heaps[i] = new KNNHeap<DoubleDistance>(k);
+      objs[i] = relation.get(id);
     }
     final double[] max = new double[ids.size()];
     Arrays.fill(max, Double.POSITIVE_INFINITY);
@@ -81,9 +85,8 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
     for(DBID candidateID : relation.iterDBIDs()) {
       O candidate = relation.get(candidateID);
       for(int index = 0; index < ids.size(); index++) {
-        O object = objs.get(index);
-        KNNHeap<DoubleDistance> heap = heaps.get(index);
-        double distance = rawdist.doubleDistance(object, candidate);
+        final KNNHeap<DoubleDistance> heap = (KNNHeap<DoubleDistance>) heaps[index];
+        double distance = rawdist.doubleDistance((O) objs[index], candidate);
         if(distance <= max[index]) {
           final DoubleDistance distobj = new DoubleDistance(distance);
           heap.add(distobj, candidateID);
@@ -94,9 +97,9 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
       }
     }
 
-    List<List<DistanceResultPair<DoubleDistance>>> result = new ArrayList<List<DistanceResultPair<DoubleDistance>>>(heaps.size());
-    for(KNNHeap<DoubleDistance> heap : heaps) {
-      result.add(heap.toSortedArrayList());
+    List<List<DistanceResultPair<DoubleDistance>>> result = new ArrayList<List<DistanceResultPair<DoubleDistance>>>(size);
+    for(int i = 0; i < size; i++) {
+      result.add(((KNNHeap<DoubleDistance>)heaps[i]).toSortedArrayList());
     }
     return result;
   }

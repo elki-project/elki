@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.query.distance;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -16,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <V> Vector type to use
  * @param <D> Distance result type
  */
-public class SpatialPrimitiveDistanceQuery<V extends FeatureVector<?, ?> & SpatialComparable, D extends Distance<D>> extends PrimitiveDistanceQuery<V, D> implements SpatialDistanceQuery<V, D> {
+public class SpatialPrimitiveDistanceQuery<V extends SpatialComparable, D extends Distance<D>> extends PrimitiveDistanceQuery<V, D> implements SpatialDistanceQuery<V, D> {
   /**
    * The distance function we use.
    */
