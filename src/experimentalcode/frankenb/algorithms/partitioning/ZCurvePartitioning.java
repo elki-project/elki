@@ -13,14 +13,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.utils.ZCurve;
 
 /**
  * This class orders the items of the data set according to their z-curve value
- * and splits them in ascending order to their z-curve value into a given amount of partitions. 
+ * and splits them in ascending order to their z-curve value into a given amount
+ * of partitions.
  * 
  * @author Florian Frankenberger
  */
@@ -33,14 +34,17 @@ public class ZCurvePartitioning<V extends NumberVector<?, ?>> extends AbstractFi
   public ZCurvePartitioning(Parameterization config) {
     super(config);
   }
-  
-  @Override
-  protected List<DBIDPartition> makePartitions(Relation<? extends V> dataSet, int partitionQuantity) throws UnableToComplyException {
-    try {
-      List<Pair<DBID, BigInteger>> projection = ZCurve.projectToZCurve(dataSet);
-      
-      Collections.sort(projection, new Comparator<Pair<DBID, BigInteger>>() {
 
+  @Override
+  protected List<DBIDPartition> makePartitions(Relation<? extends V> relation, int partitionQuantity) throws UnableToComplyException {
+    try {
+      ZCurve.Transformer zcurve = new ZCurve.Transformer(relation, relation.getDBIDs());
+      
+      List<Pair<DBID, BigInteger>> projection = new ArrayList<Pair<DBID, BigInteger>>(relation.size());
+      for (DBID id : relation.iterDBIDs()) {
+        projection.add(new Pair<DBID, BigInteger>(id, zcurve.asBigInteger(relation.get(id))));
+      }
+      Collections.sort(projection, new Comparator<Pair<DBID, BigInteger>>() {
         @Override
         public int compare(Pair<DBID, BigInteger> o1, Pair<DBID, BigInteger> o2) {
           int result = o1.second.compareTo(o2.second);
@@ -49,11 +53,10 @@ public class ZCurvePartitioning<V extends NumberVector<?, ?>> extends AbstractFi
           }
           return result;
         }
-        
       });
 
-      int itemsPerPartition = dataSet.size() / partitionQuantity;
-      int addItemsUntilPartition = dataSet.size() % partitionQuantity;
+      int itemsPerPartition = relation.size() / partitionQuantity;
+      int addItemsUntilPartition = relation.size() % partitionQuantity;
       
       logger.verbose(String.format("Items per partition about: %d", itemsPerPartition));
       

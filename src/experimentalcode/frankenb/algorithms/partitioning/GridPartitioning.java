@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -157,7 +156,7 @@ public class GridPartitioning<V extends NumberVector<?, ?>> implements IPartitio
   }
 
   @Override
-  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet) throws UnableToComplyException {
+  public List<DBIDPartition> makePartitions(Relation<? extends V> dataSet) {
     int itemsPerSectorAndDimension = (int) Math.floor(dataSet.size() / (float) sectors);
 
     int addItemsUntilPartition = dataSet.size() % sectors;
