@@ -1,11 +1,21 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanRawDoubleDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRawDoubleDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 
 /**
@@ -15,7 +25,8 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
  */
 public final class QueryUtil {
   /**
-   * Get a distance query for a given distance function, automatically choosing a relation.
+   * Get a distance query for a given distance function, automatically choosing
+   * a relation.
    * 
    * @param <O> Object type
    * @param <D> Distance type
@@ -94,5 +105,59 @@ public final class QueryUtil {
   public static <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Database database, Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
     return database.getKNNQuery(distanceQuery, hints);
+  }
+
+  /**
+   * Get a linear scan query for the given distance query.
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param distanceQuery distance query
+   * @return KNN query
+   */
+  public static <O, D extends Distance<D>> KNNQuery<O, D> getLinearScanKNNQuery(DistanceQuery<O, D> distanceQuery) {
+    // Slight optimizations of linear scans
+    if(distanceQuery instanceof PrimitiveDistanceQuery) {
+      if(distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+        final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
+        @SuppressWarnings("unchecked")
+        final KNNQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceKNNQuery<O>(distanceQuery.getRelation(), (PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+        @SuppressWarnings("unchecked")
+        final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
+        return castQuery;
+      }
+      else {
+        final PrimitiveDistanceQuery<O, D> pdq = (PrimitiveDistanceQuery<O, D>) distanceQuery;
+        return new LinearScanPrimitiveDistanceKNNQuery<O, D>(pdq.getRelation(), pdq);
+      }
+    }
+    return new LinearScanKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
+  }
+
+  /**
+   * Get a linear scan query for the given distance query.
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param distanceQuery distance query
+   * @return Range query
+   */
+  public static <O, D extends Distance<D>> RangeQuery<O, D> getLinearScanRangeQuery(DistanceQuery<O, D> distanceQuery) {
+    // Slight optimizations of linear scans
+    if(distanceQuery instanceof PrimitiveDistanceQuery) {
+      if(distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+        final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
+        @SuppressWarnings("unchecked")
+        final RangeQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceRangeQuery<O>(distanceQuery.getRelation(), (PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+        @SuppressWarnings("unchecked")
+        final RangeQuery<O, D> castQuery = (RangeQuery<O, D>) knnQuery;
+        return castQuery;
+      }
+      else {
+        final PrimitiveDistanceQuery<O, D> pdq = (PrimitiveDistanceQuery<O, D>) distanceQuery;
+        return new LinearScanPrimitiveDistanceRangeQuery<O, D>(pdq.getRelation(), pdq);
+      }
+    }
+    return new LinearScanRangeQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
   }
 }

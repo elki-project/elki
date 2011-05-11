@@ -41,11 +41,12 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
    */
   @Override
   public double doubleDistance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
-    if(v1.getDimensionality() != v2.getDimensionality()) {
+    final int dim = v1.getDimensionality();
+    if(dim != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
     double sum = 0;
-    for(int i = 1; i <= v1.getDimensionality(); i++) {
+    for(int i = 1; i <= dim; i++) {
       sum += Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
     }
     return sum;

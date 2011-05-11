@@ -5,22 +5,20 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
@@ -165,7 +163,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
       }
     }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return new LinearScanKNNQuery<O, D>(objQuery, distanceQuery);
+    return QueryUtil.getLinearScanKNNQuery(distanceQuery);
   }
 
   @Override
@@ -185,7 +183,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
         return null;
       }
     }
-    return new LinearScanKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
+    return QueryUtil.getLinearScanKNNQuery(distanceQuery);
   }
 
   @Override
@@ -206,7 +204,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
       }
     }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return new LinearScanRangeQuery<O, D>(objQuery, distanceQuery);
+    return QueryUtil.getLinearScanRangeQuery(distanceQuery);
   }
 
   @Override
@@ -226,7 +224,7 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
         return null;
       }
     }
-    return new LinearScanRangeQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
+    return QueryUtil.getLinearScanRangeQuery(distanceQuery);
   }
 
   @Override

@@ -12,15 +12,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?,?>> {
+public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements RawDoubleDistance<NumberVector<?, ?>> {
   /**
    * Static instance. Use this.
    */
   public static final MinimumDistanceFunction STATIC = new MinimumDistanceFunction();
 
   /**
-   * Provides a Minimum distance function that can compute the Minimum
-   * distance (that is a DoubleDistance) for FeatureVectors.
+   * Provides a Minimum distance function that can compute the Minimum distance
+   * (that is a DoubleDistance) for FeatureVectors.
    * 
    * @deprecated Use static instance!
    */
@@ -30,13 +30,14 @@ public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<N
   }
 
   @Override
-  public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
-    if(v1.getDimensionality() != v2.getDimensionality()) {
+  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+    final int dim = v1.getDimensionality();
+    if(dim != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
     double min = Double.MAX_VALUE;
-    for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
+    for(int i = 1; i <= dim; i++) {
+      final double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       min = Math.min(d, min);
     }
     return new DoubleDistance(min);
@@ -44,12 +45,13 @@ public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<N
 
   @Override
   public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    if(v1.getDimensionality() != v2.getDimensionality()) {
+    final int dim = v1.getDimensionality();
+    if(dim != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
     double min = Double.MAX_VALUE;
-    for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
+    for(int i = 1; i <= dim; i++) {
+      final double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       min = Math.min(d, min);
     }
     return min;
