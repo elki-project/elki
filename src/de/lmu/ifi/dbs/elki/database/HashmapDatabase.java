@@ -19,9 +19,12 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDoubleDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanRawDoubleDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRawDoubleDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -477,15 +480,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       }
     }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
-      final DistanceQuery<O, ?> pdq = distanceQuery;
-      @SuppressWarnings("unchecked")
-      final KNNQuery<O, ?> knnQuery = new LinearScanDoubleDistanceKNNQuery<O>(distanceQuery.getRelation(), (DistanceQuery<O, DoubleDistance>) pdq);
-      @SuppressWarnings("unchecked")
-      final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
-      return castQuery;
-    }
-    return new LinearScanKNNQuery<O, D>(objQuery, distanceQuery);
+    return getKNNQuery(distanceQuery, hints);
   }
 
   @Override
@@ -511,13 +506,19 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
         return null;
       }
     }
-    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
-      final DistanceQuery<O, ?> pdq = distanceQuery;
-      @SuppressWarnings("unchecked")
-      final KNNQuery<O, ?> knnQuery = new LinearScanDoubleDistanceKNNQuery<O>(distanceQuery.getRelation(), (PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
-      @SuppressWarnings("unchecked")
-      final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
-      return castQuery;
+    // Slight optimizations of linear scans
+    if(distanceQuery instanceof PrimitiveDistanceQuery) {
+      if(distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+        final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
+        @SuppressWarnings("unchecked")
+        final KNNQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceKNNQuery<O>(distanceQuery.getRelation(), (PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+        @SuppressWarnings("unchecked")
+        final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
+        return castQuery;
+      } else {
+        final PrimitiveDistanceQuery<O, D> pdq = (PrimitiveDistanceQuery<O, D>) distanceQuery;
+        return new LinearScanPrimitiveDistanceKNNQuery<O, D>(pdq.getRelation(), pdq);
+      }
     }
     return new LinearScanKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
   }
@@ -546,7 +547,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
       }
     }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return new LinearScanRangeQuery<O, D>(objQuery, distanceQuery);
+    return getRangeQuery(distanceQuery, hints);
   }
 
   @Override
@@ -570,6 +571,20 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Datab
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
+      }
+    }
+    // Slight optimizations of linear scans
+    if(distanceQuery instanceof PrimitiveDistanceQuery) {
+      if(distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+        final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
+        @SuppressWarnings("unchecked")
+        final RangeQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceRangeQuery<O>(distanceQuery.getRelation(), (PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+        @SuppressWarnings("unchecked")
+        final RangeQuery<O, D> castQuery = (RangeQuery<O, D>) knnQuery;
+        return castQuery;
+      } else {
+        final PrimitiveDistanceQuery<O, D> pdq = (PrimitiveDistanceQuery<O, D>) distanceQuery;
+        return new LinearScanPrimitiveDistanceRangeQuery<O, D>(pdq.getRelation(), pdq);
       }
     }
     return new LinearScanRangeQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
