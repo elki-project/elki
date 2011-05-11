@@ -158,7 +158,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   protected Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
     KNNQuery<O, D> knnComp;
     KNNQuery<O, D> knnReach;
-    if(comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
+    if(comparisonDistanceFunction == reachabilityDistanceFunction || comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
       // We need each neighborhood twice - use "HEAVY" flag.
       knnComp = database.getKNNQuery(relation, comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
       // No optimized kNN query - use a preprocessor!

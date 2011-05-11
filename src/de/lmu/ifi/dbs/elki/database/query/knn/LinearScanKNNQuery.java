@@ -38,7 +38,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
     if(PrimitiveDistanceQuery.class.isInstance(distanceQuery)) {
       O obj = relation.get(id);
       for(DBID candidateID : relation.iterDBIDs()) {
-        heap.add(distanceQuery.distance(obj, candidateID), candidateID);
+        heap.add(distanceQuery.distance(obj, relation.get(candidateID)), candidateID);
       }
     }
     else {
@@ -51,26 +51,32 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
 
   @Override
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(ids.size());
-    for(int i = 0; i < ids.size(); i++) {
-      heaps.add(new KNNHeap<D>(k));
-    }
-
+    final List<KNNHeap<D>> heaps;
     if(PrimitiveDistanceQuery.class.isAssignableFrom(distanceQuery.getClass())) {
+      heaps = new ArrayList<KNNHeap<D>>(ids.size());
+      List<O> objs = new ArrayList<O>(ids.size());
+      for(DBID id : ids) {
+        heaps.add(new KNNHeap<D>(k));
+        objs.add(relation.get(id));
+      }
       // The distance is computed on arbitrary vectors, we can reduce object
       // loading by working on the actual vectors.
       for(DBID candidateID : relation.iterDBIDs()) {
         O candidate = relation.get(candidateID);
-        Integer index = -1;
-        for(DBID id : ids) {
-          index++;
-          O object = relation.get(id);
+        for (int index = 0; index < ids.size(); index++) {
+          O object = objs.get(index);
           KNNHeap<D> heap = heaps.get(index);
           heap.add(distanceQuery.distance(object, candidate), candidateID);
         }
       }
     }
     else {
+      heaps = new ArrayList<KNNHeap<D>>(ids.size());
+      List<O> objs = new ArrayList<O>(ids.size());
+      for(DBID id : ids) {
+        heaps.add(new KNNHeap<D>(k));
+        objs.add(relation.get(id));
+      }
       // The distance is computed on database IDs
       for(DBID candidateID : relation.iterDBIDs()) {
         Integer index = -1;

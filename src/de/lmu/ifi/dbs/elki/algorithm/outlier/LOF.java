@@ -191,7 +191,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
 
     // knnReach is only used once
     KNNQuery<O, D> knnRefer;
-    if(neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
+    if(neighborhoodDistanceFunction == reachabilityDistanceFunction || neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
       knnRefer = knnReach;
     }
     else {
