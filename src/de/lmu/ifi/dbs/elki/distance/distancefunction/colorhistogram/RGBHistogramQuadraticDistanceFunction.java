@@ -48,7 +48,7 @@ public class RGBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
   public static Matrix computeWeightMatrix(int bpp) {
     final int dim = bpp * bpp * bpp;
 
-    Matrix m = new Matrix(dim, dim);
+    final Matrix m = new Matrix(dim, dim);
     // maximum occurring distance in manhattan between bins:
     final double max = 3. * (bpp - 1.);
     for(int x = 0; x < dim; x++) {

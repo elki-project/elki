@@ -54,9 +54,9 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
    * @return Weight matrix
    */
   public static Matrix computeWeightMatrix(final int quanth, final int quants, final int quantb) {
-    int dim = quanth * quants * quantb;
+    final int dim = quanth * quants * quantb;
     assert (dim > 0);
-    Matrix m = new Matrix(dim, dim);
+    final Matrix m = new Matrix(dim, dim);
     for(int x = 0; x < dim; x++) {
       final int hx = x / (quantb * quants);
       final int sx = (x / quantb) % quants;
