@@ -71,4 +71,12 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
     return id.compareTo(o.getDBID());
   }
 
+  /**
+   * Get the distance as double value.
+   * 
+   * @return distance value
+   */
+  public double getDoubleDistance() {
+    return distance;
+  }
 }

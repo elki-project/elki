@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -52,10 +53,10 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
     for(DBID candidateID : relation.iterDBIDs()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(candidateID));
       if(doubleDistance <= max) {
-        heap.add(new DoubleDistance(doubleDistance), candidateID);
+        heap.add(new DoubleDistanceResultPair(doubleDistance, candidateID));
         // Update cutoff
         if(heap.size() >= heap.getK()) {
-          max = heap.getMaximumDistance().doubleValue();
+          max = ((DoubleDistanceResultPair)heap.peek()).getDoubleDistance();
         }
       }
     }
@@ -86,12 +87,11 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
       O candidate = relation.get(candidateID);
       for(int index = 0; index < ids.size(); index++) {
         final KNNHeap<DoubleDistance> heap = (KNNHeap<DoubleDistance>) heaps[index];
-        double distance = rawdist.doubleDistance((O) objs[index], candidate);
-        if(distance <= max[index]) {
-          final DoubleDistance distobj = new DoubleDistance(distance);
-          heap.add(distobj, candidateID);
+        double doubleDistance = rawdist.doubleDistance((O) objs[index], candidate);
+        if(doubleDistance <= max[index]) {
+          heap.add(new DoubleDistanceResultPair(doubleDistance, candidateID));
           if(heap.size() >= heap.getK()) {
-            max[index] = heap.getMaximumDistance().doubleValue();
+            max[index] = ((DoubleDistanceResultPair)heap.peek()).getDoubleDistance();
           }
         }
       }
