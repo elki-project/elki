@@ -146,6 +146,11 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
     }
     // normalize the adjacent Matrix
     E.normalizeColumns();
+    E.times(c);
+    Matrix temp = Matrix.identity(relation.size(), relation.size());
+    temp.minus(E);
+    temp.times((1-c));
+    Matrix w = temp.inverse() ;
 
     // compute similarity vector for each Object
     int count = 0;
@@ -163,19 +168,12 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
         }
       }
       Ei.transpose();
-      // compute similarity vector
-      Matrix I = Matrix.unitMatrix(relation.size());
-      Matrix R = E.times(c);
-      R = I.minus(R);
-      R = R.times((1 - c));
-      R = R.inverse();
-      Si = R.times(Ei);
+      Si = w.times(Ei);
       similarityVectors.put(id, Si);
       count++;
     }
 
     // compute the relevance scores between specified objects and its neighbors
-
     for(DBID id : relation.iterDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       ArrayList<Pair<DBID, Double>> sim = new ArrayList<Pair<DBID, Double>>();
@@ -184,22 +182,22 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
         sim.add(p);
       }
       simScores.put(id, sim);
-      System.out.println(sim);
     }
-
+    
     MinMax<Double> minmax = new MinMax<Double>();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : relation.iterDBIDs()) {
       List<Pair<DBID, Double>> simScore = simScores.get(id);
-      GeometricMean gm = new GeometricMean();
+      double score = 1 ;
       for(Pair<DBID, Double> pair : simScore) {
-        gm.increment(pair.second);
+        score *= pair.second ;
       }
-      scores.put(id, gm.getResult());
-      minmax.put(gm.getResult());
+      System.out.println(id.getIntegerID()+":"+score);
+      scores.put(id, score);
+      minmax.put(score);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LOM", "LOM-outlier", RW_EC_SCORE, scores);
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.17);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("randomwalkec", "RandomWalkEC", RW_EC_SCORE, scores);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
@@ -207,13 +205,15 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
    * Computes the cosine similarity for two given feature vectors.
    */
   private static double cosineSimilarity(Vector v1, Vector v2) {
-    v1.normalize();
-    v2.normalize();
-    double d = 1 - v1.transposeTimes(v2);
-    if(d < 0) {
-      d = 0;
+    double p = 0 ;
+    double p1 = 0 ;
+    double p2 = 0 ;
+    for(int i =0 ; i<v1.getDimensionality();i++){
+    	p += v1.get(i)*v2.get(i);
+    	p1 += v1.get(i)*v1.get(i);
+    	p2 += v2.get(i)*v2.get(i);
     }
-    return d;
+    return (p/(Math.sqrt(p1)*Math.sqrt(p2)));
   }
 
   /**
