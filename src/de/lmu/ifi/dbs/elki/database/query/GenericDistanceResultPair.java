@@ -70,4 +70,18 @@ public class GenericDistanceResultPair<D extends Distance<D>> extends Pair<D, DB
     }
     return second.compareTo(o.getDBID());
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof DistanceResultPair)) {
+      return false;
+    }
+    DistanceResultPair<?> other = (DistanceResultPair<?>) obj;
+    return first.equals(other.getDistance()) && second.equals(other.getDBID());
+  }
+
+  @Override
+  public String toString() {
+    return "DistanceResultPair(" + getFirst() + ", " + getSecond() + ")";
+  }
 }
