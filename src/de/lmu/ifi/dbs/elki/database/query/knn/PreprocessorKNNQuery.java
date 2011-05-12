@@ -58,7 +58,25 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>> extends AbstractData
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
     if(!warned && k < preprocessor.getK()) {
-      LoggingUtil.warning("FIXME: we're returning too many neighbors!");
+      List<DistanceResultPair<D>> dr = preprocessor.get(id);
+      int subk = k;
+      D kdist = dr.get(subk - 1).getDistance();
+      while(subk < dr.size()) {
+        D ndist = dr.get(subk).getDistance();
+        if(kdist.equals(ndist)) {
+          // Tie - increase subk.
+          subk++;
+        }
+        else {
+          break;
+        }
+      }
+      if(subk < dr.size()) {
+        return dr.subList(0, subk);
+      }
+      else {
+        return dr;
+      }
     }
     return preprocessor.get(id);
   }
@@ -68,12 +86,34 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>> extends AbstractData
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
-    if(!warned && k < preprocessor.getK()) {
-      LoggingUtil.warning("FIXME: we're returning too many neighbors!");
-    }
     List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
-    for(DBID id : ids) {
-      result.add(preprocessor.get(id));
+    if(k < preprocessor.getK()) {
+      for(DBID id : ids) {
+        List<DistanceResultPair<D>> dr = preprocessor.get(id);
+        int subk = k;
+        D kdist = dr.get(subk - 1).getDistance();
+        while(subk < dr.size()) {
+          D ndist = dr.get(subk).getDistance();
+          if(kdist.equals(ndist)) {
+            // Tie - increase subk.
+            subk++;
+          }
+          else {
+            break;
+          }
+        }
+        if(subk < dr.size()) {
+          result.add(dr.subList(0, subk));
+        }
+        else {
+          result.add(dr);
+        }
+      }
+    }
+    else {
+      for(DBID id : ids) {
+        result.add(preprocessor.get(id));
+      }
     }
     return result;
   }

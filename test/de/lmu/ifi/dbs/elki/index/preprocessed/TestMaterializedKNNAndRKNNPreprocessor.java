@@ -94,9 +94,14 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
     db.addIndex(preproc);
+    assertTrue("Preprocessor knn query class incorrect.", !(preproc_knn_query instanceof LinearScanKNNQuery));
+    assertTrue("Preprocessor rknn query class incorrect.", !(preproc_rknn_query instanceof LinearScanKNNQuery));
 
     // test queries
-    testQueries(rep, lin_knn_query, lin_rknn_query, preproc_knn_query, preproc_rknn_query);
+    testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(rep, lin_rknn_query, preproc_rknn_query, k);
+    // also test partial queries, forward only
+    testKNNQueries(rep, lin_knn_query, preproc_knn_query, k / 2);
 
     // insert new objects
     List<DoubleVector> insertions = new ArrayList<DoubleVector>();
@@ -111,24 +116,22 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rep.getDataTypeInformation(), insertions));
 
     // test queries
-    testQueries(rep, lin_knn_query, lin_rknn_query, preproc_knn_query, preproc_rknn_query);
+    testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(rep, lin_rknn_query, preproc_rknn_query, k);
 
     // delete objects
     System.out.println("Delete " + deletions);
     db.delete(deletions);
 
     // test queries
-    testQueries(rep, lin_knn_query, lin_rknn_query, preproc_knn_query, preproc_rknn_query);
-
+    testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(rep, lin_rknn_query, preproc_rknn_query, k);
   }
 
-  private void testQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector, DoubleDistance> lin_knn_query, RKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query, KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query, RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query) {
+  private void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector, DoubleDistance> lin_knn_query, KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query, int k) {
     ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
     List<List<DistanceResultPair<DoubleDistance>>> lin_knn_ids = lin_knn_query.getKNNForBulkDBIDs(sample, k);
-    List<List<DistanceResultPair<DoubleDistance>>> lin_rknn_ids = lin_rknn_query.getRKNNForBulkDBIDs(sample, k);
     List<List<DistanceResultPair<DoubleDistance>>> preproc_knn_ids = preproc_knn_query.getKNNForBulkDBIDs(sample, k);
-    List<List<DistanceResultPair<DoubleDistance>>> preproc_rknn_ids = preproc_rknn_query.getRKNNForBulkDBIDs(sample, k);
-
     for(int i = 0; i < rep.size(); i++) {
       List<DistanceResultPair<DoubleDistance>> lin_knn = lin_knn_ids.get(i);
       List<DistanceResultPair<DoubleDistance>> pre_knn = preproc_knn_ids.get(i);
@@ -143,7 +146,12 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
       }
     }
     System.out.println("knns ok");
+  }
 
+  private void testRKNNQueries(Relation<DoubleVector> rep, RKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query, RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query, int k) {
+    ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
+    List<List<DistanceResultPair<DoubleDistance>>> lin_rknn_ids = lin_rknn_query.getRKNNForBulkDBIDs(sample, k);
+    List<List<DistanceResultPair<DoubleDistance>>> preproc_rknn_ids = preproc_rknn_query.getRKNNForBulkDBIDs(sample, k);
     for(int i = 0; i < rep.size(); i++) {
       List<DistanceResultPair<DoubleDistance>> lin_rknn = lin_rknn_ids.get(i);
       List<DistanceResultPair<DoubleDistance>> pre_rknn = preproc_rknn_ids.get(i);
@@ -152,7 +160,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
         System.out.println("PRE RkNN " + pre_rknn);
         System.out.println();
       }
-      assertEquals("rkNN sizes do not agree.", lin_rknn.size(), pre_rknn.size());
+      assertEquals("rkNN sizes do not agree for k=" + k, lin_rknn.size(), pre_rknn.size());
       for(int j = 0; j < lin_rknn.size(); j++) {
         assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).getDBID().equals(pre_rknn.get(j).getDBID()));
         assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).getDistance().equals(pre_rknn.get(j).getDistance()));
@@ -161,5 +169,4 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     System.out.println("rknns ok");
     System.out.println();
   }
-
 }

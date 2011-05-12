@@ -1,7 +1,6 @@
-package de.lmu.ifi.dbs.elki.database;
+package de.lmu.ifi.dbs.elki.database.query;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -23,7 +22,7 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
 
   /**
    * Constructor.
-   *
+   * 
    * @param distance Distance value
    * @param id Object ID
    */
@@ -71,6 +70,19 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
     return id.compareTo(o.getDBID());
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof DistanceResultPair)) {
+      return false;
+    }
+    if(obj instanceof DoubleDistanceResultPair) {
+      DoubleDistanceResultPair ddrp = (DoubleDistanceResultPair) obj;
+      return distance == ddrp.distance && id.equals(ddrp.id);
+    }
+    DistanceResultPair<?> other = (DistanceResultPair<?>) obj;
+    return other.getDistance().equals(distance) && id.equals(other.getDBID());
+  }
+
   /**
    * Get the distance as double value.
    * 
@@ -78,5 +90,10 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
    */
   public double getDoubleDistance() {
     return distance;
+  }
+
+  @Override
+  public String toString() {
+    return "DistanceResultPair(" + distance + ", " + id + ")";
   }
 }
