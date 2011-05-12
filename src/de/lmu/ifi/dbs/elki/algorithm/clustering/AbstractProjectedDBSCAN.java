@@ -261,7 +261,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
     for(DistanceResultPair<DoubleDistance> seed : seeds) {
-      DBID nextID = seed.getID();
+      DBID nextID = seed.getDBID();
 
       Integer nextID_corrDim = distFunc.getIndex().getLocalProjection(nextID).getCorrelationDimension();
       // nextID is not reachable from start object
@@ -281,7 +281,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     seeds.remove(0);
 
     while(seeds.size() > 0) {
-      DBID q = seeds.remove(0).getID();
+      DBID q = seeds.remove(0).getDBID();
       Integer corrDim_q = distFunc.getIndex().getLocalProjection(q).getCorrelationDimension();
       // q forms no lambda-dim hyperplane
       if(corrDim_q > lambda) {
@@ -291,22 +291,22 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
       List<DistanceResultPair<DoubleDistance>> reachables = rangeQuery.getRangeForDBID(q, epsilon);
       if(reachables.size() > minpts) {
         for(DistanceResultPair<DoubleDistance> r : reachables) {
-          Integer corrDim_r = distFunc.getIndex().getLocalProjection(r.getID()).getCorrelationDimension();
+          Integer corrDim_r = distFunc.getIndex().getLocalProjection(r.getDBID()).getCorrelationDimension();
           // r is not reachable from q
           if(corrDim_r > lambda) {
             continue;
           }
 
-          boolean inNoise = noise.contains(r.getID());
-          boolean unclassified = !processedIDs.contains(r.getID());
+          boolean inNoise = noise.contains(r.getDBID());
+          boolean unclassified = !processedIDs.contains(r.getDBID());
           if(inNoise || unclassified) {
             if(unclassified) {
               seeds.add(r);
             }
-            currentCluster.add(r.getID());
-            processedIDs.add(r.getID());
+            currentCluster.add(r.getDBID());
+            processedIDs.add(r.getDBID());
             if(inNoise) {
-              noise.remove(r.getID());
+              noise.remove(r.getDBID());
             }
             if(objprog != null && clusprog != null) {
               objprog.setProcessed(processedIDs.size(), getLogger());

@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -113,7 +114,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     // knn of rnn
     ModifiableDBIDs ids = DBIDUtil.newArray();
     for(DistanceResultPair<D> rnn : rnns) {
-      ids.add(rnn.getID());
+      ids.add(rnn.getDBID());
     }
 
     final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
@@ -182,16 +183,16 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     for(int i = 0; i < candidates.size(); i++) {
       DistanceResultPair<D> candidate = (DistanceResultPair<D>) candidates.get(i);
       KNNHeap<T> knns = new KNNHeap<T>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-      knnLists.put(candidate.getID(), (KNNHeap<D>)knns);
-      candidateIDs.add(candidate.getID());
+      knnLists.put(candidate.getDBID(), (KNNHeap<D>)knns);
+      candidateIDs.add(candidate.getDBID());
     }
     batchNN(getRoot(), distanceQuery, knnLists);
 
     List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
     for(DBID id : candidateIDs) {
       for(DistanceResultPair<D> qr : knnLists.get(id)) {
-        if(oid.equals(qr.getID())) {
-          result.add(new DistanceResultPair<T>((T)qr.getDistance(), id));
+        if(oid.equals(qr.getDBID())) {
+          result.add(new GenericDistanceResultPair<T>((T)qr.getDistance(), id));
           break;
         }
       }
@@ -229,9 +230,9 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     for(List<DistanceResultPair<D>> candidates : candidateMap.values()) {
       for(DistanceResultPair<D> candidate : candidates) {
-        if(!knnLists.containsKey(candidate.getID())) {
+        if(!knnLists.containsKey(candidate.getDBID())) {
           KNNHeap<T> knns = new KNNHeap<T>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-          knnLists.put(candidate.getID(), (KNNHeap<D>) knns);
+          knnLists.put(candidate.getDBID(), (KNNHeap<D>) knns);
         }
       }
     }
@@ -243,9 +244,9 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
       List<DistanceResultPair<D>> candidates = candidateMap.get(id);
       List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
       for(DistanceResultPair<D> candidate : candidates) {
-        for(DistanceResultPair<D> qr : knnLists.get(candidate.getID())) {
-          if(qr.getID() == id) {
-            result.add(new DistanceResultPair<T>((T)qr.getDistance(), id));
+        for(DistanceResultPair<D> qr : knnLists.get(candidate.getDBID())) {
+          if(qr.getDBID() == id) {
+            result.add(new GenericDistanceResultPair<T>((T)qr.getDistance(), id));
             break;
           }
         }
@@ -391,7 +392,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         RdKNNLeafEntry<D, N> entry = (RdKNNLeafEntry<D, N>) node.getEntry(i);
         D distance = distanceQuery.distance(entry.getDBID(), oid);
         if(distance.compareTo(entry.getKnnDistance()) <= 0) {
-          result.add(new DistanceResultPair<D>(distance, entry.getDBID()));
+          result.add(new GenericDistanceResultPair<D>(distance, entry.getDBID()));
         }
       }
     }
@@ -421,7 +422,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         for(DBID id : ids) {
           D distance = distanceQuery.distance(entry.getDBID(), id);
           if(distance.compareTo(entry.getKnnDistance()) <= 0) {
-            result.get(id).add(new DistanceResultPair<D>(distance, entry.getDBID()));
+            result.get(id).add(new GenericDistanceResultPair<D>(distance, entry.getDBID()));
           }
         }
       }

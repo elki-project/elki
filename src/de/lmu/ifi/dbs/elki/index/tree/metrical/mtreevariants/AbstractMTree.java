@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQuery;
@@ -798,7 +799,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         if(diff.compareTo(r_q) <= 0) {
           D d3 = distanceQuery.distance(o_j, q);
           if(d3.compareTo(r_q) <= 0) {
-            DistanceResultPair<D> queryResult = new DistanceResultPair<D>(d3, o_j);
+            DistanceResultPair<D> queryResult = new GenericDistanceResultPair<D>(d3, o_j);
             result.add(queryResult);
           }
         }
@@ -862,7 +863,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         if(diff.compareTo(r_q) <= 0) {
           D d3 = distanceQuery.distance(o_j, q);
           if(d3.compareTo(r_q) <= 0) {
-            DistanceResultPair<D> queryResult = new DistanceResultPair<D>(d3, o_j);
+            DistanceResultPair<D> queryResult = new GenericDistanceResultPair<D>(d3, o_j);
             result.add(queryResult);
           }
         }

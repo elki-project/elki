@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
@@ -35,43 +36,45 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
 
   @Override
   public List<DistanceResultPair<DoubleDistance>> getRangeForDBID(DBID id, DoubleDistance range) {
-    if (distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
       @SuppressWarnings("unchecked")
       RawDoubleDistance<O> rawdist = (RawDoubleDistance<O>) distanceQuery.getDistanceFunction();
       double epsilon = range.doubleValue();
-      
+
       O qo = relation.get(id);
       List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
       for(DBID currentID : relation.iterDBIDs()) {
         double doubleDistance = rawdist.doubleDistance(qo, relation.get(currentID));
         if(doubleDistance <= epsilon) {
-          result.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(doubleDistance), currentID));
+          result.add(new DoubleDistanceResultPair(doubleDistance, currentID));
         }
       }
       Collections.sort(result);
       return result;
-    } else {
+    }
+    else {
       return super.getRangeForDBID(id, range);
     }
   }
 
   @Override
   public List<DistanceResultPair<DoubleDistance>> getRangeForObject(O obj, DoubleDistance range) {
-    if (distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
       @SuppressWarnings("unchecked")
       RawDoubleDistance<O> rawdist = (RawDoubleDistance<O>) distanceQuery.getDistanceFunction();
       double epsilon = range.doubleValue();
-      
+
       List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
       for(DBID currentID : relation.iterDBIDs()) {
         double doubleDistance = rawdist.doubleDistance(obj, relation.get(currentID));
         if(doubleDistance <= epsilon) {
-          result.add(new DistanceResultPair<DoubleDistance>(new DoubleDistance(doubleDistance), currentID));
+          result.add(new DoubleDistanceResultPair(doubleDistance, currentID));
         }
       }
       Collections.sort(result);
       return result;
-    } else {
+    }
+    else {
       return super.getRangeForObject(obj, range);
     }
   }

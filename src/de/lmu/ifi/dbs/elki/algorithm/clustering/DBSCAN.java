@@ -187,7 +187,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
     for(DistanceResultPair<D> seed : seeds) {
-      DBID nextID = seed.getID();
+      DBID nextID = seed.getDBID();
       if(!processedIDs.contains(nextID)) {
         currentCluster.add(nextID);
         processedIDs.add(nextID);
@@ -200,12 +200,12 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     seeds.remove(0);
 
     while(seeds.size() > 0) {
-      DBID o = seeds.remove(0).getID();
+      DBID o = seeds.remove(0).getDBID();
       List<DistanceResultPair<D>> neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
 
       if(neighborhood.size() >= minpts) {
         for(DistanceResultPair<D> neighbor : neighborhood) {
-          DBID p = neighbor.getID();
+          DBID p = neighbor.getDBID();
           boolean inNoise = noise.contains(p);
           boolean unclassified = !processedIDs.contains(p);
           if(inNoise || unclassified) {

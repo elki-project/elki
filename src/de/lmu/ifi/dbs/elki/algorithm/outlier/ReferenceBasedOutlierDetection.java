@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -136,7 +137,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     Collections.sort(firstReferenceDists);
     for(int l = 0; l < firstReferenceDists.size(); l++) {
       density = computeDensity(firstReferenceDists, l);
-      rbod_score.put(firstReferenceDists.get(l).getID(), density);
+      rbod_score.put(firstReferenceDists.get(l).getDBID(), density);
     }
     // compute density values for all remaining reference points
     for(V refPoint : refPoints) {
@@ -146,8 +147,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
       // compute density value for each object
       for(int l = 0; l < referenceDists.size(); l++) {
         density = computeDensity(referenceDists, l);
-        if(density < rbod_score.get(referenceDists.get(l).getID())) {
-          rbod_score.put(referenceDists.get(l).getID(), density);
+        if(density < rbod_score.get(referenceDists.get(l).getDBID())) {
+          rbod_score.put(referenceDists.get(l).getDBID(), density);
         }
       }
     }
@@ -191,7 +192,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     int counter = 0;
     for(Iterator<DBID> iter = database.iterDBIDs(); iter.hasNext(); counter++) {
       DBID id = iter.next();
-      DistanceResultPair<D> referenceDist = new DistanceResultPair<D>(distFunc.distance(id, refPoint), id);
+      DistanceResultPair<D> referenceDist = new GenericDistanceResultPair<D>(distFunc.distance(id, refPoint), id);
       referenceDists.add(counter, referenceDist);
     }
     return referenceDists;

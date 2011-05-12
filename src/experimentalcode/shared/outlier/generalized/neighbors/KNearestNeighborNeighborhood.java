@@ -126,7 +126,7 @@ public class KNearestNeighborNeighborhood<D extends Distance<D>> implements Neig
          List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
          ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
          for(DistanceResultPair<D> dpair : neighbors){
-           neighbours.add(dpair.second);
+           neighbours.add(dpair.getDBID());
          }
          s.put(id, neighbours);
          

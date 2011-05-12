@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -266,7 +267,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
           D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
 
           if(distance.compareTo(approximatedKnnDist) <= 0) {
-            result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
+            result.add(new GenericDistanceResultPair<D>(distance, entry.getRoutingObjectID()));
           }
         }
       }

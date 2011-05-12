@@ -250,7 +250,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       double neighborhodSize;
       HashSet<DBID> neighborhood = new HashSet<DBID>();
       for(DistanceResultPair<D> dpair : neighbors) {
-        neighborhood.add(dpair.second);
+        neighborhood.add(dpair.getDBID());
       }
       neighborhood.remove(id);
       neighborhodSize = neighborhood.size();

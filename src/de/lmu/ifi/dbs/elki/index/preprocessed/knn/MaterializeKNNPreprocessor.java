@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -71,7 +72,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    */
   protected MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, boolean preprocess) {
     super(relation, distanceFunction, k);
-    this.knnQuery = relation.getDatabase().getKNNQuery(distanceQuery, k);
+    this.knnQuery = relation.getDatabase().getKNNQuery(distanceQuery, k, DatabaseQuery.HINT_BULK, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_NO_CACHE);
 
     if(preprocess) {
       preprocess();
@@ -219,7 +220,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     for(DBID id1 : relation.getDBIDs()) {
       List<DistanceResultPair<D>> kNNs = storage.get(id1);
       for(DistanceResultPair<D> kNN : kNNs) {
-        if(idsSet.contains(kNN.second)) {
+        if(idsSet.contains(kNN.getDBID())) {
           rkNN_ids.add(id1);
           break;
         }
@@ -318,7 +319,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     TreeSetModifiableDBIDs ids = DBIDUtil.newTreeSet();
     for(List<DistanceResultPair<D>> drps : extraxt) {
       for(DistanceResultPair<D> drp : drps) {
-        ids.add(drp.second);
+        ids.add(drp.getDBID());
       }
     }
     ids.removeAll(remove);

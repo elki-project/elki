@@ -422,17 +422,17 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
         for(ListIterator<DistanceResultPair<D>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
           DistanceResultPair<D> pair = iter.previous();
-          Element line = plotSeries(pair.getID(), MAXRESOLUTION);
+          Element line = plotSeries(pair.getDBID(), MAXRESOLUTION);
           double dist = pair.getDistance().doubleValue() / maxdist;
           Color color = getColor(dist);
           String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
-          String width = (pair.getID() == idx) ? "0.5%" : "0.2%";
+          String width = (pair.getDBID() == idx) ? "0.5%" : "0.2%";
           SVGUtil.setStyle(line, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
           newe.appendChild(line);
           // put into cache
-          Double known = distancecache.get(pair.getID());
+          Double known = distancecache.get(pair.getDBID());
           if(known == null || dist < known) {
-            distancecache.put(pair.getID(), dist);
+            distancecache.put(pair.getDBID(), dist);
           }
         }
       }

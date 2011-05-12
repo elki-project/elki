@@ -137,7 +137,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
           }
           ModifiableDBIDs partition = DBIDUtil.newArray();
           for(DistanceResultPair<DoubleDistance> point : res) {
-            partition.add(point.getID());
+            partition.add(point.getDBID());
           }
           dCopy = dCopy.partition(partition);
           // TODO partition database according to range

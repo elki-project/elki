@@ -266,8 +266,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       List<DistanceResultPair<D>> neighbors = knnReach.getKNNForDBID(id, k);
       int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
       for(DistanceResultPair<D> neighbor : neighbors) {
-        if(objectIsInKNN || neighbor.getID() != id) {
-          List<DistanceResultPair<D>> neighborsNeighbors = knnReach.getKNNForDBID(neighbor.getID(), k);
+        if(objectIsInKNN || neighbor.getDBID() != id) {
+          List<DistanceResultPair<D>> neighborsNeighbors = knnReach.getKNNForDBID(neighbor.getDBID(), k);
           sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
         }
       }
@@ -311,8 +311,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         // neighbors.remove(0);
         double sum = 0;
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if(objectIsInKNN || neighbor.getID() != id) {
-            sum += lrds.get(neighbor.getID());
+          if(objectIsInKNN || neighbor.getDBID() != id) {
+            sum += lrds.get(neighbor.getDBID());
           }
         }
         lof = (sum / nsize) / lrdp;

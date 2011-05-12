@@ -7,6 +7,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -41,7 +42,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
     for(DBID currentID : relation.iterDBIDs()) {
       D currentDistance = distanceQuery.distance(id, currentID);
       if(currentDistance.compareTo(range) <= 0) {
-        result.add(new DistanceResultPair<D>(currentDistance, currentID));
+        result.add(new GenericDistanceResultPair<D>(currentDistance, currentID));
       }
     }
     Collections.sort(result);
@@ -61,7 +62,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
     for(DBID currentID : relation.iterDBIDs()) {
       D currentDistance = distanceQuery.distance(currentID, obj);
       if(currentDistance.compareTo(range) <= 0) {
-        result.add(new DistanceResultPair<D>(currentDistance, currentID));
+        result.add(new GenericDistanceResultPair<D>(currentDistance, currentID));
       }
     }
     Collections.sort(result);

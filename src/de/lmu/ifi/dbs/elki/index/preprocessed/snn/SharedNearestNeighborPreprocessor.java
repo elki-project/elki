@@ -95,7 +95,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
       TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
       List<DistanceResultPair<D>> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors);
       for(int i = 0; i < kNN.size(); i++) {
-        final DBID nid = kNN.get(i).getID();
+        final DBID nid = kNN.get(i).getDBID();
         // if(!id.equals(nid)) {
         neighbors.add(nid);
         // }

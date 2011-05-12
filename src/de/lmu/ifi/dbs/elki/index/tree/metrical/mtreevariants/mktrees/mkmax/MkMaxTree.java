@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -102,16 +103,16 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     ModifiableDBIDs candidateIDs = DBIDUtil.newArray();
     for(DistanceResultPair<D> candidate : candidates) {
       KNNHeap<D> knns = new KNNHeap<D>(k, getDistanceQuery().infiniteDistance());
-      knnLists.put(candidate.getID(), knns);
-      candidateIDs.add(candidate.getID());
+      knnLists.put(candidate.getDBID(), knns);
+      candidateIDs.add(candidate.getDBID());
     }
     batchNN(getRoot(), candidateIDs, knnLists);
 
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     for(DBID cid : candidateIDs) {
       for(DistanceResultPair<D> qr : knnLists.get(cid)) {
-        if(id.equals(qr.getID())) {
-          result.add(new DistanceResultPair<D>(qr.getDistance(), cid));
+        if(id.equals(qr.getDBID())) {
+          result.add(new GenericDistanceResultPair<D>(qr.getDistance(), cid));
           break;
         }
       }
@@ -191,7 +192,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         MkMaxEntry<D> entry = node.getEntry(i);
         D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
         if(distance.compareTo(entry.getKnnDistance()) <= 0) {
-          result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
+          result.add(new GenericDistanceResultPair<D>(distance, entry.getRoutingObjectID()));
         }
       }
     }
@@ -238,7 +239,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         // p is nearer to q than the farthest kNN-candidate of q
         // ==> p becomes a knn-candidate
         if(dist_pq.compareTo(knnDist_q) <= 0) {
-          DistanceResultPair<D> knn = new DistanceResultPair<D>(dist_pq, p.getRoutingObjectID());
+          DistanceResultPair<D> knn = new GenericDistanceResultPair<D>(dist_pq, p.getRoutingObjectID());
           knns_q.add(knn);
           if(knns_q.size() >= k_max) {
             knnDist_q = knns_q.getMaximumDistance();
@@ -250,7 +251,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         // q becomes knn of p
         if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
           KNNHeap<D> knns_p = new KNNHeap<D>(k_max, getDistanceQuery().infiniteDistance());
-          knns_p.add(new DistanceResultPair<D>(dist_pq, q.getRoutingObjectID()));
+          knns_p.add(new GenericDistanceResultPair<D>(dist_pq, q.getRoutingObjectID()));
           doKNNQuery(p.getRoutingObjectID(), knns_p);
 
           if(knns_p.size() < k_max) {

@@ -98,7 +98,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
         if(logger.isDebugging()) {
           logger.debugFine("distance to mth nearest neighbour" + knns.toString());
         }
-        if(knns.get(Math.min(m, knns.size()) - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
+        if(knns.get(Math.min(m, knns.size()) - 1).getDistance().compareTo(neighborhoodSize) <= 0) {
           // flag as outlier
           scores.put(id, 1.0);
         }

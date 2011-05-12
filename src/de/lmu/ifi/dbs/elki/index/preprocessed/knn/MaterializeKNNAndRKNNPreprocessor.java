@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.PreprocessorRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -91,8 +92,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
       List<DistanceResultPair<D>> kNNs = kNNList.get(i);
       storage.put(id, kNNs);
       for(DistanceResultPair<D> kNN : kNNs) {
-        Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(kNN.second);
-        rknns.add(new DistanceResultPair<D>(kNN.first, id));
+        Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(kNN.getDBID());
+        rknns.add(new GenericDistanceResultPair<D>(kNN.getDistance(), id));
       }
       if(progress != null) {
         progress.incrementProcessed(getLogger());
@@ -186,13 +187,13 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         }
         // add new RkNN
         for(DistanceResultPair<D> drp : added) {
-          Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(drp.second);
-          rknns.add(new DistanceResultPair<D>(drp.first, id1));
+          Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(drp.getDBID());
+          rknns.add(new GenericDistanceResultPair<D>(drp.getDistance(), id1));
         }
         // remove old RkNN
         for(DistanceResultPair<D> drp : removed) {
-          Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(drp.second);
-          rknns.remove(new DistanceResultPair<D>(drp.first, id1));
+          Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(drp.getDBID());
+          rknns.remove(new GenericDistanceResultPair<D>(drp.getDistance(), id1));
         }
 
         rkNN_ids.add(id1);
@@ -231,8 +232,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
       DBID id = rkNN_ids.get(i);
       storage.put(id, kNNList.get(i));
       for(DistanceResultPair<D> kNN : kNNList.get(i)) {
-        Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(kNN.second);
-        rknns.add(new DistanceResultPair<D>(kNN.first, id));
+        Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(kNN.getDBID());
+        rknns.add(new GenericDistanceResultPair<D>(kNN.getDistance(), id));
       }
     }
     // update the RkNNs of the kNNs
@@ -242,7 +243,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
       SortedSet<DistanceResultPair<D>> rkNN = materialized_RkNN.get(id);
       for(Iterator<DistanceResultPair<D>> it = rkNN.iterator(); it.hasNext();) {
         DistanceResultPair<D> drp = it.next();
-        if(idsSet.contains(drp.second)) {
+        if(idsSet.contains(drp.getDBID())) {
           it.remove();
         }
       }

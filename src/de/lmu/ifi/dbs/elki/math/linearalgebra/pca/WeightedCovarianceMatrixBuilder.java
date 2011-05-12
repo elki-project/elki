@@ -189,7 +189,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
     int i = 0;
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
       DistanceResultPair<D> res = it.next();
-      V obj = database.get(res.getID());
+      V obj = database.get(res.getDBID());
       double weight = weightfunction.getWeight(res.getDistance().doubleValue(), maxdist, stddev);
       for(int d1 = 0; d1 < dim; d1++) {
         /* We're exploiting symmetry here, start with d2 == d1 */

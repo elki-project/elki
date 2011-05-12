@@ -137,7 +137,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
         // TODO: use exactly k neighbors?
         List<DistanceResultPair<D>> list = knnQuery.getKNNForDBID(id, k);
         for(DistanceResultPair<D> d : list) {
-          knns.get(id).add(d.getID());
+          knns.get(id).add(d.getDBID());
         }
         processedIDs.add(id);
         s = knns.get(id);
@@ -152,7 +152,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
           // TODO: use exactly k neighbors?
           List<DistanceResultPair<D>> listQ = knnQuery.getKNNForDBID(q, k);
           for(DistanceResultPair<D> dq : listQ) {
-            knns.get(q).add(dq.getID());
+            knns.get(q).add(dq.getDBID());
           }
           density.put(q, 1 / listQ.get(k - 1).getDistance().doubleValue());
           processedIDs.add(q);

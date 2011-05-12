@@ -193,7 +193,7 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
 
     @Override
     public DBID next() {
-      return itr.next().getID();
+      return itr.next().getDBID();
     }
 
     @Override
@@ -210,7 +210,7 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
   protected class DBIDView extends AbstractList<DBID> implements ArrayDBIDs {
     @Override
     public DBID get(int i) {
-      return KNNList.this.get(i).getID();
+      return KNNList.this.get(i).getDBID();
     }
 
     @Override

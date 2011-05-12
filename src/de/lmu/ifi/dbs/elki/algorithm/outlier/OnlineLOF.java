@@ -344,7 +344,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       }
       for(List<DistanceResultPair<D>> queryResult : queryResults) {
         for(DistanceResultPair<D> qr : queryResult) {
-          result.add(qr.getID());
+          result.add(qr.getDBID());
         }
       }
       return DBIDUtil.newArray(result);

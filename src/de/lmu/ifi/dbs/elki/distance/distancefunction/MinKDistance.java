@@ -146,7 +146,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
     // TODO: need to check neighborhood size?
     // TODO: Do we need to check we actually got the object itself in the
     // neighborhood?
-    D kdist = neighborhood.get(neighborhood.size() - 1).first;
+    D kdist = neighborhood.get(neighborhood.size() - 1).getDistance();
     return DistanceUtil.max(kdist, truedist);
   }
 

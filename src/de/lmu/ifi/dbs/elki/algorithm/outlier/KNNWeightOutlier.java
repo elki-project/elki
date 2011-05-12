@@ -107,10 +107,10 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
       // compute sum of the distances to the k nearest neighbors
 
       List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(id, k);
-      D skn = knn.get(0).getFirst();
+      D skn = knn.get(0).getDistance();
       final int last = Math.min(k + 1, knn.size());
       for(int i = 1; i < last; i++) {
-        skn = skn.plus(knn.get(i).getFirst());
+        skn = skn.plus(knn.get(i).getDistance());
       }
 
       double doubleSkn = skn.getValue().doubleValue();

@@ -6,6 +6,7 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -14,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @apiviz.has KNNList oneway - - serializes to
- *
+ * 
  * @param <D> distance type
  */
 public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceResultPair<D>> {
@@ -22,7 +23,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * Serial version
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * Maximum distance, usually infiniteDistance
    */
@@ -32,7 +33,8 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * Constructor.
    * 
    * @param k k Parameter
-   * @param maxdist k-distance to return for less than k neighbors - usually infiniteDistance
+   * @param maxdist k-distance to return for less than k neighbors - usually
+   *        infiniteDistance
    */
   public KNNHeap(int k, D maxdist) {
     super(k, new Comp<D>());
@@ -40,7 +42,8 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
   }
 
   /**
-   * Simplified constructor. Will return {@code null} as kNN distance with less than k entries.
+   * Simplified constructor. Will return {@code null} as kNN distance with less
+   * than k entries.
    * 
    * @param k k Parameter
    */
@@ -58,7 +61,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
   /**
    * Serialize to a {@link KNNList}. This empties the heap!
    * 
-   * @return KNNList with the heaps contents. 
+   * @return KNNList with the heaps contents.
    */
   public KNNList<D> toKNNList() {
     return new KNNList<D>(this, maxdist);
@@ -79,7 +82,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * @return Maximum distance
    */
   public D getKNNDistance() {
-    if (size() < getK()) {
+    if(size() < getK()) {
       return maxdist;
     }
     return peek().getDistance();
@@ -89,12 +92,12 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * Get maximum distance in heap
    */
   public D getMaximumDistance() {
-    if (isEmpty()) {
+    if(isEmpty()) {
       return maxdist;
     }
     return peek().getDistance();
   }
-  
+
   /**
    * @deprecated AVOID: the construction of a result pair may be unnecessary!
    */
@@ -114,8 +117,8 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * @return success code
    */
   public boolean add(D distance, DBID id) {
-    if (size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
-      return super.add(new DistanceResultPair<D>(distance, id));
+    if(size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
+      return super.add(new GenericDistanceResultPair<D>(distance, id));
     }
     return true; /* "success" */
   }
@@ -130,7 +133,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
   public static class Comp<D extends Distance<D>> implements Comparator<DistanceResultPair<D>> {
     @Override
     public int compare(DistanceResultPair<D> o1, DistanceResultPair<D> o2) {
-      return - o1.first.compareTo(o2.first);
+      return -o1.getDistance().compareTo(o2.getDistance());
     }
   }
 }

@@ -194,7 +194,7 @@ public class ROC {
     @Override
     public Pair<D, DBID> next() {
       DistanceResultPair<D> d = this.iter.next();
-      return new Pair<D, DBID>(d.getDistance(), d.getID());
+      return new Pair<D, DBID>(d.getDistance(), d.getDBID());
     }
 
     @Override
