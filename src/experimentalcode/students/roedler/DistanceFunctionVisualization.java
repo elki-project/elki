@@ -113,7 +113,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
         drawDistancefunction: for(DistanceResultPair<DoubleDistance> j : result.get(i)) {
           try {
-            double[] v = proj.fastProjectDataToRenderSpace(rep.get(j.second));
+            double[] v = proj.fastProjectDataToRenderSpace(rep.get(j.getDBID()));
             Element dot = svgp.svgCircle(v[0], v[1], size);
             SVGUtil.addCSSClass(dot, KNNMARKER);
             layer.appendChild(dot);
@@ -137,7 +137,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
                 break;
               }
               case 4: {
-                dist = DistanceFunctionDrawUtils.drawCosine(svgp, proj, rep.get(i), rep.get(j.second));
+                dist = DistanceFunctionDrawUtils.drawCosine(svgp, proj, rep.get(i), rep.get(j.getDBID()));
                 break;
               }
               default: {

@@ -137,7 +137,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.size());
         for(DistanceResultPair<D> n : neighbors) {
-          nids.add(n.getID());
+          nids.add(n.getDBID());
         }
 
         // TODO: do we want to use the query point as centroid?

@@ -152,11 +152,11 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
       if(!coreDistance.isInfiniteDistance()) {
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if(processedIDs.contains(neighbor.getID())) {
+          if(processedIDs.contains(neighbor.getDBID())) {
             continue;
           }
           D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
-          heap.add(new ClusterOrderEntry<D>(neighbor.getID(), current.getID(), reachability));
+          heap.add(new ClusterOrderEntry<D>(neighbor.getDBID(), current.getID(), reachability));
         }
       }
       if(progress != null) {

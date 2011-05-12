@@ -144,7 +144,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
         List<DistanceResultPair<D>> queryResults = database.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
         ModifiableDBIDs tids = DBIDUtil.newHashSet(this.sampleSize);
         for(DistanceResultPair<D> qr : queryResults) {
-          tids.add(qr.getID());
+          tids.add(qr.getDBID());
         }
         // Cast to non-modifiable
         ids = tids;

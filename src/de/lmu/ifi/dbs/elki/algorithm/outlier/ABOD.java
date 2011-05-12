@@ -176,12 +176,12 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       List<DistanceResultPair<DoubleDistance>> neighbors = knnQuery.getKNNForDBID(objKey, k);
       Iterator<DistanceResultPair<DoubleDistance>> iter = neighbors.iterator();
       while(iter.hasNext()) {
-        DBID key1 = iter.next().getID();
+        DBID key1 = iter.next().getDBID();
         // Iterator iter2 = data.keyIterator();
         Iterator<DistanceResultPair<DoubleDistance>> iter2 = neighbors.iterator();
         // PriorityQueue best = new PriorityQueue(false, k);
         while(iter2.hasNext()) {
-          DBID key2 = iter2.next().getID();
+          DBID key2 = iter2.next().getDBID();
           if(key2.equals(key1) || key1.equals(objKey) || key2.equals(objKey)) {
             continue;
           }

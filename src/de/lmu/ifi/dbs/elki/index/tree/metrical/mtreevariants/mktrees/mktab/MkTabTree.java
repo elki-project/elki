@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -210,7 +211,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         MkTabEntry<D> entry = node.getEntry(i);
         D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
         if(distance.compareTo(entry.getKnnDistance(k)) <= 0) {
-          result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
+          result.add(new GenericDistanceResultPair<D>(distance, entry.getRoutingObjectID()));
         }
       }
     }

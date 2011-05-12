@@ -166,7 +166,7 @@ public class TestIndexStructures implements JUnit4Test {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
-        DBID id = res.getID();
+        DBID id = res.getDBID();
         DoubleVector c = rep.get(id);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
@@ -188,7 +188,7 @@ public class TestIndexStructures implements JUnit4Test {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
-        DBID id = res.getID();
+        DBID id = res.getDBID();
         DoubleVector c = rep.get(id);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);

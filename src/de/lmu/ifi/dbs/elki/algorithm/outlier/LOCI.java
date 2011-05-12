@@ -221,7 +221,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
           continue;
         }
         for(DistanceResultPair<D> rn : rneighbors) {
-          List<DoubleIntPair> rncdist = interestingDistances.get(rn.getID());
+          List<DoubleIntPair> rncdist = interestingDistances.get(rn.getDBID());
           int rn_alphar = 0;
           for(DoubleIntPair c2 : rncdist) {
             if(c2.first <= alpha_r) {

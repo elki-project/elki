@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -263,7 +264,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     for(Iterator<DBID> it = cluster.objectIDs.iterator(); it.hasNext();) {
       DBID id = it.next();
       DoubleDistance distance = distFunc.distance(cluster.centroid, database.get(id));
-      DistanceResultPair<DoubleDistance> qr = new DistanceResultPair<DoubleDistance>(distance, id);
+      DistanceResultPair<DoubleDistance> qr = new GenericDistanceResultPair<DoubleDistance>(distance, id);
       results.add(qr);
     }
     Collections.sort(results);

@@ -99,7 +99,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       List<DistanceResultPair<DoubleDistance>> knns = knnQuery.getKNNForDBID(id, k);
       ModifiableDBIDs knnIDs = DBIDUtil.newArray(knns.size());
       for(DistanceResultPair<DoubleDistance> knn : knns) {
-        knnIDs.add(knn.getID());
+        knnIDs.add(knn.getDBID());
         //if(logger.isDebugging()) {
         //  msg.append(database.getObjectLabelQuery().get(knn.getID())).append(" ");
         //}

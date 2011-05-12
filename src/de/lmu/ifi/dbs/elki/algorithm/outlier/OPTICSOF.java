@@ -119,7 +119,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
       List<Double> core = new ArrayList<Double>();
       double lrd = 0;
       for(DistanceResultPair<D> neighPair : nMinPts.get(id)) {
-        DBID idN = neighPair.getID();
+        DBID idN = neighPair.getDBID();
         double coreDist = coreDistance.get(idN);
         double dist = distQuery.distance(id, idN).doubleValue();
         Double rd = Math.max(coreDist, dist);
@@ -137,7 +137,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     for(DBID id : relation.iterDBIDs()) {
       double of = 0;
       for(DistanceResultPair<D> pair : nMinPts.get(id)) {
-        DBID idN = pair.getID();
+        DBID idN = pair.getDBID();
         double lrd = lrds.get(id);
         double lrdN = lrds.get(idN);
         of = of + lrdN / lrd;

@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.database.query;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
  * Class that consists of a pair (distance, object ID) commonly returned
@@ -12,50 +12,32 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
  *
  * @param <D> Distance type
  */
-public class DistanceResultPair<D extends Distance<D>> extends CPair<D, DBID> {
-  /**
-   * Canonical constructor
-   * 
-   * @param first Distance
-   * @param second Object ID
-   */
-  public DistanceResultPair(D first, DBID second) {
-    super(first, second);
-  }
-
+public interface DistanceResultPair<D extends Distance<D>> extends PairInterface, Comparable<DistanceResultPair<D>> {
   /**
    * Getter for first
    * 
    * @return first element in pair
    */
-  public final D getDistance() {
-    return first;
-  }
+  public D getDistance();
 
   /**
    * Setter for first
    * 
    * @param first new value for first element
    */
-  public final void setDistance(D first) {
-    this.first = first;
-  }
+  public void setDistance(D first);
 
   /**
    * Getter for second element in pair
    * 
    * @return second element in pair
    */
-  public final DBID getID() {
-    return second;
-  }
+  public DBID getDBID();
 
   /**
    * Setter for second
    * 
    * @param second new value for second element
    */
-  public final void setID(DBID second) {
-    this.second = second;
-  }
+  public void setID(DBID second);
 }

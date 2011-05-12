@@ -120,11 +120,11 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       double dxp = 0;
       double Dxp = 0;
       for(DistanceResultPair<D> neighbor1 : neighbors) {
-        if(neighbor1.getID() != id) {
+        if(neighbor1.getDBID() != id) {
           dxp += neighbor1.getDistance().doubleValue();
           for(DistanceResultPair<D> neighbor2 : neighbors) {
-            if(neighbor1.getID() != neighbor2.getID() && neighbor2.getID() != id) {
-              Dxp += distFunc.distance(neighbor1.getID(), neighbor2.getID()).doubleValue();
+            if(neighbor1.getDBID() != neighbor2.getDBID() && neighbor2.getDBID() != id) {
+              Dxp += distFunc.distance(neighbor1.getDBID(), neighbor2.getDBID()).doubleValue();
             }
           }
         }

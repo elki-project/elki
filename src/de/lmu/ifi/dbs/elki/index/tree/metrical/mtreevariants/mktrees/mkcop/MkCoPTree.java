@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -173,8 +174,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, N>, N extends Number> exte
 
     for(DBID cid : candidates) {
       for(DistanceResultPair<D> qr : knnLists.get(id)) {
-        if(qr.getID().equals(id)) {
-          result.add(new DistanceResultPair<D>(qr.getDistance(), cid));
+        if(qr.getDBID().equals(id)) {
+          result.add(new GenericDistanceResultPair<D>(qr.getDistance(), cid));
           break;
         }
       }
@@ -296,7 +297,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, N>, N extends Number> exte
           D approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k, getDistanceQuery());
 
           if(distance.compareTo(approximatedKnnDist_prog) <= 0) {
-            result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
+            result.add(new GenericDistanceResultPair<D>(distance, entry.getRoutingObjectID()));
           }
           else {
             D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceQuery());

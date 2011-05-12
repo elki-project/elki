@@ -155,7 +155,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
           List<DistanceResultPair<DoubleDistance>> qrList = rangeQueries[d].getRangeForDBID(id, epsilon[d]);
           allNeighbors[d] = DBIDUtil.newHashSet(qrList.size());
           for(DistanceResultPair<DoubleDistance> qr : qrList) {
-            allNeighbors[d].add(qr.getID());
+            allNeighbors[d].add(qr.getDBID());
           }
         }
 

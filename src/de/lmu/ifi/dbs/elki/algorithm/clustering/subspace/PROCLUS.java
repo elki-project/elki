@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -240,7 +241,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     Map<DBID, DistanceResultPair<DoubleDistance>> distances = new HashMap<DBID, DistanceResultPair<DoubleDistance>>();
     for(DBID id : s) {
       DoubleDistance dist = distFunc.distance(id, m_i);
-      distances.put(id, new DistanceResultPair<DoubleDistance>(dist, id));
+      distances.put(id, new GenericDistanceResultPair<DoubleDistance>(dist, id));
     }
 
     for(int i = 1; i < m; i++) {
@@ -248,7 +249,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       List<DistanceResultPair<DoubleDistance>> d = new ArrayList<DistanceResultPair<DoubleDistance>>(distances.values());
       Collections.sort(d);
 
-      m_i = d.get(d.size() - 1).getID();
+      m_i = d.get(d.size() - 1).getDBID();
       medoids.add(m_i);
       s.remove(m_i);
       distances.remove(m_i);
@@ -256,10 +257,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       // compute distances of each point to closest medoid
       for(DBID id : s) {
         DoubleDistance dist_new = distFunc.distance(id, m_i);
-        DoubleDistance dist_old = distances.get(id).getFirst();
+        DoubleDistance dist_old = distances.get(id).getDistance();
 
         DoubleDistance dist = dist_new.compareTo(dist_old) < 0 ? dist_new : dist_old;
-        distances.put(id, new DistanceResultPair<DoubleDistance>(dist, id));
+        distances.put(id, new GenericDistanceResultPair<DoubleDistance>(dist, id));
       }
 
       if(logger.isDebugging()) {
@@ -380,7 +381,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       List<DistanceResultPair<DoubleDistance>> l_i = localities.get(m_i);
       double[] x_i = new double[dim];
       for(DistanceResultPair<DoubleDistance> qr : l_i) {
-        V o = database.get(qr.getID());
+        V o = database.get(qr.getDBID());
         for(int d = 0; d < dim; d++) {
           x_i[d] += Math.abs(medoid_i.doubleValue(d + 1) - o.doubleValue(d + 1));
         }
@@ -542,14 +543,14 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       DistanceResultPair<DoubleDistance> minDist = null;
       for(DBID m_i : dimensions.keySet()) {
         V m = database.get(m_i);
-        DistanceResultPair<DoubleDistance> currentDist = new DistanceResultPair<DoubleDistance>(manhattanSegmentalDistance(p, m, dimensions.get(m_i)), m_i);
+        DistanceResultPair<DoubleDistance> currentDist = new GenericDistanceResultPair<DoubleDistance>(manhattanSegmentalDistance(p, m, dimensions.get(m_i)), m_i);
         if(minDist == null || currentDist.compareTo(minDist) < 0) {
           minDist = currentDist;
         }
       }
       // add p to cluster with mindist
       assert minDist != null;
-      ModifiableDBIDs ids = clusterIDs.get(minDist.getID());
+      ModifiableDBIDs ids = clusterIDs.get(minDist.getDBID());
       ids.add(p_id);
     }
 

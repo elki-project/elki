@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -321,7 +322,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
         if(distance.compareTo(epsilon) <= 0) {
           if(node.isLeaf()) {
             LeafEntry entry = (LeafEntry) node.getEntry(i);
-            result.add(new DistanceResultPair<D>(distance, entry.getDBID()));
+            result.add(new GenericDistanceResultPair<D>(distance, entry.getDBID()));
           }
           else {
             DirectoryEntry entry = (DirectoryEntry) node.getEntry(i);
