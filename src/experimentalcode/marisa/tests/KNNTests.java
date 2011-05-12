@@ -33,7 +33,7 @@ public class KNNTests {
     }
     List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
     while(!pq.isEmpty()) {
-      result.add(0, new DistanceResultPair<DoubleDistance>(new DoubleDistance(pq.firstPriority()), pq.removeFirst().getID()));
+      result.add(0, new DistanceResultPair<DoubleDistance>(new DoubleDistance(pq.firstPriority()), pq.removeFirst().getDBID()));
     }
     return result;
   }
