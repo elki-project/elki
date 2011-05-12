@@ -196,7 +196,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @return the k-nearest neighbor distance of pr in ps
    */
   private D processDataPages(DistanceQuery<V, D> distQ, N pr, N ps, WritableDataStore<KNNHeap<D>> knnLists, D pr_knn_distance) {
-    // noinspection unchecked
+    // TODO: optimize for double?
     boolean infinite = pr_knn_distance.isInfiniteDistance();
     for(int i = 0; i < pr.getNumEntries(); i++) {
       DBID r_id = ((LeafEntry) pr.getEntry(i)).getDBID();

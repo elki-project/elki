@@ -99,15 +99,6 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
   }
 
   /**
-   * @deprecated AVOID: the construction of a result pair may be unnecessary!
-   */
-  @Override
-  @Deprecated
-  public boolean add(DistanceResultPair<D> e) {
-    return super.add(e);
-  }
-
-  /**
    * Add a distance-id pair to the heap unless the distance is too large.
    * 
    * Compared to the super.add() method, this often saves the pair construction.
