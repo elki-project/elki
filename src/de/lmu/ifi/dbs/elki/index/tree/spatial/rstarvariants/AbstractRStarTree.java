@@ -44,13 +44,11 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -302,19 +300,19 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   @Override
   public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
+    final Heap<HeapNode<D>> pq = new UpdatableHeap<HeapNode<D>>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID()));
+    pq.add(new HeapNode<D>(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID()));
 
     // search in tree
     while(!pq.isEmpty()) {
-      HeapNode<D, Integer> pqNode = pq.getMinNode();
-      if(pqNode.getKey().compareTo(epsilon) > 0) {
+      HeapNode<D> pqNode = pq.poll();
+      if(pqNode.distance.compareTo(epsilon) > 0) {
         break;
       }
 
-      N node = getNode(pqNode.getValue());
+      N node = getNode(pqNode.pageid);
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {
@@ -326,7 +324,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
           }
           else {
             DirectoryEntry entry = (DirectoryEntry) node.getEntry(i);
-            pq.addNode(new DefaultHeapNode<D, Integer>(distance, entry.getEntryID()));
+            pq.add(new HeapNode<D>(distance, entry.getEntryID()));
           }
         }
       }
@@ -549,22 +547,21 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @param knnList the knn list containing the result
    */
   protected <D extends Distance<D>> void doKNNQuery(O object, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, KNNHeap<D> knnList) {
-    // variables
-    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
+    final Heap<HeapNode<D>> pq = new UpdatableHeap<HeapNode<D>>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Integer>(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID()));
+    pq.add(new HeapNode<D>(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID()));
     D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
 
     // search in tree
     while(!pq.isEmpty()) {
-      HeapNode<D, Integer> pqNode = pq.getMinNode();
+      HeapNode<D> pqNode = pq.poll();
 
-      if(pqNode.getKey().compareTo(maxDist) > 0) {
+      if(pqNode.distance.compareTo(maxDist) > 0) {
         return;
       }
 
-      N node = getNode(pqNode.getValue());
+      N node = getNode(pqNode.pageid);
       // data node
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
@@ -584,7 +581,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
           D distance = distanceFunction.minDist(entry, object);
           distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new DefaultHeapNode<D, Integer>(distance, entry.getEntryID()));
+            pq.add(new HeapNode<D>(distance, entry.getEntryID()));
           }
         }
       }
@@ -1410,5 +1407,47 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   @Override
   public String getShortName() {
     return "rstartree";
+  }
+
+  /**
+   * Heap node for searching in the tree.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <D> Distance type
+   */
+  protected class HeapNode<D extends Distance<D>> implements Comparable<HeapNode<D>> {
+    /**
+     * Distance value
+     */
+    public D distance;
+
+    /**
+     * Page id
+     */
+    public int pageid;
+
+    /**
+     * Constructor.
+     * 
+     * @param distance
+     * @param pagenr
+     */
+    public HeapNode(D distance, int pagenr) {
+      this.distance = distance;
+      this.pageid = pagenr;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      @SuppressWarnings("unchecked")
+      HeapNode<?> other = (HeapNode<?>) obj;
+      return this.pageid == other.pageid;
+    }
+
+    @Override
+    public int compareTo(HeapNode<D> o) {
+      return this.distance.compareTo(o.distance);
+    }
   }
 }

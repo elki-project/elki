@@ -41,6 +41,8 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<Clus
   /**
    * Indicates whether some other object is "equal to" this one.
    * 
+   * NOTE: for the use in an UpdatableHeap, only the ID is compared!
+   * 
    * @param o the reference object with which to compare.
    * @return <code>true</code> if this object has the same attribute values as
    *         the o argument; <code>false</code> otherwise.
