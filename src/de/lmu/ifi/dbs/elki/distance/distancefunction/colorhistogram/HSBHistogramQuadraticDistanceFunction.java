@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -66,8 +67,8 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
         final int sy = (y / quantb) % quants;
         final int by = y % quantb;
 
-        final double cos = Math.cos((hx + .5) / quanth * 2 * Math.PI) * (sx + .5) / quants - Math.cos((hy + .5) / quanth * 2 * Math.PI) * (sy + .5) / quants;
-        final double sin = Math.sin((hx + .5) / quanth * 2 * Math.PI) * (sx + .5) / quants - Math.sin((hy + .5) / quanth * 2 * Math.PI) * (sy + .5) / quants;
+        final double cos = Math.cos((hx + .5) / quanth * MathUtil.TWOPI) * (sx + .5) / quants - Math.cos((hy + .5) / quanth * MathUtil.TWOPI) * (sy + .5) / quants;
+        final double sin = Math.sin((hx + .5) / quanth * MathUtil.TWOPI) * (sx + .5) / quants - Math.sin((hy + .5) / quanth * MathUtil.TWOPI) * (sy + .5) / quants;
         final double db = (bx - by) / (double) quantb;
         final double val = 1. - Math.sqrt((db * db + sin * sin + cos * cos) / 5);
         m.set(x, y, val);

@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,7 +22,7 @@ public final class FormatUtil {
    * Dynamic number formatter, but with language constraint.
    */
   public static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
-  
+
   /**
    * Number Formatter (2 digits) for output purposes.
    */
@@ -69,6 +70,21 @@ public final class FormatUtil {
    * Non-breaking unicode space character.
    */
   public static final String NONBREAKING_SPACE = "\u00a0";
+
+  /**
+   * The time unit sizes: ms, s, m, h, d; all in ms.
+   */
+  private static final long[] TIME_UNIT_SIZES = new long[] { 1L, 1000L, 60000L, 3600000L, 86400000L };
+
+  /**
+   * The strings used in serialization
+   */
+  private static final String[] TIME_UNIT_NAMES = new String[] { "ms", "s", "m", "h", "d" };
+
+  /**
+   * The number of digits used for formatting
+   */
+  private static final int[] TIME_UNIT_DIGITS = new int[] { 3, 2, 2, 2, 2 };
 
   /**
    * Formats the double d with the specified fraction digits.
@@ -542,7 +558,7 @@ public final class FormatUtil {
     }
     return buffer.toString();
   }
-  
+
   /**
    * Returns a string representation of this matrix.
    * 
@@ -652,7 +668,7 @@ public final class FormatUtil {
   public static String format(Matrix m) {
     return format(m, FormatUtil.NF8);
   }
-  
+
   /**
    * returns String-representation of Vector.
    * 
@@ -863,5 +879,33 @@ public final class FormatUtil {
       // Do nothing, stick with default of 78.
     }
     return termwidth;
+  }
+
+  /**
+   * Formats a time delta in human readable format.
+   * 
+   * @param time time delta in ms
+   * @return Formatted string
+   */
+  public static String formatTimeDelta(long time, CharSequence sep) {
+    final StringBuilder sb = new StringBuilder();
+    final Formatter fmt = new Formatter(sb);
+
+    for(int i = TIME_UNIT_SIZES.length - 1; i >= 0; --i) {
+      // We do not include ms if we are in the order of minutes.
+      if(i == 0 && sb.length() > 4) {
+        continue;
+      }
+      // Separator
+      if(sb.length() > 0) {
+        sb.append(sep);
+      }
+      final long acValue = time / TIME_UNIT_SIZES[i];
+      time = time % TIME_UNIT_SIZES[i];
+      if(!(acValue == 0 && sb.length() == 0)) {
+        fmt.format("%0" + TIME_UNIT_DIGITS[i] + "d%s", acValue, TIME_UNIT_NAMES[i]);
+      }
+    }
+    return sb.toString();
   }
 }

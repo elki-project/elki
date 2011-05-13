@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
  * Simple generator for a Gaussian = Normal Distribution
  * 
@@ -45,7 +47,7 @@ public final class NormalDistribution implements Distribution {
   // TODO: make a math.distributions package with various PDF, CDF, Error
   // functions etc.?
   private static double phi(double x) {
-    return Math.exp(-x * x / 2) / Math.sqrt(2 * Math.PI);
+    return Math.exp(-x * x / 2) / MathUtil.SQRTTWOPI;
   }
 
   /**

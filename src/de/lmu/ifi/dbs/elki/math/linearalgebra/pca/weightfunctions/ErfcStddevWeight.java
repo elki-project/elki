@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
 
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Gaussian Error Function Weight function, scaled using stddev. This probably
@@ -14,7 +15,7 @@ public final class ErfcStddevWeight implements WeightFunction {
   /**
    * Precomputed value 1 / sqrt(2)
    */
-  private static final double onebysqrt2 = 1 / Math.sqrt(2);
+  private static final double onebysqrt2 = 1 / MathUtil.SQRT2;
 
   /**
    * Return Erfc weight, scaled by standard deviation. max is ignored.

@@ -16,11 +16,10 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MouseEvent;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -29,7 +28,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -43,8 +41,6 @@ import experimentalcode.students.goldhofa.ClusteringComparisonResult;
 import experimentalcode.students.goldhofa.Color;
 import experimentalcode.students.goldhofa.SegmentID;
 import experimentalcode.students.goldhofa.Segments;
-import experimentalcode.students.goldhofa.visualization.gui.SVGWindow;
-import experimentalcode.students.goldhofa.visualization.visualizers.vis2d.ClusteringComparisonVisualization;
 
 
 /**
@@ -230,7 +226,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     clusterSize = segments.getHighestClusterCount();
     clusterings = this.segments.getClusterings();
     
-    Properties.ANGLE_PAIR.setValue((2*Math.PI-(Properties.CLUSTER_DISTANCE.getValue()*pairSegments.size()))/segments.getPairCount());
+    Properties.ANGLE_PAIR.setValue((MathUtil.TWOPI-(Properties.CLUSTER_DISTANCE.getValue()*pairSegments.size()))/segments.getPairCount());
     Properties.PAIR_MIN_COUNT.setValue(Math.ceil(Properties.CLUSTER_MIN_WIDTH.getValue()/Properties.ANGLE_PAIR.getValue()));
     
     // number of segments needed to be resized
@@ -242,7 +238,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements Cont
     Properties.CLUSTER_MIN_COUNT.setValue(segMinCount);
     
     // update width of a pair
-    Properties.ANGLE_PAIR.setValue((2*Math.PI-(Properties.CLUSTER_DISTANCE.getValue()*pairSegments.size()+segMinCount*Properties.CLUSTER_MIN_WIDTH.getValue()))/(segments.getPairCount()-Properties.CLUSTER_MIN_COUNT.getValue()));
+    Properties.ANGLE_PAIR.setValue((MathUtil.TWOPI-(Properties.CLUSTER_DISTANCE.getValue()*pairSegments.size()+segMinCount*Properties.CLUSTER_MIN_WIDTH.getValue()))/(segments.getPairCount()-Properties.CLUSTER_MIN_COUNT.getValue()));
     
     Properties.RADIUS_DELTA.setValue((Properties.RADIUS_OUTER.getValue()-Properties.RADIUS_INNER.getValue()-clusterings*Properties.CLUSTERING_DISTANCE.getValue())/(clusterings));
     Properties.BORDER_WIDTH.setValue(Properties.CLUSTER_DISTANCE.getValue());

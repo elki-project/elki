@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 
@@ -49,7 +50,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
         }
       }
       mean = mv.getMean();
-      factor = lambda * mv.getSampleStddev() * Math.sqrt(2);
+      factor = lambda * mv.getSampleStddev() * MathUtil.SQRT2;
     }
     else {
       mean = fixedmean;
@@ -62,7 +63,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
           cnt += 1;
         }
       }
-      factor = lambda * Math.sqrt(sqsum / cnt) * Math.sqrt(2);
+      factor = lambda * Math.sqrt(sqsum / cnt) * MathUtil.SQRT2;
     }
   }
 

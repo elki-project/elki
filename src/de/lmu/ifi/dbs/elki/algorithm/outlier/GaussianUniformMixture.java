@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -199,7 +200,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     Matrix covInv = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
 
     double covarianceDet = covarianceMatrix.det();
-    double fakt = 1.0 / Math.sqrt(Math.pow(2 * Math.PI, DatabaseUtil.dimensionality(database)) * covarianceDet);
+    double fakt = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, DatabaseUtil.dimensionality(database)) * covarianceDet);
     // for each object compute probability and sum
     for(DBID id : objids) {
       V x = database.get(id);

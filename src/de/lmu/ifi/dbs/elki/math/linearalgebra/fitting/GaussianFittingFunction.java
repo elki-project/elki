@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
  * Gaussian function for parameter fitting
  * 
@@ -31,11 +33,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
  */
 public class GaussianFittingFunction implements FittingFunction {
   /**
-   * Precomputed constant value of Sqrt(2*PI)
-   */
-  protected static final double Sqrt2PI = Math.sqrt(2 * Math.PI);
-
-  /**
    * compute the mixture of Gaussians at the given position
    */
   @Override
@@ -54,7 +51,7 @@ public class GaussianFittingFunction implements FittingFunction {
       // Standardized Gaussian parameter (centered, scaled by stddev)
       double stdpar = (x - params[i]) / params[i + 1];
       double e = Math.exp(-.5 * stdpar * stdpar);
-      double localy = params[i + 2] / (params[i + 1] * Sqrt2PI) * e;
+      double localy = params[i + 2] / (params[i + 1] * MathUtil.SQRTTWOPI) * e;
 
       y += localy;
       // // 1+ offsets at the beginning since we use [0] to return the y value!
@@ -63,7 +60,7 @@ public class GaussianFittingFunction implements FittingFunction {
       // stddev gradient
       gradients[i + 1] = (stdpar * stdpar - 1.0) * localy;
       // amplitude gradient
-      gradients[i + 2] = e / (params[i + 1] * Sqrt2PI);
+      gradients[i + 2] = e / (params[i + 1] * MathUtil.SQRTTWOPI);
     }
 
     return new FittingFunctionResult(y, gradients);
