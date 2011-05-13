@@ -1,7 +1,7 @@
 package experimentalcode.frankenb.model;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import experimentalcode.frankenb.algorithms.partitioning.DBIDPartition;
-import experimentalcode.frankenb.utils.Utils;
 
 public class PartitionPairing {
 
@@ -75,7 +75,7 @@ public class PartitionPairing {
     long totalCalculations = 0;
     if(this.getPartitionOne() != null && this.getPartitionTwo() != null) {
       if(this.isSelfPairing()) {
-        totalCalculations = Utils.sumFormular(this.getPartitionOne().getSize() - 1);
+        totalCalculations = MathUtil.sumFirstIntegers(this.getPartitionOne().getSize() - 1);
       }
       else {
         totalCalculations = this.getPartitionOne().getSize() * this.getPartitionTwo().getSize();

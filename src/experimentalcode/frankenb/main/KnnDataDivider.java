@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -102,7 +103,7 @@ public class KnnDataDivider<V extends NumberVector<V, ?>> extends AbstractApplic
       final Database dataBase = databaseConnection.getDatabase();
       Relation<V> relation = dataBase.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
       int dim = DatabaseUtil.assumeVectorField(relation).dimensionality();
-      long totalCalculationsWithoutApproximation = Utils.sumFormular(relation.size() - 1);
+      long totalCalculationsWithoutApproximation = MathUtil.sumFirstIntegers(relation.size() - 1);
 
       logger.verbose(String.format("DB Size: %,d (%d dimensions)", relation.size(), dim));
       logger.verbose(String.format("Packages to create: %,8d", packageQuantity));
