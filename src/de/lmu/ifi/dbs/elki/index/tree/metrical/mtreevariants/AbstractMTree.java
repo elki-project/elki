@@ -26,11 +26,11 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 
 /**
  * Abstract super class for all M-Tree variants.
@@ -364,22 +364,22 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param knnList the query result list
    */
   protected final void doKNNQuery(O q, KNNHeap<D> knnList) {
-    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
+    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceFactory().nullDistance(), getRootEntry().getEntryID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootEntry().getEntryID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
     while(!pq.isEmpty()) {
-      PQNode<D> pqNode = (PQNode<D>) pq.getMinNode();
+      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
 
-      if(pqNode.getKey().compareTo(d_k) > 0) {
+      if(pqNode.mindist.compareTo(d_k) > 0) {
         return;
       }
 
-      N node = getNode(pqNode.getValue());
-      DBID o_p = pqNode.getRoutingObjectID();
+      N node = getNode(pqNode.nodeID);
+      DBID o_p = pqNode.routingObjectID;
 
       // directory node
       if(!node.isLeaf()) {
@@ -398,7 +398,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
             D d3 = distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), getDistanceFactory().nullDistance());
             if(d_min.compareTo(d_k) <= 0) {
-              pq.addNode(new PQNode<D>(d_min, entry.getEntryID(), o_r));
+              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, entry.getEntryID(), o_r));
             }
           }
         }
@@ -437,22 +437,22 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param knnList the query result list
    */
   protected final void doKNNQuery(DBID q, KNNHeap<D> knnList) {
-    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
+    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceFactory().nullDistance(), getRootEntry().getEntryID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootEntry().getEntryID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
     while(!pq.isEmpty()) {
-      PQNode<D> pqNode = (PQNode<D>) pq.getMinNode();
+      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
 
-      if(pqNode.getKey().compareTo(d_k) > 0) {
+      if(pqNode.mindist.compareTo(d_k) > 0) {
         return;
       }
 
-      N node = getNode(pqNode.getValue());
-      DBID o_p = pqNode.getRoutingObjectID();
+      N node = getNode(pqNode.nodeID);
+      DBID o_p = pqNode.routingObjectID;
 
       // directory node
       if(!node.isLeaf()) {
@@ -471,7 +471,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
             D d3 = distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), getDistanceFactory().nullDistance());
             if(d_min.compareTo(d_k) <= 0) {
-              pq.addNode(new PQNode<D>(d_min, entry.getEntryID(), o_r));
+              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, entry.getEntryID(), o_r));
             }
           }
         }
