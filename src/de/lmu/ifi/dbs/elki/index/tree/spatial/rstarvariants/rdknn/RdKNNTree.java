@@ -48,14 +48,14 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
  * @param <D> Distance type
  * @param <N> Number type
  * 
- * FIXME: currently does not yet return RKNNQuery objects!
+ *        FIXME: currently does not yet return RKNNQuery objects!
  */
 public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> implements RKNNIndex<O> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(RdKNNTree.class);
-  
+
   /**
    * Parameter k.
    */
@@ -148,7 +148,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
       getRoot().integrityCheck();
     }
   }
-  
+
   @Override
   public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
     // FIXME: re-add
@@ -161,7 +161,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     return null;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes"})
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
@@ -183,7 +183,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     for(int i = 0; i < candidates.size(); i++) {
       DistanceResultPair<D> candidate = (DistanceResultPair<D>) candidates.get(i);
       KNNHeap<T> knns = new KNNHeap<T>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-      knnLists.put(candidate.getDBID(), (KNNHeap<D>)knns);
+      knnLists.put(candidate.getDBID(), (KNNHeap<D>) knns);
       candidateIDs.add(candidate.getDBID());
     }
     batchNN(getRoot(), distanceQuery, knnLists);
@@ -192,7 +192,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     for(DBID id : candidateIDs) {
       for(DistanceResultPair<D> qr : knnLists.get(id)) {
         if(oid.equals(qr.getDBID())) {
-          result.add(new GenericDistanceResultPair<T>((T)qr.getDistance(), id));
+          result.add(new GenericDistanceResultPair<T>((T) qr.getDistance(), id));
           break;
         }
       }
@@ -202,7 +202,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     return result;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes"})
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     checkDistanceFunction(distanceFunction);
     if(k > k_max) {
@@ -246,7 +246,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
       for(DistanceResultPair<D> candidate : candidates) {
         for(DistanceResultPair<D> qr : knnLists.get(candidate.getDBID())) {
           if(qr.getDBID() == id) {
-            result.add(new GenericDistanceResultPair<T>((T)qr.getDistance(), id));
+            result.add(new GenericDistanceResultPair<T>((T) qr.getDistance(), id));
             break;
           }
         }

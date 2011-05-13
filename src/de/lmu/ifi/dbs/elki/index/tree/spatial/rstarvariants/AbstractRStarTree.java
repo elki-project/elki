@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -19,23 +18,19 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.elki.index.tree.query.GenericDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
@@ -44,11 +39,10 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -299,77 +293,6 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   }
 
   @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, D epsilon, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericDistanceSearchCandidate<D>>();
-
-    // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID()));
-
-    // search in tree
-    while(!pq.isEmpty()) {
-      GenericDistanceSearchCandidate<D> pqNode = pq.poll();
-      if(pqNode.mindist.compareTo(epsilon) > 0) {
-        break;
-      }
-
-      N node = getNode(pqNode.nodeID);
-      final int numEntries = node.getNumEntries();
-
-      for(int i = 0; i < numEntries; i++) {
-        D distance = distanceFunction.minDist(node.getEntry(i), object);
-        if(distance.compareTo(epsilon) <= 0) {
-          if(node.isLeaf()) {
-            LeafEntry entry = (LeafEntry) node.getEntry(i);
-            result.add(new GenericDistanceResultPair<D>(distance, entry.getDBID()));
-          }
-          else {
-            DirectoryEntry entry = (DirectoryEntry) node.getEntry(i);
-            pq.add(new GenericDistanceSearchCandidate<D>(distance, entry.getEntryID()));
-          }
-        }
-      }
-    }
-
-    // sort the result according to the distances
-    Collections.sort(result);
-    return result;
-  }
-
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    if(k < 1) {
-      throw new IllegalArgumentException("At least one enumeration has to be requested!");
-    }
-
-    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-    doKNNQuery(object, distanceFunction, knnList);
-    return knnList.toSortedArrayList();
-  }
-
-  @Override
-  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    // FIXME: the current implementation relies on DBID->Object lookups.
-    if(k < 1) {
-      throw new IllegalArgumentException("At least one enumeration has to be requested!");
-    }
-
-    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
-    for(DBID id : ids) {
-      knnLists.put(id, new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
-    }
-
-    SpatialPrimitiveDistanceQuery<O, D> distanceQuery = (SpatialPrimitiveDistanceQuery<O, D>) getRelation().getDatabase().getDistanceQuery(getRelation(), distanceFunction);
-    batchNN(getRoot(), distanceQuery, knnLists);
-
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>();
-    for(DBID id : ids) {
-      result.add(knnLists.get(id).toSortedArrayList());
-    }
-    return result;
-  }
-
-  @Override
   public final List<E> getLeaves() {
     List<E> result = new ArrayList<E>();
 
@@ -538,104 +461,6 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given NumberVector with the
-   * given parameter k and the according distance function. The query result is
-   * in ascending order to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @param knnList the knn list containing the result
-   */
-  protected <D extends Distance<D>> void doKNNQuery(O object, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, KNNHeap<D> knnList) {
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericDistanceSearchCandidate<D>>();
-
-    // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID()));
-    D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
-
-    // search in tree
-    while(!pq.isEmpty()) {
-      GenericDistanceSearchCandidate<D> pqNode = pq.poll();
-
-      if(pqNode.mindist.compareTo(maxDist) > 0) {
-        return;
-      }
-
-      N node = getNode(pqNode.nodeID);
-      // data node
-      if(node.isLeaf()) {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          E entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry, object);
-          distanceCalcs++;
-          if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(distance, ((LeafEntry) entry).getDBID());
-            maxDist = knnList.getKNNDistance();
-          }
-        }
-      }
-      // directory node
-      else {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          E entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry, object);
-          distanceCalcs++;
-          if(distance.compareTo(maxDist) <= 0) {
-            pq.add(new GenericDistanceSearchCandidate<D>(distance, entry.getEntryID()));
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Performs a batch knn query.
-   * 
-   * @param node the node for which the query should be performed
-   * @param distanceQuery the distance function for computing the distances
-   * @param knnLists a map containing the knn lists for each query objects
-   */
-  protected <D extends Distance<D>> void batchNN(N node, SpatialDistanceQuery<O, D> distanceQuery, Map<DBID, KNNHeap<D>> knnLists) {
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        SpatialEntry p = node.getEntry(i);
-        for(Entry<DBID, KNNHeap<D>> ent : knnLists.entrySet()) {
-          final DBID q = ent.getKey();
-          final KNNHeap<D> knns_q = ent.getValue();
-          D knn_q_maxDist = knns_q.getKNNDistance();
-
-          DBID pid = ((LeafEntry) p).getDBID();
-          // FIXME: objects are NOT accessible by DBID in a plain rtree context!
-          D dist_pq = distanceQuery.distance(pid, q);
-          if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(dist_pq, pid);
-          }
-        }
-      }
-    }
-    else {
-      ModifiableDBIDs ids = DBIDUtil.newArray(knnLists.size());
-      ids.addAll(knnLists.keySet());
-      List<DistanceEntry<D, E>> entries = getSortedEntries(node, ids, distanceQuery);
-      for(DistanceEntry<D, E> distEntry : entries) {
-        D minDist = distEntry.getDistance();
-        for(Entry<DBID, KNNHeap<D>> ent : knnLists.entrySet()) {
-          final KNNHeap<D> knns_q = ent.getValue();
-          D knn_q_maxDist = knns_q.getKNNDistance();
-
-          if(minDist.compareTo(knn_q_maxDist) <= 0) {
-            E entry = distEntry.getEntry();
-            N child = getNode(entry);
-            batchNN(child, distanceQuery, knnLists);
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  /**
    * Returns the path to the leaf entry in the specified subtree that represents
    * the data object with the specified mbr and id.
    * 
@@ -707,54 +532,6 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     if(getLogger().isDebugging()) {
       getLogger().debugFine("numDataPages = " + result.size());
     }
-    return result;
-  }
-
-  /**
-   * Sorts the entries of the specified node according to their minimum distance
-   * to the specified object.
-   * 
-   * @param node the node
-   * @param q the query object
-   * @param distanceFunction the distance function for computing the distances
-   * @return a list of the sorted entries
-   */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, O q, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
-
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      E entry = node.getEntry(i);
-      D minDist = distanceFunction.minDist(entry, q);
-      result.add(new DistanceEntry<D, E>(entry, minDist, i));
-    }
-
-    Collections.sort(result);
-    return result;
-  }
-
-  /**
-   * Sorts the entries of the specified node according to their minimum distance
-   * to the specified objects.
-   * 
-   * @param node the node
-   * @param ids the id of the objects
-   * @param distanceQuery the distance function for computing the distances
-   * @return a list of the sorted entries
-   */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids, SpatialDistanceQuery<O, D> distanceQuery) {
-    List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
-
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      E entry = node.getEntry(i);
-      D minMinDist = distanceQuery.getDistanceFactory().infiniteDistance();
-      for(DBID id : ids) {
-        D minDist = distanceQuery.minDist(entry, id);
-        minMinDist = DistanceUtil.min(minDist, minMinDist);
-      }
-      result.add(new DistanceEntry<D, E>(entry, minMinDist, i));
-    }
-
-    Collections.sort(result);
     return result;
   }
 
@@ -1401,6 +1178,60 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   }
 
   @Override
+  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
+    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
+      }
+      return null;
+    }
+    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return new GenericRStarTreeRangeQuery<O, D>(relation, this, dq, df);
+  }
+
+  @Override
+  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
+    DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
+    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
+      }
+      return null;
+    }
+    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return new GenericRStarTreeRangeQuery<O, D>(relation, this, dq, df);
+  }
+
+  @Override
+  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
+    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
+      }
+      return null;
+    }
+    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return new GenericRStarTreeKNNQuery<O, D>(relation, this, dq, df);
+  }
+
+  @Override
+  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
+    DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
+    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
+      if(getLogger().isDebugging()) {
+        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
+      }
+      return null;
+    }
+    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return new GenericRStarTreeKNNQuery<O, D>(relation, this, dq, df);
+  }
+
+  @Override
   public String getLongName() {
     return "Abstract R*-Tree";
   }
@@ -1409,5 +1240,4 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   public String getShortName() {
     return "rstartree";
   }
-
 }

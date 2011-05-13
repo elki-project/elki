@@ -227,7 +227,7 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
    * 
    * @return the root node of this index
    */
-  protected N getRoot() {
+  public N getRoot() {
     return file.readPage(rootEntry.getEntryID());
   }
 
