@@ -231,7 +231,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class ByteSerializer implements ByteBufferSerializer<Byte> {
+  public static class ByteSerializer implements FixedSizeByteBufferSerializer<Byte> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -251,6 +251,11 @@ public final class ByteArrayUtil {
 
     @Override
     public int getByteSize(@SuppressWarnings("unused") Byte object) {
+      return getFixedByteSize();
+    }
+
+    @Override
+    public int getFixedByteSize() {
       return SIZE_BYTE;
     }
   }
@@ -260,7 +265,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class ShortSerializer implements ByteBufferSerializer<Short> {
+  public static class ShortSerializer implements FixedSizeByteBufferSerializer<Short> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -280,6 +285,11 @@ public final class ByteArrayUtil {
 
     @Override
     public int getByteSize(@SuppressWarnings("unused") Short object) {
+      return getFixedByteSize();
+    }
+
+    @Override
+    public int getFixedByteSize() {
       return SIZE_SHORT;
     }
   }
@@ -289,7 +299,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class IntegerSerializer implements ByteBufferSerializer<Integer> {
+  public static class IntegerSerializer implements FixedSizeByteBufferSerializer<Integer> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -309,6 +319,11 @@ public final class ByteArrayUtil {
 
     @Override
     public int getByteSize(@SuppressWarnings("unused") Integer object) {
+      return getFixedByteSize();
+    }
+
+    @Override
+    public int getFixedByteSize() {
       return SIZE_INT;
     }
   }
@@ -318,7 +333,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class LongSerializer implements ByteBufferSerializer<Long> {
+  public static class LongSerializer implements FixedSizeByteBufferSerializer<Long> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -338,6 +353,11 @@ public final class ByteArrayUtil {
 
     @Override
     public int getByteSize(@SuppressWarnings("unused") Long object) {
+      return getFixedByteSize();
+    }
+
+    @Override
+    public int getFixedByteSize() {
       return SIZE_LONG;
     }
   }
@@ -347,7 +367,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class FloatSerializer implements ByteBufferSerializer<Float> {
+  public static class FloatSerializer implements FixedSizeByteBufferSerializer<Float> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -367,6 +387,11 @@ public final class ByteArrayUtil {
 
     @Override
     public int getByteSize(@SuppressWarnings("unused") Float object) {
+      return getFixedByteSize();
+    }
+
+    @Override
+    public int getFixedByteSize() {
       return SIZE_FLOAT;
     }
   }
@@ -376,7 +401,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class DoubleSerializer implements ByteBufferSerializer<Double> {
+  public static class DoubleSerializer implements FixedSizeByteBufferSerializer<Double> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -396,6 +421,11 @@ public final class ByteArrayUtil {
 
     @Override
     public int getByteSize(@SuppressWarnings("unused") Double object) {
+      return getFixedByteSize();
+    }
+
+    @Override
+    public int getFixedByteSize() {
       return SIZE_DOUBLE;
     }
   }

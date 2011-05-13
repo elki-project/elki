@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 import de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 
 /**
  * Factory interface for generating DBIDs. See {@link #FACTORY} for the static
@@ -153,7 +154,7 @@ public interface DBIDFactory {
    * 
    * @return DBID serializer
    */
-  public ByteBufferSerializer<DBID> getDBIDSerializerStatic();
+  public FixedSizeByteBufferSerializer<DBID> getDBIDSerializerStatic();
   
   /**
    * Get type restriction
