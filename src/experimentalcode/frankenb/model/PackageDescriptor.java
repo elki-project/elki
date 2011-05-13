@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -193,8 +194,8 @@ public class PackageDescriptor<V> implements Iterable<PartitionPairing> {
     return new Pair<File, File>(new File(parentDirectory, String.format(PAIRING_RESULT_FILE_PREFIX + ".dir", pairing.getStorageId())), new File(parentDirectory, String.format(PAIRING_RESULT_FILE_PREFIX + ".dat", pairing.getStorageId())));
   }
 
-  public static PackageDescriptor readFromStorage(IDataStorage dataStorage) throws IOException {
-    return new PackageDescriptor(-1, -1, dataStorage);
+  public static <V> PackageDescriptor<V> readFromStorage(IDataStorage dataStorage) throws IOException {
+    return new PackageDescriptor<V>(-1, -1, dataStorage);
   }
 
   public void close() throws IOException {
@@ -209,8 +210,8 @@ public class PackageDescriptor<V> implements Iterable<PartitionPairing> {
     catch(IOException e) {
       throw new RuntimeException(e);
     }
-    return new Iterator<PartitionPairing>() {
 
+    return new Iterator<PartitionPairing>() {
       int position = 0;
 
       @Override
@@ -223,8 +224,8 @@ public class PackageDescriptor<V> implements Iterable<PartitionPairing> {
         try {
           File partitionOneFile = new File(parentDirectory, String.format(PARTITION_DAT_FILE_FORMAT, dataStorage.readInt()));
           File partitionTwoFile = new File(parentDirectory, String.format(PARTITION_DAT_FILE_FORMAT, dataStorage.readInt()));
-          IPartition partitionOne = BufferedDiskBackedPartition.loadFromFile(partitionOneFile);
-          IPartition partitionTwo = (partitionOneFile.equals(partitionTwoFile) ? partitionOne : BufferedDiskBackedPartition.loadFromFile(partitionTwoFile));
+          IPartition<V> partitionOne = BufferedDiskBackedPartition.loadFromFile(partitionOneFile);
+          IPartition<V> partitionTwo = (partitionOneFile.equals(partitionTwoFile) ? partitionOne : BufferedDiskBackedPartition.loadFromFile(partitionTwoFile));
 
           position++;
           PartitionPairing partitionPairing = new PartitionPairing(partitionOne, partitionTwo);
@@ -241,8 +242,6 @@ public class PackageDescriptor<V> implements Iterable<PartitionPairing> {
       public void remove() {
         throw new UnsupportedOperationException();
       }
-
     };
   }
-
 }

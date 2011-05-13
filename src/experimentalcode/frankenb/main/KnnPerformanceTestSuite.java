@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
@@ -32,7 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import experimentalcode.frankenb.model.ConstantSizeIntegerSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
@@ -166,7 +166,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
     File resultDirectory = new File(inputFolder, "result.dir");
     File resultData = new File(inputFolder, "result.dat");
 
-    DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(new BufferedDiskBackedDataStorage(resultDirectory), (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)), new ConstantSizeIntegerSerializer(), new DistanceListSerializer());
+    DynamicBPlusTree<Integer, DistanceList> resultTree = new DynamicBPlusTree<Integer, DistanceList>(new BufferedDiskBackedDataStorage(resultDirectory), (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)), ByteArrayUtil.INT_SERIALIZER, new DistanceListSerializer());
 
     Relation<NumberVector<?, ?>> relation = null;
     PrecalculatedKnnIndex<NumberVector<?, ?>> index = new PrecalculatedKnnIndex<NumberVector<?, ?>>(relation, resultTree);
@@ -250,8 +250,9 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
   private static List<File> findResultDirectories(File dir) {
     List<File> result = new ArrayList<File>();
     for(File file : dir.listFiles()) {
-      if(file.equals(dir) || file.equals(dir.getParentFile()))
+      if(file.equals(dir) || file.equals(dir.getParentFile())) {
         continue;
+      }
       if(file.isDirectory()) {
         result.addAll(findResultDirectories(file));
       }

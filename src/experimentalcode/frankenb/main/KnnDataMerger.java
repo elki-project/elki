@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -14,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ConstantSizeIntegerDBIDSerializer;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
@@ -97,22 +97,22 @@ public class KnnDataMerger extends AbstractApplication {
       logger.verbose("maximum k to calculate: " + k);
 
       File[] packageDirectories = indir.listFiles(new FilenameFilter() {
-
         @Override
         public boolean accept(File dir, String name) {
           return name.matches("^package[0-9]{5}$");
         }
-
       });
 
       File resultDirectory = new File(outdir, "result.dir");
-      if(resultDirectory.exists())
+      if(resultDirectory.exists()) {
         resultDirectory.delete();
+      }
       File resultData = new File(outdir, "result.dat");
-      if(resultData.exists())
+      if(resultData.exists()) {
         resultData.delete();
+      }
 
-      DynamicBPlusTree<DBID, DistanceList> resultTree = new DynamicBPlusTree<DBID, DistanceList>(new BufferedDiskBackedDataStorage(resultDirectory), (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)), new ConstantSizeIntegerDBIDSerializer(), new DistanceListSerializer(), 8);
+      DynamicBPlusTree<DBID, DistanceList> resultTree = new DynamicBPlusTree<DBID, DistanceList>(new BufferedDiskBackedDataStorage(resultDirectory), (inMemory ? new BufferedDiskBackedDataStorage(resultData) : new DiskBackedDataStorage(resultData)), DBIDFactory.FACTORY.getDBIDSerializerStatic(), new DistanceListSerializer(), 8);
 
       // open all result files
       HashSetModifiableDBIDs testSet = DBIDUtil.newHashSet();
@@ -129,7 +129,7 @@ public class KnnDataMerger extends AbstractApplication {
         if(packageDescriptorCandidates.length > 0) {
           logger.verbose("Opening result of " + packageDirectory.getName() + " ...");
           File packageDescriptorFile = packageDescriptorCandidates[0];
-          PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new BufferedDiskBackedDataStorage(packageDescriptorFile));
+          PackageDescriptor<?> packageDescriptor = PackageDescriptor.readFromStorage(new BufferedDiskBackedDataStorage(packageDescriptorFile));
 
           int counter = 0;
           for(PartitionPairing pairing : packageDescriptor) {

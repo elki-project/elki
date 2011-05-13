@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
@@ -24,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ConstantSizeIntegerDBIDSerializer;
+import experimentalcode.frankenb.algorithms.partitioning.DBIDPartition;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.DistanceListSerializer;
 import experimentalcode.frankenb.model.DynamicBPlusTree;
@@ -32,7 +33,6 @@ import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.datastorage.DiskBackedDataStorage;
-import experimentalcode.frankenb.model.ifaces.IPartition;
 
 /**
  * This class calculates the distances given in denoted package and creates a
@@ -128,7 +128,7 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
       logger.verbose("multithreaded: " + Boolean.valueOf(multiThreaded));
       logger.verbose("maximum k to calculate: " + maxK);
       logger.verbose(String.format("opening package %s ...", input));
-      final PackageDescriptor packageDescriptor = PackageDescriptor.readFromStorage(new DiskBackedDataStorage(input));
+      final PackageDescriptor<?> packageDescriptor = PackageDescriptor.readFromStorage(new DiskBackedDataStorage(input));
 
       logger.verbose("Verifying package ...");
       packageDescriptor.verify();
@@ -143,20 +143,21 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
 
       logger.verbose("Creating tasks ...");
       List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
-      for(final PartitionPairing<V> pairing : packageDescriptor) {
+      for(final PartitionPairing pairing : packageDescriptor) {
         if(pairing.getPartitionOne().getSize() < 1 || pairing.getPartitionTwo().getSize() < 1) {
           throw new UnableToComplyException("Pairing " + pairing + " has 0 items");
         }
 
         if(pairing.hasResult()) {
-          logger.verbose(String.format("Skipping pairing of partition%05d with partition%05d - as it already contains a result", pairing.getPartitionOne().getId(), pairing.getPartitionTwo().getId()));
+          // logger.verbose(String.format("Skipping pairing of partition%05d with partition%05d - as it already contains a result",
+          // pairing.getPartitionOne().getId(),
+          // pairing.getPartitionTwo().getId()));
           continue;
         }
 
         final int taskId = ++totalTasks;
 
         Callable<Boolean> task = new Callable<Boolean>() {
-
           @Override
           public Boolean call() throws Exception {
             try {
@@ -170,14 +171,14 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
               File tmpDirFile = File.createTempFile("pairing" + taskId, ".dir");
               File tmpDataFile = File.createTempFile("pairing" + taskId, ".dat");
 
-              DynamicBPlusTree<DBID, DistanceList> resultTree = new DynamicBPlusTree<DBID, DistanceList>(new BufferedDiskBackedDataStorage(tmpDirFile), new DiskBackedDataStorage(tmpDataFile), new ConstantSizeIntegerDBIDSerializer(), new DistanceListSerializer(), maxKeysPerBucket);
+              DynamicBPlusTree<DBID, DistanceList> resultTree = new DynamicBPlusTree<DBID, DistanceList>(new BufferedDiskBackedDataStorage(tmpDirFile), new DiskBackedDataStorage(tmpDataFile), DBIDFactory.FACTORY.getDBIDSerializerStatic(), new DistanceListSerializer(), maxKeysPerBucket);
               ModifiableDBIDs processedIds = DBIDUtil.newHashSet();
 
-              logger.verbose(String.format("\tPairing %010d: partition%05d (%,d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
+              //logger.verbose(String.format("\tPairing %010d: partition%05d (%,d items) with partition%05d (%,d items)", taskId, pairing.getPartitionOne().getId(), pairing.getPartitionOne().getSize(), pairing.getPartitionTwo().getId(), pairing.getPartitionTwo().getSize()));
 
-              List<Pair<IPartition<V>,IPartition<V>>> partitionsToProcess = new ArrayList<Pair<IPartition<V>,IPartition<V>>>(2);
-              partitionsToProcess.add(new Pair<IPartition<V>,IPartition<V>>(pairing.getPartitionOne(), pairing.getPartitionTwo()));
-              partitionsToProcess.add(new Pair<IPartition<V>,IPartition<V>>( pairing.getPartitionTwo(), pairing.getPartitionOne()));
+              List<Pair<DBIDPartition, DBIDPartition>> partitionsToProcess = new ArrayList<Pair<DBIDPartition, DBIDPartition>>(2);
+              partitionsToProcess.add(new Pair<DBIDPartition, DBIDPartition>(pairing.getPartitionOne(), pairing.getPartitionTwo()));
+              partitionsToProcess.add(new Pair<DBIDPartition, DBIDPartition>(pairing.getPartitionTwo(), pairing.getPartitionOne()));
 
               // we make two passes here as the calculation is much faster than
               // deserializing the distanceLists all the
@@ -186,7 +187,7 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
               // the drawback of using too much memory - especially when more
               // threads run simultaneously - the memory usage is n^2 per thread
               for(int i = 0; i < (pairing.isSelfPairing() ? 1 : partitionsToProcess.size()); ++i) {
-                Pair<IPartition<V>,IPartition<V>> partitions = partitionsToProcess.get(i);
+                Pair<DBIDPartition, DBIDPartition> partitions = partitionsToProcess.get(i);
                 int counter = 0;
                 for(Pair<DBID, V> pointOne : partitions.first) {
                   if(counter++ % 50 == 0) {
@@ -218,7 +219,6 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
             }
             return true;
           }
-
         };
 
         tasks.add(task);

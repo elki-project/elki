@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -27,7 +26,6 @@ import experimentalcode.frankenb.model.PackageDescriptor;
 import experimentalcode.frankenb.model.PartitionPairing;
 import experimentalcode.frankenb.model.datastorage.BufferedDiskBackedDataStorage;
 import experimentalcode.frankenb.model.ifaces.IDividerAlgorithm;
-import experimentalcode.frankenb.utils.Utils;
 
 /**
  * This application divides a given database into a given numbers of packages to
@@ -177,7 +175,7 @@ public class KnnDataDivider<V extends NumberVector<V, ?>> extends AbstractApplic
           pairings.remove(pairingToAdd);
           calculations += pairingToAdd.getCalculations();
 
-          packageDescriptor.addPartitionPairing(pairingToAdd);
+          packageDescriptor.addPartitionPairing(relation, pairingToAdd);
           logger.verbose(String.format("\tAdding %s\t%,16d calculations of at least %,16d", pairingToAdd.toString(), calculations, calculationsPerPackage));
         }
 

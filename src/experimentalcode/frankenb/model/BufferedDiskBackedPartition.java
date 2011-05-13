@@ -1,5 +1,6 @@
 package experimentalcode.frankenb.model;
 
+import java.io.DataInput;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -25,7 +25,7 @@ import experimentalcode.frankenb.model.ifaces.IPartition;
  * 
  * @author Florian Frankenberger
  */
-public class BufferedDiskBackedPartition<V extends NumberVector<?, ?>> implements IPartition<V> {
+public class BufferedDiskBackedPartition<V extends NumberVector<V, ?>> implements IPartition<V> {
 
   private int id;
 
@@ -35,17 +35,20 @@ public class BufferedDiskBackedPartition<V extends NumberVector<?, ?>> implement
 
   private List<Pair<DBID, V>> entries = new ArrayList<Pair<DBID, V>>();
 
-  public BufferedDiskBackedPartition(int id, int dimensionality) {
-    this(id, dimensionality, null);
+  private V prototype;
+
+  public BufferedDiskBackedPartition(int id, int dimensionality, V prototype) {
+    this(id, dimensionality, null, prototype);
   }
 
-  private BufferedDiskBackedPartition(int id, int dimensionality, File storageFile) {
+  private BufferedDiskBackedPartition(int id, int dimensionality, File storageFile, V prototype) {
     if(storageFile == null && dimensionality < 1) {
       throw new RuntimeException("You need to specify a dimensionality if you don't load a partition from disk");
     }
 
     this.id = id;
     this.dimensionality = dimensionality;
+    this.prototype = prototype;
 
     if(storageFile == null) {
       try {
@@ -66,8 +69,9 @@ public class BufferedDiskBackedPartition<V extends NumberVector<?, ?>> implement
   }
 
   private void readAll() {
-    if(storageFile == null || !storageFile.exists() || !storageFile.canRead())
+    if(storageFile == null || !storageFile.exists() || !storageFile.canRead()) {
       return;
+    }
 
     try {
       entries.clear();
@@ -79,15 +83,8 @@ public class BufferedDiskBackedPartition<V extends NumberVector<?, ?>> implement
         this.dimensionality = file.readInt();
 
         while(file.getFilePointer() < this.storageFile.length() - 1) {
-
-          DBID id = DBIDUtil.importInteger(file.readInt());
-
-          double[] data = new double[dimensionality];
-          for(int k = 0; k < dimensionality; ++k) {
-            data[k] = file.readDouble();
-          }
-
-          entries.add(new Pair<DBID, V>(id, new DoubleVector(data)));
+          Pair<DBID, V> rec = deserializeRecord(file);
+          entries.add(rec);
         }
       }
       finally {
@@ -101,6 +98,16 @@ public class BufferedDiskBackedPartition<V extends NumberVector<?, ?>> implement
     }
   }
 
+  protected Pair<DBID, V> deserializeRecord(DataInput file) throws IOException {
+    DBID id = DBIDUtil.importInteger(file.readInt());
+    double[] data = new double[dimensionality];
+    for(int k = 0; k < dimensionality; ++k) {
+      data[k] = file.readDouble();
+    }
+    V vec = prototype.newInstance(data);
+    return new Pair<DBID, V>(id, vec);
+  }
+
   private void writeAll() {
     try {
       RandomAccessFile file = null;
@@ -110,7 +117,6 @@ public class BufferedDiskBackedPartition<V extends NumberVector<?, ?>> implement
         file.writeInt(this.id);
         file.writeInt(this.dimensionality);
         for(Pair<DBID, V> entry : entries) {
-
           file.writeInt(entry.first.getIntegerID());
 
           for(int k = 0; k < dimensionality; ++k) {
@@ -199,18 +205,20 @@ public class BufferedDiskBackedPartition<V extends NumberVector<?, ?>> implement
 
     }
     finally {
-      if(in != null)
+      if(in != null) {
         in.close();
-      if(out != null)
+      }
+      if(out != null) {
         out.close();
+      }
     }
 
   }
 
-  public static <V extends NumberVector<?, ?>> BufferedDiskBackedPartition<V> loadFromFile(File file) throws IOException {
-    if(!file.exists())
+  public static <V extends NumberVector<V, ?>> BufferedDiskBackedPartition<V> loadFromFile(File file, V prototype) throws IOException {
+    if(!file.exists()) {
       throw new IOException("Specified partition file " + file + " does not exist!");
-    return new BufferedDiskBackedPartition<V>(0, 0, file);
+    }
+    return new BufferedDiskBackedPartition<V>(0, 0, file, prototype);
   }
-
 }

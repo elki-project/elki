@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -160,7 +161,7 @@ public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
           resultTree = new DynamicBPlusTree<Integer, DistanceList>(
               new BufferedDiskBackedDataStorage(resultDirectory), 
               new BufferedDiskBackedDataStorage(resultData), 
-              new ConstantSizeIntegerSerializer(), 
+              ByteArrayUtil.INT_SERIALIZER, 
               new DistanceListSerializer()
               );
         }

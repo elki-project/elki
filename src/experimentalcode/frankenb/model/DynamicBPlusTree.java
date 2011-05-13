@@ -8,8 +8,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.ifaces.IConstantSizeByteBufferSerializer;
 import experimentalcode.frankenb.model.ifaces.IDataStorage;
 
 /**
@@ -52,7 +52,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
   private static final int FIRST_BUCKET_POSITION = 4 * Long.SIZE / 8 + Integer.SIZE / 8;
 
   private final IDataStorage directoryStorage, dataStorage;
-  private final IConstantSizeByteBufferSerializer<K> keySerializer;
+  private final FixedSizeByteBufferSerializer<K> keySerializer;
   private final ByteBufferSerializer<V> valueSerializer;
   
   private long nextBucketPosition = FIRST_BUCKET_POSITION;
@@ -120,7 +120,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
    * @param maxKeysPerBucket
    * @throws IOException
    */
-  public DynamicBPlusTree(IDataStorage directoryStorage, IDataStorage dataStorage, IConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer, int maxKeysPerBucket) throws IOException {
+  public DynamicBPlusTree(IDataStorage directoryStorage, IDataStorage dataStorage, FixedSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer, int maxKeysPerBucket) throws IOException {
 
     this.directoryStorage = directoryStorage;
     this.dataStorage = dataStorage;
@@ -143,7 +143,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
    * @param valueSerializer
    * @throws IOException
    */
-  public DynamicBPlusTree(IDataStorage directoryStorage, IDataStorage dataStorage, IConstantSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer) throws IOException {
+  public DynamicBPlusTree(IDataStorage directoryStorage, IDataStorage dataStorage, FixedSizeByteBufferSerializer<K> keySerializer, ByteBufferSerializer<V> valueSerializer) throws IOException {
     this.directoryStorage = directoryStorage;
     
     this.dataStorage = dataStorage;
@@ -163,7 +163,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
  
   private void initTree() {
     this.bucketByteSize = 
-      this.keySerializer.getConstantByteSize() * maxKeysPerBucket //items
+      this.keySerializer.getFixedByteSize() * maxKeysPerBucket //items
       + (maxKeysPerBucket + 1) * (Long.SIZE / 8) //pointers
       + Integer.SIZE / 8 + Byte.SIZE / 8; //size indicator
     this.linkOffset = (bucketByteSize - Long.SIZE / 8);
@@ -285,8 +285,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
   
   private long getDataSize(V value) throws IOException {
     long size = valueSerializer.getByteSize(value);
-    if (valueSerializer instanceof IConstantSizeByteBufferSerializer<?>) {
-      size = ((IConstantSizeByteBufferSerializer<V>) valueSerializer).getConstantByteSize();
+    if (valueSerializer instanceof FixedSizeByteBufferSerializer<?>) {
+      size = ((FixedSizeByteBufferSerializer<V>) valueSerializer).getFixedByteSize();
     }
     return size;
   }
@@ -312,22 +312,22 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     
     //now we search for the insert position
     int position = size;
-    long insertAddress = this.directoryStorage.getFilePointer() + size * (this.keySerializer.getConstantByteSize() + (Long.SIZE / 8));
+    long insertAddress = this.directoryStorage.getFilePointer() + size * (this.keySerializer.getFixedByteSize() + (Long.SIZE / 8));
     for (int i = 0; i < size; ++i) {
       directoryStorage.readLong();
       
-      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
-      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
+      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getFixedByteSize());
+      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getFixedByteSize());
 
       K aKey = this.keySerializer.fromByteBuffer(buffer);
       if (aKey.compareTo(key) > 0) {
-        insertAddress = directoryStorage.getFilePointer() - (this.keySerializer.getConstantByteSize()) - Long.SIZE / 8;
+        insertAddress = directoryStorage.getFilePointer() - (this.keySerializer.getFixedByteSize()) - Long.SIZE / 8;
         position = i;
         break;
       }
     }    
     
-    int keyPlusAddressSize = (Long.SIZE / 8) + this.keySerializer.getConstantByteSize();
+    int keyPlusAddressSize = (Long.SIZE / 8) + this.keySerializer.getFixedByteSize();
     
     if (size < this.maxKeysPerBucket) {
       //if there is enough space in the bucket for one more
@@ -343,7 +343,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
       //actually write key
       directoryStorage.seek(insertAddress);
       directoryStorage.writeLong(leftAddress);
-      ByteBuffer bBuffer = ByteBuffer.allocate(this.keySerializer.getConstantByteSize());
+      ByteBuffer bBuffer = ByteBuffer.allocate(this.keySerializer.getFixedByteSize());
       this.keySerializer.toByteBuffer(bBuffer, key);
       directoryStorage.writeBuffer(bBuffer);
       
@@ -421,12 +421,12 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     for (int i = 0; i < size; ++i) {
       directoryStorage.readLong();
       
-      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
-      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
+      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getFixedByteSize());
+      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getFixedByteSize());
 
       K aKey = this.keySerializer.fromByteBuffer(buffer);
       if (aKey.equals(key)) {
-        insertAddress = directoryStorage.getFilePointer() - (this.keySerializer.getConstantByteSize()) - Long.SIZE / 8;
+        insertAddress = directoryStorage.getFilePointer() - (this.keySerializer.getFixedByteSize()) - Long.SIZE / 8;
         break;
       }
     }
@@ -444,7 +444,7 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     
     if (size == 0) return null;
     directoryStorage.readLong();
-    ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
+    ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getFixedByteSize());
     K aKey = this.keySerializer.fromByteBuffer(buffer);
     return aKey;
   }
@@ -476,8 +476,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
     boolean found = false;
     for (int i = 0; i < size; ++i) {
       long targetAddress = directoryStorage.readLong();
-      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
-      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
+      ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getFixedByteSize());
+      directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getFixedByteSize());
       
       K aKey = this.keySerializer.fromByteBuffer(buffer);
       if (aKey.compareTo(key) > 0) {
@@ -559,8 +559,8 @@ public class DynamicBPlusTree<K extends Comparable<K>, V> implements Iterable<Pa
           if (!hasNextEntry) return null;
           try {
             long targetAddress = directoryStorage.readLong();
-            ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getConstantByteSize());
-            directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getConstantByteSize());
+            ByteBuffer buffer = directoryStorage.getReadOnlyByteBuffer(keySerializer.getFixedByteSize());
+            directoryStorage.seek(directoryStorage.getFilePointer() + keySerializer.getFixedByteSize());
             
             K aKey = keySerializer.fromByteBuffer(buffer);
             
