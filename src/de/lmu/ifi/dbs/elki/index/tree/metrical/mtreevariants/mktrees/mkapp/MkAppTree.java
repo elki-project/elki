@@ -20,14 +20,14 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 
 /**
  * MkAppTree is a metrical index structure based on the concepts of the M-Tree
@@ -47,7 +47,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(MkAppTree.class);
-  
+
   /**
    * Parameter k.
    */
@@ -107,10 +107,10 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    */
   @Override
   public void insertAll(DBIDs ids) {
-    if (ids.isEmpty()) {
+    if(ids.isEmpty()) {
       return;
     }
-    
+
     if(logger.isDebugging()) {
       logger.debugFine("insert " + ids + "\n");
     }
@@ -137,7 +137,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
 
     // finish KNN lists (sort them completely)
     Map<DBID, KNNList<D>> knnLists = new HashMap<DBID, KNNList<D>>();
-    for (Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
+    for(Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
       knnLists.put(ent.getKey(), ent.getValue().toKNNList());
     }
 
@@ -226,16 +226,16 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    */
   private List<DistanceResultPair<D>> doReverseKNNQuery(int k, DBID q) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    final Heap<D, Integer> pq = new DefaultHeap<D, Integer>();
+    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.addNode(new PQNode<D>(getDistanceQuery().nullDistance(), getRootEntry().getEntryID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootEntry().getEntryID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
-      PQNode<D> pqNode = (PQNode<D>) pq.getMinNode();
+      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
 
-      MkAppTreeNode<O, D, N> node = getNode(pqNode.getValue());
+      MkAppTreeNode<O, D, N> node = getNode(pqNode.nodeID);
 
       // directory node
       if(!node.isLeaf()) {
@@ -251,7 +251,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
           D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
 
           if(minDist.compareTo(approximatedKnnDist) <= 0) {
-            pq.addNode(new PQNode<D>(minDist, entry.getEntryID(), entry.getRoutingObjectID()));
+            pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, entry.getEntryID(), entry.getRoutingObjectID()));
           }
         }
       }
@@ -338,7 +338,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkAppEntry<D, N> entry = node.getEntry(i);
-        result.add(((LeafEntry)entry).getDBID());
+        result.add(((LeafEntry) entry).getDBID());
       }
     }
     else {
@@ -422,6 +422,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
   /**
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
+   * 
    * @param object the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
