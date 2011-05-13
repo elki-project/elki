@@ -8,6 +8,7 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 
 /**
  * Database ID object.
@@ -188,7 +189,7 @@ class IntegerDBID extends AbstractList<DBID> implements DBID {
    * 
    * @author Erich Schubert
    */
-  public static class StaticSerializer implements ByteBufferSerializer<DBID> {
+  public static class StaticSerializer implements FixedSizeByteBufferSerializer<DBID> {
     /**
      * Constructor. Protected: use static instance!
      */
@@ -208,6 +209,11 @@ class IntegerDBID extends AbstractList<DBID> implements DBID {
 
     @Override
     public int getByteSize(@SuppressWarnings("unused") DBID object) throws UnsupportedOperationException {
+      return getFixedByteSize();
+    }
+
+    @Override
+    public int getFixedByteSize() {
       return ByteArrayUtil.SIZE_INT;
     }
   }
