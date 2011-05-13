@@ -9,7 +9,29 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 /**
  * A collection of math related utility functions.
  */
-public class MathUtil {
+public final class MathUtil {
+  /**
+   * Two times Pi.
+   */
+  public static final double TWOPI = 2 * Math.PI;
+
+  /**
+   * Squre root of two times Pi.
+   */
+  public static final double SQRTTWOPI = Math.sqrt(TWOPI);
+
+  /**
+   * Square root of 2.
+   */
+  public static final double SQRT2 = Math.sqrt(2);
+
+  /**
+   * Fake constructor for static class.
+   */
+  private MathUtil() {
+    // Static methods only - do not instantiate!
+  }
+
   /**
    * Computes the square root of the sum of the squared arguments without under
    * or overflow.
@@ -19,19 +41,17 @@ public class MathUtil {
    * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup>)}
    */
   public static double hypotenuse(double a, double b) {
-    double r;
     if(Math.abs(a) > Math.abs(b)) {
-      r = b / a;
-      r = Math.abs(a) * Math.sqrt(1 + r * r);
+      final double r = b / a;
+      return Math.abs(a) * Math.sqrt(1 + r * r);
     }
     else if(b != 0) {
-      r = a / b;
-      r = Math.abs(b) * Math.sqrt(1 + r * r);
+      final double r = a / b;
+      return Math.abs(b) * Math.sqrt(1 + r * r);
     }
     else {
-      r = 0.0;
+      return 0.0;
     }
-    return r;
   }
 
   /**
@@ -42,13 +62,12 @@ public class MathUtil {
    * @return Mahalanobis distance
    */
   public static double mahalanobisDistance(Matrix weightMatrix, Vector o1_minus_o2) {
-    double sqrDist = o1_minus_o2.transposeTimes(weightMatrix).times(o1_minus_o2).get(0, 0);
+    double sqrDist = o1_minus_o2.transposeTimes(weightMatrix).times(o1_minus_o2).get(0);
 
     if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
       sqrDist = Math.abs(sqrDist);
     }
-    double dist = Math.sqrt(sqrDist);
-    return dist;
+    return Math.sqrt(sqrDist);
   }
 
   /**
@@ -62,32 +81,36 @@ public class MathUtil {
    * @return the Pearson product-moment correlation coefficient for x and y
    */
   public static double pearsonCorrelationCoefficient(NumberVector<?, ?> x, NumberVector<?, ?> y) {
-    if(x.getDimensionality() != y.getDimensionality()) {
+    final int xdim = x.getDimensionality();
+    final int ydim = y.getDimensionality();
+    if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }
-    if(x.getDimensionality() <= 0) {
+    if(xdim <= 0) {
       throw new IllegalArgumentException("Invalid arguments: dimensionality not positive.");
     }
     double sumSqX = 0;
     double sumSqY = 0;
     double sumCoproduct = 0;
-    double meanX = x.doubleValue(1);
-    double meanY = y.doubleValue(1);
-    for(int i = 2; i < x.getDimensionality(); i++) {
-      double sweep = (i - 1.0) / i;
-      double deltaX = x.doubleValue(i) - meanX;
-      double deltaY = y.doubleValue(i) - meanY;
-      sumSqX += deltaX * deltaX * sweep;
-      sumSqY += deltaY * deltaY * sweep;
-      sumCoproduct += deltaX * deltaY * sweep;
-      meanX += deltaX / i;
-      meanY += deltaY / i;
+    {
+      // Incremental computation
+      double meanX = x.doubleValue(1);
+      double meanY = y.doubleValue(1);
+      for(int i = 2; i < xdim; i++) {
+        final double sweep = (i - 1.0) / i;
+        final double deltaX = x.doubleValue(i) - meanX;
+        final double deltaY = y.doubleValue(i) - meanY;
+        sumSqX += deltaX * deltaX * sweep;
+        sumSqY += deltaY * deltaY * sweep;
+        sumCoproduct += deltaX * deltaY * sweep;
+        meanX += deltaX / i;
+        meanY += deltaY / i;
+      }
     }
-    double popSdX = Math.sqrt(sumSqX / x.getDimensionality());
-    double popSdY = Math.sqrt(sumSqY / y.getDimensionality());
-    double covXY = sumCoproduct / x.getDimensionality();
-    double correlation = covXY / (popSdX * popSdY);
-    return correlation;
+    final double popSdX = Math.sqrt(sumSqX / xdim);
+    final double popSdY = Math.sqrt(sumSqY / ydim);
+    final double covXY = sumCoproduct / xdim;
+    return covXY / (popSdX * popSdY);
   }
 
   /**
@@ -136,8 +159,8 @@ public class MathUtil {
    * @return n! / (k! * (n-k)!)
    */
   public static long binomialCoefficient(long n, long k) {
+    final long m = Math.max(k, n - k);
     double temp = 1;
-    long m = Math.max(k, n - k);
     for(long i = n, j = 1; i > m; i--, j++) {
       temp = temp * i / j;
     }
@@ -170,8 +193,8 @@ public class MathUtil {
    * @return n! / (k! * (n-k)!)
    */
   public static double approximateBinomialCoefficient(int n, int k) {
+    final int m = Math.max(k, n - k);
     long temp = 1;
-    int m = Math.max(k, n - k);
     for(int i = n, j = 1; i > m; i--, j++) {
       temp = temp * i / j;
     }
@@ -191,7 +214,9 @@ public class MathUtil {
    * @return PDF of the given normal distribution at x.
    */
   public static double normalPDF(double x, double mu, double sigma) {
-    return 1 / (Math.sqrt(2 * Math.PI * sigma * sigma)) * Math.exp(-1 * (x - mu) * (x - mu) / 2 / sigma / sigma);
+    final double x_mu = x - mu;
+    final double sigmasq = sigma * sigma;
+    return 1 / (Math.sqrt(TWOPI * sigmasq)) * Math.exp(-1 * x_mu * x_mu / 2 / sigmasq);
   }
 
   /**
@@ -204,5 +229,15 @@ public class MathUtil {
    */
   public static double normalCDF(double x, double mu, double sigma) {
     return (1 + ErrorFunctions.erf(x / Math.sqrt(2))) / 2;
+  }
+
+  /**
+   * Compute the sum of the i first integers.
+   * 
+   * @param i maximum summand
+   * @return Sum
+   */
+  public static long sumFirstIntegers(final long i) {
+    return ((i - 1L) * i) / 2;
   }
 }

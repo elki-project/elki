@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -45,7 +46,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
   /**
    * Precomputed static value
    */
-  public final static double ONEBYSQRT2PI = 1.0 / Math.sqrt(2 * Math.PI);
+  public final static double ONEBYSQRT2PI = 1.0 / MathUtil.SQRTTWOPI;
 
   private static final double DELTA = 0.0001;
 

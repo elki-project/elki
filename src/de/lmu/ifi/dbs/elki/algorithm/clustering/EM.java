@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -159,7 +160,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     for(int i = 0; i < k; i++) {
       Matrix m = Matrix.identity(dimensionality, dimensionality);
       covarianceMatrices.add(m);
-      normDistrFactor.add(1.0 / Math.sqrt(Math.pow(2 * Math.PI, dimensionality) * m.det()));
+      normDistrFactor.add(1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * m.det()));
       invCovMatr.add(m.inverse());
       clusterWeights.add(1.0 / k);
       if(logger.isDebuggingFinest()) {
@@ -229,7 +230,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
         covarianceMatrices.set(i, covarianceMatrices.get(i).times(1 / sumOfClusterProbabilities[i]).cheatToAvoidSingularity(SINGULARITY_CHEAT));
       }
       for(int i = 0; i < k; i++) {
-        normDistrFactor.set(i, 1.0 / Math.sqrt(Math.pow(2 * Math.PI, dimensionality) * covarianceMatrices.get(i).det()));
+        normDistrFactor.set(i, 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * covarianceMatrices.get(i).det()));
         invCovMatr.set(i, covarianceMatrices.get(i).inverse());
       }
       // reassign probabilities
