@@ -89,6 +89,7 @@
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
 	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
+		<exclude name="de/lmu/ifi/dbs/elki/index/tree/spatial/rstarvariants/rdknn/**" />
 		<exclude name="experimentalcode/attenberger/**" />
 		<exclude name="experimentalcode/erich/gearth/**" />
 		<exclude name="experimentalcode/erich/newdblayer/**" />
