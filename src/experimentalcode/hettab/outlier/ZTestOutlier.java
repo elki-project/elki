@@ -85,13 +85,13 @@ public class ZTestOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorith
    * @param config
    * @return
    */
-  public static <V extends NumberVector<V, ?>> MedianAlgorithm<V> parameterize(Parameterization config) {
+  public static <V extends NumberVector<V, ?>> ZTestOutlier<V> parameterize(Parameterization config) {
     final NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
     final int y = getParameterY(config);
     if(config.hasErrors()) {
       return null;
     }
-    return new MedianAlgorithm<V>(npred, y);
+    return new ZTestOutlier<V>(npred, y);
   }
 
   protected static int getParameterY(Parameterization config) {
