@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
@@ -1060,6 +1061,29 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   }
 
   /**
+   * Sorts the entries of the specified node according to their minimum distance
+   * to the specified object.
+   * 
+   * @param node the node
+   * @param q the query object
+   * @param distanceFunction the distance function for computing the distances
+   * @return a list of the sorted entries
+   */
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, O q, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
+    List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
+
+    for(int i = 0; i < node.getNumEntries(); i++) {
+      @SuppressWarnings("unchecked")
+      E entry = (E) node.getEntry(i);
+      D minDist = distanceFunction.minDist(entry, q);
+      result.add(new DistanceEntry<D, E>(entry, minDist, i));
+    }
+
+    Collections.sort(result);
+    return result;
+  }
+  
+  /**
    * Condenses the tree after deletion of some nodes.
    * 
    * @param subtree the subtree to be condensed
@@ -1214,6 +1238,14 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    if (distanceFunction.getDistanceFactory() instanceof DoubleDistance) {
+      @SuppressWarnings("unchecked")
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) dq;
+      @SuppressWarnings("unchecked")
+      SpatialPrimitiveDistanceFunction<? super O, DoubleDistance> dfc = (SpatialPrimitiveDistanceFunction<? super O, DoubleDistance>) df;
+      KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<O>(relation, this, dqc, dfc);
+      return (KNNQuery<O, D>) q;
+    }
     return new GenericRStarTreeKNNQuery<O, D>(relation, this, dq, df);
   }
 
@@ -1228,6 +1260,14 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    if (distanceFunction.getDistanceFactory() instanceof DoubleDistance) {
+      @SuppressWarnings("unchecked")
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) dq;
+      @SuppressWarnings("unchecked")
+      SpatialPrimitiveDistanceFunction<? super O, DoubleDistance> dfc = (SpatialPrimitiveDistanceFunction<? super O, DoubleDistance>) df;
+      KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<O>(relation, this, dqc, dfc);
+      return (KNNQuery<O, D>) q;
+    }
     return new GenericRStarTreeKNNQuery<O, D>(relation, this, dq, df);
   }
 
