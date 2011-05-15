@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -26,7 +25,6 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
  * A proxy database to use e.g. for projections and partitions.
@@ -82,30 +80,6 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
   @Override
   public String getShortName() {
     return "Proxy database";
-  }
-
-  @SuppressWarnings("unused")
-  @Override
-  public DBIDs insert(MultipleObjectsBundle objpackages) throws UnableToComplyException {
-    throw new UnsupportedOperationException("Proxy databases are read-only!");
-  }
-
-  @SuppressWarnings("unused")
-  @Override
-  public DBID insert(SingleObjectBundle objpackage) throws UnableToComplyException {
-    throw new UnsupportedOperationException("Proxy databases are read-only!");
-  }
-
-  @SuppressWarnings("unused")
-  @Override
-  public SingleObjectBundle delete(DBID id) {
-    throw new UnsupportedOperationException("Proxy databases are read-only!");
-  }
-
-  @SuppressWarnings("unused")
-  @Override
-  public List<SingleObjectBundle> delete(DBIDs ids) {
-    throw new UnsupportedOperationException("Proxy databases are read-only!");
   }
 
   @SuppressWarnings("deprecation")

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.datasource;
 
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -21,5 +21,5 @@ public interface DatabaseConnection extends Parameterizable {
    * 
    * @return a Database according to parameter settings
    */
-  Database getDatabase();
+  UpdatableDatabase getDatabase();
 }

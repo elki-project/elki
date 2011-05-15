@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.datasource;
 import java.io.InputStream;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser;
@@ -59,13 +59,13 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
    * @param filters Filters to use
    * @param parser the parser to provide a database
    */
-  public InputStreamDatabaseConnection(Database database, List<ObjectFilter> filters, Parser parser) {
+  public InputStreamDatabaseConnection(UpdatableDatabase database, List<ObjectFilter> filters, Parser parser) {
     super(database, filters);
     this.parser = parser;
   }
 
   @Override
-  public Database getDatabase() {
+  public UpdatableDatabase getDatabase() {
     try {
       if(logger.isDebugging()) {
         logger.debugFine("*** parse");

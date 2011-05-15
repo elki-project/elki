@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
@@ -14,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -22,7 +19,6 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
  * Database specifies the requirements for any database implementation. Note
@@ -42,43 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * @apiviz.uses DataStoreListener oneway - - invokes
  */
 public interface Database extends HierarchicalResult {
-  /**
-   * Inserts the given objects and their associations into the database.
-   * 
-   * @param objpackages the objects to be inserted
-   * @return the IDs assigned to the inserted objects
-   * @throws UnableToComplyException if insertion is not possible
-   */
-  DBIDs insert(MultipleObjectsBundle objpackages) throws UnableToComplyException;
-
-  /**
-   * Inserts the given object package into the database.
-   * 
-   * @param objpackage the packaged object
-   * @return the ID assigned to the inserted object
-   * @throws UnableToComplyException if insertion is not possible
-   */
-  DBID insert(SingleObjectBundle objpackage) throws UnableToComplyException;
-
-  /**
-   * Removes and returns the object with the given id from the database.
-   * 
-   * @param id the id of an object to be removed from the database
-   * @return the object that has been removed
-   * @throws UnableToComplyException if deletion is not possible
-   */
-  SingleObjectBundle delete(DBID id);
-
-  /**
-   * Removes and returns the specified objects with the given ids from the
-   * database.
-   * 
-   * @param ids the ids of the object to be removed from the database
-   * @return the objects that have been removed
-   * @throws UnableToComplyException if deletion is not possible
-   */
-  List<SingleObjectBundle> delete(DBIDs ids);
-
   /**
    * Returns the number of objects contained in this Database.
    * 
