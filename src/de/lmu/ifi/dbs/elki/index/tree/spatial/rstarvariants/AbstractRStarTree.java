@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
@@ -1212,6 +1213,16 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    if (df instanceof SpatialPrimitiveNumberDistanceFunction) {
+      DistanceQuery<O, ?> dqc1 = dq;
+      @SuppressWarnings("unchecked")
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) dqc1;
+      SpatialPrimitiveNumberDistanceFunction<? super O, ?> dfc1 = (SpatialPrimitiveNumberDistanceFunction<? super O, ?>) df;
+      @SuppressWarnings("unchecked")
+      SpatialPrimitiveNumberDistanceFunction<? super O, DoubleDistance> dfc = (SpatialPrimitiveNumberDistanceFunction<? super O, DoubleDistance>) dfc1;
+      RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<O>(relation, this, dqc, dfc);
+      return (RangeQuery<O, D>) q;
+    }
     return new GenericRStarTreeRangeQuery<O, D>(relation, this, dq, df);
   }
 
@@ -1226,6 +1237,16 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    if (df instanceof SpatialPrimitiveNumberDistanceFunction) {
+      DistanceQuery<O, ?> dqc1 = dq;
+      @SuppressWarnings("unchecked")
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) dqc1;
+      SpatialPrimitiveNumberDistanceFunction<? super O, ?> dfc1 = (SpatialPrimitiveNumberDistanceFunction<? super O, ?>) df;
+      @SuppressWarnings("unchecked")
+      SpatialPrimitiveNumberDistanceFunction<? super O, DoubleDistance> dfc = (SpatialPrimitiveNumberDistanceFunction<? super O, DoubleDistance>) dfc1;
+      RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<O>(relation, this, dqc, dfc);
+      return (RangeQuery<O, D>) q;
+    }
     return new GenericRStarTreeRangeQuery<O, D>(relation, this, dq, df);
   }
 
