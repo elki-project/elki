@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveNumberDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
 /**
@@ -53,7 +53,7 @@ public class KDTree<V extends NumberVector<?, ?>> {
    * @param distanceFunction
    * @return
    */
-  public DistanceList findNearestNeighbors(DBID id, int k, PrimitiveNumberDistanceFunction<V, ?> distanceFunction) {
+  public DistanceList findNearestNeighbors(DBID id, int k, PrimitiveDoubleDistanceFunction<V> distanceFunction) {
     V vector = this.relation.get(id);
     KDTreeNode node = searchNodeFor(vector, this.root);
 
@@ -64,7 +64,7 @@ public class KDTree<V extends NumberVector<?, ?>> {
     return distanceList;
   }
 
-  private void findNeighbors(int k, PrimitiveNumberDistanceFunction<V, ?> distanceFunction, V queryVector, KDTreeNode currentNode, DistanceList distanceList, Set<KDTreeNode> alreadyVisited) {
+  private void findNeighbors(int k, PrimitiveDoubleDistanceFunction<V> distanceFunction, V queryVector, KDTreeNode currentNode, DistanceList distanceList, Set<KDTreeNode> alreadyVisited) {
     for(DBID id : currentNode.ids) {
       double maxDistance = (distanceList.getSize() >= k ? distanceList.getLast().second : Double.POSITIVE_INFINITY);
       double distanceToId = distanceFunction.doubleDistance(queryVector, relation.get(id));

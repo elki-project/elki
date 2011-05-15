@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveNumberDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -96,7 +96,7 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
    */
   public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("knn.reachdistfunction", "Distance function to determine the reachability distance between database objects.");
 
-  private final PrimitiveNumberDistanceFunction<V, DoubleDistance> distanceAlgorithm;
+  private final PrimitiveDoubleDistanceFunction<V> distanceAlgorithm;
 
   private int totalTasks;
 
@@ -111,7 +111,7 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
    * @param distanceAlgorithm
    * @param multiThreaded
    */
-  public KnnDataProcessor(boolean verbose, File input, int maxK, PrimitiveNumberDistanceFunction<V, DoubleDistance> distanceAlgorithm, boolean multiThreaded) {
+  public KnnDataProcessor(boolean verbose, File input, int maxK, PrimitiveDoubleDistanceFunction<V> distanceAlgorithm, boolean multiThreaded) {
     super(verbose);
     this.input = input;
     this.maxK = maxK;
@@ -303,7 +303,7 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
 
     boolean multiThreaded = false;
 
-    private PrimitiveNumberDistanceFunction<V, DoubleDistance> distanceAlgorithm = null;
+    private PrimitiveDoubleDistanceFunction<V> distanceAlgorithm = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -334,7 +334,7 @@ public class KnnDataProcessor<V extends NumberVector<V, ?>> extends AbstractAppl
      * @return Parameter value or null.
      */
     protected void configParameterReachabilityDistanceFunction(Parameterization config) {
-      final ObjectParameter<PrimitiveNumberDistanceFunction<V, DoubleDistance>> param = new ObjectParameter<PrimitiveNumberDistanceFunction<V, DoubleDistance>>(REACHABILITY_DISTANCE_FUNCTION_ID, PrimitiveNumberDistanceFunction.class, true);
+      final ObjectParameter<PrimitiveDoubleDistanceFunction<V>> param = new ObjectParameter<PrimitiveDoubleDistanceFunction<V>>(REACHABILITY_DISTANCE_FUNCTION_ID, PrimitiveDoubleDistanceFunction.class, true);
       if(config.grab(param)) {
         distanceAlgorithm = param.instantiateClass(config);
       }
