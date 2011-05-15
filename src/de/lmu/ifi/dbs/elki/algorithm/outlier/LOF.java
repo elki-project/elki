@@ -260,14 +260,12 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   protected WritableDataStore<Double> computeLRDs(DBIDs ids, KNNQuery<O, D> knnReach) {
     WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
-    int counter = 0;
     for(DBID id : ids) {
-      counter++;
       double sum = 0;
       List<DistanceResultPair<D>> neighbors = knnReach.getKNNForDBID(id, k);
       int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
       for(DistanceResultPair<D> neighbor : neighbors) {
-        if(objectIsInKNN || neighbor.getDBID() != id) {
+        if(objectIsInKNN || !neighbor.getDBID().equals(id)) {
           List<DistanceResultPair<D>> neighborsNeighbors = knnReach.getKNNForDBID(neighbor.getDBID(), k);
           sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
         }
@@ -276,7 +274,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       Double lrd = (sum > 0) ? nsize / sum : 0.0;
       lrds.put(id, lrd);
       if(lrdsProgress != null) {
-        lrdsProgress.setProcessed(counter, logger);
+        lrdsProgress.incrementProcessed(logger);
       }
     }
     if(lrdsProgress != null) {
@@ -300,9 +298,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     MinMax<Double> lofminmax = new MinMax<Double>();
 
     FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
-    int counter = 0;
     for(DBID id : ids) {
-      counter++;
       double lrdp = lrds.get(id);
       final Double lof;
       if(lrdp > 0) {
@@ -312,7 +308,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         // neighbors.remove(0);
         double sum = 0;
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if(objectIsInKNN || neighbor.getDBID() != id) {
+          if(objectIsInKNN || !neighbor.getDBID().equals(id)) {
             sum += lrds.get(neighbor.getDBID());
           }
         }
@@ -326,7 +322,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       lofminmax.put(lof);
 
       if(progressLOFs != null) {
-        progressLOFs.setProcessed(counter, logger);
+        progressLOFs.incrementProcessed(logger);
       }
     }
     if(progressLOFs != null) {

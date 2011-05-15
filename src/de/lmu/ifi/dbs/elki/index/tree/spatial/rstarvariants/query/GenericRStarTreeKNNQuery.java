@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -209,7 +207,9 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
-
+    return null;
+    // While this works, it seems to be slow at least for large sets!
+    /*
     final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
     for(DBID id : ids) {
       knnLists.put(id, new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
@@ -223,7 +223,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     for(DBID id : ids) {
       result.add(knnLists.get(id).toSortedArrayList());
     }
-    return result;
+    return result; */
   }
 
   @Override
