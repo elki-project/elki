@@ -182,7 +182,7 @@ public class SquareEuclideanDistanceFunction extends AbstractPrimitiveDistanceFu
    *         <code>mbr2</code>.
    */
   @Override
-  public DoubleDistance mbrDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(square_distance(mbr1, mbr2));
   }
 
