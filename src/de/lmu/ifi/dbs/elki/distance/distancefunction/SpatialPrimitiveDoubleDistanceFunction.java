@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Interface combining spatial primitive distance functions with primitive
@@ -14,9 +14,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
-public interface SpatialPrimitiveNumberDistanceFunction<V extends SpatialComparable, D extends NumberDistance<D, ?>> extends SpatialPrimitiveDistanceFunction<V, D>, PrimitiveNumberDistanceFunction<V, D> {
+public interface SpatialPrimitiveDoubleDistanceFunction<V extends SpatialComparable> extends SpatialPrimitiveDistanceFunction<V, DoubleDistance>, PrimitiveDoubleDistanceFunction<V> {
   /**
    * Computes the distance between the two given MBRs according to this
    * distance function.
