@@ -1214,11 +1214,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
     if (df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, ?> dqc1 = dq;
-      @SuppressWarnings("unchecked")
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) dqc1;
-      @SuppressWarnings("unchecked")
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) df;
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(dq);
+      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>)SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
       RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<O>(relation, this, dqc, dfc);
       return (RangeQuery<O, D>) q;
     }
@@ -1237,11 +1234,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
     if (df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, ?> dqc1 = dq;
-      @SuppressWarnings("unchecked")
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) dqc1;
-      @SuppressWarnings("unchecked")
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) df;
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(dq);
+      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>)SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
       RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<O>(relation, this, dqc, dfc);
       return (RangeQuery<O, D>) q;
     }
@@ -1259,11 +1253,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
     if (df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, ?> dqc1 = dq;
-      @SuppressWarnings("unchecked")
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) dqc1;
-      @SuppressWarnings("unchecked")
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) df;
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(dq);
+      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>)SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
       KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<O>(relation, this, dqc, dfc);
       return (KNNQuery<O, D>) q;
     }
@@ -1282,11 +1273,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
     DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
     if (df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, ?> dqc1 = dq;
-      @SuppressWarnings("unchecked")
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) dqc1;
-      @SuppressWarnings("unchecked")
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) df;
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(dq);
+      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>)SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
       KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<O>(relation, this, dqc, dfc);
       return (KNNQuery<O, D>) q;
     }

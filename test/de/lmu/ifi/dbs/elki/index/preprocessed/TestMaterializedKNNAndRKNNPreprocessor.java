@@ -12,7 +12,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -74,7 +74,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
 
     // get database
     FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, params);
-    Database db = dbconn.getDatabase();
+    UpdatableDatabase db = dbconn.getDatabase();
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector, DoubleDistance> distanceQuery = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
 

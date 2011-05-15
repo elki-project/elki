@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
@@ -102,7 +102,7 @@ public class TestIndexStructures implements JUnit4Test {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(HashmapDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams, GenericRStarTreeKNNQuery.class, GenericRStarTreeRangeQuery.class);
+    testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, GenericRStarTreeRangeQuery.class);
   }
 
   /**
@@ -118,7 +118,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(HashmapDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractRStarTreeFactory.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams, GenericRStarTreeKNNQuery.class, GenericRStarTreeRangeQuery.class);
+    testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, GenericRStarTreeRangeQuery.class);
   }
 
   /**
