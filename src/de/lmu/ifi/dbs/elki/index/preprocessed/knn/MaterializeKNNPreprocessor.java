@@ -86,15 +86,29 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   protected void preprocess() {
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
 
+    logger.warning("Using knnQuery: " + knnQuery);
+
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
 
+    // Try bulk
     List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
-    for(int i = 0; i < ids.size(); i++) {
-      DBID id = ids.get(i);
-      storage.put(id, kNNList.get(i));
-      if(progress != null) {
-        progress.incrementProcessed(getLogger());
+    if (kNNList != null) {
+      for(int i = 0; i < ids.size(); i++) {
+        DBID id = ids.get(i);
+        storage.put(id, kNNList.get(i));
+        if(progress != null) {
+          progress.incrementProcessed(getLogger());
+        }
+      }
+    }
+    else {
+      for(DBID id : ids) {
+        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(id, k);
+        storage.put(id, knn);
+        if(progress != null) {
+          progress.incrementProcessed(getLogger());
+        }
       }
     }
 

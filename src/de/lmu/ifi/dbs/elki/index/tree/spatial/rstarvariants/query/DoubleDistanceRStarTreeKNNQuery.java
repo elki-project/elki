@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -221,7 +220,10 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
+    return null;
 
+    // While this works, it seems to be slow at least for large sets!
+    /*
     final Map<DBID, KNNHeap<DoubleDistance>> knnLists = new HashMap<DBID, KNNHeap<DoubleDistance>>(ids.size());
     for(DBID id : ids) {
       knnLists.put(id, new KNNHeap<DoubleDistance>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
@@ -234,6 +236,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       result.add(knnLists.get(id).toSortedArrayList());
     }
     return result;
+    */
   }
 
   @Override
