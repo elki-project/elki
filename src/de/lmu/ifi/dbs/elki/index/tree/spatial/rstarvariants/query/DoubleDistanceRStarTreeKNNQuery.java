@@ -14,12 +14,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveNumberDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
@@ -47,7 +48,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
   /**
    * Spatial primitive distance function
    */
-  protected final SpatialPrimitiveDistanceFunction<? super O, DoubleDistance> distanceFunction;
+  protected final SpatialPrimitiveNumberDistanceFunction<? super O, DoubleDistance> distanceFunction;
 
   /**
    * Constructor.
@@ -57,7 +58,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public DoubleDistanceRStarTreeKNNQuery(Relation<? extends O> relation, AbstractRStarTree<O, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, DoubleDistance> distanceFunction) {
+  public DoubleDistanceRStarTreeKNNQuery(Relation<? extends O> relation, AbstractRStarTree<O, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveNumberDistanceFunction<? super O, DoubleDistance> distanceFunction) {
     super(relation, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;
@@ -91,10 +92,10 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           SpatialEntry entry = node.getEntry(i);
-          double distance = distanceFunction.minDist(entry, object).doubleValue();
+          double distance = distanceFunction.doubleMinDist(entry, object);
           index.distanceCalcs++;
           if(distance <= maxDist) {
-            knnList.add(new DoubleDistance(distance), ((LeafEntry) entry).getDBID());
+            knnList.add(new DoubleDistanceResultPair(distance, ((LeafEntry) entry).getDBID()));
             maxDist = knnList.getKNNDistance().doubleValue();
           }
         }
@@ -103,7 +104,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
           SpatialEntry entry = node.getEntry(i);
-          double distance = distanceFunction.minDist(entry, object).doubleValue();
+          double distance = distanceFunction.doubleMinDist(entry, object);
           index.distanceCalcs++;
           if(distance <= maxDist) {
             pq.add(new DoubleDistanceSearchCandidate(distance, entry.getEntryID()));
@@ -175,7 +176,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       SpatialEntry entry = node.getEntry(i);
       double minMinDist = Double.MAX_VALUE;
       for(DBID id : ids) {
-        double minDist = distanceQuery.minDist(entry, id).doubleValue();
+        double minDist = distanceFunction.doubleMinDist(entry, relation.get(id));
         minMinDist = Math.min(minDist, minMinDist);
       }
       result.add(new DoubleDistanceEntry(entry, minMinDist));
@@ -187,7 +188,9 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
   class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
     SpatialEntry entry;
+
     double distance;
+
     public DoubleDistanceEntry(SpatialEntry entry, double distance) {
       this.entry = entry;
       this.distance = distance;
@@ -198,7 +201,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       return Double.compare(this.distance, o.distance);
     }
   }
-  
+
   @Override
   public List<DistanceResultPair<DoubleDistance>> getKNNForObject(O obj, int k) {
     if(k < 1) {

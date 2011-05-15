@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveNumberDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  */
-public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveNumberDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
    * Parameter for dimensionality.
    */
@@ -51,45 +51,17 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
    *         distance function
    */
   @Override
-  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     if(dim > v1.getDimensionality() || dim > v2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
 
     double manhattan = v1.doubleValue(dim) - v2.doubleValue(dim);
-    return new DoubleDistance(Math.abs(manhattan));
+    return Math.abs(manhattan);
   }
 
   @Override
-  public DoubleDistance minDist(SpatialComparable mbr, NumberVector<?, ?> v) {
-    if(dim > mbr.getDimensionality() || dim > v.getDimensionality()) {
-      throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString() + "\n  dimension: " + dim);
-    }
-
-    double value = v.doubleValue(dim);
-    double r;
-    if(value < mbr.getMin(dim)) {
-      r = mbr.getMin(dim);
-    }
-    else if(value > mbr.getMax(dim)) {
-      r = mbr.getMax(dim);
-    }
-    else {
-      r = value;
-    }
-
-    double manhattan = value - r;
-    return new DoubleDistance(Math.abs(manhattan));
-  }
-
-  // FIXME: REMOVE?
-  /*
-   * @Override public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
-   * return minDist(mbr, getDatabase().get(id)); }
-   */
-
-  @Override
-  public DoubleDistance mbrDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
@@ -109,11 +81,11 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
     }
     double manhattan = m1 - m2;
 
-    return new DoubleDistance(Math.abs(manhattan));
+    return Math.abs(manhattan);
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
@@ -123,7 +95,22 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
 
     double manhattan = c1 - c2;
 
-    return new DoubleDistance(Math.abs(manhattan));
+    return Math.abs(manhattan);
+  }
+
+  @Override
+  public DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+    return new DoubleDistance(doubleDistance(o1, o2));
+  }
+
+  @Override
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
+  }
+
+  @Override
+  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
   }
 
   /**

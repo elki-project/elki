@@ -11,12 +11,12 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveNumberDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
- * Optimized linear scan query for {@link RawDoubleDistance}s.
+ * Optimized linear scan query for {@link PrimitiveNumberDistanceFunction}s.
  * 
  * @author Erich Schubert
  * 
@@ -33,7 +33,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
    */
   public LinearScanRawDoubleDistanceKNNQuery(Relation<? extends O> relation, PrimitiveDistanceQuery<O, DoubleDistance> distanceQuery) {
     super(relation, distanceQuery);
-    if(!(distanceQuery.getDistanceFunction() instanceof RawDoubleDistance)) {
+    if(!(distanceQuery.getDistanceFunction() instanceof PrimitiveNumberDistanceFunction)) {
       throw new UnsupportedOperationException("LinearScanRawDoubleDistance instantiated for non-RawDoubleDistance!");
     }
   }
@@ -46,7 +46,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
   @Override
   public List<DistanceResultPair<DoubleDistance>> getKNNForObject(O obj, int k) {
     @SuppressWarnings("unchecked")
-    final RawDoubleDistance<O> rawdist = (RawDoubleDistance<O>) distanceQuery.getDistanceFunction();
+    final PrimitiveNumberDistanceFunction<O, DoubleDistance> rawdist = (PrimitiveNumberDistanceFunction<O, DoubleDistance>) distanceQuery.getDistanceFunction();
     // Optimization for double distances.
     final KNNHeap<DoubleDistance> heap = new KNNHeap<DoubleDistance>(k);
     double max = Double.POSITIVE_INFINITY;
@@ -67,7 +67,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
   @SuppressWarnings("unchecked")
   public List<List<DistanceResultPair<DoubleDistance>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // We have a couple of casts in this implementation to avoid generics hacks.
-    final RawDoubleDistance<O> rawdist = (RawDoubleDistance<O>) distanceQuery.getDistanceFunction();
+    final PrimitiveNumberDistanceFunction<O, DoubleDistance> rawdist = (PrimitiveNumberDistanceFunction<O, DoubleDistance>) distanceQuery.getDistanceFunction();
     final int size = ids.size();
     final Object[] heaps = new Object[size];
     // TODO: this array can become quite large - save it?

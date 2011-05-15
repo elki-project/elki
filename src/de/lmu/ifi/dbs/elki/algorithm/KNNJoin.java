@@ -139,7 +139,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
         if(up) {
           for(E ps_entry : ps_candidates) {
-            D distance = distFunction.mbrDist(pr_entry, ps_entry);
+            D distance = distFunction.minDist(pr_entry, ps_entry);
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = index.getNode(ps_entry);
@@ -152,7 +152,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         else {
           for(int s = ps_candidates.size() - 1; s >= 0; s--) {
             E ps_entry = ps_candidates.get(s);
-            D distance = distFunction.mbrDist(pr_entry, ps_entry);
+            D distance = distFunction.minDist(pr_entry, ps_entry);
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = index.getNode(ps_entry);

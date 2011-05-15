@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveNumberDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Elke Achtert
  */
-public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?, ?>> implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?, ?>> implements SpatialPrimitiveNumberDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
    * Constructor.
    * 
@@ -37,7 +37,7 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
    *         selected dimensions
    */
   @Override
-  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " + "first argument: " + v1 + "\n  " + "second argument: " + v2);
     }
@@ -51,11 +51,10 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
       double manhattanI = v1.doubleValue(d + 1) - v2.doubleValue(d + 1);
       sqrDist += manhattanI * manhattanI;
     }
-    return new DoubleDistance(Math.sqrt(sqrDist));
+    return Math.sqrt(sqrDist);
   }
 
-  @Override
-  public DoubleDistance minDist(SpatialComparable mbr, NumberVector<?, ?> v) {
+  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -80,17 +79,11 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
       double manhattanI = value - r;
       sqrDist += manhattanI * manhattanI;
     }
-    return new DoubleDistance(Math.sqrt(sqrDist));
+    return Math.sqrt(sqrDist);
   }
 
-  // FIXME: REMOVE?
-  // @Override
-  // public DoubleDistance minDist(HyperBoundingBox mbr, DBID id) {
-  // return minDist(mbr, getDatabase().get(id));
-  // }
-
   @Override
-  public DoubleDistance mbrDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
@@ -100,7 +93,7 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
 
     double sqrDist = 0;
     for(int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
-      double m1, m2;
+      final double m1, m2;
       if(mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr1.getMax(d);
         m2 = mbr2.getMin(d);
@@ -110,17 +103,16 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
         m2 = mbr2.getMax(d);
       }
       else { // The mbrs intersect!
-        m1 = 0;
-        m2 = 0;
+        continue;
       }
       double manhattanI = m1 - m2;
       sqrDist += manhattanI * manhattanI;
     }
-    return new DoubleDistance(Math.sqrt(sqrDist));
+    return Math.sqrt(sqrDist);
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
@@ -136,9 +128,24 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
       double manhattanI = c1 - c2;
       sqrDist += manhattanI * manhattanI;
     }
-    return new DoubleDistance(Math.sqrt(sqrDist));
+    return Math.sqrt(sqrDist);
   }
 
+  @Override
+  public DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+    return new DoubleDistance(doubleDistance(o1, o2));
+  }
+
+  @Override
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
+  }
+
+  @Override
+  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
+  }
+  
   @Override
   public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;

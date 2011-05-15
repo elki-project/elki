@@ -37,7 +37,7 @@ public class SpatialPrimitiveDistanceQuery<V extends SpatialComparable, D extend
 
   @Override
   public D mbrDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return distanceFunction.mbrDist(mbr1, mbr2);
+    return distanceFunction.minDist(mbr1, mbr2);
   }
 
   @Override
