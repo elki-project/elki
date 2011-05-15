@@ -229,7 +229,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
         if(!entry2.hasHandled()) {
           continue;
         }
-        D distance = distFunction.mbrDist(entry1, entry2);
+        D distance = distFunction.minDist(entry1, entry2);
 
         SpatialObjectPair nodePair = new SpatialObjectPair(distance, entry1, entry2, true);
         heap.add(nodePair);
@@ -262,7 +262,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
           continue;
         }
 
-        D distance = distFunction.mbrDist(entry1, entry2);
+        D distance = distFunction.minDist(entry1, entry2);
         D reach = DistanceUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
         SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
         heap.add(dataPair);
@@ -293,7 +293,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
         if(entry1.hasHandled()) {
           continue;
         }
-        D distance = distFunction.mbrDist(entry1, entry2);
+        D distance = distFunction.minDist(entry1, entry2);
         D reach = DistanceUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
         SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
         heap.add(dataPair);
@@ -306,7 +306,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
 
         // not yet expanded
         if(!expanded.contains(entry1.getEntryID())) {
-          D distance = distFunction.mbrDist(entry1, entry2);
+          D distance = distFunction.minDist(entry1, entry2);
           SpatialObjectPair nodePair = new SpatialObjectPair(distance, entry1, entry2, true);
           heap.add(nodePair);
         }

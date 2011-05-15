@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.RawDoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveNumberDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -36,9 +36,9 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
 
   @Override
   public List<DistanceResultPair<DoubleDistance>> getRangeForDBID(DBID id, DoubleDistance range) {
-    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof PrimitiveNumberDistanceFunction) {
       @SuppressWarnings("unchecked")
-      RawDoubleDistance<O> rawdist = (RawDoubleDistance<O>) distanceQuery.getDistanceFunction();
+      PrimitiveNumberDistanceFunction<O, DoubleDistance> rawdist = (PrimitiveNumberDistanceFunction<O, DoubleDistance>) distanceQuery.getDistanceFunction();
       double epsilon = range.doubleValue();
 
       O qo = relation.get(id);
@@ -59,9 +59,9 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
 
   @Override
   public List<DistanceResultPair<DoubleDistance>> getRangeForObject(O obj, DoubleDistance range) {
-    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof RawDoubleDistance) {
+    if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof PrimitiveNumberDistanceFunction) {
       @SuppressWarnings("unchecked")
-      RawDoubleDistance<O> rawdist = (RawDoubleDistance<O>) distanceQuery.getDistanceFunction();
+      PrimitiveNumberDistanceFunction<O, DoubleDistance> rawdist = (PrimitiveNumberDistanceFunction<O, DoubleDistance>) distanceQuery.getDistanceFunction();
       double epsilon = range.doubleValue();
 
       List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();

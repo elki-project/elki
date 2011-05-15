@@ -1,19 +1,22 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 
 /**
- * API for a spatial primitive distance function.
+ * Interface combining spatial primitive distance functions with primitive
+ * number distance functions. This allows for optimization in the most common
+ * types, while not sacrificing generality to support the others.
+ * 
+ * In essence, you should use this interface only in specialized optimized
+ * codepaths.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public interface SpatialPrimitiveDistanceFunction<V extends SpatialComparable, D extends Distance<D>> extends PrimitiveDistanceFunction<V, D> {
+public interface SpatialPrimitiveNumberDistanceFunction<V extends SpatialComparable, D extends NumberDistance<D, ?>> extends SpatialPrimitiveDistanceFunction<V, D>, PrimitiveNumberDistanceFunction<V, D> {
   /**
    * Computes the distance between the two given MBRs according to this
    * distance function.
@@ -23,7 +26,7 @@ public interface SpatialPrimitiveDistanceFunction<V extends SpatialComparable, D
    * @return the distance between the two given MBRs according to this
    *         distance function
    */
-  D minDist(SpatialComparable mbr1, SpatialComparable mbr2);
+  double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2);
 
   /**
    * Computes the distance between the centroids of the two given MBRs
@@ -34,8 +37,5 @@ public interface SpatialPrimitiveDistanceFunction<V extends SpatialComparable, D
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
    */
-  D centerDistance(SpatialComparable mbr1, SpatialComparable mbr2);
-  
-  @Override
-  public <T extends V> SpatialDistanceQuery<T, D> instantiate(Relation<T> relation);
+  double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2);
 }

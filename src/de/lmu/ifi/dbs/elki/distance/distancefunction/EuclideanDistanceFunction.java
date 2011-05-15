@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance>, RawDoubleDistance<NumberVector<?, ?>> {
+public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveNumberDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
   /**
    * Static instance. Use this!
    */
@@ -49,8 +49,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     return Math.sqrt(sqrDist);
   }
 
-  @Override
-  public DoubleDistance minDist(SpatialComparable mbr, NumberVector<?, ?> v) {
+  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
     final int dim = mbr.getDimensionality();
     if(dim != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString() + "\n" + dim + "!=" + v.getDimensionality());
@@ -73,11 +72,23 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
       final double manhattanI = value - r;
       sqrDist += manhattanI * manhattanI;
     }
-    return new DoubleDistance(Math.sqrt(sqrDist));
+    return Math.sqrt(sqrDist);
   }
 
   @Override
-  public DoubleDistance mbrDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    // Some optimizations for simpler cases.
+    if(mbr1 instanceof NumberVector) {
+      if(mbr2 instanceof NumberVector) {
+        return doubleDistance((NumberVector<?, ?>) mbr1, (NumberVector<?, ?>) mbr2);
+      }
+      else {
+        return doubleMinDistObject(mbr2, (NumberVector<?, ?>) mbr1);
+      }
+    }
+    else if(mbr2 instanceof NumberVector) {
+      return doubleMinDistObject(mbr1, (NumberVector<?, ?>) mbr2);
+    }
     final int dim1 = mbr1.getDimensionality();
     if(dim1 != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
@@ -100,11 +111,21 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
       final double manhattanI = m1 - m2;
       sqrDist += manhattanI * manhattanI;
     }
-    return new DoubleDistance(Math.sqrt(sqrDist));
+    return Math.sqrt(sqrDist);
+  }
+
+  @Override
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }
 
   @Override
   public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
+  }
+
+  @Override
+  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality();
     if(dim1 != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
@@ -118,7 +139,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
       final double manhattanI = c1 - c2;
       sqrDist += manhattanI * manhattanI;
     }
-    return new DoubleDistance(Math.sqrt(sqrDist));
+    return Math.sqrt(sqrDist);
   }
 
   @Override
