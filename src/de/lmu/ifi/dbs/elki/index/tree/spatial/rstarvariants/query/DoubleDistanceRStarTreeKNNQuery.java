@@ -16,8 +16,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveNumberDistanceFunction;
@@ -37,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
  * @author Erich Schubert
  * 
  * @apiviz.uses AbstractRStarTree
- * @apiviz.uses SpatialPrimitiveDistanceFunction
+ * @apiviz.uses SpatialPrimitiveNumberDistanceFunction
  */
 public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extends AbstractDistanceKNNQuery<O, DoubleDistance> {
   /**
@@ -121,7 +119,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param distanceQuery the distance function for computing the distances
    * @param knnLists a map containing the knn lists for each query objects
    */
-  protected void batchNN(AbstractRStarTreeNode<?, ?> node, SpatialDistanceQuery<O, DoubleDistance> distanceQuery, Map<DBID, KNNHeap<DoubleDistance>> knnLists) {
+  protected void batchNN(AbstractRStarTreeNode<?, ?> node, Map<DBID, KNNHeap<DoubleDistance>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry p = node.getEntry(i);
@@ -132,7 +130,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
           DBID pid = ((LeafEntry) p).getDBID();
           // FIXME: objects are NOT accessible by DBID in a plain rtree context!
-          DoubleDistance dist_pq = distanceQuery.distance(pid, q);
+          DoubleDistance dist_pq = distanceFunction.distance(relation.get(pid), relation.get(q));
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
             knns_q.add(dist_pq, pid);
           }
@@ -142,7 +140,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     else {
       ModifiableDBIDs ids = DBIDUtil.newArray(knnLists.size());
       ids.addAll(knnLists.keySet());
-      List<DoubleDistanceEntry> entries = getSortedEntries(node, ids, distanceQuery);
+      List<DoubleDistanceEntry> entries = getSortedEntries(node, ids);
       for(DoubleDistanceEntry distEntry : entries) {
         double minDist = distEntry.distance;
         for(Entry<DBID, KNNHeap<DoubleDistance>> ent : knnLists.entrySet()) {
@@ -152,7 +150,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
           if(minDist <= knn_q_maxDist) {
             SpatialEntry entry = distEntry.entry;
             AbstractRStarTreeNode<?, ?> child = index.getNode(entry.getEntryID());
-            batchNN(child, distanceQuery, knnLists);
+            batchNN(child, knnLists);
             break;
           }
         }
@@ -166,10 +164,9 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * 
    * @param node the node
    * @param ids the id of the objects
-   * @param distanceQuery the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected List<DoubleDistanceEntry> getSortedEntries(AbstractRStarTreeNode<?, ?> node, DBIDs ids, SpatialDistanceQuery<O, DoubleDistance> distanceQuery) {
+  protected List<DoubleDistanceEntry> getSortedEntries(AbstractRStarTreeNode<?, ?> node, DBIDs ids) {
     List<DoubleDistanceEntry> result = new ArrayList<DoubleDistanceEntry>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -230,9 +227,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       knnLists.put(id, new KNNHeap<DoubleDistance>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
     }
 
-    @SuppressWarnings("unchecked")
-    SpatialPrimitiveDistanceQuery<O, DoubleDistance> distanceQuery = (SpatialPrimitiveDistanceQuery<O, DoubleDistance>) getRelation().getDatabase().getDistanceQuery(getRelation(), distanceFunction);
-    batchNN(index.getRoot(), distanceQuery, knnLists);
+    batchNN(index.getRoot(), knnLists);
 
     List<List<DistanceResultPair<DoubleDistance>>> result = new ArrayList<List<DistanceResultPair<DoubleDistance>>>();
     for(DBID id : ids) {
