@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
@@ -36,7 +36,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param parser the parser to provide a database
    * @param in the input stream to parse from.
    */
-  public FileBasedDatabaseConnection(Database database, List<ObjectFilter> filters, Parser parser, InputStream in) {
+  public FileBasedDatabaseConnection(UpdatableDatabase database, List<ObjectFilter> filters, Parser parser, InputStream in) {
     super(database, filters, parser);
     this.in = in;
   }

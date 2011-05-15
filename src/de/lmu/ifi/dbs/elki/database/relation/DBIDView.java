@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -67,7 +68,12 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
 
   @Override
   public void delete(DBID id) {
-    database.delete(id);
+    if(database instanceof UpdatableDatabase) {
+      ((UpdatableDatabase) database).delete(id);
+    }
+    else {
+      throw new UnsupportedOperationException("Deletions are not supported.");
+    }
   }
 
   @Override

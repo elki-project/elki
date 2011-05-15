@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.datasource;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -44,7 +44,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   /**
    * The database provided by the parse method.
    */
-  Database database;
+  UpdatableDatabase database;
 
   /**
    * The filters to invoke
@@ -57,7 +57,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @param database the instance of the database
    * @param filters Filters to apply, can be null
    */
-  protected AbstractDatabaseConnection(Database database, List<ObjectFilter> filters) {
+  protected AbstractDatabaseConnection(UpdatableDatabase database, List<ObjectFilter> filters) {
     this.database = database;
     this.filters = filters;
   }
@@ -93,7 +93,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @apiviz.exclude
    */
   public static abstract class Parameterizer extends AbstractParameterizer {
-    protected Database database = null;
+    protected UpdatableDatabase database = null;
 
     protected List<ObjectFilter> filters;
 
@@ -104,7 +104,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
 
     protected void configDatabase(Parameterization config) {
       // parameter database
-      final ObjectParameter<Database> dbParam = new ObjectParameter<Database>(DATABASE_ID, Database.class, HashmapDatabase.class);
+      final ObjectParameter<UpdatableDatabase> dbParam = new ObjectParameter<UpdatableDatabase>(DATABASE_ID, UpdatableDatabase.class, HashmapDatabase.class);
       if(config.grab(dbParam)) {
         database = dbParam.instantiateClass(config);
       }

@@ -16,6 +16,7 @@ import javax.swing.table.AbstractTableModel;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
@@ -182,6 +183,10 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
    * Delete the marked objects in the database.
    */
   protected void handleDelete() {
+    if (!(database instanceof UpdatableDatabase)) {
+      throw new UnsupportedOperationException("Database not updatable.");
+    }
+    UpdatableDatabase upd = (UpdatableDatabase) database;
     ModifiableDBIDs todel = DBIDUtil.newHashSet();
     ModifiableDBIDs remain = DBIDUtil.newHashSet(dbids);
     for(int row : table.getSelectedRows()) {
@@ -193,7 +198,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     context.setSelection(new DBIDSelection(remain));
     // Now delete them.
     for(DBID id : todel) {
-      database.delete(id);
+      upd.delete(id);
     }
   }
 

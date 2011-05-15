@@ -6,7 +6,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -46,7 +46,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
    * @param seed Random seed
    * @param filters
    */
-  public RandomDoubleVectorDatabaseConnection(Database database, int dim, int size, Long seed, List<ObjectFilter> filters) {
+  public RandomDoubleVectorDatabaseConnection(UpdatableDatabase database, int dim, int size, Long seed, List<ObjectFilter> filters) {
     super(database, filters);
     this.dim = dim;
     this.size = size;
@@ -56,7 +56,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
   private static final Logging logger = Logging.getLogger(RandomDoubleVectorDatabaseConnection.class);
 
   @Override
-  public Database getDatabase() {
+  public UpdatableDatabase getDatabase() {
     VectorFieldTypeInformation<DoubleVector> type = VectorFieldTypeInformation.get(DoubleVector.class, dim);
     List<DoubleVector> vectors = new ArrayList<DoubleVector>(size);
 

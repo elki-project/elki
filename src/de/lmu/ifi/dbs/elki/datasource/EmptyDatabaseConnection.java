@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.datasource;
 
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -24,12 +24,12 @@ public class EmptyDatabaseConnection extends AbstractDatabaseConnection {
    * 
    * @param database the instance of the database
    */
-  protected EmptyDatabaseConnection(Database database) {
+  protected EmptyDatabaseConnection(UpdatableDatabase database) {
     super(database, null);
   }
 
   @Override
-  public Database getDatabase() {
+  public UpdatableDatabase getDatabase() {
     return database;
   }
 
