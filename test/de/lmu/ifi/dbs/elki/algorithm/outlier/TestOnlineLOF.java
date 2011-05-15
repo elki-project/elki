@@ -11,7 +11,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -68,7 +68,7 @@ public class TestOnlineLOF implements JUnit4Test {
   @SuppressWarnings("unchecked")
   @Test
   public void testOnlineLOF() throws UnableToComplyException {
-    Database db = getDatabase();
+    UpdatableDatabase db = getDatabase();
 
     // 1. Run LOF
     LOF<DoubleVector, DoubleDistance> lof = new LOF<DoubleVector, DoubleDistance>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
@@ -92,7 +92,7 @@ public class TestOnlineLOF implements JUnit4Test {
    * Run OnlineLOF (with insertions and removals) on database.
    */
   @SuppressWarnings("unchecked")
-  private static OutlierResult runOnlineLOF(Database db) throws UnableToComplyException {
+  private static OutlierResult runOnlineLOF(UpdatableDatabase db) throws UnableToComplyException {
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
     // setup algorithm
@@ -120,7 +120,7 @@ public class TestOnlineLOF implements JUnit4Test {
   /**
    * Returns the database.
    */
-  private static Database getDatabase() {
+  private static UpdatableDatabase getDatabase() {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
@@ -131,7 +131,7 @@ public class TestOnlineLOF implements JUnit4Test {
     }
 
     // get database
-    Database db = dbconn.getDatabase();
+    UpdatableDatabase db = dbconn.getDatabase();
     return db;
   }
 
