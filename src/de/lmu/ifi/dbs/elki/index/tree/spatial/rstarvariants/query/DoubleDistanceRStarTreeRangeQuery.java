@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveNumberDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -40,7 +40,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
   /**
    * Spatial primitive distance function
    */
-  protected final SpatialPrimitiveNumberDistanceFunction<? super O, DoubleDistance> distanceFunction;
+  protected final SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction;
 
   /**
    * Constructor.
@@ -50,7 +50,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public DoubleDistanceRStarTreeRangeQuery(Relation<? extends O> relation, AbstractRStarTree<O, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveNumberDistanceFunction<? super O, DoubleDistance> distanceFunction) {
+  public DoubleDistanceRStarTreeRangeQuery(Relation<? extends O> relation, AbstractRStarTree<O, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
     super(relation, distanceQuery);
     this.index = index;
     this.distanceFunction = distanceFunction;

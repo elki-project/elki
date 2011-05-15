@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveNumberDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  */
-public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveNumberDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Parameter for dimensionality.
    */

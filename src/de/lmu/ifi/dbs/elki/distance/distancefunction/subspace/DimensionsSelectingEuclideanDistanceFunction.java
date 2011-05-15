@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveNumberDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Elke Achtert
  */
-public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?, ?>> implements SpatialPrimitiveNumberDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?, ?>> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Constructor.
    * 

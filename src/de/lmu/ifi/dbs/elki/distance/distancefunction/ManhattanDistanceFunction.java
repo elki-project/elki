@@ -10,7 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class ManhattanDistanceFunction extends LPNormDistanceFunction implements PrimitiveNumberDistanceFunction<NumberVector<?,?>, DoubleDistance> {
+// TODO: add spatial!
+public class ManhattanDistanceFunction extends LPNormDistanceFunction {
   /**
    * The static instance to use.
    */

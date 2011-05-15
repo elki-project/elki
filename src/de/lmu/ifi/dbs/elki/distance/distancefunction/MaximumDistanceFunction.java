@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class MaximumDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveNumberDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+public class MaximumDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Static instance.
    */

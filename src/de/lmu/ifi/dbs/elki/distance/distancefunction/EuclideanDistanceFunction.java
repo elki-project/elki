@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveNumberDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Static instance. Use this!
    */

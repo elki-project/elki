@@ -12,7 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveNumberDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+// TODO: add spatial?
+public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Static instance. Use this.
    */
