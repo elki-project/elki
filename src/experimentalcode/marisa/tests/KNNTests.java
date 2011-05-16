@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import experimentalcode.marisa.index.xtree.common.XTree;
-import experimentalcode.marisa.index.xtree.util.SquareEuclideanDistanceFunction;
 import experimentalcode.marisa.utils.PriorityQueue;
 import experimentalcode.marisa.utils.Zeit;
 
