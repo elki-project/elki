@@ -21,14 +21,10 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
@@ -39,12 +35,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
 import experimentalcode.marisa.index.xtree.util.XSplitter;
-import experimentalcode.marisa.utils.PQ;
-import experimentalcode.marisa.utils.PriorityQueue;
 
 /**
  * Base class for XTree implementations and other extensions; derived from
@@ -1260,82 +1253,6 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     }
     // the root entry still needs to be set to the new root node's MBR
     return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
-  }
-
-  /**
-   * Performs a k-nearest neighbor query for the given NumberVector with the
-   * given parameter k and the according distance function. The query result is
-   * in ascending order to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param k the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @return a List of the query results
-   */
-  @Override
-  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    if(k < 1) {
-      throw new IllegalArgumentException("At least one enumeration has to be requested!");
-    }
-    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-    doKNNQuery(object, distanceFunction, knnList);
-    return knnList.toSortedArrayList();
-  }
-
-  /**
-   * Performs a k-nearest neighbor query for the given NumberVector with the
-   * given parameter k (in <code>knnList</code>) and the according distance
-   * function. The query result is in ascending order to the distance to the
-   * query object.
-   * 
-   * @param object the query object
-   * @param distanceFunction the distance function that computes the distances
-   *        between the objects
-   * @param knnList the knn list containing the result
-   */
-  @Override
-  protected <D extends Distance<D>> void doKNNQuery(O object, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, KNNHeap<D> knnList) {
-    // candidate queue
-    PQ<D, Integer> pq = new PQ<D, Integer>(PriorityQueue.Ascending, QUEUE_INIT);
-
-    // push root
-    pq.add(distanceFunction.getDistanceFactory().nullDistance(), getRootEntry().getEntryID());
-    D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
-
-    // search in tree
-    while(!pq.isEmpty()) {
-      D dist = pq.firstPriority();
-      Integer firstID = pq.removeFirst();
-      if(dist.compareTo(maxDist) > 0) {
-        return;
-      }
-
-      N node = getNode(firstID);
-      // data node
-      if(node.isLeaf()) {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          E entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry, object);
-          distanceCalcs++;
-          if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(distance, ((LeafEntry)entry).getDBID());
-            maxDist = knnList.getKNNDistance();
-          }
-        }
-      }
-      // directory node
-      else {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          E entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry, object);
-          distanceCalcs++;
-          if(distance.compareTo(maxDist) <= 0) {
-            pq.add(distance, entry.getEntryID());
-          }
-        }
-      }
-    }
   }
 
   /**
