@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -144,7 +145,7 @@ public class TestIndexStructures implements JUnit4Test {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    Database db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, inputparams);
+    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);
     db.initialize();
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector, DoubleDistance> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);

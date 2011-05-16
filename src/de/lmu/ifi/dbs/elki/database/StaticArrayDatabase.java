@@ -202,7 +202,9 @@ public class StaticArrayDatabase extends AbstractHierarchicalResult implements D
             final IndexFactory<Object, ?> ofact = (IndexFactory<Object, ?>) factory;
             @SuppressWarnings("unchecked")
             final Relation<Object> orep = (Relation<Object>) relation;
-            addIndex(ofact.instantiate(orep));
+            final Index index = ofact.instantiate(orep);
+            addIndex(index);
+            index.insertAll(ids);
           }
         }
       }
