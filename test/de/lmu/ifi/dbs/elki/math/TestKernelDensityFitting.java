@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
@@ -54,8 +55,8 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // This data was generated with a mean of 0.0 and stddev 1.23,
 
     // get database
-    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, config);
-    Database db = dbconn.getDatabase();
+    Database db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, config);
+    db.initialize();
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
     // verify data set size.

@@ -50,6 +50,12 @@ public final class OptionID extends ConstantObject<OptionID> {
   /**
    * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep}
    */
+  public static final OptionID DATABASE = new OptionID("db", "Database class.");
+
+  /**
+   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep}
+   */
+  // TODO: move to database class?
   public static final OptionID DATABASE_CONNECTION = new OptionID("dbc", "Database connection class.");
 
   /**

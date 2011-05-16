@@ -5,8 +5,7 @@ import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -68,7 +67,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
   /**
    * Holds the database connection to have the algorithm run with.
    */
-  private DatabaseConnection databaseConnection;
+  private Database database;
 
   /**
    * Distance function that is to be cached.
@@ -84,20 +83,20 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
    * Constructor.
    * 
    * @param verbose Verbose flag
-   * @param databaseConnection Database connection
+   * @param database Database
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheFloatDistanceInOnDiskMatrix(boolean verbose, DatabaseConnection databaseConnection, DistanceFunction<O, D> distance, File out) {
+  public CacheFloatDistanceInOnDiskMatrix(boolean verbose, Database database, DistanceFunction<O, D> distance, File out) {
     super(verbose);
-    this.databaseConnection = databaseConnection;
+    this.database = database;
     this.distance = distance;
     this.out = out;
   }
 
   @Override
   public void run() {
-    Database database = databaseConnection.getDatabase();
+    database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distance);
 
@@ -149,7 +148,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
     /**
      * Holds the database connection to have the algorithm run with.
      */
-    private DatabaseConnection databaseConnection = null;
+    private Database database = null;
 
     /**
      * Distance function that is to be cached.
@@ -165,9 +164,9 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Database connection parameter
-      final ObjectParameter<DatabaseConnection> dcpar = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if(config.grab(dcpar)) {
-        databaseConnection = dcpar.instantiateClass(config);
+      final ObjectParameter<Database> dbpar = new ObjectParameter<Database>(OptionID.DATABASE_CONNECTION, Database.class, HashmapDatabase.class);
+      if(config.grab(dbpar)) {
+        database = dbpar.instantiateClass(config);
       }
       // Distance function parameter
       final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
@@ -184,7 +183,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
 
     @Override
     protected CacheFloatDistanceInOnDiskMatrix<O, D> makeInstance() {
-      return new CacheFloatDistanceInOnDiskMatrix<O, D>(verbose, databaseConnection, distance, out);
+      return new CacheFloatDistanceInOnDiskMatrix<O, D>(verbose, database, distance, out);
     }
   }
 

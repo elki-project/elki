@@ -25,6 +25,8 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
@@ -45,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
@@ -101,12 +104,19 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
   final Collection<IndexFactory<?, ?>> indexFactories;
 
   /**
+   * The data source we get the initial data from.
+   */
+  protected DatabaseConnection databaseConnection;
+
+  /**
    * Constructor.
    * 
+   * @param databaseConnection Database connection to get the initial data from.
    * @param indexFactories Indexes to add
    */
-  public HashmapDatabase(Collection<IndexFactory<?, ?>> indexFactories) {
+  public HashmapDatabase(DatabaseConnection databaseConnection, Collection<IndexFactory<?, ?>> indexFactories) {
     super();
+    this.databaseConnection = databaseConnection;
     this.ids = DBIDUtil.newTreeSet();
     this.relations = new java.util.Vector<Relation<?>>();
     this.idrep = new DBIDView(this, this.ids);
@@ -125,7 +135,20 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
    * Constructor with no indexes.
    */
   public HashmapDatabase() {
-    this(null);
+    this(null, null);
+  }
+
+  /**
+   * Initialize the database by getting the initial data from the database
+   * connection.
+   */
+  @Override
+  public void initialize() {
+    if(databaseConnection != null) {
+      this.insert(databaseConnection.loadData());
+      // Run at most once.
+      databaseConnection = null;
+    }
   }
 
   @Override
@@ -655,6 +678,11 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
+     * Holds the database connection to get the initial data from.
+     */
+    protected DatabaseConnection databaseConnection = null;
+
+    /**
      * Indexes to add.
      */
     private Collection<IndexFactory<?, ?>> indexFactories;
@@ -662,6 +690,11 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      // Get database connection.
+      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      if(config.grab(dbcP)) {
+        databaseConnection = dbcP.instantiateClass(config);
+      }
       // Get indexes.
       final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<IndexFactory<?, ?>>(INDEX_ID, IndexFactory.class, true);
       if(config.grab(indexFactoryP)) {
@@ -671,7 +704,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
 
     @Override
     protected HashmapDatabase makeInstance() {
-      return new HashmapDatabase(indexFactories);
+      return new HashmapDatabase(databaseConnection, indexFactories);
     }
   }
 }

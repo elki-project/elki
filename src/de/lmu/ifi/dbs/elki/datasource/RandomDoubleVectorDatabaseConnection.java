@@ -6,11 +6,9 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -40,14 +38,13 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
   /**
    * Constructor.
    * 
-   * @param database
    * @param dim Dimensionality
    * @param size Database size
    * @param seed Random seed
    * @param filters
    */
-  public RandomDoubleVectorDatabaseConnection(UpdatableDatabase database, int dim, int size, Long seed, List<ObjectFilter> filters) {
-    super(database, filters);
+  public RandomDoubleVectorDatabaseConnection(int dim, int size, Long seed, List<ObjectFilter> filters) {
+    super(filters);
     this.dim = dim;
     this.size = size;
     this.seed = seed;
@@ -55,8 +52,9 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
 
   private static final Logging logger = Logging.getLogger(RandomDoubleVectorDatabaseConnection.class);
 
+  
   @Override
-  public UpdatableDatabase getDatabase() {
+  public MultipleObjectsBundle loadData() {
     VectorFieldTypeInformation<DoubleVector> type = VectorFieldTypeInformation.get(DoubleVector.class, dim);
     List<DoubleVector> vectors = new ArrayList<DoubleVector>(size);
 
@@ -75,13 +73,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
       vectors.add(factory.randomInstance(rand));
     }
 
-    try {
-      database.insert(MultipleObjectsBundle.makeSimple(type, vectors));
-    }
-    catch(UnableToComplyException e) {
-      logger.exception(e);
-    }
-    return database;
+    return MultipleObjectsBundle.makeSimple(type, vectors);
   }
 
   @Override
@@ -130,7 +122,6 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      configDatabase(config);
       configFilters(config);
       configDimensionality(config);
       configSize(config);
@@ -160,7 +151,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
 
     @Override
     protected RandomDoubleVectorDatabaseConnection makeInstance() {
-      return new RandomDoubleVectorDatabaseConnection(database, dim, size, seed, filters);
+      return new RandomDoubleVectorDatabaseConnection(dim, size, seed, filters);
     }
   }
 }

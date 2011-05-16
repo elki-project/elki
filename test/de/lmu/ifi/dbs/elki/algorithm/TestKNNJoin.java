@@ -96,10 +96,10 @@ public class TestKNNJoin implements JUnit4Test {
     inputparams.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
 
     // get database
-    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);
-    Database db = dbconn.getDatabase();
+    Database db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, inputparams);
     inputparams.failOnErrors();
 
+    db.initialize();
     // verify data set size.
     org.junit.Assert.assertEquals("Database size does not match.", shoulds, db.size());
 
