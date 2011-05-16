@@ -48,6 +48,13 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   private static final Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
 
   /**
+   * Flag to use bulk operations.
+   * 
+   * TODO: right now, bulk is not that good - so don't use
+   */
+  private static final boolean usebulk = false;
+
+  /**
    * KNNQuery instance to use.
    */
   protected final KNNQuery<O, D> knnQuery;
@@ -86,19 +93,20 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   protected void preprocess() {
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
 
-    logger.warning("Using knnQuery: " + knnQuery);
-
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
 
     // Try bulk
-    List<List<DistanceResultPair<D>>> kNNList = null; // knnQuery.getKNNForBulkDBIDs(ids, k);
-    if (kNNList != null) {
-      for(int i = 0; i < ids.size(); i++) {
-        DBID id = ids.get(i);
-        storage.put(id, kNNList.get(i));
-        if(progress != null) {
-          progress.incrementProcessed(getLogger());
+    List<List<DistanceResultPair<D>>> kNNList = null;
+    if(usebulk) {
+      kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
+      if(kNNList != null) {
+        for(int i = 0; i < ids.size(); i++) {
+          DBID id = ids.get(i);
+          storage.put(id, kNNList.get(i));
+          if(progress != null) {
+            progress.incrementProcessed(getLogger());
+          }
         }
       }
     }
