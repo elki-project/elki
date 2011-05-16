@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -41,7 +42,6 @@ import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
-import experimentalcode.marisa.index.xtree.util.SquareEuclideanDistanceFunction;
 import experimentalcode.marisa.index.xtree.util.XSplitter;
 import experimentalcode.marisa.utils.PQ;
 import experimentalcode.marisa.utils.PriorityQueue;
@@ -954,7 +954,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
   @Override
   @SuppressWarnings("unchecked")
   protected void reInsert(N node, int level, TreeIndexPath<E> path) {
-    SquareEuclideanDistanceFunction distFunction = new SquareEuclideanDistanceFunction();
+    SquaredEuclideanDistanceFunction distFunction = SquaredEuclideanDistanceFunction.STATIC;
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
     // O centroid = compute_centroid(node);

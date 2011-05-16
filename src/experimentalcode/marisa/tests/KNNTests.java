@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -39,7 +40,7 @@ public class KNNTests {
   }
 
   public static <O extends NumberVector<O, ?>> void knnCorrectTest(int k, List<O> objects, AbstractRStarTree<O, ?, ?> index, List<O> queries) {
-    SquareEuclideanDistanceFunction ed = new SquareEuclideanDistanceFunction();
+    SquaredEuclideanDistanceFunction ed = SquaredEuclideanDistanceFunction.STATIC;
     int queryNumber = 0;
     for(; queryNumber < queries.size(); queryNumber++) {
       O nv = queries.get(queryNumber);
@@ -53,7 +54,7 @@ public class KNNTests {
   }
 
   public static <O extends NumberVector<O, ?>> void knnRun(int k, AbstractRStarTree<O, ?, ?> index, List<O> queries) {
-    SquareEuclideanDistanceFunction sed = new SquareEuclideanDistanceFunction();
+    SquaredEuclideanDistanceFunction sed = SquaredEuclideanDistanceFunction.STATIC;
     int queryNumber = 0;
     for(; queryNumber < queries.size(); queryNumber++) {
       O nv = queries.get(queryNumber);
