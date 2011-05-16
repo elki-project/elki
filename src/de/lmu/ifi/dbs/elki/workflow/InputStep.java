@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.workflow;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -56,7 +56,7 @@ public class InputStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<Database> dbP = new ObjectParameter<Database>(OptionID.DATABASE, Database.class, HashmapDatabase.class);
+      final ObjectParameter<Database> dbP = new ObjectParameter<Database>(OptionID.DATABASE, Database.class, StaticArrayDatabase.class);
       if(config.grab(dbP)) {
         database = dbP.instantiateClass(config);
       }      

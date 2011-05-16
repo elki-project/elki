@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
@@ -84,7 +84,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     }
     params.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filterlist);
     params.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
-    Database db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, params);
+    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
 
     testParameterizationOk(params);
 
