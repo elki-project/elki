@@ -144,8 +144,8 @@ public class TestIndexStructures implements JUnit4Test {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    FileBasedDatabaseConnection dbconn = ClassGenericsUtil.parameterizeOrAbort(FileBasedDatabaseConnection.class, inputparams);
-    Database db = dbconn.getDatabase();
+    Database db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, inputparams);
+    db.initialize();
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector, DoubleDistance> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
 

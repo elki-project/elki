@@ -62,6 +62,11 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
     this.relations.add(idrep);
     this.addChildResult(idrep);
   }
+  
+  @Override
+  public void initialize() {
+    // Nothing to do - we were initialized on construction time.
+  }
 
   /**
    * Add a new representation.

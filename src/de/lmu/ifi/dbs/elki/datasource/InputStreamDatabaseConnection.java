@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.datasource;
 import java.io.InputStream;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser;
@@ -11,7 +10,6 @@ import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -55,38 +53,28 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * Constructor.
    * 
-   * @param database the instance of the database
    * @param filters Filters to use
    * @param parser the parser to provide a database
    */
-  public InputStreamDatabaseConnection(UpdatableDatabase database, List<ObjectFilter> filters, Parser parser) {
-    super(database, filters);
+  public InputStreamDatabaseConnection(List<ObjectFilter> filters, Parser parser) {
+    super(filters);
     this.parser = parser;
   }
 
   @Override
-  public UpdatableDatabase getDatabase() {
-    try {
-      if(logger.isDebugging()) {
-        logger.debugFine("*** parse");
-      }
-
-      // parse
-      MultipleObjectsBundle parsingResult = parser.parse(in);
-      // normalize objects and transform labels
-      MultipleObjectsBundle objects = transformLabels(parsingResult);
-
-      if(logger.isDebugging()) {
-        logger.debugFine("*** insert");
-      }
-      // insert into database
-      database.insert(objects);
-
-      return database;
+  public MultipleObjectsBundle loadData() {
+    // Run parser
+    if(logger.isDebugging()) {
+      logger.debugFine("Invoking parsers.");
     }
-    catch(UnableToComplyException e) {
-      throw new IllegalStateException(e);
+    MultipleObjectsBundle parsingResult = parser.parse(in);
+
+    // normalize objects and transform labels
+    if(logger.isDebugging()) {
+      logger.debugFine("Invoking filters.");
     }
+    MultipleObjectsBundle objects = invokeFilters(parsingResult);
+    return objects;
   }
 
   @Override
@@ -108,7 +96,6 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configParser(config, Parser.class, DoubleVectorLabelParser.class);
-      configDatabase(config);
       configFilters(config);
     }
 
@@ -121,7 +108,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
 
     @Override
     protected InputStreamDatabaseConnection makeInstance() {
-      return new InputStreamDatabaseConnection(database, filters, parser);
+      return new InputStreamDatabaseConnection(filters, parser);
     }
   }
 }

@@ -34,13 +34,12 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -107,7 +106,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 @Reference(authors = "E. Achtert, T. Bernecker, H.-P. Kriegel, E. Schubert, A. Zimek", title = "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series", booktitle = "Proceedings of the 11th International Symposium on Spatial and Temporal Databases (SSTD), Aalborg, Denmark, 2009", url = "http://dx.doi.org/10.1007/978-3-642-02982-0_35")
 public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractApplication {
   // TODO: replace by a wrapper creating appropriate visualization modules.
-  
+
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -125,7 +124,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
   /**
    * Holds the database connection to have the algorithm run with.
    */
-  private DatabaseConnection databaseConnection;
+  private Database database;
 
   /**
    * Holds the instance of the distance function specified by
@@ -137,18 +136,18 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
    * Constructor.
    * 
    * @param verbose Verbose flag
-   * @param databaseConnection Database connection
+   * @param database Database
    * @param distanceFunction Distance function
    */
-  public KNNExplorer(boolean verbose, DatabaseConnection databaseConnection, DistanceFunction<O, D> distanceFunction) {
+  public KNNExplorer(boolean verbose, Database database, DistanceFunction<O, D> distanceFunction) {
     super(verbose);
-    this.databaseConnection = databaseConnection;
+    this.database = database;
     this.distanceFunction = distanceFunction;
   }
 
   @Override
   public void run() throws IllegalStateException {
-    Database database = databaseConnection.getDatabase();
+    database.initialize();
     Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction());
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, distanceFunction);
     (new ExplorerWindow()).run(database, distFunc);
@@ -529,7 +528,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
    * @apiviz.exclude
    */
   public static class Parameterizer<O extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
-    protected DatabaseConnection databaseConnection = null;
+    protected Database database = null;
 
     protected DistanceFunction<O, D> distanceFunction = null;
 
@@ -537,9 +536,9 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // parameter database connection
-      final ObjectParameter<DatabaseConnection> dbcpar = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if(config.grab(dbcpar)) {
-        databaseConnection = dbcpar.instantiateClass(config);
+      final ObjectParameter<Database> dbpar = new ObjectParameter<Database>(OptionID.DATABASE_CONNECTION, Database.class, HashmapDatabase.class);
+      if(config.grab(dbpar)) {
+        database = dbpar.instantiateClass(config);
       }
 
       // Distance function
@@ -551,7 +550,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
     @Override
     protected KNNExplorer<O, D> makeInstance() {
-      return new KNNExplorer<O, D>(verbose, databaseConnection, distanceFunction);
+      return new KNNExplorer<O, D>(verbose, database, distanceFunction);
     }
   }
 

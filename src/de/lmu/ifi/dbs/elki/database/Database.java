@@ -39,6 +39,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
  */
 public interface Database extends HierarchicalResult {
   /**
+   * Initialize the database, for example by loading the input data. (Since this
+   * should NOT be done on construction time!)
+   */
+  public void initialize();
+
+  /**
    * Returns the number of objects contained in this Database.
    * 
    * @return the number of objects in this Database
@@ -238,7 +244,7 @@ public interface Database extends HierarchicalResult {
    * @throws ObjectNotFoundException when the DBID was not found.
    */
   // TODO: add
-  //MultipleObjectsBundle getBundles(DBIDs id) throws ObjectNotFoundException;
+  // MultipleObjectsBundle getBundles(DBIDs id) throws ObjectNotFoundException;
 
   /**
    * Returns a list comprising all IDs currently in use.

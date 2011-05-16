@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.elki.datasource;
 
-import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Pseudo database that is empty.
@@ -12,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  */
 @Title("Empty Database")
-@Description("Dummy database implementation that cannot not contain any objects.")
+@Description("Dummy data source that does not provide any objects.")
 public class EmptyDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * Static logger
@@ -21,36 +20,16 @@ public class EmptyDatabaseConnection extends AbstractDatabaseConnection {
   
   /**
    * Constructor.
-   * 
-   * @param database the instance of the database
    */
-  protected EmptyDatabaseConnection(UpdatableDatabase database) {
-    super(database, null);
+  protected EmptyDatabaseConnection() {
+    super(null);
   }
-
+  
   @Override
-  public UpdatableDatabase getDatabase() {
-    return database;
-  }
-
-  /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      configDatabase(config);
-    }
-
-    @Override
-    protected EmptyDatabaseConnection makeInstance() {
-      return new EmptyDatabaseConnection(database);
-    }
+  public MultipleObjectsBundle loadData() {
+    // Return an empty bundle
+    // TODO: add some dummy column, such as DBIDs?
+    return new MultipleObjectsBundle();
   }
 
   @Override

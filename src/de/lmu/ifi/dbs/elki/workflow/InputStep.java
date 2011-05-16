@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.elki.workflow;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -13,28 +12,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has DatabaseConnection
  * @apiviz.has Database
  */
 public class InputStep implements WorkflowStep {
   /**
-   * Holds the database connection to have the algorithm run with.
+   * Holds the database to have the algorithms run with.
    */
-  private DatabaseConnection databaseConnection;
-
-  /**
-   * Database read.
-   */
-  private Database db = null;
+  private Database database;
 
   /**
    * Constructor.
    *
    * @param databaseConnection
    */
-  public InputStep(DatabaseConnection databaseConnection) {
+  public InputStep(Database database) {
     super();
-    this.databaseConnection = databaseConnection;
+    this.database = database;
   }
 
   /**
@@ -43,10 +36,8 @@ public class InputStep implements WorkflowStep {
    * @return Database
    */
   public Database getDatabase() {
-    if (db == null) {
-      db  = databaseConnection.getDatabase();
-    }
-    return db;
+    database.initialize();
+    return database;
   }
   
   /**
@@ -58,22 +49,22 @@ public class InputStep implements WorkflowStep {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Holds the database connection to have the algorithm run with.
+     * Holds the database to have the algorithms run on.
      */
-    protected DatabaseConnection databaseConnection = null;
+    protected Database database = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if(config.grab(dbcP)) {
-        databaseConnection = dbcP.instantiateClass(config);
+      final ObjectParameter<Database> dbP = new ObjectParameter<Database>(OptionID.DATABASE, Database.class, HashmapDatabase.class);
+      if(config.grab(dbP)) {
+        database = dbP.instantiateClass(config);
       }      
     }
 
     @Override
     protected InputStep makeInstance() {
-      return new InputStep(databaseConnection);
+      return new InputStep(database);
     }
   }
 }

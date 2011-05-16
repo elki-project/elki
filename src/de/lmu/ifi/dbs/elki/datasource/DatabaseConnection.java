@@ -1,25 +1,26 @@
 package de.lmu.ifi.dbs.elki.datasource;
 
-import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
- * DatabaseConnection is to provide a database.
+ * DatabaseConnection is used to load data into a database.
  * <p/>
- * A database connection is to manage the input and to provide a database where
+ * A database connection is to manage the input and for a database where
  * algorithms can run on. An implementation may either use a parser to parse a
  * sequential file or piped input and provide a file based database or provide
  * an intermediate connection to a database system.
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.uses Database oneway - - «create»
+ * @apiviz.uses MultipleObjectsBundle
  */
 public interface DatabaseConnection extends Parameterizable {
   /**
-   * Returns a Database according to parameter settings.
+   * Returns the initial data for a database.
    * 
-   * @return a Database according to parameter settings
+   * @return a database object bundle
    */
-  UpdatableDatabase getDatabase();
+  // TODO: streaming load?
+  MultipleObjectsBundle loadData();
 }
