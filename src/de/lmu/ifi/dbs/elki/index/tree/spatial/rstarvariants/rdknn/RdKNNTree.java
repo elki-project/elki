@@ -352,16 +352,14 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
         if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
-          KNNHeap<D> knns_p = new KNNHeap<D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance());
-          knns_p.add(dist_pq, ((LeafEntry) q).getDBID());
           O obj = relation.get(p.getDBID());
-          doKNNQuery(obj, distanceFunction, knns_p);
-
-          if(knns_p.size() < k_max) {
+          List<DistanceResultPair<D>> knns_without_q = knnQuery.getKNNForObject(obj, k_max);
+          
+          if(knns_without_q.size() + 1 < k_max) {
             p.setKnnDistance(distanceQuery.getDistanceFactory().undefinedDistance());
           }
           else {
-            D knnDist_p = knns_p.getMaximumDistance();
+            D knnDist_p = DistanceUtil.min(knns_without_q.get(knns_without_q.size() - 1).getDistance(), dist_pq);
             p.setKnnDistance(knnDist_p);
           }
         }
