@@ -115,13 +115,13 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
   }
 
   @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
+  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }
 
   @Override
