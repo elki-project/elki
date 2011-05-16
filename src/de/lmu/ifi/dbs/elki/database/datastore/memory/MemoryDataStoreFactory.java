@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
-import de.lmu.ifi.dbs.elki.database.datastore.RangeIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
+import de.lmu.ifi.dbs.elki.database.datastore.RangeIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Simple factory class that will store all data in memory using object arrays or hashmaps.
