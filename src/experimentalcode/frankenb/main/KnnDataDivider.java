@@ -10,12 +10,10 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -55,7 +53,7 @@ public class KnnDataDivider<V extends NumberVector<V, ?>> extends AbstractApplic
 
   private int packageQuantity = 0;
 
-  private final DatabaseConnection databaseConnection;
+  private final Database database;
 
   private IDividerAlgorithm<V> algorithm;
 
@@ -65,14 +63,14 @@ public class KnnDataDivider<V extends NumberVector<V, ?>> extends AbstractApplic
    * @param verbose
    * @param outputDir
    * @param packageQuantity
-   * @param databaseConnection
+   * @param database
    * @param algorithm
    */
-  public KnnDataDivider(boolean verbose, File outputDir, int packageQuantity, DatabaseConnection databaseConnection, IDividerAlgorithm<V> algorithm) {
+  public KnnDataDivider(boolean verbose, File outputDir, int packageQuantity, Database database, IDividerAlgorithm<V> algorithm) {
     super(verbose);
     this.outputDir = outputDir;
     this.packageQuantity = packageQuantity;
-    this.databaseConnection = databaseConnection;
+    this.database = database;
     this.algorithm = algorithm;
   }
 
@@ -98,8 +96,8 @@ public class KnnDataDivider<V extends NumberVector<V, ?>> extends AbstractApplic
       // Date().getTime() - Log.getElapsedTime())));
 
       logger.verbose("reading database ...");
-      final Database dataBase = databaseConnection.getDatabase();
-      Relation<V> relation = dataBase.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+      database.initialize();
+      Relation<V> relation = database.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
       int dim = DatabaseUtil.assumeVectorField(relation).dimensionality();
       long totalCalculationsWithoutApproximation = MathUtil.sumFirstIntegers(relation.size() - 1);
 
@@ -238,7 +236,7 @@ public class KnnDataDivider<V extends NumberVector<V, ?>> extends AbstractApplic
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractApplication.Parameterizer {
     private int packageQuantity = 0;
 
-    private DatabaseConnection databaseConnection = null;
+    private Database database = null;
 
     private IDividerAlgorithm<V> algorithm = null;
 
@@ -259,13 +257,12 @@ public class KnnDataDivider<V extends NumberVector<V, ?>> extends AbstractApplic
         algorithm = paramPartitioner.instantiateClass(config);
       }
 
-      Class<FileBasedDatabaseConnection> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
-      databaseConnection = config.tryInstantiate(dbcls);
+      database = config.tryInstantiate(HashmapDatabase.class);
     }
 
     @Override
     protected KnnDataDivider<V> makeInstance() {
-      return new KnnDataDivider<V>(verbose, outputDir, packageQuantity, databaseConnection, algorithm);
+      return new KnnDataDivider<V>(verbose, outputDir, packageQuantity, database, algorithm);
     }
   }
 

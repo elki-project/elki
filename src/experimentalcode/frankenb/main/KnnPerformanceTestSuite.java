@@ -15,9 +15,8 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
@@ -27,7 +26,6 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -121,16 +119,16 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
 
   private final ComputeROCCurve rocComputer;
 
-  private final DatabaseConnection databaseConnection;
+  private final Database database;
 
   private File inputFolder = null;
 
   private boolean inMemory = false;
 
-  public KnnPerformanceTestSuite(boolean verbose, ComputeROCCurve rocComputer, DatabaseConnection databaseConnection, File inputFolder, boolean inMemory) {
+  public KnnPerformanceTestSuite(boolean verbose, ComputeROCCurve rocComputer, Database database, File inputFolder, boolean inMemory) {
     super(verbose);
     this.rocComputer = rocComputer;
-    this.databaseConnection = databaseConnection;
+    this.database = database;
     this.inputFolder = inputFolder;
     this.inMemory = inMemory;
   }
@@ -142,7 +140,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
       logger.verbose("using inMemory strategy: " + Boolean.toString(inMemory));
 
       logger.verbose("Reading database ...");
-      Database database = databaseConnection.getDatabase();
+      database.initialize();
 
       List<File> resultDirectories = findResultDirectories(this.inputFolder);
       for(File resultDirectory : resultDirectories) {
@@ -279,7 +277,7 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     ComputeROCCurve rocComputer;
 
-    FileBasedDatabaseConnection databaseConnection;
+    Database database;
 
     File inputFolder = null;
 
@@ -298,14 +296,13 @@ public class KnnPerformanceTestSuite extends AbstractApplication {
         inMemory = IN_MEMORY_PARAM.getValue();
       }
 
-      Class<FileBasedDatabaseConnection> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
-      databaseConnection = config.tryInstantiate(dbcls);
+      database = config.tryInstantiate(HashmapDatabase.class);
       rocComputer = config.tryInstantiate(ComputeROCCurve.class);
     }
 
     @Override
     protected KnnPerformanceTestSuite makeInstance() {
-      return new KnnPerformanceTestSuite(verbose, rocComputer, databaseConnection, inputFolder, inMemory);
+      return new KnnPerformanceTestSuite(verbose, rocComputer, database, inputFolder, inMemory);
     }
   }
 }

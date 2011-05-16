@@ -8,9 +8,8 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
@@ -19,7 +18,6 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -43,7 +41,7 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
 
   public static final OptionID K_FACTOR_ID = OptionID.getOrCreateOptionID("kfactor", "factor to multiply with k when searching for the neighborhood in the projected space");
 
-  private final DatabaseConnection databaseConnection;
+  private final Database database;
 
   private final RandomProjection<V> randomProjection;
 
@@ -59,16 +57,16 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
    * Constructor.
    * 
    * @param verbose
-   * @param databaseConnection
+   * @param database
    * @param randomProjection
    * @param rocComputer
    * @param k
    * @param kFactor
    * @param outputFile
    */
-  public PINN(boolean verbose, DatabaseConnection databaseConnection, RandomProjection<V> randomProjection, ComputeROCCurve rocComputer, int k, int kFactor, File outputFile) {
+  public PINN(boolean verbose, Database database, RandomProjection<V> randomProjection, ComputeROCCurve rocComputer, int k, int kFactor, File outputFile) {
     super(verbose);
-    this.databaseConnection = databaseConnection;
+    this.database = database;
     this.randomProjection = randomProjection;
     this.rocComputer = rocComputer;
     this.k = k;
@@ -79,8 +77,8 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
   @Override
   public void run() throws UnableToComplyException {
     logger.verbose("Reading database ...");
-    final Database dataBase = databaseConnection.getDatabase();
-    Relation<V> dataset = dataBase.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    database.initialize();
+    Relation<V> dataset = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     logger.verbose("Projecting ...");
     Relation<V> dataSet = randomProjection.project(dataset);
@@ -89,23 +87,23 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
     KDTree<V> tree = new KDTree<V>(dataSet);
 
     PINNKnnIndex<V> index = new PINNKnnIndex<V>(dataset, tree, kFactor);
-    dataBase.addIndex(index);
+    database.addIndex(index);
 
     logger.verbose("Running LOF ...");
 
     OutlierAlgorithm algorithm = new LOF<NumberVector<?, ?>, DoubleDistance>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
-    OutlierResult result = algorithm.run(dataBase);
+    OutlierResult result = algorithm.run(database);
 
     logger.verbose("Calculating ROC ...");
 
     BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
-    rocComputer.processResult(dataBase, result);
+    rocComputer.processResult(database, result);
 
     this.outputFile.mkdirs();
     ResultWriter resultWriter = getResultWriter(this.outputFile);
 
     for(Result aResult : totalResult.getHierarchy().iterDescendants(result)) {
-      resultWriter.processResult(dataBase, aResult);
+      resultWriter.processResult(database, aResult);
     }
     logger.verbose("Writing results to dir " + this.outputFile);
 
@@ -128,7 +126,7 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractApplication.Parameterizer {
-    private FileBasedDatabaseConnection databaseConnection;
+    private Database database;
 
     private RandomProjection<V> randomProjection;
 
@@ -157,14 +155,13 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
 
       randomProjection = new RandomProjection<V>(config);
 
-      Class<FileBasedDatabaseConnection> dbcls = ClassGenericsUtil.uglyCastIntoSubclass(FileBasedDatabaseConnection.class);
-      databaseConnection = config.tryInstantiate(dbcls);
+      database = config.tryInstantiate(HashmapDatabase.class);
       rocComputer = config.tryInstantiate(ComputeROCCurve.class);
     }
 
     @Override
     protected PINN<V> makeInstance() {
-      return new PINN<V>(verbose, databaseConnection, randomProjection, rocComputer, k, kFactor, outputFile);
+      return new PINN<V>(verbose, database, randomProjection, rocComputer, k, kFactor, outputFile);
     }
   }
 }
