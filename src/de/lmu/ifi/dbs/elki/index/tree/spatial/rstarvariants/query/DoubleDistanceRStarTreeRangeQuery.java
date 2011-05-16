@@ -110,6 +110,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
     return getRangeForObject(relation.get(id), range);
   }
 
+  @SuppressWarnings("unused")
   @Override
   public List<List<DistanceResultPair<DoubleDistance>>> getRangeForBulkDBIDs(ArrayDBIDs ids, DoubleDistance range) {
     // TODO: implement

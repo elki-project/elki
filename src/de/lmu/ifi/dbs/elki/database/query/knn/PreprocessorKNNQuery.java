@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -13,6 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -116,6 +119,17 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>> extends AbstractData
       }
     }
     return result;
+  }
+
+  @Override
+  public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
+    for(Entry<DBID, KNNHeap<D>> ent : heaps.entrySet()) {
+      DBID id = ent.getKey();
+      KNNHeap<D> heap = ent.getValue();
+      for(DistanceResultPair<D> dr : preprocessor.get(id)) {
+        heap.add(dr);
+      }
+    }
   }
 
   @SuppressWarnings("unused")

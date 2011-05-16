@@ -92,7 +92,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
 
     // Try bulk
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
+    List<List<DistanceResultPair<D>>> kNNList = null; // knnQuery.getKNNForBulkDBIDs(ids, k);
     if (kNNList != null) {
       for(int i = 0; i < ids.size(); i++) {
         DBID id = ids.get(i);
