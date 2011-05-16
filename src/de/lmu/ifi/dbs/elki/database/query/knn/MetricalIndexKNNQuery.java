@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import java.util.List;
+import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -9,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
@@ -16,7 +18,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex
+ * @apiviz.uses MetricalIndex
+ * 
+ * @param <O> Object type
+ * @param <D> Distance type
  */
 public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
   /**
@@ -50,6 +55,13 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
   @SuppressWarnings("unused")
   @Override
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    // TODO: implement
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
     // TODO: implement
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }

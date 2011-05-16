@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -72,6 +73,11 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   private SpatialDistanceQuery<O, D> distanceQuery;
 
   /**
+   * Internal knn query object, for updating the rKNN.
+   */
+  private KNNQuery<O, D> knnQuery;
+
+  /**
    * Constructor.
    * 
    * @param relation Relation
@@ -89,6 +95,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
     this.distanceQuery = distanceFunction.instantiate(relation);
+    this.knnQuery = this.getKNNQuery(distanceQuery);
   }
 
   /**
@@ -121,7 +128,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     for(DBID id : ids) {
       knnLists.put(id, new KNNHeap<D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance()));
     }
-    batchNN(getRoot(), distanceQuery, knnLists);
+    knnQuery.getKNNForBulkHeaps(knnLists);
 
     // adjust knn distances
     adjustKNNDistance(getRootEntry(), knnLists);
@@ -140,7 +147,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     for(DBID id : ids) {
       knnLists.put(id, new KNNHeap<D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance()));
     }
-    batchNN(getRoot(), distanceQuery, knnLists);
+    knnQuery.getKNNForBulkHeaps(knnLists);
     adjustKNNDistance(getRootEntry(), knnLists);
 
     // test
@@ -186,7 +193,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
       knnLists.put(candidate.getDBID(), (KNNHeap<D>) knns);
       candidateIDs.add(candidate.getDBID());
     }
-    batchNN(getRoot(), distanceQuery, knnLists);
+    knnQuery.getKNNForBulkHeaps(knnLists);
 
     List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
     for(DBID id : candidateIDs) {
@@ -236,7 +243,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         }
       }
     }
-    batchNN(getRoot(), distanceQuery, knnLists);
+    knnQuery.getKNNForBulkHeaps(knnLists);
 
     // and add candidate c to the result if o is a knn of c
     List<List<DistanceResultPair<T>>> resultList = new ArrayList<List<DistanceResultPair<T>>>();

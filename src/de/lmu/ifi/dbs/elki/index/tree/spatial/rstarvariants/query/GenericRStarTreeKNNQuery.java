@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -120,7 +120,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @param distanceQuery the distance function for computing the distances
    * @param knnLists a map containing the knn lists for each query objects
    */
-  protected void batchNN(AbstractRStarTreeNode<?, ?> node, SpatialDistanceQuery<O, D> distanceQuery, Map<DBID, KNNHeap<D>> knnLists) {
+  protected void batchNN(AbstractRStarTreeNode<?, ?> node, Map<DBID, KNNHeap<D>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry p = node.getEntry(i);
@@ -141,7 +141,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     else {
       ModifiableDBIDs ids = DBIDUtil.newArray(knnLists.size());
       ids.addAll(knnLists.keySet());
-      List<DistanceEntry<D, SpatialEntry>> entries = getSortedEntries(node, ids, distanceQuery);
+      List<DistanceEntry<D, SpatialEntry>> entries = getSortedEntries(node, ids);
       for(DistanceEntry<D, SpatialEntry> distEntry : entries) {
         D minDist = distEntry.getDistance();
         for(Entry<DBID, KNNHeap<D>> ent : knnLists.entrySet()) {
@@ -151,12 +151,18 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
             SpatialEntry entry = distEntry.getEntry();
             AbstractRStarTreeNode<?, ?> child = index.getNode(entry.getEntryID());
-            batchNN(child, distanceQuery, knnLists);
+            batchNN(child, knnLists);
             break;
           }
         }
       }
     }
+  }
+
+  @Override
+  public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
+    AbstractRStarTreeNode<?, ?> root = index.getRoot();
+    batchNN(root, heaps);
   }
 
   /**
@@ -168,14 +174,14 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @param distanceQuery the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected List<DistanceEntry<D, SpatialEntry>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, DBIDs ids, SpatialDistanceQuery<O, D> distanceQuery) {
+  protected List<DistanceEntry<D, SpatialEntry>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, DBIDs ids) {
     List<DistanceEntry<D, SpatialEntry>> result = new ArrayList<DistanceEntry<D, SpatialEntry>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       SpatialEntry entry = node.getEntry(i);
       D minMinDist = distanceQuery.getDistanceFactory().infiniteDistance();
       for(DBID id : ids) {
-        D minDist = distanceQuery.minDist(entry, id);
+        D minDist = distanceFunction.minDist(entry, relation.get(id));
         minMinDist = DistanceUtil.min(minDist, minMinDist);
       }
       result.add(new DistanceEntry<D, SpatialEntry>(entry, minMinDist, i));
@@ -184,7 +190,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     Collections.sort(result);
     return result;
   }
-  
+
   @Override
   public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
     if(k < 1) {
@@ -203,27 +209,22 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
   @Override
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    // FIXME: the current implementation relies on DBID->Object lookups.
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
-    return null;
     // While this works, it seems to be slow at least for large sets!
-    /*
     final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
     for(DBID id : ids) {
       knnLists.put(id, new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
     }
 
-    @SuppressWarnings("unchecked")
-    SpatialPrimitiveDistanceQuery<O, D> distanceQuery = (SpatialPrimitiveDistanceQuery<O, D>) getRelation().getDatabase().getDistanceQuery(getRelation(), distanceFunction);
-    batchNN(index.getRoot(), distanceQuery, knnLists);
+    batchNN(index.getRoot(), knnLists);
 
     List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>();
     for(DBID id : ids) {
       result.add(knnLists.get(id).toSortedArrayList());
     }
-    return result; */
+    return result;
   }
 
   @Override
