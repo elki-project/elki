@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreproces
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -357,13 +357,13 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
      * @param lofResult the result of the former LOF run
      */
     private void recomputeLOFs(DBIDs ids, LOFResult<O, D> lofResult) {
-      Pair<WritableDataStore<Double>, MinMax<Double>> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getKNNRefer());
+      Pair<WritableDataStore<Double>, DoubleMinMax> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getKNNRefer());
       WritableDataStore<Double> new_lofs = lofsAndMax.getFirst();
       for(DBID id : ids) {
         lofResult.getLofs().put(id, new_lofs.get(id));
       }
       // track the maximum value for normalization.
-      MinMax<Double> new_lofminmax = lofsAndMax.getSecond();
+      DoubleMinMax new_lofminmax = lofsAndMax.getSecond();
 
       // Actualize meta info
       if(new_lofminmax.getMax() != null && lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) {
