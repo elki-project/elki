@@ -74,11 +74,7 @@ public class ConvexHull2D {
     this.list = list;
   }
 
-  public void clearHull() {
-    top = new VertexList();
-  }
-
-  public Vector[] start() {
+  public Vector[] computeHull() {
     if(list == null) {
       return null;
     }
@@ -94,7 +90,7 @@ public class ConvexHull2D {
     return resv;
   }
 
-  public VertexList makeHull() {
+  private VertexList makeHull() {
     Vertex v = new Vertex();
     v = list.head;
     for(i = 0; i < list.n; i++) {
@@ -258,15 +254,5 @@ public class ConvexHull2D {
 
   private void Pop(VertexList top) {
     top.delete(top.head.prev);
-  }
-  
-  public class ScaledVectorList {
-    List<Vector> list;
-    double scale;
-    
-    public double[] get(int i) {
-      double[] raw = list.get(i).getArrayRef();
-      return new double[]{ raw[X] * scale, raw[Y] * scale };
-    }
   }
 }

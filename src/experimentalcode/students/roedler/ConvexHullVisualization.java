@@ -88,10 +88,8 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
 
     // addCSSClasses(svgp);
     // SVGPath path = new SVGPath();
-    ConvexHull2D ch;
 
     double opacity = 0.25;
-    Vector[] chres;
 
     Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
     int clusterID = 0;
@@ -109,8 +107,7 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
         double[] projP = proj.fastProjectDataToRenderSpace(rep.get(clpnum).getColumnVector());
         clsPoints.add(new Vector(projP));
       }
-      ch = new ConvexHull2D(clsPoints);
-      chres = ch.start();
+      Vector[] chres = new ConvexHull2D(clsPoints).computeHull();
 
       if(chres != null) {
         DoubleMinMax mmX = new DoubleMinMax();

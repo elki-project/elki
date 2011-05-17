@@ -75,11 +75,6 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-    Vector[] chres;
-    Element selHull;
-    ConvexHull2D ch;
-    SVGPath path = new SVGPath();
-
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
@@ -96,9 +91,9 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
         }
       }
       if(points.size() >= 3) {
-        ch = new ConvexHull2D(points);
-        chres = ch.start();
+        Vector[] chres = new ConvexHull2D(points).computeHull();
 
+        SVGPath path = new SVGPath();
         if(chres != null && chres.length >= 3) {
           for(int i = 0; i < chres.length; i++) {
             path.drawTo(chres[i].get(0), chres[i].get(1));
@@ -106,7 +101,7 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
           path.close();
         }
 
-        selHull = path.makeElement(svgp);
+        Element selHull = path.makeElement(svgp);
 
         SVGUtil.addCSSClass(selHull, SELECTEDHULL);
         layer.appendChild(selHull);
