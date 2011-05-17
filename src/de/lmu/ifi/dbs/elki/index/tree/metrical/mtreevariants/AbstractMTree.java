@@ -8,12 +8,8 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -24,6 +20,8 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
@@ -117,28 +115,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   }
 
   @Override
-  public final List<DistanceResultPair<D>> rangeQuery(O object, D epsilon) {
-    final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-
-    doRangeQuery(null, getRoot(), object, epsilon, result);
-
-    // sort the result according to the distances
-    Collections.sort(result);
-    return result;
-  }
-
-  @Override
-  public final List<DistanceResultPair<D>> kNNQuery(O object, int k) {
-    if(k < 1) {
-      throw new IllegalArgumentException("At least one object has to be requested!");
-    }
-
-    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceQuery.getDistanceFactory().infiniteDistance());
-    doKNNQuery(object, knnList);
-    return knnList.toSortedArrayList();
-  }
-
-  @Override
   public final DistanceFunction<O, D> getDistanceFunction() {
     return distanceFunction;
   }
@@ -152,7 +128,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if (distanceQuery.getRelation() != relation) {
+    if(distanceQuery.getRelation() != relation) {
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
@@ -168,7 +144,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         return null;
       }
     }
-    MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
+    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return new MetricalIndexKNNQuery<O, S>(relation, idx, dq);
   }
@@ -177,7 +153,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   @Override
   public <S extends Distance<S>> RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if (distanceQuery.getRelation() != relation) {
+    if(distanceQuery.getRelation() != relation) {
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
@@ -193,7 +169,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         return null;
       }
     }
-    MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
+    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return new MetricalIndexRangeQuery<O, S>(relation, idx, dq);
   }
@@ -322,79 +298,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   protected final void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
     N root = createNewLeafNode(leafCapacity);
     file.writePage(root);
-  }
-
-  /**
-   * Performs a k-nearest neighbor query for the given FeatureVector with the
-   * given parameter k and the according distance function. The query result is
-   * in ascending order to the distance to the query object.
-   * 
-   * @param q the id of the query object
-   * @param knnList the query result list
-   */
-  protected final void doKNNQuery(O q, KNNHeap<D> knnList) {
-    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
-
-    // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootEntry().getEntryID(), null));
-    D d_k = knnList.getKNNDistance();
-
-    // search in tree
-    while(!pq.isEmpty()) {
-      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
-
-      if(pqNode.mindist.compareTo(d_k) > 0) {
-        return;
-      }
-
-      N node = getNode(pqNode.nodeID);
-      DBID o_p = pqNode.routingObjectID;
-
-      // directory node
-      if(!node.isLeaf()) {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          E entry = node.getEntry(i);
-          DBID o_r = entry.getRoutingObjectID();
-          D r_or = entry.getCoveringRadius();
-          D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-          D d2 = o_p != null ? distanceQuery.distance(o_r, o_p) : getDistanceFactory().nullDistance();
-
-          D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
-
-          D sum = d_k.plus(r_or);
-
-          if(diff.compareTo(sum) <= 0) {
-            D d3 = distance(o_r, q);
-            D d_min = DistanceUtil.max(d3.minus(r_or), getDistanceFactory().nullDistance());
-            if(d_min.compareTo(d_k) <= 0) {
-              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, entry.getEntryID(), o_r));
-            }
-          }
-        }
-
-      }
-
-      // data node
-      else {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          E entry = node.getEntry(i);
-          DBID o_j = entry.getRoutingObjectID();
-
-          D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-          D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : getDistanceFactory().nullDistance();
-
-          D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
-
-          if(diff.compareTo(d_k) <= 0) {
-            D d3 = distanceQuery.distance(o_j, q);
-            if(d3.compareTo(d_k) <= 0) {
-              knnList.add(d3, o_j);
-              d_k = knnList.getKNNDistance();
-            }
-          }
-        }
-      }
-    }
   }
 
   /**
@@ -711,134 +614,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * 
    * Collections.sort(result); return result; }
    */
-
-  /**
-   * Performs a range query on the specified subtree. It recursively traverses
-   * all paths from the specified node, which cannot be excluded from leading to
-   * qualifying objects.
-   * 
-   * @param o_p the routing object of the specified node
-   * @param node the root of the subtree to be traversed
-   * @param q the id of the query object
-   * @param r_q the query range
-   * @param result the list holding the query results
-   */
-  private void doRangeQuery(DBID o_p, N node, DBID q, D r_q, List<DistanceResultPair<D>> result) {
-    if(!node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        E entry = node.getEntry(i);
-        DBID o_r = entry.getRoutingObjectID();
-
-        D r_or = entry.getCoveringRadius();
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? entry.getParentDistance() : getDistanceFactory().nullDistance(); // o_p
-                                                                                              // !=
-                                                                                              // null
-                                                                                              // ?
-                                                                                              // distanceFunction.distance(o_r,
-                                                                                              // o_p)
-                                                                                              // :
-                                                                                              // distanceFunction.nullDistance();
-
-        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
-
-        D sum = r_q.plus(r_or);
-
-        if(diff.compareTo(sum) <= 0) {
-          D d3 = distanceQuery.distance(o_r, q);
-          if(d3.compareTo(sum) <= 0) {
-            N child = getNode(entry.getEntryID());
-            doRangeQuery(o_r, child, q, r_q, result);
-          }
-        }
-
-      }
-    }
-
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        MTreeEntry<D> entry = node.getEntry(i);
-        DBID o_j = entry.getRoutingObjectID();
-
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : getDistanceFactory().nullDistance();
-
-        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
-
-        if(diff.compareTo(r_q) <= 0) {
-          D d3 = distanceQuery.distance(o_j, q);
-          if(d3.compareTo(r_q) <= 0) {
-            DistanceResultPair<D> queryResult = new GenericDistanceResultPair<D>(d3, o_j);
-            result.add(queryResult);
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Performs a range query on the specified subtree. It recursively traverses
-   * all paths from the specified node, which cannot be excluded from leading to
-   * qualifying objects.
-   * 
-   * @param o_p the routing object of the specified node
-   * @param node the root of the subtree to be traversed
-   * @param q the id of the query object
-   * @param r_q the query range
-   * @param result the list holding the query results
-   */
-  private void doRangeQuery(DBID o_p, N node, O q, D r_q, List<DistanceResultPair<D>> result) {
-    if(!node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        E entry = node.getEntry(i);
-        DBID o_r = entry.getRoutingObjectID();
-
-        D r_or = entry.getCoveringRadius();
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? entry.getParentDistance() : getDistanceFactory().nullDistance(); // o_p
-                                                                                              // !=
-                                                                                              // null
-                                                                                              // ?
-                                                                                              // distanceFunction.distance(o_r,
-                                                                                              // o_p)
-                                                                                              // :
-                                                                                              // distanceFunction.nullDistance();
-
-        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
-
-        D sum = r_q.plus(r_or);
-
-        if(diff.compareTo(sum) <= 0) {
-          D d3 = distanceQuery.distance(o_r, q);
-          if(d3.compareTo(sum) <= 0) {
-            N child = getNode(entry.getEntryID());
-            doRangeQuery(o_r, child, q, r_q, result);
-          }
-        }
-
-      }
-    }
-
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        MTreeEntry<D> entry = node.getEntry(i);
-        DBID o_j = entry.getRoutingObjectID();
-
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : getDistanceFactory().nullDistance();
-
-        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
-
-        if(diff.compareTo(r_q) <= 0) {
-          D d3 = distanceQuery.distance(o_j, q);
-          if(d3.compareTo(r_q) <= 0) {
-            DistanceResultPair<D> queryResult = new GenericDistanceResultPair<D>(d3, o_j);
-            result.add(queryResult);
-          }
-        }
-      }
-    }
-  }
 
   /**
    * Adjusts the tree after insertion of some nodes.
