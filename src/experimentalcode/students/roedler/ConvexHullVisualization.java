@@ -9,13 +9,15 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -34,7 +36,7 @@ import experimentalcode.students.roedler.utils.convexhull.ConvexHull2D;
 
 /**
  * Visualizer for generating an SVG-Element containing the convex hull of each
- * cluster
+ * cluster.
  * 
  * @author Robert Rödler
  * 
@@ -43,11 +45,10 @@ import experimentalcode.students.roedler.utils.convexhull.ConvexHull2D;
  * @param <NV> Type of the NumberVector being visualized.
  */
 public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
-
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "convex Hull Visualization";
+  private static final String NAME = "Convex Hull Visualization";
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -57,7 +58,7 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
   /**
    * The result we work on
    */
-  Clustering<MeanModel<NV>> clustering;
+  Clustering<Model> clustering;
 
   /**
    * The hulls
@@ -78,6 +79,9 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
 
   @Override
   protected void redraw() {
+    // Viewport size, for "relative size" computations
+    final Pair<DoubleMinMax, DoubleMinMax> viewp = proj.estimateViewport();
+    double projarea = (viewp.getFirst().getDiff()) * (viewp.getSecond().getDiff());
 
     // addCSSClasses(svgp);
     // SVGPath path = new SVGPath();
@@ -85,21 +89,16 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
 
     double opacity = 0.25;
     Vector[] chres;
-    Vector[] means = new Vector[clustering.getAllClusters().size()];
-    Vector[] meansproj = new Vector[clustering.getAllClusters().size()];
 
-    Iterator<Cluster<MeanModel<NV>>> ci = clustering.getAllClusters().iterator();
+    Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
     int clusterID = 0;
 
     for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
       SVGPath path = new SVGPath();
-      Cluster<MeanModel<NV>> clus = ci.next();
-      double[] mean = proj.fastProjectDataToRenderSpace(clus.getModel().getMean());
-      meansproj[cnum] = new Vector(mean);
-      means[cnum] = clus.getModel().getMean().getColumnVector();
+      Cluster<?> clus = ci.next();
 
-      Vector[] clsPoints = new Vector[clustering.getAllClusters().get(cnum).getIDs().size()];
-      Iterator<DBID> clp = clustering.getAllClusters().get(cnum).getIDs().iterator();
+      Vector[] clsPoints = new Vector[clus.getIDs().size()];
+      Iterator<DBID> clp = clus.getIDs().iterator();
 
       for(int i = 0; i < clsPoints.length; i++) {
         DBID clpnum = clp.next();
@@ -109,33 +108,16 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
       ch = new ConvexHull2D(clsPoints);
       chres = ch.start();
 
-      double minX, maxX, minY, maxY;
-
       if(chres != null) {
-        minX = chres[0].get(0);
-        maxX = chres[0].get(0);
-        minY = chres[1].get(1);
-        maxY = chres[1].get(1);
+        DoubleMinMax mmX = new DoubleMinMax();
+        DoubleMinMax mmY = new DoubleMinMax();
 
         for(int i = 0; i < chres.length; i++) {
-          if(chres[i].get(0) > maxX) {
-            maxX = chres[i].get(0);
-          }
-          if(chres[i].get(0) < minX) {
-            minX = chres[i].get(0);
-          }
-          if(chres[i].get(1) > maxY) {
-            maxY = chres[i].get(1);
-          }
-          if(chres[i].get(1) < minY) {
-            minY = chres[i].get(1);
-          }
-
+          mmX.put(chres[i].get(0));
+          mmY.put(chres[i].get(1));
           path.drawTo(chres[i].get(0), chres[i].get(1));
         }
-        double hullarea = (Math.abs(maxX - minX) * Math.abs(maxY - minY));
-        double projarea = (proj.estimateViewport().getFirst().getMax() - proj.estimateViewport().getFirst().getMin()) * (proj.estimateViewport().getSecond().getMax() - proj.estimateViewport().getSecond().getMin());
-
+        final double hullarea = Math.abs(mmX.getDiff()) * Math.abs(mmY.getDiff());
         opacity = Math.sqrt(((double) clsPoints.length / rep.size()) * ((projarea - hullarea) / projarea));
 
         path.close();
@@ -161,8 +143,7 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
     CSSClass cls = new CSSClass(this, CONVEXHULL + clusterID);
     cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
 
-    String color;
-
+    final String color;
     if(clustering.getAllClusters().size() == 1) {
       color = "black";
     }
@@ -176,20 +157,14 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
     svgp.addCSSClassOrLogError(cls);
   }
 
-  /*
-   * @Override public void resultChanged(Result current) { if (current
-   * instanceof SelectionResult) { synchronizedRedraw(); return; }
-   * super.resultChanged(current); }
-   */
-
   /**
-   * Factory for visualizers to generate an SVG-Element containing the lines
-   * between kMeans clusters
+   * Factory for visualizers to generate an SVG-Element containing the convex
+   * hull of a cluster.
    * 
-   * @author Heidi Kolb
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses kMeansVisualisation oneway - - «create»
+   * @apiviz.uses ConvexHullVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
@@ -214,32 +189,11 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
         // Find clusterings we can visualize:
         Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
         for(Clustering<?> c : clusterings) {
-          if(c.getAllClusters().size() > 0) {
-            // Does the cluster have a model with cluster means?
-            Clustering<MeanModel<NV>> mcls = findMeanModel(c);
-            if(mcls != null) {
-              final VisualizationTask task = new VisualizationTask(NAME, context, c, rep, this, P2DVisualization.class);
-              task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
-              context.addVisualizer(c, task);
-            }
-          }
+          final VisualizationTask task = new VisualizationTask(NAME, context, c, rep, this, P2DVisualization.class);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+          context.addVisualizer(c, task);
         }
       }
-    }
-
-    /**
-     * Test if the given clustering has a mean model.
-     * 
-     * @param <NV> Vector type
-     * @param c Clustering to inspect
-     * @return the clustering cast to return a mean model, null otherwise.
-     */
-    @SuppressWarnings("unchecked")
-    private static <NV extends NumberVector<NV, ?>> Clustering<MeanModel<NV>> findMeanModel(Clustering<?> c) {
-      if(c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
-        return (Clustering<MeanModel<NV>>) c;
-      }
-      return null;
     }
 
     @Override
