@@ -3,6 +3,16 @@ package experimentalcode.students.goldhofa;
 import java.util.ArrayList;
 import java.lang.Comparable;
 
+/**
+ * Identifies a CircleSegment by its clusterings and cluster. Can be stored as and
+ * retrieved from a String.
+ * 
+ * A segmentID String consists of the cluster id of each clustering, ordered by clustering
+ * and separated by a character. Thus a segment ID describes the common pairs in all
+ * clusterings and cluster.
+ * 
+ * i.e. clusteringID 0 & clusterID 2, clusteringID 1 & clusterID 0 => segmentID: 2-0
+ */
 public class SegmentID implements Comparable<SegmentID> {
   
   private static final String SEPARATOR = "-"; 
