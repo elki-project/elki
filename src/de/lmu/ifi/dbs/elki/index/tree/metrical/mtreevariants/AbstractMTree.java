@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.MetricalIndexKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.MetricalIndexRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -149,26 +150,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
-      return null;
-    }
-    // TODO: Bulk requests are not yet supported!
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
-    }
-    MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MetricalIndexKNNQuery<O, S>(relation, idx, dq);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
@@ -190,27 +171,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
-      return null;
-    }
-    // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
-    }
-    MetricalIndex<O, S, ?, ?> idx = (MetricalIndex<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MetricalIndexRangeQuery<O, S>(relation, idx, dq);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <S extends Distance<S>> de.lmu.ifi.dbs.elki.database.query.range.RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
+  public <S extends Distance<S>> RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {

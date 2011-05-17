@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.index;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.result.Result;
 
@@ -50,11 +49,4 @@ public interface Index extends Result {
    * @param ids Objects to remove
    */
   public void deleteAll(DBIDs ids);
-
-  /**
-   * Get the indexed relation.
-   * 
-   * @return Relation this index is bound to
-   */
-  public Relation<?> getRelation();
 }

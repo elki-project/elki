@@ -1204,26 +1204,12 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   }
 
   @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
-    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
-      }
+  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
+    // Query on the relation we index
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
-    if (df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(dq);
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>)SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
-      RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<O>(relation, this, dqc, dfc);
-      return (RangeQuery<O, D>) q;
-    }
-    return new GenericRStarTreeRangeQuery<O, D>(relation, this, dq, df);
-  }
-
-  @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
+    // Can we support this distance function - spatial distances only!
     DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
     if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -1232,37 +1218,23 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       return null;
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    // Can we use an optimized query?
     if (df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(dq);
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(distanceQuery);
       SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>)SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
       RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<O>(relation, this, dqc, dfc);
       return (RangeQuery<O, D>) q;
     }
-    return new GenericRStarTreeRangeQuery<O, D>(relation, this, dq, df);
-  }
-
-  @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, @SuppressWarnings("unused") Object... hints) {
-    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
-      }
-      return null;
-    }
-    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
-    if (df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(dq);
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>)SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
-      KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<O>(relation, this, dqc, dfc);
-      return (KNNQuery<O, D>) q;
-    }
-    return new GenericRStarTreeKNNQuery<O, D>(relation, this, dq, df);
+    return new GenericRStarTreeRangeQuery<O, D>(relation, this, distanceQuery, df);
   }
 
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
+    // Query on the relation we index
+    if (distanceQuery.getRelation() != relation) {
+      return null;
+    }
+    // Can we support this distance function - spatial distances only!
     DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
     if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -1271,14 +1243,14 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       return null;
     }
     SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    // Can we use an optimized query?
     if (df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(dq);
+      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>)DistanceQuery.class.cast(distanceQuery);
       SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>)SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
       KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<O>(relation, this, dqc, dfc);
       return (KNNQuery<O, D>) q;
     }
-    return new GenericRStarTreeKNNQuery<O, D>(relation, this, dq, df);
+    return new GenericRStarTreeKNNQuery<O, D>(relation, this, distanceQuery, df);
   }
 
   @Override

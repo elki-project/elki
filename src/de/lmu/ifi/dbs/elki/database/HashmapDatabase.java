@@ -198,18 +198,14 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
         relation.set(newid, objpackages.data(j, i));
       }
       newids.add(newid);
-
-      // Notify indexes of insertions
-      // FIXME: support bulk...
-      for(Index index : indexes) {
-        for(int i = 0; i < targets.length; i++) {
-          if(index.getRelation() == targets[i]) {
-            index.insert(newid);
-          }
-        }
-      }
     }
 
+    // Notify indexes of insertions
+    // FIXME: support bulk...
+    for(Index index : indexes) {
+      index.insertAll(newids);
+    }
+    
     // fire insertion event
     eventManager.fireObjectsInserted(newids);
     return newids;
@@ -249,9 +245,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     // insert into indexes
     for(Index index : indexes) {
       for(int i = 0; i < targets.length; i++) {
-        if(index.getRelation() == targets[i]) {
-          index.insert(newid);
-        }
+        index.insert(newid);
       }
     }
 
@@ -475,26 +469,8 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     if(distanceFunction == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
-    for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index idx = indexes.get(i);
-      if(idx instanceof KNNIndex) {
-        if(idx.getRelation() == objQuery) {
-          KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceFunction, hints);
-          if(q != null) {
-            return q;
-          }
-        }
-      }
-    }
-
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return QueryUtil.getLinearScanKNNQuery(distanceQuery);
+    return getKNNQuery(distanceQuery, hints);
   }
 
   @Override
@@ -505,11 +481,9 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index idx = indexes.get(i);
       if(idx instanceof KNNIndex) {
-        if(idx.getRelation() == distanceQuery.getRelation()) {
-          KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceQuery, hints);
-          if(q != null) {
-            return q;
-          }
+        KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceQuery, hints);
+        if(q != null) {
+          return q;
         }
       }
     }
@@ -528,26 +502,8 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     if(distanceFunction == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index idx = indexes.get(i);
-      if(idx instanceof RangeIndex) {
-        if(idx.getRelation() == objQuery) {
-          RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceFunction, hints);
-          if(q != null) {
-            return q;
-          }
-        }
-      }
-    }
-
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return QueryUtil.getLinearScanRangeQuery(distanceQuery);
+    return getRangeQuery(distanceQuery, hints);
   }
 
   @Override
@@ -558,11 +514,9 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index idx = indexes.get(i);
       if(idx instanceof RangeIndex) {
-        if(idx.getRelation() == distanceQuery.getRelation()) {
-          RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceQuery, hints);
-          if(q != null) {
-            return q;
-          }
+        RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceQuery, hints);
+        if(q != null) {
+          return q;
         }
       }
     }
@@ -581,31 +535,9 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     if(distanceFunction == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
-    for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index idx = indexes.get(i);
-      if(idx instanceof RKNNIndex) {
-        if(idx.getRelation() == objQuery) {
-          RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceFunction, hints);
-          if(q != null) {
-            return q;
-          }
-        }
-      }
-    }
 
-    Integer maxk = null;
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-      if(hint instanceof Integer) {
-        maxk = (Integer) hint;
-      }
-    }
     DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
-    return new LinearScanRKNNQuery<O, D>(objQuery, distanceQuery, knnQuery, maxk);
+    return getRKNNQuery(distanceQuery, hints);
   }
 
   @Override
@@ -616,11 +548,9 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     for(int i = indexes.size() - 1; i >= 0; i--) {
       Index idx = indexes.get(i);
       if(idx instanceof RKNNIndex) {
-        if(idx.getRelation() == distanceQuery.getRelation()) {
-          RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceQuery, hints);
-          if(q != null) {
-            return q;
-          }
+        RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceQuery, hints);
+        if(q != null) {
+          return q;
         }
       }
     }
