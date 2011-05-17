@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -17,6 +18,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 
 /**
  * MkTabTree is a metrical index structure based on the concepts of the M-Tree
@@ -38,6 +40,11 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   private static final Logging logger = Logging.getLogger(MkTabTree.class);
   
   /**
+   * The knn query we use internally.
+   */
+  private final KNNQuery<O, D> knnQuery;
+  
+  /**
    * Constructor.
    * 
    * @param relation Relation indexed
@@ -50,6 +57,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   public MkTabTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
     super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
+    this.knnQuery = this.getKNNQuery(distanceQuery);
   }
 
   /**
@@ -240,10 +248,8 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @return the knn distance of the object with the specified id
    */
   private List<D> knnDistances(O objectID) {
-    KNNHeap<D> knns = new KNNHeap<D>(k_max, getDistanceQuery().infiniteDistance());
-    doKNNQuery(objectID, knns);
-
-    return knns.toKNNList().asDistanceList();
+    List<DistanceResultPair<D>> knns = knnQuery.getKNNForObject(objectID, k_max - 1);
+    return KNNList.asDistanceList(knns);
   }
 
   /**

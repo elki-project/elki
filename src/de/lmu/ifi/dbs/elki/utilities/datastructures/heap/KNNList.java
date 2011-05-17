@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.composedOf DBIDView
  * @apiviz.composedOf DistanceItr
  * @apiviz.composedOf DistanceView
- *
+ * 
  * @param <D>
  */
 public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair<D>> {
@@ -28,12 +28,12 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
    * Serial ID
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * The value of k this was materialized for.
    */
   private final int k;
-  
+
   /**
    * The maximum distance to return if size() &lt; k
    */
@@ -51,17 +51,17 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
     this.maxdist = maxdist;
     // Get sorted data from heap; but in reverse.
     int i;
-    for (i = 0; i < heap.size(); i++) {
+    for(i = 0; i < heap.size(); i++) {
       super.add(null);
     }
     while(!heap.isEmpty()) {
       i--;
-      assert(i >= 0);
+      assert (i >= 0);
       super.set(i, heap.poll());
     }
-    assert(heap.size() == 0);
+    assert (heap.size() == 0);
   }
-  
+
   /**
    * Get the K parameter.
    * 
@@ -70,98 +70,89 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
   public int getK() {
     return k;
   }
-  
+
   /**
    * Get the distance to the k nearest neighbor, or maxdist otherwise.
    * 
    * @return Maximum distance
    */
   public D getKNNDistance() {
-    if (size() < getK()) {
+    if(size() < getK()) {
       return maxdist;
     }
     return get(getK() - 1).getDistance();
   }
-  
+
   /**
    * Get maximum distance in list
    */
   public D getMaximumDistance() {
-    if (isEmpty()) {
+    if(isEmpty()) {
       return maxdist;
     }
     return get(size() - 1).getDistance();
   }
-  
+
   /**
    * View as ArrayDBIDs
    * 
    * @return Static DBIDs
    */
   public ArrayDBIDs asDBIDs() {
-    return new DBIDView();
+    return new DBIDView(this);
   }
-  
+
   /**
    * View as list of distances
    * 
    * @return List of distances view
    */
   public List<D> asDistanceList() {
-    return new DistanceView();
+    return new DistanceView<D>(this);
   }
-  
+
   /* Make the list unmodifiable! */
-  
-  /** {@inheritDoc} */
+
   @Override
   public boolean add(@SuppressWarnings("unused") DistanceResultPair<D> e) {
     throw new UnsupportedOperationException();
   }
 
-  /** {@inheritDoc} */
   @Override
   public void add(@SuppressWarnings("unused") int index, @SuppressWarnings("unused") DistanceResultPair<D> element) {
     throw new UnsupportedOperationException();
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean addAll(@SuppressWarnings("unused") Collection<? extends DistanceResultPair<D>> c) {
     throw new UnsupportedOperationException();
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean addAll(@SuppressWarnings("unused") int index, @SuppressWarnings("unused") Collection<? extends DistanceResultPair<D>> c) {
     throw new UnsupportedOperationException();
   }
 
-  /** {@inheritDoc} */
   @Override
   public void clear() {
     throw new UnsupportedOperationException();
   }
 
-  /** {@inheritDoc} */
   @Override
   public DistanceResultPair<D> remove(@SuppressWarnings("unused") int index) {
     throw new UnsupportedOperationException();
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean remove(@SuppressWarnings("unused") Object o) {
     throw new UnsupportedOperationException();
   }
 
-  /** {@inheritDoc} */
   @Override
   public DistanceResultPair<D> set(@SuppressWarnings("unused") int index, @SuppressWarnings("unused") DistanceResultPair<D> element) {
     throw new UnsupportedOperationException();
   }
 
-  /** {@inheritDoc} */
   @Override
   public void trimToSize() {
     throw new UnsupportedOperationException();
@@ -172,18 +163,18 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
    * 
    * @author Erich Schubert
    */
-  protected class DBIDItr implements Iterator<DBID> {
+  protected static class DBIDItr implements Iterator<DBID> {
     /**
      * The real iterator.
      */
-    Iterator<DistanceResultPair<D>> itr;
-    
+    Iterator<? extends DistanceResultPair<?>> itr;
+
     /**
      * Constructor.
      */
-    protected DBIDItr() {
+    protected DBIDItr(Iterator<? extends DistanceResultPair<?>> itr) {
       super();
-      this.itr = KNNList.this.iterator();
+      this.itr = itr;
     }
 
     @Override
@@ -201,16 +192,31 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
       itr.remove();
     }
   }
-  
+
   /**
-   * A view on the DBIDs of the result 
+   * A view on the DBIDs of the result
    * 
    * @author Erich Schubert
    */
-  protected class DBIDView extends AbstractList<DBID> implements ArrayDBIDs {
+  protected static class DBIDView extends AbstractList<DBID> implements ArrayDBIDs {
+    /**
+     * The true list.
+     */
+    final List<? extends DistanceResultPair<?>> parent;
+
+    /**
+     * Constructor.
+     * 
+     * @param parent Owner
+     */
+    public DBIDView(List<? extends DistanceResultPair<?>> parent) {
+      super();
+      this.parent = parent;
+    }
+
     @Override
     public DBID get(int i) {
-      return KNNList.this.get(i).getDBID();
+      return parent.get(i).getDBID();
     }
 
     @Override
@@ -220,32 +226,32 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
 
     @Override
     public Iterator<DBID> iterator() {
-      return new DBIDItr();
+      return new DBIDItr(parent.iterator());
     }
 
     @Override
     public int size() {
-      return KNNList.this.size();
+      return parent.size();
     }
   }
-  
+
   /**
    * Proxy iterator for accessing DBIDs.
    * 
    * @author Erich Schubert
    */
-  protected class DistanceItr implements Iterator<D> {
+  protected static class DistanceItr<D extends Distance<D>> implements Iterator<D> {
     /**
      * The real iterator.
      */
-    Iterator<DistanceResultPair<D>> itr;
+    Iterator<? extends DistanceResultPair<D>> itr;
 
     /**
      * Constructor.
      */
-    protected DistanceItr() {
+    protected DistanceItr(Iterator<? extends DistanceResultPair<D>> itr) {
       super();
-      this.itr = KNNList.this.iterator();
+      this.itr = itr;
     }
 
     @Override
@@ -263,26 +269,59 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
       itr.remove();
     }
   }
-  
+
   /**
-   * A view on the Distances of the result 
+   * A view on the Distances of the result
    * 
    * @author Erich Schubert
    */
-  protected class DistanceView extends AbstractList<D> implements List<D> {
+  protected static class DistanceView<D extends Distance<D>> extends AbstractList<D> implements List<D> {
+    /**
+     * The true list.
+     */
+    final List<? extends DistanceResultPair<D>> parent;
+
+    /**
+     * Constructor.
+     * 
+     * @param parent Owner
+     */
+    public DistanceView(List<? extends DistanceResultPair<D>> parent) {
+      super();
+      this.parent = parent;
+    }
+
     @Override
     public D get(int i) {
-      return KNNList.this.get(i).getDistance();
+      return parent.get(i).getDistance();
     }
 
     @Override
     public Iterator<D> iterator() {
-      return new DistanceItr();
+      return new DistanceItr<D>(parent.iterator());
     }
 
     @Override
     public int size() {
-      return KNNList.this.size();
+      return parent.size();
     }
+  }
+
+  /**
+   * View as ArrayDBIDs
+   * 
+   * @return Static DBIDs
+   */
+  public static ArrayDBIDs asDBIDs(List<? extends DistanceResultPair<?>> list) {
+    return new DBIDView(list);
+  }
+
+  /**
+   * View as list of distances
+   * 
+   * @return List of distances view
+   */
+  public static <D extends Distance<D>> List<D> asDistanceList(List<? extends DistanceResultPair<D>> list) {
+    return new DistanceView<D>(list);
   }
 }

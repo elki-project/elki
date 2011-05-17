@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -42,11 +43,16 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(MkMaxTree.class);
-  
+
   /**
    * Provides some statistics about performed reverse knn-queries.
    */
   private QueryStatistic rkNNStatistics = new QueryStatistic();
+
+  /**
+   * The kNN query we use internally.
+   */
+  private final KNNQuery<O, D> knnQuery;
 
   /**
    * Constructor.
@@ -61,12 +67,14 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   public MkMaxTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
     super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
+
+    this.knnQuery = this.getKNNQuery(distanceQuery);
   }
 
   /**
    * Inserts the specified object into this MkMax-Tree by calling
-   * {@link AbstractMTree#insert(DBID,O,boolean)
-   * AbstractMTree.insert(id, object, true)}.
+   * {@link AbstractMTree#insert(DBID,O,boolean) AbstractMTree.insert(id,
+   * object, true)}.
    * 
    * @param object the object to be inserted
    */
@@ -341,9 +349,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkMaxEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    KNNHeap<D> knns = new KNNHeap<D>(k_max - 1, getDistanceQuery().infiniteDistance());
-    doKNNQuery(object, knns);
-    D knnDistance = knns.getKNNDistance();
+    List<DistanceResultPair<D>> knns = knnQuery.getKNNForObject(object, k_max - 1);
+    D knnDistance = knns.get(knns.size() - 1).getDistance();
     return new MkMaxLeafEntry<D>(id, parentDistance, knnDistance);
   }
 
@@ -363,7 +370,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   protected MkMaxEntry<D> createRootEntry() {
     return new MkMaxDirectoryEntry<D>(null, null, 0, null, null);
   }
-  
+
   /**
    * Return the node base class.
    * 

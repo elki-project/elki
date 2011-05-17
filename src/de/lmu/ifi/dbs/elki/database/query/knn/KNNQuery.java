@@ -59,6 +59,7 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
+  // TODO: return KNNList<D> instead?
   public List<DistanceResultPair<D>> getKNNForObject(O obj, int k);
 
   /**
