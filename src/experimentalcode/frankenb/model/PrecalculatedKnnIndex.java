@@ -82,31 +82,13 @@ public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
     return "Precalculated Knn Query";
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.index.KNNIndex#getKNNQuery(de.lmu.ifi.dbs.elki.database
-   * .Database, de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction,
-   * java.lang.Object[])
-   */
-  @SuppressWarnings("unchecked")
-  @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    return (KNNQuery<O, D>) new PrecalculatedKnnQuery<O>(this.relation, this.resultTree);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.index.KNNIndex#getKNNQuery(de.lmu.ifi.dbs.elki.database
-   * .Database, de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery,
-   * java.lang.Object[])
-   */
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    // Query on the relation we index
+    if (distanceQuery.getRelation() != relation) {
+      return null;
+    }
     return (KNNQuery<O, D>) new PrecalculatedKnnQuery<O>(this.relation, this.resultTree);
   }
 
@@ -180,10 +162,5 @@ public class PrecalculatedKnnIndex<O> implements KNNIndex<O> {
     public TypeInformation getInputTypeRestriction() {
       return TypeUtil.ANY;
     }
-  }
-
-  @Override
-  public Relation<O> getRelation() {
-    return this.relation;
   }
 }
