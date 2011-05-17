@@ -124,7 +124,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
   public static class Comp<D extends Distance<D>> implements Comparator<DistanceResultPair<D>> {
     @Override
     public int compare(DistanceResultPair<D> o1, DistanceResultPair<D> o2) {
-      return -o1.getDistance().compareTo(o2.getDistance());
+      return -o1.compareByDistance(o2);
     }
   }
 }

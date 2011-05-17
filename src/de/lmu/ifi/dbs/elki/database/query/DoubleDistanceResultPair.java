@@ -53,7 +53,7 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
   }
 
   @Override
-  public int compareTo(DistanceResultPair<DoubleDistance> o) {
+  public int compareByDistance(DistanceResultPair<DoubleDistance> o) {
     if(o instanceof DoubleDistanceResultPair) {
       DoubleDistanceResultPair od = (DoubleDistanceResultPair) o;
       final int delta = Double.compare(distance, od.distance);
@@ -66,6 +66,15 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
       if(delta != 0) {
         return delta;
       }
+    }
+    return 0;
+  }
+
+  @Override
+  public int compareTo(DistanceResultPair<DoubleDistance> o) {
+    final int delta = this.compareByDistance(o);
+    if(delta != 0) {
+      return delta;
     }
     return id.compareTo(o.getDBID());
   }
