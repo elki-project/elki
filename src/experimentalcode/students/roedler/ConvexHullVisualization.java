@@ -1,7 +1,9 @@
 package experimentalcode.students.roedler;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -11,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -97,13 +100,14 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
       SVGPath path = new SVGPath();
       Cluster<?> clus = ci.next();
 
-      Vector[] clsPoints = new Vector[clus.getIDs().size()];
-      Iterator<DBID> clp = clus.getIDs().iterator();
+      final DBIDs ids = clus.getIDs();
+      List<Vector> clsPoints = new ArrayList<Vector>(ids.size());
+      Iterator<DBID> clp = ids.iterator();
 
-      for(int i = 0; i < clsPoints.length; i++) {
+      for(int i = 0; i < ids.size(); i++) {
         DBID clpnum = clp.next();
         double[] projP = proj.fastProjectDataToRenderSpace(rep.get(clpnum).getColumnVector());
-        clsPoints[i] = new Vector(projP);
+        clsPoints.add(new Vector(projP));
       }
       ch = new ConvexHull2D(clsPoints);
       chres = ch.start();
@@ -118,7 +122,7 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
           path.drawTo(chres[i].get(0), chres[i].get(1));
         }
         final double hullarea = Math.abs(mmX.getDiff()) * Math.abs(mmY.getDiff());
-        opacity = Math.sqrt(((double) clsPoints.length / rep.size()) * ((projarea - hullarea) / projarea));
+        opacity = Math.sqrt(((double) clsPoints.size() / rep.size()) * ((projarea - hullarea) / projarea));
 
         path.close();
       }

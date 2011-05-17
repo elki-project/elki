@@ -2,6 +2,7 @@ package experimentalcode.students.roedler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -47,9 +48,7 @@ import experimentalcode.students.roedler.utils.convexhull.ConvexHull2D;
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-
 public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements ContextChangeListener, DataStoreListener {
-
   /**
    * A short name characterizing this Visualizer.
    */
@@ -76,7 +75,6 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-    Vector[] points;
     Vector[] chres;
     Element selHull;
     ConvexHull2D ch;
@@ -85,19 +83,19 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
-      points = new Vector[selContext.getSelectedIds().size()];
+      List<Vector> points = new ArrayList<Vector>(selContext.getSelectedIds().size());
       int j = 0;
       for(DBID i : selection) {
         try {
           double[] v = proj.fastProjectDataToRenderSpace(rep.get(i));
-          points[j] = new Vector(v);
+          points.add(new Vector(v));
           j++;
         }
         catch(ObjectNotFoundException e) {
           // ignore
         }
       }
-      if(points.length >= 3) {
+      if(points.size() >= 3) {
         ch = new ConvexHull2D(points);
         chres = ch.start();
 
