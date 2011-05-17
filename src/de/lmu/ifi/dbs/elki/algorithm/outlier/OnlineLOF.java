@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -107,8 +108,9 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
         stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", logger);
       }
       MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(relation, neighborhoodDistanceFunction, k);
-      kNNRefer = preproc.getKNNQuery(neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNRefer = preproc.getRKNNQuery(neighborhoodDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+      DistanceQuery<O, D> ndq = relation.getDatabase().getDistanceQuery(relation, neighborhoodDistanceFunction);
+      kNNRefer = preproc.getKNNQuery(ndq, k, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNRefer = preproc.getRKNNQuery(ndq, k, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
       relation.getDatabase().addIndex(preproc);
     }
@@ -128,8 +130,9 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
       config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.K_ID, k);
       MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(relation, reachabilityDistanceFunction, k);
-      kNNReach = preproc.getKNNQuery(reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNReach = preproc.getRKNNQuery(reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
+      DistanceQuery<O, D> rdq = relation.getDatabase().getDistanceQuery(relation, reachabilityDistanceFunction);
+      kNNReach = preproc.getKNNQuery(rdq, k, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNReach = preproc.getRKNNQuery(rdq, k, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
       relation.getDatabase().addIndex(preproc);
     }

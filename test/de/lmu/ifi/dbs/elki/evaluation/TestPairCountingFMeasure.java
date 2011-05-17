@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllNoise;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -45,7 +45,7 @@ public class TestPairCountingFMeasure implements JUnit4Test {
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database
-    Database db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, params);
+    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
     db.initialize();
 
     // verify data set size.

@@ -100,23 +100,6 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      return null;
-    }
-    // k max supported?
-    for(Object hint : hints) {
-      if(hint instanceof Integer) {
-        if(((Integer) hint) > k) {
-          return null;
-        }
-      }
-    }
-    return new PreprocessorKNNQuery<O, S>(relation, (MaterializeKNNPreprocessor<O, S>) this);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     if(!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
       return null;
@@ -127,6 +110,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
         if(((Integer) hint) > k) {
           return null;
         }
+        break;
       }
     }
     return new PreprocessorKNNQuery<O, S>(relation, (MaterializeKNNPreprocessor<O, S>) this);

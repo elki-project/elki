@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -187,7 +188,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       }
       MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, reachabilityDistanceFunction, k);
       relation.getDatabase().addIndex(preproc);
-      knnReach = preproc.getKNNQuery(reachabilityDistanceFunction, k);
+      DistanceQuery<O, D> rdq = relation.getDatabase().getDistanceQuery(relation, reachabilityDistanceFunction);
+      knnReach = preproc.getKNNQuery(rdq, k);
     }
 
     // knnReach is only used once

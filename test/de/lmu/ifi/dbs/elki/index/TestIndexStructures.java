@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -88,7 +87,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testMetrical() throws ParameterException {
     ListParameterization metparams = new ListParameterization();
-    metparams.addParameter(HashmapDatabase.INDEX_ID, MTreeFactory.class);
+    metparams.addParameter(StaticArrayDatabase.INDEX_ID, MTreeFactory.class);
     metparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 100);
     testFileBasedDatabaseConnection(metparams, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
   }
@@ -101,7 +100,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testRStarTree() throws ParameterException {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(HashmapDatabase.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
   }
@@ -116,7 +115,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testRStarTreeFast() throws ParameterException {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(HashmapDatabase.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractRStarTreeFactory.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);

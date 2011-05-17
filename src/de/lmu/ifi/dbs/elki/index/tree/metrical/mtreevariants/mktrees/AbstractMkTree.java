@@ -44,26 +44,6 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
-      return null;
-    }
-    // Bulk is not yet supported
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
-    }
-    AbstractMkTreeUnified<O, S, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MkTreeRKNNQuery<O, S>(relation, idx, dq);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
   public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.getDistanceFunction().equals(distanceFunction)) {

@@ -283,23 +283,6 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     return new ArrayList<DistanceResultPair<D>>(rKNN);
   }
 
-  @SuppressWarnings({ "unchecked" })
-  @Override
-  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      return null;
-    }
-    // k max supported?
-    for(Object hint : hints) {
-      if(hint instanceof Integer) {
-        if(((Integer) hint) > k) {
-          return null;
-        }
-      }
-    }
-    return new PreprocessorRKNNQuery<O, S>(relation, (MaterializeKNNAndRKNNPreprocessor<O, S>) this);
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
@@ -312,6 +295,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         if(((Integer) hint) > k) {
           return null;
         }
+        break;
       }
     }
     return new PreprocessorRKNNQuery<O, S>(relation, (MaterializeKNNAndRKNNPreprocessor<O, S>) this);

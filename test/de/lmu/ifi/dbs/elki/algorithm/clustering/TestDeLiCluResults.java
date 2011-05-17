@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -33,7 +33,7 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
   public void testDeLiCluResults() throws ParameterException {
     ListParameterization indexparams = new ListParameterization();
     // We need a special index for this algorithm:
-    indexparams.addParameter(HashmapDatabase.INDEX_ID, DeLiCluTreeFactory.class);
+    indexparams.addParameter(StaticArrayDatabase.INDEX_ID, DeLiCluTreeFactory.class);
     indexparams.addParameter(DeLiCluTreeFactory.PAGE_SIZE_ID, 1000);
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710, indexparams, null);
     

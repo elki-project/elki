@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -154,12 +153,6 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     if(extraIntegrityChecks) {
       getRoot().integrityCheck();
     }
-  }
-
-  @Override
-  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceFunction<? super O, S> distanceFunction, Object... hints) {
-    // FIXME: re-add
-    return null;
   }
 
   @Override

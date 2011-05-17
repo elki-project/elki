@@ -4,17 +4,17 @@
  * <p>The general use-case for any parser is to create objects out of an
  * {@link java.io.InputStream} (e.g. by reading a data file).
  * The objects are packed in a
- * {@link de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle} which,
+ * {@link de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle} which,
  * in turn, is used by a {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection}-Object
- * to create a {@link de.lmu.ifi.dbs.elki.database.Database}
+ * to fill a {@link de.lmu.ifi.dbs.elki.database.Database}
  * containing the corresponding objects.</p>
  * <p>By default (i.e., if the user does not specify any specific requests),
  * any {@link de.lmu.ifi.dbs.elki.KDDTask} will
- * use the {@link de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection} which,
- * in turn, will use the
- * {@link de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser}
+ * use the {@link de.lmu.ifi.dbs.elki.database.StaticArrayDatabase} which,
+ * in turn, will use a {@link de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection}
+ * and a  * {@link de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser}
  * to parse a specified data file creating
- * a {@link de.lmu.ifi.dbs.elki.database.HashmapDatabase}
+ * a {@link de.lmu.ifi.dbs.elki.database.StaticArrayDatabase}
  * containing {@link de.lmu.ifi.dbs.elki.data.DoubleVector}-Objects.</p>
  * 
  * <p>Thus, the standard procedure to use a data set of a real-valued vector space
