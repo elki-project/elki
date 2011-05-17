@@ -1,6 +1,6 @@
 package experimentalcode.students.roedler.utils.convexhull;
 
-import java.lang.Math;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -28,7 +28,7 @@ public class ConvexHull2D {
 
   private static final int Y = 1;
 
-  private Vector[] points;
+  private List<Vector> points;
 
   private VertexList list, top;
 
@@ -40,40 +40,32 @@ public class ConvexHull2D {
 
   private DoubleMinMax minmaxY = new DoubleMinMax();
 
-  public ConvexHull2D(Vector[] points) {
-    if(points.length < 3) {
+  public ConvexHull2D(List<Vector> points) {
+    if(points.size() < 3) {
       return;
     }
     this.points = points;
     list = new VertexList();
     // Scan for extends of data set
-    for(i = 0; i < points.length; i++) {
-      minmaxX.put(points[i].get(X));
-      minmaxY.put(points[i].get(Y));
+    for(Vector point : points) {
+      minmaxX.put(point.get(X));
+      minmaxY.put(point.get(Y));
     }
     // Avoid numerical instabilities by rescaling
-    boolean toSmall = false;
     double factor = 1.0;
     double maxX = Math.max(Math.abs(minmaxX.getMin()), Math.abs(minmaxX.getMax()));
     double maxY = Math.max(Math.abs(minmaxY.getMin()), Math.abs(minmaxY.getMax()));
     if(maxX < 10.0 || maxY < 10.0) {
-      toSmall = true;
       factor = 10 / maxX;
       if(10 / maxY > factor) {
         factor = 10 / maxY;
       }
     }
 
-    for(i = 0; i < points.length; i++) {
+    for(i = 0; i < points.size(); i++) {
       Vertex v = list.makeNullVertex();
-      if(!toSmall) {
-        v.v[X] = points[i].get(X);
-        v.v[Y] = points[i].get(Y);
-      }
-      else {
-        v.v[X] = points[i].get(X) * factor;
-        v.v[Y] = points[i].get(Y) * factor;
-      }
+      v.v[X] = points.get(i).get(X) * factor;
+      v.v[Y] = points.get(i).get(Y) * factor;
       v.vnum = i;
     }
   }
@@ -96,7 +88,7 @@ public class ConvexHull2D {
     Vector[] resv = new Vector[res.n];
     for(int i = 0; i < resv.length; i++) {
       // resv[i] = it.getVector2D();
-      resv[i] = points[it.vnum];
+      resv[i] = points.get(it.vnum);
       it = it.next;
     }
     return resv;
@@ -266,5 +258,15 @@ public class ConvexHull2D {
 
   private void Pop(VertexList top) {
     top.delete(top.head.prev);
+  }
+  
+  public class ScaledVectorList {
+    List<Vector> list;
+    double scale;
+    
+    public double[] get(int i) {
+      double[] raw = list.get(i).getArrayRef();
+      return new double[]{ raw[X] * scale, raw[Y] * scale };
+    }
   }
 }
