@@ -151,6 +151,10 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   @SuppressWarnings("unchecked")
   @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
+    // Query on the relation we index
+    if (distanceQuery.getRelation() != relation) {
+      return null;
+    }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
@@ -172,6 +176,10 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   @SuppressWarnings("unchecked")
   @Override
   public <S extends Distance<S>> RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
+    // Query on the relation we index
+    if (distanceQuery.getRelation() != relation) {
+      return null;
+    }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
       if(getLogger().isDebugging()) {
