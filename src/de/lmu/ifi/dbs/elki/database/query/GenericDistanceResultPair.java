@@ -63,8 +63,13 @@ public class GenericDistanceResultPair<D extends Distance<D>> extends Pair<D, DB
   }
 
   @Override
+  public int compareByDistance(DistanceResultPair<D> o) {
+    return first.compareTo(o.getDistance());
+  }
+
+  @Override
   public int compareTo(DistanceResultPair<D> o) {
-    final int ret = first.compareTo(o.getDistance());
+    final int ret = compareByDistance(o);
     if(ret != 0) {
       return ret;
     }

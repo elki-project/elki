@@ -40,4 +40,12 @@ public interface DistanceResultPair<D extends Distance<D>> extends PairInterface
    * @param second new value for second element
    */
   public void setID(DBID second);
+
+  /**
+   * Compare value, but by distance only.
+   * 
+   * @param o Other object
+   * @return comparison result, as by Double.compare(this, other)
+   */
+  public int compareByDistance(DistanceResultPair<D> o);
 }
