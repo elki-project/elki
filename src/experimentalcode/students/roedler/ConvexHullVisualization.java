@@ -2,7 +2,6 @@ package experimentalcode.students.roedler;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -11,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -103,7 +103,7 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
         double[] projP = proj.fastProjectDataToRenderSpace(rep.get(clpnum).getColumnVector());
         hull.add(new Vector(projP));
       }
-      List<Vector> chres = hull.getHull();
+      Polygon chres = hull.getHull();
 
       // Plot the convex hull:
       SVGPath path = new SVGPath();
