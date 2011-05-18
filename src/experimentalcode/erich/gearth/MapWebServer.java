@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -83,9 +84,9 @@ public class MapWebServer {
       while(polyit.hasNext()) {
         Polygon poly = polyit.next();
         re.append("[");
-        Iterator<double[]> iter = poly.iterator();
+        Iterator<Vector> iter = poly.iterator();
         while(iter.hasNext()) {
-          double[] data = iter.next();
+          double[] data = iter.next().getArrayRef();
           re.append("[");
           for(int i = 0; i < data.length; i++) {
             if(i > 0) {

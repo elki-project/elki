@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -93,7 +94,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     LabelList labels = new LabelList();
     List<Polygon> polys = new java.util.Vector<Polygon>(1);
 
-    List<double[]> coords = new ArrayList<double[]>();
+    List<Vector> coords = new ArrayList<Vector>();
     while(iter.hasNext()) {
       String cur = iter.next();
       Matcher m = COORD.matcher(cur);
@@ -103,10 +104,10 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
           double c2 = Double.valueOf(m.group(2));
           if(m.group(3) != null) {
             double c3 = Double.valueOf(m.group(3));
-            coords.add(new double[] { c1, c2, c3 });
+            coords.add(new Vector(new double[] { c1, c2, c3 }));
           }
           else {
-            coords.add(new double[] { c1, c2 });
+            coords.add(new Vector(new double[] { c1, c2 }));
           }
           continue;
         }
@@ -118,7 +119,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       if(cur.equals(POLYGON_SEPARATOR)) {
         if(coords.size() > 0) {
           polys.add(new Polygon(coords));
-          coords = new ArrayList<double[]>();
+          coords = new ArrayList<Vector>();
         }
         continue;
       }
