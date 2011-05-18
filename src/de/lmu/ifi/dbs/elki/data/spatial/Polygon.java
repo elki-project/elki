@@ -59,4 +59,13 @@ public class Polygon implements Iterable<Vector> {
     appendToBuffer(buf);
     return buf.toString();
   }
+
+  /**
+   * Get the polygon length.
+   * 
+   * @return Polygon length
+   */
+  public int size() {
+    return points.size();
+  }
 }

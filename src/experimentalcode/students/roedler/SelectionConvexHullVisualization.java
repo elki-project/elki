@@ -2,12 +2,12 @@ package experimentalcode.students.roedler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -90,7 +90,7 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
           // ignore
         }
       }
-      List<Vector> chres = hull.getHull();
+      Polygon chres = hull.getHull();
       if (chres != null && chres.size() >= 3) {
         SVGPath path = new SVGPath();
         for(Vector vec : chres) {

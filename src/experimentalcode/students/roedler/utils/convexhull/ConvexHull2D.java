@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -217,11 +218,11 @@ public class ConvexHull2D {
     points = stack;
   }
 
-  public List<Vector> getHull() {
+  public Polygon getHull() {
     if(!ok) {
       computeConvexHull();
     }
-    return points;
+    return new Polygon(points);
   }
 
   /**
