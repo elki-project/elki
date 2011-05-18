@@ -29,10 +29,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -233,11 +231,6 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      */
     protected Relation<String> labelRep;
 
-    /**
-     * The class representation
-     */
-    protected Relation<ClassLabel> classRep;
-
     private Database db;
 
     /**
@@ -343,7 +336,6 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
     public void run(Database db, DistanceQuery<O, D> distanceQuery) {
       this.db = db;
       this.data = distanceQuery.getRelation();
-      this.classRep = db.getRelation(TypeUtil.CLASSLABEL);
       this.labelRep = DatabaseUtil.guessObjectLabelRepresentation(db);
       this.dim = DatabaseUtil.dimensionality(distanceQuery.getRelation());
       this.distanceQuery = distanceQuery;
@@ -501,13 +493,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
           label = labelRep.get((DBID) value);
         }
         if(label == null || label == "") {
-          ClassLabel cls = classRep.get((DBID) value);
-          if(cls != null) {
-            label = cls.toString();
-          }
-        }
-        if(label == null || label == "") {
-          label = Integer.toString(((DBID) value).getIntegerID());
+          label = ((DBID) value).toString();
         }
         // setText(label);
         Component renderer = super.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
