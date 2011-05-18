@@ -11,11 +11,21 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
  * 
  * @author Erich Schubert
  */
-public class Polygon implements Iterable<Vector> {
+public class Polygon implements Iterable<Vector>, SpatialComparable {
   /**
    * The actual points
    */
   private List<Vector> points;
+
+  /**
+   * Minimum values
+   */
+  private double[] min = null;
+
+  /**
+   * Maximum values
+   */
+  private double[] max = null;
 
   /**
    * Constructor.
@@ -25,6 +35,29 @@ public class Polygon implements Iterable<Vector> {
   public Polygon(List<Vector> points) {
     super();
     this.points = points;
+    // Compute the bounds.
+    if(points.size() > 0) {
+      final Iterator<Vector> iter = points.iterator();
+      final Vector first = iter.next();
+      final int dim = first.getDimensionality();
+      min = first.getArrayCopy();
+      max = first.getArrayCopy();
+      while(iter.hasNext()) {
+        Vector next = iter.next();
+        for(int i = 0; i < dim; i++) {
+          final double cur = next.get(i);
+          min[i] = Math.min(min[i], cur);
+          max[i] = Math.max(max[i], cur);
+        }
+      }
+    }
+  }
+
+  public Polygon(List<Vector> points, double minx, double maxx, double miny, double maxy) {
+    super();
+    this.points = points;
+    this.min = new double[] { minx, miny };
+    this.max = new double[] { maxx, maxy };
   }
 
   @Override
@@ -67,5 +100,20 @@ public class Polygon implements Iterable<Vector> {
    */
   public int size() {
     return points.size();
+  }
+
+  @Override
+  public int getDimensionality() {
+    return min.length;
+  }
+
+  @Override
+  public double getMin(int dimension) {
+    return min[dimension];
+  }
+
+  @Override
+  public double getMax(int dimension) {
+    return max[dimension];
   }
 }

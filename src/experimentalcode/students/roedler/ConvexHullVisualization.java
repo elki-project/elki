@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -106,22 +107,19 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
       Polygon chres = hull.getHull();
 
       // Plot the convex hull:
-      SVGPath path = new SVGPath();
       if(chres != null) {
-        for (Vector vec : chres) {
-          path.drawTo(vec.get(0), vec.get(1));
-        }
-        double hullarea = hull.getBoundingBoxArea();
-        opacity = Math.sqrt(((double) ids.size() / rep.size()) * ((projarea - hullarea) / projarea));
+        SVGPath path = new SVGPath(chres);
+        // Approximate area (using bounding box)
+        double hullarea = SpatialUtil.volume(chres);
+        final double relativeArea = (projarea - hullarea) / projarea;
+        final double relativeSize = (double) ids.size() / rep.size();
+        opacity = Math.sqrt(relativeSize * relativeArea);
 
-        path.close();
+        hulls = path.makeElement(svgp);
+        addCSSClasses(svgp, cnum, opacity);
+        SVGUtil.addCSSClass(hulls, CONVEXHULL + cnum);
+        layer.appendChild(hulls);
       }
-
-      hulls = path.makeElement(svgp);
-      addCSSClasses(svgp, cnum, opacity);
-
-      SVGUtil.addCSSClass(hulls, CONVEXHULL + cnum);
-      layer.appendChild(hulls);
       clusterID++;
     }
   }
