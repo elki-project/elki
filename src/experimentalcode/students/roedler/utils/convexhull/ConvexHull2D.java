@@ -60,11 +60,13 @@ public class ConvexHull2D {
    * @param point Point to add
    */
   public void add(Vector point) {
+    if (this.ok) {
+      this.points = new LinkedList<Vector>(this.points);
+    }
     this.points.add(point);
     // Update data set extends
     minmaxX.put(point.get(0));
     minmaxY.put(point.get(1));
-    this.ok = (points.size() < 3);
   }
 
   /**
@@ -218,19 +220,15 @@ public class ConvexHull2D {
     points = stack;
   }
 
+  /**
+   * Compute the convex hull, and return the resulting polygon.
+   * 
+   * @return Polygon of the hull
+   */
   public Polygon getHull() {
     if(!ok) {
       computeConvexHull();
     }
-    return new Polygon(points);
-  }
-
-  /**
-   * Estimate the polygon area, very heuristically: bounding box.
-   * 
-   * @return Bounding box size.
-   */
-  public double getBoundingBoxArea() {
-    return Math.abs(minmaxX.getDiff()) * Math.abs(minmaxY.getDiff());
+    return new Polygon(points, minmaxX.getMin(), minmaxX.getMax(), minmaxY.getMin(), minmaxY.getMax());
   }
 }

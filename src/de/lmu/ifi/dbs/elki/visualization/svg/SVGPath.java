@@ -4,6 +4,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+
 /**
  * Element used for building an SVG path using a string buffer.
  * 
@@ -90,6 +92,19 @@ public class SVGPath {
   public SVGPath(double x, double y) {
     this();
     this.moveTo(x, y);
+  }
+
+  /**
+   * Constructor from a vector collection (e.g. a polygon)
+   *
+   * @param vectors vectors
+   */
+  public SVGPath(Iterable<Vector> vectors) {
+    this();
+    for(Vector vec : vectors) {
+      this.drawTo(vec.get(0), vec.get(1));
+    }
+    this.close();
   }
 
   /**

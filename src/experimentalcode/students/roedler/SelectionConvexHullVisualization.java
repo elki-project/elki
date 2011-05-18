@@ -79,27 +79,19 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
       ConvexHull2D hull = new ConvexHull2D();
-      int j = 0;
       for(DBID i : selection) {
         try {
-          double[] v = proj.fastProjectDataToRenderSpace(rep.get(i));
-          hull.add(new Vector(v));
-          j++;
+          hull.add(new Vector(proj.fastProjectDataToRenderSpace(rep.get(i))));
         }
         catch(ObjectNotFoundException e) {
           // ignore
         }
       }
       Polygon chres = hull.getHull();
-      if (chres != null && chres.size() >= 3) {
-        SVGPath path = new SVGPath();
-        for(Vector vec : chres) {
-          path.drawTo(vec.get(0), vec.get(1));
-        }
-        path.close();
+      if(chres != null && chres.size() >= 3) {
+        SVGPath path = new SVGPath(chres);
 
         Element selHull = path.makeElement(svgp);
-
         SVGUtil.addCSSClass(selHull, SELECTEDHULL);
         layer.appendChild(selHull);
       }
@@ -134,10 +126,10 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
    * Factory for visualizers to generate an SVG-Element containing the convex
    * hull of the selected points
    * 
-   * @author Heidi Kolb
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses SelectionDotVisualization oneway - - «create»
+   * @apiviz.uses SelectionConvexHullVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
@@ -166,7 +158,7 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
         final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
         for(SelectionResult selres : selectionResults) {
           final VisualizationTask task = new VisualizationTask(NAME, context, selres, rep, this, P2DVisualization.class);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 2);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
           context.addVisualizer(selres, task);
         }
       }
