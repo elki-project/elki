@@ -78,28 +78,25 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
-      List<Vector> points = new ArrayList<Vector>(selContext.getSelectedIds().size());
+      ConvexHull2D hull = new ConvexHull2D();
       int j = 0;
       for(DBID i : selection) {
         try {
           double[] v = proj.fastProjectDataToRenderSpace(rep.get(i));
-          points.add(new Vector(v));
+          hull.add(new Vector(v));
           j++;
         }
         catch(ObjectNotFoundException e) {
           // ignore
         }
       }
-      if(points.size() >= 3) {
-        Vector[] chres = new ConvexHull2D(points).computeHull();
-
+      List<Vector> chres = hull.getHull();
+      if (chres != null && chres.size() >= 3) {
         SVGPath path = new SVGPath();
-        if(chres != null && chres.length >= 3) {
-          for(int i = 0; i < chres.length; i++) {
-            path.drawTo(chres[i].get(0), chres[i].get(1));
-          }
-          path.close();
+        for(Vector vec : chres) {
+          path.drawTo(vec.get(0), vec.get(1));
         }
+        path.close();
 
         Element selHull = path.makeElement(svgp);
 
