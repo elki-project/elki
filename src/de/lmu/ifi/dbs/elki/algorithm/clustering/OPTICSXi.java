@@ -182,7 +182,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
                 }
                 // still steep - continue.
                 if(scan.steepUp(ixi)) {
-                  endsteep = Math.min(scan.index + 1, clusterOrder.size());
+                  endsteep = Math.min(scan.index + 1, clusterOrder.size() - 1);
                   mib = scan.ecurr.getReachability().doubleValue();
                   esuccr = scan.esucc.getReachability().doubleValue();
                 }
@@ -301,7 +301,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
           clustering.addCluster(cluster);
         }
       }
-      clusterOrderResult.addChildResult(clustering);
+      clustering.addChildResult(clusterOrderResult);
       if(salist != null) {
         clusterOrderResult.addChildResult(new SteepAreaResult(salist));
       }
