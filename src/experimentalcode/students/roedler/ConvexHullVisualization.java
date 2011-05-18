@@ -1,6 +1,5 @@
 package experimentalcode.students.roedler;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -95,31 +94,25 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
     int clusterID = 0;
 
     for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-      SVGPath path = new SVGPath();
       Cluster<?> clus = ci.next();
 
       final DBIDs ids = clus.getIDs();
-      List<Vector> clsPoints = new ArrayList<Vector>(ids.size());
-      Iterator<DBID> clp = ids.iterator();
+      ConvexHull2D hull = new ConvexHull2D();
 
-      for(int i = 0; i < ids.size(); i++) {
-        DBID clpnum = clp.next();
+      for(DBID clpnum : ids) {
         double[] projP = proj.fastProjectDataToRenderSpace(rep.get(clpnum).getColumnVector());
-        clsPoints.add(new Vector(projP));
+        hull.add(new Vector(projP));
       }
-      Vector[] chres = new ConvexHull2D(clsPoints).computeHull();
+      List<Vector> chres = hull.getHull();
 
+      // Plot the convex hull:
+      SVGPath path = new SVGPath();
       if(chres != null) {
-        DoubleMinMax mmX = new DoubleMinMax();
-        DoubleMinMax mmY = new DoubleMinMax();
-
-        for(int i = 0; i < chres.length; i++) {
-          mmX.put(chres[i].get(0));
-          mmY.put(chres[i].get(1));
-          path.drawTo(chres[i].get(0), chres[i].get(1));
+        for (Vector vec : chres) {
+          path.drawTo(vec.get(0), vec.get(1));
         }
-        final double hullarea = Math.abs(mmX.getDiff()) * Math.abs(mmY.getDiff());
-        opacity = Math.sqrt(((double) clsPoints.size() / rep.size()) * ((projarea - hullarea) / projarea));
+        double hullarea = hull.getBoundingBoxArea();
+        opacity = Math.sqrt(((double) ids.size() / rep.size()) * ((projarea - hullarea) / projarea));
 
         path.close();
       }
