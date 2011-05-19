@@ -81,7 +81,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @param distanceFunction Distance function
    * @param k k Parameter
    */
-  public KNNWeightOutlier(DistanceFunction<O, D> distanceFunction, int k) {
+  public KNNWeightOutlier(DistanceFunction<? super O, D> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }

@@ -46,7 +46,7 @@ public class KernelMatrix {
    * @deprecated ID mapping is not reliable!
    */
   @Deprecated
-  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Relation<? extends O> database) {
+  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<? super O, DoubleDistance> kernelFunction, final Relation<? extends O> database) {
     this(kernelFunction, database, DBIDUtil.ensureArray(database.getDBIDs()));
   }
 
@@ -57,7 +57,7 @@ public class KernelMatrix {
    * @param database the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<O, DoubleDistance> kernelFunction, final Relation<? extends O> database, final ArrayDBIDs ids) {
+  public <O extends FeatureVector<O, ?>> KernelMatrix(final PrimitiveSimilarityFunction<? super O, DoubleDistance> kernelFunction, final Relation<? extends O> database, final ArrayDBIDs ids) {
     LoggingUtil.logExpensive(Level.FINER, "Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
     double value;

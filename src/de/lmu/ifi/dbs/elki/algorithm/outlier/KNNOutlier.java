@@ -82,7 +82,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
    * @param distanceFunction distance function to use
    * @param k Value of k
    */
-  public KNNOutlier(DistanceFunction<O, D> distanceFunction, int k) {
+  public KNNOutlier(DistanceFunction<? super O, D> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }

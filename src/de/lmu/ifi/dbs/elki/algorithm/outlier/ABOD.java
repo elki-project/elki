@@ -117,7 +117,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   /**
    * Store the configured Kernel version
    */
-  private PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction;
+  private PrimitiveSimilarityFunction<? super V, DoubleDistance> primitiveKernelFunction;
 
   private ArrayModifiableDBIDs staticids = null;
 
@@ -129,7 +129,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @param primitiveKernelFunction Kernel function to use
    * @param distanceFunction Distance function
    */
-  public ABOD(int k, int sampleSize, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, DistanceFunction<V, DoubleDistance> distanceFunction) {
+  public ABOD(int k, int sampleSize, PrimitiveSimilarityFunction<? super V, DoubleDistance> primitiveKernelFunction, DistanceFunction<V, DoubleDistance> distanceFunction) {
     super(distanceFunction);
     this.k = k;
     this.sampleSize = sampleSize;
@@ -143,7 +143,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @param primitiveKernelFunction kernel function to use
    * @param distanceFunction Distance function
    */
-  public ABOD(int k, PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction, DistanceFunction<V, DoubleDistance> distanceFunction) {
+  public ABOD(int k, PrimitiveSimilarityFunction<? super V, DoubleDistance> primitiveKernelFunction, DistanceFunction<V, DoubleDistance> distanceFunction) {
     super(distanceFunction);
     this.k = k;
     this.sampleSize = 0;
