@@ -72,6 +72,13 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
     this.lambda = lambda;
   }
 
+  /**
+   * Constructor.
+   */
+  public StandardDeviationScaling() {
+    this(null, 1.0);
+  }
+
   @Override
   public double getScaled(double value) {
     if(value <= mean) {
