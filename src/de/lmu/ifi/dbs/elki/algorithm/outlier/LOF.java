@@ -125,12 +125,12 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   /**
    * Neighborhood distance function.
    */
-  protected DistanceFunction<O, D> neighborhoodDistanceFunction;
+  protected DistanceFunction<? super O, D> neighborhoodDistanceFunction;
 
   /**
    * Reachability distance function.
    */
-  protected DistanceFunction<O, D> reachabilityDistanceFunction;
+  protected DistanceFunction<? super O, D> reachabilityDistanceFunction;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -147,7 +147,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * @param neighborhoodDistanceFunction the neighborhood distance function
    * @param reachabilityDistanceFunction the reachability distance function
    */
-  public LOF(int k, DistanceFunction<O, D> neighborhoodDistanceFunction, DistanceFunction<O, D> reachabilityDistanceFunction) {
+  public LOF(int k, DistanceFunction<? super O, D> neighborhoodDistanceFunction, DistanceFunction<? super O, D> reachabilityDistanceFunction) {
     super();
     this.k = k;
     this.neighborhoodDistanceFunction = neighborhoodDistanceFunction;
