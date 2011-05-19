@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.math;
 import java.math.BigInteger;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
@@ -111,7 +110,7 @@ public final class MathUtil {
     final double popSdX = Math.sqrt(sumSqX / xdim);
     final double popSdY = Math.sqrt(sumSqY / ydim);
     final double covXY = sumCoproduct / xdim;
-    if (popSdX == 0 || popSdY == 0) {
+    if(popSdX == 0 || popSdY == 0) {
       return 0;
     }
     return covXY / (popSdX * popSdY);
@@ -148,34 +147,36 @@ public final class MathUtil {
         final double valX = x.doubleValue(i);
         final double valY = y.doubleValue(i);
 
-        sumW += weight;
-        sumSqW += weight * weight;
         sumX += valX * weight;
         sumY += valY * weight;
+        sumW += weight;
+        sumSqW += weight * weight;
       }
     }
     final double meanX = sumX / sumW;
     final double meanY = sumY / sumW;
     // Compute stddevs
-    // TODO: can we do this single-pass but mathematically sound? Steiner Translation?
-    double sumDX = 0.0;
-    double sumDY = 0.0;
+    // TODO: can we do this in a single-pass but mathematically sound?
+    // Steiner Translation -- proof in Erichs DA?
+    double sumSqDX = 0.0;
+    double sumSqDY = 0.0;
     double sumCo = 0.0;
     {
       for(int i = 1; i < xdim; i++) {
         final double weight = weights[i - 1];
-        final double deltaX = Math.abs(x.doubleValue(i) - meanX);
-        final double deltaY = Math.abs(y.doubleValue(i) - meanY);
+        final double deltaX = x.doubleValue(i) - meanX;
+        final double deltaY = y.doubleValue(i) - meanY;
 
-        sumDX += deltaX * weight;
-        sumDY += deltaY * weight;
+        sumSqDX += deltaX * deltaX * weight;
+        sumSqDY += deltaY * deltaY * weight;
         sumCo += deltaX * deltaY * weight;
       }
     }
-    final double varX = (sumDX / sumW) / (1 - sumSqW); 
-    final double varY = (sumDY / sumW) / (1 - sumSqW); 
-    final double covXY = (sumCo / sumW);
-    if (varX <= 0 || varY <= 0) {
+    // (1-sumSqW) is a correction factor for using the sample mean.
+    double varX = (sumSqDX / sumW) / (1 - sumSqW);
+    double varY = (sumSqDY / sumW) / (1 - sumSqW);
+    final double covXY = (sumCo / sumW) / (1 - sumSqW);
+    if(varX <= 0 || varY <= 0) {
       return 0;
     }
     return covXY / (Math.sqrt(varX) * Math.sqrt(varY));

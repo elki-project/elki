@@ -185,6 +185,20 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
         detachResult(database, loopresult);
       }
     });
+    // LDOF
+    logger.verbose("Running LDOF");
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
+        LDOF<O, D> ldof = new LDOF<O, D>(distf, k);
+        OutlierResult lofresult = ldof.run(database, relation);
+        // Setup scaling
+        StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
+        scaling.prepare(ids, lofresult);
+        writeResult(fout, ids, lofresult, scaling, "LDOF-" + kstr);
+        detachResult(database, lofresult);
+      }
+    });
     // KNN
     logger.verbose("Running KNN");
     runForEachK(new AlgRunner() {
@@ -211,20 +225,6 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
         scaling.prepare(ids, knnresult);
         writeResult(fout, ids, knnresult, scaling, "KNNW-" + kstr);
         detachResult(database, knnresult);
-      }
-    });
-    // LDOF
-    logger.verbose("Running LDOF");
-    runForEachK(new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        LDOF<O, D> ldof = new LDOF<O, D>(distf, k);
-        OutlierResult lofresult = ldof.run(database, relation);
-        // Setup scaling
-        StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
-        scaling.prepare(ids, lofresult);
-        writeResult(fout, ids, lofresult, scaling, "LDOF-" + kstr);
-        detachResult(database, lofresult);
       }
     });
     // ABOD
