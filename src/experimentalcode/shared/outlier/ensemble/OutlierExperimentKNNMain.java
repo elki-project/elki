@@ -6,8 +6,7 @@ import java.io.PrintStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-
+import sun.misc.BASE64Encoder;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.ByLabelOutlier;
@@ -161,7 +160,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
         md.update(" ".getBytes());
         md.update(id.toString().getBytes());
       }
-      fout.append(Base64.encode(md.digest()));
+      fout.append((new BASE64Encoder()).encode(md.digest()));
       fout.append(FormatUtil.NEWLINE);
     }
 
