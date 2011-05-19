@@ -68,6 +68,11 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
   final DistanceFunction<? super O, D> distf;
 
   /**
+   * Starting value of k.
+   */
+  final int startk;
+
+  /**
    * k step size
    */
   final int stepk;
@@ -93,14 +98,16 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * @param verbose Verbose flag
    * @param inputstep Input step
    * @param distf Distance function
+   * @param startk Starting value of k
    * @param stepk K step size
    * @param maxk Maximum k value
    * @param bylabel By label outlier (reference)
    * @param outfile Output file
    */
-  public OutlierExperimentKNNMain(boolean verbose, InputStep inputstep, DistanceFunction<? super O, D> distf, int stepk, int maxk, ByLabelOutlier bylabel, File outfile) {
+  public OutlierExperimentKNNMain(boolean verbose, InputStep inputstep, DistanceFunction<? super O, D> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile) {
     super(verbose);
     this.distf = distf;
+    this.startk = startk;
     this.stepk = stepk;
     this.maxk = maxk;
     this.inputstep = inputstep;
@@ -154,6 +161,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
     }
 
     // Run LOF
+    logger.verbose("Running LOF");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -167,6 +175,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       }
     });
     // LoOP
+    logger.verbose("Running LoOP");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -177,6 +186,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       }
     });
     // KNN
+    logger.verbose("Running KNN");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -190,6 +200,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       }
     });
     // KNN Weight
+    logger.verbose("Running KNNweight");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -203,6 +214,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       }
     });
     // LDOF
+    logger.verbose("Running LDOF");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -220,6 +232,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       final PolynomialKernelFunction poly = new PolynomialKernelFunction(PolynomialKernelFunction.DEFAULT_DEGREE);
       @SuppressWarnings("unchecked")
       final DistanceFunction<DoubleVector, DoubleDistance> df = DistanceFunction.class.cast(distf);
+      logger.verbose("Running ABOD");
       runForEachK(new AlgRunner() {
         @Override
         public void run(int k, String kstr) {
@@ -278,8 +291,8 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    */
   private void runForEachK(AlgRunner runner) {
     final int digits = (int) Math.ceil(Math.log10(maxk));
-    for(int k = stepk; k <= maxk; k += stepk) {
-      logger.verbose("Running for k=" + k);
+    final int startk = (this.startk > 0) ? this.startk : this.stepk;
+    for(int k = startk; k <= maxk; k += stepk) {
       String kstr = String.format("%0" + digits + "d", k);
       runner.run(k, kstr);
     }
@@ -308,6 +321,11 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
     public static final OptionID STEPK_ID = OptionID.getOrCreateOptionID("stepk", "Step size for k.");
 
     /**
+     * Option ID for k start size.
+     */
+    public static final OptionID STARTK_ID = OptionID.getOrCreateOptionID("startk", "Minimum value for k.");
+
+    /**
      * Option ID for k step size.
      */
     public static final OptionID MAXK_ID = OptionID.getOrCreateOptionID("maxk", "Maximum value for k.");
@@ -316,6 +334,11 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
      * k step size
      */
     int stepk;
+
+    /**
+     * starting value of k
+     */
+    int startk;
 
     /**
      * Maximum value of k
@@ -357,6 +380,13 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       if(config.grab(stepkP)) {
         stepk = stepkP.getValue();
       }
+      IntParameter startkP = new IntParameter(STARTK_ID, true);
+      if(config.grab(startkP)) {
+        startk = startkP.getValue();
+      }
+      else {
+        startk = stepk;
+      }
       IntParameter maxkP = new IntParameter(MAXK_ID, new GreaterConstraint(0));
       if(config.grab(maxkP)) {
         maxk = maxkP.getValue();
@@ -368,7 +398,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
 
     @Override
     protected AbstractApplication makeInstance() {
-      return new OutlierExperimentKNNMain<O, D>(verbose, inputstep, distf, stepk, maxk, bylabel, outfile);
+      return new OutlierExperimentKNNMain<O, D>(verbose, inputstep, distf, startk, stepk, maxk, bylabel, outfile);
     }
   }
 
