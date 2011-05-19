@@ -16,14 +16,25 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * The distance between two vectors will be low (near 0), if their attribute values are dimension-wise strictly positively or negatively correlated.
  * For Features with uncorrelated attributes, the distance value will be high (near 1).
  * 
+ * This variation is for weighted dimensions.
+ * 
  * @author Arthur Zimek
+ * @author Erich Schubert
  */
-public class SquaredPearsonCorrelationDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
+public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
+  /**
+   * Weights
+   */
+  private double[] weights;
+
   /**
    * Provides a SquaredPearsonCorrelationDistanceFunction.
+   * 
+   * @param weights Weights
    */
-  public SquaredPearsonCorrelationDistanceFunction() {
+  public WeightedSquaredPearsonCorrelationDistanceFunction(double[] weights) {
     super();
+    this.weights = weights;
   }
 
   /**
@@ -38,7 +49,7 @@ public class SquaredPearsonCorrelationDistanceFunction extends AbstractPrimitive
    */
   @Override
   public DoubleDistance distance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
-    final double pcc = MathUtil.pearsonCorrelationCoefficient(v1, v2);
+    final double pcc = MathUtil.weightedPearsonCorrelationCoefficient(v1, v2, weights);
     return new DoubleDistance(1 - pcc * pcc);
   }
 
