@@ -59,7 +59,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
    * @param neighborhoodDistanceFunction the neighborhood distance function
    * @param reachabilityDistanceFunction the reachability distance function
    */
-  public OnlineLOF(int k, DistanceFunction<O, D> neighborhoodDistanceFunction, DistanceFunction<O, D> reachabilityDistanceFunction) {
+  public OnlineLOF(int k, DistanceFunction<? super O, D> neighborhoodDistanceFunction, DistanceFunction<? super O, D> reachabilityDistanceFunction) {
     super(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
   }
 
