@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.math;
 import java.math.BigInteger;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
@@ -110,7 +111,74 @@ public final class MathUtil {
     final double popSdX = Math.sqrt(sumSqX / xdim);
     final double popSdY = Math.sqrt(sumSqY / ydim);
     final double covXY = sumCoproduct / xdim;
+    if (popSdX == 0 || popSdY == 0) {
+      return 0;
+    }
     return covXY / (popSdX * popSdY);
+  }
+
+  /**
+   * <p>
+   * Provides the Pearson product-moment correlation coefficient for two
+   * FeatureVectors.
+   * </p>
+   * 
+   * @param x first FeatureVector
+   * @param y second FeatureVector
+   * @return the Pearson product-moment correlation coefficient for x and y
+   */
+  // TODO: mathematically correct?
+  public static double weightedPearsonCorrelationCoefficient(NumberVector<?, ?> x, NumberVector<?, ?> y, double[] weights) {
+    final int xdim = x.getDimensionality();
+    final int ydim = y.getDimensionality();
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
+    }
+    if(xdim != weights.length) {
+      throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
+    }
+    // Compute means
+    double sumW = 0.0;
+    double sumX = 0.0;
+    double sumY = 0.0;
+    double sumSqW = 0.0;
+    {
+      for(int i = 1; i < xdim; i++) {
+        final double weight = weights[i - 1];
+        final double valX = x.doubleValue(i);
+        final double valY = y.doubleValue(i);
+
+        sumW += weight;
+        sumSqW += weight * weight;
+        sumX += valX * weight;
+        sumY += valY * weight;
+      }
+    }
+    final double meanX = sumX / sumW;
+    final double meanY = sumY / sumW;
+    // Compute stddevs
+    // TODO: can we do this single-pass but mathematically sound? Steiner Translation?
+    double sumDX = 0.0;
+    double sumDY = 0.0;
+    double sumCo = 0.0;
+    {
+      for(int i = 1; i < xdim; i++) {
+        final double weight = weights[i - 1];
+        final double deltaX = Math.abs(x.doubleValue(i) - meanX);
+        final double deltaY = Math.abs(y.doubleValue(i) - meanY);
+
+        sumDX += deltaX * weight;
+        sumDY += deltaY * weight;
+        sumCo += deltaX * deltaY * weight;
+      }
+    }
+    final double varX = (sumDX / sumW) / (1 - sumSqW); 
+    final double varY = (sumDY / sumW) / (1 - sumSqW); 
+    final double covXY = (sumCo / sumW);
+    if (varX <= 0 || varY <= 0) {
+      return 0;
+    }
+    return covXY / (Math.sqrt(varX) * Math.sqrt(varY));
   }
 
   /**
