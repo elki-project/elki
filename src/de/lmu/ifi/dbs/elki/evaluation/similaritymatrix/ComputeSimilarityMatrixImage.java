@@ -67,7 +67,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * The distance function to use
    */
-  private DistanceFunction<O, ? extends NumberDistance<?, ?>> distanceFunction;
+  private DistanceFunction<? super O, ? extends NumberDistance<?, ?>> distanceFunction;
 
   /**
    * Scaling function to use
@@ -86,7 +86,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
    * @param scaling Scaling function to use for contrast
    * @param skipzero Skip zero values when scaling.
    */
-  public ComputeSimilarityMatrixImage(DistanceFunction<O, ? extends NumberDistance<?, ?>> distanceFunction, ScalingFunction scaling, boolean skipzero) {
+  public ComputeSimilarityMatrixImage(DistanceFunction<? super O, ? extends NumberDistance<?, ?>> distanceFunction, ScalingFunction scaling, boolean skipzero) {
     super();
     this.distanceFunction = distanceFunction;
     this.scaling = scaling;
