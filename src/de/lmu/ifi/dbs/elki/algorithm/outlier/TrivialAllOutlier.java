@@ -49,7 +49,7 @@ public class TrivialAllOutlier extends AbstractAlgorithm<OutlierResult> implemen
   public OutlierResult run(@SuppressWarnings("unused") Database database, Relation<?> relation) throws IllegalStateException {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, Double.class);
     for(DBID id : relation.iterDBIDs()) {
-      scores.put(id, 0.0);
+      scores.put(id, 1.0);
     }
     AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("Trivial all-outlier score", "all-outlier", TRIVIAL_ALL_OUT, scores);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
