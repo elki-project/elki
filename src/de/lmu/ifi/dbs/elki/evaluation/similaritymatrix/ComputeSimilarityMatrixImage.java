@@ -229,7 +229,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     if(nonefound) {
       // Use the database ordering.
       // But be careful to NOT cause a loop, process new databases only.
-      Iterable<Database> iter = ResultUtil.filteredResults(result, Database.class);
+      List<Database> iter = ResultUtil.filterResults(result, Database.class);
       for(Database database : iter) {
         // Get an arbitrary representation
         Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction());

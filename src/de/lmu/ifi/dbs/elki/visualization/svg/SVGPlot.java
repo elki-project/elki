@@ -502,7 +502,7 @@ public class SVGPlot {
       File f = File.createTempFile("elki-debug", ".svg");
       f.deleteOnExit();
       this.saveAsSVG(f);
-      LoggingUtil.warning("Saved debug file to:" + f.getAbsolutePath());
+      LoggingUtil.warning("Saved debug file to: " + f.getAbsolutePath());
     }
     catch(Throwable err) {
       // Ignore.
