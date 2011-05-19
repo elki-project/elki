@@ -5,13 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.ByLabelOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.TrivialAllOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.TrivialNoOutlier;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -20,7 +24,9 @@ import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -36,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MinusLogStandardDeviationScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.StandardDeviationScaling;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
@@ -53,32 +60,32 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
   /**
    * Input step
    */
-  private final InputStep inputstep;
+  final InputStep inputstep;
 
   /**
    * Distance function to use
    */
-  private DistanceFunction<? super O, D> distf;
+  final DistanceFunction<? super O, D> distf;
 
   /**
    * k step size
    */
-  private final int stepk;
+  final int stepk;
 
   /**
    * Maximum value of k
    */
-  private final int maxk;
+  final int maxk;
 
   /**
    * Output file
    */
-  private File outfile;
+  File outfile;
 
   /**
    * By label outlier detection - reference
    */
-  private ByLabelOutlier bylabel;
+  ByLabelOutlier bylabel;
 
   /**
    * Constructor.
@@ -88,7 +95,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * @param distf Distance function
    * @param stepk K step size
    * @param maxk Maximum k value
-   * @param bylabel By label outlier (reference) 
+   * @param bylabel By label outlier (reference)
    * @param outfile Output file
    */
   public OutlierExperimentKNNMain(boolean verbose, InputStep inputstep, DistanceFunction<? super O, D> distf, int stepk, int maxk, ByLabelOutlier bylabel, File outfile) {
@@ -103,8 +110,8 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
 
   @Override
   public void run() {
-    Database database = inputstep.getDatabase();
-    Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
+    final Database database = inputstep.getDatabase();
+    final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
     logger.verbose("Running preprocessor ...");
     MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, distf, maxk);
     database.addIndex(preproc);
@@ -115,9 +122,9 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       logger.warning("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }
 
-    DBIDs ids = relation.getDBIDs();
+    final DBIDs ids = relation.getDBIDs();
 
-    PrintStream fout;
+    final PrintStream fout;
     try {
       fout = new PrintStream(outfile);
     }
@@ -138,57 +145,97 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       OutlierResult bylabelresult = bylabel.run(database);
       writeResult(fout, ids, bylabelresult, new IdentityScaling(), "bylabel");
     }
+    // No/all outliers "results"
+    {
+      OutlierResult noresult = (new TrivialNoOutlier()).run(database);
+      writeResult(fout, ids, noresult, new IdentityScaling(), "no-outliers");
+      OutlierResult allresult = (new TrivialAllOutlier()).run(database);
+      writeResult(fout, ids, allresult, new IdentityScaling(), "all-outliers");
+    }
 
-    // Iterate over ks.
-    for(int k = stepk; k <= maxk; k += stepk) {
-      logger.verbose("Running for k=" + k);
-      // LOF
-      {
+    // Run LOF
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
         LOF<O, D> lof = new LOF<O, D>(k, distf, distf);
         OutlierResult lofresult = lof.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
         scaling.prepare(ids, lofresult);
-        writeResult(fout, ids, lofresult, scaling, "LOF-" + k);
+        writeResult(fout, ids, lofresult, scaling, "LOF-" + kstr);
         detachResult(database, lofresult);
       }
-      // LoOP
-      {
+    });
+    // LoOP
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
         LoOP<O, D> loop = new LoOP<O, D>(k, k, distf, distf, 1.0);
         OutlierResult loopresult = loop.run(database, relation);
-        writeResult(fout, ids, loopresult, new IdentityScaling(), "LOOP-" + k);
+        writeResult(fout, ids, loopresult, new IdentityScaling(), "LOOP-" + kstr);
         detachResult(database, loopresult);
       }
-      // KNN
-      {
+    });
+    // KNN
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
         KNNOutlier<O, D> knn = new KNNOutlier<O, D>(distf, k);
         OutlierResult knnresult = knn.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling();
         scaling.prepare(ids, knnresult);
-        writeResult(fout, ids, knnresult, scaling, "KNN-" + k);
+        writeResult(fout, ids, knnresult, scaling, "KNN-" + kstr);
         detachResult(database, knnresult);
       }
-      // KNN Weight
-      {
+    });
+    // KNN Weight
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
         KNNWeightOutlier<O, D> knnw = new KNNWeightOutlier<O, D>(distf, k);
         OutlierResult knnresult = knnw.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling();
         scaling.prepare(ids, knnresult);
-        writeResult(fout, ids, knnresult, scaling, "KNNW-" + k);
+        writeResult(fout, ids, knnresult, scaling, "KNNW-" + kstr);
         detachResult(database, knnresult);
       }
-      // LDOF
-      {
+    });
+    // LDOF
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
         LDOF<O, D> ldof = new LDOF<O, D>(distf, k);
         OutlierResult lofresult = ldof.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
         scaling.prepare(ids, lofresult);
-        writeResult(fout, ids, lofresult, scaling, "LDOF-" + k);
+        writeResult(fout, ids, lofresult, scaling, "LDOF-" + kstr);
         detachResult(database, lofresult);
       }
+    });
+    // ABOD
+    try {
+      final PolynomialKernelFunction poly = new PolynomialKernelFunction(PolynomialKernelFunction.DEFAULT_DEGREE);
+      @SuppressWarnings("unchecked")
+      final DistanceFunction<DoubleVector, DoubleDistance> df = DistanceFunction.class.cast(distf);
+      runForEachK(new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          ABOD<DoubleVector> abod = new ABOD<DoubleVector>(k, poly, df);
+          OutlierResult abodresult = abod.run(database);
+          // Setup scaling
+          StandardDeviationScaling scaling = new MinusLogStandardDeviationScaling(null, 1.0);
+          scaling.prepare(ids, abodresult);
+          writeResult(fout, ids, abodresult, scaling, "ABOD-" + kstr);
+          detachResult(database, abodresult);
+        }
+      });
+    }
+    catch(ClassCastException e) {
+      // ABOD might just be not appropriate.
+      logger.warning("Running ABOD failed - probably not appropriate to this data type / distance?", e);
     }
   }
 
@@ -198,7 +245,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * @param database Database
    * @param discardresult Result to discard.
    */
-  private void detachResult(Database database, OutlierResult discardresult) {
+  void detachResult(Database database, OutlierResult discardresult) {
     final ResultHierarchy hier = database.getHierarchy();
     for(Result parent : hier.getParents(discardresult)) {
       hier.remove(parent, discardresult);
@@ -214,14 +261,37 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * @param scaling Scaling function.
    * @param label Identification label
    */
-  private void writeResult(PrintStream out, DBIDs ids, OutlierResult result, ScalingFunction scaling, String label) {
+  void writeResult(PrintStream out, DBIDs ids, OutlierResult result, ScalingFunction scaling, String label) {
     out.append(label);
     AnnotationResult<Double> scores = result.getScores();
     for(DBID id : ids) {
       final double value = scaling.getScaled(scores.getValueFor(id));
-      out.append(" ").append(FormatUtil.format(value));
+      out.append(" ").append(FormatUtil.format(value, FormatUtil.NF8));
     }
     out.append(FormatUtil.NEWLINE);
+  }
+
+  /**
+   * Iterate over the k range.
+   * 
+   * @param runner Runner to run
+   */
+  private void runForEachK(AlgRunner runner) {
+    final int digits = (int) Math.ceil(Math.log10(maxk));
+    for(int k = stepk; k <= maxk; k += stepk) {
+      logger.verbose("Running for k=" + k);
+      String kstr = String.format("%0" + digits + "d", k);
+      runner.run(k, kstr);
+    }
+  }
+
+  /**
+   * Run an algorithm for a given k.
+   * 
+   * @author Erich Schubert
+   */
+  private interface AlgRunner {
+    public void run(int k, String kstr);
   }
 
   /**
@@ -261,7 +331,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
      * Distance function to use
      */
     DistanceFunction<? super O, D> distf;
-    
+
     /**
      * By label outlier -- reference
      */

@@ -201,7 +201,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     this.overview.screenheight = dim.height;
 
     // Maximize.
-    this.setSize(600, 600);
+    this.setSize(dim.width - 50, dim.height - 50);
     this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
     // resize listener
