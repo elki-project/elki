@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Cosine distance function for feature vectors.
@@ -19,8 +20,16 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  */
 public class ArcCosineDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
   /**
-   * Provides a CosineDistanceFunction.
+   * Static instance
    */
+  public static final ArcCosineDistanceFunction STATIC = new ArcCosineDistanceFunction();
+  
+  /**
+   * Provides a CosineDistanceFunction.
+   * 
+   * @deprecated Use static instance!
+   */
+  @Deprecated
   public ArcCosineDistanceFunction() {
     super();
   }
@@ -98,5 +107,19 @@ public class ArcCosineDistanceFunction extends AbstractPrimitiveDistanceFunction
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected ArcCosineDistanceFunction makeInstance() {
+      return ArcCosineDistanceFunction.STATIC;
+    }
   }
 }

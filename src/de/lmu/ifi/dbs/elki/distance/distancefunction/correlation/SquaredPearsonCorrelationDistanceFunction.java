@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Squared Pearson correlation distance function for feature vectors.
@@ -20,8 +21,16 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  */
 public class SquaredPearsonCorrelationDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
   /**
-   * Provides a SquaredPearsonCorrelationDistanceFunction.
+   * Static instance.
    */
+  public static final SquaredPearsonCorrelationDistanceFunction STATIC = new SquaredPearsonCorrelationDistanceFunction();
+  
+  /**
+   * Provides a SquaredPearsonCorrelationDistanceFunction.
+   * 
+   * @deprecated use static instance!
+   */
+  @Deprecated
   public SquaredPearsonCorrelationDistanceFunction() {
     super();
   }
@@ -50,5 +59,19 @@ public class SquaredPearsonCorrelationDistanceFunction extends AbstractPrimitive
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected SquaredPearsonCorrelationDistanceFunction makeInstance() {
+      return SquaredPearsonCorrelationDistanceFunction.STATIC;
+    }
   }
 }

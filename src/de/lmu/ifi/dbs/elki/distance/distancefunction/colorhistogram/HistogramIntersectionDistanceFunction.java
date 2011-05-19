@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Intersection distance for color histograms.
@@ -23,8 +24,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Reference(authors = "M. J. Swain, D. H. Ballard", title = "Color Indexing", booktitle = "International Journal of Computer Vision, 7(1), 32, 1991")
 public class HistogramIntersectionDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?,?>, DoubleDistance> {
   /**
-   * Constructor. No parameters.
+   * Static instance
    */
+  public static final HistogramIntersectionDistanceFunction STATIC = new HistogramIntersectionDistanceFunction();
+  
+  /**
+   * Constructor. No parameters.
+   * 
+   * @deprecated Use static instance
+   */
+  @Deprecated
   public HistogramIntersectionDistanceFunction() {
     super();
   }
@@ -57,5 +66,19 @@ public class HistogramIntersectionDistanceFunction extends AbstractPrimitiveDist
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected HistogramIntersectionDistanceFunction makeInstance() {
+      return HistogramIntersectionDistanceFunction.STATIC;
+    }
   }
 }
