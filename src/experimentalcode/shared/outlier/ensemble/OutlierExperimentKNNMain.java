@@ -3,6 +3,10 @@ package experimentalcode.shared.outlier.ensemble;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD;
@@ -56,6 +60,11 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * Our logger class.
    */
   private static final Logging logger = Logging.getLogger(OutlierExperimentKNNMain.class);
+
+  /**
+   * Disable ABOD for now, it takes pretty long.
+   */
+  private static final boolean runabod = false;
 
   /**
    * Input step
@@ -140,10 +149,19 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
     }
     // Control: print the DBIDs in case we are seeing an odd iteration
     {
-      fout.append("# DBIDs:");
-      for(DBID id : ids) {
-        fout.append(" ").append(id.toString());
+      fout.append("# DBID-series MD5:");
+      MessageDigest md;
+      try {
+        md = MessageDigest.getInstance("MD5");
       }
+      catch(NoSuchAlgorithmException e) {
+        throw new AbortException("MD5 not found.");
+      }
+      for(DBID id : ids) {
+        md.update(" ".getBytes());
+        md.update(id.toString().getBytes());
+      }
+      fout.append(Base64.encode(md.digest()));
       fout.append(FormatUtil.NEWLINE);
     }
 
@@ -228,27 +246,29 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       }
     });
     // ABOD
-    try {
-      final PolynomialKernelFunction poly = new PolynomialKernelFunction(PolynomialKernelFunction.DEFAULT_DEGREE);
-      @SuppressWarnings("unchecked")
-      final DistanceFunction<DoubleVector, DoubleDistance> df = DistanceFunction.class.cast(distf);
-      logger.verbose("Running ABOD");
-      runForEachK(new AlgRunner() {
-        @Override
-        public void run(int k, String kstr) {
-          ABOD<DoubleVector> abod = new ABOD<DoubleVector>(k, poly, df);
-          OutlierResult abodresult = abod.run(database);
-          // Setup scaling
-          StandardDeviationScaling scaling = new MinusLogStandardDeviationScaling(null, 1.0);
-          scaling.prepare(ids, abodresult);
-          writeResult(fout, ids, abodresult, scaling, "ABOD-" + kstr);
-          detachResult(database, abodresult);
-        }
-      });
-    }
-    catch(ClassCastException e) {
-      // ABOD might just be not appropriate.
-      logger.warning("Running ABOD failed - probably not appropriate to this data type / distance?", e);
+    if(runabod) {
+      try {
+        final PolynomialKernelFunction poly = new PolynomialKernelFunction(PolynomialKernelFunction.DEFAULT_DEGREE);
+        @SuppressWarnings("unchecked")
+        final DistanceFunction<DoubleVector, DoubleDistance> df = DistanceFunction.class.cast(distf);
+        logger.verbose("Running ABOD");
+        runForEachK(new AlgRunner() {
+          @Override
+          public void run(int k, String kstr) {
+            ABOD<DoubleVector> abod = new ABOD<DoubleVector>(k, poly, df);
+            OutlierResult abodresult = abod.run(database);
+            // Setup scaling
+            StandardDeviationScaling scaling = new MinusLogStandardDeviationScaling(null, 1.0);
+            scaling.prepare(ids, abodresult);
+            writeResult(fout, ids, abodresult, scaling, "ABOD-" + kstr);
+            detachResult(database, abodresult);
+          }
+        });
+      }
+      catch(ClassCastException e) {
+        // ABOD might just be not appropriate.
+        logger.warning("Running ABOD failed - probably not appropriate to this data type / distance?", e);
+      }
     }
   }
 
