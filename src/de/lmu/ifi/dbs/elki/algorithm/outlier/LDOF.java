@@ -96,9 +96,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     this.k = k;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
+  public OutlierResult run(Database database, Relation<O> relation) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k);
 
