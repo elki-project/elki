@@ -84,7 +84,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
       }
       scores.put(id, score);
     }
-    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("By label outlier scores", "em-outlier", LABEL_OUT, scores);
+    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("By label outlier scores", "label-outlier", LABEL_OUT, scores);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
     return new OutlierResult(meta, scoreres);
   }
