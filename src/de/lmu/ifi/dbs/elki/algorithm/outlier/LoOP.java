@@ -119,12 +119,12 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   /**
    * Preprocessor Step 1
    */
-  protected DistanceFunction<O, D> reachabilityDistanceFunction;
+  protected DistanceFunction<? super O, D> reachabilityDistanceFunction;
 
   /**
    * Preprocessor Step 2
    */
-  protected DistanceFunction<O, D> comparisonDistanceFunction;
+  protected DistanceFunction<? super O, D> comparisonDistanceFunction;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -140,7 +140,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
    * @param comparisonDistanceFunction
    * @param lambda
    */
-  public LoOP(int kreach, int kcomp, DistanceFunction<O, D> reachabilityDistanceFunction, DistanceFunction<O, D> comparisonDistanceFunction, double lambda) {
+  public LoOP(int kreach, int kcomp, DistanceFunction<? super O, D> reachabilityDistanceFunction, DistanceFunction<? super O, D> comparisonDistanceFunction, double lambda) {
     super();
     this.kreach = kreach;
     this.kcomp = kcomp;
