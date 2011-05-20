@@ -152,6 +152,11 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
+  @Override
+  public String toString() {
+    return "EuclideanDistance";
+  }
+
   /**
    * Parameterization class.
    * 

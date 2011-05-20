@@ -68,6 +68,11 @@ public class MinimumDistanceFunction extends AbstractPrimitiveDistanceFunction<N
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public String toString() {
+    return "MinimumDistance";
+  }
+
   /**
    * Parameterization class.
    * 

@@ -105,6 +105,11 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
+  @Override
+  public String toString() {
+    return "MaximumDistance";
+  }
+
   /**
    * Parameterization class.
    * 

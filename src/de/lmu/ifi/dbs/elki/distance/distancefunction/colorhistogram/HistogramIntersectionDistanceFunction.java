@@ -68,6 +68,11 @@ public class HistogramIntersectionDistanceFunction extends AbstractPrimitiveDist
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public String toString() {
+    return "HistogramIntersectionDistance";
+  }
+
   /**
    * Parameterization class.
    * 

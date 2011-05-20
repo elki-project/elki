@@ -170,6 +170,11 @@ public class SquaredEuclideanDistanceFunction extends AbstractPrimitiveDistanceF
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
+  @Override
+  public String toString() {
+    return "SquaredEuclideanDistance";
+  }
+
   /**
    * Parameterization class.
    * 
