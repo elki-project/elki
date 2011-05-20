@@ -85,6 +85,11 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public String toString() {
+    return "RandomDistance";
+  }
+
   /**
    * Parameterization class.
    * 

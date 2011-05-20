@@ -61,6 +61,11 @@ public class PearsonCorrelationDistanceFunction extends AbstractPrimitiveDistanc
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public String toString() {
+    return "PearsonCorrelationDistance";
+  }
+
   /**
    * Parameterization class.
    * 

@@ -109,6 +109,11 @@ public class ArcCosineDistanceFunction extends AbstractPrimitiveDistanceFunction
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public String toString() {
+    return "ArcCosineDistance";
+  }
+
   /**
    * Parameterization class.
    * 

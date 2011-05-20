@@ -154,6 +154,11 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
+  @Override
+  public String toString() {
+    return "ManhattanDistance";
+  }
+
   /**
    * Parameterization class.
    * 

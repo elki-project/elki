@@ -100,6 +100,11 @@ public class LPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public String toString() {
+    return "L_"+p+" Norm";
+  }
+
   /**
    * Parameterization class.
    * 

@@ -109,6 +109,11 @@ public class CosineDistanceFunction extends AbstractPrimitiveDistanceFunction<Nu
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public String toString() {
+    return "CosineDistance";
+  }
+
   /**
    * Parameterization class.
    * 
