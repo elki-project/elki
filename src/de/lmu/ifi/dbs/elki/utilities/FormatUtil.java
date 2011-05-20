@@ -46,14 +46,19 @@ public final class FormatUtil {
   static {
     NF.setMinimumFractionDigits(0);
     NF.setMaximumFractionDigits(10);
+    NF.setGroupingUsed(false);
     NF2.setMinimumFractionDigits(2);
     NF2.setMaximumFractionDigits(2);
+    NF2.setGroupingUsed(false);
     NF4.setMinimumFractionDigits(4);
     NF4.setMaximumFractionDigits(4);
+    NF4.setGroupingUsed(false);
     NF6.setMinimumFractionDigits(6);
     NF6.setMaximumFractionDigits(6);
+    NF6.setGroupingUsed(false);
     NF8.setMinimumFractionDigits(8);
     NF8.setMaximumFractionDigits(8);
+    NF8.setGroupingUsed(false);
   }
 
   /**
