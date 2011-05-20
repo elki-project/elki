@@ -159,4 +159,18 @@ public class MultipleObjectsBundle implements ObjectBundle {
     bundle.appendColumn(type2, data2);
     return bundle;
   }
+
+  /**
+   * Get an object row.
+   * 
+   * @param row Row number
+   * @return Array of values
+   */
+  public Object[] getRow(int row) {
+    Object[] ret = new Object[columns.size()];
+    for(int c = 0; c < columns.size(); c++) {
+      ret[c] = data(row, c);
+    }
+    return ret;
+  }
 }
