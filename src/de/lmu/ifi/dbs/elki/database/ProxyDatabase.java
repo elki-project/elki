@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
@@ -270,11 +272,19 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
     return DBIDUtil.makeUnmodifiable(ids);
   }
 
-  /**
-   * @param index
-   */
   @Override
   public void addIndex(Index index) {
+    throw new UnsupportedOperationException("FIXME: Proxy databases currently do not yet allow indexes.");
+  }
+  
+  @Override
+  public Collection<Index> getIndexes() {
+    final List<Index> indexes = Collections.emptyList();
+    return indexes;
+  }
+
+  @Override
+  public void removeIndex(Index index) {
     throw new UnsupportedOperationException("FIXME: Proxy databases currently do not yet allow indexes.");
   }
 

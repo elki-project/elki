@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.database;
 
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
@@ -219,6 +220,17 @@ public class StaticArrayDatabase extends AbstractHierarchicalResult implements D
     this.indexes.add(index);
     // TODO: actually add index to the representation used?
     this.addChildResult(index);
+  }
+
+  @Override
+  public Collection<Index> getIndexes() {
+    return Collections.unmodifiableList(this.indexes);
+  }
+
+  @Override
+  public void removeIndex(Index index) {
+    this.indexes.remove(index);
+    this.getHierarchy().remove(this, index);
   }
 
   /**
