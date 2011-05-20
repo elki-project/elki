@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
@@ -41,6 +42,14 @@ public class SimpleSVGViewer extends JFrame {
    */
   public SimpleSVGViewer() throws HeadlessException {
     super();
+    // Prefer system look&feel
+    try {
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    }
+    catch(Exception e) {
+      // ignore
+    }
+    
     // close handler
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     // Maximize.
