@@ -72,7 +72,7 @@ public class ShuffleObjectsFilter implements ObjectFilter {
 
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     for(int j = 0; j < objects.metaLength(); j++) {
-      // Reorder column accoringly
+      // Reorder column accordingly
       List<?> in = objects.getColumn(j);
       List<Object> data = new ArrayList<Object>(size);
       for(int i = 0; i < size; i++) {

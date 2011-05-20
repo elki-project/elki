@@ -39,7 +39,7 @@ public class SortByLabelFilter implements ObjectFilter {
     for(int i = 0; i < size; i++) {
       offsets[i] = i;
     }
-    // Sory by labels - identify a label column
+    // Sort by labels - identify a label column
     final int lblcol;
     {
       int lblc = -1;
@@ -62,7 +62,7 @@ public class SortByLabelFilter implements ObjectFilter {
 
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     for(int j = 0; j < objects.metaLength(); j++) {
-      // Reorder column accoringly
+      // Reorder column accordingly
       List<?> in = objects.getColumn(j);
       List<Object> data = new ArrayList<Object>(size);
       for(int i = 0; i < size; i++) {
