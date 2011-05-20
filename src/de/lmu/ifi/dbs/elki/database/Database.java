@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
+import java.util.Collection;
+
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
@@ -263,6 +265,20 @@ public interface Database extends HierarchicalResult {
    * @param index Index to add
    */
   public void addIndex(Index index);
+
+  /**
+   * Collection of known indexes
+   * 
+   * @param Collection
+   */
+  public Collection<Index> getIndexes();
+
+  /**
+   * Remove a particular index
+   * 
+   * @param index Index to remove
+   */
+  public void removeIndex(Index index);
 
   /**
    * Adds a listener for the <code>DataStoreEvent</code> posted after the
