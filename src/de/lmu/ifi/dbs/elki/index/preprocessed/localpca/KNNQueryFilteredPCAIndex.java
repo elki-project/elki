@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -127,7 +128,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
     @Override
     public KNNQueryFilteredPCAIndex<V> instantiate(Relation<V> relation) {
       // TODO: set bulk flag, once the parent class supports bulk.
-      KNNQuery<V, DoubleDistance> knnquery = relation.getDatabase().getKNNQuery(relation, pcaDistanceFunction, k);
+      KNNQuery<V, DoubleDistance> knnquery = QueryUtil.getKNNQuery(relation, pcaDistanceFunction, k);
       return new KNNQueryFilteredPCAIndex<V>(relation, pca, knnquery, k);
     }
 

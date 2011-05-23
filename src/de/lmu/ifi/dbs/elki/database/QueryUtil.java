@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRange
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRawDoubleDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -93,18 +94,96 @@ public final class QueryUtil {
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
+   * @param relation Relation used
+   * @param distanceFunction Distance function
+   * @param hints Optimizer hints
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @return KNN Query object
+   */
+  public static <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    final Database database = relation.getDatabase();
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
+    return database.getKNNQuery(distanceQuery, hints);
+  }
+
+  /**
+   * Get a range query object for the given distance function.
+   * 
+   * When possible, this will use an index, but it may default to an expensive
+   * linear scan.
+   * 
+   * Hints include:
+   * <ul>
+   * <li>Range: maximum range requested</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
+   * query needed</li>
+   * </ul>
    * 
    * @param <O> Object type
    * @param <D> Distance type
    * @param database Database
-   * @param relation Relation used
    * @param distanceFunction Distance function
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  public static <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Database database, Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+  public static <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Database database, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    final Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction(), hints);
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
-    return database.getKNNQuery(distanceQuery, hints);
+    return database.getRangeQuery(distanceQuery, hints);
+  }
+
+  /**
+   * Get a range query object for the given distance function.
+   * 
+   * When possible, this will use an index, but it may default to an expensive
+   * linear scan.
+   * 
+   * Hints include:
+   * <ul>
+   * <li>Range: maximum range requested</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
+   * query needed</li>
+   * </ul>
+   * @param relation Relation used
+   * @param distanceFunction Distance function
+   * @param hints Optimizer hints
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @return KNN Query object
+   */
+  public static <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    final Database database = relation.getDatabase();
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
+    return database.getRangeQuery(distanceQuery, hints);
+  }
+
+  /**
+   * Get a rKNN query object for the given distance function.
+   * 
+   * When possible, this will use an index, but it may default to an expensive
+   * linear scan.
+   * 
+   * Hints include:
+   * <ul>
+   * <li>Integer: maximum value for k needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
+   * query needed</li>
+   * </ul>
+   * @param relation Relation used
+   * @param distanceFunction Distance function
+   * @param hints Optimizer hints
+   * 
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @return RKNN Query object
+   */
+  public static <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+    final Database database = relation.getDatabase();
+    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
+    return database.getRKNNQuery(distanceQuery, hints);
   }
 
   /**

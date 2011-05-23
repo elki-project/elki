@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -107,7 +108,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     if(epsilon == null) {
       epsilon = getDistanceFunction().getDistanceFactory().infiniteDistance();
     }
-    RangeQuery<O, D> rangeQuery = database.getRangeQuery(relation, getDistanceFunction(), epsilon);
+    RangeQuery<O, D> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction(), epsilon);
 
     int size = relation.size();
     final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", size, logger) : null;

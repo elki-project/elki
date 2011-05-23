@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -87,7 +88,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
     long start = System.currentTimeMillis();
-    RangeQuery<NV, D> rangeQuery = relation.getDatabase().getRangeQuery(relation, rangeQueryDistanceFunction);
+    RangeQuery<NV, D> rangeQuery = QueryUtil.getRangeQuery(relation, rangeQueryDistanceFunction);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
     for(DBID id : relation.iterDBIDs()) {

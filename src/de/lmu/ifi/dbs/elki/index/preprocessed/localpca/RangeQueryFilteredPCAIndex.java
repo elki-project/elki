@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -119,7 +120,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
     @Override
     public RangeQueryFilteredPCAIndex<V> instantiate(Relation<V> relation) {
       // TODO: set bulk flag, once the parent class supports bulk.
-      RangeQuery<V, DoubleDistance> rangequery = relation.getDatabase().getRangeQuery(relation, pcaDistanceFunction);
+      RangeQuery<V, DoubleDistance> rangequery = QueryUtil.getRangeQuery(relation, pcaDistanceFunction);
       return new RangeQueryFilteredPCAIndex<V>(relation, pca, rangequery, epsilon);
     }
 

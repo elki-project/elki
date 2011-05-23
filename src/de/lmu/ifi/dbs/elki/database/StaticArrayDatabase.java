@@ -368,15 +368,6 @@ public class StaticArrayDatabase extends AbstractHierarchicalResult implements D
   }
 
   @Override
-  public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if(distanceFunction == null) {
-      throw new AbortException("kNN query requested for 'null' distance!");
-    }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return getKNNQuery(distanceQuery, hints);
-  }
-
-  @Override
   public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
@@ -401,15 +392,6 @@ public class StaticArrayDatabase extends AbstractHierarchicalResult implements D
   }
 
   @Override
-  public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if(distanceFunction == null) {
-      throw new AbortException("Range query requested for 'null' distance!");
-    }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return getRangeQuery(distanceQuery, hints);
-  }
-
-  @Override
   public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
@@ -431,15 +413,6 @@ public class StaticArrayDatabase extends AbstractHierarchicalResult implements D
       }
     }
     return QueryUtil.getLinearScanRangeQuery(distanceQuery);
-  }
-
-  @Override
-  public <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if(distanceFunction == null) {
-      throw new AbortException("RKNN query requested for 'null' distance!");
-    }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return getRKNNQuery(distanceQuery, hints);
   }
 
   @Override

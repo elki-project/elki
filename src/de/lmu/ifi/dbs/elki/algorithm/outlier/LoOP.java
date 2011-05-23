@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -161,7 +162,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     KNNQuery<O, D> knnReach;
     if(comparisonDistanceFunction == reachabilityDistanceFunction || comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
       // We need each neighborhood twice - use "HEAVY" flag.
-      knnComp = database.getKNNQuery(relation, comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+      knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
       // No optimized kNN query - use a preprocessor!
       if(knnComp == null) {
         if(stepprog != null) {
@@ -183,8 +184,8 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       if(stepprog != null) {
         stepprog.beginStep(1, "Not materializing distance functions, since we request each DBID once only.", logger);
       }
-      knnComp = database.getKNNQuery(relation, comparisonDistanceFunction, kreach);
-      knnReach = database.getKNNQuery(relation, reachabilityDistanceFunction, kcomp);
+      knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, kreach);
+      knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kcomp);
     }
     return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnComp, knnReach);
   }

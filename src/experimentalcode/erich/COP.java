@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -119,7 +120,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   }
 
   public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(data, getDistanceFunction(), k + 1);
+    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(data, getDistanceFunction(), k + 1);
 
     DBIDs ids = data.getDBIDs();
 

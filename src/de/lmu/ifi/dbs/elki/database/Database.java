@@ -101,28 +101,6 @@ public interface Database extends HierarchicalResult {
   <O, D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(Relation<O> relation, SimilarityFunction<? super O, D> similarityFunction, Object... hints);
 
   /**
-   * Get a KNN query object for the given distance function.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
-   * Hints include:
-   * <ul>
-   * <li>Integer: maximum value for k needed</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
-   * </ul>
-   * 
-   * @param <O> Object type
-   * @param <D> Distance type
-   * @param relation Relation used
-   * @param distanceFunction Distance function
-   * @param hints Optimizer hints
-   * @return KNN Query object
-   */
-  <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints);
-
-  /**
    * Get a KNN query object for the given distance query.
    * 
    * When possible, this will use an index, but it may default to an expensive
@@ -144,28 +122,6 @@ public interface Database extends HierarchicalResult {
   <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
 
   /**
-   * Get a range query object for the given distance function.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
-   * Hints include:
-   * <ul>
-   * <li>Distance object: Maximum query range</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
-   * </ul>
-   * 
-   * @param <O> Object type
-   * @param <D> Distance type
-   * @param relation Relation used
-   * @param distanceFunction Distance function
-   * @param hints Optimizer hints
-   * @return KNN Query object
-   */
-  <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints);
-
-  /**
    * Get a range query object for the given distance query.
    * 
    * When possible, this will use an index, but it may default to an expensive
@@ -185,28 +141,6 @@ public interface Database extends HierarchicalResult {
    * @return KNN Query object
    */
   <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
-
-  /**
-   * Get a rKNN query object for the given distance function.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
-   * Hints include:
-   * <ul>
-   * <li>Integer: maximum value for k needed</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
-   * </ul>
-   * 
-   * @param <O> Object type
-   * @param <D> Distance type
-   * @param relation Relation used
-   * @param distanceFunction Distance function
-   * @param hints Optimizer hints
-   * @return KNN Query object
-   */
-  <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints);
 
   /**
    * Get a rKNN query object for the given distance query.
