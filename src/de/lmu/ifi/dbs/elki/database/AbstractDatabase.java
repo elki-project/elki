@@ -8,9 +8,6 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -18,83 +15,100 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.RKNNIndex;
+import de.lmu.ifi.dbs.elki.index.RangeIndex;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
- * A proxy database to use e.g. for projections and partitions.
+ * Abstract base class for database API implementations. Provides default
+ * management of relations, indexes and events as well as default query matching.
  * 
  * @author Erich Schubert
  */
-// FIXME: allow indexes (preprocessors!), allow events and listeners
-// FIXME: add an auto-proxy option to proxy all existing relations.
-public class ProxyDatabase extends AbstractHierarchicalResult implements Database {
+public abstract class AbstractDatabase extends AbstractHierarchicalResult implements Database {
   /**
-   * Our DBIDs
+   * Parameter to specify the indexes to use.
+   * <p>
+   * Key: {@code -db.index}
+   * </p>
    */
-  final protected DBIDs ids;
+  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("db.index", "Database indexes to add.");
 
   /**
-   * The representations we have.
+   * The event manager, collects events and fires them on demand.
    */
-  final protected List<Relation<?>> relations;
+  protected final DatabaseEventManager eventManager = new DatabaseEventManager();
 
   /**
-   * Our DBID representation
+   * The relations we manage.
    */
-  final protected DBIDView idrep;
+  protected final List<Relation<?>> relations = new java.util.Vector<Relation<?>>();
+
+  /**
+   * Indexes
+   */
+  protected final List<Index> indexes = new java.util.Vector<Index>();
+
+  /**
+   * Index factories
+   */
+  protected final Collection<IndexFactory<?, ?>> indexFactories = new java.util.Vector<IndexFactory<?, ?>>();
 
   /**
    * Constructor.
-   * 
-   * @param ids DBIDs to use
    */
-  public ProxyDatabase(DBIDs ids) {
+  public AbstractDatabase() {
     super();
-    this.ids = ids;
-    this.relations = new java.util.Vector<Relation<?>>();
-    this.idrep = new DBIDView(this, this.ids);
-    this.relations.add(idrep);
-    this.addChildResult(idrep);
-  }
-  
-  @Override
-  public void initialize() {
-    // Nothing to do - we were initialized on construction time.
-  }
-
-  /**
-   * Add a new representation.
-   * 
-   * @param relation Representation to add.
-   */
-  public void addRelation(Relation<?> relation) {
-    this.relations.add(relation);
   }
 
   @Override
-  public String getLongName() {
-    return "Proxy database";
+  public void addIndex(Index index) {
+    this.indexes.add(index);
+    // TODO: actually add index to the representation used?
+    this.addChildResult(index);
   }
 
   @Override
-  public String getShortName() {
-    return "Proxy database";
+  public Collection<Index> getIndexes() {
+    return Collections.unmodifiableList(this.indexes);
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
   @Override
-  public int size() {
-    return ids.size();
+  public void removeIndex(Index index) {
+    this.indexes.remove(index);
+    this.getHierarchy().remove(this, index);
+  }
+
+  @Override
+  public SingleObjectBundle getBundle(DBID id) {
+    assert (id != null);
+    // TODO: ensure that the ID actually exists in the database?
+    try {
+      // Build an object package
+      SingleObjectBundle ret = new SingleObjectBundle();
+      for(Relation<?> relation : relations) {
+        ret.append(relation.getDataTypeInformation(), relation.get(id));
+      }
+      return ret;
+    }
+    catch(RuntimeException e) {
+      if(id == null) {
+        throw new UnsupportedOperationException("AbstractDatabase.getPackage(null) called!");
+      }
+      // throw e upwards.
+      throw e;
+    }
   }
 
   @SuppressWarnings({ "unchecked", "unused" })
@@ -132,12 +146,17 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
     if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
-    /*
-     * FIXME: re-add index support for(int i = indexes.size() - 1; i >= 0; i--)
-     * { Index<?> idx = indexes.get(i); if(idx instanceof KNNIndex) {
-     * KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceQuery, hints);
-     * if(q != null) { return q; } } }
-     */
+    for(Index idx : getIndexes()) {
+      if(idx instanceof KNNIndex) {
+        @SuppressWarnings("unchecked")
+        final KNNIndex<O> knnIndex = (KNNIndex<O>) idx;
+        KNNQuery<O, D> q = knnIndex.getKNNQuery(distanceQuery, hints);
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+
     // Default
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
@@ -152,12 +171,17 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    /*
-     * FIXME: re-add index support for(int i = indexes.size() - 1; i >= 0; i--)
-     * { Index<?> idx = indexes.get(i); if(idx instanceof RangeIndex) {
-     * RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this,
-     * distanceQuery, hints); if(q != null) { return q; } } }
-     */
+    for(Index idx : getIndexes()) {
+      if(idx instanceof RangeIndex) {
+        @SuppressWarnings("unchecked")
+        final RangeIndex<O> rangeIndex = (RangeIndex<O>) idx;
+        RangeQuery<O, D> q = rangeIndex.getRangeQuery(distanceQuery, hints);
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+
     // Default
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
@@ -172,12 +196,17 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
     if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
-    /*
-     * FIXME: re-add index support for(int i = indexes.size() - 1; i >= 0; i--)
-     * { Index<?> idx = indexes.get(i); if(idx instanceof RKNNIndex) {
-     * RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this,
-     * distanceQuery, hints); if(q != null) { return q; } } }
-     */
+    for(Index idx : getIndexes()) {
+      if(idx instanceof RKNNIndex) {
+        @SuppressWarnings("unchecked")
+        final RKNNIndex<O> rknnIndex = (RKNNIndex<O>) idx;
+        RKNNQuery<O, D> q = rknnIndex.getRKNNQuery(distanceQuery, hints);
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+
     Integer maxk = null;
     // Default
     for(Object hint : hints) {
@@ -192,54 +221,35 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
     return new LinearScanRKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery, knnQuery, maxk);
   }
 
-  @SuppressWarnings("unused")
-  @Override
-  public SingleObjectBundle getBundle(DBID id) throws ObjectNotFoundException {
-    throw new UnsupportedOperationException("FIXME: Proxy databases currently do not yet allow retrieving object packages.");
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public StaticDBIDs getDBIDs() {
-    return DBIDUtil.makeUnmodifiable(ids);
-  }
-
-  @Override
-  public void addIndex(Index index) {
-    throw new UnsupportedOperationException("FIXME: Proxy databases currently do not yet allow indexes.");
-  }
-  
-  @Override
-  public Collection<Index> getIndexes() {
-    final List<Index> indexes = Collections.emptyList();
-    return indexes;
-  }
-
-  @Override
-  public void removeIndex(Index index) {
-    throw new UnsupportedOperationException("FIXME: Proxy databases currently do not yet allow indexes.");
-  }
-
-  @SuppressWarnings("unused")
   @Override
   public void addDataStoreListener(DataStoreListener l) {
-    throw new UnsupportedOperationException("FIXME: Proxy databases currently do not yet allow listeners.");
+    eventManager.addListener(l);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void removeDataStoreListener(DataStoreListener l) {
-    throw new UnsupportedOperationException("FIXME: Proxy databases currently do not yet allow listeners.");
+    eventManager.removeListener(l);
   }
 
   @Override
   public void accumulateDataStoreEvents() {
-    // FIXME: implement
+    eventManager.accumulateDataStoreEvents();
   }
 
   @Override
   public void flushDataStoreEvents() {
-    // FIXME: implement
+    eventManager.flushDataStoreEvents();
   }
+
+  @Override
+  public String getLongName() {
+    return "Database";
+  }
+
+  @Override
+  public String getShortName() {
+    return "database";
+  }
+
+  abstract protected Logging getLogger();
 }

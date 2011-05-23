@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 
 /**
  * Database specifies the requirements for any database implementation. Note
@@ -168,9 +167,8 @@ public interface Database extends HierarchicalResult {
    * 
    * @param id the id of the Object to be obtained from the Database
    * @return Bundle containing the objects' data
-   * @throws ObjectNotFoundException when the DBID was not found.
    */
-  SingleObjectBundle getBundle(DBID id) throws ObjectNotFoundException;
+  SingleObjectBundle getBundle(DBID id);
 
   /**
    * Returns the DatabaseObject represented by the specified id.
@@ -191,7 +189,7 @@ public interface Database extends HierarchicalResult {
    * @return a list comprising all IDs currently in use
    */
   @Deprecated
-  DBIDs getDBIDs();
+  StaticDBIDs getDBIDs();
 
   /**
    * Add a new index to the database.
