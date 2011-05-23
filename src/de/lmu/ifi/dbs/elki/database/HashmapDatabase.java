@@ -3,26 +3,16 @@ package de.lmu.ifi.dbs.elki.database;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -31,15 +21,9 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
-import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.index.RKNNIndex;
-import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -65,19 +49,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf DBIDs
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
-public class HashmapDatabase extends AbstractHierarchicalResult implements UpdatableDatabase, Parameterizable {
+public class HashmapDatabase extends AbstractDatabase implements UpdatableDatabase, Parameterizable {
   /**
-   * Parameter to specify the indexes to use.
-   * <p>
-   * Key: {@code -db.index}
-   * </p>
+   * Our logger
    */
-  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("db.index", "Database indexes to add.");
-
-  /**
-   * The representations we have.
-   */
-  protected final List<Relation<?>> relations;
+  private static final Logging logger = Logging.getLogger(HashmapDatabase.class);
 
   /**
    * IDs of this database
@@ -85,24 +61,9 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
   private TreeSetModifiableDBIDs ids;
 
   /**
-   * The event manager, collects events and fires them on demand.
-   */
-  protected final DatabaseEventManager eventManager = new DatabaseEventManager();
-
-  /**
    * The DBID representation we use
    */
   private final DBIDView idrep;
-
-  /**
-   * Indexes
-   */
-  final List<Index> indexes;
-
-  /**
-   * Index factories
-   */
-  final Collection<IndexFactory<?, ?>> indexFactories;
 
   /**
    * The data source we get the initial data from.
@@ -119,14 +80,11 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     super();
     this.databaseConnection = databaseConnection;
     this.ids = DBIDUtil.newTreeSet();
-    this.relations = new java.util.Vector<Relation<?>>();
     this.idrep = new DBIDView(this, this.ids);
     this.relations.add(idrep);
     this.addChildResult(idrep);
-    this.indexes = new java.util.Vector<Index>();
 
     // Add indexes.
-    this.indexFactories = new java.util.Vector<IndexFactory<?, ?>>();
     if(indexFactories != null) {
       this.indexFactories.addAll(indexFactories);
     }
@@ -150,24 +108,6 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
       // Run at most once.
       databaseConnection = null;
     }
-  }
-
-  @Override
-  public void addIndex(Index index) {
-    this.indexes.add(index);
-    // TODO: actually add index to the representation used?
-    this.addChildResult(index);
-  }
-
-  @Override
-  public Collection<Index> getIndexes() {
-    return Collections.unmodifiableList(this.indexes);
-  }
-
-  @Override
-  public void removeIndex(Index index) {
-    this.indexes.remove(index);
-    this.getHierarchy().remove(this, index);
   }
 
   @Override
@@ -291,7 +231,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
           }
         }
         if(targets[i] == null) {
-          targets[i] = addNewRepresentation(meta);
+          targets[i] = addNewRelation(meta);
           used.set(relations.size() - 1);
         }
       }
@@ -305,7 +245,7 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
    * @param meta meta data
    * @return new representation
    */
-  private Relation<?> addNewRepresentation(SimpleTypeInformation<?> meta) {
+  private Relation<?> addNewRelation(SimpleTypeInformation<?> meta) {
     @SuppressWarnings("unchecked")
     SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
     Relation<?> relation = new MaterializedRelation<Object>(this, ometa, ids);
@@ -395,45 +335,17 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
     restoreID(id);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public final int size() {
     return ids.size();
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
-  public final SingleObjectBundle getBundle(DBID id) throws ObjectNotFoundException {
-    assert (id != null);
-    assert (ids.contains(id));
-    try {
-      // Build an object package
-      SingleObjectBundle ret = new SingleObjectBundle();
-      for(Relation<?> relation : relations) {
-        ret.append(relation.getDataTypeInformation(), relation.get(id));
-      }
-      return ret;
-    }
-    catch(RuntimeException e) {
-      if(id == null) {
-        throw new UnsupportedOperationException("AbstractDatabase.getPackage(null) called!");
-      }
-      if(!ids.contains(id)) {
-        throw new UnsupportedOperationException("AbstractDatabase.getPackage() called for unknown id!");
-      }
-      // throw e upwards.
-      throw e;
-    }
-  }
-
-  /**
-   * Returns a list of all ids currently in use in the database.
-   * 
-   * The list is not affected of any changes made to the database in the future
-   * nor vice versa.
-   * 
-   * @see de.lmu.ifi.dbs.elki.database.Database#getDBIDs()
-   */
-  @Override
-  public DBIDs getDBIDs() {
+  public StaticDBIDs getDBIDs() {
     return DBIDUtil.makeUnmodifiable(ids);
   }
 
@@ -442,145 +354,13 @@ public class HashmapDatabase extends AbstractHierarchicalResult implements Updat
    * 
    * @param id the id to become reusable
    */
-  protected void restoreID(final DBID id) {
+  private void restoreID(final DBID id) {
     DBIDFactory.FACTORY.deallocateSingleDBID(id);
   }
 
-  @SuppressWarnings({ "unchecked", "unused" })
   @Override
-  public <O> Relation<O> getRelation(TypeInformation restriction, Object... hints) throws NoSupportedDataTypeException {
-    // Get first match
-    for(Relation<?> relation : relations) {
-      if(restriction.isAssignableFromType(relation.getDataTypeInformation())) {
-        return (Relation<O>) relation;
-      }
-    }
-    throw new NoSupportedDataTypeException(restriction);
-  }
-
-  @SuppressWarnings("unused")
-  @Override
-  public <O, D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if(distanceFunction == null) {
-      throw new AbortException("Distance query requested for 'null' distance!");
-    }
-    return distanceFunction.instantiate(objQuery);
-  }
-
-  @SuppressWarnings("unused")
-  @Override
-  public <O, D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(Relation<O> objQuery, SimilarityFunction<? super O, D> similarityFunction, Object... hints) {
-    if(similarityFunction == null) {
-      throw new AbortException("Similarity query requested for 'null' similarity!");
-    }
-    return similarityFunction.instantiate(objQuery);
-  }
-
-  @Override
-  public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if(distanceQuery == null) {
-      throw new AbortException("kNN query requested for 'null' distance!");
-    }
-    for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index idx = indexes.get(i);
-      if(idx instanceof KNNIndex) {
-        KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(distanceQuery, hints);
-        if(q != null) {
-          return q;
-        }
-      }
-    }
-
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    return QueryUtil.getLinearScanKNNQuery(distanceQuery);
-  }
-
-  @Override
-  public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if(distanceQuery == null) {
-      throw new AbortException("Range query requested for 'null' distance!");
-    }
-    for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index idx = indexes.get(i);
-      if(idx instanceof RangeIndex) {
-        RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(distanceQuery, hints);
-        if(q != null) {
-          return q;
-        }
-      }
-    }
-
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    return QueryUtil.getLinearScanRangeQuery(distanceQuery);
-  }
-
-  @Override
-  public <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if(distanceQuery == null) {
-      throw new AbortException("RKNN query requested for 'null' distance!");
-    }
-    for(int i = indexes.size() - 1; i >= 0; i--) {
-      Index idx = indexes.get(i);
-      if(idx instanceof RKNNIndex) {
-        RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(distanceQuery, hints);
-        if(q != null) {
-          return q;
-        }
-      }
-    }
-
-    Integer maxk = null;
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-      if(hint instanceof Integer) {
-        maxk = (Integer) hint;
-      }
-    }
-    KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
-    return new LinearScanRKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery, knnQuery, maxk);
-  }
-
-  @Override
-  public void addDataStoreListener(DataStoreListener l) {
-    eventManager.addListener(l);
-  }
-
-  @Override
-  public void removeDataStoreListener(DataStoreListener l) {
-    eventManager.removeListener(l);
-  }
-
-  @Override
-  public String getLongName() {
-    return "Database";
-  }
-
-  @Override
-  public String getShortName() {
-    return "database";
-  }
-
-  @Override
-  public void accumulateDataStoreEvents() {
-    eventManager.accumulateDataStoreEvents();
-  }
-
-  @Override
-  public void flushDataStoreEvents() {
-    eventManager.flushDataStoreEvents();
+  protected Logging getLogger() {
+    return logger;
   }
 
   /**
