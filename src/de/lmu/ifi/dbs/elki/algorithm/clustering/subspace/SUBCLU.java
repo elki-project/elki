@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
@@ -282,16 +281,14 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       ids = relation.getDBIDs();
     }
 
-    proxy = new ProxyDatabase(ids);
-    Relation<V> prep = ProxyView.wrap(proxy, ids, relation);
-    proxy.addRelation(prep);
+    proxy = new ProxyDatabase(ids, relation);
 
     DBSCAN<V, DoubleDistance> dbscan = new DBSCAN<V, DoubleDistance>(distanceFunction, epsilon, minpts);
     // run DBSCAN
     if(logger.isVerbose()) {
       logger.verbose("\nRun DBSCAN on subspace " + subspace.dimensonsToString());
     }
-    Clustering<Model> dbsres = dbscan.run(proxy, prep);
+    Clustering<Model> dbsres = dbscan.run(proxy);
 
     // separate cluster and noise
     List<Cluster<Model>> clusterAndNoise = dbsres.getAllClusters();

@@ -110,6 +110,11 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
       throw e;
     }
   }
+  
+  @Override
+  public Collection<Relation<?>> getRelations() {
+    return Collections.unmodifiableCollection(relations);
+  }
 
   @SuppressWarnings({ "unchecked", "unused" })
   @Override

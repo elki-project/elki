@@ -52,6 +52,13 @@ public interface Database extends HierarchicalResult {
    */
   @Deprecated
   int size();
+  
+  /**
+   * Get all relations of a database.
+   * 
+   * @return All relations in the database
+   */
+  Collection<Relation<?>> getRelations();
 
   /**
    * Get an object representation.
