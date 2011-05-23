@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
@@ -217,9 +216,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
       }
       else {
         DBIDs partids = pair.getValue();
-        ProxyDatabase proxy = new ProxyDatabase(partids);
-        Relation<V> partition = ProxyView.wrap(proxy, partids, relation);
-        proxy.addRelation(partition);
+        ProxyDatabase proxy = new ProxyDatabase(partids, relation);
         
         ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = getPartitionAlgorithm(query);
         if(logger.isVerbose()) {
