@@ -98,8 +98,8 @@ public class CASHIntervalSplit {
       if(f_min == null) {
         ParameterizationFunction f = database.get(id);
         HyperBoundingBox minMax = f.determineAlphaMinMax(interval);
-        f_min = f.function(minMax.getMin());
-        f_max = f.function(minMax.getMax());
+        f_min = f.function(SpatialUtil.getMin(minMax));
+        f_max = f.function(SpatialUtil.getMax(minMax));
         minima.put(id, f_min);
         maxima.put(id, f_max);
       }
