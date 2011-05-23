@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.database;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -20,13 +19,11 @@ import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -111,7 +108,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   }
 
   @Override
-  public DBIDs insert(MultipleObjectsBundle objpackages) {
+  public DBIDs insert(ObjectBundle objpackages) {
     if(objpackages.dataLength() == 0) {
       return DBIDUtil.EMPTYDBIDS;
     }
@@ -153,7 +150,6 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     }
 
     // Notify indexes of insertions
-    // FIXME: support bulk...
     for(Index index : indexes) {
       index.insertAll(newids);
     }
@@ -161,49 +157,6 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     // fire insertion event
     eventManager.fireObjectsInserted(newids);
     return newids;
-  }
-
-  @Override
-  public DBID insert(SingleObjectBundle objpackage) {
-    Relation<?>[] targets = alignColumns(objpackage);
-
-    DBID newid = null;
-    for(int i = 0; i < targets.length; i++) {
-      if(targets[i] == idrep) {
-        newid = (DBID) objpackage.data(i);
-        break;
-      }
-    }
-    if(newid == null) {
-      newid = DBIDUtil.generateSingleDBID();
-    }
-
-    if(ids.contains(newid)) {
-      throw new AbortException("Duplicate DBID conflict.");
-    }
-    ids.add(newid);
-
-    // insert object into representations
-    for(int i = 0; i < targets.length; i++) {
-      @SuppressWarnings("unchecked")
-      final Relation<Object> relation = (Relation<Object>) targets[i];
-      // Skip the DBID we used above
-      if((Object) relation == idrep) {
-        continue;
-      }
-      relation.set(newid, objpackage.data(i));
-    }
-
-    // insert into indexes
-    for(Index index : indexes) {
-      for(int i = 0; i < targets.length; i++) {
-        index.insert(newid);
-      }
-    }
-
-    // fire insertion event
-    eventManager.fireObjectInserted(newid);
-    return newid;
   }
 
   /**
@@ -265,43 +218,19 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   }
 
   /**
-   * Removes the objects from the database (by calling {@link #doDelete(DBID)})
-   * and from all indexes and fires a deletion event.
-   */
-  @Override
-  public SingleObjectBundle delete(DBID id) {
-    final SingleObjectBundle existing;
-    try {
-      existing = getBundle(id);
-    }
-    catch(ObjectNotFoundException e) {
-      return null;
-    }
-    // remove from all indexes
-    for(Index index : indexes) {
-      index.delete(id);
-    }
-    // remove from db
-    doDelete(id);
-    // fire deletion event
-    eventManager.fireObjectRemoved(id);
-    return existing;
-  }
-
-  /**
    * Removes the objects from the database (by calling {@link #doDelete(DBID)}
    * for each object) and indexes and fires a deletion event.
    */
   @Override
-  public List<SingleObjectBundle> delete(DBIDs ids) {
-    final List<SingleObjectBundle> existing = new ArrayList<SingleObjectBundle>(ids.size());
-    for(DBID id : ids) {
-      try {
-        existing.add(getBundle(id));
+  public MultipleObjectsBundle delete(DBIDs ids) {
+    // Prepare bundle to return
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+    for(Relation<?> relation : relations) {
+      ArrayList<Object> data = new ArrayList<Object>(ids.size());
+      for(DBID id : ids) {
+        data.add(relation.get(id));
       }
-      catch(ObjectNotFoundException e) {
-        // do nothing?
-      }
+      bundle.appendColumn(relation.getDataTypeInformation(), data);
     }
     // remove from db
     for(DBID id : ids) {
@@ -314,7 +243,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     // fire deletion event
     eventManager.fireObjectsRemoved(ids);
 
-    return existing;
+    return bundle;
   }
 
   /**

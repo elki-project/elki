@@ -189,6 +189,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     //
     Pair<DBID,Double> candidate = getCandidate(relation,database);
     
+    // Note: removing/inserting is rather expensive - can't this be done *virtually* only?
     int outlierNumber = 0 ;
     while(candidate.second > alpha && m > outlierNumber){
       outlierNumber ++ ;
