@@ -69,18 +69,6 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
   }
 
   /**
-   * Returns a clone of the minimum hyper point.
-   * 
-   * @return the minimum hyper point
-   * 
-   * @deprecated Use SpatialUtil.getMin(mbr)?
-   */
-  @Deprecated
-  public double[] getMin() {
-    return min.clone();
-  }
-
-  /**
    * Returns the coordinate at the specified dimension of the minimum hyper
    * point
    * 
@@ -92,18 +80,6 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
   @Override
   public double getMin(int dimension) {
     return min[dimension - 1];
-  }
-
-  /**
-   * Returns a clone of the maximum hyper point.
-   * 
-   * @return the maximum hyper point
-   * 
-   * @deprecated Use SpatialUtil.getMin(mbr)?
-   */
-  @Deprecated
-  public double[] getMax() {
-    return max.clone();
   }
 
   /**

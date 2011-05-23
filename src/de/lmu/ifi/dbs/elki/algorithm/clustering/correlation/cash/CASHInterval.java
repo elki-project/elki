@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -313,8 +314,8 @@ public class CASHInterval extends HyperBoundingBox {
 
     // left and right child
     for(int i = 0; i < 2; i++) {
-      double[] min = getMin();
-      double[] max = getMax();
+      double[] min = SpatialUtil.getMin(this);
+      double[] max = SpatialUtil.getMax(this);
 
       // right child
       if(i == 0) {
