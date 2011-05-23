@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.TrivialNoOutlier;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -132,7 +133,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
     database.addIndex(preproc);
 
     // Test that we did get a proper index query
-    KNNQuery<O, D> knnq = database.getKNNQuery(relation, distf);
+    KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, distf);
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       logger.warning("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }

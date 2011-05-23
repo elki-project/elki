@@ -2,6 +2,7 @@ package experimentalcode.shared.outlier.generalized.neighbors;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -108,7 +109,7 @@ public class KNearestNeighborNeighborhood<D extends Distance<D>> implements Neig
      */ 
     private DataStore<List<DistanceResultPair<D>>> getKNNNeighbors(Relation<?> database){
       WritableDataStore<List<DistanceResultPair<D>>> store = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, List.class);   
-      KNNQuery<?,D> knnQuery = database.getDatabase().getKNNQuery(database, distFunc, KNNQuery.HINT_EXACT);
+      KNNQuery<?,D> knnQuery = QueryUtil.getKNNQuery(database, distFunc, KNNQuery.HINT_EXACT);
       for(DBID id : database.iterDBIDs()){
          List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);       
          store.put(id, neighbors);
@@ -121,7 +122,7 @@ public class KNearestNeighborNeighborhood<D extends Distance<D>> implements Neig
      */
     private DataStore<DBIDs> getNeighbors(Relation<?> database){
       WritableDataStore<DBIDs> s = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
-      KNNQuery<?,D> knnQuery = database.getDatabase().getKNNQuery(database, distFunc, KNNQuery.HINT_EXACT);
+      KNNQuery<?,D> knnQuery = QueryUtil.getKNNQuery(database, distFunc, KNNQuery.HINT_EXACT);
       for(DBID id : database.iterDBIDs()){
          List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
          ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();

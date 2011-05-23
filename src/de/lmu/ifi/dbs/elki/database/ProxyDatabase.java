@@ -127,27 +127,6 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
   }
 
   @Override
-  public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if(distanceFunction == null) {
-      throw new AbortException("kNN query requested for 'null' distance!");
-    }
-    /*
-     * FIXME: re-add index support for(int i = indexes.size() - 1; i >= 0; i--)
-     * { Index<?> idx = indexes.get(i); if(idx instanceof KNNIndex) {
-     * KNNQuery<O, D> q = ((KNNIndex<O>) idx).getKNNQuery(objQuery,
-     * distanceFunction, hints); if(q != null) { return q; } } }
-     */
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return QueryUtil.getLinearScanKNNQuery(distanceQuery);
-  }
-
-  @Override
   public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
@@ -168,27 +147,6 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
   }
 
   @Override
-  public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if(distanceFunction == null) {
-      throw new AbortException("Range query requested for 'null' distance!");
-    }
-    /*
-     * FIXME: re-add index support for(int i = indexes.size() - 1; i >= 0; i--)
-     * { Index<?> idx = indexes.get(i); if(idx instanceof RangeIndex) {
-     * RangeQuery<O, D> q = ((RangeIndex<O>) idx).getRangeQuery(this,
-     * distanceFunction, hints); if(q != null) { return q; } } }
-     */
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    return QueryUtil.getLinearScanRangeQuery(distanceQuery);
-  }
-
-  @Override
   public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
@@ -206,32 +164,6 @@ public class ProxyDatabase extends AbstractHierarchicalResult implements Databas
       }
     }
     return QueryUtil.getLinearScanRangeQuery(distanceQuery);
-  }
-
-  @Override
-  public <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if(distanceFunction == null) {
-      throw new AbortException("RKNN query requested for 'null' distance!");
-    }
-    /*
-     * FIXME: re-add index support for(int i = indexes.size() - 1; i >= 0; i--)
-     * { Index<?> idx = indexes.get(i); if(idx instanceof RKNNIndex) {
-     * RKNNQuery<O, D> q = ((RKNNIndex<O>) idx).getRKNNQuery(this,
-     * distanceFunction, hints); if(q != null) { return q; } } }
-     */
-    Integer maxk = null;
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-      if(hint instanceof Integer) {
-        maxk = (Integer) hint;
-      }
-    }
-    DistanceQuery<O, D> distanceQuery = getDistanceQuery(objQuery, distanceFunction);
-    KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
-    return new LinearScanRKNNQuery<O, D>(objQuery, distanceQuery, knnQuery, maxk);
   }
 
   @Override

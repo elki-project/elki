@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -89,8 +90,8 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
   }
 
   @Override
-  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> database) {
-    return new Instance<T>(database, k, parentDistance);
+  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> relation) {
+    return new Instance<T>(relation, k, parentDistance);
   }
 
   /**
@@ -112,13 +113,13 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
     /**
      * Constructor.
      * 
-     * @param database Database
+     * @param relation Database
      * @param k Value of k
      */
-    public Instance(Relation<T> database, int k, DistanceFunction<? super O, D> parentDistance) {
-      super(database);
+    public Instance(Relation<T> relation, int k, DistanceFunction<? super O, D> parentDistance) {
+      super(relation);
       this.k = k;
-      this.knnQuery= database.getDatabase().getKNNQuery(database, parentDistance, k, DatabaseQuery.HINT_HEAVY_USE);
+      this.knnQuery = QueryUtil.getKNNQuery(relation, parentDistance, k, DatabaseQuery.HINT_HEAVY_USE);
     }
 
     @Override

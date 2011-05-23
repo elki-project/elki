@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -175,7 +176,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    */
   private Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Relation<O> relation, StepProgress stepprog) {
     // "HEAVY" flag for knnReach since it is used more than once
-    KNNQuery<O, D> knnReach = relation.getDatabase().getKNNQuery(relation, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O, D> knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnReach instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
@@ -199,7 +200,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
     else {
       // do not materialize the first neighborhood, since it is used only once
-      knnRefer = relation.getDatabase().getKNNQuery(relation, neighborhoodDistanceFunction, k);
+      knnRefer = QueryUtil.getKNNQuery(relation, neighborhoodDistanceFunction, k);
     }
 
     return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnRefer, knnReach);

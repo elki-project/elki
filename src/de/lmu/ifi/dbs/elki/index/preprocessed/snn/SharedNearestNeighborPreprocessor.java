@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.snn;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -88,7 +89,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, SetDBIDs.class);
-    KNNQuery<O, D> knnquery = relation.getDatabase().getKNNQuery(relation, distanceFunction, numberOfNeighbors);
+    KNNQuery<O, D> knnquery = QueryUtil.getKNNQuery(relation, distanceFunction, numberOfNeighbors);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), getLogger()) : null;
     for(DBID id : relation.iterDBIDs()) {

@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -232,9 +233,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    */
   //TODO test
   private Pair<DBID, Double> getCandidate(Relation<V> relation , Database database) {
-    
-    
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(relation , spatialDistanceFunction, k); 
+    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, spatialDistanceFunction, k); 
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
 
     // init F,X,Z

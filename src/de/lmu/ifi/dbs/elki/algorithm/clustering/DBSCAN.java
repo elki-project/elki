@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -109,7 +110,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * Performs the DBSCAN algorithm on the given database.
    */
   public Clustering<Model> run(Database database, Relation<O> relation) {
-    RangeQuery<O, D> rangeQuery = database.getRangeQuery(relation, getDistanceFunction());
+    RangeQuery<O, D> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
     FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", size, logger) : null;

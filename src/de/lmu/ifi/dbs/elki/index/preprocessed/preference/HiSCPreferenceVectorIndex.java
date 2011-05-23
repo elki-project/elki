@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -84,7 +85,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     long start = System.currentTimeMillis();
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), logger) : null;
 
-    KNNQuery<V, DoubleDistance> knnQuery = relation.getDatabase().getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
+    KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
 
     Iterator<DBID> it = relation.iterDBIDs();
     while(it.hasNext()) {
