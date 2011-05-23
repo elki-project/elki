@@ -170,7 +170,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   public int getMinPts() {
     return minpts;
   }
-  
+
   @Override
   public D getDistanceFactory() {
     return getDistanceFunction().getDistanceFactory();

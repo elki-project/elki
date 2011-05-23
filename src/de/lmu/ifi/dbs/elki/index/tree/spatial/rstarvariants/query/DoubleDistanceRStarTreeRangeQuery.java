@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
@@ -65,7 +64,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    */
   protected List<DistanceResultPair<DoubleDistance>> doRangeQuery(O object, double epsilon) {
     final List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
-    final Heap<DoubleDistanceSearchCandidate> pq = new UpdatableHeap<DoubleDistanceSearchCandidate>();
+    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>();
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, index.getRootEntry().getEntryID()));
@@ -81,7 +80,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {
-        double distance = distanceFunction.doubleMinDist(node.getEntry(i), object);
+        double distance = distanceFunction.doubleMinDist(object, node.getEntry(i));
         if(distance <= epsilon) {
           if(node.isLeaf()) {
             LeafEntry entry = (LeafEntry) node.getEntry(i);
