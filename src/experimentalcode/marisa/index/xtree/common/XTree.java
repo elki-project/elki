@@ -66,7 +66,7 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
 
   @Override
   protected SpatialEntry createNewLeafEntry(DBID id) {
-    return new SpatialPointLeafEntry(id, getValues(relation.get(id)));
+    return new SpatialPointLeafEntry(id, relation.get(id));
   }
 
   @Override
