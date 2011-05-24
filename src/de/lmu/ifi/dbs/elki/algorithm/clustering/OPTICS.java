@@ -11,15 +11,20 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.optics.DoubleDistanceClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.result.optics.GenericClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -79,11 +84,6 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   private ModifiableDBIDs processedIDs;
 
   /**
-   * The priority queue for the algorithm.
-   */
-  private UpdatableHeap<ClusterOrderEntry<D>> heap;
-
-  /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
@@ -115,11 +115,27 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("OPTICS Clusterorder", "optics-clusterorder");
-    heap = new UpdatableHeap<ClusterOrderEntry<D>>();
 
-    for(DBID id : relation.iterDBIDs()) {
-      if(!processedIDs.contains(id)) {
-        expandClusterOrder(clusterOrder, database, rangeQuery, id, progress);
+    if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction && DoubleDistance.class.isInstance(epsilon)) {
+      // Optimized codepath for double-based distances. Avoids Java
+      // boxing/unboxing.
+      for(DBID id : relation.iterDBIDs()) {
+        if(!processedIDs.contains(id)) {
+          // We need to do some ugly casts to be able to run the optimized version, unfortunately.
+          @SuppressWarnings("unchecked")
+          final ClusterOrderResult<DoubleDistance> doubleClusterOrder = ClusterOrderResult.class.cast(clusterOrder);
+          @SuppressWarnings("unchecked")
+          final RangeQuery<O, DoubleDistance> doubleRangeQuery = RangeQuery.class.cast(rangeQuery);
+          final DoubleDistance depsilon = DoubleDistance.class.cast(epsilon);
+          expandClusterOrderDouble(doubleClusterOrder, database, doubleRangeQuery, id, depsilon, progress);
+        }
+      }
+    }
+    else {
+      for(DBID id : relation.iterDBIDs()) {
+        if(!processedIDs.contains(id)) {
+          expandClusterOrder(clusterOrder, database, rangeQuery, id, epsilon, progress);
+        }
       }
     }
     if(progress != null) {
@@ -136,12 +152,13 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * @param database the database on which the algorithm is run
    * @param rangeQuery the range query to use
    * @param objectID the currently processed object
+   * @param epsilon Epsilon range value
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database database, RangeQuery<O, D> rangeQuery, DBID objectID, FiniteProgress progress) {
-    assert (heap.isEmpty());
-    heap.add(new ClusterOrderEntry<D>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
+  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database database, RangeQuery<O, D> rangeQuery, DBID objectID, D epsilon, FiniteProgress progress) {
+    UpdatableHeap<ClusterOrderEntry<D>> heap = new UpdatableHeap<ClusterOrderEntry<D>>();
+    heap.add(new GenericClusterOrderEntry<D>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
 
     while(!heap.isEmpty()) {
       final ClusterOrderEntry<D> current = heap.poll();
@@ -149,15 +166,70 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       processedIDs.add(current.getID());
 
       List<DistanceResultPair<D>> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
-      D coreDistance = neighbors.size() < minpts ? getDistanceFunction().getDistanceFactory().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
+      if(neighbors.size() >= minpts) {
+        final DistanceResultPair<D> last = neighbors.get(minpts - 1);
+        D coreDistance = last.getDistance();
 
-      if(!coreDistance.isInfiniteDistance()) {
         for(DistanceResultPair<D> neighbor : neighbors) {
           if(processedIDs.contains(neighbor.getDBID())) {
             continue;
           }
           D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
-          heap.add(new ClusterOrderEntry<D>(neighbor.getDBID(), current.getID(), reachability));
+          heap.add(new GenericClusterOrderEntry<D>(neighbor.getDBID(), current.getID(), reachability));
+        }
+      }
+      if(progress != null) {
+        progress.setProcessed(processedIDs.size(), logger);
+      }
+    }
+  }
+
+  /**
+   * OPTICS-function expandClusterOrder.
+   * 
+   * @param clusterOrder Cluster order result to expand
+   * @param database the database on which the algorithm is run
+   * @param rangeQuery the range query to use
+   * @param objectID the currently processed object
+   * @param epsilon Query epsilon
+   * @param progress the progress object to actualize the current progress if
+   *        the algorithm
+   */
+  protected void expandClusterOrderDouble(ClusterOrderResult<DoubleDistance> clusterOrder, Database database, RangeQuery<O, DoubleDistance> rangeQuery, DBID objectID, DoubleDistance epsilon, FiniteProgress progress) {
+    UpdatableHeap<DoubleDistanceClusterOrderEntry> heap = new UpdatableHeap<DoubleDistanceClusterOrderEntry>();
+    heap.add(new DoubleDistanceClusterOrderEntry(objectID, null, Double.POSITIVE_INFINITY));
+
+    while(!heap.isEmpty()) {
+      final DoubleDistanceClusterOrderEntry current = heap.poll();
+      clusterOrder.add(current);
+      processedIDs.add(current.getID());
+
+      List<DistanceResultPair<DoubleDistance>> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
+      if(neighbors.size() >= minpts) {
+        final DistanceResultPair<DoubleDistance> last = neighbors.get(minpts - 1);
+        if(last instanceof DoubleDistanceResultPair) {
+          double coreDistance = ((DoubleDistanceResultPair) last).getDoubleDistance();
+
+          for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
+            if(processedIDs.contains(neighbor.getDBID())) {
+              continue;
+            }
+            double reachability = Math.max(((DoubleDistanceResultPair) neighbor).getDoubleDistance(), coreDistance);
+            heap.add(new DoubleDistanceClusterOrderEntry(neighbor.getDBID(), current.getID(), reachability));
+          }
+        }
+        else {
+          // Actually we have little gains in this situation,
+          // Only if we got an optimized result before.
+          double coreDistance = last.getDistance().doubleValue();
+
+          for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
+            if(processedIDs.contains(neighbor.getDBID())) {
+              continue;
+            }
+            double reachability = Math.max(neighbor.getDistance().doubleValue(), coreDistance);
+            heap.add(new DoubleDistanceClusterOrderEntry(neighbor.getDBID(), current.getID(), reachability));
+          }
         }
       }
       if(progress != null) {

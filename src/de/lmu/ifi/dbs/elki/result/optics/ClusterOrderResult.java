@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.result;
+package de.lmu.ifi.dbs.elki.result.optics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +11,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.IterableResult;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
 
@@ -91,7 +96,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
    * @param reachability Reachability distance
    */
   public void add(DBID id, DBID predecessor, D reachability) {
-    add(new ClusterOrderEntry<D>(id, predecessor, reachability));
+    add(new GenericClusterOrderEntry<D>(id, predecessor, reachability));
   }
 
   /**

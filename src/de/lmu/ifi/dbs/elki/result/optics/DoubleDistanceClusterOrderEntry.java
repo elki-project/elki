@@ -1,15 +1,14 @@
-package de.lmu.ifi.dbs.elki.result;
+package de.lmu.ifi.dbs.elki.result.optics;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Provides an entry in a cluster order.
  * 
  * @author Elke Achtert
- * @param <D> the type of Distance used by the ClusterOrderEntry
  */
-public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<ClusterOrderEntry<D>> {
+public class DoubleDistanceClusterOrderEntry implements Comparable<ClusterOrderEntry<DoubleDistance>>, ClusterOrderEntry<DoubleDistance> {
   /**
    * The id of the entry.
    */
@@ -23,7 +22,7 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<Clus
   /**
    * The reachability of the entry.
    */
-  private D reachability;
+  private double reachability;
 
   /**
    * Creates a new entry in a cluster order with the specified parameters.
@@ -32,7 +31,7 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<Clus
    * @param predecessorID the id of the entry's predecessor
    * @param reachability the reachability of the entry
    */
-  public ClusterOrderEntry(DBID objectID, DBID predecessorID, D reachability) {
+  public DoubleDistanceClusterOrderEntry(DBID objectID, DBID predecessorID, double reachability) {
     this.objectID = objectID;
     this.predecessorID = predecessorID;
     this.reachability = reachability;
@@ -47,19 +46,18 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<Clus
    * @return <code>true</code> if this object has the same attribute values as
    *         the o argument; <code>false</code> otherwise.
    */
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
     if(this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if(o == null || !(o instanceof ClusterOrderEntry)) {
       return false;
     }
 
-    final ClusterOrderEntry<D> that = (ClusterOrderEntry<D>) o;
+    final ClusterOrderEntry<?> that = (ClusterOrderEntry<?>) o;
     // Compare by ID only, for UpdatableHeap!
-    return objectID.equals(that.objectID);
+    return objectID.equals(that.getID());
   }
 
   /**
@@ -87,6 +85,7 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<Clus
    * 
    * @return the object id of this entry
    */
+  @Override
   public DBID getID() {
     return objectID;
   }
@@ -97,6 +96,7 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<Clus
    * 
    * @return the id of the predecessor of this entry
    */
+  @Override
   public DBID getPredecessorID() {
     return predecessorID;
   }
@@ -106,15 +106,24 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Comparable<Clus
    * 
    * @return the reachability distance of this entry
    */
-  public D getReachability() {
-    return reachability;
+  @Override
+  public DoubleDistance getReachability() {
+    return new DoubleDistance(reachability);
   }
 
   @Override
-  public int compareTo(ClusterOrderEntry<D> o) {
-    int delta = this.getReachability().compareTo(o.getReachability());
-    if(delta != 0) {
-      return delta;
+  public int compareTo(ClusterOrderEntry<DoubleDistance> o) {
+    if(o instanceof DoubleDistanceClusterOrderEntry) {
+      int delta = Double.compare(this.reachability, ((DoubleDistanceClusterOrderEntry) o).reachability);
+      if(delta != 0) {
+        return delta;
+      }
+    }
+    else {
+      int delta = this.getReachability().compareTo(o.getReachability());
+      if(delta != 0) {
+        return delta;
+      }
     }
     return -getID().compareTo(o.getID());
   }

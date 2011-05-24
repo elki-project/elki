@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.opticsplot;
 
-import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 
 /**
  * Class to handle coloring of the OPTICS plot.
