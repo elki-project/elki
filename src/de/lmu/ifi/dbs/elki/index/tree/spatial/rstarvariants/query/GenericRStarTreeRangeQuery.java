@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
@@ -20,7 +19,6 @@ import de.lmu.ifi.dbs.elki.index.tree.query.GenericDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
  * Instance of a range query for a particular spatial index.
@@ -30,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @apiviz.uses AbstractRStarTree
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  */
+// TODO: add bulk range queries.
 public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
   /**
    * The index to use
@@ -107,12 +106,5 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   @Override
   public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
     return getRangeForObject(relation.get(id), range);
-  }
-
-  @SuppressWarnings("unused")
-  @Override
-  public List<List<DistanceResultPair<D>>> getRangeForBulkDBIDs(ArrayDBIDs ids, D range) {
-    // TODO: implement
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 }

@@ -36,28 +36,20 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
     super(relation, distanceQuery);
   }
 
-  private void doBatchKNN(ArrayDBIDs ids, List<O> objs, List<KNNHeap<D>> heaps) {
-    if(PrimitiveDistanceQuery.class.isAssignableFrom(distanceQuery.getClass())) {
-      // The distance is computed on arbitrary vectors, we can reduce object
-      // loading by working on the actual vectors.
-      for(DBID candidateID : relation.iterDBIDs()) {
-        O candidate = relation.get(candidateID);
-        for(int index = 0; index < ids.size(); index++) {
-          O object = objs.get(index);
-          KNNHeap<D> heap = heaps.get(index);
-          heap.add(distanceQuery.distance(object, candidate), candidateID);
-        }
-      }
-    }
-    else {
-      // The distance is computed on database IDs
-      for(DBID candidateID : relation.iterDBIDs()) {
-        Integer index = -1;
-        for(DBID id : ids) {
-          index++;
-          KNNHeap<D> heap = heaps.get(index);
-          heap.add(distanceQuery.distance(id, candidateID), candidateID);
-        }
+  /**
+   * Linear batch knn for arbitrary distance functions.
+   * 
+   * @param ids DBIDs to process
+   * @param heaps Heaps to store the results in
+   */
+  private void linearScanBatchKNN(ArrayDBIDs ids, List<KNNHeap<D>> heaps) {
+    // The distance is computed on database IDs
+    for(DBID candidateID : relation.iterDBIDs()) {
+      Integer index = -1;
+      for(DBID id : ids) {
+        index++;
+        KNNHeap<D> heap = heaps.get(index);
+        heap.add(distanceQuery.distance(id, candidateID), candidateID);
       }
     }
   }
@@ -81,15 +73,14 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
 
   @Override
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    final List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(ids.size());
-    List<O> objs = new ArrayList<O>(ids.size());
-    for(DBID id : ids) {
+    final int size = ids.size();
+    final List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(size);
+    for(int i = 0; i < size; i++) {
       heaps.add(new KNNHeap<D>(k));
-      objs.add(relation.get(id));
     }
-    doBatchKNN(ids, objs, heaps);
-
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(heaps.size());
+    linearScanBatchKNN(ids, heaps);
+    // Serialize heaps
+    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(size);
     for(KNNHeap<D> heap : heaps) {
       result.add(heap.toSortedArrayList());
     }
@@ -98,15 +89,14 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
 
   @Override
   public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(heaps.size());
-    List<O> objs = new ArrayList<O>(heaps.size());
-    List<KNNHeap<D>> kheaps = new ArrayList<KNNHeap<D>>(heaps.size());
+    final int size = heaps.size();
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(size);
+    List<KNNHeap<D>> kheaps = new ArrayList<KNNHeap<D>>(size);
     for(Entry<DBID, KNNHeap<D>> ent : heaps.entrySet()) {
       ids.add(ent.getKey());
-      objs.add(relation.get(ent.getKey()));
       kheaps.add(ent.getValue());
     }
-    doBatchKNN(ids, objs, kheaps);
+    linearScanBatchKNN(ids, kheaps);
   }
 
   @Override
