@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.opticsplot;
 
-import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 
 /**
  * Pseudo-coloring for OPTICS plot that just uses a static color.

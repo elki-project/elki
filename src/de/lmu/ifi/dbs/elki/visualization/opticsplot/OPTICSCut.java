@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 
 /**
  * Compute a partitioning from an OPTICS plot by doing a horizontal cut.

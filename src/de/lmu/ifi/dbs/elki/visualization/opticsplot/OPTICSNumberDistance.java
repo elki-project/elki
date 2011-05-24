@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.opticsplot;
 
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 
 /**
  * Adapter that will map a regular number distance to its double value.

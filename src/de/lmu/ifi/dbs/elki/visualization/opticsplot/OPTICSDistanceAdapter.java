@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.opticsplot;
 
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 
 /**
  * Interface to map ClusterOrderEntries to double values to use in the OPTICS plot.

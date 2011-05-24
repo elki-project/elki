@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 
 /**
  * Interface for OPTICS type algorithms, that can be analysed by OPTICS Xi etc.
