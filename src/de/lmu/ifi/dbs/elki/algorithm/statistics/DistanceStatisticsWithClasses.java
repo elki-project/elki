@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> Object type
  * @param <D> Distance type
  */
+// TODO: add progress bar support!
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
 public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
