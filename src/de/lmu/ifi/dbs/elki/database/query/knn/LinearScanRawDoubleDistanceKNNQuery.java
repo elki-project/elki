@@ -1,11 +1,8 @@
 package de.lmu.ifi.dbs.elki.database.query.knn;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
@@ -56,7 +53,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
         heap.add(new DoubleDistanceResultPair(doubleDistance, candidateID));
         // Update cutoff
         if(heap.size() >= heap.getK()) {
-          max = ((DoubleDistanceResultPair)heap.peek()).getDoubleDistance();
+          max = ((DoubleDistanceResultPair) heap.peek()).getDoubleDistance();
         }
       }
     }
@@ -64,43 +61,28 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public List<List<DistanceResultPair<DoubleDistance>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    // We have a couple of casts in this implementation to avoid generics hacks.
+  protected void linearScanBatchKNN(List<O> objs, List<KNNHeap<DoubleDistance>> heaps) {
+    final int size = objs.size();
+    @SuppressWarnings("unchecked")
     final PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
-    final int size = ids.size();
-    final Object[] heaps = new Object[size];
-    // TODO: this array can become quite large - save it?
-    final Object[] objs = new Object[size];
-    Iterator<DBID> iditer = ids.iterator();
-    for(int i = 0; i < size; i++) {
-      DBID id = iditer.next();
-      heaps[i] = new KNNHeap<DoubleDistance>(k);
-      objs[i] = relation.get(id);
-    }
-    final double[] max = new double[ids.size()];
+    // Track the max ourselves to reduce object access for comparisons.
+    final double[] max = new double[size];
     Arrays.fill(max, Double.POSITIVE_INFINITY);
 
     // The distance is computed on arbitrary vectors, we can reduce object
     // loading by working on the actual vectors.
     for(DBID candidateID : relation.iterDBIDs()) {
       O candidate = relation.get(candidateID);
-      for(int index = 0; index < ids.size(); index++) {
-        final KNNHeap<DoubleDistance> heap = (KNNHeap<DoubleDistance>) heaps[index];
-        double doubleDistance = rawdist.doubleDistance((O) objs[index], candidate);
+      for(int index = 0; index < size; index++) {
+        final KNNHeap<DoubleDistance> heap = heaps.get(index);
+        double doubleDistance = rawdist.doubleDistance(objs.get(index), candidate);
         if(doubleDistance <= max[index]) {
           heap.add(new DoubleDistanceResultPair(doubleDistance, candidateID));
           if(heap.size() >= heap.getK()) {
-            max[index] = ((DoubleDistanceResultPair)heap.peek()).getDoubleDistance();
+            max[index] = ((DoubleDistanceResultPair) heap.peek()).getDoubleDistance();
           }
         }
       }
     }
-
-    List<List<DistanceResultPair<DoubleDistance>>> result = new ArrayList<List<DistanceResultPair<DoubleDistance>>>(size);
-    for(int i = 0; i < size; i++) {
-      result.add(((KNNHeap<DoubleDistance>)heaps[i]).toSortedArrayList());
-    }
-    return result;
   }
 }

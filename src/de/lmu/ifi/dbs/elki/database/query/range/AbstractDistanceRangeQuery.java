@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.database.query.range;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -40,6 +42,15 @@ public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> exten
 
   @Override
   abstract public List<DistanceResultPair<D>> getRangeForObject(O obj, D range);
+
+  @Override
+  public List<List<DistanceResultPair<D>>> getRangeForBulkDBIDs(ArrayDBIDs ids, D range) {
+    final List<List<DistanceResultPair<D>>> lists = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+    for(DBID id : ids) {
+      lists.add(getRangeForDBID(id, range));
+    }
+    return lists;
+  }
 
   @Override
   public D getDistanceFactory() {
