@@ -24,6 +24,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
@@ -51,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> Object type
  * @param <D> Distance type
  */
-// TODO: add progress bar support!
+// TODO: optimize for double distances.
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
 public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
@@ -112,7 +114,9 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
     final Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    
+
+    final StepProgress stepprog = logger.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
+
     // determine binning ranges.
     DoubleMinMax gminmax = new DoubleMinMax();
 
@@ -133,6 +137,9 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     MeanVariance modif = new MeanVariance();
     // Histogram
     final AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> histogram;
+    if(stepprog != null) {
+      stepprog.beginStep(1, "Prepare histogram.", logger);
+    }
     if(exact) {
       gminmax = exactMinMax(relation, distFunc);
       histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
@@ -145,6 +152,10 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
       histogram = FlexiHistogram.LongSumLongSumHistogram(numbin);
     }
 
+    if(stepprog != null) {
+      stepprog.beginStep(2, "Build histogram.", logger);
+    }
+    final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Distance computations", relation.size(), logger) : null;
     // iterate per cluster
     final Pair<Long, Long> incFirst = new Pair<Long, Long>(1L, 0L);
     final Pair<Long, Long> incSecond = new Pair<Long, Long>(0L, 1L);
@@ -196,11 +207,21 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         // min/max
         gominmax.put(ominmax.getMin());
         gominmax.put(ominmax.getMax());
+        if(progress != null) {
+          progress.incrementProcessed(logger);
+        }
       }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
     }
     // Update values (only needed for sampling case).
     gminmax.setFirst(Math.min(giminmax.getMin(), gominmax.getMin()));
     gminmax.setSecond(Math.max(giminmax.getMax(), gominmax.getMax()));
+
+    if(stepprog != null) {
+      stepprog.setCompleted(logger);
+    }
 
     // count the number of samples we have in the data
     long inum = 0;
