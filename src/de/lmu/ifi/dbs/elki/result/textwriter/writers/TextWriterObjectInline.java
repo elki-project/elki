@@ -20,7 +20,12 @@ public class TextWriterObjectInline extends TextWriterWriterInterface<Object> {
       res = res + label + "=";
     }
     if(object != null) {
-      res = res + object.toString().replace(" ", "");
+      if(label != null) {
+        res = res + object.toString().replace(" ", "");
+      }
+      else {
+        res = res + object.toString();
+      }
     }
     out.inlinePrintNoQuotes(res);
   }
