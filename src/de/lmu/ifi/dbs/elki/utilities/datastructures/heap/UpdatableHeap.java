@@ -88,6 +88,22 @@ public class UpdatableHeap<O> extends Heap<O> {
     return node;
   }
 
+  /**
+   * Remove the given object from the queue.
+   * 
+   * @param e Obejct to remove
+   * @return Existing entry
+   */
+  public O removeObject(O e) {
+    Integer pos = index.get(e);
+    if(pos != null) {
+      return removeAt(pos);
+    }
+    else {
+      return null;
+    }
+  }
+
   @Override
   public O poll() {
     O node = super.poll();
