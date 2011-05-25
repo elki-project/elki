@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -27,11 +26,10 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
   /**
    * Constructor.
    * 
-   * @param relation Data to query
    * @param distanceQuery Distance function to use
    */
-  public LinearScanRangeQuery(Relation<? extends O> relation, DistanceQuery<O, D> distanceQuery) {
-    super(relation, distanceQuery);
+  public LinearScanRangeQuery(DistanceQuery<O, D> distanceQuery) {
+    super(distanceQuery);
   }
 
   @Override

@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
@@ -29,11 +28,10 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   /**
    * Constructor.
    * 
-   * @param relation Data to query
    * @param distanceQuery Distance function to use
    */
-  public LinearScanKNNQuery(Relation<? extends O> relation, DistanceQuery<O, D> distanceQuery) {
-    super(relation, distanceQuery);
+  public LinearScanKNNQuery(DistanceQuery<O, D> distanceQuery) {
+    super(distanceQuery);
   }
 
   /**

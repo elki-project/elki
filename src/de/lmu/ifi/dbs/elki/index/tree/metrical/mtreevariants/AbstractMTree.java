@@ -7,29 +7,23 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
+import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
  * Abstract super class for all M-Tree variants.
@@ -44,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  */
-public abstract class AbstractMTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndex<O, D, N, E> {
+public abstract class AbstractMTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndexTree<O, D, N, E> {
   /**
    * Debugging flag: do extra integrity checks
    */
@@ -63,55 +57,14 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   /**
    * Constructor.
    * 
-   * @param relation Relation in use
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    */
-  public AbstractMTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
-    super(relation, fileName, pageSize, cacheSize);
+  public AbstractMTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
+    super(pagefile);
     this.distanceQuery = distanceQuery;
     this.distanceFunction = distanceFunction;
-  }
-
-  /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
-   * yet supported by an M-Tree.
-   * 
-   * @throws UnsupportedOperationException thrown, since deletions aren't
-   *         implemented yet.
-   */
-  @SuppressWarnings("unused")
-  @Override
-  public final boolean delete(DBID id) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
-
-  /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
-   * yet supported by an M-Tree.
-   * 
-   * @throws UnsupportedOperationException thrown, since deletions aren't
-   *         implemented yet.
-   */
-  @SuppressWarnings("unused")
-  @Override
-  public void deleteAll(DBIDs ids) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
-
-  /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
-   * yet supported by an M-Tree.
-   * 
-   * @throws UnsupportedOperationException
-   */
-  @SuppressWarnings("unused")
-  @Override
-  protected final void postDelete(DBID id) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   @Override
@@ -122,56 +75,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   @Override
   public final DistanceQuery<O, D> getDistanceQuery() {
     return distanceQuery;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
-      return null;
-    }
-    // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
-    }
-    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MetricalIndexKNNQuery<O, S>(relation, idx, dq);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <S extends Distance<S>> RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
-      return null;
-    }
-    // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
-    }
-    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MetricalIndexRangeQuery<O, S>(relation, idx, dq);
   }
 
   /**
@@ -208,9 +111,9 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
 
-    BreadthFirstEnumeration<O, N, E> enumeration = new BreadthFirstEnumeration<O, N, E>(this, getRootPath());
+    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
     while(enumeration.hasMoreElements()) {
-      TreeIndexPath<E> path = enumeration.nextElement();
+      IndexTreePath<E> path = enumeration.nextElement();
       E entry = path.getLastPathComponent().getEntry();
       if(entry.isLeafEntry()) {
         objects++;
@@ -253,27 +156,27 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    *        called before inserting the object
    */
   // todo: implement a bulk load for M-Tree and remove this method
-  protected final void insert(DBID id, O object, boolean withPreInsert) {
+  public void insert(E entry, boolean withPreInsert) {
     if(getLogger().isDebugging()) {
-      getLogger().debugFine("insert " + id + " " + object + "\n");
+      getLogger().debugFine("insert " + entry.getRoutingObjectID() + "\n");
     }
 
     if(!initialized) {
-      initialize(createNewLeafEntry(id, object, distanceFunction.getDistanceFactory().nullDistance()));
+      initialize(entry);
     }
 
     // choose subtree for insertion
-    TreeIndexPath<E> subtree = choosePath(id, getRootPath());
+    IndexTreePath<E> subtree = choosePath(entry, getRootPath());
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
     }
 
     // determine parent distance
     E parentEntry = subtree.getLastPathComponent().getEntry();
-    D parentDistance = distance(parentEntry.getRoutingObjectID(), id);
+    D parentDistance = distance(parentEntry.getRoutingObjectID(), entry.getRoutingObjectID());
+    entry.setParentDistance(parentDistance);
 
     // create leaf entry and do pre insert
-    E entry = createNewLeafEntry(id, object, parentDistance);
     if(withPreInsert) {
       preInsert(entry);
     }
@@ -291,6 +194,20 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       if(withPreInsert) {
         getRoot().integrityCheck(this, getRootEntry());
       }
+    }
+  }
+
+  /**
+   * Bulk insert.
+   * 
+   * @param entries
+   */
+  public void insertAll(List<E> entries) {
+    if(!initialized && entries.size() > 0) {
+      initialize(entries.get(0));
+    }
+    for(E entry : entries) {
+      insert(entry, false);
     }
   }
 
@@ -381,7 +298,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param objectID the id of the object to be inserted
    * @return the path of the appropriate subtree to insert the given object
    */
-  private TreeIndexPath<E> choosePath(DBID objectID, TreeIndexPath<E> subtree) {
+  private IndexTreePath<E> choosePath(E object, IndexTreePath<E> subtree) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
 
     // leaf
@@ -395,7 +312,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      D distance = distance(objectID, entry.getRoutingObjectID());
+      D distance = distance(object.getRoutingObjectID(), entry.getRoutingObjectID());
       D enlrg = distance.minus(entry.getCoveringRadius());
 
       if(enlrg.compareTo(nullDistance) <= 0) {
@@ -418,7 +335,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       entry.setCoveringRadius(cr.plus(bestCandidate.getDistance()));
     }
 
-    return choosePath(objectID, subtree.pathByAddingChild(new TreeIndexPathComponent<E>(bestCandidate.getEntry(), bestCandidate.getIndex())));
+    return choosePath(object, subtree.pathByAddingChild(new TreeIndexPathComponent<E>(bestCandidate.getEntry(), bestCandidate.getIndex())));
   }
 
   /**
@@ -428,7 +345,10 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    *        performed
    * @param ids the ids of th query objects
    * @param knnLists the knn lists of the query objcets
+   * 
+   * @deprecated Change to use by-object NN lookups instead.
    */
+  @Deprecated
   protected final void batchNN(N node, DBIDs ids, Map<DBID, KNNHeap<D>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
@@ -542,18 +462,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   }
 
   /**
-   * Creates a new leaf entry representing the specified data object.
-   * 
-   * @param id TODO
-   * @param object the data object to be represented by the new entry
-   * @param parentDistance the distance from the object to the routing object of
-   *        the parent node
-   * 
-   * @return the newly created leaf entry
-   */
-  abstract protected E createNewLeafEntry(DBID id, O object, D parentDistance);
-
-  /**
    * Creates a new directory entry representing the specified node.
    * 
    * @param node the node to be represented by the new entry
@@ -620,7 +528,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * 
    * @param subtree the subtree to be adjusted
    */
-  private void adjustTree(TreeIndexPath<E> subtree) {
+  private void adjustTree(IndexTreePath<E> subtree) {
     if(getLogger().isDebugging()) {
       getLogger().debugFine("Adjust tree " + subtree + "\n");
     }
@@ -639,7 +547,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       // nodes
       if(node.getPageID() == getRootEntry().getEntryID()) {
         // FIXME: stimmen die parentDistance der Kinder in node & splitNode?
-        TreeIndexPath<E> newRootPath = createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());
+        IndexTreePath<E> newRootPath = createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());
         adjustTree(newRootPath);
       }
       // node is not root
@@ -716,7 +624,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @return the path to the new root node that points to the two specified
    *         child nodes
    */
-  private TreeIndexPath<E> createNewRoot(final N oldRoot, final N newNode, DBID firstRoutingObjectID, DBID secondRoutingObjectID) {
+  private IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode, DBID firstRoutingObjectID, DBID secondRoutingObjectID) {
     N root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
 
@@ -755,7 +663,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       getLogger().debugFine(msg);
     }
 
-    return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
+    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
   }
 
   /**
@@ -774,13 +682,12 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     }
   }
 
-  /** {@inheritDoc} */
   @Override
   public List<E> getLeaves() {
     List<E> result = new ArrayList<E>();
-    BreadthFirstEnumeration<O, N, E> enumeration = new BreadthFirstEnumeration<O, N, E>(this, getRootPath());
+    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
     while(enumeration.hasMoreElements()) {
-      TreeIndexPath<E> path = enumeration.nextElement();
+      IndexTreePath<E> path = enumeration.nextElement();
       E entry = path.getLastPathComponent().getEntry();
       if(entry.isLeafEntry()) {
         // ignore, we are within a leaf!
@@ -813,15 +720,5 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
     return levels;
-  }
-
-  @Override
-  public String getLongName() {
-    return "Abstract M-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "mtree";
   }
 }

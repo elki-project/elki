@@ -9,16 +9,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 
 /**
  * MkTabTree is a metrical index structure based on the concepts of the M-Tree
@@ -40,24 +37,15 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   private static final Logging logger = Logging.getLogger(MkTabTree.class);
   
   /**
-   * The knn query we use internally.
-   */
-  private final KNNQuery<O, D> knnQuery;
-  
-  /**
    * Constructor.
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    * @param k_max Maximum value for k
    */
-  public MkTabTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
-    this.knnQuery = this.getKNNQuery(distanceQuery);
+  public MkTabTree(PageFile<MkTabTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(pagefile, distanceQuery, distanceFunction, k_max);
   }
 
   /**
@@ -75,13 +63,13 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @SuppressWarnings("unused")
   @Override
-  public void insert(DBID id) {
+  public void insert(MkTabEntry<D> entry, boolean withPreInsert) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
   @Override
   public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
-    if(k > this.k_max) {
+    if(k > this.getKmax()) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MkTab-Tree!");
     }
 
@@ -98,16 +86,16 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(pageSize - overhead < 0) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+    if(file.getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance + kmax + kmax * knnDistance) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize + 4 + k_max * distanceSize) + 1;
+    dirCapacity = (int) (file.getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + 4 + getKmax() * distanceSize) + 1;
 
     if(dirCapacity <= 1) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -116,10 +104,10 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + +
     // kmax + kmax * knnDistance) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize + 4 + k_max * distanceSize) + 1;
+    leafCapacity = (int) (file.getPageSize() - overhead) / (4 + distanceSize + 4 + getKmax() * distanceSize) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -163,18 +151,6 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   @Override
   protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
     return new MkTabTreeNode<O, D>(file, capacity, false);
-  }
-
-  /**
-   * Creates a new leaf entry representing the specified data object in the
-   * specified subtree.
-   * @param object the data object to be represented by the new entry
-   * @param parentDistance the distance from the object to the routing object of
-   *        the parent node
-   */
-  @Override
-  protected MkTabEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    return new MkTabLeafEntry<D>(id, parentDistance, knnDistances(object));
   }
 
   /**
@@ -242,17 +218,6 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
 
   /**
-   * Returns the knn distance of the object with the specified id.
-   * 
-   * @param objectID the query object
-   * @return the knn distance of the object with the specified id
-   */
-  private List<D> knnDistances(O objectID) {
-    List<DistanceResultPair<D>> knns = knnQuery.getKNNForObject(objectID, k_max - 1);
-    return KNNList.asDistanceList(knns);
-  }
-
-  /**
    * Returns an array that holds the maximum values of the both specified arrays
    * in each index.
    * 
@@ -282,23 +247,13 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @return a knn distance list with all distances set to null distance
    */
   private List<D> initKnnDistanceList() {
-    List<D> knnDistances = new ArrayList<D>(k_max);
-    for(int i = 0; i < k_max; i++) {
+    List<D> knnDistances = new ArrayList<D>(getKmax());
+    for(int i = 0; i < getKmax(); i++) {
       knnDistances.add(getDistanceQuery().nullDistance());
     }
     return knnDistances;
   }
   
-  /**
-   * Return the node base class.
-   * 
-   * @return node base class
-   */
-  @Override
-  protected Class<MkTabTreeNode<O, D>> getNodeClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(MkTabTreeNode.class);
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;

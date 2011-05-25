@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -41,7 +40,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
   /**
    * The index to use
    */
-  protected final AbstractRStarTree<O, ?, ?> index;
+  protected final AbstractRStarTree<?, ?> tree;
 
   /**
    * Spatial primitive distance function
@@ -51,14 +50,13 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
   /**
    * Constructor.
    * 
-   * @param relation Relation to use
-   * @param index Index to use
+   * @param tree Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public DoubleDistanceRStarTreeKNNQuery(Relation<? extends O> relation, AbstractRStarTree<O, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
-    super(relation, distanceQuery);
-    this.index = index;
+  public DoubleDistanceRStarTreeKNNQuery(AbstractRStarTree<?, ?> tree, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
+    super(distanceQuery);
+    this.tree = tree;
     this.distanceFunction = distanceFunction;
   }
 
@@ -74,7 +72,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     final Heap<DoubleDistanceSearchCandidate> pq = new UpdatableHeap<DoubleDistanceSearchCandidate>();
 
     // push root
-    pq.add(new DoubleDistanceSearchCandidate(0.0, index.getRootEntry().getEntryID()));
+    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootEntry().getEntryID()));
     double maxDist = Double.MAX_VALUE;
 
     // search in tree
@@ -85,13 +83,13 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
         return;
       }
 
-      AbstractRStarTreeNode<?, ?> node = index.getNode(pqNode.nodeID);
+      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
       // data node
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           SpatialEntry entry = node.getEntry(i);
           double distance = distanceFunction.doubleMinDist(entry, object);
-          index.distanceCalcs++;
+          tree.distanceCalcs++;
           if(distance <= maxDist) {
             knnList.add(new DoubleDistanceResultPair(distance, ((LeafEntry) entry).getDBID()));
             maxDist = knnList.getKNNDistance().doubleValue();
@@ -103,7 +101,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
         for(int i = 0; i < node.getNumEntries(); i++) {
           SpatialEntry entry = node.getEntry(i);
           double distance = distanceFunction.doubleMinDist(entry, object);
-          index.distanceCalcs++;
+          tree.distanceCalcs++;
           if(distance <= maxDist) {
             pq.add(new DoubleDistanceSearchCandidate(distance, entry.getEntryID()));
           }
@@ -131,6 +129,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
           DBID pid = ((LeafEntry) p).getDBID();
           // FIXME: objects are NOT accessible by DBID in a plain rtree context!
           DoubleDistance dist_pq = distanceFunction.distance(relation.get(pid), relation.get(q));
+          tree.distanceCalcs++;
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
             knns_q.add(dist_pq, pid);
           }
@@ -149,7 +148,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
           if(minDist <= knn_q_maxDist) {
             SpatialEntry entry = distEntry.entry;
-            AbstractRStarTreeNode<?, ?> child = index.getNode(entry.getEntryID());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(entry.getEntryID());
             batchNN(child, knnLists);
             break;
           }
@@ -174,6 +173,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       double minMinDist = Double.MAX_VALUE;
       for(DBID id : ids) {
         double minDist = distanceFunction.doubleMinDist(entry, relation.get(id));
+        tree.distanceCalcs++;
         minMinDist = Math.min(minDist, minMinDist);
       }
       result.add(new DoubleDistanceEntry(entry, minMinDist));
@@ -227,7 +227,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       knnLists.put(id, new KNNHeap<DoubleDistance>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
     }
 
-    batchNN(index.getRoot(), knnLists);
+    batchNN(tree.getRoot(), knnLists);
 
     List<List<DistanceResultPair<DoubleDistance>>> result = new ArrayList<List<DistanceResultPair<DoubleDistance>>>();
     for(DBID id : ids) {
@@ -238,7 +238,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
   @Override
   public void getKNNForBulkHeaps(Map<DBID, KNNHeap<DoubleDistance>> heaps) {
-    AbstractRStarTreeNode<?, ?> root = index.getRoot();
+    AbstractRStarTreeNode<?, ?> root = tree.getRoot();
     batchNN(root, heaps);
   }
 

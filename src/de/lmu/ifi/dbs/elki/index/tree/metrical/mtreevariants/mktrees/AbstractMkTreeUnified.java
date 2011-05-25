@@ -1,18 +1,19 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
@@ -33,61 +34,51 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
   /**
    * Holds the maximum value of k to support.
    */
-  protected int k_max;
+  private int k_max;
 
   /**
    * Constructor.
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    * @param k_max Maximum value for k
    */
-  public AbstractMkTreeUnified(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public AbstractMkTreeUnified(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(pagefile, distanceQuery, distanceFunction);
     this.k_max = k_max;
   }
 
   /**
-   * <p>
-   * Inserts the specified objects into this M-Tree sequentially since a bulk
-   * load method is not implemented so far.
-   * <p/>
-   * <p>
-   * Calls for each object
-   * {@link AbstractMTree#insert(DBID,O,boolean)
-   * AbstractMTree.insert(id, object, false)}. After insertion a batch knn query is
-   * performed and the knn distances are adjusted.
-   * <p/>
+   * @return a new {@link MkTreeHeader}
    */
   @Override
-  public final void insertAll(DBIDs ids) {
-    if(ids.isEmpty()) {
+  protected TreeIndexHeader createHeader() {
+    return new MkTreeHeader(file.getPageSize(), dirCapacity, leafCapacity, k_max);
+  }
+
+  @Override
+  public void insertAll(List<E> entries) {
+    if(entries.size() <= 0) {
       return;
     }
-
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("insert " + ids + "\n");
-    }
-
     if(!initialized) {
-      final DBID id = ids.iterator().next();
-      final O object = relation.get(id);
-      initialize(createNewLeafEntry(id, object, distanceFunction.getDistanceFactory().nullDistance()));
+      initialize(entries.get(0));
     }
 
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
+    ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert sequentially
-    for (DBID id : ids) {
+    for(E entry : entries) {
       // create knnList for the object
+      final DBID id = entry.getRoutingObjectID();
+
+      ids.add(id);
       knnLists.put(id, new KNNHeap<D>(k_max, getDistanceFactory().infiniteDistance()));
 
       // insert the object
-      super.insert(id, relation.get(id), false);
+      super.insert(entry, false);
     }
 
     // do batch nn
@@ -102,18 +93,19 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
   }
 
   /**
-   * @return a new {@link MkTreeHeader}
-   */
-  @Override
-  protected TreeIndexHeader createHeader() {
-    return new MkTreeHeader(pageSize, dirCapacity, leafCapacity, k_max);
-  }
-
-  /**
    * Performs a distance adjustment in the subtree of the specified root entry.
    * 
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
   protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNHeap<D>> knnLists);
+
+  /**
+   * Get the value of k_max.
+   * 
+   * @return k_max value.
+   */
+  public int getKmax() {
+    return k_max;
+  }
 }

@@ -14,9 +14,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -42,7 +41,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
   /**
    * The index to use
    */
-  protected final AbstractRStarTree<O, ?, ?> index;
+  protected final AbstractRStarTree<?, ?> tree;
 
   /**
    * Spatial primitive distance function
@@ -52,15 +51,14 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
   /**
    * Constructor.
    * 
-   * @param relation Relation to use
-   * @param index Index to use
+   * @param tree Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public GenericRStarTreeKNNQuery(Relation<? extends O> relation, AbstractRStarTree<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    super(relation, distanceQuery);
-    this.index = index;
-    this.distanceFunction = distanceFunction;
+  public GenericRStarTreeKNNQuery(AbstractRStarTree<?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery) {
+    super(distanceQuery);
+    this.tree = tree;
+    this.distanceFunction = distanceQuery.getDistanceFunction();
   }
 
   /**
@@ -75,7 +73,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     final Heap<GenericDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), index.getRootEntry().getEntryID()));
+    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootEntry().getEntryID()));
     D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
 
     // search in tree
@@ -86,13 +84,13 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
         return;
       }
 
-      AbstractRStarTreeNode<?, ?> node = index.getNode(pqNode.nodeID);
+      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
       // data node
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           SpatialEntry entry = node.getEntry(i);
           D distance = distanceFunction.minDist(entry, object);
-          index.distanceCalcs++;
+          tree.distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             knnList.add(distance, ((LeafEntry) entry).getDBID());
             maxDist = knnList.getKNNDistance();
@@ -104,7 +102,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
         for(int i = 0; i < node.getNumEntries(); i++) {
           SpatialEntry entry = node.getEntry(i);
           D distance = distanceFunction.minDist(entry, object);
-          index.distanceCalcs++;
+          tree.distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             pq.add(new GenericDistanceSearchCandidate<D>(distance, entry.getEntryID()));
           }
@@ -150,7 +148,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
             SpatialEntry entry = distEntry.getEntry();
-            AbstractRStarTreeNode<?, ?> child = index.getNode(entry.getEntryID());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(entry.getEntryID());
             batchNN(child, knnLists);
             break;
           }
@@ -161,7 +159,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
   @Override
   public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
-    AbstractRStarTreeNode<?, ?> root = index.getRoot();
+    AbstractRStarTreeNode<?, ?> root = tree.getRoot();
     batchNN(root, heaps);
   }
 
@@ -218,7 +216,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       knnLists.put(id, new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
     }
 
-    batchNN(index.getRoot(), knnLists);
+    batchNN(tree.getRoot(), knnLists);
 
     List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>();
     for(DBID id : ids) {

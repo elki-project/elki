@@ -1,16 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import java.io.File;
-
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.persistent.LRUCache;
-import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
-import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 
 /**
  * Abstract super class for all tree based index classes.
@@ -20,30 +12,14 @@ import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
  * @apiviz.has Node oneway - - contains
  * @apiviz.has TreeIndexHeader oneway
  * 
- * @param <O> the type of DatabaseObject to be stored in the index
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extends AbstractIndex<O> {
-  /**
-   * Holds the name of the file storing the index or null
-   */
-  private String fileName = null;
-
-  /**
-   * Holds the index page size
-   */
-  protected int pageSize;
-
-  /**
-   * Holds the cache size
-   */
-  protected long cacheSize;
-
+public abstract class IndexTree<N extends Node<N, E>, E extends Entry> {
   /**
    * The file storing the entries of this index.
    */
-  protected PageFile<N> file;
+  final protected PageFile<N> file;
 
   /**
    * True if this index is already initialized.
@@ -76,20 +52,26 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
    * The entry representing the root node.
    */
   private E rootEntry = createRootEntry();
-  
+
   /**
    * Constructor.
    * 
-   * @param relation Representation
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile page file to use
    */
-  public TreeIndex(Relation<O> relation, String fileName, int pageSize, long cacheSize) {
-    super(relation);
-    this.fileName = fileName;
-    this.pageSize = pageSize;
-    this.cacheSize = cacheSize;
+  public IndexTree(PageFile<N> pagefile) {
+    super();
+    this.file = pagefile;
+  }
+
+  /**
+   * Initialize the tree if the page file already existed.
+   */
+  // FIXME: ensure this is called in all the appropriate places!
+  public void initialize() {
+    TreeIndexHeader header = createHeader();
+    if(this.file.initialize(header)) {
+      initializeFromFile(header);
+    }
   }
 
   /**
@@ -141,21 +123,13 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
    * @return a new header for this index structure
    */
   protected TreeIndexHeader createHeader() {
-    return new TreeIndexHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum);
+    return new TreeIndexHeader(file.getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafMinimum);
   }
 
   /**
    * Initializes this index from an existing persistent file.
    */
-  public void initializeFromFile() {
-    if(fileName == null) {
-      throw new IllegalArgumentException("Parameter file name is not specified.");
-    }
-
-    // init the file
-    TreeIndexHeader header = createHeader();
-    this.file = new PersistentPageFile<N>(header, cacheSize, new LRUCache<N>(), fileName, getNodeClass());
-
+  public void initializeFromFile(TreeIndexHeader header) {
     this.dirCapacity = header.getDirCapacity();
     this.leafCapacity = header.getLeafCapacity();
     this.dirMinimum = header.getDirMinimum();
@@ -177,23 +151,7 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
    * @param exampleLeaf an object that will be stored in the index
    */
   protected final void initialize(E exampleLeaf) {
-    // determine minimum and maximum entries in a node
-    // todo verbose flag as parameter
-    // initializeCapacities(object, true);
     initializeCapacities(exampleLeaf);
-
-    // init the file
-    if(fileName == null) {
-      this.file = new MemoryPageFile<N>(pageSize, cacheSize, new LRUCache<N>());
-    }
-    else {
-      if(new File(fileName).exists()) {
-        initializeFromFile();
-      }
-      else {
-        this.file = new PersistentPageFile<N>(createHeader(), cacheSize, new LRUCache<N>(), fileName, getNodeClass());
-      }
-    }
 
     // create empty root
     createEmptyRoot(exampleLeaf);
@@ -218,8 +176,8 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
    * 
    * @return the path to the root of this tree
    */
-  protected final TreeIndexPath<E> getRootPath() {
-    return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(rootEntry, null));
+  public final IndexTreePath<E> getRootPath() {
+    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(rootEntry, null));
   }
 
   /**
@@ -273,30 +231,24 @@ public abstract class TreeIndex<O, N extends Node<N, E>, E extends Entry> extend
    * 
    * @param entry the entry to be inserted
    */
-  abstract protected void preInsert(E entry);
-
-  /**
-   * Performs necessary operations after deleting the specified object.
-   * 
-   * @param id object id
-   */
-  abstract protected void postDelete(DBID id);
-
-  /**
-   * Get the node class of this index
-   * 
-   * @return node class
-   */
-  abstract protected Class<N> getNodeClass();
-
-  /**
-   * @return filename of the underlying persistence layer
-   */
-  public String getFileName() {
-    return fileName;
+  protected void preInsert(E entry) {
+    // Default is no-op.
   }
 
-  @Override
+  /**
+   * Performs necessary operations after deleting the specified entry.
+   * 
+   * @param entry the entry that was removed
+   */
+  protected void postDelete(E entry) {
+    // Default is no-op.
+  }
+
+  /**
+   * Get the index file page access statistics.
+   * 
+   * @return access statistics
+   */
   public PageFileStatistics getPageFileStatistics() {
     return file;
   }

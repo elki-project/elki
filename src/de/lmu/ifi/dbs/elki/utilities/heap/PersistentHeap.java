@@ -121,7 +121,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
       throw new IllegalArgumentException("Cache size of " + cacheSize + " Bytes is choosen too small for a" + " pagesize of " + pageSize + " Bytes!");
     }
 
-    Class<Deap<K,V>> deapcls = ClassGenericsUtil.uglyCastIntoSubclass(Deap.class);
+    Class<Deap<K, V>> deapcls = ClassGenericsUtil.uglyCastIntoSubclass(Deap.class);
     this.cachePath = ClassGenericsUtil.newArrayOfNull(maxCacheSize, deapcls);
 
     // maximum index of a deap
@@ -141,8 +141,9 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
       this.file = new MemoryPageFile<Deap<K, V>>(pageSize, maxCacheSize * pageSize, new LRUCache<Deap<K, V>>());
     }
     else {
-      Class<Deap<K,V>> deapclass = ClassGenericsUtil.uglyCastIntoSubclass(Deap.class);
-      this.file = new PersistentPageFile<Deap<K, V>>(new DefaultPageHeader(pageSize), maxCacheSize * pageSize, new LRUCache<Deap<K, V>>(), fileName, deapclass);
+      Class<Deap<K, V>> deapclass = ClassGenericsUtil.uglyCastIntoSubclass(Deap.class);
+      this.file = new PersistentPageFile<Deap<K, V>>(pageSize, maxCacheSize * pageSize, new LRUCache<Deap<K, V>>(), fileName, deapclass);
+      this.file.initialize(new DefaultPageHeader(pageSize));
     }
 
     if(logger.isDebugging()) {
@@ -880,9 +881,9 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
   }
 
   /**
-   * Re-establishes the heap order: while minimum of the specified max is greater
-   * than maximum of the specified min the minimum will be moved up and the
-   * maximum will be moved down.
+   * Re-establishes the heap order: while minimum of the specified max is
+   * greater than maximum of the specified min the minimum will be moved up and
+   * the maximum will be moved down.
    * 
    * @param min the minimum deap to be tested
    * @param max the maximum deap to be tested

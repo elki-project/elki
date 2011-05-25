@@ -15,8 +15,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
+import de.lmu.ifi.dbs.elki.index.tree.Node;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor<O, D> {
+public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<N, E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor<O, D> {
   /**
    * Logger to use
    */
@@ -67,7 +67,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   protected void preprocess() {
     DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
 
-    MetricalIndex<O, D, N, E> index = getMetricalIndex(relation);
+    MetricalIndexTree<O, D, N, E> index = getMetricalIndex(relation);
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
     MeanVariance pagesize = new MeanVariance();
@@ -138,9 +138,9 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @return Metrical index
    * @throws IllegalStateException when the cast fails.
    */
-  private MetricalIndex<O, D, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
-    Class<MetricalIndex<O, D, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndex.class);
-    ArrayList<MetricalIndex<O, D, N, E>> indexes = ResultUtil.filterResults(relation.getDatabase(), mcls);
+  private MetricalIndexTree<O, D, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
+    Class<MetricalIndexTree<O, D, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndexTree.class);
+    ArrayList<MetricalIndexTree<O, D, N, E>> indexes = ResultUtil.filterResults(relation.getDatabase(), mcls);
     // FIXME: check we got the right the representation
     if(indexes.size() == 1) {
       return indexes.get(0);
@@ -180,7 +180,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Factory<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D> {
+  public static class Factory<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<N, E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D> {
     /**
      * Constructor.
      * 
@@ -204,7 +204,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<N, E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
       protected Factory<O, D, N, E> makeInstance() {
         return new Factory<O, D, N, E>(k, distanceFunction);

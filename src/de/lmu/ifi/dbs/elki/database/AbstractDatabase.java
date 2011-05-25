@@ -223,7 +223,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
       }
     }
     KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
-    return new LinearScanRKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery, knnQuery, maxk);
+    return new LinearScanRKNNQuery<O, D>(distanceQuery, knnQuery, maxk);
   }
 
   @Override

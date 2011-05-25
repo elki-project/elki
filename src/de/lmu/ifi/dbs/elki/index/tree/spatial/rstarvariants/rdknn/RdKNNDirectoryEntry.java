@@ -15,9 +15,8 @@ import java.io.ObjectOutput;
  * 
  * @author Elke Achtert
  * @param <D> Distance type
- * @param <N> Number type
  */
-public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Number> extends SpatialDirectoryEntry implements RdKNNEntry<D, N> {
+public class RdKNNDirectoryEntry<D extends NumberDistance<D, ?>> extends SpatialDirectoryEntry implements RdKNNEntry<D> {
   private static final long serialVersionUID = 1;
 
   /**
@@ -103,7 +102,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Numbe
       return false;
     }
 
-    final RdKNNDirectoryEntry<D, N> that = (RdKNNDirectoryEntry<D, N>) o;
+    final RdKNNDirectoryEntry<D> that = (RdKNNDirectoryEntry<D>) o;
 
     return knnDistance.equals(that.knnDistance);
   }

@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -67,11 +67,11 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   protected void preprocess() {
     DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
 
-    Collection<SpatialIndex<O, N, E>> indexes = ResultUtil.filterResults(relation, SpatialIndex.class);
+    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation, SpatialIndexTree.class);
     if(indexes.size() != 1) {
       throw new AbortException(SpatialApproximationMaterializeKNNPreprocessor.class.getSimpleName() + " found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
-    SpatialIndex<O, N, E> index = indexes.iterator().next();
+    SpatialIndexTree<N, E> index = indexes.iterator().next();
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
     MeanVariance pagesize = new MeanVariance();

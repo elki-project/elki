@@ -35,14 +35,29 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
   private static final int FILLED_PAGE = 1;
 
   /**
+   * The file name to use
+   */
+  private File filename;
+
+  /**
    * The file storing the pages.
    */
-  private final OnDiskArray file;
+  private OnDiskArray file;
 
   /**
    * The header of this page file.
    */
-  protected final PageHeader header;
+  protected PageHeader header;
+
+  /**
+   * Whether or not the file originally existed
+   */
+  private final boolean existed;
+
+  /**
+   * Cache size
+   */
+  private int cacheSize;
 
   /**
    * Creates a new OnDiskArrayPageFile from an existing file.
@@ -52,66 +67,15 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
    * @param cacheSize the size of the cache in Byte
    * @param cache the class of the cache to be used
    */
-  public OnDiskArrayPageFile(PageHeader header, int cacheSize, Cache<P> cache, String fileName) {
+  public OnDiskArrayPageFile(int cacheSize, Cache<P> cache, String fileName) {
     super();
+    this.cacheSize = cacheSize;
 
-    try {
-      // init the file
-      File f = new File(fileName);
+    // init the file
+    this.filename = new File(fileName);
 
-      // create from existing file
-      if(f.exists()) {
-        LoggingUtil.logExpensive(Level.INFO, "Create from existing file.");
-        this.file = new OnDiskArray(f, 0, header.size(), pageSize, true);
-
-        // init the header
-        this.header = header;
-        {
-          ByteBuffer buffer = file.getExtraHeader();
-          byte[] bytes = new byte[buffer.remaining()];
-          buffer.get(bytes);
-          header.readHeader(bytes);
-        }
-
-        // init the cache
-        initCache(header.getPageSize(), cacheSize, cache);
-
-        // reading empty nodes in Stack
-        for(int i = 0; i < file.getNumRecords(); i++) {
-          ByteBuffer buffer = file.getRecordBuffer(i);
-
-          int type = buffer.getInt();
-          if(type == EMPTY_PAGE) {
-            emptyPages.push(i);
-          }
-          else if(type == FILLED_PAGE) {
-            nextPageID = i + 1;
-          }
-          else {
-            throw new IllegalArgumentException("Unknown type: " + type);
-          }
-          i++;
-        }
-      }
-      // create new file
-      else {
-        LoggingUtil.logExpensive(Level.INFO, "Create a new file.");
-
-        // init the file
-        this.file = new OnDiskArray(f, 0, header.size(), pageSize, 0);
-
-        // writing header
-        this.header = header;
-        ByteBuffer buffer = file.getExtraHeader();
-        buffer.put(header.asByteArray());
-
-        // init the cache
-        initCache(header.getPageSize(), cacheSize, cache);
-      }
-    }
-    catch(IOException e) {
-      throw new RuntimeException("IOException occurred.", e);
-    }
+    // create from existing file
+    existed = this.filename.exists();
   }
 
   /**
@@ -292,5 +256,59 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
     catch(IOException e) {
       throw new RuntimeException("IOException occurred! ", e);
     }
+  }
+
+  @Override
+  public boolean initialize(PageHeader header) {
+    this.header = header;
+    try {
+      if(existed) {
+        LoggingUtil.logExpensive(Level.INFO, "Create from existing file.");
+        this.file = new OnDiskArray(filename, 0, header.size(), pageSize, true);
+
+        // init the header
+        {
+          ByteBuffer buffer = file.getExtraHeader();
+          byte[] bytes = new byte[buffer.remaining()];
+          buffer.get(bytes);
+          header.readHeader(bytes);
+        }
+
+        // reading empty nodes in Stack
+        for(int i = 0; i < file.getNumRecords(); i++) {
+          ByteBuffer buffer = file.getRecordBuffer(i);
+
+          int type = buffer.getInt();
+          if(type == EMPTY_PAGE) {
+            emptyPages.push(i);
+          }
+          else if(type == FILLED_PAGE) {
+            nextPageID = i + 1;
+          }
+          else {
+            throw new IllegalArgumentException("Unknown type: " + type);
+          }
+          i++;
+        }
+      }
+      // create new file
+      else {
+        LoggingUtil.logExpensive(Level.INFO, "Create a new file.");
+
+        // init the file
+        this.file = new OnDiskArray(filename, 0, header.size(), pageSize, 0);
+
+        // write the header
+        ByteBuffer buffer = file.getExtraHeader();
+        buffer.put(header.asByteArray());
+      }
+    }
+    catch(IOException e) {
+      throw new RuntimeException("IOException occurred.", e);
+    }
+    // init the cache
+    initCache(header.getPageSize(), cacheSize, cache);
+
+    return existed;
   }
 }

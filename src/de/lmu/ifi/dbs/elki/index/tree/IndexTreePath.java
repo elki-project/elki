@@ -13,12 +13,12 @@ import java.util.List;
  * 
  * @param <E> the type of Entry used in the index
  */
-public class TreeIndexPath<E extends Entry> {
+public class IndexTreePath<E extends Entry> {
   /**
    * Path representing the parent, null if lastPathComponent represents the
    * root.
    */
-  private TreeIndexPath<E> parentPath;
+  private IndexTreePath<E> parentPath;
 
   /**
    * Last path component.
@@ -33,13 +33,13 @@ public class TreeIndexPath<E extends Entry> {
    * 
    * @param path a list of IndexPathComponents representing the path to a node
    */
-  public TreeIndexPath(List<TreeIndexPathComponent<E>> path) {
+  public IndexTreePath(List<TreeIndexPathComponent<E>> path) {
     if(path == null || path.size() == 0) {
       throw new IllegalArgumentException("Path in IndexPath must be non null and not empty.");
     }
     lastPathComponent = path.get(path.size() - 1);
     if(path.size() > 1) {
-      parentPath = new TreeIndexPath<E>(path, path.size() - 1);
+      parentPath = new IndexTreePath<E>(path, path.size() - 1);
     }
   }
 
@@ -49,7 +49,7 @@ public class TreeIndexPath<E extends Entry> {
    * 
    * @param singlePath a IndexPathComponent representing the path to a node
    */
-  public TreeIndexPath(TreeIndexPathComponent<E> singlePath) {
+  public IndexTreePath(TreeIndexPathComponent<E> singlePath) {
     if(singlePath == null) {
       throw new IllegalArgumentException("path in TreePath must be non null.");
     }
@@ -64,7 +64,7 @@ public class TreeIndexPath<E extends Entry> {
    * @param parent the parent path
    * @param lastElement the last path component
    */
-  protected TreeIndexPath(TreeIndexPath<E> parent, TreeIndexPathComponent<E> lastElement) {
+  protected IndexTreePath(IndexTreePath<E> parent, TreeIndexPathComponent<E> lastElement) {
     if(lastElement == null) {
       throw new IllegalArgumentException("path in TreePath must be non null.");
     }
@@ -79,10 +79,10 @@ public class TreeIndexPath<E extends Entry> {
    * @param path the whole path
    * @param length the length of the newly created index path
    */
-  protected TreeIndexPath(List<TreeIndexPathComponent<E>> path, int length) {
+  protected IndexTreePath(List<TreeIndexPathComponent<E>> path, int length) {
     lastPathComponent = path.get(length - 1);
     if(length > 1) {
-      parentPath = new TreeIndexPath<E>(path, length - 1);
+      parentPath = new IndexTreePath<E>(path, length - 1);
     }
   }
 
@@ -95,7 +95,7 @@ public class TreeIndexPath<E extends Entry> {
   public List<TreeIndexPathComponent<E>> getPath() {
     List<TreeIndexPathComponent<E>> result = new ArrayList<TreeIndexPathComponent<E>>();
 
-    for(TreeIndexPath<E> path = this; path != null; path = path.parentPath) {
+    for(IndexTreePath<E> path = this; path != null; path = path.parentPath) {
       result.add(path.lastPathComponent);
     }
     Collections.reverse(result);
@@ -118,7 +118,7 @@ public class TreeIndexPath<E extends Entry> {
    */
   public int getPathCount() {
     int result = 0;
-    for(TreeIndexPath<E> path = this; path != null; path = path.parentPath) {
+    for(IndexTreePath<E> path = this; path != null; path = path.parentPath) {
       result++;
     }
     return result;
@@ -140,7 +140,7 @@ public class TreeIndexPath<E extends Entry> {
       throw new IllegalArgumentException("Index " + element + " is out of the specified range");
     }
 
-    TreeIndexPath<E> path = this;
+    IndexTreePath<E> path = this;
 
     for(int i = pathLength - 1; i != element; i--) {
       path = path.parentPath;
@@ -166,12 +166,12 @@ public class TreeIndexPath<E extends Entry> {
       return false;
     }
 
-    TreeIndexPath<E> other = (TreeIndexPath<E>) o;
+    IndexTreePath<E> other = (IndexTreePath<E>) o;
 
     if(getPathCount() != other.getPathCount()) {
       return false;
     }
-    for(TreeIndexPath<E> path = this; path != null; path = path.parentPath) {
+    for(IndexTreePath<E> path = this; path != null; path = path.parentPath) {
       if(!(path.lastPathComponent.equals(other.lastPathComponent))) {
         return false;
       }
@@ -203,7 +203,7 @@ public class TreeIndexPath<E extends Entry> {
    * @param aIndexPath the index path to be tested
    * @return true if <code>aIndexPath</code> is a descendant of this path
    */
-  public boolean isDescendant(TreeIndexPath<E> aIndexPath) {
+  public boolean isDescendant(IndexTreePath<E> aIndexPath) {
     if(aIndexPath == this) {
       return true;
     }
@@ -234,12 +234,12 @@ public class TreeIndexPath<E extends Entry> {
    * @return a new path containing all the elements of this object plus
    *         <code>child</code>
    */
-  public TreeIndexPath<E> pathByAddingChild(TreeIndexPathComponent<E> child) {
+  public IndexTreePath<E> pathByAddingChild(TreeIndexPathComponent<E> child) {
     if(child == null) {
       throw new NullPointerException("Null child not allowed");
     }
 
-    return new TreeIndexPath<E>(this, child);
+    return new IndexTreePath<E>(this, child);
   }
 
   /**
@@ -249,7 +249,7 @@ public class TreeIndexPath<E extends Entry> {
    * @return a path containing all the elements of this object, except the last
    *         path component
    */
-  public TreeIndexPath<E> getParentPath() {
+  public IndexTreePath<E> getParentPath() {
     return parentPath;
   }
 

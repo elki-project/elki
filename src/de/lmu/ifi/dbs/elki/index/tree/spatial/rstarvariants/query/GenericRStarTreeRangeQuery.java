@@ -8,9 +8,8 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
@@ -33,7 +32,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   /**
    * The index to use
    */
-  protected final AbstractRStarTree<O, ?, ?> index;
+  protected final AbstractRStarTree<?, ?> tree;
 
   /**
    * Spatial primitive distance function
@@ -43,15 +42,14 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   /**
    * Constructor.
    * 
-   * @param relation Relation to use
-   * @param index Index to use
+   * @param tree Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public GenericRStarTreeRangeQuery(Relation<? extends O> relation, AbstractRStarTree<O, ?, ?> index, DistanceQuery<O, D> distanceQuery, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
-    super(relation, distanceQuery);
-    this.index = index;
-    this.distanceFunction = distanceFunction;
+  public GenericRStarTreeRangeQuery(AbstractRStarTree<?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery) {
+    super( distanceQuery);
+    this.tree = tree;
+    this.distanceFunction = distanceQuery.getDistanceFunction();
   }
 
   /**
@@ -66,7 +64,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
     final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), index.getRootEntry().getEntryID()));
+    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootEntry().getEntryID()));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -75,7 +73,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
         break;
       }
 
-      AbstractRStarTreeNode<?, ?> node = index.getNode(pqNode.nodeID);
+      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {

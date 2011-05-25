@@ -2,20 +2,15 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * DeLiCluTree is a spatial index structure based on an R-TRee. DeLiCluTree is
@@ -26,15 +21,13 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * @author Elke Achtert
  * 
  * @apiviz.has DeLiCluNode oneway - - contains
- * 
- * @param <O> object type
  */
-public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
+public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(DeLiCluTree.class);
-  
+
   /**
    * Holds the ids of the expanded nodes.
    */
@@ -43,58 +36,13 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
   /**
    * Constructor.
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param bulk bulk flag
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public DeLiCluTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
-  }
-
-  /**
-   * Marks the specified object as handled and returns the path of node ids from
-   * the root to the objects's parent.
-   * 
-   * @param o the object to be marked as handled
-   * @return the path of node ids from the root to the objects's parent
-   */
-  public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(DBID id, O o) {
-    if(logger.isDebugging()) {
-      logger.debugFine("setHandled " + id + ", " + o + "\n");
-    }
-
-    // find the leaf node containing o
-    O obj = relation.get(id);
-    TreeIndexPath<DeLiCluEntry> pathToObject = findPathToObject(getRootPath(), obj, id);
-
-    if(pathToObject == null) {
-      return null;
-    }
-
-    // set o handled
-    DeLiCluEntry entry = pathToObject.getLastPathComponent().getEntry();
-    entry.setHasHandled(true);
-    entry.setHasUnhandled(false);
-
-    for(TreeIndexPath<DeLiCluEntry> path = pathToObject; path.getParentPath() != null; path = path.getParentPath()) {
-      DeLiCluEntry parentEntry = path.getParentPath().getLastPathComponent().getEntry();
-      DeLiCluNode node = getNode(parentEntry);
-      boolean hasHandled = false;
-      boolean hasUnhandled = false;
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        final DeLiCluEntry nodeEntry = node.getEntry(i);
-        hasHandled = hasHandled || nodeEntry.hasHandled();
-        hasUnhandled = hasUnhandled || nodeEntry.hasUnhandled();
-      }
-      parentEntry.setHasUnhandled(hasUnhandled);
-      parentEntry.setHasHandled(hasHandled);
-    }
-
-    return pathToObject.getPath();
+  public DeLiCluTree(PageFile<DeLiCluNode> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**
@@ -148,7 +96,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
   public int numNodes() {
     int numNodes = 0;
 
-    BreadthFirstEnumeration<O, DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<O, DeLiCluNode, DeLiCluEntry>(this, getRootPath());
+    BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry>(this, getRootPath());
     while(bfs.hasMoreElements()) {
       Entry entry = bfs.nextElement().getLastPathComponent().getEntry();
       if(!entry.isLeafEntry()) {
@@ -182,14 +130,6 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
   }
 
   /**
-   * Creates a new leaf entry representing the specified data object.
-   */
-  @Override
-  protected DeLiCluEntry createNewLeafEntry(DBID id) {
-    return new DeLiCluLeafEntry(id, relation.get(id));
-  }
-
-  /**
    * Creates a new directory entry representing the specified node.
    * 
    * @param node the node to be represented by the new entry
@@ -207,33 +147,6 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
   @Override
   protected DeLiCluEntry createRootEntry() {
     return new DeLiCluDirectoryEntry(0, null, false, true);
-  }
-
-  /**
-   * Does nothing.
-   */
-  @Override
-  protected void preInsert(@SuppressWarnings("unused") DeLiCluEntry entry) {
-    // do nothing
-  }
-
-  /**
-   * Does nothing.
-   */
-  @SuppressWarnings("unused")
-  @Override
-  protected void postDelete(DBID id) {
-    // do nothing
-  }
-
-  /**
-   * Return the node base class.
-   * 
-   * @return node base class
-   */
-  @Override
-  protected Class<DeLiCluNode> getNodeClass() {
-    return DeLiCluNode.class;
   }
 
   @Override

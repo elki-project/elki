@@ -16,38 +16,28 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
+import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeRangeQuery;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.GenericRStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -63,11 +53,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.composedOf BulkSplit
  * @apiviz.composedOf TopologicalSplit
  * 
- * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class AbstractRStarTree<O extends SpatialComparable, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
+public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndexTree<N, E> {
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */
@@ -104,83 +93,68 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   /**
    * Constructor
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param bulk bulk flag
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public AbstractRStarTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy);
+  public AbstractRStarTree(PageFile<N> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(pagefile, bulk, bulkLoadStrategy);
     this.insertionCandidates = insertionCandidates;
   }
 
   /**
-   * Inserts the specified reel vector object into this index.
+   * Test whether a bulk insert is still possible.
    * 
-   * @param id the object id that was inserted
+   * @return Success code
    */
-  @Override
-  public final void insert(DBID id) {
-    if(getLogger().isDebugging()) {
-      getLogger().debug("insert object " + id + "\n");
-    }
-
-    // Wrap entry as leaf
-    E entry = createNewLeafEntry(id);
-
-    if(!initialized) {
-      initialize(entry);
-    }
-
-    reinsertions.clear();
-
-    preInsert(entry);
-    insertLeafEntry(entry);
-
-    if(extraIntegrityChecks) {
-      getRoot().integrityCheck();
-    }
+  public boolean canBulkLoad() {
+    return (bulk && !initialized);
   }
 
   /**
-   * Inserts the specified objects into this index. If a bulk load mode is
-   * implemented, the objects are inserted in one bulk.
+   * Returns the path to the leaf entry in the specified subtree that represents
+   * the data object with the specified mbr and id.
    * 
-   * @param objects the objects to be inserted
+   * @param subtree the subtree to be tested
+   * @param mbr the mbr to look for
+   * @param id the id to look for
+   * @return the path to the leaf entry of the specified subtree that represents
+   *         the data object with the specified mbr and id
    */
-  @Override
-  public final void insertAll(DBIDs ids) {
-    // empty input file
-    if(ids.isEmpty() || (ids.size() == 1)) {
-      // FIXME: abusing this empty-insert for re-loading an on-disk tree is an
-      // ugly hack.
-      initializeFromFile();
-      return;
-    }
-
-    // Make an example leaf
-    E exampleLeaf = createNewLeafEntry(ids.iterator().next());
-    if(bulk && !initialized) {
-      initialize(exampleLeaf);
-      bulkLoad(ids);
-      if(getLogger().isDebugging()) {
-        StringBuffer msg = new StringBuffer();
-        msg.append(" height  = ").append(height).append("\n");
-        msg.append(" root    = ").append(getRoot());
-        getLogger().debugFine(msg.toString());
+  protected IndexTreePath<E> findPathToObject(IndexTreePath<E> subtree, SpatialComparable mbr, DBID id) {
+    N node = getNode(subtree.getLastPathComponent().getEntry());
+    if(node.isLeaf()) {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        if(((LeafEntry) node.getEntry(i)).getDBID() == id) {
+          return subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
+        }
       }
     }
+    // directory node
     else {
-      if(!initialized) {
-        initialize(exampleLeaf);
-      }
-      for(DBID id : ids) {
-        insert(id);
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        if(SpatialUtil.intersects(node.getEntry(i), mbr)) {
+          IndexTreePath<E> childSubtree = subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
+          IndexTreePath<E> path = findPathToObject(childSubtree, mbr, id);
+          if(path != null) {
+            return path;
+          }
+        }
       }
     }
+    return null;
+  }
+  
+  @Override
+  public void insertLeaf(E leaf) {
+    if(!initialized) {
+      initialize(leaf);
+    }
+    reinsertions.clear();
+
+    preInsert(leaf);
+    insertLeafEntry(leaf);
 
     if(extraIntegrityChecks) {
       getRoot().integrityCheck();
@@ -195,7 +169,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   protected void insertLeafEntry(E entry) {
     lastInsertedEntry = entry;
     // choose subtree for insertion
-    TreeIndexPath<E> subtree = choosePath(getRootPath(), entry, 1);
+    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, 1);
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
@@ -219,7 +193,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   protected void insertDirectoryEntry(E entry, int level) {
     lastInsertedEntry = entry;
     // choose node for insertion of o
-    TreeIndexPath<E> subtree = choosePath(getRootPath(), entry, level);
+    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, level);
     if(getLogger().isDebugging()) {
       getLogger().debugFine("subtree " + subtree);
     }
@@ -231,30 +205,18 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     // adjust the tree from subtree to root
     adjustTree(subtree);
   }
-
+  
   /**
-   * Deletes the specified object from this index.
+   * Delete a leaf at a given path - deletions for non-leaves are not supported!
    * 
-   * @return true if this index did contain the object with the specified id,
-   *         false otherwise
+   * @param deletionPath Path to delete
    */
-  @Override
-  public final boolean delete(DBID id) {
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("delete " + id + "\n");
-    }
-
-    // find the leaf node containing o
-    O obj = relation.get(id);
-    TreeIndexPath<E> deletionPath = findPathToObject(getRootPath(), obj, id);
-    if(deletionPath == null) {
-      return false;
-    }
-
+  public void deletePath(IndexTreePath<E> deletionPath) {
     N leaf = getNode(deletionPath.getParentPath().getLastPathComponent().getEntry());
     int index = deletionPath.getLastPathComponent().getIndex();
 
     // delete o
+    E entry = leaf.getEntry(index);
     leaf.deleteEntry(index);
     file.writePage(leaf);
 
@@ -278,20 +240,9 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       }
       file.deletePage(node.getPageID());
     }
+    postDelete(entry);
 
-    if(extraIntegrityChecks) {
-      getRoot().integrityCheck();
-    }
-
-    postDelete(id);
-    return true;
-  }
-
-  @Override
-  public void deleteAll(DBIDs ids) {
-    for(DBID id : ids) {
-      delete(id);
-    }
+    doExtraIntegrityChecks();
   }
 
   @Override
@@ -341,9 +292,9 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
         }
       }
 
-      de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration<O, N, E> enumeration = new de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration<O, N, E>(this, getRootPath());
+      BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
       while(enumeration.hasMoreElements()) {
-        TreeIndexPath<E> indexPath = enumeration.nextElement();
+        IndexTreePath<E> indexPath = enumeration.nextElement();
         E entry = indexPath.getLastPathComponent().getEntry();
         if(entry.isLeafEntry()) {
           objects++;
@@ -378,8 +329,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * Initializes this R*-Tree from an existing persistent file.
    */
   @Override
-  public void initializeFromFile() {
-    super.initializeFromFile();
+  public void initializeFromFile(TreeIndexHeader header) {
+    super.initializeFromFile(header);
     // compute height
     this.height = computeHeight();
 
@@ -399,7 +350,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[exampleLeaf.getDimensionality()]);
-      while(baos.size() <= pageSize) {
+      while(baos.size() <= file.getPageSize()) {
         sl.writeExternal(oos);
         oos.flush();
         cap++;
@@ -418,7 +369,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       HyperBoundingBox hb = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
       SpatialDirectoryEntry sl = new SpatialDirectoryEntry(0, hb);
-      while(baos.size() <= pageSize) {
+      while(baos.size() <= file.getPageSize()) {
         sl.writeExternal(oos);
         oos.flush();
         cap++;
@@ -430,7 +381,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
 
     if(dirCapacity <= 1) {
-      throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new IllegalArgumentException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -444,7 +395,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
 
     if(leafCapacity <= 1) {
-      throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new IllegalArgumentException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -463,62 +414,28 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
   }
 
   /**
-   * Returns the path to the leaf entry in the specified subtree that represents
-   * the data object with the specified mbr and id.
-   * 
-   * @param subtree the subtree to be tested
-   * @param mbr the mbr to look for
-   * @param id the id to look for
-   * @return the path to the leaf entry of the specified subtree that represents
-   *         the data object with the specified mbr and id
-   */
-  protected TreeIndexPath<E> findPathToObject(TreeIndexPath<E> subtree, SpatialComparable mbr, DBID id) {
-    N node = getNode(subtree.getLastPathComponent().getEntry());
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        if(((LeafEntry) node.getEntry(i)).getDBID() == id) {
-          return subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
-        }
-      }
-    }
-    // directory node
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        if(SpatialUtil.intersects(node.getEntry(i), mbr)) {
-          TreeIndexPath<E> childSubtree = subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
-          TreeIndexPath<E> path = findPathToObject(childSubtree, mbr, id);
-          if(path != null) {
-            return path;
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
    * Creates and returns the leaf nodes for bulk load.
    * 
    * @param objects the objects to be inserted
    * @return the array of leaf nodes containing the objects
    */
-  protected List<N> createLeafNodes(List<SpatialPair<DBID, O>> objects) {
+  protected List<N> createBulkLeafNodes(List<E> objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
 
     ArrayList<N> result = new ArrayList<N>();
-    BulkSplit<SpatialPair<DBID, O>> split = new BulkSplit<SpatialPair<DBID, O>>();
-    List<List<SpatialPair<DBID, O>>> partitions = split.partition(objects, minEntries, maxEntries, bulkLoadStrategy);
+    BulkSplit<E> split = new BulkSplit<E>();
+    List<List<E>> partitions = split.partition(objects, minEntries, maxEntries, bulkLoadStrategy);
 
-    for(List<SpatialPair<DBID, O>> partition : partitions) {
+    for(List<E> partition : partitions) {
       // create leaf node
       N leafNode = createNewLeafNode(leafCapacity);
       file.writePage(leafNode);
       result.add(leafNode);
 
       // insert data
-      for(Pair<DBID, O> o : partition) {
-        leafNode.addLeafEntry(createNewLeafEntry(o.getFirst()));
+      for(E o : partition) {
+        leafNode.addLeafEntry(o);
       }
 
       // write to file
@@ -583,16 +500,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * Performs a bulk load on this RTree with the specified data. Is called by
    * the constructor.
    */
-  abstract protected void bulkLoad(DBIDs ids);
-
-  /**
-   * Creates a new leaf entry representing the specified data object in the
-   * specified subtree.
-   * 
-   * @param id the object id
-   * @return the newly created leaf entry
-   */
-  abstract protected E createNewLeafEntry(DBID id);
+  abstract protected void bulkLoad(List<E> entrys);
 
   /**
    * Creates a new directory entry representing the specified node.
@@ -652,7 +560,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    *        indicates leaf-level)
    * @return the path of the appropriate subtree to insert the given mbr
    */
-  protected TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, SpatialComparable mbr, int level) {
+  protected IndexTreePath<E> choosePath(IndexTreePath<E> subtree, SpatialComparable mbr, int level) {
     if(getLogger().isDebuggingFiner()) {
       getLogger().debugFiner("node " + subtree + ", level " + level);
     }
@@ -664,7 +572,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     // first test on containment
     TreeIndexPathComponent<E> containingEntry = containedTest(node, mbr);
     if(containingEntry != null) {
-      TreeIndexPath<E> newSubtree = subtree.pathByAddingChild(containingEntry);
+      IndexTreePath<E> newSubtree = subtree.pathByAddingChild(containingEntry);
       if(height - subtree.getPathCount() == level) {
         return newSubtree;
       }
@@ -692,7 +600,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     }
     // children are directory nodes
     else {
-      TreeIndexPath<E> newSubtree = subtree.pathByAddingChild(getLeastEnlargement(node, mbr));
+      IndexTreePath<E> newSubtree = subtree.pathByAddingChild(getLeastEnlargement(node, mbr));
       // desired level is reached
       if(height - subtree.getPathCount() == level) {
         return newSubtree;
@@ -857,7 +765,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @return the newly created split node in case of split, null in case of
    *         reinsertion
    */
-  private N overflowTreatment(N node, TreeIndexPath<E> path) {
+  private N overflowTreatment(N node, IndexTreePath<E> path) {
     int level = height - path.getPathCount() + 1;
     Boolean reInsert = reinsertions.get(level);
 
@@ -924,7 +832,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @param path the path to the node
    */
   @SuppressWarnings("unchecked")
-  protected void reInsert(N node, int level, TreeIndexPath<E> path) {
+  protected void reInsert(N node, int level, IndexTreePath<E> path) {
     EuclideanDistanceFunction distFunction = EuclideanDistanceFunction.STATIC;
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
@@ -946,7 +854,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
     file.writePage(node);
 
     // and adapt the mbrs
-    TreeIndexPath<E> childPath = path;
+    IndexTreePath<E> childPath = path;
     N child = node;
     while(childPath.getParentPath() != null) {
       N parent = getNode(childPath.getParentPath().getLastPathComponent().getEntry());
@@ -980,7 +888,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * 
    * @param subtree the subtree to be adjusted
    */
-  protected void adjustTree(TreeIndexPath<E> subtree) {
+  protected void adjustTree(IndexTreePath<E> subtree) {
     if(getLogger().isDebugging()) {
       getLogger().debugFine("Adjust tree " + subtree + "\n");
     }
@@ -998,7 +906,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
         // if root was split: create a new root that points the two
         // split nodes
         if(node.getPageID().equals(getRootEntry().getEntryID())) {
-          TreeIndexPath<E> newRootPath = createNewRoot(node, split);
+          IndexTreePath<E> newRootPath = createNewRoot(node, split);
           height++;
           adjustTree(newRootPath);
         }
@@ -1052,7 +960,8 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @param distanceFunction the distance function for computing the distances
    * @return a list of the sorted entries
    */
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, O q, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction) {
+  // TODO: move somewhere else?
+  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistanceFunction<?, D> distanceFunction) {
     List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
@@ -1073,7 +982,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @param stack the stack holding the nodes to be reinserted after the tree
    *        has been condensed
    */
-  private void condenseTree(TreeIndexPath<E> subtree, Stack<N> stack) {
+  private void condenseTree(IndexTreePath<E> subtree, Stack<N> stack) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     // node is not root
     if(!node.getPageID().equals(getRootEntry().getEntryID())) {
@@ -1151,7 +1060,7 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
    * @return the path to the new root node that points to the two specified
    *         child nodes
    */
-  protected TreeIndexPath<E> createNewRoot(final N oldRoot, final N newNode) {
+  protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode) {
     N root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
 
@@ -1181,68 +1090,15 @@ public abstract class AbstractRStarTree<O extends SpatialComparable, N extends A
       getLogger().debugFine(msg);
     }
 
-    return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
+    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
   }
 
-  @SuppressWarnings({ "cast", "unchecked" })
-  @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
+  /**
+   * Perform additional integrity checks.
+   */
+  public void doExtraIntegrityChecks() {
+    if(extraIntegrityChecks) {
+      getRoot().integrityCheck();
     }
-    // Can we support this distance function - spatial distances only!
-    DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
-      }
-      return null;
-    }
-    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    // Can we use an optimized query?
-    if(df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) DistanceQuery.class.cast(distanceQuery);
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
-      RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<O>(relation, this, dqc, dfc);
-      return (RangeQuery<O, D>) q;
-    }
-    return new GenericRStarTreeRangeQuery<O, D>(relation, this, distanceQuery, df);
-  }
-
-  @SuppressWarnings({ "cast", "unchecked" })
-  @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, @SuppressWarnings("unused") Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    // Can we support this distance function - spatial distances only!
-    DistanceFunction<? super O, D> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!(distanceFunction instanceof SpatialPrimitiveDistanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Requested distance " + distanceFunction.toString() + " not supported by index.");
-      }
-      return null;
-    }
-    SpatialPrimitiveDistanceFunction<? super O, D> df = (SpatialPrimitiveDistanceFunction<? super O, D>) distanceFunction;
-    // Can we use an optimized query?
-    if(df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) DistanceQuery.class.cast(distanceQuery);
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
-      KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<O>(relation, this, dqc, dfc);
-      return (KNNQuery<O, D>) q;
-    }
-    return new GenericRStarTreeKNNQuery<O, D>(relation, this, distanceQuery, df);
-  }
-
-  @Override
-  public String getLongName() {
-    return "Abstract R*-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "rstartree";
   }
 }

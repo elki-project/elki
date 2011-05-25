@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * 
  * @author Elke Achtert
  */
-class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends MTreeLeafEntry<D> implements MkCoPEntry<D, N> {
+class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> implements MkCoPEntry<D> {
   private static final long serialVersionUID = 1;
 
   /**
@@ -169,7 +169,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
       return false;
     }
 
-    final MkCoPLeafEntry<D, N> that = (MkCoPLeafEntry<D, N>) o;
+    final MkCoPLeafEntry<D> that = (MkCoPLeafEntry<D>) o;
 
     if(conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null) {
       return false;

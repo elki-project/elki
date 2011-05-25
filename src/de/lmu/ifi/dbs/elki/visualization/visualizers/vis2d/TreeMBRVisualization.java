@@ -70,7 +70,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
   /**
    * The tree we visualize
    */
-  protected AbstractRStarTree<NV, N, E> rtree;
+  protected AbstractRStarTree<N, E> tree;
 
   /**
    * Constructor.
@@ -78,9 +78,10 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
    * @param task Visualization task
    * @param fill Fill flag
    */
+  @SuppressWarnings("unchecked")
   public TreeMBRVisualization(VisualizationTask task, boolean fill) {
     super(task);
-    this.rtree = task.getResult();
+    this.tree = AbstractRStarTree.class.cast(task.getResult());
     this.fill = fill;
     incrementalRedraw();
     context.addDataStoreListener(this);
@@ -91,12 +92,12 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
     int projdim = proj.getVisibleDimensions2D().cardinality();
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-    if(rtree != null) {
-      E root = rtree.getRootEntry();
-      for(int i = 0; i < rtree.getHeight(); i++) {
+    if(tree != null) {
+      E root = tree.getRootEntry();
+      for(int i = 0; i < tree.getHeight(); i++) {
         CSSClass cls = new CSSClass(this, INDEX + i);
         // Relative depth of this level. 1.0 = toplevel
-        final double relDepth = 1. - (((double) i) / rtree.getHeight());
+        final double relDepth = 1. - (((double) i) / tree.getHeight());
         if(fill) {
           cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
@@ -112,7 +113,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
         cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         svgp.addCSSClassOrLogError(cls);
       }
-      visualizeRTreeEntry(svgp, layer, proj, rtree, root, 0);
+      visualizeRTreeEntry(svgp, layer, proj, tree, root, 0);
     }
   }
 
@@ -126,7 +127,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
    * @param entry Current entry
    * @param depth Current depth
    */
-  private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<NV, ? extends N, E> rtree, E entry, int depth) {
+  private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth) {
     SpatialComparable mbr = entry;
 
     if(fill) {
@@ -205,11 +206,13 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
     public void addVisualizers(VisualizerContext context, Result result) {
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
-        ArrayList<AbstractRStarTree<NV, RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
-        for(AbstractRStarTree<NV, RStarTreeNode, SpatialEntry> tree : trees) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, tree, rep, this, P2DVisualization.class);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
-          context.addVisualizer(tree, task);
+        ArrayList<AbstractRStarTree<RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
+        for(AbstractRStarTree<RStarTreeNode, SpatialEntry> tree : trees) {
+          if(tree instanceof Result) {
+            final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, rep, this, P2DVisualization.class);
+            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
+            context.addVisualizer((Result) tree, task);
+          }
         }
       }
     }

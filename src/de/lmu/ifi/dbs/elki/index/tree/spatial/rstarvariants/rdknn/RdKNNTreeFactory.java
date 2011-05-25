@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFun
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -23,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends AbstractRStarTreeFactory<O, RdKNNTree<O, D, N>> {
+public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory<O, RdKNNTree<O, D>> {
   /**
    * Parameter for k
    */
@@ -68,8 +70,13 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
   }
 
   @Override
-  public RdKNNTree<O, D, N> instantiate(Relation<O> database) {
-    return new RdKNNTree<O, D, N>(database, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates, k_max, distanceFunction);
+  public RdKNNTree<O, D> instantiate(Relation<O> relation) {
+    PageFile<RdKNNNode<D>> pagefile = makePageFile(getNodeClass());
+    return new RdKNNTree<O, D>(relation, pagefile, bulk, bulkLoadStrategy, insertionCandidates, k_max, distanceFunction, distanceFunction.instantiate(relation));
+  }
+
+  protected Class<RdKNNNode<D>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(RdKNNNode.class);
   }
 
   /**
@@ -79,7 +86,7 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends AbstractRStarTreeFactory.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     /**
      * Parameter k.
      */
@@ -105,8 +112,8 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
     }
 
     @Override
-    protected RdKNNTreeFactory<O, D, N> makeInstance() {
-      return new RdKNNTreeFactory<O, D, N>(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates, k_max, distanceFunction);
+    protected RdKNNTreeFactory<O, D> makeInstance() {
+      return new RdKNNTreeFactory<O, D>(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates, k_max, distanceFunction);
     }
   }
 }

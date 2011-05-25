@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -21,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkAppTreeFactory<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeFactory<O, D, MkAppTree<O, D, N>> {
+public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkAppTreeIndex<O, D>> {
   /**
    * Parameter for nolog
    */
@@ -71,8 +73,13 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, N>, N extends Numbe
   }
 
   @Override
-  public MkAppTree<O, D, N> instantiate(Relation<O> relation) {
-    return new MkAppTree<O, D, N>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction, k_max, p, log);
+  public MkAppTreeIndex<O, D> instantiate(Relation<O> relation) {
+    PageFile<MkAppTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
+    return new MkAppTreeIndex<O, D>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max, p, log);
+  }
+
+  protected Class<MkAppTreeNode<O, D>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(MkAppTreeNode.class);
   }
 
   /**
@@ -82,7 +89,7 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, N>, N extends Numbe
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeFactory.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D> {
     /**
      * Parameter k.
      */
@@ -118,8 +125,8 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, N>, N extends Numbe
     }
 
     @Override
-    protected MkAppTreeFactory<O, D, N> makeInstance() {
-      return new MkAppTreeFactory<O, D, N>(fileName, pageSize, cacheSize, distanceFunction, k_max, p, log);
+    protected MkAppTreeFactory<O, D> makeInstance() {
+      return new MkAppTreeFactory<O, D>(fileName, pageSize, cacheSize, distanceFunction, k_max, p, log);
     }
   }
 }

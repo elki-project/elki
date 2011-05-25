@@ -129,7 +129,7 @@ public class TestIndexStructures implements JUnit4Test {
 //  @Test
 //  public void testXTree() throws ParameterException {
 //    ListParameterization xtreeparams = new ListParameterization();
-//    xtreeparams.addParameter(HashmapDatabase.INDEX_ID, experimentalcode.marisa.index.xtree.common.XTreeFactory.class);
+//    xtreeparams.addParameter(StaticArrayDatabase.INDEX_ID, experimentalcode.marisa.index.xtree.common.XTreeFactory.class);
 //    xtreeparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
 //    testFileBasedDatabaseConnection(xtreeparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
 //  }

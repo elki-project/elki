@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -25,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses MetricalIndex
+ * @apiviz.uses AbstractMTree
  * 
  * @param <O> Object type
  * @param <D> Distance type
@@ -39,12 +38,11 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
   /**
    * Constructor.
    *
-   * @param relation Relation to use
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexKNNQuery(Relation<? extends O> relation, AbstractMTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
-    super(relation, distanceQuery);
+  public MetricalIndexKNNQuery(AbstractMTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+    super(distanceQuery);
     this.index = index;
   }
 

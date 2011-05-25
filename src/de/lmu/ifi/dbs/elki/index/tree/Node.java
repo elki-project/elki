@@ -23,7 +23,7 @@ public interface Node<N extends Node<N, E>, E extends Entry> extends Page<N> {
    * @param parentPath the path to this node
    * @return an enumeration of the children paths of this node
    */
-  Enumeration<TreeIndexPath<E>> children(TreeIndexPath<E> parentPath);
+  Enumeration<IndexTreePath<E>> children(IndexTreePath<E> parentPath);
 
   /**
    * Returns the number of entries of this node.

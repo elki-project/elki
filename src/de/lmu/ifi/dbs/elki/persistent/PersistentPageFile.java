@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -26,6 +25,11 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <P> Page type
  */
 public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
+  /**
+   * Our logger
+   */
+  private static final Logging logger = Logging.getLogger(PersistentPageFile.class);
+
   /**
    * Indicates an empty page.
    */
@@ -44,94 +48,47 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   /**
    * The header of this page file.
    */
-  protected final PageHeader header;
+  protected PageHeader header;
 
   /**
    * The type of pages we use.
    */
-  protected final Class<? extends P> pageclass;
+  protected final Class<P> pageclass;
+
+  /**
+   * Whether we are initializing from an existing file.
+   */
+  private boolean existed;
+
+  /**
+   * Cache size to use.
+   */
+  private long cacheSize;
 
   /**
    * Creates a new PersistentPageFile from an existing file.
    * 
-   * @param header the header of this file
-   * @param fileName the name of the file
+   * @param pageSize the page size
    * @param cacheSize the size of the cache in Byte
    * @param cache the class of the cache to be used
    * @param pageclass the class of pages to be used
    */
-  public PersistentPageFile(PageHeader header, long cacheSize, Cache<P> cache, String fileName, Class<? extends P> pageclass) {
+  public PersistentPageFile(int pageSize, long cacheSize, Cache<P> cache, String fileName, Class<P> pageclass) {
     super();
+    this.pageSize = pageSize;
     this.pageclass = pageclass;
+    this.cache = cache;
+    this.cacheSize = cacheSize;
+    // init the file
+    File f = new File(fileName);
 
+    // create from existing file
+    existed = f.exists();
     try {
-      // init the file
-      File f = new File(fileName);
-
-      // create from existing file
-      if(f.exists()) {
-        LoggingUtil.logExpensive(Level.INFO, "Create from existing file.");
-        file = new RandomAccessFile(f, "rw");
-
-        // init the header
-        this.header = header;
-        header.readHeader(file);
-        // init the cache
-        initCache(header.getPageSize(), cacheSize, cache);
-
-        // reading empty nodes in Stack
-        if(header instanceof TreeIndexHeader) {
-          TreeIndexHeader tiHeader = (TreeIndexHeader) header;
-          nextPageID = tiHeader.getLargestPageID();
-          try {
-            emptyPages = tiHeader.readEmptyPages(file);
-          }
-          catch(ClassNotFoundException e) {
-            throw new RuntimeException("ClassNotFoundException occurred when reading empty pages.", e);
-          }
-        }
-        else { // must scan complete file
-          int i = 0;
-          while(file.getFilePointer() + pageSize <= file.length()) {
-            long offset = ((long) (header.getReservedPages() + i)) * (long) pageSize;
-            byte[] buffer = new byte[pageSize];
-            file.seek(offset);
-            file.read(buffer);
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            int type = ois.readInt();
-            if(type == EMPTY_PAGE) {
-              emptyPages.push(i);
-            }
-            else if(type == FILLED_PAGE) {
-              nextPageID = i + 1;
-            }
-            else {
-              throw new IllegalArgumentException("Unknown type: " + type);
-            }
-            i++;
-          }
-        }
-      }
-      // create new file
-      else {
-        LoggingUtil.logExpensive(Level.INFO, "Create a new file.");
-
-        // init the file
-        this.file = new RandomAccessFile(f, "rw");
-        this.file.setLength(0);
-
-        // writing header
-        this.header = header;
-        header.writeHeader(file);
-
-        // init the cache
-        initCache(header.getPageSize(), cacheSize, cache);
-      }
+      file = new RandomAccessFile(f, "rw");
     }
     catch(IOException e) {
-      throw new RuntimeException("IOException occurred.", e);
+      throw new AbortException("IO error in loading persistent page file.", e);
     }
   }
 
@@ -269,6 +226,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         P page;
         try {
           page = pageclass.newInstance();
+          page.readExternal(ois);
         }
         catch(InstantiationException e) {
           throw new AbortException("Error instanciating an index page", e);
@@ -276,7 +234,9 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         catch(IllegalAccessException e) {
           throw new AbortException("Error instanciating an index page", e);
         }
-        page.readExternal(ois);
+        catch(ClassNotFoundException e) {
+          throw new AbortException("Error instanciating an index page", e);
+        }
         return page;
       }
       else {
@@ -284,14 +244,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       }
     }
     catch(IOException e) {
-      // FIXME exception handling
-      e.printStackTrace();
-      return null;
-    }
-    catch(ClassNotFoundException e) {
-      // FIXME exception handling
-      e.printStackTrace();
-      return null;
+      throw new AbortException("IO Error in page file", e);
     }
   }
 
@@ -380,5 +333,70 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
     while(!emptyPages.isEmpty() && emptyPages.peek() >= this.nextPageID) {
       emptyPages.pop();
     }
+  }
+
+  @Override
+  public boolean initialize(PageHeader header) {
+    try {
+      if(existed) {
+        logger.debug("Initializing from an existing page file.");
+
+        // init the header
+        this.header = header;
+        header.readHeader(file);
+
+        // reading empty nodes in Stack
+        if(header instanceof TreeIndexHeader) {
+          TreeIndexHeader tiHeader = (TreeIndexHeader) header;
+          nextPageID = tiHeader.getLargestPageID();
+          try {
+            emptyPages = tiHeader.readEmptyPages(file);
+          }
+          catch(ClassNotFoundException e) {
+            throw new RuntimeException("ClassNotFoundException occurred when reading empty pages.", e);
+          }
+        }
+        else { // must scan complete file
+          int i = 0;
+          while(file.getFilePointer() + pageSize <= file.length()) {
+            long offset = ((long) (header.getReservedPages() + i)) * (long) pageSize;
+            byte[] buffer = new byte[pageSize];
+            file.seek(offset);
+            file.read(buffer);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            int type = ois.readInt();
+            if(type == EMPTY_PAGE) {
+              emptyPages.push(i);
+            }
+            else if(type == FILLED_PAGE) {
+              nextPageID = i + 1;
+            }
+            else {
+              throw new IllegalArgumentException("Unknown type: " + type);
+            }
+            i++;
+          }
+        }
+      }
+      // create new file
+      else {
+        logger.debug("Initializing with a new page file.");
+
+        // writing header
+        this.header = header;
+        header.writeHeader(file);
+      }
+    }
+    catch(IOException e) {
+      throw new RuntimeException("IOException occurred.", e);
+    }
+
+    // init the cache
+    initCache(header.getPageSize(), cacheSize, cache);
+
+    // Return "new file" status
+    return existed;
   }
 }

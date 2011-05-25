@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalEntry;
+import de.lmu.ifi.dbs.elki.index.tree.Entry;
 
 /**
  * Defines the requirements for an entry in an M-Tree node.
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalEntry;
  * @author Elke Achtert
  * @param <D> the type of Distance used in the M-Tree
  */
-public interface MTreeEntry<D extends Distance<D>> extends MetricalEntry {
+public interface MTreeEntry<D extends Distance<D>> extends Entry {
   /**
    * Returns the id of the underlying database object of this entry, if this
    * entry is a leaf entry, the id of the routing object, otherwise.

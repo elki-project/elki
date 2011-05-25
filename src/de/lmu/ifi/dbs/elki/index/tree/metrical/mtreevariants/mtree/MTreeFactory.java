@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -12,27 +14,32 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses MTree oneway - - «create»
+ * @apiviz.uses MTreeIndex oneway - - «create»
  * 
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory<O, D, MTree<O, D>> {
+public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory<O, D, MTreeIndex<O, D>> {
   /**
    * Constructor.
    * 
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
-   * @param distanceFunction
+   * @param fileName file name
+   * @param pageSize page size
+   * @param cacheSize cache size
+   * @param distanceFunction Distance function
    */
   public MTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction) {
     super(fileName, pageSize, cacheSize, distanceFunction);
   }
 
   @Override
-  public MTree<O, D> instantiate(Relation<O> relation) {
-    return new MTree<O, D>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction);
+  public MTreeIndex<O, D> instantiate(Relation<O> relation) {
+    PageFile<MTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
+    return new MTreeIndex<O, D>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction);
+  }
+
+  protected Class<MTreeNode<O, D>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(MTreeNode.class);
   }
 
   /**

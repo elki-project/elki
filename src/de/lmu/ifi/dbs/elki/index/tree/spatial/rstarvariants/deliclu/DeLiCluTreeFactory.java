@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Factory for DeLiClu R*-Trees.
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFac
  * 
  * @param <O> Object type
  */
-public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory<O, DeLiCluTree<O>> {
+public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory<O, DeLiCluTreeIndex<O>> {
   /**
    * Constructor.
    * 
@@ -31,8 +32,13 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
   }
 
   @Override
-  public DeLiCluTree<O> instantiate(Relation<O> relation) {
-    return new DeLiCluTree<O>(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public DeLiCluTreeIndex<O> instantiate(Relation<O> relation) {
+    PageFile<DeLiCluNode> pagefile = makePageFile(getNodeClass());
+    return new DeLiCluTreeIndex<O>(relation, pagefile, bulk, bulkLoadStrategy, insertionCandidates);
+  }
+
+  protected Class<DeLiCluNode> getNodeClass() {
+    return DeLiCluNode.class;
   }
 
   /**

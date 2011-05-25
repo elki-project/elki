@@ -200,17 +200,17 @@ public final class QueryUtil {
       if(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
         @SuppressWarnings("unchecked")
-        final KNNQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceKNNQuery<O>(distanceQuery.getRelation(), (PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+        final KNNQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceKNNQuery<O>((PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
         @SuppressWarnings("unchecked")
         final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
         return castQuery;
       }
       else {
         final PrimitiveDistanceQuery<O, D> pdq = (PrimitiveDistanceQuery<O, D>) distanceQuery;
-        return new LinearScanPrimitiveDistanceKNNQuery<O, D>(pdq.getRelation(), pdq);
+        return new LinearScanPrimitiveDistanceKNNQuery<O, D>(pdq);
       }
     }
-    return new LinearScanKNNQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
+    return new LinearScanKNNQuery<O, D>(distanceQuery);
   }
 
   /**
@@ -227,16 +227,16 @@ public final class QueryUtil {
       if(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
         @SuppressWarnings("unchecked")
-        final RangeQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceRangeQuery<O>(distanceQuery.getRelation(), (PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+        final RangeQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceRangeQuery<O>((PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
         @SuppressWarnings("unchecked")
         final RangeQuery<O, D> castQuery = (RangeQuery<O, D>) knnQuery;
         return castQuery;
       }
       else {
         final PrimitiveDistanceQuery<O, D> pdq = (PrimitiveDistanceQuery<O, D>) distanceQuery;
-        return new LinearScanPrimitiveDistanceRangeQuery<O, D>(pdq.getRelation(), pdq);
+        return new LinearScanPrimitiveDistanceRangeQuery<O, D>(pdq);
       }
     }
-    return new LinearScanRangeQuery<O, D>(distanceQuery.getRelation(), distanceQuery);
+    return new LinearScanRangeQuery<O, D>(distanceQuery);
   }
 }

@@ -138,8 +138,8 @@ public final class FormatUtil {
   public static String format(double[] d, String sep) {
     StringBuffer buffer = new StringBuffer();
     for(int i = 0; i < d.length; i++) {
-      if(i < d.length - 1) {
-        buffer.append(d[i]).append(sep);
+      if(i > 0) {
+        buffer.append(sep).append(d[i]);
       }
       else {
         buffer.append(d[i]);
