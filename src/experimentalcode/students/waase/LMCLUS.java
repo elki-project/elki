@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
@@ -131,6 +132,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
         System.out.println("Sampling level:" + samplingLevel);
         System.out.println("Threshold" + sensivityThreshold);
         while(findSeparation(dCopy, i, samplingLevel) > sensivityThreshold) {
+          // FIXME: use a proper RangeQuery object
           List<DistanceResultPair<DoubleDistance>> res = DatabaseQueryUtil.singleRangeQueryByDBID(d, new LMCLUSDistanceFunction<V>(basis), new DoubleDistance(threshold), origin);
           if(res.size() < NOISE_SIZE) {
             break;
@@ -139,6 +141,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
           for(DistanceResultPair<DoubleDistance> point : res) {
             partition.add(point.getDBID());
           }
+          // FIXME: Partition by using new ProxyDatabase(ids, database)
           dCopy = dCopy.partition(partition);
           // TODO partition database according to range
           lMDim = i;
@@ -148,6 +151,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       DBIDs delete = dCopy.getDBIDs();
       HashSetModifiableDBIDs all = DBIDUtil.newHashSet(d.getDBIDs());
       all.removeDBIDs(delete);
+      // FIXME: Partition by using new ProxyDatabase(ids, database)
       d = d.partition(all);
       ret.addCluster(new Cluster<Model>(all));
     }
@@ -174,7 +178,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * @return the overall goodness of the separation. The values origin basis and
    *         threshold are returned indirectly over class variables.
    */
-  private double findSeparation(Database databasePartition, int dimension, int samplingLevel) {
+  private double findSeparation(Relation<V> databasePartition, int dimension, int samplingLevel) {
     double goodness = -1;
     double threshold = -1;
     DBID origin = null;
