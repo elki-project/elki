@@ -1,7 +1,9 @@
 package experimentalcode.marisa.index.xtree;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -18,9 +20,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @author Erich Schubert
  * 
  * @param <O> object type
- * @param <X> actuall tree
+ * @param <X> actual tree type
  */
-public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, X extends XTreeBase<O, ?, ?>> extends AbstractRStarTreeFactory<O, X> {
+public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, X extends AbstractRStarTree<?, ?> & Index> extends AbstractRStarTreeFactory<O, X> {
   protected double relativeMinEntries;
 
   protected double relativeMinFanout;

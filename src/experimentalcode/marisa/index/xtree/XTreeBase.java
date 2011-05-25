@@ -20,20 +20,19 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
+import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
-import de.lmu.ifi.dbs.elki.persistent.LRUCache;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
@@ -49,7 +48,7 @@ import experimentalcode.marisa.index.xtree.util.XSplitter;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
+public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<N, E> {
   /**
    * If <code>true</code>, the expensive call of
    * {@link #calculateOverlapIncrease(List, SpatialEntry, HyperBoundingBox)} is
@@ -116,11 +115,8 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
 
   /**
    * Constructor.
-   *
-   * @param relation
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
+   * 
+   * @param pagefile the page file
    * @param bulk
    * @param bulkLoadStrategy
    * @param insertionCandidates
@@ -130,16 +126,14 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    * @param max_overlap
    * @param overlap_type
    */
-  public XTreeBase(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public XTreeBase(PageFile<N> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;
     this.max_overlap = max_overlap;
     this.overlap_type = overlap_type;
   }
-
-
 
   /**
    * Returns true if in the specified node an overflow occurred, false
@@ -252,7 +246,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    * the constructor and should be overwritten by subclasses if necessary.
    */
   @Override
-  protected void bulkLoad(DBIDs ids) {
+  protected void bulkLoad(List<E> spatialObjects) {
     throw new UnsupportedOperationException("Bulk Load not supported for XTree");
   }
 
@@ -357,7 +351,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       oos.close();
       baos.close();
       byte[] array = baos.toByteArray();
-      byte[] sn_array = new byte[pageSize * (int) Math.ceil((double) supernode.getCapacity() / dirCapacity)];
+      byte[] sn_array = new byte[file.getPageSize() * (int) Math.ceil((double) supernode.getCapacity() / dirCapacity)];
       if(array.length > sn_array.length) {
         throw new IllegalStateException("Supernode is too large for fitting in " + ((int) Math.ceil((double) supernode.getCapacity() / dirCapacity)) + " pages of total size " + sn_array.length);
       }
@@ -371,7 +365,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
 
   @Override
   protected TreeIndexHeader createHeader() {
-    return new XTreeHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum, min_fanout, num_elements, dimensionality, reinsert_fraction, max_overlap);
+    return new XTreeHeader(file.getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafMinimum, min_fanout, num_elements, dimensionality, reinsert_fraction, max_overlap);
   }
 
   /**
@@ -379,6 +373,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    */
   @Override
   protected void preInsert(@SuppressWarnings("unused") E entry) {
+    // TODO: can we do this somewhere else?
     num_elements++;
   }
 
@@ -391,17 +386,8 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    * To be called via the constructor if the tree is to be read from file.
    */
   @Override
-  public void initializeFromFile() {
-    if(getFileName() == null) {
-      throw new IllegalArgumentException("Parameter file name is not specified.");
-    }
-
-    // init the file (meaning no parameter used in createHeader() survives)
-    XTreeHeader header = (XTreeHeader) createHeader();
-    // header is read here:
-    super.file = new PersistentPageFile<N>(header, cacheSize, new LRUCache<N>(), getFileName(), getNodeClass());
-
-    super.pageSize = header.getPageSize();
+  public void initializeFromFile(TreeIndexHeader hdr) {
+    XTreeHeader header = (XTreeHeader) hdr;
     super.dirCapacity = header.getDirCapacity();
     super.leafCapacity = header.getLeafCapacity();
     super.dirMinimum = header.getDirMinimum();
@@ -426,7 +412,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     // read supernodes (if there are any)
     if(superNodeOffset > 0) {
       RandomAccessFile ra_file = ((PersistentPageFile<N>) super.file).getFile();
-      long offset = header.getReservedPages() * pageSize + superNodeOffset;
+      long offset = header.getReservedPages() * file.getPageSize() + superNodeOffset;
       int bs = 0 // omit this: 4 // EMPTY_PAGE or FILLED_PAGE ?
           + 4 // id
           + 1 // isLeaf
@@ -437,7 +423,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       try {
         // go to supernode region
         ra_file.seek(offset);
-        while(ra_file.getFilePointer() + pageSize <= ra_file.length()) {
+        while(ra_file.getFilePointer() + file.getPageSize() <= ra_file.length()) {
           ((PersistentPageFile<N>) super.file).increaseReadAccess();
           ra_file.read(buffer);
           ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(buffer));
@@ -462,7 +448,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
           }
           ((PersistentPageFile<N>) super.file).increaseReadAccess();
           ra_file.seek(offset);
-          byte[] superbuffer = new byte[pageSize * (int) Math.ceil((double) capacity / dirCapacity)];
+          byte[] superbuffer = new byte[file.getPageSize() * (int) Math.ceil((double) capacity / dirCapacity)];
           // increase offset for the next position seek
           offset += superbuffer.length;
           ra_file.read(superbuffer);
@@ -480,7 +466,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
         }
       }
       catch(IOException e) {
-        throw new RuntimeException("IOException caught when loading tree from file '" + getFileName() + "'" + e);
+        throw new RuntimeException("IOException caught when loading tree from file." + e);
       }
     }
 
@@ -497,6 +483,8 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     }
   }
 
+  protected abstract Class<N> getNodeClass();
+
   @Override
   protected void initializeCapacities(E exampleLeaf) {
     /* Simulate the creation of a leaf page to get the page capacity */
@@ -505,7 +493,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[exampleLeaf.getDimensionality()]);
-      while(baos.size() <= pageSize) {
+      while(baos.size() <= file.getPageSize()) {
         sl.writeExternal(oos);
         oos.flush();
         cap++;
@@ -524,7 +512,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       HyperBoundingBox hb = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
       XDirectoryEntry xl = new XDirectoryEntry(0, hb);
-      while(baos.size() <= pageSize) {
+      while(baos.size() <= file.getPageSize()) {
         xl.writeExternal(oos);
         oos.flush();
         cap++;
@@ -536,7 +524,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     }
 
     if(dirCapacity <= 1) {
-      throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new IllegalArgumentException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -556,7 +544,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     }
 
     if(leafCapacity <= 1) {
-      throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new IllegalArgumentException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -599,7 +587,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    *         <code>mbr</code>
    */
   @Override
-  protected TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, SpatialComparable mbr, int level) {
+  protected IndexTreePath<E> choosePath(IndexTreePath<E> subtree, SpatialComparable mbr, int level) {
     if(getLogger().isDebuggingFiner()) {
       getLogger().debugFiner("node " + subtree + ", level " + level);
     }
@@ -611,7 +599,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     // first test on containment
     TreeIndexPathComponent<E> containingEntry = containedTest(node, mbr);
     if(containingEntry != null) {
-      TreeIndexPath<E> newSubtree = subtree.pathByAddingChild(containingEntry);
+      IndexTreePath<E> newSubtree = subtree.pathByAddingChild(containingEntry);
       if(height - subtree.getPathCount() == level) {
         return newSubtree;
       }
@@ -696,7 +684,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       }
     }
     assert optEntry != null;
-    TreeIndexPath<E> newSubtree = subtree.pathByAddingChild(optEntry);
+    IndexTreePath<E> newSubtree = subtree.pathByAddingChild(optEntry);
     if(height - subtree.getPathCount() == level) {
       return newSubtree;
     }
@@ -869,7 +857,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    *         in <code>splitAxis</code>, or <code>null</code>, if
    *         <code>node</code> has been converted into a supernode.
    */
-  private N overflowTreatment(N node, TreeIndexPath<E> path, int[] splitAxis) {
+  private N overflowTreatment(N node, IndexTreePath<E> path, int[] splitAxis) {
     if(node.isSuperNode()) {
       // only extend supernode; no re-insertions
       assert node.getCapacity() == node.getNumEntries();
@@ -946,7 +934,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    */
   @Override
   @SuppressWarnings("unchecked")
-  protected void reInsert(N node, int level, TreeIndexPath<E> path) {
+  protected void reInsert(N node, int level, IndexTreePath<E> path) {
     SquaredEuclideanDistanceFunction distFunction = SquaredEuclideanDistanceFunction.STATIC;
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
@@ -977,7 +965,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
     file.writePage(node);
 
     // and adapt the mbrs
-    TreeIndexPath<E> childPath = path;
+    IndexTreePath<E> childPath = path;
     N child = node;
     while(childPath.getParentPath() != null) {
       N parent = getNode(childPath.getParentPath().getLastPathComponent().getEntry());
@@ -1022,7 +1010,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
   @Override
   protected void insertLeafEntry(E entry) {
     // choose subtree for insertion
-    TreeIndexPath<E> subtree = choosePath(getRootPath(), entry, 1);
+    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, 1);
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
@@ -1054,7 +1042,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
   @Override
   protected void insertDirectoryEntry(E entry, int level) {
     // choose node for insertion of o
-    TreeIndexPath<E> subtree = choosePath(getRootPath(), entry, level);
+    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, level);
     if(getLogger().isDebugging()) {
       getLogger().debugFine("subtree " + subtree);
     }
@@ -1081,7 +1069,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    * @param subtree the subtree to be adjusted
    */
   @Override
-  protected void adjustTree(TreeIndexPath<E> subtree) {
+  protected void adjustTree(IndexTreePath<E> subtree) {
     if(getLogger().isDebugging()) {
       getLogger().debugFine("Adjust tree " + subtree);
     }
@@ -1120,7 +1108,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
           // if the root was split: create a new root containing the two
           // split nodes
           if(node.getPageID() == getRootEntry().getEntryID()) {
-            TreeIndexPath<E> newRootPath = createNewRoot(node, split, splitAxis[0]);
+            IndexTreePath<E> newRootPath = createNewRoot(node, split, splitAxis[0]);
             height++;
             adjustTree(newRootPath);
           }
@@ -1201,7 +1189,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
    * @return the path to the new root node that points to the two specified
    *         child nodes
    */
-  protected TreeIndexPath<E> createNewRoot(final N oldRoot, final N newNode, int splitAxis) {
+  protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode, int splitAxis) {
     N root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
     // get split history
@@ -1252,7 +1240,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       getLogger().debugFine(msg);
     }
     // the root entry still needs to be set to the new root node's MBR
-    return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
+    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
   }
 
   /**
@@ -1283,9 +1271,9 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
         }
       }
 
-      de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration<O, N, E> enumeration = new de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration<O, N, E>(this, getRootPath());
+      BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
       while(enumeration.hasMoreElements()) {
-        TreeIndexPath<E> indexPath = enumeration.nextElement();
+        IndexTreePath<E> indexPath = enumeration.nextElement();
         E entry = indexPath.getLastPathComponent().getEntry();
         if(entry.isLeafEntry()) {
           objects++;
@@ -1322,7 +1310,7 @@ public abstract class XTreeBase<O extends SpatialComparable, N extends XNode<E, 
       result.append("Read I/O-Access: ").append(file.getPhysicalReadAccess()).append("\n");
       result.append("Write I/O-Access: ").append(file.getPhysicalWriteAccess()).append("\n");
       result.append("Logical Page-Access: ").append(file.getLogicalPageAccess()).append("\n");
-      result.append("File ").append(getFileName()).append("\n");
+      result.append("File ").append(file.toString()).append("\n");
       result.append("Storage Quota ").append(BigInteger.valueOf(objects + dirNodes + superNodes + leafNodes).multiply(BigInteger.valueOf(100)).divide(totalCapacity).toString()).append("%\n");
     }
     else {

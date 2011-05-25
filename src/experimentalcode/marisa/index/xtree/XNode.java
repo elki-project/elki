@@ -237,7 +237,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * @throws IllegalStateException if the parameters of the file's supernode do
    *         not match this
    */
-  public <T extends XTreeBase<?, N, E>> void readSuperNode(ObjectInput in, T tree) throws IOException, ClassNotFoundException {
+  public <T extends XTreeBase<N, E>> void readSuperNode(ObjectInput in, T tree) throws IOException, ClassNotFoundException {
     readExternal(in);
     if(capacity_to_be_filled <= 0 || !isSuperNode()) {
       throw new IllegalStateException("This node does not appear to be a supernode");

@@ -24,7 +24,7 @@ import experimentalcode.marisa.utils.PriorityQueue;
  * 
  * @author Marisa Thoma
  */
-public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, N>, T extends XTreeBase<?, N, E>> {
+public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, N>, T extends XTreeBase<N, E>> {
 
   /** Logger object for the XSplitter. */
   private transient Logger logger = Logger.getLogger(XSplitter.class.getName());
