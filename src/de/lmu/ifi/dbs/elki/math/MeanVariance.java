@@ -82,7 +82,9 @@ public final class MeanVariance {
    * @param val Value
    */
   public void put(double val) {
-    put(val, 1.0);
+    sum += val;
+    sqrSum += val * val;
+    count += 1.0;
   }
 
   /**
