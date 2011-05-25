@@ -89,10 +89,9 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     config.grab(sensivityThreshold);
   }
 
-  @Override
-  public Clustering<Model> run(Database database) throws IllegalStateException {
+  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
     try {
-      return runLMCLUS(database, maxLMDim.getValue(), samplingLevel.getValue(), sensivityThreshold.getValue());
+      return runLMCLUS(database, relation, maxLMDim.getValue(), samplingLevel.getValue(), sensivityThreshold.getValue());
     }
     catch(UnableToComplyException ex) {
       throw new IllegalStateException(); // TODO
@@ -114,6 +113,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * </PRE>
    * 
    * @param d The database to operate on
+   * @param relation 
    * @param maxLMDim The maximum dimension of the linear manifolds to look for.
    * @param samplingLevel
    * @param sensivityThreshold the threshold specifying if a manifold is good
@@ -122,9 +122,9 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    *         algorithm.
    * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    */
-  private Clustering<Model> runLMCLUS(Database d, int maxLMDim, int samplingLevel, double sensivityThreshold) throws UnableToComplyException {
+  private Clustering<Model> runLMCLUS(Database d, Relation<V> relation, int maxLMDim, int samplingLevel, double sensivityThreshold) throws UnableToComplyException {
     Clustering<Model> ret = new Clustering<Model>("LMCLUS Clustering", "lmclus-clustering");
-    while(d.size() > NOISE_SIZE) {
+    while(relation.size() > NOISE_SIZE) {
       Database dCopy = d; // TODO copy database
       int lMDim = 1;
       for(int i = 1; i <= maxLMDim; i++) {
