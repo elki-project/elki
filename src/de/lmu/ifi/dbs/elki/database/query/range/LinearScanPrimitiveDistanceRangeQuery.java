@@ -5,7 +5,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -25,11 +24,10 @@ public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> ext
   /**
    * Constructor.
    * 
-   * @param relation Data to query
    * @param distanceQuery Distance function to use
    */
-  public LinearScanPrimitiveDistanceRangeQuery(Relation<? extends O> relation, PrimitiveDistanceQuery<O, D> distanceQuery) {
-    super(relation, distanceQuery);
+  public LinearScanPrimitiveDistanceRangeQuery(PrimitiveDistanceQuery<O, D> distanceQuery) {
+    super(distanceQuery);
   }
 
   @Override

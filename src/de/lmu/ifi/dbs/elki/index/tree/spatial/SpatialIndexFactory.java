@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -16,12 +17,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory,interface
- * @apiviz.uses SpatialIndex oneway - - «create»
+ * @apiviz.uses SpatialIndexTree oneway - - «create»
  * 
  * @param <O> Object type
  * @param <I> Index type
  */
-public abstract class SpatialIndexFactory<O extends NumberVector<?, ?>, I extends SpatialIndex<O, ?, ?>> extends TreeIndexFactory<O, I> {
+public abstract class SpatialIndexFactory<O extends NumberVector<?, ?>, I extends SpatialIndexTree<?, ?> & Index> extends TreeIndexFactory<O, I> {
   /**
    * Parameter for bulk loading
    */
@@ -41,10 +42,10 @@ public abstract class SpatialIndexFactory<O extends NumberVector<?, ?>, I extend
    * The strategy for bulk load.
    */
   protected BulkSplit.Strategy bulkLoadStrategy;
-  
+
   /**
    * Constructor.
-   *
+   * 
    * @param fileName
    * @param pageSize
    * @param cacheSize
@@ -59,7 +60,7 @@ public abstract class SpatialIndexFactory<O extends NumberVector<?, ?>, I extend
 
   /**
    * Constructor with bulk load disabled.
-   *
+   * 
    * @param fileName
    * @param pageSize
    * @param cacheSize

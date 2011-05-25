@@ -3,12 +3,12 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
+import de.lmu.ifi.dbs.elki.index.tree.Entry;
+import de.lmu.ifi.dbs.elki.index.tree.IndexTree;
+import de.lmu.ifi.dbs.elki.index.tree.Node;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Abstract super class for all metrical index classes.
@@ -17,22 +17,19 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
  * 
  * @apiviz.has MetricalNode oneway - - contains
  * 
- * @param <O> the type of DatabaseObject to be stored in the metrical index
+ * @param <O> the type of objects stored in the index
  * @param <D> the type of Distance used in the metrical index
- * @param <N> the type of MetricalNode used in the metrical index
- * @param <E> the type of MetricalEntry used in the metrical index
+ * @param <N> the type of nodes used in the metrical index
+ * @param <E> the type of entries used in the metrical index
  */
-public abstract class MetricalIndex<O, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MetricalEntry> extends TreeIndex<O, N, E> implements KNNIndex<O>, RangeIndex<O> {
+public abstract class MetricalIndexTree<O, D extends Distance<D>, N extends Node<N, E>, E extends Entry> extends IndexTree<N, E> {
   /**
    * Constructor.
    * 
-   * @param relation Relation in use
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    */
-  public MetricalIndex(Relation<O> relation, String fileName, int pageSize, long cacheSize) {
-    super(relation, fileName, pageSize, cacheSize);
+  public MetricalIndexTree(PageFile<N> pagefile) {
+    super(pagefile);
   }
 
   /**

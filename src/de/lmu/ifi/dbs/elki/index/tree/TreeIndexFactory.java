@@ -1,7 +1,13 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.persistent.LRUCache;
+import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
+import de.lmu.ifi.dbs.elki.persistent.Page;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -22,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @param <O> Object type
  * @param <I> Index type
  */
-public abstract class TreeIndexFactory<O, I extends TreeIndex<O, ?, ?>> implements IndexFactory<O, I> {
+public abstract class TreeIndexFactory<O, I extends Index> implements IndexFactory<O, I> {
   /**
    * Optional parameter that specifies the name of the file storing the index.
    * If this parameter is not set the index is hold in the main memory.
@@ -74,7 +80,7 @@ public abstract class TreeIndexFactory<O, I extends TreeIndex<O, ?, ?>> implemen
 
   /**
    * Constructor.
-   *
+   * 
    * @param fileName
    * @param pageSize
    * @param cacheSize
@@ -84,6 +90,23 @@ public abstract class TreeIndexFactory<O, I extends TreeIndex<O, ?, ?>> implemen
     this.fileName = fileName;
     this.pageSize = pageSize;
     this.cacheSize = cacheSize;
+  }
+
+  /**
+   * Make the page file for this index.
+   * 
+   * @param <N> page type
+   * @param cls Class information
+   * @return Page file
+   */
+  // FIXME: make this single-shot when filename is set!
+  protected <N extends Page<N>> PageFile<N> makePageFile(Class<N> cls) {
+    if(fileName == null) {
+      return new MemoryPageFile<N>(pageSize, cacheSize, new LRUCache<N>());
+    }
+    else {
+      return new PersistentPageFile<N>(pageSize, cacheSize, new LRUCache<N>(), fileName, cls);
+    }
   }
 
   @Override

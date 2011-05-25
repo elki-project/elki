@@ -18,9 +18,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @param <O> object type
  * @param <D> distance type
- * @param <N> number type
  */
-class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
+class MkCoPTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> {
   /**
    * Serial version UID
    */
@@ -41,7 +40,7 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public MkCoPTreeNode(PageFile<MkCoPTreeNode<O, D, N>> file, int capacity, boolean isLeaf) {
+  public MkCoPTreeNode(PageFile<MkCoPTreeNode<O, D>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf, MkCoPEntry.class);
   }
 
@@ -52,8 +51,8 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
    * @return a new leaf node
    */
   @Override
-  protected MkCoPTreeNode<O, D, N> createNewLeafNode(int capacity) {
-    return new MkCoPTreeNode<O, D, N>(getFile(), capacity, true);
+  protected MkCoPTreeNode<O, D> createNewLeafNode(int capacity) {
+    return new MkCoPTreeNode<O, D>(getFile(), capacity, true);
   }
 
   /**
@@ -63,8 +62,8 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
    * @return a new directory node
    */
   @Override
-  protected MkCoPTreeNode<O, D, N> createNewDirectoryNode(int capacity) {
-    return new MkCoPTreeNode<O, D, N>(getFile(), capacity, false);
+  protected MkCoPTreeNode<O, D> createNewDirectoryNode(int capacity) {
+    return new MkCoPTreeNode<O, D>(getFile(), capacity, false);
   }
 
   /**
@@ -82,13 +81,13 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
     double y_kmax = Double.NEGATIVE_INFINITY;
 
     for(int i = 0; i < getNumEntries(); i++) {
-      MkCoPEntry<D, N> entry = getEntry(i);
+      MkCoPEntry<D> entry = getEntry(i);
       ApproximationLine approx = entry.getConservativeKnnDistanceApproximation();
       k_0 = Math.min(approx.getK_0(), k_0);
     }
 
     for(int i = 0; i < getNumEntries(); i++) {
-      MkCoPEntry<D, N> entry = getEntry(i);
+      MkCoPEntry<D> entry = getEntry(i);
       ApproximationLine approx = entry.getConservativeKnnDistanceApproximation();
       double entry_y_1 = approx.getValueAt(k_0);
       double entry_y_kmax = approx.getValueAt(k_max);
@@ -136,13 +135,13 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
     double y_kmax = Double.POSITIVE_INFINITY;
 
     for(int i = 0; i < getNumEntries(); i++) {
-      MkCoPLeafEntry<D, N> entry = (MkCoPLeafEntry<D, N>) getEntry(i);
+      MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) getEntry(i);
       ApproximationLine approx = entry.getProgressiveKnnDistanceApproximation();
       k_0 = Math.max(approx.getK_0(), k_0);
     }
 
     for(int i = 0; i < getNumEntries(); i++) {
-      MkCoPLeafEntry<D, N> entry = (MkCoPLeafEntry<D, N>) getEntry(i);
+      MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) getEntry(i);
       ApproximationLine approx = entry.getProgressiveKnnDistanceApproximation();
       y_1 = Math.min(approx.getValueAt(k_0), y_1);
       y_kmax = Math.min(approx.getValueAt(k_max), y_kmax);
@@ -156,7 +155,7 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
   }
 
   @Override
-  public void adjustEntry(MkCoPEntry<D, N> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> mTree) {
+  public void adjustEntry(MkCoPEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust conservative distance approximation
     // int k_max = ((MkCoPTree<O,D>) mTree).getK_max();
@@ -164,11 +163,11 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
   }
 
   @Override
-  protected void integrityCheckParameters(MkCoPEntry<D, N> parentEntry, MkCoPTreeNode<O, D, N> parent, int index, AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> mTree) {
+  protected void integrityCheckParameters(MkCoPEntry<D> parentEntry, MkCoPTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test conservative approximation
-    MkCoPEntry<D, N> entry = parent.getEntry(index);
-    int k_max = ((MkCoPTree<O, D, N>) mTree).getK_max();
+    MkCoPEntry<D> entry = parent.getEntry(index);
+    int k_max = ((MkCoPTree<O, D>) mTree).getK_max();
     ApproximationLine approx = conservativeKnnDistanceApproximation(k_max);
     if(!entry.getConservativeKnnDistanceApproximation().equals(approx)) {
       String soll = approx.toString();

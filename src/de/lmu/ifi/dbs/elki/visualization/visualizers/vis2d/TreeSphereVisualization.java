@@ -97,9 +97,10 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    * @param task Task
    * @param fill fill flag
    */
+  @SuppressWarnings("unchecked")
   public TreeSphereVisualization(VisualizationTask task, boolean fill) {
     super(task);
-    this.tree = task.getResult();
+    this.tree = AbstractMTree.class.cast(task.getResult());
     this.p = getLPNormP(this.tree);
     this.fill = fill;
     incrementalRedraw();
@@ -186,7 +187,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    * @param entry Current entry
    * @param depth Current depth
    */
-  private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<NV, D, ? extends N, E> mtree, E entry, int depth) {
+  private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<NV, D, N, E> mtree, E entry, int depth) {
     DBID roid = entry.getRoutingObjectID();
     if(roid != null) {
       NV ro = rep.get(roid);
@@ -260,12 +261,12 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
     public void addVisualizers(VisualizerContext context, Result result) {
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
-        ArrayList<AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
-        for(AbstractMTree<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>> tree : trees) {
-          if(canVisualize(tree)) {
-            final VisualizationTask task = new VisualizationTask(NAME, context, tree, rep, this, P2DVisualization.class);
+        ArrayList<AbstractMTree<NV, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
+        for(AbstractMTree<NV, DoubleDistance, ?, ?> tree : trees) {
+          if(canVisualize(tree) && tree instanceof Result) {
+            final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, rep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
-            context.addVisualizer(tree, task);
+            context.addVisualizer((Result) tree, task);
           }
         }
       }

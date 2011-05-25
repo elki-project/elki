@@ -1,17 +1,14 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -40,48 +37,12 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
   /**
    * Constructor.
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    */
-  public MTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
-    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
-  }
-
-  /**
-   * Inserts the specified object into this M-Tree by calling
-   * {@link AbstractMTree#insert
-   * AbstractMTree.insert(id, object, false)}.
-   * 
-   * @param object the object to be inserted
-   */
-  @Override
-  public void insert(DBID id) {
-    this.insert(id, relation.get(id), false);
-  }
-
-  /**
-   * Inserts the specified objects into this M-Tree sequentially since a bulk
-   * load method is not implemented so far. Calls for each object
-   * {@link AbstractMTree#insert
-   * AbstractMTree.insert(id, object, false)}.
-   */
-  // todo: bulk load method
-  @Override
-  public void insertAll(DBIDs ids) {
-    if (ids.isEmpty()) {
-      return;
-    }
-    for (DBID id : ids) {
-      insert(id, relation.get(id), false);
-    }
-
-    if(extraIntegrityChecks) {
-      getRoot().integrityCheck(this, getRootEntry());
-    }
+  public MTree(PageFile<MTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
+    super(pagefile, distanceQuery, distanceFunction);
   }
 
   /**
@@ -97,12 +58,12 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
     int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
 
     // FIXME: simulate a proper feature size!
-    int featuresize = 0; //DatabaseUtil.dimensionality(relation);
+    int featuresize = 0; // DatabaseUtil.dimensionality(relation);
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(pageSize - overhead < 0) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+    if(file.getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
@@ -112,10 +73,10 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
 
     // dirCapacity = (pageSize - overhead) / (nodeID + **object feature size** +
     // coveringRadius + parentDistance) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + featuresize + distanceSize + distanceSize) + 1;
+    dirCapacity = (int) (file.getPageSize() - overhead) / (4 + featuresize + distanceSize + distanceSize) + 1;
 
     if(dirCapacity <= 2) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -127,10 +88,10 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
     // leafCapacity = (pageSize - overhead) / (objectID + ** object size ** +
     // parentDistance) +
     // 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + featuresize + distanceSize) + 1;
+    leafCapacity = (int) (file.getPageSize() - overhead) / (4 + featuresize + distanceSize) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -140,14 +101,6 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
     if(logger.isVerbose()) {
       logger.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
-  }
-
-  /**
-   * @return a new MTreeLeafEntry representing the specified data object
-   */
-  @Override
-  protected MTreeEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    return new MTreeLeafEntry<D>(id, parentDistance);
   }
 
   /**
@@ -181,16 +134,6 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
   @Override
   protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
     return new MTreeNode<O, D>(file, capacity, false);
-  }
-
-  /**
-   * Return the node base class.
-   * 
-   * @return node base class
-   */
-  @Override
-  protected Class<MTreeNode<O, D>> getNodeClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(MTreeNode.class);
   }
 
   @Override

@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D> Distance type
  * @param <I> Index type
  */
-public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, I extends AbstractMkTreeUnified<O, D, ?, ?>> extends AbstractMTreeFactory<O, D, I> {
+public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, I extends AbstractMkTree<O, D, ?, ?> & Index> extends AbstractMTreeFactory<O, D, I> {
   /**
    * Parameter specifying the maximal number k of reverse k nearest neighbors to
    * be supported, must be an integer greater than 0.

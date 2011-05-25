@@ -12,16 +12,13 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
@@ -50,37 +47,15 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   private QueryStatistic rkNNStatistics = new QueryStatistic();
 
   /**
-   * The kNN query we use internally.
-   */
-  private final KNNQuery<O, D> knnQuery;
-
-  /**
    * Constructor.
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    * @param k_max Maximum value for k
    */
-  public MkMaxTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction, k_max);
-
-    this.knnQuery = this.getKNNQuery(distanceQuery);
-  }
-
-  /**
-   * Inserts the specified object into this MkMax-Tree by calling
-   * {@link AbstractMTree#insert(DBID,O,boolean) AbstractMTree.insert(id,
-   * object, true)}.
-   * 
-   * @param object the object to be inserted
-   */
-  @Override
-  public void insert(DBID id) {
-    this.insert(id, relation.get(id), true);
+  public MkMaxTree(PageFile<MkMaxTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
+    super(pagefile, distanceQuery, distanceFunction, k_max);
   }
 
   /**
@@ -91,7 +66,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
-    if(k > this.k_max) {
+    if(k > this.getKmax()) {
       throw new IllegalArgumentException("Parameter k has to be equal or less than " + "parameter k of the MkMax-Tree!");
     }
 
@@ -99,7 +74,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     List<DistanceResultPair<D>> candidates = new ArrayList<DistanceResultPair<D>>();
     doReverseKNNQuery(id, getRoot(), null, candidates);
 
-    if(k == this.k_max) {
+    if(k == this.getKmax()) {
       Collections.sort(candidates);
       rkNNStatistics.addTrueHits(candidates.size());
       rkNNStatistics.addResults(candidates.size());
@@ -154,7 +129,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected void preInsert(MkMaxEntry<D> entry) {
-    KNNHeap<D> knns_o = new KNNHeap<D>(k_max, getDistanceQuery().infiniteDistance());
+    KNNHeap<D> knns_o = new KNNHeap<D>(getKmax(), getDistanceQuery().infiniteDistance());
     preInsert(entry, getRootEntry(), knns_o);
   }
 
@@ -249,7 +224,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         if(dist_pq.compareTo(knnDist_q) <= 0) {
           DistanceResultPair<D> knn = new GenericDistanceResultPair<D>(dist_pq, p.getRoutingObjectID());
           knns_q.add(knn);
-          if(knns_q.size() >= k_max) {
+          if(knns_q.size() >= getKmax()) {
             knnDist_q = knns_q.getMaximumDistance();
             q.setKnnDistance(knnDist_q);
           }
@@ -258,11 +233,11 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
         if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
-          KNNHeap<D> knns_p = new KNNHeap<D>(k_max, getDistanceQuery().infiniteDistance());
+          KNNHeap<D> knns_p = new KNNHeap<D>(getKmax(), getDistanceQuery().infiniteDistance());
           knns_p.add(new GenericDistanceResultPair<D>(dist_pq, q.getRoutingObjectID()));
           doKNNQuery(p.getRoutingObjectID(), knns_p);
 
-          if(knns_p.size() < k_max) {
+          if(knns_p.size() < getKmax()) {
             p.setKnnDistance(getDistanceQuery().undefinedDistance());
           }
           else {
@@ -299,28 +274,28 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(pageSize - overhead < 0) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+    if(file.getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
-    // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
+    // dirCapacity = (file.getPageSize() - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance + knnDistance) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + 3 * distanceSize) + 1;
+    dirCapacity = (int) (file.getPageSize() - overhead) / (4 + 4 + 3 * distanceSize) + 1;
 
     if(dirCapacity <= 1) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
       logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
-    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance +
+    // leafCapacity = (file.getPageSize() - overhead) / (objectID + parentDistance +
     // knnDistance) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + 2 * distanceSize) + 1;
+    leafCapacity = (int) (file.getPageSize() - overhead) / (4 + 2 * distanceSize) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -345,16 +320,6 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
 
   /**
-   * @return a new MkMaxLeafEntry representing the specified data object
-   */
-  @Override
-  protected MkMaxEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    List<DistanceResultPair<D>> knns = knnQuery.getKNNForObject(object, k_max - 1);
-    D knnDistance = knns.get(knns.size() - 1).getDistance();
-    return new MkMaxLeafEntry<D>(id, parentDistance, knnDistance);
-  }
-
-  /**
    * @return a new MkMaxDirectoryEntry representing the specified node
    */
   @Override
@@ -369,16 +334,6 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   @Override
   protected MkMaxEntry<D> createRootEntry() {
     return new MkMaxDirectoryEntry<D>(null, null, 0, null, null);
-  }
-
-  /**
-   * Return the node base class.
-   * 
-   * @return node base class
-   */
-  @Override
-  protected Class<MkMaxTreeNode<O, D>> getNodeClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(MkMaxTreeNode.class);
   }
 
   @Override

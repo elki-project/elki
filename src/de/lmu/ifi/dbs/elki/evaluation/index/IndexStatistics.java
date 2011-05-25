@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
+import de.lmu.ifi.dbs.elki.index.tree.IndexTree;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -31,11 +31,11 @@ public class IndexStatistics implements Evaluator {
   @Override
   public void processResult(Database db, Result result) {
     Collection<String> header = null;
-    final ArrayList<TreeIndex<?, ?, ?>> indexes = ResultUtil.filterResults(result, TreeIndex.class);
+    final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(result, IndexTree.class);
     if (indexes == null || indexes.size() <= 0) {
       return;
     }
-    for(TreeIndex<?, ?, ?> index : indexes) {
+    for(IndexTree<?, ?> index : indexes) {
       header = new java.util.Vector<String>();
       header.add(index.toString());
     }

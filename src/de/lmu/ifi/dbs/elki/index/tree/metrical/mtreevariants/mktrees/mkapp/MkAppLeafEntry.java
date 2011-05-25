@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * 
  * @author Elke Achtert
  */
-class MkAppLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends MTreeLeafEntry<D> implements MkAppEntry<D, N> {
+class MkAppLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> implements MkAppEntry<D> {
   /**
    * Serial Version UID
    */

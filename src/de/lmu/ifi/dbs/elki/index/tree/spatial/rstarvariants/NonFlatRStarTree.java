@@ -3,16 +3,12 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -20,24 +16,20 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Elke Achtert
  * 
- * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
+public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractRStarTree<N, E> {
   /**
    * Constructor.
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param bulk bulk flag
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public NonFlatRStarTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public NonFlatRStarTree(PageFile<N> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**
@@ -107,16 +99,15 @@ public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends Ab
    * the constructor and should be overwritten by subclasses if necessary.
    */
   @Override
-  protected void bulkLoad(DBIDs ids) {
+  protected void bulkLoad(List<E> spatialObjects) {
+    if(!initialized) {
+      initialize(spatialObjects.get(0));
+    }
+    
     StringBuffer msg = new StringBuffer();
 
-    List<SpatialPair<DBID, O>> spatialObjects = new ArrayList<SpatialPair<DBID, O>>(ids.size());
-    for (DBID id : ids) {
-      spatialObjects.add(new SpatialPair<DBID, O>(id, relation.get(id)));
-    }
-
     // root is leaf node
-    if(ids.size() / (leafCapacity - 1.0) <= 1) {
+    if(spatialObjects.size() / (leafCapacity - 1.0) <= 1) {
       N root = createNewLeafNode(leafCapacity);
       root.setPageID(getRootEntry().getEntryID());
       file.writePage(root);
@@ -134,7 +125,7 @@ public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends Ab
       file.writePage(root);
 
       // create leaf nodes
-      List<N> nodes = createLeafNodes(spatialObjects);
+      List<N> nodes = createBulkLeafNodes(spatialObjects);
 
       int numNodes = nodes.size();
       if(getLogger().isDebugging()) {
@@ -214,12 +205,9 @@ public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends Ab
   private N createRoot(N root, List<? extends SpatialComparable> objects) {
     // insert data
     for(SpatialComparable object : objects) {
-      if(object instanceof SpatialPair) {
-        SpatialPair<?, ?> pair = (SpatialPair<?, ?>) object;
-        if(pair.first instanceof DBID && pair.second instanceof NumberVector) {
-          root.addLeafEntry(createNewLeafEntry((DBID) pair.first));
-          continue;
-        }
+      if(object instanceof SpatialEntry) {
+        E entry = (E) object;
+        root.addLeafEntry(entry);
         throw new AbortException("Unexpected spatial comparable encountered.");
       }
       else {
@@ -228,7 +216,7 @@ public abstract class NonFlatRStarTree<O extends SpatialComparable, N extends Ab
     }
 
     // set root mbr
-    ((SpatialDirectoryEntry)getRootEntry()).setMBR(root.computeMBR());
+    ((SpatialDirectoryEntry) getRootEntry()).setMBR(root.computeMBR());
 
     // write to file
     file.writePage(root);

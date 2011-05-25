@@ -87,4 +87,10 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
     super.clear();
     file.clear();
   }
+
+  @Override
+  public boolean initialize(@SuppressWarnings("unused") PageHeader header) {
+    // Did not exist.
+    return false;
+  }
 }

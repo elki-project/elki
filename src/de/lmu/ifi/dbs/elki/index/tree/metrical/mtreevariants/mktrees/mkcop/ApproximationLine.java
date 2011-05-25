@@ -104,7 +104,7 @@ public class ApproximationLine implements Externalizable {
    * @param distanceFunction the distance function
    * @return the approximated knn-distance at the specified k
    */
-  public <O, D extends NumberDistance<D, N>, N extends Number> D getApproximatedKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
+  public <O, D extends NumberDistance<D, ?>> D getApproximatedKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
     if(k < k_0) {
       return distanceFunction.nullDistance();
     }

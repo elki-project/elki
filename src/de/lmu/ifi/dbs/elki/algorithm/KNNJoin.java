@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFun
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -88,7 +88,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   /**
    * Joins in the given spatial database to each object its k-nearest neighbors.
    * 
-   * @throws IllegalStateException if not suitable {@link SpatialIndex} was
+   * @throws IllegalStateException if not suitable {@link SpatialIndexTree} was
    *         found or the specified distance function is not an instance of
    *         {@link SpatialPrimitiveDistanceFunction}.
    */
@@ -97,12 +97,12 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
-    Collection<SpatialIndex<V, N, E>> indexes = ResultUtil.filterResults(database, SpatialIndex.class);
+    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(database, SpatialIndexTree.class);
     if(indexes.size() != 1) {
       throw new AbortException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
     // FIXME: Ensure were looking at the right relation!
-    SpatialIndex<V, N, E> index = indexes.iterator().next();
+    SpatialIndexTree<N, E> index = indexes.iterator().next();
     SpatialPrimitiveDistanceFunction<V, D> distFunction = (SpatialPrimitiveDistanceFunction<V, D>) getDistanceFunction();
     DistanceQuery<V, D> distq = database.getDistanceQuery(relation, distFunction);
 

@@ -1,20 +1,15 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * FlatRTree is a spatial index structure based on a R*-Tree but with a flat
@@ -24,15 +19,13 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * @author Elke Achtert
  * 
  * @apiviz.has FlatRStarTreeNode oneway - - contains
- * 
- * @param <O> object type
  */
-public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
+public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialEntry> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(FlatRStarTree.class);
-  
+
   /**
    * The root of this flat RTree.
    */
@@ -41,24 +34,21 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   /**
    * Constructor.
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param bulk bulk flag
    * @param bulkLoadStrategy bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public FlatRStarTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public FlatRStarTree(PageFile<FlatRStarTreeNode> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
   }
 
   /**
    * Initializes the flat RTree from an existing persistent file.
    */
   @Override
-  public void initializeFromFile() {
-    super.initializeFromFile();
+  public void initializeFromFile(TreeIndexHeader header) {
+    super.initializeFromFile(header);
 
     // reconstruct root
     int nextPageID = file.getNextPageID();
@@ -98,15 +88,13 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
    * the constructor and should be overwritten by subclasses if necessary.
    */
   @Override
-  protected void bulkLoad(DBIDs ids) {
-    List<SpatialPair<DBID, O>> spatialObjects = new ArrayList<SpatialPair<DBID, O>>(ids.size());
-    for (DBID id : ids) {
-      spatialObjects.add(new SpatialPair<DBID, O>(id, relation.get(id)));
+  protected void bulkLoad(List<SpatialEntry> spatialObjects) {
+    if(!initialized) {
+      initialize(spatialObjects.get(0));
     }
     // create leaf nodes
-    // noinspection PointlessArithmeticExpression
     file.setNextPageID(getRootEntry().getEntryID() + 1);
-    List<FlatRStarTreeNode> nodes = createLeafNodes(spatialObjects);
+    List<FlatRStarTreeNode> nodes = createBulkLeafNodes(spatialObjects);
     int numNodes = nodes.size();
     if(logger.isDebugging()) {
       logger.debugFine("  numLeafNodes = " + numNodes);
@@ -208,11 +196,6 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   }
 
   @Override
-  protected SpatialEntry createNewLeafEntry(DBID id) {
-    return new SpatialPointLeafEntry(id, relation.get(id));
-  }
-
-  @Override
   protected SpatialEntry createNewDirectoryEntry(FlatRStarTreeNode node) {
     return new SpatialDirectoryEntry(node.getPageID(), node.computeMBR());
   }
@@ -220,33 +203,6 @@ public final class FlatRStarTree<O extends NumberVector<O, ?>> extends AbstractR
   @Override
   protected SpatialEntry createRootEntry() {
     return new SpatialDirectoryEntry(0, null);
-  }
-
-  /**
-   * Does nothing.
-   */
-  @Override
-  protected void preInsert(@SuppressWarnings("unused") SpatialEntry entry) {
-    // do nothing
-  }
-
-  /**
-   * Does nothing.
-   */
-  @SuppressWarnings("unused")
-  @Override
-  protected void postDelete(DBID id) {
-    // do nothing
-  }
-
-  /**
-   * Return the node base class.
-   * 
-   * @return node base class
-   */
-  @Override
-  protected Class<FlatRStarTreeNode> getNodeClass() {
-    return FlatRStarTreeNode.class;
   }
 
   @Override

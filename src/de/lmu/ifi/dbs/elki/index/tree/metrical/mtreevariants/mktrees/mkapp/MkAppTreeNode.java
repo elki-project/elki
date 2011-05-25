@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @param <D> distance type
  * @param <N> number type
  */
-class MkAppTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTreeNode<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
+class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
   private static final long serialVersionUID = 1;
 
   /**
@@ -40,7 +40,7 @@ class MkAppTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public MkAppTreeNode(PageFile<MkAppTreeNode<O, D, N>> file, int capacity, boolean isLeaf) {
+  public MkAppTreeNode(PageFile<MkAppTreeNode<O, D>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf, MkAppEntry.class);
   }
 
@@ -51,8 +51,8 @@ class MkAppTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
    * @return a new leaf node
    */
   @Override
-  protected MkAppTreeNode<O, D, N> createNewLeafNode(int capacity) {
-    return new MkAppTreeNode<O, D, N>(getFile(), capacity, true);
+  protected MkAppTreeNode<O, D> createNewLeafNode(int capacity) {
+    return new MkAppTreeNode<O, D>(getFile(), capacity, true);
   }
 
   /**
@@ -62,8 +62,8 @@ class MkAppTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
    * @return a new directory node
    */
   @Override
-  protected MkAppTreeNode<O, D, N> createNewDirectoryNode(int capacity) {
-    return new MkAppTreeNode<O, D, N>(getFile(), capacity, false);
+  protected MkAppTreeNode<O, D> createNewDirectoryNode(int capacity) {
+    return new MkAppTreeNode<O, D>(getFile(), capacity, false);
   }
 
   /**
@@ -77,7 +77,7 @@ class MkAppTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
     int p_max = 0;
     double[] b = null;
     for(int i = 0; i < getNumEntries(); i++) {
-      MkAppEntry<D, N> entry = getEntry(i);
+      MkAppEntry<D> entry = getEntry(i);
       PolynomialApproximation approximation = entry.getKnnDistanceApproximation();
       if(b == null) {
         p_max = approximation.getPolynomialOrder();
@@ -111,16 +111,16 @@ class MkAppTreeNode<O, D extends NumberDistance<D, N>, N extends Number> extends
    * @param mTree the M-Tree object holding this node
    */
   @Override
-  public void adjustEntry(MkAppEntry<D, N> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> mTree) {
+  public void adjustEntry(MkAppEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // entry.setKnnDistanceApproximation(knnDistanceApproximation());
   }
 
   @Override
-  protected void integrityCheckParameters(MkAppEntry<D, N> parentEntry, MkAppTreeNode<O, D, N> parent, int index, AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> mTree) {
+  protected void integrityCheckParameters(MkAppEntry<D> parentEntry, MkAppTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
 
-    MkAppEntry<D, N> entry = parent.getEntry(index);
+    MkAppEntry<D> entry = parent.getEntry(index);
     PolynomialApproximation approximation_soll = knnDistanceApproximation();
     PolynomialApproximation approximation_ist = entry.getKnnDistanceApproximation();
 

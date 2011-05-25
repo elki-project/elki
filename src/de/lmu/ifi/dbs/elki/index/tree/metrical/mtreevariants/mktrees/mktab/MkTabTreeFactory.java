@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnifiedFactory;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Factory for MkTabTrees
@@ -16,7 +18,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTree<O, D>> {
+public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTreeIndex<O, D>> {
   /**
    * Constructor.
    * 
@@ -31,8 +33,13 @@ public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   }
 
   @Override
-  public MkTabTree<O, D> instantiate(Relation<O> relation) {
-    return new MkTabTree<O, D>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction, k_max);
+  public MkTabTreeIndex<O, D> instantiate(Relation<O> relation) {
+    PageFile<MkTabTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
+    return new MkTabTreeIndex<O, D>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
+  }
+
+  protected Class<MkTabTreeNode<O, D>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(MkTabTreeNode.class);
   }
 
   /**

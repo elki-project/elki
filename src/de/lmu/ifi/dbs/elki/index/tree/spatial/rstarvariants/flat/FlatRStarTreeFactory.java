@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Factory for flat R*-Trees.
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFac
  * 
  * @param <O> Object type
  */
-public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory<O, FlatRStarTree<O>> {
+public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory<O, FlatRStarTreeIndex<O>> {
   /**
    * Constructor.
    * 
@@ -32,8 +33,13 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
   }
 
   @Override
-  public FlatRStarTree<O> instantiate(Relation<O> relation) {
-    return new FlatRStarTree<O>(relation, fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public FlatRStarTreeIndex<O> instantiate(Relation<O> relation) {
+    PageFile<FlatRStarTreeNode> pagefile = makePageFile(getNodeClass());
+    return new FlatRStarTreeIndex<O>(relation, pagefile, bulk, bulkLoadStrategy, insertionCandidates);
+  }
+
+  protected Class<FlatRStarTreeNode> getNodeClass() {
+    return FlatRStarTreeNode.class;
   }
 
   /**

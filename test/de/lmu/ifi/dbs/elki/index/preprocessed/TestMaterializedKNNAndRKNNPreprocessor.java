@@ -83,8 +83,8 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     assertEquals("Data set size doesn't match parameters.", shoulds, rep.size());
 
     // get linear queries
-    LinearScanKNNQuery<DoubleVector, DoubleDistance> lin_knn_query = new LinearScanKNNQuery<DoubleVector, DoubleDistance>(rep, distanceQuery);
-    LinearScanRKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query = new LinearScanRKNNQuery<DoubleVector, DoubleDistance>(rep, distanceQuery, lin_knn_query, k);
+    LinearScanKNNQuery<DoubleVector, DoubleDistance> lin_knn_query = new LinearScanKNNQuery<DoubleVector, DoubleDistance>(distanceQuery);
+    LinearScanRKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query = new LinearScanRKNNQuery<DoubleVector, DoubleDistance>(distanceQuery, lin_knn_query, k);
 
     // get preprocessed queries
     ListParameterization config = new ListParameterization();

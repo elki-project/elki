@@ -51,7 +51,7 @@ public class TestOnlineLOF implements JUnit4Test {
 
   // reachability distance function for LOF and OnlineLOF
   @SuppressWarnings("rawtypes")
-  static DistanceFunction reachabilityDistanceFunction = new CosineDistanceFunction();
+  static DistanceFunction reachabilityDistanceFunction = CosineDistanceFunction.STATIC;
 
   // seed for the generator
   static int seed = 5;

@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnifiedFactory;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Factory for MkMaxTrees
@@ -16,7 +18,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkMaxTree<O, D>> {
+public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkMaxTreeIndex<O, D>> {
   /**
    * Constructor.
    *
@@ -31,8 +33,13 @@ public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   }
 
   @Override
-  public MkMaxTree<O, D> instantiate(Relation<O> relation) {
-    return new MkMaxTree<O, D>(relation, fileName, pageSize, cacheSize, distanceFunction.instantiate(relation), distanceFunction, k_max);
+  public MkMaxTreeIndex<O, D> instantiate(Relation<O> relation) {
+    PageFile<MkMaxTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
+    return new MkMaxTreeIndex<O, D>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
+  }
+
+  protected Class<MkMaxTreeNode<O, D>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(MkMaxTreeNode.class);
   }
 
   /**

@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -21,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> Distance type
  * @param <I> Index type
  */
-public abstract class AbstractMTreeFactory<O, D extends Distance<D>, I extends AbstractMTree<O, D, ?, ?>> extends TreeIndexFactory<O, I> {
+public abstract class AbstractMTreeFactory<O, D extends Distance<D>, I extends AbstractMTree<O, D, ?, ?> & Index> extends TreeIndexFactory<O, I> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend

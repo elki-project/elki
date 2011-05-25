@@ -66,8 +66,8 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   }
 
   @Override
-  public final Enumeration<TreeIndexPath<E>> children(final TreeIndexPath<E> parentPath) {
-    return new Enumeration<TreeIndexPath<E>>() {
+  public final Enumeration<IndexTreePath<E>> children(final IndexTreePath<E> parentPath) {
+    return new Enumeration<IndexTreePath<E>>() {
       int count = 0;
 
       @Override
@@ -76,7 +76,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
       }
 
       @Override
-      public TreeIndexPath<E> nextElement() {
+      public IndexTreePath<E> nextElement() {
         synchronized(AbstractNode.this) {
           if(count < numEntries) {
             return parentPath.pathByAddingChild(new TreeIndexPathComponent<E>(entries[count], count++));

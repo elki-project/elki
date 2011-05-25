@@ -10,25 +10,24 @@ import java.util.Queue;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses TreeIndex
- * @apiviz.has TreeIndexPath
+ * @apiviz.uses IndexTree
+ * @apiviz.has IndexTreePath
  * 
- * @param <O> Object type
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public class BreadthFirstEnumeration<O, N extends Node<N, E>, E extends Entry> implements Enumeration<TreeIndexPath<E>> {
+public class BreadthFirstEnumeration<N extends Node<N, E>, E extends Entry> implements Enumeration<IndexTreePath<E>> {
   /**
    * Represents an empty enumeration.
    */
-  public final Enumeration<TreeIndexPath<E>> EMPTY_ENUMERATION = new Enumeration<TreeIndexPath<E>>() {
+  public final Enumeration<IndexTreePath<E>> EMPTY_ENUMERATION = new Enumeration<IndexTreePath<E>>() {
     @Override
     public boolean hasMoreElements() {
       return false;
     }
 
     @Override
-    public TreeIndexPath<E> nextElement() {
+    public IndexTreePath<E> nextElement() {
       throw new NoSuchElementException("No more children");
     }
   };
@@ -36,26 +35,26 @@ public class BreadthFirstEnumeration<O, N extends Node<N, E>, E extends Entry> i
   /**
    * The queue for the enumeration.
    */
-  private Queue<Enumeration<TreeIndexPath<E>>> queue;
+  private Queue<Enumeration<IndexTreePath<E>>> queue;
 
   /**
    * The index storing the nodes.
    */
-  private TreeIndex<O, N, E> index;
+  private IndexTree<N, E> index;
 
   /**
    * Creates a new breadth first enumeration with the specified node as root
    * node.
    * 
    * @param rootPath the root entry of the enumeration
-   * @param index the index storing the nodes
+   * @param tree the index storing the nodes
    */
-  public BreadthFirstEnumeration(final TreeIndex<O, N, E> index, final TreeIndexPath<E> rootPath) {
+  public BreadthFirstEnumeration(final IndexTree<N, E> index, final IndexTreePath<E> rootPath) {
     super();
-    this.queue = new LinkedList<Enumeration<TreeIndexPath<E>>>();
+    this.queue = new LinkedList<Enumeration<IndexTreePath<E>>>();
     this.index = index;
 
-    Enumeration<TreeIndexPath<E>> root_enum = new Enumeration<TreeIndexPath<E>>() {
+    Enumeration<IndexTreePath<E>> root_enum = new Enumeration<IndexTreePath<E>>() {
       boolean hasNext = true;
 
       @Override
@@ -64,7 +63,7 @@ public class BreadthFirstEnumeration<O, N extends Node<N, E>, E extends Entry> i
       }
 
       @Override
-      public TreeIndexPath<E> nextElement() {
+      public IndexTreePath<E> nextElement() {
         hasNext = false;
         return rootPath;
       }
@@ -92,11 +91,11 @@ public class BreadthFirstEnumeration<O, N extends Node<N, E>, E extends Entry> i
    * @throws java.util.NoSuchElementException if no more elements exist.
    */
   @Override
-  public TreeIndexPath<E> nextElement() {
-    Enumeration<TreeIndexPath<E>> enumeration = queue.peek();
-    TreeIndexPath<E> nextPath = enumeration.nextElement();
+  public IndexTreePath<E> nextElement() {
+    Enumeration<IndexTreePath<E>> enumeration = queue.peek();
+    IndexTreePath<E> nextPath = enumeration.nextElement();
 
-    Enumeration<TreeIndexPath<E>> children;
+    Enumeration<IndexTreePath<E>> children;
     if(nextPath.getLastPathComponent().getEntry().isLeafEntry()) {
       children = EMPTY_ENUMERATION;
     }

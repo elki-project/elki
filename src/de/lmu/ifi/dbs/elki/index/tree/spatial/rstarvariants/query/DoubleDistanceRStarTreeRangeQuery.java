@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
@@ -33,7 +32,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
   /**
    * The index to use
    */
-  protected final AbstractRStarTree<O, ?, ?> index;
+  protected final AbstractRStarTree<?, ?> tree;
 
   /**
    * Spatial primitive distance function
@@ -43,14 +42,13 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
   /**
    * Constructor.
    * 
-   * @param relation Relation to use
-   * @param index Index to use
+   * @param tree Index to use
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public DoubleDistanceRStarTreeRangeQuery(Relation<? extends O> relation, AbstractRStarTree<O, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
-    super(relation, distanceQuery);
-    this.index = index;
+  public DoubleDistanceRStarTreeRangeQuery(AbstractRStarTree<?, ?> tree, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
+    super(distanceQuery);
+    this.tree = tree;
     this.distanceFunction = distanceFunction;
   }
 
@@ -66,7 +64,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
     final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>();
 
     // push root
-    pq.add(new DoubleDistanceSearchCandidate(0.0, index.getRootEntry().getEntryID()));
+    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootEntry().getEntryID()));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -75,11 +73,12 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
         break;
       }
 
-      AbstractRStarTreeNode<?, ?> node = index.getNode(pqNode.nodeID);
+      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {
         double distance = distanceFunction.doubleMinDist(object, node.getEntry(i));
+        tree.distanceCalcs++;
         if(distance <= epsilon) {
           if(node.isLeaf()) {
             LeafEntry entry = (LeafEntry) node.getEntry(i);

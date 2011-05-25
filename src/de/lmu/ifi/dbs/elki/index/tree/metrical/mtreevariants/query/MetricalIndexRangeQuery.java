@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -31,12 +30,11 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
   /**
    * Constructor.
    * 
-   * @param relation Relation to use
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexRangeQuery(Relation<? extends O> relation, AbstractMTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
-    super(relation, distanceQuery);
+  public MetricalIndexRangeQuery(AbstractMTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+    super(distanceQuery);
     this.index = index;
   }
 

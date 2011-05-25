@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -20,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  * @param <I> Index type
  */
-public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I extends AbstractRStarTree<O, ?, ?>> extends SpatialIndexFactory<O, I> {
+public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I extends AbstractRStarTree<?, ?> & Index> extends SpatialIndexFactory<O, I> {
   /**
    * Fast-insertion parameter. Optional.
    */

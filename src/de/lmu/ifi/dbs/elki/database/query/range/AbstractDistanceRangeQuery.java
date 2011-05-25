@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -29,11 +28,10 @@ public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> exten
   /**
    * Constructor.
    * 
-   * @param relation Relation
    * @param distanceQuery Distance query
    */
-  public AbstractDistanceRangeQuery(Relation<? extends O> relation, DistanceQuery<O, D> distanceQuery) {
-    super(relation);
+  public AbstractDistanceRangeQuery(DistanceQuery<O, D> distanceQuery) {
+    super(distanceQuery.getRelation());
     this.distanceQuery = distanceQuery;
   }
 

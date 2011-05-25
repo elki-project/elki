@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -23,7 +22,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
  * @param <D> the type of NumberDistance used in the metrical index
  * @param <N> the type of Number used in the NumberDistance
  */
-public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> extends AbstractMkTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
+public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
   /**
    * The logger for this class.
    */
@@ -66,18 +65,15 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
   /**
    * Constructor.
    * 
-   * @param relation Relation indexed
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    * @param k_max Maximum value of k supported
    * @param p Parameter p
    * @param log Logspace flag
    */
-  public MkAppTree(Relation<O> relation, String fileName, int pageSize, long cacheSize, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
-    super(relation, fileName, pageSize, cacheSize, distanceQuery, distanceFunction);
+  public MkAppTree(PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
+    super(pageFile, distanceQuery, distanceFunction);
     this.k_max = k_max;
     this.p = p;
     this.log = log;
@@ -88,15 +84,16 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    */
   @SuppressWarnings("unused")
   @Override
-  public void insert(DBID id) {
+  public void insert(MkAppEntry<D> id, boolean withPreInsert) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
   /**
    * @throws UnsupportedOperationException since this operation is not supported
    */
+  @SuppressWarnings("unused")
   @Override
-  protected void preInsert(@SuppressWarnings("unused") MkAppEntry<D, N> entry) {
+  protected void preInsert(MkAppEntry<D> entry) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -106,30 +103,31 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @param objects the object to be inserted
    */
   @Override
-  public void insertAll(DBIDs ids) {
-    if(ids.isEmpty()) {
+  public void insertAll(List<MkAppEntry<D>> entries) {
+    if(entries.isEmpty()) {
       return;
     }
 
     if(logger.isDebugging()) {
-      logger.debugFine("insert " + ids + "\n");
+      logger.debugFine("insert " + entries + "\n");
     }
 
     if(!initialized) {
-      final DBID id = ids.iterator().next();
-      final O object = relation.get(id);
-      initialize(createNewLeafEntry(id, object, distanceFunction.getDistanceFactory().nullDistance()));
+      initialize(entries.get(0));
     }
 
-    Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>();
+    Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>(entries.size());
+    ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert
-    for(DBID id : ids) {
+    for(MkAppEntry<D> entry : entries) {
+      DBID id = entry.getRoutingObjectID();
       // create knnList for the object
       knnHeaps.put(id, new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
 
+      ids.add(id);
       // insert the object
-      super.insert(id, relation.get(id), false);
+      super.insert(entry, false);
     }
 
     // do batch nn
@@ -177,33 +175,34 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * Determines the maximum and minimum number of entries in a node.
    */
   @Override
-  protected void initializeCapacities(MkAppEntry<D, N> exampleLeaf) {
+  protected void initializeCapacities(MkAppEntry<D> exampleLeaf) {
     int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(pageSize - overhead < 0) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+    if(file.getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
-    // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
+    // dirCapacity = (file.getPageSize() - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance + approx) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize + (p + 1) * 4 + 2) + 1;
+    dirCapacity = (int) (file.getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + (p + 1) * 4 + 2) + 1;
 
     if(dirCapacity <= 1) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
       logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
-    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance +
+    // leafCapacity = (file.getPageSize() - overhead) / (objectID +
+    // parentDistance +
     // approx) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize + (p + 1) * 4 + 2) + 1;
+    leafCapacity = (int) (file.getPageSize() - overhead) / (4 + distanceSize + (p + 1) * 4 + 2) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -235,12 +234,12 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
     while(!pq.isEmpty()) {
       GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
 
-      MkAppTreeNode<O, D, N> node = getNode(pqNode.nodeID);
+      MkAppTreeNode<O, D> node = getNode(pqNode.nodeID);
 
       // directory node
       if(!node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
-          MkAppEntry<D, N> entry = node.getEntry(i);
+          MkAppEntry<D> entry = node.getEntry(i);
           D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
           D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
 
@@ -258,7 +257,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
       // data node
       else {
         for(int i = 0; i < node.getNumEntries(); i++) {
-          MkAppLeafEntry<D, N> entry = (MkAppLeafEntry<D, N>) node.getEntry(i);
+          MkAppLeafEntry<D> entry = (MkAppLeafEntry<D>) node.getEntry(i);
           D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
           double approxValue = log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if(approxValue < 0) {
@@ -301,12 +300,12 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkAppEntry<D, N> entry, Map<DBID, KNNList<D>> knnLists) {
-    MkAppTreeNode<O, D, N> node = file.readPage(entry.getEntryID());
+  private void adjustApproximatedKNNDistances(MkAppEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
+    MkAppTreeNode<O, D> node = file.readPage(entry.getEntryID());
 
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        MkAppLeafEntry<D, N> leafEntry = (MkAppLeafEntry<D, N>) node.getEntry(i);
+        MkAppLeafEntry<D> leafEntry = (MkAppLeafEntry<D>) node.getEntry(i);
         // approximateKnnDistances(leafEntry,
         // getKNNList(leafEntry.getRoutingObjectID(), knnLists));
         PolynomialApproximation approx = approximateKnnDistances(getMeanKNNList(leafEntry.getDBID(), knnLists));
@@ -315,7 +314,7 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
     }
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        MkAppEntry<D, N> dirEntry = node.getEntry(i);
+        MkAppEntry<D> dirEntry = node.getEntry(i);
         adjustApproximatedKNNDistances(dirEntry, knnLists);
       }
     }
@@ -334,16 +333,16 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @param result the result list containing the ids of the leaf entries stored
    *        in the specified subtree
    */
-  private void leafEntryIDs(MkAppTreeNode<O, D, N> node, ModifiableDBIDs result) {
+  private void leafEntryIDs(MkAppTreeNode<O, D> node, ModifiableDBIDs result) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        MkAppEntry<D, N> entry = node.getEntry(i);
+        MkAppEntry<D> entry = node.getEntry(i);
         result.add(((LeafEntry) entry).getDBID());
       }
     }
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        MkAppTreeNode<O, D, N> childNode = getNode(node.getEntry(i));
+        MkAppTreeNode<O, D> childNode = getNode(node.getEntry(i));
         leafEntryIDs(childNode, result);
       }
     }
@@ -404,8 +403,8 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @return a new leaf node
    */
   @Override
-  protected MkAppTreeNode<O, D, N> createNewLeafNode(int capacity) {
-    return new MkAppTreeNode<O, D, N>(file, capacity, true);
+  protected MkAppTreeNode<O, D> createNewLeafNode(int capacity) {
+    return new MkAppTreeNode<O, D>(file, capacity, true);
   }
 
   /**
@@ -415,21 +414,8 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @return a new directory node
    */
   @Override
-  protected MkAppTreeNode<O, D, N> createNewDirectoryNode(int capacity) {
-    return new MkAppTreeNode<O, D, N>(file, capacity, false);
-  }
-
-  /**
-   * Creates a new leaf entry representing the specified data object in the
-   * specified subtree.
-   * 
-   * @param object the data object to be represented by the new entry
-   * @param parentDistance the distance from the object to the routing object of
-   *        the parent node
-   */
-  @Override
-  protected MkAppEntry<D, N> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    return new MkAppLeafEntry<D, N>(id, parentDistance, null);
+  protected MkAppTreeNode<O, D> createNewDirectoryNode(int capacity) {
+    return new MkAppTreeNode<O, D>(file, capacity, false);
   }
 
   /**
@@ -441,8 +427,8 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    *        the routing object of the parent node
    */
   @Override
-  protected MkAppEntry<D, N> createNewDirectoryEntry(MkAppTreeNode<O, D, N> node, DBID routingObjectID, D parentDistance) {
-    return new MkAppDirectoryEntry<D, N>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
+  protected MkAppEntry<D> createNewDirectoryEntry(MkAppTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
+    return new MkAppDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
   }
 
   /**
@@ -451,18 +437,8 @@ public class MkAppTree<O, D extends NumberDistance<D, N>, N extends Number> exte
    * @return an entry representing the root node
    */
   @Override
-  protected MkAppEntry<D, N> createRootEntry() {
-    return new MkAppDirectoryEntry<D, N>(null, null, 0, null, null);
-  }
-
-  /**
-   * Return the node base class.
-   * 
-   * @return node base class
-   */
-  @Override
-  protected Class<MkAppTreeNode<O, D, N>> getNodeClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(MkAppTreeNode.class);
+  protected MkAppEntry<D> createRootEntry() {
+    return new MkAppDirectoryEntry<D>(null, null, 0, null, null);
   }
 
   @Override

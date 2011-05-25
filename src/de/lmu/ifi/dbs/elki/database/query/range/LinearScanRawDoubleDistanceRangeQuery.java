@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
@@ -27,11 +26,10 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
   /**
    * Constructor.
    * 
-   * @param relation Data to query
    * @param distanceQuery Distance function to use
    */
-  public LinearScanRawDoubleDistanceRangeQuery(Relation<? extends O> relation, DistanceQuery<O, DoubleDistance> distanceQuery) {
-    super(relation, distanceQuery);
+  public LinearScanRawDoubleDistanceRangeQuery(DistanceQuery<O, DoubleDistance> distanceQuery) {
+    super(distanceQuery);
   }
 
   @Override

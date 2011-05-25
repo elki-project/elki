@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -98,11 +99,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   }
 
   public ClusterOrderResult<D> run(Database database, Relation<NV> relation) {
-    Collection<DeLiCluTree<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTree.class);
+    Collection<DeLiCluTreeIndex<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTreeIndex.class);
     if(indexes.size() != 1) {
       throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes, expected exactly one.");
     }
-    DeLiCluTree<NV> index = indexes.iterator().next();
+    DeLiCluTreeIndex<NV> index = indexes.iterator().next();
     // FIXME: check that the index matches the relation!
 
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction<?, ?>)) {
@@ -186,12 +187,12 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   /**
    * Expands the spatial nodes of the specified pair.
    * 
-   * @param index the index storing the objects
+   * @param tree the index storing the objects
    * @param distFunction the spatial distance function of this algorithm
    * @param nodePair the pair of nodes to be expanded
    * @param knns the knn list
    */
-  private void expandNodes(DeLiCluTree<NV> index, SpatialPrimitiveDistanceFunction<NV, D> distFunction, SpatialObjectPair nodePair, DataStore<KNNList<D>> knns) {
+  private void expandNodes(DeLiCluTree index, SpatialPrimitiveDistanceFunction<NV, D> distFunction, SpatialObjectPair nodePair, DataStore<KNNList<D>> knns) {
     DeLiCluNode node1 = index.getNode(nodePair.entry1.getEntryID());
     DeLiCluNode node2 = index.getNode(nodePair.entry2.getEntryID());
 
@@ -274,16 +275,16 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * Reinserts the objects of the already expanded nodes.
    * 
    * @param distFunction the spatial distance function of this algorithm
-   * @param index the index storing the objects
+   * @param tree the index storing the objects
    * @param path the path of the object inserted last
    * @param knns the knn list
    */
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree<NV> index, List<TreeIndexPathComponent<DeLiCluEntry>> path, DataStore<KNNList<D>> knns) {
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, DataStore<KNNList<D>> knns) {
     SpatialEntry rootEntry = path.remove(0).getEntry();
     reinsertExpanded(distFunction, index, path, 0, rootEntry, knns);
   }
 
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree<NV> index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialEntry parentEntry, DataStore<KNNList<D>> knns) {
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialEntry parentEntry, DataStore<KNNList<D>> knns) {
     DeLiCluNode parentNode = index.getNode(parentEntry.getEntryID());
     SpatialEntry entry2 = path.get(pos).getEntry();
 

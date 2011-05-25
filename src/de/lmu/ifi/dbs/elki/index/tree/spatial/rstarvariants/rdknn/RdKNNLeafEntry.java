@@ -16,9 +16,8 @@ import java.io.ObjectOutput;
  * 
  * @author Elke Achtert
  * @param <D> Distance type
- * @param <N> Number type
  */
-public class RdKNNLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends SpatialPointLeafEntry implements RdKNNEntry<D, N> {
+public class RdKNNLeafEntry<D extends NumberDistance<D, ?>> extends SpatialPointLeafEntry implements RdKNNEntry<D> {
   private static final long serialVersionUID = 1;
 
   /**
@@ -103,7 +102,7 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, N>, N extends Number> ex
       return false;
     }
 
-    final RdKNNLeafEntry<?, ?> that = (RdKNNLeafEntry<?, ?>) o;
+    final RdKNNLeafEntry<?> that = (RdKNNLeafEntry<?>) o;
 
     return knnDistance.equals(that.knnDistance);
   }

@@ -237,4 +237,20 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P>, Page
     this.nextPageID = nextPageID;
   }
 
+  /**
+   * Get the page size of this page file.
+   * 
+   * @return page size
+   */
+  public int getPageSize() {
+    return pageSize;
+  }
+
+  /**
+   * Initialize the page file with the given header - return "true" if the file already existed.
+   * 
+   * @param header Header
+   * @return true when the file already existed.
+   */
+  public abstract boolean initialize(PageHeader header);
 }
