@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
@@ -1307,10 +1308,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       result.append(leafNodes).append(" Data Nodes (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
       result.append(objects).append(" ").append(dimensionality).append("-dim. points in the tree \n");
       result.append("min_fanout = ").append(min_fanout).append(", max_overlap = ").append(max_overlap).append((this.overlap_type == DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", re_inserts = ").append(reinsert_fraction + "\n");
-      result.append("Read I/O-Access: ").append(file.getPhysicalReadAccess()).append("\n");
-      result.append("Write I/O-Access: ").append(file.getPhysicalWriteAccess()).append("\n");
-      result.append("Logical Page-Access: ").append(file.getLogicalPageAccess()).append("\n");
-      result.append("File ").append(file.toString()).append("\n");
+      PageFileUtil.appendPageFileStatistics(result, file);
       result.append("Storage Quota ").append(BigInteger.valueOf(objects + dirNodes + superNodes + leafNodes).multiply(BigInteger.valueOf(100)).divide(totalCapacity).toString()).append("%\n");
     }
     else {
