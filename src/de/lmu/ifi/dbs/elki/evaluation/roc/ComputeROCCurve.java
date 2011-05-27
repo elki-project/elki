@@ -141,6 +141,11 @@ public class ComputeROCCurve implements Evaluator {
   public void processResult(Database db, Result result) {
     // Prepare
     DBIDs positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
+    
+    if (positiveids.size() == 0) {
+      logger.warning("Computing a ROC curve failed - no objects matched.");
+      return;
+    }
 
     boolean nonefound = true;
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
