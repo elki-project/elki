@@ -6,9 +6,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -104,6 +106,40 @@ public class TextWriter {
     writers.insertHandler(DBID.class, trivialwriter);
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
+  }
+
+  /**
+   * For producing unique filenames.
+   */
+  protected Map<String, Object> filenames = new HashMap<String, Object>();
+
+  /**
+   * Try to find a unique file name.
+   * 
+   * @param result Result we print
+   * @param filenamepre File name prefix to use
+   * @return
+   */
+  protected String getFilename(Object result, String filenamepre) {
+    if(filenamepre == null || filenamepre.length() == 0) {
+      filenamepre = "result";
+    }
+    int i = 0;
+    while(true) {
+      String filename;
+      if(i > 0) {
+        filename = filenamepre + "-" + i;
+      }
+      else {
+        filename = filenamepre;
+      }
+      Object existing = filenames.get(filename);
+      if(existing == null || existing == result) {
+        filenames.put(filename, result);
+        return filename;
+      }
+      i++;
+    }
   }
 
   /**
@@ -229,12 +265,17 @@ public class TextWriter {
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
       for(IterableResult<?> rii : ri) {
-        writeIterableResult(db, streamOpener, rii, r, rs);
+        writeIterableResult(db, streamOpener, rii, rs);
       }
     }
     if(groups != null && groups.size() > 0) {
       for(DBIDs group : groups) {
-        writeGroupResult(db, streamOpener, group, ra, ro, naming, rs);
+        writeGroupResult(db, streamOpener, group, ra, naming, rs);
+      }
+    }
+    if(ro != null && ro.size() > 0) {
+      for(OrderingResult ror : ro) {
+        writeOrderingResult(db, streamOpener, ror, ra, rs);
       }
     }
     if(otherres != null && otherres.size() > 0) {
@@ -244,25 +285,8 @@ public class TextWriter {
     }
   }
 
-  private void writeOtherResult(Database db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
-    String filename = r.getShortName();
-    if(filename == null) {
-      throw new UnableToComplyException("No result name for result class: " + r.getClass().getName());
-    }
-    PrintStream outStream = streamOpener.openStream(filename);
-    TextWriterStream out = new TextWriterStream(outStream, writers);
-    TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
-    if(owriter == null) {
-      throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
-    }
-    // Write settings preamble
-    printSettings(out, rs);
-    // Write data
-    owriter.writeObject(out, null, r);
-    out.flush();
-  }
-
-  private void printObject(TextWriterStream out, SingleObjectBundle bundle, List<Pair<String, Object>> anns) throws UnableToComplyException, IOException {
+  private void printObject(TextWriterStream out, Database db, final DBID objID, List<AnnotationResult<?>> ra) throws UnableToComplyException, IOException {
+    SingleObjectBundle bundle = db.getBundle(objID);
     // Write database element itself.
     for(int i = 0; i < bundle.metaLength(); i++) {
       Object obj = bundle.data(i);
@@ -279,23 +303,40 @@ public class TextWriter {
     }
 
     // print the annotations
-    if(anns != null) {
-      for(Pair<String, Object> a : anns) {
-        if(a.getSecond() == null) {
+    if(ra != null) {
+      for(AnnotationResult<?> a : ra) {
+        String label = a.getAssociationID().getLabel();
+        Object value = a.getValueFor(objID);
+        if(value == null) {
           continue;
         }
-        TextWriterWriterInterface<?> writer = out.getWriterFor(a.getSecond());
+        TextWriterWriterInterface<?> writer = out.getWriterFor(value);
         if(writer == null) {
-          throw new UnableToComplyException("No handler for annotation " + a.getFirst() + " in Output: " + a.getSecond().getClass().getSimpleName());
+          // Ignore
+          continue;
         }
-
-        writer.writeObject(out, a.getFirst(), a.getSecond());
+        writer.writeObject(out, label, value);
       }
     }
     out.flush();
+    out.flush();
   }
 
-  private void writeGroupResult(Database db, StreamFactory streamOpener, DBIDs group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeOtherResult(Database db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
+    PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
+    TextWriterStream out = new TextWriterStream(outStream, writers);
+    TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
+    if(owriter == null) {
+      throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
+    }
+    // Write settings preamble
+    printSettings(out, rs);
+    // Write data
+    owriter.writeObject(out, null, r);
+    out.flush();
+  }
+
+  private void writeGroupResult(Database db, StreamFactory streamOpener, DBIDs group, List<AnnotationResult<?>> ra, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
     if(group instanceof Cluster) {
@@ -303,15 +344,9 @@ public class TextWriter {
         filename = filenameFromLabel(naming.getNameFor((Cluster<?>) group));
       }
     }
-    if(filename == null) {
-      if(ro != null && ro.size() > 0) {
-        filename = ro.get(0).getShortName();
-      }
-    }
 
-    PrintStream outStream = streamOpener.openStream(filename);
+    PrintStream outStream = streamOpener.openStream(getFilename(group, filename));
     TextWriterStream out = new TextWriterStream(outStream, writers);
-
     printSettings(out, sr);
     // print group information...
     if(group instanceof TextWriteable) {
@@ -327,59 +362,18 @@ public class TextWriter {
     // print ids.
     DBIDs ids = group;
     Iterator<DBID> iter = ids.iterator();
-    // apply sorting.
-    if(ro != null && ro.size() > 0) {
-      try {
-        iter = ro.get(0).iter(ids);
-      }
-      catch(Exception e) {
-        logger.warning("Exception while trying to sort results.", e);
-      }
-    }
 
     while(iter.hasNext()) {
-      DBID objID = iter.next();
-      if(objID == null) {
-        // shoulnd't really happen?
-        continue;
-      }
-      SingleObjectBundle obj = db.getBundle(objID);
-      // do we have annotations to print?
-      List<Pair<String, Object>> anns = new ArrayList<Pair<String, Object>>();
-      if(ra != null) {
-        for(AnnotationResult<?> a : ra) {
-          anns.add(new Pair<String, Object>(a.getAssociationID().getLabel(), a.getValueFor(objID)));
-        }
-      }
-      // print the object with its annotations.
-      printObject(out, obj, anns);
+      printObject(out, db, iter.next(), ra);
     }
     out.commentPrintSeparator();
     out.flush();
   }
 
-  private void writeIterableResult(Database db, StreamFactory streamOpener, IterableResult<?> ri, Result mr, List<SettingsResult> sr) throws UnableToComplyException, IOException {
-    String filename = ri.getShortName();
-    logger.debugFine("Filename is " + filename);
-    if(filename == null) {
-      filename = "list";
-    }
-    PrintStream outStream = streamOpener.openStream(filename);
+  private void writeIterableResult(Database db, StreamFactory streamOpener, IterableResult<?> ri, List<SettingsResult> sr) throws UnableToComplyException, IOException {
+    PrintStream outStream = streamOpener.openStream(getFilename(ri, ri.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
     printSettings(out, sr);
-
-    if(mr != null) {
-      // TODO: this is an ugly hack!
-      out.setForceincomments(true);
-      /*
-       * for(AssociationID<?> assoc : mr.getAssociations()) { Object o =
-       * mr.getAssociation(assoc); TextWriterWriterInterface<?> writer =
-       * out.getWriterFor(o); if(writer != null) { writer.writeObject(out,
-       * assoc.getLabel(), o); } out.flush(); }
-       */
-      // TODO: this is an ugly hack!
-      out.setForceincomments(false);
-    }
 
     // hack to print collectionResult header information
     if(ri instanceof CollectionResult<?>) {
@@ -399,6 +393,19 @@ public class TextWriter {
         writer.writeObject(out, null, o);
       }
       out.flush();
+    }
+    out.commentPrintSeparator();
+    out.flush();
+  }
+
+  private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<AnnotationResult<?>> ra, List<SettingsResult> sr) throws IOException, UnableToComplyException {
+    PrintStream outStream = streamOpener.openStream(getFilename(or, or.getShortName()));
+    TextWriterStream out = new TextWriterStream(outStream, writers);
+    printSettings(out, sr);
+
+    Iterator<DBID> i = or.iter(db.getDBIDs());
+    while(i.hasNext()) {
+      printObject(out, db, i.next(), ra);
     }
     out.commentPrintSeparator();
     out.flush();
