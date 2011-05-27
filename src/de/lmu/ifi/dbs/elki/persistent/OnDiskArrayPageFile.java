@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @param <P> Page type
  */
-public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
+public class OnDiskArrayPageFile<P extends Page<P>> extends AbstractStoringPageFile<P> {
   /**
    * Indicates an empty page.
    */
@@ -55,21 +55,13 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
   private final boolean existed;
 
   /**
-   * Cache size
-   */
-  private int cacheSize;
-
-  /**
    * Creates a new OnDiskArrayPageFile from an existing file.
    * 
-   * @param header the header of this file
+   * @param pageSize page size
    * @param fileName the name of the file
-   * @param cacheSize the size of the cache in Byte
-   * @param cache the class of the cache to be used
    */
-  public OnDiskArrayPageFile(int cacheSize, Cache<P> cache, String fileName) {
-    super();
-    this.cacheSize = cacheSize;
+  public OnDiskArrayPageFile(int pageSize, String fileName) {
+    super(pageSize);
 
     // init the file
     this.filename = new File(fileName);
@@ -87,17 +79,10 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
   @Override
   public P readPage(int pageID) {
     try {
-      // try to get from cache
-      P page = super.readPage(pageID);
-
-      // get from file and put to cache
-      if(page == null) {
-        readAccess++;
-        page = byteBufferToPage(this.file.getRecordBuffer(pageID));
-        if(page != null) {
-          page.setFile(this);
-          cache.put(page);
-        }
+      readAccess++;
+      P page = byteBufferToPage(this.file.getRecordBuffer(pageID));
+      if(page != null) {
+        page.setFile(this);
       }
       return page;
 
@@ -130,19 +115,19 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
   }
 
   /**
-   * This method is called by the cache if the <code>page</code> is not longer
-   * stored in the cache and has to be written to disk.
+   * Write page to disk.
    * 
+   * @param pageID page id
    * @param page the page which has to be written to disk
    */
   @Override
-  public void objectRemoved(P page) {
+  public void writePage(Integer pageID, P page) {
     if(page.isDirty()) {
       try {
-        page.setDirty(false);
         writeAccess++;
         byte[] array = pageToByteArray(page);
-        file.getRecordBuffer(page.getPageID()).put(array);
+        file.getRecordBuffer(pageID).put(array);
+        page.setDirty(false);
       }
       catch(IOException e) {
         throw new RuntimeException(e);
@@ -170,7 +155,6 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
   @Override
   public void clear() {
     try {
-      super.clear();
       file.resizeFile(0);
     }
     catch(IOException e) {
@@ -290,6 +274,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
           }
           i++;
         }
+        return true;
       }
       // create new file
       else {
@@ -301,14 +286,11 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
         // write the header
         ByteBuffer buffer = file.getExtraHeader();
         buffer.put(header.asByteArray());
+        return false;
       }
     }
     catch(IOException e) {
       throw new RuntimeException("IOException occurred.", e);
     }
-    // init the cache
-    initCache(header.getPageSize(), cacheSize, cache);
-
-    return existed;
   }
 }

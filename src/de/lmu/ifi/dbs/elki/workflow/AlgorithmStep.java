@@ -4,10 +4,14 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
+import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -57,14 +61,29 @@ public class AlgorithmStep implements WorkflowStep {
   public HierarchicalResult runAlgorithms(Database database) {
     result = new BasicResult("Algorithm Step", "main");
     result.addChildResult(database);
+    if(logger.isVerbose() && database.getIndexes().size() > 0) {
+      StringBuffer buf = new StringBuffer();
+      buf.append("Index statistics before running algorithms:").append(FormatUtil.NEWLINE);
+      for(Index idx : database.getIndexes()) {
+        PageFileStatistics stat = idx.getPageFileStatistics();
+        PageFileUtil.appendPageFileStatistics(buf, stat);
+      }
+      logger.verbose(buf.toString());
+    }
     for(Algorithm algorithm : algorithms) {
       long start = System.currentTimeMillis();
       Result res = algorithm.run(database);
       long end = System.currentTimeMillis();
       if(logger.isVerbose()) {
         long elapsedTime = end - start;
-        logger.verbose(algorithm.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
-
+        StringBuffer buf = new StringBuffer();
+        buf.append(algorithm.getClass().getName()).append(" runtime  : ");
+        buf.append(elapsedTime).append(" milliseconds.").append(FormatUtil.NEWLINE);
+        for(Index idx : database.getIndexes()) {
+          PageFileStatistics stat = idx.getPageFileStatistics();
+          PageFileUtil.appendPageFileStatistics(buf, stat);
+        }
+        logger.verbose(buf.toString());
       }
       if(res != null) {
         result.addChildResult(res);
