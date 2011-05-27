@@ -10,8 +10,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 /**
  * This final class contains some static convenience methods for logging.
  * 
- * {@link #logExpensive} allows the programmer to easily emit a log message, however the function
- * is rather expensive and thus should not be used within loop constructs.
+ * {@link #logExpensive} allows the programmer to easily emit a log message,
+ * however the function is rather expensive and thus should not be used within
+ * loop constructs.
  * 
  * @author Erich Schubert
  * 
@@ -19,10 +20,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  */
 public final class LoggingUtil {
   /**
-   * Expensive logging function that is convenient, but should only be used in rare conditions.
+   * Expensive logging function that is convenient, but should only be used in
+   * rare conditions.
    * 
-   * For 'frequent' logging, use more efficient techniques, such as explained in the
-   * {@link de.lmu.ifi.dbs.elki.logging logging package documentation}.
+   * For 'frequent' logging, use more efficient techniques, such as explained in
+   * the {@link de.lmu.ifi.dbs.elki.logging logging package documentation}.
    * 
    * @param level Logging level
    * @param message Message to log.
@@ -40,10 +42,11 @@ public final class LoggingUtil {
   }
 
   /**
-   * Expensive logging function that is convenient, but should only be used in rare conditions.
+   * Expensive logging function that is convenient, but should only be used in
+   * rare conditions.
    * 
-   * For 'frequent' logging, use more efficient techniques, such as explained in the
-   * {@link de.lmu.ifi.dbs.elki.logging logging package documentation}.
+   * For 'frequent' logging, use more efficient techniques, such as explained in
+   * the {@link de.lmu.ifi.dbs.elki.logging logging package documentation}.
    * 
    * @param level Logging level
    * @param message Message to log.
@@ -61,7 +64,7 @@ public final class LoggingUtil {
       Logger.getAnonymousLogger().log(rec);
     }
   }
-  
+
   /**
    * Static version to log a severe exception.
    * 
@@ -78,7 +81,7 @@ public final class LoggingUtil {
    * @param e causing exception
    */
   public final static void exception(String message, Throwable e) {
-    if (message == null && e != null) {
+    if(message == null && e != null) {
       message = e.getMessage();
     }
     logExpensive(Level.SEVERE, message, e);
@@ -90,7 +93,7 @@ public final class LoggingUtil {
    * @param message Warning message.
    */
   public final static void warning(String message) {
-    logExpensive(Level.WARNING, message);    
+    logExpensive(Level.WARNING, message);
   }
 
   /**
@@ -100,7 +103,7 @@ public final class LoggingUtil {
    * @param e causing exception
    */
   public final static void warning(String message, Throwable e) {
-    if (message == null && e != null) {
+    if(message == null && e != null) {
       message = e.getMessage();
     }
     logExpensive(Level.WARNING, message, e);
@@ -112,7 +115,7 @@ public final class LoggingUtil {
    * @param message Warning message.
    */
   public final static void message(String message) {
-    logExpensive(Level.INFO, message);    
+    logExpensive(Level.INFO, message);
   }
 
   /**
@@ -122,7 +125,7 @@ public final class LoggingUtil {
    * @param e causing exception
    */
   public final static void message(String message, Throwable e) {
-    if (message == null && e != null) {
+    if(message == null && e != null) {
       message = e.getMessage();
     }
     logExpensive(Level.INFO, message, e);
@@ -132,8 +135,8 @@ public final class LoggingUtil {
    * Infer which class has called the logging helper.
    * 
    * While this looks like duplicated code from ELKILogRecord, it is needed here
-   * to find an appropriate Logger (and check the logging level) for the calling class,
-   * not just to log the right class and method name.
+   * to find an appropriate Logger (and check the logging level) for the calling
+   * class, not just to log the right class and method name.
    * 
    * @return calling class name and calling method name
    */
@@ -165,7 +168,13 @@ public final class LoggingUtil {
       try {
         String[] chunks = opt.split("=");
         if(chunks.length == 1) {
-          LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
+          try {
+            Level level = Level.parse(chunks[0]);
+            LoggingConfiguration.setDefaultLevel(level);
+          }
+          catch(IllegalArgumentException e) {
+            LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
+          }
         }
         else if(chunks.length == 2) {
           LoggingConfiguration.setLevelFor(chunks[0], chunks[1]);
@@ -175,7 +184,7 @@ public final class LoggingUtil {
         }
       }
       catch(IllegalArgumentException e) {
-        throw(new WrongParameterValueException(param, param.getValue(), "Could not process value.", e));
+        throw (new WrongParameterValueException(param, param.getValue(), "Could not process value.", e));
       }
     }
   }
