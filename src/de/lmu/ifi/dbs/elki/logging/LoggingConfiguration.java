@@ -172,4 +172,13 @@ public final class LoggingConfiguration {
     Level lev = Level.parse(level);
     logr.setLevel(lev);
   }
+
+  /**
+   * Set the default level.
+   * 
+   * @param level level
+   */
+  public static void setDefaultLevel(Level level) {
+    Logger.getLogger(TOPLEVEL_PACKAGE).setLevel(level);
+  }
 }

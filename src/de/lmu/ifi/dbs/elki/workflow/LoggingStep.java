@@ -4,6 +4,7 @@ import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -16,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.logging.LoggingConfiguration
+ * @apiviz.uses LoggingConfiguration
  */
 public class LoggingStep implements WorkflowStep {
   /**
@@ -24,6 +25,12 @@ public class LoggingStep implements WorkflowStep {
    */
   private final static Logging logger = Logging.getLogger(LoggingStep.class);
 
+  /**
+   * Constructor.
+   * 
+   * @param verbose Verbose flag
+   * @param levels Level settings array
+   */
   public LoggingStep(boolean verbose, String[][] levels) {
     super();
     LoggingConfiguration.setVerbose(verbose);
@@ -31,10 +38,20 @@ public class LoggingStep implements WorkflowStep {
       for(String[] pair : levels) {
         try {
           if(pair.length == 1) {
-            LoggingConfiguration.setLevelFor(pair[0], Level.FINEST.getName());
+            // Try to parse as level:
+            try {
+              Level level = Level.parse(pair[0]);
+              LoggingConfiguration.setDefaultLevel(level);
+            }
+            catch(IllegalArgumentException e) {
+              LoggingConfiguration.setLevelFor(pair[0], Level.FINEST.getName());
+            }
           }
           else if(pair.length == 2) {
             LoggingConfiguration.setLevelFor(pair[0], pair[1]);
+          }
+          else {
+            throw new AbortException("Invalid logging settings");
           }
         }
         catch(IllegalArgumentException e) {
@@ -66,12 +83,16 @@ public class LoggingStep implements WorkflowStep {
       final StringParameter debugP = new StringParameter(OptionID.DEBUG, true);
       if(config.grab(debugP)) {
         String[] opts = debugP.getValue().split(",");
+        levels = new String[opts.length][];
+        int i = 0;
         for(String opt : opts) {
           String[] chunks = opt.split("=");
           if(chunks.length != 1 && chunks.length != 2) {
             config.reportError(new WrongParameterValueException(debugP, debugP.getValue(), "Invalid debug option."));
             break;
           }
+          levels[i] = chunks;
+          i++;
         }
       }
     }
