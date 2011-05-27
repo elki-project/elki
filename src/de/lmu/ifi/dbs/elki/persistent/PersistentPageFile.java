@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @param <P> Page type
  */
-public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
+public class PersistentPageFile<P extends Page<P>> extends AbstractStoringPageFile<P> {
   /**
    * Our logger
    */
@@ -61,24 +61,14 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   private boolean existed;
 
   /**
-   * Cache size to use.
-   */
-  private long cacheSize;
-
-  /**
    * Creates a new PersistentPageFile from an existing file.
    * 
    * @param pageSize the page size
-   * @param cacheSize the size of the cache in Byte
-   * @param cache the class of the cache to be used
    * @param pageclass the class of pages to be used
    */
-  public PersistentPageFile(int pageSize, long cacheSize, Cache<P> cache, String fileName, Class<P> pageclass) {
-    super();
-    this.pageSize = pageSize;
+  public PersistentPageFile(int pageSize, String fileName, Class<P> pageclass) {
+    super(pageSize);
     this.pageclass = pageclass;
-    this.cache = cache;
-    this.cacheSize = cacheSize;
     // init the file
     File f = new File(fileName);
 
@@ -101,25 +91,16 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   @Override
   public P readPage(int pageID) {
     try {
-      // try to get from cache
-      P page = super.readPage(pageID);
-
-      // get from file and put to cache
-      if(page == null) {
-        readAccess++;
-        long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
-        byte[] buffer = new byte[pageSize];
-        file.seek(offset);
-        file.read(buffer);
-        page = byteArrayToPage(buffer);
-        if(page != null) {
-          // noinspection unchecked
-          page.setFile(this);
-          cache.put(page);
-        }
+      readAccess++;
+      long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
+      byte[] buffer = new byte[pageSize];
+      file.seek(offset);
+      file.read(buffer);
+      P page = byteArrayToPage(buffer);
+      if(page != null) {
+        page.setFile(this);
       }
       return page;
-
     }
     catch(IOException e) {
       throw new RuntimeException("IOException occurred during reading of page " + pageID + "\n", e);
@@ -134,8 +115,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   @Override
   public void deletePage(int pageID) {
     try {
-      // / put id to empty nodes and
-      // delete from cache
+      // / put id to empty pages list
       super.deletePage(pageID);
 
       // delete from file
@@ -157,20 +137,18 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    * @param page the page which has to be written to disk
    */
   @Override
-  public void objectRemoved(P page) {
-    if(page.isDirty()) {
-      try {
-        page.setDirty(false);
-        writeAccess++;
-        byte[] array = pageToByteArray(page);
-        long offset = ((long) (header.getReservedPages() + page.getPageID())) * (long) pageSize;
-        assert offset >= 0 : header.getReservedPages() + " " + page.getPageID() + " " + pageSize + " " + offset;
-        file.seek(offset);
-        file.write(array);
-      }
-      catch(IOException e) {
-        throw new RuntimeException(e);
-      }
+  public void writePage(Integer pageID, P page) {
+    try {
+      writeAccess++;
+      byte[] array = pageToByteArray(page);
+      long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
+      assert offset >= 0 : header.getReservedPages() + " " + pageID + " " + pageSize + " " + offset;
+      file.seek(offset);
+      file.write(array);
+      page.setDirty(false);
+    }
+    catch(IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -200,7 +178,6 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   @Override
   public void clear() {
     try {
-      super.clear();
       file.setLength(header.size());
     }
     catch(IOException e) {
@@ -308,12 +285,18 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
     return header;
   }
 
-  /** Increases the {@link PageFile#readAccess readAccess} counter by one. */
+  /**
+   * Increases the {@link AbstractStoringPageFile#readAccess readAccess} counter by
+   * one.
+   */
   public void increaseReadAccess() {
     readAccess++;
   }
 
-  /** Increases the {@link PageFile#writeAccess writeAccess} counter by one. */
+  /**
+   * Increases the {@link AbstractStoringPageFile#writeAccess writeAccess} counter by
+   * one.
+   */
   public void increaseWriteAccess() {
     writeAccess++;
   }
@@ -392,9 +375,6 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
     catch(IOException e) {
       throw new RuntimeException("IOException occurred.", e);
     }
-
-    // init the cache
-    initCache(header.getPageSize(), cacheSize, cache);
 
     // Return "new file" status
     return existed;

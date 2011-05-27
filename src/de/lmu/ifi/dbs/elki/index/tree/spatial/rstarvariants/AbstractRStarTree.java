@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
@@ -280,7 +281,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     int objects = 0;
     int levels = 0;
 
-    if(file != null) {
+    if(file != null && initialized) {
       N node = getRoot();
       int dim = node.getDimensionality();
 
@@ -313,10 +314,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
       result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
       result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");
-      result.append("Read I/O-Access: ").append(file.getPhysicalReadAccess()).append("\n");
-      result.append("Write I/O-Access: ").append(file.getPhysicalWriteAccess()).append("\n");
-      result.append("Logical Page-Access: ").append(file.getLogicalPageAccess()).append("\n");
-      result.append("File ").append(file.getClass()).append("\n");
+      PageFileUtil.appendPageFileStatistics(result, file);
     }
     else {
       result.append(getClass().getName()).append(" is empty!\n");
@@ -566,6 +564,9 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     N node = getNode(subtree.getLastPathComponent().getEntry());
+    if (node == null) {
+      throw new RuntimeException("Page file did not return node for node id: "+subtree.getLastPathComponent().getEntry().getEntryID());
+    }
     if(node.isLeaf()) {
       return subtree;
     }

@@ -6,6 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+
 /**
  * An LRU cache, based on <code>LinkedHashMap</code>.<br>
  * This cache has a fixed maximum number of objects (<code>cacheSize</code>). If
@@ -18,7 +21,17 @@ import java.util.Map;
  * 
  * @param <P> Page type
  */
-public class LRUCache<P extends Page<P>> implements Cache<P> {
+public class LRUCache<P extends Page<P>> extends AbstractPageFile<P> {
+  /**
+   * Our logger
+   */
+  private static final Logging logger = Logging.getLogger(LRUCache.class);
+
+  /**
+   * Cache size in bytes.
+   */
+  protected long cacheSizeBytes;
+
   /**
    * The maximum number of objects in this cache.
    */
@@ -33,48 +46,18 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * The underlying file of this cache. If an object is dropped it is written to
    * the file.
    */
-  protected CachedFile<P> file;
-
-  /**
-   * The number of read accesses
-   */
-  private long pageAccess;
-
-  /**
-   * Creates a new empty LRU cache.
-   */
-  public LRUCache() {
-    // empty constructor
-  }
+  protected PageFile<P> file;
 
   /**
    * Initializes this cache with the specified parameters.
    * 
-   * @param cacheSize the maximum number of pages in this cache
+   * @param cacheSizeBytes the maximum number of pages in this cache
    * @param file the underlying file of this cache, if a page is dropped it is
    *        written to the file
    */
-  @Override
-  @SuppressWarnings("serial")
-  public void initialize(long cacheSize, CachedFile<P> file) {
+  public LRUCache(long cacheSizeBytes, PageFile<P> file) {
     this.file = file;
-    assert(cacheSize <= Integer.MAX_VALUE);
-    this.cacheSize = (int) cacheSize;
-    this.pageAccess = 0;
-
-    float hashTableLoadFactor = 0.75f;
-    int hashTableCapacity = (int) Math.ceil(cacheSize / hashTableLoadFactor) + 1;
-
-    this.map = new LinkedHashMap<Integer, P>(hashTableCapacity, hashTableLoadFactor, true) {
-      @Override
-      protected boolean removeEldestEntry(Map.Entry<Integer, P> eldest) {
-        if(size() > LRUCache.this.cacheSize) {
-          LRUCache.this.file.objectRemoved(eldest.getValue());
-          return true;
-        }
-        return false;
-      }
-    };
+    this.cacheSizeBytes = cacheSizeBytes;
   }
 
   /**
@@ -86,60 +69,122 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    *         exists in the cache
    */
   @Override
-  public synchronized P get(int pageID) {
+  public synchronized P readPage(int pageID) {
+    readAccess++;
     P page = map.get(pageID);
     if(page != null) {
-      pageAccess++;
+      if(logger.isDebuggingFine()) {
+        logger.debugFine("Read from cache: " + pageID);
+      }
+    }
+    else {
+      if(logger.isDebuggingFine()) {
+        logger.debugFine("Read from backing: " + pageID);
+      }
+      page = file.readPage(pageID);
+      map.put(pageID, page);
     }
     return page;
   }
 
-  /**
-   * Adds a page to this cache. If the cache is full, the LRU (least recently
-   * used) page is dropped and written to file.
-   * 
-   * @param page the page to be added
-   */
   @Override
-  public synchronized void put(P page) {
-    pageAccess++;
-    map.put(page.getPageID(), page);
+  public synchronized void writePage(Integer pageID, P page) {
+    writeAccess++;
+    page.setDirty(true);
+    map.put(pageID, page);
+    if(logger.isDebuggingFine()) {
+      logger.debugFine("Write to cache: " + pageID);
+    }
+  }
+
+  @Override
+  public void deletePage(int pageID) {
+    writeAccess++;
+    map.remove(pageID);
+    file.deletePage(pageID);
   }
 
   /**
-   * Removes a page from this cache.
+   * Write page through to disk.
    * 
-   * @param pageID the number of the node to be removed.
-   * @return the removed page
+   * @param page page
    */
-  @Override
-  public synchronized P remove(int pageID) {
-    P page = map.remove(pageID);
-    if(page != null) {
-      pageAccess++;
+  protected void expirePage(P page) {
+    if(logger.isDebuggingFine()) {
+      logger.debugFine("Write to backing:" + page.getPageID());
     }
-    return page;
+    if (page.isDirty()) {
+      file.writePage(page);
+    }
+  }
+
+  @Override
+  public Integer setPageID(P page) {
+    Integer pageID = file.setPageID(page);
+    return pageID;
+  }
+
+  @Override
+  public int getNextPageID() {
+    return file.getNextPageID();
+  }
+
+  @Override
+  public void setNextPageID(int nextPageID) {
+    file.setNextPageID(nextPageID);
+  }
+
+  @Override
+  public int getPageSize() {
+    return file.getPageSize();
+  }
+
+  @Override
+  public boolean initialize(PageHeader header) {
+    boolean created = file.initialize(header);
+    // Compute the actual cache size.
+    this.cacheSize = cacheSizeBytes / header.getPageSize();
+
+    if(this.cacheSize <= 0) {
+      throw new AbortException("Invalid cache size: " + cacheSizeBytes + " / " + header.getPageSize() + " = " + cacheSize);
+    }
+
+    if(logger.isDebugging()) {
+      logger.debug("LRU cache size is " + cacheSize + " pages.");
+    }
+
+    float hashTableLoadFactor = 0.75f;
+    int hashTableCapacity = (int) Math.ceil(cacheSize / hashTableLoadFactor) + 1;
+
+    this.map = new LinkedHashMap<Integer, P>(hashTableCapacity, hashTableLoadFactor, true) {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      protected boolean removeEldestEntry(Map.Entry<Integer, P> eldest) {
+        if(size() > LRUCache.this.cacheSize) {
+          expirePage(eldest.getValue());
+          return true;
+        }
+        return false;
+      }
+    };
+    return created;
+  }
+
+  @Override
+  public void close() {
+    flush();
+    file.close();
   }
 
   /**
    * Flushes this caches by writing any entry to the underlying file.
    */
-  @Override
   public void flush() {
     for(P object : map.values()) {
-      file.objectRemoved(object);
+      expirePage(object);
     }
     map.clear();
-  }
-
-  /**
-   * Returns the number of page accesses.
-   * 
-   * @return the number of page accesses
-   */
-  @Override
-  public long getPageAccess() {
-    return pageAccess;
   }
 
   /**
@@ -165,7 +210,6 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * 
    * @param cacheSize the cache size to be set
    */
-  @Override
   public void setCacheSize(int cacheSize) {
     this.cacheSize = cacheSize;
 
@@ -179,16 +223,12 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
 
     for(Integer id : keys) {
       P page = map.remove(id);
-      pageAccess++;
-      file.objectRemoved(page);
+      file.writePage(page);
     }
   }
 
-  /**
-   * Resets the pages access of this cache.
-   */
   @Override
-  public void resetPageAccess() {
-    this.pageAccess = 0;
+  public PageFileStatistics getInnerStatistics() {
+    return file;
   }
 }

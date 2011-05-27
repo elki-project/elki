@@ -51,7 +51,7 @@ public abstract class IndexTree<N extends Node<N, E>, E extends Entry> {
   /**
    * The entry representing the root node.
    */
-  private E rootEntry = createRootEntry();
+  private E rootEntry;
 
   /**
    * Constructor.
@@ -72,6 +72,7 @@ public abstract class IndexTree<N extends Node<N, E>, E extends Entry> {
     if(this.file.initialize(header)) {
       initializeFromFile(header);
     }
+    rootEntry = createRootEntry();
   }
 
   /**

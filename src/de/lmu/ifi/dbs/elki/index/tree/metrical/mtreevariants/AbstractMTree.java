@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
@@ -140,11 +141,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     result.append(leafNodes).append(" Leaf Nodes \n");
     result.append(objects).append(" Objects \n");
 
-    result.append("Logical Page Access: ").append(file.getLogicalPageAccess()).append("\n");
-    result.append("Physical Read Access: ").append(file.getPhysicalReadAccess()).append("\n");
-    result.append("Physical Write Access: ").append(file.getPhysicalWriteAccess()).append("\n");
-    result.append("File ").append(file.getClass()).append("\n");
-
+    PageFileUtil.appendPageFileStatistics(result, file);
     return result.toString();
   }
 

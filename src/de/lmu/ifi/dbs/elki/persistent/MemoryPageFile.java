@@ -11,7 +11,7 @@ import java.util.Map;
  * 
  * @param <P> Page type
  */
-public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
+public class MemoryPageFile<P extends Page<P>> extends AbstractStoringPageFile<P> {
   /**
    * Holds the pages.
    */
@@ -22,52 +22,25 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
    * specified parameters.
    * 
    * @param pageSize the size of a page in Bytes
-   * @param cacheSize the size of the cache in Byte
-   * @param cache the class of the cache to be used
    */
-  public MemoryPageFile(int pageSize, long cacheSize, Cache<P> cache) {
-    super();
-    initCache(pageSize, cacheSize, cache);
+  public MemoryPageFile(int pageSize) {
+    super(pageSize);
     this.file = new HashMap<Integer, P>();
   }
 
   @Override
-  public synchronized void objectRemoved(P page) {
-    if(page.isDirty()) {
-      writeAccess++;
-      page.setDirty(false);
-      file.put(page.getPageID(), page);
-    }
-  }
-
-  /**
-   * Reads the page with the given id from this file.
-   * 
-   * @param pageID the id of the page to be returned
-   * @return the page with the given pageId
-   */
-  @Override
   public synchronized P readPage(int pageID) {
-    // try to get from cache
-    P page = super.readPage(pageID);
-
-    // get from file and put to cache
-    if(page == null) {
-      readAccess++;
-      page = file.get(pageID);
-      if(page != null) {
-        cache.put(page);
-
-      }
-    }
-    return page;
+    readAccess++;
+    return file.get(pageID);
+  }
+  
+  @Override
+  protected void writePage(Integer pageID, P page) {
+    writeAccess++;
+    file.put(pageID, page);
+    page.setDirty(false);
   }
 
-  /**
-   * Deletes the node with the specified id from this file.
-   * 
-   * @param pageID the id of the node to be deleted
-   */
   @Override
   public synchronized void deletePage(int pageID) {
     // put id to empty nodes and
@@ -79,18 +52,8 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
     file.remove(pageID);
   }
 
-  /**
-   * Clears this PageFile.
-   */
   @Override
   public void clear() {
-    super.clear();
     file.clear();
-  }
-
-  @Override
-  public boolean initialize(@SuppressWarnings("unused") PageHeader header) {
-    // Did not exist.
-    return false;
   }
 }

@@ -5,9 +5,9 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.DefaultPageHeader;
-import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
@@ -138,11 +138,12 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
     this.numDeaps = 0;
 
     if(fileName == null) {
-      this.file = new MemoryPageFile<Deap<K, V>>(pageSize, maxCacheSize * pageSize, new LRUCache<Deap<K, V>>());
+      this.file = new MemoryPageFile<Deap<K, V>>(pageSize);
     }
     else {
       Class<Deap<K, V>> deapclass = ClassGenericsUtil.uglyCastIntoSubclass(Deap.class);
-      this.file = new PersistentPageFile<Deap<K, V>>(pageSize, maxCacheSize * pageSize, new LRUCache<Deap<K, V>>(), fileName, deapclass);
+      this.file = new PersistentPageFile<Deap<K, V>>(pageSize, fileName, deapclass);
+      // FIXME: re-add cache: maxCacheSize * pageSize, new LRUCache<Deap<K, V>>(), 
       this.file.initialize(new DefaultPageHeader(pageSize));
     }
 
@@ -401,7 +402,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * @return the I/O-Access of this heap
    */
   public long getPhysicalReadAccess() {
-    return file.getPhysicalReadAccess();
+    return PageFileUtil.getPhysicalReadOperations(file);
   }
 
   /**
@@ -410,7 +411,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * @return the I/O-Access of this heap
    */
   public long getPhysicalWriteAccess() {
-    return file.getPhysicalWriteAccess();
+    return PageFileUtil.getPhysicalWriteOperations(file);
   }
 
   /**
@@ -419,7 +420,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
    * @return the I/O-Access of this heap
    */
   public long getLogicalPageAccess() {
-    return file.getLogicalPageAccess();
+    return PageFileUtil.getLogicalReadOperations(file) + PageFileUtil.getLogicalWriteOperations(file);
   }
 
   /**
@@ -485,10 +486,10 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Se
     // else: this heap grows
     else {
       height++;
-      file.setCacheSize((maxCacheSize - height) * pageSize);
+      /* file.setCacheSize((maxCacheSize - height) * pageSize);
       if(logger.isDebugging()) {
         logger.debugFine("NEW CACHESIZE " + (maxCacheSize - height) + " I/O = " + (getPhysicalReadAccess() + getPhysicalWriteAccess()));
-      }
+      } */
     }
     if(logger.isDebugging()) {
       logger.debugFine("***** new cache: " + this);

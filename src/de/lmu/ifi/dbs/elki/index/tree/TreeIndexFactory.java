@@ -101,12 +101,17 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
    */
   // FIXME: make this single-shot when filename is set!
   protected <N extends Page<N>> PageFile<N> makePageFile(Class<N> cls) {
+    final PageFile<N> inner;
     if(fileName == null) {
-      return new MemoryPageFile<N>(pageSize, cacheSize, new LRUCache<N>());
+      inner = new MemoryPageFile<N>(pageSize);
     }
     else {
-      return new PersistentPageFile<N>(pageSize, cacheSize, new LRUCache<N>(), fileName, cls);
+      inner = new PersistentPageFile<N>(pageSize, fileName, cls);
     }
+    if(cacheSize >= Integer.MAX_VALUE) {
+      return inner;
+    }
+    return new LRUCache<N>(cacheSize, inner);
   }
 
   @Override
