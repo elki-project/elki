@@ -528,7 +528,8 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Returns the median of a data set in the given dimension by using a sampling method.
+   * Returns the median of a data set in the given dimension by using a sampling
+   * method.
    * 
    * @param relation Relation to process
    * @param ids DBIDs to process
@@ -565,7 +566,7 @@ public final class DatabaseUtil {
   public static <V extends NumberVector<?, ?>> double exactMedian(Relation<V> relation, DBIDs ids, int dimension) {
     final double[] vals = new double[ids.size()];
     int i = 0;
-    for (DBID id : ids) {
+    for(DBID id : ids) {
       vals[i] = relation.get(id).doubleValue(dimension);
       i++;
     }
@@ -586,7 +587,7 @@ public final class DatabaseUtil {
    * @param database
    * @return string representation
    */
-  public static Relation<String> guessClassLabelRepresentation(Database database) throws NoSupportedDataTypeException {
+  public static Relation<String> guessLabelRepresentation(Database database) throws NoSupportedDataTypeException {
     try {
       Relation<? extends ClassLabel> classrep = database.getRelation(TypeUtil.CLASSLABEL);
       if(classrep != null) {
@@ -769,7 +770,7 @@ public final class DatabaseUtil {
    * @return found cluster or it throws an exception.
    */
   public static ArrayModifiableDBIDs getObjectsByLabelMatch(Database database, Pattern name_pattern) {
-    Relation<String> relation = guessObjectLabelRepresentation(database);
+    Relation<String> relation = guessLabelRepresentation(database);
     if(name_pattern == null) {
       return DBIDUtil.newArray();
     }

@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
  * 
  * @author Erich Schubert
  */
-public class OutlierOrderingResult implements OrderingResult {
+public class OrderingFromAnnotationResult implements OrderingResult {
   /**
    * Outlier scores.
    */
@@ -34,7 +34,7 @@ public class OutlierOrderingResult implements OrderingResult {
    * @param scores outlier score result
    * @param ascending Ascending when {@code true}, descending otherwise
    */
-  public OutlierOrderingResult(AnnotationResult<Double> scores, boolean ascending) {
+  public OrderingFromAnnotationResult(AnnotationResult<Double> scores, boolean ascending) {
     super();
     this.scores = scores;
     this.ascending = ascending ? +1 : -1;
@@ -45,7 +45,7 @@ public class OutlierOrderingResult implements OrderingResult {
    * 
    * @param scores
    */
-  public OutlierOrderingResult(AnnotationResult<Double> scores) {
+  public OrderingFromAnnotationResult(AnnotationResult<Double> scores) {
     this(scores, true);
   }
 

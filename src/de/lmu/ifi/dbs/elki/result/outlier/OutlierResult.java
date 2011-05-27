@@ -40,7 +40,7 @@ public class OutlierResult extends BasicResult {
     super(scores.getLongName(), scores.getShortName());
     this.meta = meta;
     this.scores = scores;
-    this.ordering = new OutlierOrderingResult(scores, !(meta instanceof InvertedOutlierScoreMeta));
+    this.ordering = new OrderingFromAnnotationResult(scores, !(meta instanceof InvertedOutlierScoreMeta));
     this.addChildResult(scores);
     this.addChildResult(ordering);
     this.addChildResult(meta);
