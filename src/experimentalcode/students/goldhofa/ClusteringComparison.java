@@ -36,14 +36,14 @@ public class ClusteringComparison implements Evaluator {
    */
   protected static final Logging logger = Logging.getLogger(JudgeOutlierScores.class);
 
-  /**
+  /*
    * OptionID for {@link #REFERENCE_PARAM}
    */
   // public static final OptionID REFERENCE_ID =
   // OptionID.getOrCreateOptionID("similaritymeasures.reference",
   // "Reference clustering to compare with. Defaults to a by-label clustering.");
 
-  /**
+  /*
    * Parameter to obtain the reference clustering. Defaults to a flat label
    * clustering.
    */
@@ -100,7 +100,7 @@ public class ClusteringComparison implements Evaluator {
     List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
 
     // Abort if no clusterings to compare
-    if(clusterings.size() < 2)
+    if (clusterings.size() < 2)
       return;
 
     // result to save evaluations
@@ -206,9 +206,9 @@ public class ClusteringComparison implements Evaluator {
       }
 
       // verbose
-      if(logger.isVerbose()) {
+      if (logger.isVerbose()) {
 
-        for(MeasureResult currentResult : measureResults) {
+        for (MeasureResult currentResult : measureResults) {
 
           currentResult.print(logger, hashToClustering);
         }
@@ -226,11 +226,14 @@ public class ClusteringComparison implements Evaluator {
     // ResultUtil.getClusteringResults(result);
     // clusterings.add(refcrs.get(0));
 
+    //
     // collects all Objects into Segments and
     // converts ObjectSegments into PairSegments
+    //
+    
     Segments segments = new Segments(clusterings);
-
-    for(DBID id : db.getDBIDs()) {
+    
+    for (DBID id : db.getDBIDs()) {
 
       // tag Object over SegmentID
       segments.addObject(id);
