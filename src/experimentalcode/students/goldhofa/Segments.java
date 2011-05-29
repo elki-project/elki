@@ -15,11 +15,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
-
 /**
+ * Creates segments of two or more clusterings. Segments are the equally paired database
+ * objects of all given (2+) clusterings. Objects are combined by a string (segmentdID),
+ * so no database objects are saved.
+ * 
+ * Segments are created by adding each db object via the addObject() method and afterwards
+ * converted to pairs by the convertToPairSegments() method.
  * 
  * @author goldhofer
- *
  */
 public class Segments {
   
@@ -54,7 +58,7 @@ public class Segments {
   private TreeMap<SegmentID, Integer> objectSegments;
   
   /**
-   * List of pair based segments
+   * List of pair based segments and their paircount
    */
   private TreeMap<SegmentID, Integer> pairSegments;
   
@@ -70,21 +74,21 @@ public class Segments {
   
   
   /**
+   * Initialize segments. Add db objects via addObject method.
    * 
    * @param clusterings   List of clusterings in comparison
    */
   public Segments(List<Clustering<?>> clusterings) {
     
-    this.clusterings = clusterings;
+    this.clusterings    = clusterings;
     
-    objectSegments = new TreeMap<SegmentID, Integer>();
-    fragmentedSegments = new TreeMap<SegmentID, SortedSet<SegmentID>>();
-    pairSegments = new TreeMap<SegmentID, Integer>();
+    objectSegments      = new TreeMap<SegmentID, Integer>();
+    fragmentedSegments  = new TreeMap<SegmentID, SortedSet<SegmentID>>();
+    pairSegments        = new TreeMap<SegmentID, Integer>();
     
-    this.clusteringsCount = clusterings.size();
-    clusters = new int[this.clusteringsCount];
-    
-    clusterPaircount = new ArrayList<TreeMap<Integer, Integer>>(this.clusteringsCount);
+    clusteringsCount    = clusterings.size();
+    clusters            = new int[clusteringsCount];
+    clusterPaircount    = new ArrayList<TreeMap<Integer, Integer>>(this.clusteringsCount);
     
     // save count of clusters
     int clusteringIndex = 0;
@@ -98,7 +102,7 @@ public class Segments {
   }
   
   /**
-   * Add new Object to Segments
+   * Add a database object.
    * 
    * @param tag   occurrence in clusterings
    * @param id    object id in DB
@@ -115,6 +119,11 @@ public class Segments {
       
       objectSegments.put(tag, 1);
     }
+  }
+  
+  public String getClusteringDescription(int clusteringID) {
+    
+    return clusterings.get(clusteringID).getLongName();
   }
   
   /**
@@ -195,8 +204,6 @@ public class Segments {
     // fetch all DB objects of the first clustering and its selected clusterID.
     // This includes the selection to find.
     currentIDs = clusterings.get(startClustering).getAllClusters().get(id.get(startClustering)-1).getIDs();
-    
-    //System.out.println("   "+startClustering+"-"+(id.get(startClustering)-1)+" has "+currentIDs.size()+" objects");
 
     // convert basic selection to a modifiable set
     for (DBID dbID : currentIDs) {
@@ -208,15 +215,9 @@ public class Segments {
       
       if (id.get(i) != 0) {    
         
-        objectIDs = intersect( objectIDs, i, id.get(i)-1 );
-        
-      }/* else {
-        
-        substract(objectIDs, i, id.get(i));
-      }*/
+        objectIDs = intersect( objectIDs, i, id.get(i)-1 ); 
+      }
     }
-    
-    //System.out.println("   => intersection has "+objectIDs.size()+" objects");
     
     // and return selection
     return objectIDs;
@@ -252,32 +253,12 @@ public class Segments {
     return intersection;
   }
   
-  /*
-  private DBIDs substract(DBIDs ids, int clusteringID, int clusterID) {
-    
-    ModifiableDBIDs substraction = DBIDUtil.newHashSet();
-    
-    // entferne alle objekte in denen zwei objekte in einem cluster vorkommen
-    
-    DBIDs currentIDs = clusterings.get(clusteringID).getAllClusters().get(0).getIDs();
-    /*
-    for (DBID id : ids) {
-    
-        if (currentIDs.contains(id)) System.out.println("found");
-        else System.out.println("        not found");
-    }
-/*   
-    for (DBID currentID : currentIDs) {
-      
-      if ( ! ids.contains(currentID.getIntegerID())) {
-        substraction.add(currentID.getIntegerID());
-      }
-    }
- 
-    return ids;
-  }
-  */
-  
+  /**
+   * Get the SegmentID of a database object.
+   * 
+   * @param objectID  
+   * @return
+   */
   public SegmentID getSegmentID(DBID objectID) {
     
     SegmentID result = new SegmentID();
@@ -286,6 +267,14 @@ public class Segments {
     return result;
   }
   
+  /**
+   * Determines the SegmentID of a database object, by iterating through all clusterings and
+   * storing the index of the cluster the object is found in.
+   * 
+   * @param objectID
+   * @param tag
+   * @param clusteringIndex
+   */
   private void getSegment(DBID objectID, SegmentID tag, int clusteringIndex) {
     
     if (clusteringIndex < clusterings.size()) {
@@ -350,25 +339,6 @@ public class Segments {
     calculatePairs();
     
     isPairSegments = true;
-    
-    
-    // CHECK
-    /*
-    for (SegmentID id : fragmentedSegments.keySet()) {
-      
-      
-      System.out.println("");
-      System.out.println(id);
-      System.out.println("--");
-      
-      for (SegmentID involved : fragmentedSegments.get(id)) {
-        
-        System.out.println(involved);
-      }
-      
-      System.out.println("--");      
-    }
-    */
   }
   
   
@@ -600,19 +570,63 @@ public class Segments {
     else return objectSegments.size();
   }
   
-  public int getPairCount() {
+  /**
+   * Get total number of pairs with or without the unclustered pairs.
+   * 
+   * @param withUnclusteredPairs  if false, segment with unclustered pairs is removed
+   * @return
+   */
+  public int getPairCount(boolean withUnclusteredPairs) {
     
-    return pairs;
+    if (withUnclusteredPairs) {
+      
+      return pairs;
+      
+    } else {
+      
+      // create the SegmentID
+      SegmentID unclusteredPairs = new SegmentID(clusteringsCount);
+      for (int i=0; i<clusteringsCount; i++) unclusteredPairs.add(0);
+      
+      return pairs - pairSegments.get(unclusteredPairs);
+    }
   }
-  
+
   public int getPairCount(int clustering, int cluster) {
     
     return clusterPaircount.get(clustering).get(cluster);
   }
   
-  public TreeMap<SegmentID, Integer> getSegments() {
+  public int getPairCount(String segmentID) {
     
-    return pairSegments;
+    SegmentID segment = new SegmentID(segmentID);
+    return pairSegments.get(segment);
+  }
+  
+  /**
+   * Get segments as list with or without the segment representing pairs that are unclustered.
+   * 
+   * @param withUnclusteredPairs  if false, segment with unclustered pairs is removed
+   * @return
+   */
+  public TreeMap<SegmentID, Integer> getSegments(boolean withUnclusteredPairs) {
+    
+    if (withUnclusteredPairs) {
+      
+      return pairSegments;
+      
+    } else {
+      
+      // create the SegmentID
+      SegmentID unclusteredPairs = new SegmentID(clusteringsCount);
+      for (int i=0; i<clusteringsCount; i++) unclusteredPairs.add(0);
+      
+      @SuppressWarnings("unchecked")
+      TreeMap<SegmentID, Integer> segments = (TreeMap<SegmentID, Integer>) pairSegments.clone();
+      
+      segments.remove(unclusteredPairs);
+      return segments;
+    }
   }
   
   public int getClusterings() {
