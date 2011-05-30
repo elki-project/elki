@@ -141,7 +141,7 @@ public class Logging {
    * @param level Level to log at.
    * @param message Message to log.
    */
-  public void log(Level level, String message) {
+  public void log(Level level, CharSequence message) {
     LogRecord rec = new ELKILogRecord(level, message);
     logger.log(rec);
   }
@@ -153,7 +153,7 @@ public class Logging {
    * @param message Message to log.
    * @param e Exception
    */
-  public void log(Level level, String message, Throwable e) {
+  public void log(Level level, CharSequence message, Throwable e) {
     LogRecord rec = new ELKILogRecord(level, message);
     rec.setThrown(e);
     logger.log(rec);
@@ -174,7 +174,7 @@ public class Logging {
    * @param message Warning log message.
    * @param e Exception
    */
-  public void error(String message, Throwable e) {
+  public void error(CharSequence message, Throwable e) {
     log(Level.SEVERE, message, e);
   }
 
@@ -183,7 +183,7 @@ public class Logging {
    * 
    * @param message Warning log message.
    */
-  public void error(String message) {
+  public void error(CharSequence message) {
     log(Level.SEVERE, message);
   }
 
@@ -193,7 +193,7 @@ public class Logging {
    * @param message Warning log message.
    * @param e Exception
    */
-  public void warning(String message, Throwable e) {
+  public void warning(CharSequence message, Throwable e) {
     log(Level.WARNING, message, e);
   }
 
@@ -202,7 +202,7 @@ public class Logging {
    * 
    * @param message Warning log message.
    */
-  public void warning(String message) {
+  public void warning(CharSequence message) {
     log(Level.WARNING, message);
   }
 
@@ -214,7 +214,7 @@ public class Logging {
    * @param message Informational log message.
    * @param e Exception
    */
-  public void verbose(String message, Throwable e) {
+  public void verbose(CharSequence message, Throwable e) {
     log(Level.INFO, message, e);
   }
 
@@ -225,7 +225,7 @@ public class Logging {
    * 
    * @param message Informational log message.
    */
-  public void verbose(String message) {
+  public void verbose(CharSequence message) {
     log(Level.INFO, message);
   }
 
@@ -237,7 +237,7 @@ public class Logging {
    * @param message Informational log message.
    * @param e Exception
    */
-  public void debug(String message, Throwable e) {
+  public void debug(CharSequence message, Throwable e) {
     log(Level.FINE, message, e);
   }
 
@@ -248,7 +248,7 @@ public class Logging {
    * 
    * @param message Informational log message.
    */
-  public void debug(String message) {
+  public void debug(CharSequence message) {
     log(Level.FINE, message);
   }
 
@@ -260,7 +260,7 @@ public class Logging {
    * @param message Informational log message.
    * @param e Exception
    */
-  public void debugFine(String message, Throwable e) {
+  public void debugFine(CharSequence message, Throwable e) {
     log(Level.FINE, message, e);
   }
 
@@ -271,7 +271,7 @@ public class Logging {
    * 
    * @param message Informational log message.
    */
-  public void debugFine(String message) {
+  public void debugFine(CharSequence message) {
     log(Level.FINE, message);
   }
 
@@ -283,7 +283,7 @@ public class Logging {
    * @param message Informational log message.
    * @param e Exception
    */
-  public void fine(String message, Throwable e) {
+  public void fine(CharSequence message, Throwable e) {
     log(Level.FINE, message, e);
   }
 
@@ -294,7 +294,7 @@ public class Logging {
    * 
    * @param message Informational log message.
    */
-  public void fine(String message) {
+  public void fine(CharSequence message) {
     log(Level.FINE, message);
   }
 
@@ -306,7 +306,7 @@ public class Logging {
    * @param message Informational log message.
    * @param e Exception
    */
-  public void debugFiner(String message, Throwable e) {
+  public void debugFiner(CharSequence message, Throwable e) {
     log(Level.FINER, message, e);
   }
 
@@ -317,7 +317,7 @@ public class Logging {
    * 
    * @param message Informational log message.
    */
-  public void debugFiner(String message) {
+  public void debugFiner(CharSequence message) {
     log(Level.FINER, message);
   }
 
@@ -329,7 +329,7 @@ public class Logging {
    * @param message Informational log message.
    * @param e Exception
    */
-  public void finer(String message, Throwable e) {
+  public void finer(CharSequence message, Throwable e) {
     log(Level.FINER, message, e);
   }
 
@@ -340,7 +340,7 @@ public class Logging {
    * 
    * @param message Informational log message.
    */
-  public void finer(String message) {
+  public void finer(CharSequence message) {
     log(Level.FINER, message);
   }
 
@@ -352,7 +352,7 @@ public class Logging {
    * @param message Informational log message.
    * @param e Exception
    */
-  public void debugFinest(String message, Throwable e) {
+  public void debugFinest(CharSequence message, Throwable e) {
     log(Level.FINEST, message, e);
   }
 
@@ -363,7 +363,7 @@ public class Logging {
    * 
    * @param message Informational log message.
    */
-  public void debugFinest(String message) {
+  public void debugFinest(CharSequence message) {
     log(Level.FINEST, message);
   }
 
@@ -375,7 +375,7 @@ public class Logging {
    * @param message Informational log message.
    * @param e Exception
    */
-  public void finest(String message, Throwable e) {
+  public void finest(CharSequence message, Throwable e) {
     log(Level.FINEST, message, e);
   }
 
@@ -386,7 +386,7 @@ public class Logging {
    * 
    * @param message Informational log message.
    */
-  public void finest(String message) {
+  public void finest(CharSequence message) {
     log(Level.FINEST, message);
   }
 
@@ -396,7 +396,7 @@ public class Logging {
    * @param message Error log message.
    * @param e Exception
    */
-  public void exception(String message, Throwable e) {
+  public void exception(CharSequence message, Throwable e) {
     log(Level.SEVERE, message, e);
   }
 
