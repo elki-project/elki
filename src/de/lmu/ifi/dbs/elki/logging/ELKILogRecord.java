@@ -43,7 +43,7 @@ public class ELKILogRecord extends LogRecord {
    * @param msg Message contents.
    */
   public ELKILogRecord(Level level, CharSequence msg) {
-    super(level, msg.toString());
+    super(level, (msg != null) ? msg.toString() : null);
     needToInferCaller = true;
   }
 
