@@ -541,9 +541,9 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
   }
 
   /**
-   * Main method to run this wrapper.
+   * Main method to run this application.
    * 
-   * @param args the arguments to run this wrapper
+   * @param args the arguments to run this application
    */
   public static void main(String[] args) {
     runCLIApplication(KNNExplorer.class, args);

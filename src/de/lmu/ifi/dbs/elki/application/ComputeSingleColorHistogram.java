@@ -111,9 +111,9 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
   }
 
   /**
-   * Main method to run this wrapper.
+   * Main method to run this application.
    * 
-   * @param args the arguments to run this wrapper
+   * @param args the arguments to run this application
    */
   public static void main(String[] args) {
     runCLIApplication(ComputeSingleColorHistogram.class, args);
