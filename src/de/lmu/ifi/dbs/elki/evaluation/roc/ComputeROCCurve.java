@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
@@ -80,7 +80,7 @@ public class ComputeROCCurve implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
-  private ROCResult computeROCResult(Database database, DBIDs positiveids, Iterator<DBID> iter) {
+  private ROCResult computeROCResult(Database database, SetDBIDs positiveids, Iterator<DBID> iter) {
     ArrayModifiableDBIDs order = DBIDUtil.newArray(database.size());
     while(iter.hasNext()) {
       Object o = iter.next();
@@ -107,7 +107,7 @@ public class ComputeROCCurve implements Evaluator {
     return rocresult;
   }
 
-  private ROCResult computeROCResult(Database database, DBIDs positiveids, OutlierResult or) {
+  private ROCResult computeROCResult(Database database, SetDBIDs positiveids, OutlierResult or) {
     List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.OutlierScoreAdapter(database.getDBIDs(), or));
     double rocauc = ROC.computeAUC(roccurve);
     if(logger.isVerbose()) {
@@ -140,7 +140,7 @@ public class ComputeROCCurve implements Evaluator {
   @Override
   public void processResult(Database db, Result result) {
     // Prepare
-    DBIDs positiveids = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
+    SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
     
     if (positiveids.size() == 0) {
       logger.warning("Computing a ROC curve failed - no objects matched.");

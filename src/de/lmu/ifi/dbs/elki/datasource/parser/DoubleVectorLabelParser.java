@@ -43,6 +43,13 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
   }
 
   /**
+   * Constructor with default values.
+   */
+  public DoubleVectorLabelParser() {
+    this(Pattern.compile(WHITESPACE_PATTERN), QUOTE_CHAR.charAt(0), new BitSet());
+  }
+
+  /**
    * Creates a DoubleVector out of the given attribute values.
    * 
    * @see de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser#createDBObject(java.util.List)
@@ -64,9 +71,9 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<DoubleVector> {

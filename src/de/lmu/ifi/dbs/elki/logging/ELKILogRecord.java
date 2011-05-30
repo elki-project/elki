@@ -35,7 +35,7 @@ public class ELKILogRecord extends LogRecord {
    * Name of this class.
    */
   private final static String START_TRACE_AT = Logger.class.getCanonicalName();
-  
+
   /**
    * Constructor.
    * 
@@ -48,7 +48,7 @@ public class ELKILogRecord extends LogRecord {
   }
 
   /*
-   * use our inferCaller implementation. 
+   * use our inferCaller implementation.
    */
   @Override
   public String getSourceClassName() {
@@ -59,7 +59,7 @@ public class ELKILogRecord extends LogRecord {
   }
 
   /*
-   * use our inferCaller implementation. 
+   * use our inferCaller implementation.
    */
   @Override
   public void setSourceClassName(String sourceClassName) {
@@ -68,7 +68,7 @@ public class ELKILogRecord extends LogRecord {
   }
 
   /*
-   * use our inferCaller implementation. 
+   * use our inferCaller implementation.
    */
   @Override
   public String getSourceMethodName() {
@@ -79,7 +79,7 @@ public class ELKILogRecord extends LogRecord {
   }
 
   /*
-   * use our inferCaller implementation. 
+   * use our inferCaller implementation.
    */
   @Override
   public void setSourceMethodName(String sourceMethodName) {
@@ -98,13 +98,13 @@ public class ELKILogRecord extends LogRecord {
     while(ix < stack.length) {
       StackTraceElement frame = stack[ix];
       final String cls = frame.getClassName();
-      if (cls.equals(START_TRACE_AT)) {
+      if(cls.equals(START_TRACE_AT)) {
         break;
       }
       ix++;
     }
     // skip further back through helper functions
-    while (ix < stack.length) {
+    while(ix < stack.length) {
       StackTraceElement frame = stack[ix];
       final String cls = frame.getClassName();
 
