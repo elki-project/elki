@@ -10,7 +10,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -27,7 +27,7 @@ public class TestComputeROC implements JUnit4Test {
    */
   @Test
   public void testROCCurve() {
-    ModifiableDBIDs positive = DBIDUtil.newHashSet();
+    HashSetModifiableDBIDs positive = DBIDUtil.newHashSet();
     positive.add(DBIDUtil.importInteger(1));
     positive.add(DBIDUtil.importInteger(2));
     positive.add(DBIDUtil.importInteger(3));
