@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.evaluation.roc;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -53,11 +54,9 @@ public class ROC {
    *        'same positions'.
    * @return area under curve
    */
-  public static <C extends Comparable<? super C>> List<DoubleDoublePair> materializeROC(int size, DBIDs ids, Iterator<Pair<C, DBID>> nei) {
+  public static <C extends Comparable<? super C>, T> List<DoubleDoublePair> materializeROC(int size, Set<? super T> ids, Iterator<Pair<C, T>> nei) {
     final double DELTA = 0.1 / (size*size);
 
-    // ensure we have efficent "contains" available.
-    ids = DBIDUtil.ensureSet(ids);
     int postot = ids.size();
     int negtot = size - postot;
     int poscnt = 0;
@@ -67,9 +66,9 @@ public class ROC {
     // start in bottom left
     res.add(new DoubleDoublePair(0.0, 0.0));
 
-    Pair<C, DBID> prev = null;
+    Pair<C, T> prev = null;
     while(nei.hasNext()) {
-      Pair<C, DBID> cur = nei.next();
+      Pair<C, T> cur = nei.next();
       // positive or negative match?
       if(ids.contains(cur.getSecond())) {
         poscnt += 1;
@@ -310,7 +309,7 @@ public class ROC {
    */
   public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, List<DistanceResultPair<D>> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    List<DoubleDoublePair> roc = materializeROC(size, ids, new DistanceResultAdapter<D>(nei.iterator()));
+    List<DoubleDoublePair> roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<D>(nei.iterator()));
     return computeAUC(roc);
   }
 
@@ -324,7 +323,7 @@ public class ROC {
    */
   public static double computeROCAUCSimple(int size, DBIDs ids, DBIDs nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    List<DoubleDoublePair> roc = materializeROC(size, ids, new SimpleAdapter(nei.iterator()));
+    List<DoubleDoublePair> roc = materializeROC(size, DBIDUtil.ensureSet(ids), new SimpleAdapter(nei.iterator()));
     return computeAUC(roc);
   }
 }
