@@ -52,6 +52,24 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
     this.id = id;
   }
 
+  /**
+   * @deprecated Use {@link #getDoubleDistance} or {@link #getDistance} for clearness.
+   */
+  @Deprecated
+  @Override
+  public DoubleDistance getFirst() {
+    return getDistance();
+  }
+
+  /**
+   * @deprecated Use {@link #getDBID} for clearness.
+   */
+  @Deprecated
+  @Override
+  public DBID getSecond() {
+    return id;
+  }
+
   @Override
   public int compareByDistance(DistanceResultPair<DoubleDistance> o) {
     if(o instanceof DoubleDistanceResultPair) {

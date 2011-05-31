@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public class Pair<FIRST, SECOND> implements PairInterface {
+public class Pair<FIRST, SECOND> implements PairInterface<FIRST, SECOND> {
   /**
    * First value in pair
    */
@@ -48,6 +48,7 @@ public class Pair<FIRST, SECOND> implements PairInterface {
    * 
    * @return first element in pair
    */
+  @Override
   public final FIRST getFirst() {
     return first;
   }
@@ -66,6 +67,7 @@ public class Pair<FIRST, SECOND> implements PairInterface {
    * 
    * @return second element in pair
    */
+  @Override
   public final SECOND getSecond() {
     return second;
   }

@@ -586,12 +586,12 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     while(this.currentResidue > delta) {
       IntDoublePair maxRowResidue = getLargestRowResidue();
       IntDoublePair maxColResidue = getLargestColResidue();
-      if(maxRowResidue.getSecond() > maxColResidue.getSecond()) {
-        currentRows.clear(maxRowResidue.getFirst());
-        invertedRows.clear(maxRowResidue.getFirst());
+      if(maxRowResidue.second > maxColResidue.second) {
+        currentRows.clear(maxRowResidue.first);
+        invertedRows.clear(maxRowResidue.first);
       }
       else {
-        currentCols.clear(maxColResidue.getFirst());
+        currentCols.clear(maxColResidue.first);
       }
       updateValues();
     }

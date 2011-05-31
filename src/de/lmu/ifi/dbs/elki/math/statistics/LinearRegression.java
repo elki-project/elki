@@ -25,12 +25,12 @@ public class LinearRegression {
     double sumxy = 0.0;
     int gap = 0;
     for(DoubleDoublePair point : points) {
-      sumy += point.getSecond();
-      sumyy += point.getSecond() * point.getSecond();
+      sumy += point.second;
+      sumyy += point.second * point.second;
       gap++;
-      sumx += point.getFirst();
-      sumxx += point.getFirst() * point.getFirst();
-      sumxy += point.getFirst() * point.getSecond();
+      sumx += point.first;
+      sumxx += point.first * point.first;
+      sumxy += point.first * point.second;
     }
     double Sxy = sumxy - sumx * sumy / gap;
     double Sxx = sumxx - sumx * sumx / gap;

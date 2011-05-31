@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
  * Helper class which encapsulates an eigenvector and its corresponding
@@ -11,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  * 
  * @apiviz.composedOf Matrix
  */
-public class EigenPair implements Comparable<EigenPair>, PairInterface {
+public class EigenPair implements Comparable<EigenPair> {
   /**
    * The eigenvector as a matrix.
    */

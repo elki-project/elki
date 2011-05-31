@@ -12,7 +12,7 @@ import java.util.Comparator;
  * 
  * @apiviz.has Comparator
  */
-public class IntDoublePair implements Comparable<IntDoublePair>, PairInterface {
+public class IntDoublePair implements Comparable<IntDoublePair>, PairInterface<Integer, Double> {
   /**
    * first value
    */
@@ -99,11 +99,11 @@ public class IntDoublePair implements Comparable<IntDoublePair>, PairInterface {
   }
 
   /**
-   * Get first value
-   * 
-   * @return first value
+   * @deprecation use pair.first to avoid boxing!
    */
-  public final int getFirst() {
+  @Override
+  @Deprecated
+  public final Integer getFirst() {
     return first;
   }
 
@@ -117,11 +117,11 @@ public class IntDoublePair implements Comparable<IntDoublePair>, PairInterface {
   }
 
   /**
-   * Get second value
-   * 
-   * @return second value
+   * @deprecation use pair.first to avoid boxing!
    */
-  public final double getSecond() {
+  @Override
+  @Deprecated
+  public final Double getSecond() {
     return second;
   }
 

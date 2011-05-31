@@ -7,6 +7,7 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -14,7 +15,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
  * Compute ROC (Receiver Operating Characteristics) curves.
@@ -54,7 +57,7 @@ public class ROC {
    *        'same positions'.
    * @return area under curve
    */
-  public static <C extends Comparable<? super C>, T> List<DoubleDoublePair> materializeROC(int size, Set<? super T> ids, Iterator<Pair<C, T>> nei) {
+  public static <C extends Comparable<? super C>, T> List<DoubleDoublePair> materializeROC(int size, Set<? super T> ids, Iterator<? extends PairInterface<C, T>> nei) {
     final double DELTA = 0.1 / (size*size);
 
     int postot = ids.size();
@@ -66,9 +69,9 @@ public class ROC {
     // start in bottom left
     res.add(new DoubleDoublePair(0.0, 0.0));
 
-    Pair<C, T> prev = null;
+    PairInterface<C, T> prev = null;
     while(nei.hasNext()) {
-      Pair<C, T> cur = nei.next();
+      PairInterface<C, T> cur = nei.next();
       // positive or negative match?
       if(ids.contains(cur.getSecond())) {
         poscnt += 1;
@@ -88,16 +91,16 @@ public class ROC {
           DoubleDoublePair last1 = res.get(res.size() - 2);
           DoubleDoublePair last2 = res.get(res.size() - 1);
           // vertical simplification
-          if((last1.getFirst() == last2.getFirst()) && (last2.getFirst() == curneg)) {
+          if((last1.first == last2.first) && (last2.first == curneg)) {
             res.remove(res.size() - 1);
           }
           // horizontal simplification
-          else if((last1.getSecond() == last2.getSecond()) && (last2.getSecond() == curpos)) {
+          else if((last1.second == last2.second) && (last2.second == curpos)) {
             res.remove(res.size() - 1);
           }
           // diagonal simplification
           // TODO: Make a test.
-          else if(Math.abs((last2.getFirst() - last1.getFirst()) - (curneg - last2.getFirst())) < DELTA && Math.abs((last2.getSecond() - last1.getSecond()) - (curpos - last2.getSecond())) < DELTA) {
+          else if(Math.abs((last2.first - last1.first) - (curneg - last2.first)) < DELTA && Math.abs((last2.second - last1.second) - (curpos - last2.second)) < DELTA) {
             res.remove(res.size() - 1);
           }
         }
@@ -108,7 +111,7 @@ public class ROC {
     // ensure we end up in the top right corner.
     {
       DoubleDoublePair last = res.get(res.size() - 1);
-      if(last.getFirst() < 1.0 || last.getSecond() < 1.0) {
+      if(last.first < 1.0 || last.second < 1.0) {
         res.add(new DoubleDoublePair(1.0, 1.0));
       }
     }
@@ -125,7 +128,7 @@ public class ROC {
    * 
    * @author Erich Schubert
    */
-  public static class SimpleAdapter implements Iterator<Pair<DBID, DBID>> {
+  public static class SimpleAdapter implements Iterator<DBIDPair> {
     /**
      * Original Iterator
      */
@@ -147,9 +150,9 @@ public class ROC {
     }
 
     @Override
-    public Pair<DBID, DBID> next() {
+    public DBIDPair next() {
       DBID id = this.iter.next();
-      return new Pair<DBID, DBID>(id, id);
+      return DBIDUtil.newPair(id, id);
     }
 
     @Override
@@ -212,7 +215,7 @@ public class ROC {
    * 
    * @author Erich Schubert
    */
-  public static class OutlierScoreAdapter implements Iterator<Pair<Double, DBID>> {
+  public static class OutlierScoreAdapter implements Iterator<DoubleObjPair<DBID>> {
     /**
      * Original Iterator
      */
@@ -241,9 +244,9 @@ public class ROC {
     }
 
     @Override
-    public Pair<Double, DBID> next() {
+    public DoubleObjPair<DBID> next() {
       DBID id = this.iter.next();
-      return new Pair<Double, DBID>(scores.getValueFor(id), id);
+      return new DoubleObjPair<DBID>(scores.getValueFor(id), id);
     }
 
     @Override
@@ -276,8 +279,8 @@ public class ROC {
     while(iter.hasNext()) {
       DoubleDoublePair next = iter.next();
       // width * height at half way.
-      double width = next.getFirst() - prev.getFirst();
-      double meanheight = (next.getSecond() + prev.getSecond()) / 2;
+      double width = next.first - prev.first;
+      double meanheight = (next.second + prev.second) / 2;
       result += width * meanheight;
       prev = next;
     }
