@@ -11,12 +11,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBID
  */
 // TODO: implement DBIDs?
-public interface DBIDPair extends PairInterface {
+public interface DBIDPair extends PairInterface<DBID, DBID> {
   /**
    * Getter for first
    * 
    * @return first element in pair
    */
+  @Override
   public DBID getFirst();
 
   /**
@@ -24,5 +25,6 @@ public interface DBIDPair extends PairInterface {
    * 
    * @return second element in pair
    */
+  @Override
   public DBID getSecond();
 }

@@ -9,7 +9,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -75,19 +75,19 @@ public class CurveVisFactory extends AbstractVisFactory {
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     // determine scaling
-    MinMax<Double> minmaxx = new MinMax<Double>();
-    MinMax<Double> minmaxy = new MinMax<Double>();
+    DoubleMinMax minmaxx = new DoubleMinMax();
+    DoubleMinMax minmaxy = new DoubleMinMax();
     for(DoubleDoublePair pair : curve) {
-      minmaxx.put(pair.getFirst());
-      minmaxy.put(pair.getSecond());
+      minmaxx.put(pair.first);
+      minmaxy.put(pair.second);
     }
     LinearScale scalex = new LinearScale(minmaxx.getMin(), minmaxx.getMax());
     LinearScale scaley = new LinearScale(minmaxy.getMin(), minmaxy.getMax());
     // plot the line
     SVGPath path = new SVGPath();
     for(DoubleDoublePair pair : curve) {
-      final double x = scalex.getScaled(pair.getFirst());
-      final double y = 1 - scaley.getScaled(pair.getSecond());
+      final double x = scalex.getScaled(pair.first);
+      final double y = 1 - scaley.getScaled(pair.second);
       path.drawTo(sizex * x, sizey * y);
     }
     Element line = path.makeElement(svgp);

@@ -167,10 +167,10 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
    * @return ids
    */
   protected DBIDs computeSubspace(Vector<IntIntPair> subspace, ArrayList<ArrayList<DBIDs>> ranges) {
-    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).getFirst() - 1).get(subspace.get(0).getSecond()));
+    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).first - 1).get(subspace.get(0).second));
     // intersect all selected dimensions
     for(int i = 1; i < subspace.size(); i++) {
-      DBIDs current = ranges.get(subspace.get(i).getFirst() - 1).get(subspace.get(i).getSecond());
+      DBIDs current = ranges.get(subspace.get(i).first - 1).get(subspace.get(i).second);
       ids.retainAll(current);
       if(ids.size() == 0) {
         break;

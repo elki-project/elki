@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  *
  * @param <D> Distance type
  */
-public interface DistanceResultPair<D extends Distance<D>> extends PairInterface, Comparable<DistanceResultPair<D>> {
+public interface DistanceResultPair<D extends Distance<D>> extends PairInterface<D, DBID>, Comparable<DistanceResultPair<D>> {
   /**
    * Getter for first
    * 
