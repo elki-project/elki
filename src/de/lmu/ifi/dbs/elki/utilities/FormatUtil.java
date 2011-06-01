@@ -913,4 +913,25 @@ public final class FormatUtil {
     }
     return sb.toString();
   }
+
+  /**
+   * Formats the string array d with the specified separator.
+   * 
+   * @param d the string array to be formatted
+   * @param sep the separator between the single values of the double array,
+   *        e.g. ','
+   * @return a String representing the string array d
+   */
+  public static String format(String[] d, String sep) {
+    StringBuffer buffer = new StringBuffer();
+    for(int i = 0; i < d.length; i++) {
+      if(i > 0) {
+        buffer.append(sep).append(d[i]);
+      }
+      else {
+        buffer.append(d[i]);
+      }
+    }
+    return buffer.toString();
+  }
 }
