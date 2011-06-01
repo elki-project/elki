@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
+import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -30,10 +31,29 @@ public class UpdatableHeap<O> extends Heap<O> {
   /**
    * Constructor with predefined size.
    * 
-   * @param size
+   * @param size Size
    */
   public UpdatableHeap(int size) {
     super(size);
+  }
+
+  /**
+   * Constructor with comparator
+   * 
+   * @param comparator Comparator
+   */
+  public UpdatableHeap(Comparator<? super O> comparator) {
+    super(comparator);
+  }
+
+  /**
+   * Constructor with predefined size and comparator
+   * 
+   * @param size Size
+   * @param comparator Comparator
+   */
+  public UpdatableHeap(int size, Comparator<? super O> comparator) {
+    super(size, comparator);
   }
 
   @Override

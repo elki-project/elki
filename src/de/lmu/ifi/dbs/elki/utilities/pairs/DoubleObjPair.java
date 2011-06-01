@@ -20,7 +20,7 @@ public class DoubleObjPair<O> implements PairInterface<Double, O>, Comparable<Do
 
   /**
    * Constructor.
-   *
+   * 
    * @param first First value
    * @param second Second value
    */
@@ -46,5 +46,29 @@ public class DoubleObjPair<O> implements PairInterface<Double, O>, Comparable<Do
   @Override
   public int compareTo(DoubleObjPair<O> o) {
     return Double.compare(first, o.first);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof DoubleObjPair)) {
+      // TODO: allow comparison with arbitrary pairs?
+      return false;
+    }
+    DoubleObjPair<?> other = (DoubleObjPair<?>) obj;
+    if(first != other.first) {
+      return false;
+    }
+    if(second == null) {
+      return (other.second == null);
+    }
+    return second.equals(other.second);
+  }
+
+  /**
+   * Canonical toString operator
+   */
+  @Override
+  public String toString() {
+    return "Pair(" + first + ", " + (second != null ? second.toString() : "null") + ")";
   }
 }
