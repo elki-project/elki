@@ -99,7 +99,7 @@ public class KNearestNeighborNeighborhood<D extends Distance<D>> implements Neig
      */
     public NeighborSetPredicate instantiate(Relation<?> database) {
       DataStore<List<DistanceResultPair<D>>> store = getKNNNeighbors(database);
-      DataStore<DBIDs> s = getNeighbors(database) ;
+      DataStore<DBIDs> s = getNeighbors(database,store) ;
       return new KNearestNeighborNeighborhood<D>(store,s);
     }
     
@@ -120,11 +120,10 @@ public class KNearestNeighborNeighborhood<D extends Distance<D>> implements Neig
     /**
      * method to get the K-Neighborhood
      */
-    private DataStore<DBIDs> getNeighbors(Relation<?> database){
+    private DataStore<DBIDs> getNeighbors(Relation<?> database , DataStore<List<DistanceResultPair<D>>> store){
       WritableDataStore<DBIDs> s = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
-      KNNQuery<?,D> knnQuery = QueryUtil.getKNNQuery(database, distFunc, KNNQuery.HINT_EXACT);
       for(DBID id : database.iterDBIDs()){
-         List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
+         List<DistanceResultPair<D>> neighbors = store.get(id);
          ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
          for(DistanceResultPair<D> dpair : neighbors){
            neighbours.add(dpair.getDBID());
