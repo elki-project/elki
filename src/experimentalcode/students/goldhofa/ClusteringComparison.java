@@ -104,14 +104,14 @@ public class ClusteringComparison implements Evaluator {
       return;
 
     // result to save evaluations
-    ClusteringComparisonResult thisResult = new ClusteringComparisonResult("ClusteringComparison", "cc");
+    ClusteringComparisonResult thisResult = new ClusteringComparisonResult("ClusteringComparison", "cc", clusterings.get(0));
 
     //
     // calculate all measure values
     //
 
     SortedSet<MeasureResult> measureResults;
-    if(measures.size() >= 1) {
+    if (measures.size() >= 1) {
 
       measureResults = new TreeSet<MeasureResult>();
 
@@ -204,6 +204,9 @@ public class ClusteringComparison implements Evaluator {
           measureResults.add(new MeasureResult(first, second, "average", average.get(first).get(second), false));
         }
       }
+      
+      // store measure results
+      thisResult.addMeasureResult(measureResults, hashToClustering);
 
       // verbose
       if (logger.isVerbose()) {
