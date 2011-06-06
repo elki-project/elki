@@ -45,6 +45,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
   public SimpleEnumeratingScheme(Clustering<?> clustering) {
     super();
     this.clustering = clustering;
+    updateNames();
   }
 
   /**
