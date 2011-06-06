@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
@@ -215,8 +214,6 @@ public class TextWriter {
     List<SettingsResult> rs = null;
     HashSet<Result> otherres = null;
 
-    Collection<DBIDs> groups = null;
-
     ra = ResultUtil.getAnnotationResults(r);
     ro = ResultUtil.getOrderingResults(r);
     rc = ResultUtil.getClusteringResults(r);
@@ -244,33 +241,18 @@ public class TextWriter {
       throw new UnableToComplyException("No printable result found.");
     }
 
-    NamingScheme naming = null;
-    // Process groups or all data in a flat manner?
-    if(rc != null && rc.size() > 0) {
-      groups = new ArrayList<DBIDs>();
-      for(Cluster<?> c : rc.get(0).getAllClusters()) {
-        groups.add(c.getIDs());
-      }
-      // force an update of cluster names.
-      naming = new SimpleEnumeratingScheme(rc.get(0));
-    }
-    else {
-      // only 'magically' create a group if we don't have iterators either.
-      // if(ri == null || ri.size() == 0) {
-      groups = new ArrayList<DBIDs>();
-      groups.add(db.getDBIDs());
-      // }
-    }
-
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
       for(IterableResult<?> rii : ri) {
         writeIterableResult(db, streamOpener, rii, rs);
       }
     }
-    if(groups != null && groups.size() > 0) {
-      for(DBIDs group : groups) {
-        writeGroupResult(db, streamOpener, group, ra, naming, rs);
+    if(rc != null && rc.size() > 0) {
+      for(Clustering<?> c : rc) {
+        NamingScheme naming = new SimpleEnumeratingScheme(c);
+        for(Cluster<?> clus : c.getAllClusters()) {
+          writeClusterResult(db, streamOpener, clus, ra, naming, rs);
+        }
       }
     }
     if(ro != null && ro.size() > 0) {
@@ -336,31 +318,41 @@ public class TextWriter {
     out.flush();
   }
 
-  private void writeGroupResult(Database db, StreamFactory streamOpener, DBIDs group, List<AnnotationResult<?>> ra, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeClusterResult(Database db, StreamFactory streamOpener, Cluster<?> clus, List<AnnotationResult<?>> ra, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
-    // for clusters, use naming.
-    if(group instanceof Cluster) {
-      if(naming != null) {
-        filename = filenameFromLabel(naming.getNameFor((Cluster<?>) group));
-      }
+    if(naming != null) {
+      filename = filenameFromLabel(naming.getNameFor(clus));
+    }
+    else {
+      filename = "cluster";
     }
 
-    PrintStream outStream = streamOpener.openStream(getFilename(group, filename));
+    PrintStream outStream = streamOpener.openStream(getFilename(clus, filename));
     TextWriterStream out = new TextWriterStream(outStream, writers);
     printSettings(out, sr);
-    // print group information...
-    if(group instanceof TextWriteable) {
-      TextWriterWriterInterface<?> writer = out.getWriterFor(group);
-      out.commentPrintLn("Group class: " + group.getClass().getCanonicalName());
-      if(writer != null) {
-        writer.writeObject(out, null, group);
-        out.commentPrintSeparator();
-        out.flush();
+
+    // Write cluster information
+    out.commentPrintLn("Cluster: " + naming.getNameFor(clus));
+    if(clus.getParents().size() > 0) {
+      StringBuffer buf = new StringBuffer();
+      buf.append("Parents:");
+      for(Cluster<?> parent : clus.getParents()) {
+        buf.append(" ").append(naming.getNameFor(parent));
       }
+      out.commentPrintLn(buf.toString());
     }
+    if(clus.getChildren().size() > 0) {
+      StringBuffer buf = new StringBuffer();
+      buf.append("Children:");
+      for(Cluster<?> child : clus.getChildren()) {
+        buf.append(" ").append(naming.getNameFor(child));
+      }
+      out.commentPrintLn(buf.toString());
+    }
+    out.flush();
 
     // print ids.
-    DBIDs ids = group;
+    DBIDs ids = clus.getIDs();
     Iterator<DBID> iter = ids.iterator();
 
     while(iter.hasNext()) {
