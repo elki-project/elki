@@ -369,7 +369,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     // Build Interface
     //
     
-    CheckBox checkbox = new CheckBox(svgp, showUnclusteredPairs, "Show unclustered Pairs");
+    CheckBox checkbox = new CheckBox(svgp, showUnclusteredPairs, "Show unclustered pairs");
     checkbox.addCheckBoxListener(new CheckBoxListener() {
       public void switched(SwitchEvent evt) {
         showUnclusteredPairs(evt.isOn());
@@ -389,7 +389,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     barchart.setSize(segments.getPairCount(true));
     barchart.setFill(segments.getPairCount(false));
     barchart.showValues();
-    barchart.addLabel("Total paircount : clustered Pairs");
+    barchart.addLabel("Total paircount : clustered pairs");
     info.addItem(barchart.asElement(), 20);
     // and add selection info
     // ! TODO VARIABLE LENGTH
