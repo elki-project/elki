@@ -51,26 +51,22 @@ public class OutputStep implements WorkflowStep {
   }
 
   /**
-   * Get a default handler list containing a {@link ResultWriter}.
-   * 
-   * @return Result handler list
+   * Set the default handler to the {@link ResultWriter}.
    */
-  public static ArrayList<Class<? extends ResultHandler>> defaultWriter() {
-    ArrayList<Class<? extends ResultHandler>> defaultHandlers = new ArrayList<Class<? extends ResultHandler>>(1);
+  public static void setDefaultHandlerWriter() {
+    defaultHandlers = new ArrayList<Class<? extends ResultHandler>>(1);
     defaultHandlers.add(ResultWriter.class);
-    return defaultHandlers;
   }
 
   /**
-   * Get a default handler list containing a {@link ResultVisualizer}.
-   * 
-   * @return Result handler list
+   * Set the default handler to the {@link ResultVisualizer}.
    */
-  public static ArrayList<Class<? extends ResultHandler>> defaultVisualizer() {
-    ArrayList<Class<? extends ResultHandler>> defaultHandlers = new ArrayList<Class<? extends ResultHandler>>(1);
+  public static void setDefaultHandlerVisualizer() {
+    defaultHandlers = new ArrayList<Class<? extends ResultHandler>>(1);
     defaultHandlers.add(ResultVisualizer.class);
-    return defaultHandlers;
   }
+  
+  protected static ArrayList<Class<? extends ResultHandler>> defaultHandlers = null;
 
   /**
    * Parameterization class.
@@ -90,6 +86,9 @@ public class OutputStep implements WorkflowStep {
       super.makeOptions(config);
       // result handlers
       final ObjectListParameter<ResultHandler> resultHandlerParam = new ObjectListParameter<ResultHandler>(OptionID.RESULT_HANDLER, ResultHandler.class);
+      if (defaultHandlers != null) {
+        resultHandlerParam.setDefaultValue(defaultHandlers);
+      }
       if(config.grab(resultHandlerParam)) {
         resulthandlers = resultHandlerParam.instantiateClasses(config);
       }

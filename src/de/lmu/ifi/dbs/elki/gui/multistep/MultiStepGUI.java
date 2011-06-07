@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
  * Experimenter-style multi step GUI.
@@ -169,6 +170,7 @@ public class MultiStepGUI extends JPanel {
    * @param args command line parameters
    */
   public static void main(String[] args) {
+    OutputStep.setDefaultHandlerVisualizer();
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.application;
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
  * Provides a KDDCLIApplication that can be used to perform any algorithm
@@ -68,6 +69,7 @@ public class KDDCLIApplication extends AbstractApplication {
    * @param args parameter list according to description
    */
   public static void main(String[] args) {
+    OutputStep.setDefaultHandlerWriter();
     runCLIApplication(KDDCLIApplication.class, args);
   }
 }
