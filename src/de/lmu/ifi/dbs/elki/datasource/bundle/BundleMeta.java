@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * 
  * @author Erich Schubert
  * 
- * @apivis.composedOf SimpleTypeInformation
+ * @apiviz.composedOf SimpleTypeInformation
  */
 public class BundleMeta extends ArrayList<SimpleTypeInformation<?>> {
   /**
