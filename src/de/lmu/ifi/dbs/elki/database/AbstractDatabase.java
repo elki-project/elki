@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * management of relations, indexes and events as well as default query matching.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf DatabaseEventManager
+ * @apiviz.has IndexFactory
  */
 public abstract class AbstractDatabase extends AbstractHierarchicalResult implements Database {
   /**

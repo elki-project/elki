@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * 
  * @apiviz.has LOF.LOFResult oneway - - updates
+ * @apiviz.composedOf OnlineLOF.LOFKNNListener
  */
 // TODO: related to publication? 
 public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
@@ -94,7 +95,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
    * Get the kNN and rkNN queries for the algorithm.
    * 
-   * @param relaton Data
+   * @param relation Data
    * @param stepprog Progress logger
    * @return the kNN and rkNN queries
    */

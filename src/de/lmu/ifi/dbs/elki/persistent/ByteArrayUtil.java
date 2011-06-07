@@ -26,6 +26,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * 
  * @apiviz.composedOf ByteSerializer
  * @apiviz.composedOf ShortSerializer
  * @apiviz.composedOf IntegerSerializer

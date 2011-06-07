@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses FlatRStarTree oneway - - «create»
+ * @apiviz.uses FlatRStarTreeIndex oneway - - «create»
  * 
  * @param <O> Object type
  */

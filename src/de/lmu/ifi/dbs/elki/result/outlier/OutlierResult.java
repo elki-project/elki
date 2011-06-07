@@ -10,9 +10,9 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.AnnotationResult oneway - - contains
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.result.outlier.OutlierOrderingResult
+ * @apiviz.composedOf OutlierScoreMeta
+ * @apiviz.composedOf AnnotationResult oneway - - contains
+ * @apiviz.composedOf OrderingFromAnnotationResult
  */
 public class OutlierResult extends BasicResult {
   /**

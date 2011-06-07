@@ -102,7 +102,7 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair>, PairInter
   }
 
   /**
-   * @deprecation use pair.first to avoid boxing!
+   * @deprecated use pair.first to avoid boxing!
    */
   @Override
   @Deprecated
@@ -120,7 +120,7 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair>, PairInter
   }
 
   /**
-   * @deprecation use pair.first to avoid boxing!
+   * @deprecated use pair.first to avoid boxing!
    */
   @Override
   @Deprecated

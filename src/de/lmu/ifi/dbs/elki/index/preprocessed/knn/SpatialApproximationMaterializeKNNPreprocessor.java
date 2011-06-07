@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has SpatialIndex
+ * @apiviz.uses SpatialIndexTree
  * 
  * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index

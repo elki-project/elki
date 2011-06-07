@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
  * @author Erich Schubert
  * 
  * @apiviz.uses AbstractRStarTree
- * @apiviz.uses SpatialPrimitiveNumberDistanceFunction
+ * @apiviz.uses SpatialPrimitiveDoubleDistanceFunction
  */
 //TODO: add bulk range queries.
 public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> extends AbstractDistanceRangeQuery<O, DoubleDistance> {

@@ -30,7 +30,7 @@ public class DoubleObjPair<O> implements PairInterface<Double, O>, Comparable<Do
   }
 
   /**
-   * @deprecation use pair.first to avoid boxing!
+   * @deprecated use pair.first to avoid boxing!
    */
   @Override
   @Deprecated

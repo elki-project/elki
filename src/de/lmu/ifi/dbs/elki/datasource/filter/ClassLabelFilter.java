@@ -21,6 +21,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Class that turns a label column into a class label column.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has ClassLabel
  */
 public class ClassLabelFilter implements ObjectFilter {
   /**

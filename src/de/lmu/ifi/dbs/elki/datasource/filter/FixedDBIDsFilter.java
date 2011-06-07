@@ -17,6 +17,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * the bundle by adding a column of DBID type to the bundle.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses DBIDs
  */
 public class FixedDBIDsFilter implements ObjectFilter {
   /**

@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses MkCoPTree oneway - - «create»
+ * @apiviz.uses MkCoPTreeIndex oneway - - «create»
  * 
  * @param <O> Object type
  * @param <D> Distance type

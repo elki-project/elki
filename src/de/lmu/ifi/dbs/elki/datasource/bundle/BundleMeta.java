@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * it improves code readability and type safety.
  * 
  * @author Erich Schubert
+ * 
+ * @apivis.composedOf SimpleTypeInformation
  */
 public class BundleMeta extends ArrayList<SimpleTypeInformation<?>> {
   /**

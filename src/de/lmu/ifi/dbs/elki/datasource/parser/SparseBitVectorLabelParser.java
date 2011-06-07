@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * an Integer. Lines starting with &quot;#&quot; will be ignored.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has BitVector
  */
 @Title("Sparse Bit Vector Label Parser")
 @Description("Parser for the lines of the following format:\n" + "A single line provides a single sparse BitVector. The indices of the one-bits are " + "separated by whitespace. The first index starts with zero. Any substring not containing whitespace is tried to be read as an Integer. " + "If this fails, it will be appended to a label. (Thus, any label must not be parseable as an Integer.) " + "Empty lines and lines beginning with \"#\" will be ignored.")

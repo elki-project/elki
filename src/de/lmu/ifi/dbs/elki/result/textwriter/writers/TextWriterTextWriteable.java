@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * Write an object, using the objects own {@link TextWriteable} interface.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses TextWriteable
  */
 public class TextWriterTextWriteable extends TextWriterWriterInterface<TextWriteable> {
   /**

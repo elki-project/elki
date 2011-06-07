@@ -9,7 +9,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Database Object type
+ * @apiviz.landmark
+ * @apiviz.has KNNQuery oneway - - «provides»
+ * 
+ * @param <O> Object type
  */
 public interface KNNIndex<O> extends Index {
   /**

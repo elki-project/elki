@@ -7,6 +7,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * Generic Cluster Order Entry Interface.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.composedOf DBID
+ * @apiviz.composedOf Distance
  *
  * @param <D> Distance type
  */

@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.uses MultipleObjectsBundle
+ * @apiviz.has MultipleObjectsBundle
  */
 public interface DatabaseConnection extends Parameterizable {
   /**

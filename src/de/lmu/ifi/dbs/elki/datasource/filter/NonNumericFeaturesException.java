@@ -7,7 +7,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  * @author Arthur Zimek
  */
 public class NonNumericFeaturesException extends Exception {
-
   /**
    * Generated serial version UID.
    */

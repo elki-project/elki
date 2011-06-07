@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * already provides the setting of the database according to parameters.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses ObjectFilter
  */
 public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   /**

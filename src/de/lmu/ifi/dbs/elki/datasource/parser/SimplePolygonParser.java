@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Unparseable parts will be treated as labels.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has PolygonsObject
  */
 public class SimplePolygonParser extends AbstractParser implements Parser {
   /**

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
  * @author Erich Schubert
  * 
  * @apiviz.uses AbstractRStarTree
- * @apiviz.uses SpatialPrimitiveNumberDistanceFunction
+ * @apiviz.uses SpatialPrimitiveDoubleDistanceFunction
  */
 public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extends AbstractDistanceKNNQuery<O, DoubleDistance> {
   /**
@@ -183,11 +183,30 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     return result;
   }
 
+  /**
+   * Optimized double distance entry implementation.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.hidden
+   */
   class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
+    /**
+     * Referenced entry
+     */
     SpatialEntry entry;
 
+    /**
+     * Distance value
+     */
     double distance;
 
+    /**
+     * Constructor.
+     *
+     * @param entry Entry
+     * @param distance Distance
+     */
     public DoubleDistanceEntry(SpatialEntry entry, double distance) {
       this.entry = entry;
       this.distance = distance;

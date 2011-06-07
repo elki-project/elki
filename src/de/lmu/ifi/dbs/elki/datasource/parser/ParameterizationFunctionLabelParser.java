@@ -25,6 +25,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * double (or float). Lines starting with &quot;#&quot; will be ignored.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has ParameterizationFunction
  */
 @Title("Parameterization Function Label Parser")
 @Description("Parser for the following line format:\n" + "A single line provides a single point. Attributes are separated by whitespace. The real values will be parsed as as doubles. Any substring not containing whitespace is tried to be read as double. If this fails, it will be appended to a label. (Thus, any label must not be parseable " + "as double.) Empty lines and lines beginning with \"#\" will be ignored. If any point differs in its dimensionality from other points, the parse method will fail with an Exception.")

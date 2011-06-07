@@ -46,8 +46,8 @@ public class BreadthFirstEnumeration<N extends Node<N, E>, E extends Entry> impl
    * Creates a new breadth first enumeration with the specified node as root
    * node.
    * 
+   * @param index the index tree storing the nodes
    * @param rootPath the root entry of the enumeration
-   * @param tree the index storing the nodes
    */
   public BreadthFirstEnumeration(final IndexTree<N, E> index, final IndexTreePath<E> rootPath) {
     super();

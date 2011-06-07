@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
  * Ordering obtained from an outlier score.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses AnnotationResult
  */
 public class OrderingFromAnnotationResult implements OrderingResult {
   /**

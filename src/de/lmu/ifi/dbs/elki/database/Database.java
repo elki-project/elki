@@ -29,12 +29,11 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * @author Elke Achtert
  * 
  * @apiviz.landmark
- * @apiviz.has DataQuery oneway - - provides
  * @apiviz.has DistanceQuery oneway - - provides
  * @apiviz.has KNNQuery oneway - - provides
  * @apiviz.has RangeQuery oneway - - provides
  * @apiviz.has RKNNQuery oneway - - provides
- * @apiviz.has Representation
+ * @apiviz.has Relation oneway - - contains
  * @apiviz.has Index oneway - - manages
  * @apiviz.uses DataStoreListener oneway - - invokes
  */
@@ -207,8 +206,6 @@ public interface Database extends HierarchicalResult {
 
   /**
    * Collection of known indexes
-   * 
-   * @param Collection
    */
   public Collection<Index> getIndexes();
 

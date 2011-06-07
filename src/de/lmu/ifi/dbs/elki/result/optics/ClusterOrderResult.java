@@ -24,13 +24,12 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.result.ClusterOrderEntry oneway - - contains
- * @apiviz.composedOf 
- *                    de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ClusterOrderAdapter
- * @apiviz.composedOf 
- *                    de.lmu.ifi.dbs.elki.result.ClusterOrderResult.ReachabilityDistanceAdapter
- * @apiviz.composedOf 
- *                    de.lmu.ifi.dbs.elki.result.ClusterOrderResult.PredecessorAdapter
+ * @apiviz.landmark
+ * 
+ * @apiviz.has ClusterOrderEntry oneway - - contains
+ * @apiviz.composedOf ClusterOrderResult.ClusterOrderAdapter
+ * @apiviz.composedOf ClusterOrderResult.ReachabilityDistanceAdapter
+ * @apiviz.composedOf ClusterOrderResult.PredecessorAdapter
  * 
  * @param <D> distance type.
  */

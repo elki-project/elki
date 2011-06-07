@@ -96,7 +96,7 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
   }
 
   /**
-   * @deprecation use pair.first to avoid boxing!
+   * @deprecated use pair.first to avoid boxing!
    */
   @Override
   @Deprecated
@@ -114,7 +114,7 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
   }
 
   /**
-   * @deprecation use pair.first to avoid boxing!
+   * @deprecated use pair.first to avoid boxing!
    */
   @Override
   @Deprecated

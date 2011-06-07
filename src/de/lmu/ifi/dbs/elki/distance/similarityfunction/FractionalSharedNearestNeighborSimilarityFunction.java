@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.has SharedNearestNeighborsPreprocessor
+ * @apiviz.has SharedNearestNeighborIndex.Factory
  * @apiviz.uses Instance oneway - - «create»
  * 
  * @param <O> object type

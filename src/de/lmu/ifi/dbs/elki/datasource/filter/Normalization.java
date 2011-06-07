@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  *
  * @author Arthur Zimek
  * 
+ * @apiviz.has NonNumericFeaturesException
+ * 
  * @param <O> object type
  */
 public interface Normalization<O> extends ObjectFilter, Parameterizable {

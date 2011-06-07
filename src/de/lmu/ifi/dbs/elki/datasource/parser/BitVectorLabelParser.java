@@ -27,6 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Bit. Lines starting with &quot;#&quot; will be ignored.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has BitVector
  */
 @Title("Bit Vector Label Parser")
 @Description("Parses the following format of lines:\n" + "A single line provides a single BitVector. Bits are separated by whitespace. Any substring not containing whitespace is tried to be read as Bit. If this fails, it will be appended to a label. (Thus, any label must not be parseable as Bit.) Empty lines and lines beginning with \"#\" will be ignored. If any BitVector differs in its dimensionality from other BitVectors, the parse method will fail with an Exception.")

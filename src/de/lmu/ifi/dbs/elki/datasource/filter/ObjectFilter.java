@@ -6,6 +6,10 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * Object filters as part of the input step.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.uses MultipleObjectsBundle oneway - - «filters»
  */
 public interface ObjectFilter {
   /**

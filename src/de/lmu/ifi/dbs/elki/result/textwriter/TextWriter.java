@@ -117,7 +117,7 @@ public class TextWriter {
    * 
    * @param result Result we print
    * @param filenamepre File name prefix to use
-   * @return
+   * @return unique filename
    */
   protected String getFilename(Object result, String filenamepre) {
     if(filenamepre == null || filenamepre.length() == 0) {

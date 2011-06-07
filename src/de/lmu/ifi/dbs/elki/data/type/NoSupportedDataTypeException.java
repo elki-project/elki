@@ -4,6 +4,8 @@ package de.lmu.ifi.dbs.elki.data.type;
  * Exception thrown when no supported data type was found.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses TypeInformation oneway - -
  */
 public class NoSupportedDataTypeException extends IllegalStateException {
   /**

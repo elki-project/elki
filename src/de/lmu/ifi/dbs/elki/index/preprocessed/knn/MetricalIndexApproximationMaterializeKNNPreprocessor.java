@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has MetricalIndex
+ * @apiviz.uses MetricalIndexTree
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <D> the type of distance the used distance function will return

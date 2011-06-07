@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses MkTabTree oneway - - «create»
+ * @apiviz.uses MkTabTreeIndex oneway - - «create»
  * 
  * @param <O> Object type
  * @param <D> Distance type

@@ -15,6 +15,16 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  * Utility class for RStar trees
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.uses AbstractRStarTree
+ * @apiviz.uses DoubleDistanceRStarTreeKNNQuery
+ * @apiviz.uses DoubleDistanceRStarTreeRangeQuery
+ * @apiviz.uses GenericRStarTreeKNNQuery
+ * @apiviz.uses GenericRStarTreeRangeQuery
+ * @apiviz.has RangeQuery
+ * @apiviz.has KNNQuery
  */
 public final class RStarTreeUtil {
   /**

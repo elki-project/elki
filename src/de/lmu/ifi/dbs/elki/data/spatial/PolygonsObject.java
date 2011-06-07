@@ -8,6 +8,8 @@ import java.util.Iterator;
  * Object representation consisting of (multiple) polygons.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Polygon
  */
 // TODO: implement SpatialComparable!
 public class PolygonsObject {
