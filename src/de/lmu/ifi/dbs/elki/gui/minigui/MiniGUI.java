@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.workflow.LoggingStep;
+import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
  * Minimal GUI built around a table-based parameter editor.
@@ -428,6 +429,7 @@ public class MiniGUI extends JPanel {
    * @param args command line parameters
    */
   public static void main(final String[] args) {
+    OutputStep.setDefaultHandlerVisualizer();
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
