@@ -12,6 +12,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * Utility package containing various common types
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has TypeInformation oneway - -
+ * @apiviz.landmark
  */
 public final class TypeUtil {
   /**
@@ -42,7 +45,7 @@ public final class TypeUtil {
   /**
    * Either class label, object labels or a string - anything that will be
    * accepted by
-   * {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil#guessClassLabelRepresentation}
+   * {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil#guessObjectLabelRepresentation}
    */
   public static final TypeInformation GUESSED_LABEL = new AlternativeTypeInformation(LABELLIST, CLASSLABEL, STRING);
 

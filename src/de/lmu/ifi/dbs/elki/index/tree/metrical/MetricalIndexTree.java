@@ -15,8 +15,6 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has MetricalNode oneway - - contains
- * 
  * @param <O> the type of objects stored in the index
  * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of nodes used in the metrical index

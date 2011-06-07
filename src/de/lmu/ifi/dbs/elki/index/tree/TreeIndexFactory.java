@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory,interface
- * @apiviz.uses TreeIndex oneway - - «create»
+ * @apiviz.uses Index oneway - - «create»
  * 
  * @param <O> Object type
  * @param <I> Index type

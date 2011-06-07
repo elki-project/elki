@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses RawDoubleDistance
+ * @apiviz.uses PrimitiveDoubleDistanceFunction
  * 
  * @param <O> Database object type
  */

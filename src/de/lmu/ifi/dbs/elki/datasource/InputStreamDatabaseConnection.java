@@ -21,8 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * 
  * @apiviz.uses Parser oneway - - runs
- * @apiviz.uses ParsingResult oneway - - processes
- * 
  */
 @Title("Input-Stream based database connection")
 @Description("Parse an input stream such as STDIN into a database.")

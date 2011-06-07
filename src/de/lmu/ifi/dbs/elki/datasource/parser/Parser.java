@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @apiviz.landmark
  * @apiviz.uses InputStream
- * @apiviz.uses MultipleObjectsPackage oneway - - «create»
+ * @apiviz.uses MultipleObjectsBundle oneway - - «create»
  */
 public interface Parser extends Parameterizable, InspectionUtilFrequentlyScanned {
   /**

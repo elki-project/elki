@@ -33,6 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Lines starting with &quot;#&quot; will be ignored.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.has NumberDistance
+ * 
  * @param <D> distance type
  * @param <N> number type
  */

@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses DiSHPreprocessor
+ * @apiviz.uses DiSHPreferenceVectorIndex
  * @apiviz.uses DiSHDistanceFunction
  * @apiviz.has SubspaceModel
  * 

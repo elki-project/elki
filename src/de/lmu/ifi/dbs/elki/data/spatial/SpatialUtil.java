@@ -6,9 +6,14 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  * Utility class with spatial functions.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.landmark
+ * 
+ * @apiviz.uses SpatialComparable oneway - - «compares»
+ * @apiviz.has HyperBoundingBox oneway - - «creates»
  */
 // IMPORTANT NOTE: when editing this class, bear in mind that the dimension
-// numbers start at 1!
+// numbers start at 1 or 0 depending on the context!
 public final class SpatialUtil {
   /**
    * Returns a clone of the minimum hyper point.

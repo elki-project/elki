@@ -5,8 +5,6 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
  * human reading and storage in CSV files.
  * 
  * @author Erich Schubert
- *
- * @apiviz.has de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable oneway - - writeable by
  */
 //TODO: split TextWriteable interface into data writing and metadata writing?
 public interface TextWriteable {

@@ -40,10 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.composedOf DatabaseEventManager
- * @apiviz.composedOf WritableDataStore
- * @apiviz.composedOf Index
- * @apiviz.composedOf DBIDs
+ * @apiviz.composedOf TreeSetModifiableDBIDs
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
 public class HashmapDatabase extends AbstractDatabase implements UpdatableDatabase, Parameterizable {

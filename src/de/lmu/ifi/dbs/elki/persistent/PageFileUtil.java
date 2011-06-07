@@ -4,6 +4,10 @@ package de.lmu.ifi.dbs.elki.persistent;
  * Page file statistic utility functions.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.uses PageFileStatistics oneway - - analyses
  */
 public final class PageFileUtil {
   /**

@@ -24,6 +24,10 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.has DoubleVector
  */
 public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
   /**

@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.has FloatVector
  */
 public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector> {
   /**

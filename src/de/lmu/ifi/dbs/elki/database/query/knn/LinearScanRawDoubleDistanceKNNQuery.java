@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses RawDoubleDistance
+ * @apiviz.uses PrimitiveDoubleDistanceFunction
  * 
  * @param <O> Object type
  */

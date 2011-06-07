@@ -23,7 +23,7 @@ public class InputStep implements WorkflowStep {
   /**
    * Constructor.
    *
-   * @param databaseConnection
+   * @param database Database to use
    */
   public InputStep(Database database) {
     super();

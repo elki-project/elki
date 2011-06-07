@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * Shared API for both single-object and multi-object packages.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf BundleMeta
  */
 public interface ObjectBundle {
   /**

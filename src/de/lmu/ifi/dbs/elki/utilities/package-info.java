@@ -12,11 +12,14 @@
  * <li>{@link de.lmu.ifi.dbs.elki.logging.LoggingUtil}: simple logging access.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.math.MathUtil}: Mathematics utility functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.data.VectorUtil}: Vector and Matrix functions.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil}: Spatial MBR computations (intersection, union etc.).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil}: byte array processing (low-level IO via byte arrays).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.FileUtil}: File and file name utility functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil}: Generic classes (instantiation, arrays of arrays, sets that require safe but unchecked casts).</li>
  * </ul></li>
  * <li>Database-related:<ul>
+ * <li>{@link de.lmu.ifi.dbs.elki.data.type.TypeUtil}: Data type utility functions and common type definitions.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.QueryUtil}: Database Query API simplifications.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil}: Database ID DBID handling.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil}: Data storage layer (like Maps).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil}: database utility functions (centroid etc.).</li>
@@ -32,9 +35,12 @@
  * </ul></li>
  * <li>Specialized:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.data.images.ImageUtil}: image handling.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil}: Converting iterators and iterables.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil}: Managing parameter settings</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.InspectionUtil}: class and classpath inspection.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil}: documentation extraction from annotations.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.persistent.PageFileUtil}: reporting page file accesses.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil}: reporting page file accesses.</li>
  * </ul></li>
  * </ul>
  */

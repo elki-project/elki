@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Peer Kröger
  * 
- * @apiviz.uses PreDeConPreprocessor
+ * @apiviz.uses PreDeConSubspaceIndex
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */

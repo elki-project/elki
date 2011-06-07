@@ -99,7 +99,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair>, PairInterface<D
   }
 
   /**
-   * @deprecation use pair.first to avoid boxing!
+   * @deprecated use pair.first to avoid boxing!
    */
   @Override
   @Deprecated
@@ -117,7 +117,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair>, PairInterface<D
   }
 
   /**
-   * @deprecation use pair.first to avoid boxing!
+   * @deprecated use pair.first to avoid boxing!
    */
   @Override
   @Deprecated

@@ -187,7 +187,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   /**
    * Expands the spatial nodes of the specified pair.
    * 
-   * @param tree the index storing the objects
+   * @param index the index storing the objects
    * @param distFunction the spatial distance function of this algorithm
    * @param nodePair the pair of nodes to be expanded
    * @param knns the knn list
@@ -275,7 +275,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * Reinserts the objects of the already expanded nodes.
    * 
    * @param distFunction the spatial distance function of this algorithm
-   * @param tree the index storing the objects
+   * @param index the index storing the objects
    * @param path the path of the object inserted last
    * @param knns the knn list
    */
