@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing the convex hull of each
@@ -180,6 +179,7 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
         for(Clustering<?> c : clusterings) {
           final VisualizationTask task = new VisualizationTask(NAME, context, c, rep, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           context.addVisualizer(c, task);
         }
       }
