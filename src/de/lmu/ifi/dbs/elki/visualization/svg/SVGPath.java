@@ -118,13 +118,22 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath drawTo(double x, double y) {
-    if(lastaction == null) {
+    if(!isStarted()) {
       moveTo(x, y);
     }
     else {
       lineTo(x, y);
     }
     return this;
+  }
+
+  /**
+   * Test whether the path drawing has already started.
+   * 
+   * @return Path freshness
+   */
+  public boolean isStarted() {
+    return lastaction != null;
   }
 
   /**

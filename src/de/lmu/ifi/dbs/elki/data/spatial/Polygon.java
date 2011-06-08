@@ -101,6 +101,16 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
   public int size() {
     return points.size();
   }
+  
+  /**
+   * Get a vector by index.
+   * 
+   * @param idx Index to get
+   * @return Vector
+   */
+  public Vector get(int idx) {
+    return points.get(idx);
+  }
 
   @Override
   public int getDimensionality() {
