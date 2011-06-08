@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.math.ConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -35,7 +36,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
-import experimentalcode.students.roedler.utils.convexhull.ConvexHull2D;
 
 /**
  * Visualizer for generating an SVG-Element containing the convex hull of each
@@ -43,15 +43,16 @@ import experimentalcode.students.roedler.utils.convexhull.ConvexHull2D;
  * 
  * @author Robert Rödler
  * 
- * @apiviz.has MeanModel oneway - - visualizes
+ * @apiviz.has Clustering oneway - - visualizes
+ * @apiviz.uses ConvexHull2D
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Convex Hull Visualization";
+  private static final String NAME = "Cluster Convex Hull Visualization";
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -73,7 +74,7 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
    * 
    * @param task VisualizationTask
    */
-  public ConvexHullVisualization(VisualizationTask task) {
+  public ClusterConvexHullVisualization(VisualizationTask task) {
     super(task);
     this.clustering = task.getResult();
     context.addContextChangeListener(this);
@@ -85,9 +86,6 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
     // Viewport size, for "relative size" computations
     final Pair<DoubleMinMax, DoubleMinMax> viewp = proj.estimateViewport();
     double projarea = (viewp.getFirst().getDiff()) * (viewp.getSecond().getDiff());
-
-    // addCSSClasses(svgp);
-    // SVGPath path = new SVGPath();
 
     double opacity = 0.25;
 
@@ -156,11 +154,10 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
    * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses ConvexHullVisualization oneway - - «create»
+   * @apiviz.uses ClusterConvexHullVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Constructor
@@ -171,7 +168,7 @@ public class ConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2D
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ConvexHullVisualization<NV>(task);
+      return new ClusterConvexHullVisualization<NV>(task);
     }
 
     @Override

@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.math.ConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -35,7 +36,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
-import experimentalcode.students.roedler.utils.convexhull.ConvexHull2D;
 
 /**
  * Visualizer for generating an SVG-Element containing the convex hull of the
@@ -45,6 +45,7 @@ import experimentalcode.students.roedler.utils.convexhull.ConvexHull2D;
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
+ * @apiviz.uses ConvexHull2D
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
@@ -108,8 +109,8 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
     if(!svgp.getCSSClassManager().contains(SELECTEDHULL)) {
       CSSClass cls = new CSSClass(this, SELECTEDHULL);
       // cls = new CSSClass(this, CONVEXHULL);
-      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.SELECTION));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
