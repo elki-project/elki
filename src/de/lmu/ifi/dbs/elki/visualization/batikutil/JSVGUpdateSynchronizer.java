@@ -137,13 +137,15 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * 
    * @param caller For consistency checks
    */
-  protected synchronized void invokeFromRunner(JSVGSynchronizedRunner caller) {
-    // Assert that we're still "the one"
-    if(caller != getSynchronizedRunner()) {
-      return;
+  protected void invokeFromRunner(JSVGSynchronizedRunner caller) {
+    synchronized(this) {
+      // Assert that we're still "the one"
+      if(caller != getSynchronizedRunner()) {
+        return;
+      }
+      // Remove ourself. We've been run.
+      setSynchronizedRunner(null);
     }
-    // Remove ourself. We've been run.
-    setSynchronizedRunner(null);
     // Wake up all runners
     for(WeakReference<UpdateRunner> wur : updaterunner) {
       UpdateRunner ur = wur.get();

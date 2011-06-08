@@ -27,7 +27,7 @@ public final class Vector implements MatrixLike<Vector> {
    * 
    * @param values array of doubles
    */
-  public Vector(final double[] values) {
+  public Vector(final double... values) {
     elements = values;
   }
 
@@ -199,6 +199,23 @@ public final class Vector implements MatrixLike<Vector> {
   }
 
   /**
+   * Returns a new vector which is the result of this vector plus the specified
+   * vector times the given factor.
+   * 
+   * @param v the vector to be added
+   * @param s the scaling
+   * @return the resulting vector
+   */
+  public final Vector plusTimes(final Vector v, double s) {
+    checkDimensions(v);
+    final Vector result = new Vector(elements.length);
+    for(int i = 0; i < elements.length; i++) {
+      result.elements[i] = elements[i] + v.elements[i] * s;
+    }
+    return result;
+  }
+
+  /**
    * A = A + B
    * 
    * @param B another matrix
@@ -267,6 +284,21 @@ public final class Vector implements MatrixLike<Vector> {
       elements[i] -= d;
     }
     return this;
+  }
+
+  /**
+   * Returns this vector minus the specified vector v times s.
+   * 
+   * @param v the vector to be subtracted from this vector
+   * @param s the scaling factor
+   * @return this vector minus the specified vector v
+   */
+  public final Vector minusTimes(final Vector v, final double s) {
+    final Vector sub = new Vector(elements.length);
+    for(int i = 0; i < elements.length; i++) {
+      sub.elements[i] = elements[i] - v.elements[i] * s;
+    }
+    return sub;
   }
 
   /**
