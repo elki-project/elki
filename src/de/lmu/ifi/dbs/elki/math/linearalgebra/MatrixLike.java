@@ -55,7 +55,7 @@ public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
    * @param s A(i,j).
    * @throws ArrayIndexOutOfBoundsException on bounds error
    */
-  public void set(int i, int j, double s);
+  public M set(int i, int j, double s);
 
   /**
    * Increments a single element.
@@ -65,7 +65,7 @@ public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
    * @param s the increment value: A(i,j) = A(i.j) + s.
    * @throws ArrayIndexOutOfBoundsException on bounds error
    */
-  public void increment(int i, int j, double s);
+  public M increment(int i, int j, double s);
 
   /**
    * Returns the <code>i</code>th column of this matrix as vector.
@@ -91,12 +91,30 @@ public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
   public M plus(M B);
 
   /**
+   * C = A + s*B
+   * 
+   * @param B another matrix
+   * @param s scalar
+   * @return A + s*B in a new Matrix
+   */
+  public M plusTimes(M B, double s);
+
+  /**
    * A = A + B
    * 
    * @param B another matrix
    * @return A + B in this Matrix
    */
   public M plusEquals(M B);
+
+  /**
+   * C = A + s*B
+   * 
+   * @param B another matrix
+   * @param s scalar
+   * @return A + s*B in this Matrix
+   */
+  public M plusTimesEquals(M B, double s);
 
   /**
    * C = A - B
@@ -107,12 +125,30 @@ public interface MatrixLike<M extends MatrixLike<M>> extends Cloneable {
   public M minus(M B);
 
   /**
+   * C = A - s*B
+   * 
+   * @param B another matrix
+   * @param s Scalar
+   * @return A - s*B in a new Matrix
+   */
+  public M minusTimes(M B, double s);
+
+  /**
    * A = A - B
    * 
    * @param B another matrix
    * @return A - B in this Matrix
    */
   public M minusEquals(M B);
+
+  /**
+   * C = A - s*B
+   * 
+   * @param B another matrix
+   * @param s Scalar
+   * @return A - s*B in a new Matrix
+   */
+  public M minusTimesEquals(M B, double s);
 
   /**
    * Multiply a matrix by a scalar, C = s*A
