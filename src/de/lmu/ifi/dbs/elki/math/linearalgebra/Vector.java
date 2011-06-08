@@ -147,25 +147,30 @@ public final class Vector implements MatrixLike<Vector> {
    * 
    * @param i the row index
    * @param value the value to be set
+   * 
+   * @return the modified vector
    */
-  public final void set(final int i, final double value) {
+  public final Vector set(final int i, final double value) {
     elements[i] = value;
+    return this;
   }
 
   @Override
-  public final void set(final int i, final int j, final double s) {
+  public final Vector set(final int i, final int j, final double s) {
     if(j != 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
     elements[i] = s;
+    return this;
   }
 
   @Override
-  public final void increment(final int i, final int j, final double s) {
+  public final Vector increment(final int i, final int j, final double s) {
     if(j != 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
     elements[i] += s;
+    return this;
   }
 
   @Override
@@ -203,10 +208,11 @@ public final class Vector implements MatrixLike<Vector> {
    * vector times the given factor.
    * 
    * @param v the vector to be added
-   * @param s the scaling
+   * @param s the scalar
    * @return the resulting vector
    */
-  public final Vector plusTimes(final Vector v, double s) {
+  @Override
+  public final Vector plusTimes(final Vector v, final double s) {
     checkDimensions(v);
     final Vector result = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
@@ -231,12 +237,28 @@ public final class Vector implements MatrixLike<Vector> {
   }
 
   /**
+   * A = A + s * B
+   * 
+   * @param B another matrix
+   * @param s Scalar
+   * @return A + s * B in this Matrix
+   */
+  @Override
+  public final Vector plusTimesEquals(final Vector B, final double s) {
+    checkDimensions(B);
+    for(int i = 0; i < elements.length; i++) {
+      elements[i] += s * B.get(i, 0);
+    }
+    return this;
+  }
+
+  /**
    * Add a constant value to all dimensions.
    * 
    * @param d Value to add
    * @return Modified vector
    */
-  public final Vector plusEquals(double d) {
+  public final Vector plusEquals(final double d) {
     for(int i = 0; i < elements.length; i++) {
       elements[i] += d;
     }
@@ -259,6 +281,22 @@ public final class Vector implements MatrixLike<Vector> {
   }
 
   /**
+   * Returns this vector minus the specified vector v times s.
+   * 
+   * @param v the vector to be subtracted from this vector
+   * @param s the scaling factor
+   * @return this vector minus the specified vector v
+   */
+  @Override
+  public final Vector minusTimes(final Vector v, final double s) {
+    final Vector sub = new Vector(elements.length);
+    for(int i = 0; i < elements.length; i++) {
+      sub.elements[i] = elements[i] - v.elements[i] * s;
+    }
+    return sub;
+  }
+
+  /**
    * A = A - B
    * 
    * @param B another matrix
@@ -274,31 +312,32 @@ public final class Vector implements MatrixLike<Vector> {
   }
 
   /**
-   * Subtract a constant value from all dimensions.
+   * A = A - s * B
    * 
-   * @param d Value to subtract
-   * @return Modified vector
+   * @param B another matrix
+   * @param s Scalar
+   * @return A - s * B in this Matrix
    */
-  public final Vector minusEquals(double d) {
+  @Override
+  public final Vector minusTimesEquals(final Vector B, final double s) {
+    checkDimensions(B);
     for(int i = 0; i < elements.length; i++) {
-      elements[i] -= d;
+      elements[i] -= s * B.get(i, 0);
     }
     return this;
   }
 
   /**
-   * Returns this vector minus the specified vector v times s.
+   * Subtract a constant value from all dimensions.
    * 
-   * @param v the vector to be subtracted from this vector
-   * @param s the scaling factor
-   * @return this vector minus the specified vector v
+   * @param d Value to subtract
+   * @return Modified vector
    */
-  public final Vector minusTimes(final Vector v, final double s) {
-    final Vector sub = new Vector(elements.length);
+  public final Vector minusEquals(final double d) {
     for(int i = 0; i < elements.length; i++) {
-      sub.elements[i] = elements[i] - v.elements[i] * s;
+      elements[i] -= d;
     }
-    return sub;
+    return this;
   }
 
   /**
@@ -470,13 +509,14 @@ public final class Vector implements MatrixLike<Vector> {
   /**
    * Normalizes this vector to the length of 1.0.
    */
-  public final void normalize() {
+  public final Vector normalize() {
     double norm = euclideanLength();
     if(norm != 0) {
       for(int row = 0; row < elements.length; row++) {
         elements[row] /= norm;
       }
     }
+    return this;
   }
 
   /**

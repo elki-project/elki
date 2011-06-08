@@ -324,11 +324,13 @@ public final class Matrix implements MatrixLike<Matrix> {
    * @param i Row index.
    * @param j Column index.
    * @param s A(i,j).
+   * @return modified matrix
    * @throws ArrayIndexOutOfBoundsException on bounds error
    */
   @Override
-  public final void set(final int i, final int j, final double s) {
+  public final Matrix set(final int i, final int j, final double s) {
     elements[i][j] = s;
+    return this;
   }
 
   /**
@@ -337,12 +339,14 @@ public final class Matrix implements MatrixLike<Matrix> {
    * @param i the row index
    * @param j the column index
    * @param s the increment value: A(i,j) = A(i.j) + s.
+   * @return modified matrix
    * @throws ArrayIndexOutOfBoundsException on bounds error
    */
   @Override
-  public final void increment(final int i, final int j, final double s) {
+  public final Matrix increment(final int i, final int j, final double s) {
     elements[i][j] += s;
-  }
+    return this;
+}
 
   /**
    * Make a one-dimensional row packed copy of the internal array.
@@ -689,8 +693,20 @@ public final class Matrix implements MatrixLike<Matrix> {
    * @return A + B in a new Matrix
    */
   @Override
-  public final Matrix plus(Matrix B) {
+  public final Matrix plus(final Matrix B) {
     return copy().plusEquals(B);
+  }
+
+  /**
+   * C = A + s * B
+   * 
+   * @param B another matrix
+   * @param s scalar
+   * @return A + s * B in a new Matrix
+   */
+  @Override
+  public final Matrix plusTimes(final Matrix B, final double s) {
+    return copy().plusTimesEquals(B, s);
   }
 
   /**
@@ -711,14 +727,44 @@ public final class Matrix implements MatrixLike<Matrix> {
   }
 
   /**
+   * A = A + s * B
+   * 
+   * @param B another matrix
+   * @param s Scalar
+   * @return A + s * B in this Matrix
+   */
+  @Override
+  public final Matrix plusTimesEquals(final Matrix B, final double s) {
+    checkMatrixDimensions(B);
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        elements[i][j] += s * B.elements[i][j];
+      }
+    }
+    return this;
+  }
+
+  /**
    * C = A - B
    * 
    * @param B another matrix
    * @return A - B in a new Matrix
    */
   @Override
-  public final Matrix minus(Matrix B) {
+  public final Matrix minus(final Matrix B) {
     return copy().minusEquals(B);
+  }
+
+  /**
+   * C = A - s * B
+   * 
+   * @param B another matrix
+   * @param s Scalar
+   * @return A - s * B in a new Matrix
+   */
+  @Override
+  public final Matrix minusTimes(final Matrix B, final double s) {
+    return copy().minusTimesEquals(B, s);
   }
 
   /**
@@ -739,13 +785,31 @@ public final class Matrix implements MatrixLike<Matrix> {
   }
 
   /**
+   * A = A - s * B
+   * 
+   * @param B another matrix
+   * @param s Scalar
+   * @return A - s * B in this Matrix
+   */
+  @Override
+  public final Matrix minusTimesEquals(final Matrix B, final double s) {
+    checkMatrixDimensions(B);
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        elements[i][j] -= s * B.elements[i][j];
+      }
+    }
+    return this;
+  }
+
+  /**
    * Multiply a matrix by a scalar, C = s*A
    * 
    * @param s scalar
    * @return s*A
    */
   @Override
-  public final Matrix times(double s) {
+  public final Matrix times(final double s) {
     return copy().timesEquals(s);
   }
 
