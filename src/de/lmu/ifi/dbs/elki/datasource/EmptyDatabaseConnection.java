@@ -21,7 +21,7 @@ public class EmptyDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * Constructor.
    */
-  protected EmptyDatabaseConnection() {
+  public EmptyDatabaseConnection() {
     super(null);
   }
   
