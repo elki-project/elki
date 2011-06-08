@@ -13,11 +13,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  */
 public final class ErfcStddevWeight implements WeightFunction {
   /**
-   * Precomputed value 1 / sqrt(2)
-   */
-  private static final double onebysqrt2 = 1 / MathUtil.SQRT2;
-
-  /**
    * Return Erfc weight, scaled by standard deviation. max is ignored.
    */
   @Override
@@ -25,6 +20,6 @@ public final class ErfcStddevWeight implements WeightFunction {
     if(stddev <= 0) {
       return 1;
     }
-    return ErrorFunctions.erfc(onebysqrt2 * distance / stddev);
+    return ErrorFunctions.erfc(MathUtil.SQRTHALF * distance / stddev);
   }
 }
