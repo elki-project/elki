@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.utils.convexhull;
+package de.lmu.ifi.dbs.elki.math;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -197,6 +196,9 @@ public class ConvexHull2D {
     return (area < 0);
   }
 
+  /**
+   * The actual graham scan main loop.
+   */
   private void grahamScan() {
     if(points.size() < 3) {
       return;
