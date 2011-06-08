@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing the convex hull of the
@@ -94,6 +93,7 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
 
         Element selHull = path.makeElement(svgp);
         SVGUtil.addCSSClass(selHull, SELECTEDHULL);
+        // TODO: use relative selection size for opacity?
         layer.appendChild(selHull);
       }
     }
@@ -111,7 +111,8 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
       // cls = new CSSClass(this, CONVEXHULL);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
       cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
+      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, ".25");
       cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
       svgp.addCSSClassOrLogError(cls);
