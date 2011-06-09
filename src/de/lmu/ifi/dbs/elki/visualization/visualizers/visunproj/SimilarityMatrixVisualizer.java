@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
+import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -26,8 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has ComputeSimilarityMatrixImage.SimilarityMatrix oneway - 1
- *             visualizes
+ * @apiviz.has SimilarityMatrix oneway - 1 visualizes
  */
 public class SimilarityMatrixVisualizer extends AbstractVisualization {
   /**
@@ -38,7 +38,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisualization {
   /**
    * The actual pixmap result.
    */
-  private ComputeSimilarityMatrixImage.SimilarityMatrix result;
+  private SimilarityMatrix result;
 
   /**
    * Constructor.

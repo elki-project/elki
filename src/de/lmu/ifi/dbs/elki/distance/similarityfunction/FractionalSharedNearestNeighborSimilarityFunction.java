@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -31,7 +30,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O, D extends Dist
    * 
    * @param indexFactory Index factory.
    */
-  public FractionalSharedNearestNeighborSimilarityFunction(IndexFactory<O, SharedNearestNeighborIndex<O>> indexFactory) {
+  public FractionalSharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>> indexFactory) {
     super(indexFactory);
   }
 
