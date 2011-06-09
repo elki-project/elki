@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.composedOf CachedFile
+ * @apiviz.composedOf PageFile
  * 
  * @param <P> Page type
  */

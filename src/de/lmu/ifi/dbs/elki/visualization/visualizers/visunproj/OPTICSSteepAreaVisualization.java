@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses OPTICS.SteepAreaResult
+ * @apiviz.uses OPTICSXi.SteepAreaResult
  */
 public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends AbstractVisualization {
   /**

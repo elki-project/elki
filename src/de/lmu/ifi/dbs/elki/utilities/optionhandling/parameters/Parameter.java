@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * @apiviz.composedOf OptionID
  * @apiviz.uses ParameterConstraint
- * @apiviz.uses GlobalParameterConstraint
  * 
  * @param <T> the type of a possible value (i.e., the type of the option)
  * @param <S> the supertype for constraints

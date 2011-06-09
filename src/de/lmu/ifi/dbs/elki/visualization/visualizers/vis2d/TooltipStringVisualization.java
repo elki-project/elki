@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @author Remigius Wojdanowski
  * @author Erich Schubert
  * 
- * @apiviz.has Representation oneway - - visualizes
+ * @apiviz.has Relation oneway - - visualizes
  * 
  * @param <NV> Data type visualized.
  */
@@ -138,7 +138,7 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses TooltipAnnotationVisualization oneway - - «create»
+   * @apiviz.uses TooltipStringVisualization oneway - - «create»
    * 
    * @param <NV>
    */

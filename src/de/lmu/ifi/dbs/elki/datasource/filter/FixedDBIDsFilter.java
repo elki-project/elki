@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses DBIDs
+ * @apiviz.uses DBID
  */
 public class FixedDBIDsFilter implements ObjectFilter {
   /**

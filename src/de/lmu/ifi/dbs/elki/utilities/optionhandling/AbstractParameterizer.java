@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * 
  * @apiviz.uses Parameterization
- * @apiviz.has Parameter
+ * @apiviz.has de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
  * @apiviz.excludeSubtypes
  */
 public abstract class AbstractParameterizer implements Parameterizer {
