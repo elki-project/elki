@@ -131,7 +131,7 @@ public class ConvexHull2D {
    * 
    * @param a
    * @param origin origin vector
-   * @return
+   * @return relative X coordinate
    */
   private final double getRX(Vector a, Vector origin) {
     return (a.get(0) - origin.get(0)) * factor;
@@ -142,7 +142,7 @@ public class ConvexHull2D {
    * 
    * @param a
    * @param origin origin vector
-   * @return
+   * @return relative Y coordinate
    */
   private final double getRY(Vector a, Vector origin) {
     return (a.get(1) - origin.get(1)) * factor;
@@ -151,10 +151,10 @@ public class ConvexHull2D {
   /**
    * Test whether a point is left of the other wrt. the origin.
    * 
-   * @param a
-   * @param b
+   * @param a Vector A
+   * @param b Vector B
    * @param o Origin vector
-   * @return
+   * @return true when left
    */
   protected final boolean isLeft(Vector a, Vector b, Vector o) {
     final double cross = getRX(a, o) * getRY(b, o) - getRY(a, o) * getRX(b, o);
@@ -170,9 +170,9 @@ public class ConvexHull2D {
   /**
    * Manhattan distance.
    * 
-   * @param a
-   * @param b
-   * @return
+   * @param a Vector A
+   * @param b Vector B
+   * @return Manhattan distance
    */
   private double mdist(Vector a, Vector b) {
     return Math.abs(a.get(0) - b.get(0)) + Math.abs(a.get(1) - b.get(1));
@@ -181,10 +181,10 @@ public class ConvexHull2D {
   /**
    * Simple convexity test.
    * 
-   * @param a
-   * @param b
-   * @param c
-   * @return
+   * @param a Vector A
+   * @param b Vector B
+   * @param c Vector C
+   * @return convexity
    */
   private final boolean isConvex(Vector a, Vector b, Vector c) {
     // We're using factor to improve numerical contrast for small polygons.
