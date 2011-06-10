@@ -17,7 +17,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
    * The static factory instance
    */
   public final static IntegerDistance FACTORY = new IntegerDistance();
-  
+
   /**
    * The distance value
    */
@@ -43,6 +43,11 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
   public IntegerDistance(int value) {
     super();
     this.value = value;
+  }
+
+  @Override
+  public IntegerDistance fromDouble(double val) {
+    return new IntegerDistance((int) val);
   }
 
   @Override

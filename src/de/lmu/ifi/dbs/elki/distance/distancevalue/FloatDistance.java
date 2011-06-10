@@ -15,8 +15,8 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    * The static factory instance
    */
   public final static FloatDistance FACTORY = new FloatDistance();
-  
-/**
+
+  /**
    * The distance value.
    */
   private float value;
@@ -25,7 +25,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    * Generated serialVersionUID.
    */
   private static final long serialVersionUID = -5702250266358369075L;
-  
+
   /**
    * Empty constructor for serialization purposes.
    */
@@ -41,6 +41,11 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
   public FloatDistance(float value) {
     super();
     this.value = value;
+  }
+
+  @Override
+  public FloatDistance fromDouble(double val) {
+    return new FloatDistance((float) val);
   }
 
   @Override
@@ -113,7 +118,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
   void setValue(Float value) {
     this.value = value;
   }
-  
+
   @Override
   public double doubleValue() {
     return value;
@@ -167,7 +172,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
     if(val.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
-  
+
     if(DoubleDistance.DOUBLE_PATTERN.matcher(val).matches()) {
       return new FloatDistance(Float.parseFloat(val));
     }
@@ -175,7 +180,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }
   }
-  
+
   @Override
   public boolean isInfiniteDistance() {
     return Double.isInfinite(value);

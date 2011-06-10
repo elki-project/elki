@@ -44,6 +44,11 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   }
 
   @Override
+  public DoubleDistance fromDouble(double val) {
+    return new DoubleDistance(val);
+  }
+
+  @Override
   public DoubleDistance plus(DoubleDistance distance) {
     return new DoubleDistance(this.value + distance.value);
   }

@@ -18,7 +18,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
    * The static factory instance
    */
   public final static BitDistance FACTORY = new BitDistance();
-  
+
   /**
    * The distance value
    */
@@ -54,6 +54,11 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
   public BitDistance(Bit bit) {
     super();
     this.value = bit.bitValue();
+  }
+
+  @Override
+  public BitDistance fromDouble(double val) {
+    return new BitDistance(val > 0);
   }
 
   @Override
@@ -116,7 +121,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
   public double doubleValue() {
     return value ? 1.0 : 0.0;
   }
-  
+
   @Override
   public long longValue() {
     return value ? 1 : 0;
