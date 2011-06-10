@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Provides the squared Euclidean distance for FeatureVectors. This results in
@@ -11,7 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Arthur Zimek
  */
-public class WeightedSquaredEuclideanDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class WeightedSquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Weight array
    */
@@ -48,22 +45,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractPrimitiveD
   }
 
   @Override
-  public DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
-    return new DoubleDistance(doubleDistance(o1, o2));
-  }
-
-  @Override
   public boolean isMetric() {
     return false;
-  }
-
-  @Override
-  public SimpleTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 }

@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
@@ -25,7 +22,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @author Arthur Zimek
  * @author Erich Schubert
  */
-public class WeightedPearsonCorrelationDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+public class WeightedPearsonCorrelationDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Weights
    */
@@ -54,17 +51,7 @@ public class WeightedPearsonCorrelationDistanceFunction extends AbstractPrimitiv
    *         and v2
    */
   @Override
-  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    return new DoubleDistance(1 - MathUtil.weightedPearsonCorrelationCoefficient(v1, v2, weights));
-  }
-
-  @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
+  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+    return 1 - MathUtil.weightedPearsonCorrelationCoefficient(v1, v2, weights);
   }
 }

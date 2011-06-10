@@ -132,11 +132,6 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
   }
 
   @Override
-  public DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
-    return new DoubleDistance(doubleDistance(o1, o2));
-  }
-
-  @Override
   public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }

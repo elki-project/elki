@@ -2,12 +2,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -27,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Title("Color histogram intersection distance")
 @Description("Distance function for color histograms that emphasizes 'strong' bins.")
 @Reference(authors = "M. J. Swain, D. H. Ballard", title = "Color Indexing", booktitle = "International Journal of Computer Vision, 7(1), 32, 1991")
-public class HistogramIntersectionDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Static instance
    */
@@ -41,11 +39,6 @@ public class HistogramIntersectionDistanceFunction extends AbstractPrimitiveDist
   @Deprecated
   public HistogramIntersectionDistanceFunction() {
     super();
-  }
-
-  @Override
-  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    return new DoubleDistance(doubleDistance(v1, v2));
   }
 
   @Override
@@ -123,16 +116,6 @@ public class HistogramIntersectionDistanceFunction extends AbstractPrimitiveDist
   @Override
   public <T extends NumberVector<?, ?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
-  }
-
-  @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   @Override

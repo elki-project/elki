@@ -4,14 +4,17 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
-public abstract class AbstractCosineDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+/**
+ * Abstract base class for Cosine and ArcCosine distances.
+ * 
+ * @author Erich Schubert
+ */
+public abstract class AbstractCosineDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Constructor.
    */
@@ -19,11 +22,6 @@ public abstract class AbstractCosineDistanceFunction extends AbstractPrimitiveDi
     super();
   }
   
-  @Override
-  public final DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
-    return new DoubleDistance(doubleDistance(o1, o2));
-  }
-
   /**
    * Compute the angle between two vectors.
    * 
@@ -77,16 +75,6 @@ public abstract class AbstractCosineDistanceFunction extends AbstractPrimitiveDi
       cross += v1.doubleValue(i) * v2.doubleValue(i);
     }
     return cross / (l1 * l2);
-  }
-
-  @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   @Override
