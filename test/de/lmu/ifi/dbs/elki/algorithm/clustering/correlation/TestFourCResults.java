@@ -29,7 +29,7 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
    * @throws ParameterException on errors.
    */
   @Test
-  public void testFourCResults() throws ParameterException {
+  public void testFourCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
 
     // Setup 4C
@@ -54,7 +54,7 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
    * @throws ParameterException on errors.
    */
   @Test
-  public void testFourCOverlap() throws ParameterException {
+  public void testFourCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
   
     // Setup algorithm

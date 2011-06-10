@@ -32,7 +32,7 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
    * @throws ParameterException
    */
   @Test
-  public void testPreDeConResults() throws ParameterException {
+  public void testPreDeConResults() {
     // Additional input parameters
     ListParameterization inp = new ListParameterization();
     inp.addParameter(ClassLabelFilter.CLASS_LABEL_INDEX_ID, 1);
@@ -66,7 +66,7 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
    * @throws ParameterException
    */
   @Test
-  public void testPreDeConSubspaceOverlapping() throws ParameterException {
+  public void testPreDeConSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
     // Setup algorithm

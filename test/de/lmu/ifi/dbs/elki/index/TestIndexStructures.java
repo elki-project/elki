@@ -74,7 +74,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testExact() throws ParameterException {
+  public void testExact() {
     ListParameterization params = new ListParameterization();
     testFileBasedDatabaseConnection(params, LinearScanKNNQuery.class, LinearScanRangeQuery.class);
   }
@@ -85,7 +85,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testMetrical() throws ParameterException {
+  public void testMetrical() {
     ListParameterization metparams = new ListParameterization();
     metparams.addParameter(StaticArrayDatabase.INDEX_ID, MTreeFactory.class);
     metparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 100);
@@ -98,7 +98,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testRStarTree() throws ParameterException {
+  public void testRStarTree() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
@@ -113,7 +113,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testRStarTreeFast() throws ParameterException {
+  public void testRStarTreeFast() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractRStarTreeFactory.INSERTION_CANDIDATES_ID, 1);
@@ -127,7 +127,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @throws ParameterException
    */
 //  @Test
-//  public void testXTree() throws ParameterException {
+//  public void testXTree() {
 //    ListParameterization xtreeparams = new ListParameterization();
 //    xtreeparams.addParameter(StaticArrayDatabase.INDEX_ID, experimentalcode.marisa.index.xtree.common.XTreeFactory.class);
 //    xtreeparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
@@ -140,7 +140,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @param inputparams
    * @throws ParameterException
    */
-  void testFileBasedDatabaseConnection(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) throws ParameterException {
+  void testFileBasedDatabaseConnection(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
 
     // get database

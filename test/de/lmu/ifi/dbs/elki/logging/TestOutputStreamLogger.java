@@ -9,7 +9,6 @@ import java.io.Writer;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
 
 /**
  * Small experiment to assert the console output logger works as expected.

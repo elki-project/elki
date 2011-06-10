@@ -48,7 +48,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public final void testFitDoubleArray() throws ParameterException {
+  public final void testFitDoubleArray() {
     ListParameterization config = new ListParameterization();
     // Input
     config.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);

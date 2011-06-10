@@ -37,7 +37,7 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
    * @throws ParameterException on errors.
    */
   @Test
-  public void testERiCResults() throws ParameterException {
+  public void testERiCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
 
     // ERiC
@@ -74,7 +74,7 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
    * @throws ParameterException on errors.
    */
   @Test
-  public void testERiCOverlap() throws ParameterException {
+  public void testERiCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
   
     // Setup algorithm

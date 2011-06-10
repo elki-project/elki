@@ -31,7 +31,7 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException
    */
   @Test
-  public void testDBSCANResults() throws ParameterException {
+  public void testDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
     // setup algorithm
@@ -55,7 +55,7 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException
    */
   @Test
-  public void testDBSCANOnSingleLinkDataset() throws ParameterException {
+  public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
     // Setup algorithm

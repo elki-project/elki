@@ -37,7 +37,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
    * @throws ParameterException on errors.
    */
   @Test
-  public void testCOPACResults() throws ParameterException {
+  public void testCOPACResults() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
 
     // these parameters are not picked too smartly - room for improvement.
@@ -65,7 +65,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
    * @throws ParameterException on errors.
    */
   @Test
-  public void testCOPACOverlap() throws ParameterException {
+  public void testCOPACOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
   
     // Setup algorithm

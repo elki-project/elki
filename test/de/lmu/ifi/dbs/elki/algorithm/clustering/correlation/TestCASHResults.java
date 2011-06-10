@@ -29,7 +29,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
    * @throws ParameterException on errors.
    */
   @Test
-  public void testCASHResults() throws ParameterException {
+  public void testCASHResults() {
     ListParameterization inp = new ListParameterization();
     // CASH input
     inp.addParameter(FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class);
@@ -60,7 +60,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
    * @throws ParameterException on errors.
    */
   @Test
-  public void testCASHEmbedded() throws ParameterException {
+  public void testCASHEmbedded() {
     // CASH input
     ListParameterization inp = new ListParameterization();
     inp.addParameter(FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class);

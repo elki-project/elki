@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
 
 /**
  * Test to validate proper OnDiskArray operation.

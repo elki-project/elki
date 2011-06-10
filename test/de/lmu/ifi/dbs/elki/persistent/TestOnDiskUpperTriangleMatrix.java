@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 
 /**
  * Test the on-disk OnDiskUpperTriangleMatrix class.
