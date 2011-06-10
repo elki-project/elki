@@ -63,11 +63,10 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * Runs the algorithm in the timed evaluation part.
    * 
    */
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
+  public OutlierResult run(Database database, Relation<O> relation) throws IllegalStateException {
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-
+    
+    // Run the actual score process
     DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
 
     // Build result representation.
