@@ -106,7 +106,7 @@ public class TestKNNJoin implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testKNNJoinRtreeMini() throws ParameterException {
+  public void testKNNJoinRtreeMini() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 200);
@@ -120,7 +120,7 @@ public class TestKNNJoin implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testKNNJoinRtreeMaxi() throws ParameterException {
+  public void testKNNJoinRtreeMaxi() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 2000);
@@ -134,7 +134,7 @@ public class TestKNNJoin implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testKNNJoinDeLiCluTreeMini() throws ParameterException {
+  public void testKNNJoinDeLiCluTreeMini() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, DeLiCluTreeFactory.class);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 200);
@@ -148,7 +148,7 @@ public class TestKNNJoin implements JUnit4Test {
    * @param inputparams
    * @throws ParameterException
    */
-  void doKNNJoin(ListParameterization inputparams) throws ParameterException {
+  void doKNNJoin(ListParameterization inputparams) {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
     List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
     inputparams.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);

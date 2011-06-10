@@ -39,7 +39,7 @@ public class TestPairCountingFMeasure implements JUnit4Test {
    * @throws ParameterException on errors.
    */
   @Test
-  public void testCompareDatabases() throws ParameterException {
+  public void testCompareDatabases() {
     ListParameterization params = new ListParameterization();
     // Input
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);

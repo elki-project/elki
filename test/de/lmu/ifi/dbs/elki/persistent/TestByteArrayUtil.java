@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.persistent;
 
 import java.nio.ByteBuffer;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 

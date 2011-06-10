@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
@@ -30,7 +29,7 @@ public class TestEMResults extends AbstractSimpleAlgorithmTest implements JUnit4
    * @throws ParameterException
    */
   @Test
-  public void testEMResults() throws ParameterException {
+  public void testEMResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     // Setup algorithm

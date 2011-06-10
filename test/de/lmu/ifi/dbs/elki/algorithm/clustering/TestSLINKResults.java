@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -33,7 +32,7 @@ public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUn
    * @throws ParameterException
    */
   @Test
-  public void testSLINKResults() throws ParameterException {
+  public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
     // Setup algorithm

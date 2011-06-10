@@ -6,7 +6,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.ReplacingHistogram;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**

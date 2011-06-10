@@ -30,7 +30,7 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
    * @throws ParameterException
    */
   @Test
-  public void testDeLiCluResults() throws ParameterException {
+  public void testDeLiCluResults() {
     ListParameterization indexparams = new ListParameterization();
     // We need a special index for this algorithm:
     indexparams.addParameter(StaticArrayDatabase.INDEX_ID, DeLiCluTreeFactory.class);

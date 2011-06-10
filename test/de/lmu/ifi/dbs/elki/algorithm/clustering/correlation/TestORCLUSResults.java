@@ -29,7 +29,7 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException on errors.
    */
   @Test
-  public void testORCLUSResults() throws ParameterException {
+  public void testORCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
 
     ListParameterization params = new ListParameterization();
@@ -56,7 +56,7 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException on errors.
    */
   @Test
-  public void testORCLUSSkewedDisjoint() throws ParameterException {
+  public void testORCLUSSkewedDisjoint() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
   
     // Setup algorithm

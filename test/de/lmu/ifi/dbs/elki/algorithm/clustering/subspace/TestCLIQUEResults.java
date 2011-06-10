@@ -33,7 +33,7 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException
    */
   @Test
-  public void testCLIQUEResults() throws ParameterException {
+  public void testCLIQUEResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
     ListParameterization params = new ListParameterization();
@@ -62,7 +62,7 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException
    */
   @Test
-  public void testCLIQUESubspaceOverlapping() throws ParameterException {
+  public void testCLIQUESubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
   
     // Setup algorithm

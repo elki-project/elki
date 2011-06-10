@@ -30,7 +30,7 @@ public class TestSUBCLUResults extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException
    */
   @Test
-  public void testSUBCLUResults() throws ParameterException {
+  public void testSUBCLUResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
     ListParameterization params = new ListParameterization();
@@ -55,7 +55,7 @@ public class TestSUBCLUResults extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException
    */
   @Test
-  public void testSUBCLUSubspaceOverlapping() throws ParameterException {
+  public void testSUBCLUSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
   
     // Setup algorithm
