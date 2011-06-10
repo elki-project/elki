@@ -4,6 +4,7 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -18,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<?, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> {
+public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<?, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements PrimitiveDoubleDistanceFunction<V> {
   /**
    * Dimensions parameter.
    */
@@ -37,6 +38,11 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   public AbstractDimensionsSelectingDoubleDistanceFunction(BitSet dimensions) {
     super();
     this.dimensions = dimensions;
+  }
+
+  @Override
+  public DoubleDistance distance(V o1, V o2) {
+    return new DoubleDistance(doubleDistance(o1, o2));
   }
 
   /**

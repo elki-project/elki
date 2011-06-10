@@ -46,7 +46,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
    *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
    */
   @Override
-  public DoubleDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     // Current and previous columns of the matrix
     double[] curr = new double[v2.getDimensionality()];
     double[] prev = new double[v2.getDimensionality()];
@@ -125,7 +125,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
       }
     }
 
-    return new DoubleDistance(Math.sqrt(curr[v2.getDimensionality() - 1]));
+    return Math.sqrt(curr[v2.getDimensionality() - 1]);
   }
 
   /**

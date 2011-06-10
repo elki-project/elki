@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -15,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class SquaredEuclideanDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class SquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Static instance. Use this!
    */
@@ -136,11 +134,6 @@ public class SquaredEuclideanDistanceFunction extends AbstractPrimitiveDistanceF
   }
   
   @Override
-  public DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
-    return new DoubleDistance(doubleDistance(o1, o2));
-  }
-
-  @Override
   public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
   }
@@ -153,16 +146,6 @@ public class SquaredEuclideanDistanceFunction extends AbstractPrimitiveDistanceF
   @Override
   public boolean isMetric() {
     return false;
-  }
-
-  @Override
-  public SimpleTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   @Override

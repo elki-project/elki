@@ -3,8 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -17,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Thomas Bernecker
  */
-public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> {
+public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * BANDSIZE parameter
    */
@@ -36,11 +35,6 @@ public abstract class AbstractEditDistanceFunction extends AbstractPrimitiveDist
   public AbstractEditDistanceFunction(double bandSize) {
     super();
     this.bandSize = bandSize;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   // TODO: relax this to VectorTypeInformation!
