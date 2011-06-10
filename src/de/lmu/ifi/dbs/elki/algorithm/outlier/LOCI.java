@@ -90,7 +90,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   /**
    * Holds the value of {@link #NMIN_ID}.
    */
-  private double nmin;
+  private int nmin;
 
   /**
    * Holds the value of {@link #ALPHA_ID}.
@@ -139,12 +139,12 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       // build list of critical distances
       ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() * 2);
       {
-        int i = 0;
-        for(DistanceResultPair<D> r : neighbors) {
-          assert (i != Integer.MIN_VALUE);
-          cdist.add(new DoubleIntPair(r.getDistance().doubleValue(), i));
-          cdist.add(new DoubleIntPair(r.getDistance().doubleValue() / alpha, Integer.MIN_VALUE));
-          i++;
+        for(int i = 0; i < neighbors.size(); i++) {
+          DistanceResultPair<D> r = neighbors.get(i);
+          if(i + 1 < neighbors.size() && r.getDistance().compareTo(neighbors.get(i + 1).getDistance()) != 0) {
+            cdist.add(new DoubleIntPair(r.getDistance().doubleValue(), i));
+            cdist.add(new DoubleIntPair(r.getDistance().doubleValue() / alpha, Integer.MIN_VALUE));
+          }
         }
       }
       Collections.sort(cdist);
@@ -178,75 +178,70 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       double maxnormr = 0;
       List<DoubleIntPair> cdist = interestingDistances.get(id);
       double maxdist = cdist.get(cdist.size() - 1).first;
-      // TODO: avoid the string roundtrip!
-      D range = distFunc.getDistanceFactory().parseString(Double.toString(maxdist));
-      // Compute the largest neighborhood we will need.
-      List<DistanceResultPair<D>> maxneighbors = rangeQuery.getRangeForDBID(id, range);
-      for(DoubleIntPair c : cdist) {
-        double alpha_r = alpha * c.first;
-        // compute n(p_i, \alpha * r) from list
-        int n_alphar = 0;
-        for(DoubleIntPair c2 : cdist) {
-          if(c2.first <= alpha_r) {
-            n_alphar = c2.second;
-          }
-          else {
-            break;
-          }
-        }
-        // compute \hat{n}(p_i, r, \alpha)
-        double nhat_r_alpha = 0.0;
-        double sigma_nhat_r_alpha = 0.0;
-        // note that the query range is c.first
-        // List<DistanceResultPair<D>> rneighbors = database.rangeQuery(id,
-        // Double.toString(c.first), getDistanceFunction());
-        List<DistanceResultPair<D>> rneighbors = null;
-        for(int i = 0; i < maxneighbors.size(); i++) {
-          DistanceResultPair<D> ne = maxneighbors.get(i);
-          if(ne.getDistance().doubleValue() > c.first) {
-            if(i >= nmin) {
-              rneighbors = maxneighbors.subList(0, i);
-            }
-            else {
-              rneighbors = null;
-            }
-            break;
-          }
-        }
-        if(rneighbors == null) {
-          continue;
-        }
-        // redundant check.
-        if(rneighbors.size() < nmin) {
-          continue;
-        }
-        for(DistanceResultPair<D> rn : rneighbors) {
-          List<DoubleIntPair> rncdist = interestingDistances.get(rn.getDBID());
-          int rn_alphar = 0;
-          for(DoubleIntPair c2 : rncdist) {
+      int maxneig = cdist.get(cdist.size() - 1).second;
+      if(maxneig >= nmin) {
+        D range = distFunc.getDistanceFactory().fromDouble(maxdist);
+        // Compute the largest neighborhood we will need.
+        List<DistanceResultPair<D>> maxneighbors = rangeQuery.getRangeForDBID(id, range);
+        for(DoubleIntPair c : cdist) {
+          double alpha_r = alpha * c.first;
+          // compute n(p_i, \alpha * r) from list
+          int n_alphar = 0;
+          for(DoubleIntPair c2 : cdist) {
             if(c2.first <= alpha_r) {
-              rn_alphar = c2.second;
+              n_alphar = c2.second;
             }
             else {
               break;
             }
           }
-          nhat_r_alpha = nhat_r_alpha + rn_alphar;
-          sigma_nhat_r_alpha = sigma_nhat_r_alpha + (rn_alphar * rn_alphar);
-        }
-        // finalize average and deviation
-        nhat_r_alpha = nhat_r_alpha / rneighbors.size();
-        sigma_nhat_r_alpha = Math.sqrt(sigma_nhat_r_alpha / rneighbors.size() - nhat_r_alpha * nhat_r_alpha);
-        double mdef = 1.0 - (n_alphar / nhat_r_alpha);
-        double sigmamdef = sigma_nhat_r_alpha / nhat_r_alpha;
-        double mdefnorm = mdef / sigmamdef;
+          // compute \hat{n}(p_i, r, \alpha)
+          double nhat_r_alpha = 0.0;
+          double sigma_nhat_r_alpha = 0.0;
+          // Build the sublist from maxneighbors to match the radius c.first
+          List<DistanceResultPair<D>> rneighbors = null;
+          for(int i = nmin; i < maxneighbors.size(); i++) {
+            DistanceResultPair<D> ne = maxneighbors.get(i);
+            if(ne.getDistance().doubleValue() > c.first) {
+              rneighbors = maxneighbors.subList(0, i);
+              break;
+            }
+          }
+          if(rneighbors == null) {
+            continue;
+          }
+          for(DistanceResultPair<D> rn : rneighbors) {
+            List<DoubleIntPair> rncdist = interestingDistances.get(rn.getDBID());
+            int rn_alphar = 0;
+            for(DoubleIntPair c2 : rncdist) {
+              if(c2.first <= alpha_r) {
+                rn_alphar = c2.second;
+              }
+              else {
+                break;
+              }
+            }
+            nhat_r_alpha = nhat_r_alpha + rn_alphar;
+            sigma_nhat_r_alpha = sigma_nhat_r_alpha + (rn_alphar * rn_alphar);
+          }
+          // finalize average and deviation
+          nhat_r_alpha = nhat_r_alpha / rneighbors.size();
+          sigma_nhat_r_alpha = Math.sqrt(sigma_nhat_r_alpha / rneighbors.size() - nhat_r_alpha * nhat_r_alpha);
+          double mdef = 1.0 - (n_alphar / nhat_r_alpha);
+          double sigmamdef = sigma_nhat_r_alpha / nhat_r_alpha;
+          double mdefnorm = mdef / sigmamdef;
 
-        if(mdefnorm > maxmdefnorm) {
-          maxmdefnorm = mdefnorm;
-          maxnormr = c.first;
+          if(mdefnorm > maxmdefnorm) {
+            maxmdefnorm = mdefnorm;
+            maxnormr = c.first;
+          }
         }
       }
-      // FIXME: when nmin was never fulfilled, the values will remain 0.
+      else {
+        // FIXME: when nmin was never fulfilled.
+        maxmdefnorm = 0;
+        maxnormr = maxdist;
+      }
       mdef_norm.put(id, maxmdefnorm);
       mdef_radius.put(id, maxnormr);
       if(progressLOCI != null) {

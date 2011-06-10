@@ -18,6 +18,14 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
   public NumberDistance() {
     super();
   }
+  
+  /**
+   * Build a new instance from a double value.
+   * 
+   * @param val Value
+   * @return Distance
+   */
+  public abstract D fromDouble(double val);
 
   /**
    * Returns the hash code for this NumberDistance, which is the hash code of
