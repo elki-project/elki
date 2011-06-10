@@ -141,9 +141,13 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       {
         for(int i = 0; i < neighbors.size(); i++) {
           DistanceResultPair<D> r = neighbors.get(i);
-          if(i + 1 < neighbors.size() && r.getDistance().compareTo(neighbors.get(i + 1).getDistance()) != 0) {
-            cdist.add(new DoubleIntPair(r.getDistance().doubleValue(), i));
-            cdist.add(new DoubleIntPair(r.getDistance().doubleValue() / alpha, Integer.MIN_VALUE));
+          if(i + 1 < neighbors.size() && r.getDistance().compareTo(neighbors.get(i + 1).getDistance()) == 0) {
+            continue;
+          }
+          cdist.add(new DoubleIntPair(r.getDistance().doubleValue(), i));
+          final double ri = r.getDistance().doubleValue() / alpha;
+          if(ri <= rmax.doubleValue()) {
+            cdist.add(new DoubleIntPair(ri, Integer.MIN_VALUE));
           }
         }
       }
@@ -203,7 +207,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
           for(int i = nmin; i < maxneighbors.size(); i++) {
             DistanceResultPair<D> ne = maxneighbors.get(i);
             if(ne.getDistance().doubleValue() > c.first) {
-              rneighbors = maxneighbors.subList(0, i);
+              rneighbors = maxneighbors.subList(1, i);
               break;
             }
           }
@@ -238,8 +242,8 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
         }
       }
       else {
-        // FIXME: when nmin was never fulfilled.
-        maxmdefnorm = 0;
+        // FIXME: when nmin was never fulfilled - what is the proper value then?
+        maxmdefnorm = 1.0;
         maxnormr = maxdist;
       }
       mdef_norm.put(id, maxmdefnorm);
