@@ -4,7 +4,6 @@ package experimentalcode.hettab.outlier;
 
 import org.apache.commons.math.stat.descriptive.rank.Median;
 
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -122,10 +121,8 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
   public OutlierResult run(Database database, Relation<V> relation){
     WritableDataStore<Double> gi = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> hi = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    
-    
     final NeighborSetPredicate npred = npredf.instantiate(relation);
-
+    MeanVariance mv = new MeanVariance();
     for(DBID id : relation.getDBIDs()) {
       //
       DBIDs neighbors = npred.getNeighborDBIDs(id);
@@ -140,21 +137,20 @@ public class MedianAlgorithm<V extends NumberVector<?, ?>> extends AbstractAlgor
       }
       double median = m.evaluate(fi);
       gi.put(id, median);
-      // store hi
-      hi.put(id, relation.get(id).doubleValue(z) - median);
+      double h = relation.get(id).doubleValue(z) - median ;
+      hi.put(id, h);
+      mv.put(h);
     }
-    // calculate mean and variance
-    MeanVariance mv = new MeanVariance();
-    for(DBID id : relation.getDBIDs()) {
-      mv.put(hi.get(id));
-    }
+    
     double mean = mv.getMean();
     double variance = mv.getSampleVariance();
-
+    
+    System.out.println(mean);
+    System.out.println(variance);
     MinMax<Double> minmax = new MinMax<Double>();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     for(DBID id : relation.getDBIDs()) {
-      double score = Math.abs((hi.get(id) - mean) / variance);
+      double score = Math.abs((hi.get(id)- mv.getMean())/mv.getNaiveVariance());
       minmax.put(score);
       scores.put(id, score);
     }
