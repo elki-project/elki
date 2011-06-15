@@ -1,9 +1,11 @@
 package de.lmu.ifi.dbs.elki.math;
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
- * Do some simple statistics (mean, variance).
+ * Do some simple statistics (mean, variance) using a numerically stable online algorithm.
  * 
- * This class can repeatedly be fed with data using the add() methods, The
+ * This class can repeatedly be fed with data using the add() methods, the
  * resulting values for mean and average can be queried at any time using
  * getMean() and getSampleVariance().
  * 
@@ -15,8 +17,8 @@ package de.lmu.ifi.dbs.elki.math;
  * low cost.
  * 
  * @author Erich Schubert
- * 
  */
+@Reference(authors="B. P. Welford", title="Note on a method for calculating corrected sums of squares and products", booktitle = "Technometrics 4(3)")
 public final class MeanVariance {
   /**
    * Mean of values
