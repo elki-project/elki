@@ -45,8 +45,8 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
 
-    testFMeasureHierarchical(db, result, 0.77989);
-    testClusterSizes(result, new int[] { 22, 32, 396 });
+    testFMeasureHierarchical(db, result, 0.775313);
+    testClusterSizes(result, new int[] { 26, 27, 397 });
   }
 
   /**
@@ -58,19 +58,19 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
   @Test
   public void testORCLUSSkewedDisjoint() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(ORCLUS.K_ID, 3);
     params.addParameter(ORCLUS.L_ID, 4);
-    params.addParameter(ORCLUS.SEED_ID, 2);
-  
+    params.addParameter(ORCLUS.SEED_ID, 9);
+
     ORCLUS<DoubleVector> orclus = ClassGenericsUtil.parameterizeOrAbort(ORCLUS.class, params);
     testParameterizationOk(params);
-  
+
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
-    testFMeasure(db, result, 0.8276336);
-    testClusterSizes(result, new int[] { 167, 200, 234 });
+    testFMeasure(db, result, 0.8687866);
+    testClusterSizes(result, new int[] { 170, 200, 231 });
   }
 }
