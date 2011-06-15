@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @author Elke Achtert
  */
-public final class Vector implements MatrixLike<Vector> {
+public class Vector implements MatrixLike<Vector> {
   /**
    * Serial version
    */

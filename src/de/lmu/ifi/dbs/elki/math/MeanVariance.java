@@ -3,7 +3,8 @@ package de.lmu.ifi.dbs.elki.math;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Do some simple statistics (mean, variance) using a numerically stable online algorithm.
+ * Do some simple statistics (mean, variance) using a numerically stable online
+ * algorithm.
  * 
  * This class can repeatedly be fed with data using the add() methods, the
  * resulting values for mean and average can be queried at any time using
@@ -16,9 +17,23 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Trivial code, but replicated a lot. The class is final so it should come at
  * low cost.
  * 
+ * Related Literature:
+ * 
+ * <p>
+ * B. P. Welford<br />
+ * Note on a method for calculating corrected sums of squares and products<br />
+ * in: Technometrics 4(3)
+ * </p>
+ * 
+ * <p>
+ * D.H.D. West<br />
+ * Updating Mean and Variance Estimates: An Improved Method<br />
+ * In: Communications of the ACM, Volume 22 Issue 9
+ * </p>
+ * 
  * @author Erich Schubert
  */
-@Reference(authors="B. P. Welford", title="Note on a method for calculating corrected sums of squares and products", booktitle = "Technometrics 4(3)")
+@Reference(authors = "B. P. Welford", title = "Note on a method for calculating corrected sums of squares and products", booktitle = "Technometrics 4(3)")
 public final class MeanVariance {
   /**
    * Mean of values
@@ -67,7 +82,10 @@ public final class MeanVariance {
   }
 
   /**
-   * Add data with a given weight
+   * Add data with a given weight.
+   * 
+   * See also: D.H.D. West<br />
+   * Updating Mean and Variance Estimates: An Improved Method
    * 
    * @param val data
    * @param weight weight
@@ -88,7 +106,7 @@ public final class MeanVariance {
    * @param other Data to join with
    */
   public void put(MeanVariance other) {
-    final double nwsum = other.wsum + this.wsum; 
+    final double nwsum = other.wsum + this.wsum;
     final double delta = other.mean - this.mean;
     final double rval = delta * other.wsum / nwsum;
 
@@ -134,7 +152,7 @@ public final class MeanVariance {
    * @return sample variance
    */
   public double getSampleVariance() {
-    assert(wsum > 1);
+    assert (wsum > 1);
     return nvar / (wsum - 1);
   }
 
