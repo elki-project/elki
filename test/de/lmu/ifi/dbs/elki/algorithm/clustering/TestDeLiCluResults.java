@@ -47,7 +47,7 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
 
     // run DeLiClu on database
     Clustering<?> clustering = opticsxi.run(db);
-    testFMeasure(db, clustering, 0.87406257);
-    testClusterSizes(clustering, new int[] { 109, 121, 210, 270 });
+    testFMeasure(db, clustering, 0.8765283);
+    testClusterSizes(clustering, new int[] { 108, 121, 210, 271 });
   }
 }
