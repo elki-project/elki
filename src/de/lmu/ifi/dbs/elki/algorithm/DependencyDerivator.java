@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -91,7 +90,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   /**
    * Holds the object performing the pca.
    */
-  private final PCAFilteredRunner<V, DoubleDistance> pca;
+  private final PCAFilteredRunner<V> pca;
 
   /**
    * Number format for output of solution.
@@ -112,7 +111,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @param sampleSize sample size
    * @param randomsample flag for random sampling
    */
-  public DependencyDerivator(PrimitiveDistanceFunction<V, D> distanceFunction, NumberFormat nf, PCAFilteredRunner<V, DoubleDistance> pca, int sampleSize, boolean randomsample) {
+  public DependencyDerivator(PrimitiveDistanceFunction<V, D> distanceFunction, NumberFormat nf, PCAFilteredRunner<V> pca, int sampleSize, boolean randomsample) {
     super(distanceFunction);
     this.NF = nf;
     this.pca = pca;
@@ -272,7 +271,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
 
     protected boolean randomSample = false;
 
-    protected PCAFilteredRunner<V, DoubleDistance> pca = null;
+    protected PCAFilteredRunner<V> pca = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -280,7 +279,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       configAccuracy(config);
       configSampleSize(config);
       configRandomSampleFlag(config);
-      Class<PCAFilteredRunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+      Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
       pca = config.tryInstantiate(cls);
     }
 

@@ -29,9 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf EigenPairFilter
  * 
  * @param <V> Vector class to use
- * @param <D> Distance type
  */
-public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends PCARunner<V, D> {
+public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends PCARunner<V> {
   /**
    * Parameter to specify the filter for determination of the strong and weak
    * eigenvectors, must be a subclass of {@link EigenPairFilter}.
@@ -92,7 +91,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    * @param big
    * @param small
    */
-  public PCAFilteredRunner(CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
+  public PCAFilteredRunner(CovarianceMatrixBuilder<V> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
     super(covarianceMatrixBuilder);
     this.eigenPairFilter = eigenPairFilter;
     this.big = big;
@@ -119,7 +118,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
+  public <D extends NumberDistance<?, ?>> PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
@@ -163,7 +162,7 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends PCARunner.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<? extends V, ?>> extends PCARunner.Parameterizer<V> {
     /**
      * Holds the instance of the EigenPairFilter specified by
      * {@link #PCA_EIGENPAIR_FILTER}.
@@ -204,8 +203,8 @@ public class PCAFilteredRunner<V extends NumberVector<?, ?>, D extends NumberDis
     }
 
     @Override
-    protected PCAFilteredRunner<V, D> makeInstance() {
-      return new PCAFilteredRunner<V, D>(covarianceMatrixBuilder, eigenPairFilter, big, small);
+    protected PCAFilteredRunner<V> makeInstance() {
+      return new PCAFilteredRunner<V>(covarianceMatrixBuilder, eigenPairFilter, big, small);
     }
   }
 }

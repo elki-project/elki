@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
@@ -14,9 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  * @author Erich Schubert
  *
  * @param <V> Vector class to use.
- * @param <D> Distance type
  */
-public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D,?>> extends AbstractCovarianceMatrixBuilder<V,D> {
+public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>> extends AbstractCovarianceMatrixBuilder<V> {
   /**
    * Compute Covariance Matrix for a complete database
    * 

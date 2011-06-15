@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
@@ -45,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 @Title("4C Preprocessor")
 @Description("Computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n" + "The PCA is based on epsilon range queries.")
-public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex<V, D, PCAFilteredResult> {
+public class FourCSubspaceIndex<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex<V, D, PCAFilteredResult> {
   /**
    * Our logger
    */
@@ -54,7 +53,7 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
   /**
    * The Filtered PCA Runner
    */
-  private PCAFilteredRunner<V, ?> pca;
+  private PCAFilteredRunner<V> pca;
 
   /**
    * Full constructor.
@@ -65,7 +64,7 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
    * @param minpts MinPts value
    * @param pca PCA runner
    */
-  public FourCSubspaceIndex(Relation<V> relation, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V, ?> pca) {
+  public FourCSubspaceIndex(Relation<V> relation, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V> pca) {
     super(relation, epsilon, rangeQueryDistanceFunction, minpts);
     this.pca = pca;
   }
@@ -113,7 +112,7 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
    * @param <V> Vector type
    * @param <D> Distance type
    */
-  public static class Factory<V extends NumberVector<? extends V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory<V, D, FourCSubspaceIndex<V, D>> {
+  public static class Factory<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory<V, D, FourCSubspaceIndex<V, D>> {
     /**
      * The default value for delta.
      */
@@ -122,7 +121,7 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
     /**
      * The Filtered PCA Runner
      */
-    private PCAFilteredRunner<V, ?> pca;
+    private PCAFilteredRunner<V> pca;
 
     /**
      * Constructor.
@@ -132,7 +131,7 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
      * @param minpts
      * @param pca
      */
-    public Factory(D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V, ?> pca) {
+    public Factory(D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V> pca) {
       super(epsilon, rangeQueryDistanceFunction, minpts);
       this.pca = pca;
     }
@@ -149,11 +148,11 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<? extends V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
+    public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
       /**
        * The Filtered PCA Runner
        */
-      private PCAFilteredRunner<V, ?> pca;
+      private PCAFilteredRunner<V> pca;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -207,7 +206,7 @@ public class FourCSubspaceIndex<V extends NumberVector<? extends V, ?>, D extend
         pcaParameters.addParameter(PCAFilteredRunner.BIG_ID, 50);
         // small value
         pcaParameters.addParameter(PCAFilteredRunner.SMALL_ID, 1);
-        Class<PCAFilteredRunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+        Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
         pca = pcaParameters.tryInstantiate(cls);
         for(ParameterException e : pcaParameters.getErrors()) {
           LoggingUtil.warning("Error in internal parameterization: " + e.getMessage());

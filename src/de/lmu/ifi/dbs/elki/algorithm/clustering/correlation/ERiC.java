@@ -193,8 +193,8 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
         int correlationDimension = ((DimensionModel) clus.getModel()).getDimension();
 
         ListParameterization parameters = pcaParameters(correlationDimension);
-        Class<PCAFilteredRunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
-        PCAFilteredRunner<V, DoubleDistance> pca = parameters.tryInstantiate(cls);
+        Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+        PCAFilteredRunner<V> pca = parameters.tryInstantiate(cls);
         for(ParameterException e : parameters.getErrors()) {
           logger.warning("Error in internal parameterization: " + e.getMessage());
         }
@@ -236,8 +236,8 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
         clusterMap.put(dimensionality, correlationClusters);
       }
       ListParameterization parameters = pcaParameters(dimensionality);
-      Class<PCAFilteredRunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
-      PCAFilteredRunner<V, DoubleDistance> pca = parameters.tryInstantiate(cls);
+      Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+      PCAFilteredRunner<V> pca = parameters.tryInstantiate(cls);
       for(ParameterException e : parameters.getErrors()) {
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }

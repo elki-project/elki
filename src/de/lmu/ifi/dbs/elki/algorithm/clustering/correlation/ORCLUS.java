@@ -94,7 +94,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   /**
    * The PCA utility object.
    */
-  private PCARunner<V, DoubleDistance> pca;
+  private PCARunner<V> pca;
 
   /**
    * Java constructor.
@@ -106,7 +106,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
    * @param seed Seed parameter
    * @param pca PCA runner
    */
-  public ORCLUS(int k, int k_i, int l, double alpha, long seed, PCARunner<V, DoubleDistance> pca) {
+  public ORCLUS(int k, int k_i, int l, double alpha, long seed, PCARunner<V> pca) {
     super(k, k_i, l);
     this.alpha = alpha;
     this.seed = seed;
@@ -550,7 +550,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
     protected Long seed = null;
 
-    protected PCARunner<V, DoubleDistance> pca = null;
+    protected PCARunner<V> pca = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -562,7 +562,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
       configSeed(config);
 
       // TODO: make configurable, to allow using stabilized PCA
-      Class<PCARunner<V, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCARunner.class);
+      Class<PCARunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCARunner.class);
       pca = config.tryInstantiate(cls);
     }
 

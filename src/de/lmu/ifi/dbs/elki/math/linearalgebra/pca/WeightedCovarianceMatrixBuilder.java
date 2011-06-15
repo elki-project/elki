@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -43,12 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has PrimitiveDistanceFunction
  * 
  * @param <V> Vector class to use
- * @param <D> Distance type
  */
 @Title("Weighted Covariance Matrix / PCA")
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends AbstractCovarianceMatrixBuilder<V, D> {
+public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>> extends AbstractCovarianceMatrixBuilder<V> {
   /**
    * Parameter to specify the weight function to use in weighted PCA, must
    * implement
@@ -152,7 +152,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
+  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
     int dim = DatabaseUtil.dimensionality(database);
     // collecting the sums in each dimension
     double[] sums = new double[dim];
@@ -173,7 +173,12 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
       int i = 0;
       for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
         DistanceResultPair<D> res = it.next();
-        double dist = res.getDistance().doubleValue();
+        final double dist;
+        if (res instanceof DoubleDistanceResultPair) {
+          dist = ((DoubleDistanceResultPair) res).getDoubleDistance();
+        } else {
+          dist = res.getDistance().doubleValue();
+        }
         stddev += dist * dist;
         if(dist > maxdist) {
           maxdist = dist;
@@ -188,9 +193,16 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
     // calculate weighted PCA
     int i = 0;
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
-      DistanceResultPair<D> res = it.next();
-      V obj = database.get(res.getDBID());
-      double weight = weightfunction.getWeight(res.getDistance().doubleValue(), maxdist, stddev);
+      DistanceResultPair<? extends NumberDistance<?, ?>> res = it.next();
+      final double dist;
+      if (res instanceof DoubleDistanceResultPair) {
+        dist = ((DoubleDistanceResultPair) res).getDoubleDistance();
+      } else {
+        dist = res.getDistance().doubleValue();
+      }
+      
+      V obj = database.get(res.getDBID());      
+      double weight = weightfunction.getWeight(dist, maxdist, stddev);
       for(int d1 = 0; d1 < dim; d1++) {
         /* We're exploiting symmetry here, start with d2 == d1 */
         for(int d2 = d1; d2 < dim; d2++) {
@@ -243,7 +255,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
     protected WeightFunction weightfunction = null;
 
     @Override
@@ -256,8 +268,8 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
     }
 
     @Override
-    protected WeightedCovarianceMatrixBuilder<V, D> makeInstance() {
-      return new WeightedCovarianceMatrixBuilder<V, D>(weightfunction);
+    protected WeightedCovarianceMatrixBuilder<V> makeInstance() {
+      return new WeightedCovarianceMatrixBuilder<V>(weightfunction);
     }
   }
 }

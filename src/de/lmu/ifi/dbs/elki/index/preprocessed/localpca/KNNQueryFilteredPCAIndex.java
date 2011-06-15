@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 // TODO: loosen DoubleDistance restriction.
 @Title("Knn Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on k nearest neighbor queries.")
-public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex<NV> {
+public class KNNQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>> extends AbstractFilteredPCAIndex<NV> {
   /**
    * Logger.
    */
@@ -58,7 +58,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
    * @param knnQuery KNN Query to use
    * @param k k value
    */
-  public KNNQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
+  public KNNQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner<NV> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
     super(database, pca);
     this.knnQuery = knnQuery;
     this.k = k;
@@ -93,7 +93,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
    * @apiviz.landmark
    * @apiviz.uses KNNQueryFilteredPCAIndex oneway - - «create»
    */
-  public static class Factory<V extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
+  public static class Factory<V extends NumberVector<V, ?>> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
     /**
      * Optional parameter to specify the number of nearest neighbors considered
      * in the PCA, must be an integer greater than 0. If this parameter is not
@@ -120,7 +120,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
      * @param pca PCA class
      * @param k k
      */
-    public Factory(DistanceFunction<V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<V, DoubleDistance> pca, Integer k) {
+    public Factory(DistanceFunction<V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<V> pca, Integer k) {
       super(pcaDistanceFunction, pca);
       this.k = k;
     }
@@ -139,7 +139,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends Abs
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
       protected int k = 0;
 
       @Override

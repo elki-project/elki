@@ -5,14 +5,14 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
- * Class that consists of a pair (distance, object ID) commonly returned
- * for kNN and range queries.
+ * Class that consists of a pair (distance, object ID) commonly returned for kNN
+ * and range queries.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <D> Distance type
  */
-public interface DistanceResultPair<D extends Distance<D>> extends PairInterface<D, DBID>, Comparable<DistanceResultPair<D>> {
+public interface DistanceResultPair<D extends Distance<?>> extends PairInterface<D, DBID>, Comparable<DistanceResultPair<D>> {
   /**
    * Getter for first
    * 

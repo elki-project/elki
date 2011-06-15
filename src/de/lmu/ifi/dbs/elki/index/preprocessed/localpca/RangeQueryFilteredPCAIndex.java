@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  */
 @Title("Range Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on epsilon range queries.")
-public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex<NV> {
+public class RangeQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>> extends AbstractFilteredPCAIndex<NV> {
   // TODO: lose DoubleDistance restriction.
   /**
    * Logger.
@@ -56,7 +56,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
    * @param rangeQuery Range Query to use
    * @param epsilon Query range
    */
-  public RangeQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner<? super NV, DoubleDistance> pca, RangeQuery<NV, DoubleDistance> rangeQuery, DoubleDistance epsilon) {
+  public RangeQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner<NV> pca, RangeQuery<NV, DoubleDistance> rangeQuery, DoubleDistance epsilon) {
     super(database, pca);
     this.rangeQuery = rangeQuery;
     this.epsilon = epsilon;
@@ -90,7 +90,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
    * @apiviz.stereotype factory
    * @apiviz.uses RangeQueryFilteredPCAIndex oneway - - «create»
    */
-  public static class Factory<V extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory<V, RangeQueryFilteredPCAIndex<V>> {
+  public static class Factory<V extends NumberVector<V, ?>> extends AbstractFilteredPCAIndex.Factory<V, RangeQueryFilteredPCAIndex<V>> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered in the PCA, must be suitable to the distance function
@@ -112,7 +112,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
      * @param pca PCA
      * @param epsilon range value
      */
-    public Factory(DistanceFunction<V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<V, DoubleDistance> pca, DoubleDistance epsilon) {
+    public Factory(DistanceFunction<V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<V> pca, DoubleDistance epsilon) {
       super(pcaDistanceFunction, pca);
       this.epsilon = epsilon;
     }
@@ -131,7 +131,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?, ?>> extends A
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<?, ?>> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, RangeQueryFilteredPCAIndex<NV>> {
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, RangeQueryFilteredPCAIndex<NV>> {
       protected DoubleDistance epsilon = null;
 
       @Override

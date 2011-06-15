@@ -87,15 +87,16 @@ public final class DatabaseUtil {
     int dim = dimensionality(relation);
     double[] centroid = new double[dim];
 
-    for(DBID id : ids) {
-      V o = relation.get(id);
-      for(int j = 1; j <= dim; j++) {
-        centroid[j - 1] += o.doubleValue(j);
+    {
+      int size = 0;
+      for(DBID id : ids) {
+        V o = relation.get(id);
+        size++;
+        for(int j = 0; j < dim; j++) {
+          final double delta = o.doubleValue(j + 1) - centroid[j];
+          centroid[j] += delta / size;
+        }
       }
-    }
-    double size = ids.size();
-    for(int i = 0; i < dim; i++) {
-      centroid[i] /= size;
     }
 
     return assumeVectorField(relation).getFactory().newInstance(centroid);
@@ -115,7 +116,7 @@ public final class DatabaseUtil {
    *         w.r.t. the specified subspace
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Relation<V> database, DBIDs ids, BitSet dimensions) {
+  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> database, DBIDs ids, BitSet dimensions) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -123,16 +124,16 @@ public final class DatabaseUtil {
     int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
-    for(DBID id : ids) {
-      V o = database.get(id);
-      for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-        centroid[d] += o.doubleValue(d + 1);
+    {
+      int size = 0;
+      for(DBID id : ids) {
+        V o = database.get(id);
+        size++;
+        for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+          final double delta = o.doubleValue(d + 1) - centroid[d];
+          centroid[d] += delta / size;
+        }
       }
-    }
-
-    double size = ids.size();
-    for(int i = 0; i < dim; i++) {
-      centroid[i] /= size;
     }
 
     return assumeVectorField(database).getFactory().newInstance(centroid);
@@ -151,7 +152,7 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Relation<V> database, Iterator<DBID> iter, BitSet bitSet) {
+  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> database, Iterator<DBID> iter, BitSet bitSet) {
     if(!iter.hasNext()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -159,22 +160,22 @@ public final class DatabaseUtil {
     int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
-    int size = 0;
-    // we need to "cache" one o for the newInstance method, since we can't clone
-    // the iterator.
-    while(iter.hasNext()) {
-      DBID id = iter.next();
-      size++;
-      V o = database.get(id);
-      for(int j = 1; j <= dim; j++) {
-        if(bitSet.get(j - 1)) {
-          centroid[j - 1] += o.doubleValue(j);
+    {
+      int size = 0;
+      // we need to "cache" one o for the newInstance method, since we can't
+      // clone
+      // the iterator.
+      while(iter.hasNext()) {
+        DBID id = iter.next();
+        V o = database.get(id);
+        size++;
+        for(int j = 0; j < dim; j++) {
+          if(bitSet.get(j)) {
+            final double delta = o.doubleValue(j + 1) - centroid[j];
+            centroid[j] += delta / size;
+          }
         }
       }
-    }
-
-    for(int i = 0; i < dim; i++) {
-      centroid[i] /= size;
     }
 
     return assumeVectorField(database).getFactory().newInstance(centroid);
@@ -189,87 +190,26 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the database is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Relation<V> database) {
+  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> database) {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     int dim = dimensionality(database);
     double[] centroid = new double[dim];
 
-    Iterator<DBID> it = database.iterDBIDs();
-    while(it.hasNext()) {
-      V o = database.get(it.next());
-      for(int j = 1; j <= dim; j++) {
-        centroid[j - 1] += o.doubleValue(j);
+    {
+      int size = 0;
+      Iterator<DBID> it = database.iterDBIDs();
+      while(it.hasNext()) {
+        V o = database.get(it.next());
+        size++;
+        for(int j = 1; j <= dim; j++) {
+          final double delta = o.doubleValue(j) - centroid[j - 1];
+          centroid[j - 1] += delta / size;
+        }
       }
     }
 
-    double size = database.size();
-    for(int i = 0; i < dim; i++) {
-      centroid[i] /= size;
-    }
-    return assumeVectorField(database).getFactory().newInstance(centroid);
-  }
-
-  /**
-   * Returns the centroid as a NumberVector object of the specified objects
-   * stored in the given database. The objects belonging to the specified ids
-   * must be instance of <code>NumberVector</code>.
-   * 
-   * @param database the database storing the objects
-   * @param ids the ids of the objects
-   * @return the centroid of the specified objects stored in the given database
-   * @throws IllegalArgumentException if the id list is empty
-   */
-  private static NumberVector<?, ?> centroidRelaxed(Relation<? extends NumberVector<?, ?>> database, DBIDs ids) {
-    if(ids.isEmpty()) {
-      throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
-    }
-
-    int dim = dimensionality(database);
-    double[] centroid = new double[dim];
-
-    for(DBID id : ids) {
-      NumberVector<?, ?> o = database.get(id);
-      for(int j = 1; j <= dim; j++) {
-        centroid[j - 1] += o.doubleValue(j);
-      }
-    }
-    double size = ids.size();
-    for(int i = 0; i < dim; i++) {
-      centroid[i] /= size;
-    }
-
-    return assumeVectorField(database).getFactory().newInstance(centroid);
-  }
-
-  /**
-   * Returns the centroid as a NumberVector object of the specified database.
-   * The objects must be instance of <code>NumberVector</code>.
-   * 
-   * @param database the database storing the objects
-   * @return the centroid of the specified objects stored in the given database
-   * @throws IllegalArgumentException if the database is empty
-   */
-  private static NumberVector<?, ?> centroidRelaxed(Relation<? extends NumberVector<?, ?>> database) {
-    if(database == null || database.size() == 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
-    }
-    int dim = dimensionality(database);
-    double[] centroid = new double[dim];
-
-    Iterator<DBID> it = database.iterDBIDs();
-    while(it.hasNext()) {
-      NumberVector<?, ?> o = database.get(it.next());
-      for(int j = 1; j <= dim; j++) {
-        centroid[j - 1] += o.doubleValue(j);
-      }
-    }
-
-    double size = database.size();
-    for(int i = 0; i < dim; i++) {
-      centroid[i] /= size;
-    }
     return assumeVectorField(database).getFactory().newInstance(centroid);
   }
 
@@ -287,12 +227,9 @@ public final class DatabaseUtil {
     for(int i = 0; i < n; i++) {
       Vector x = data.getColumnVector(i);
       for(int j = 0; j < d; j++) {
-        centroid[j] += x.get(j);
+        final double delta = x.get(j) - centroid[j];
+        centroid[j] += delta / (i + 1);
       }
-    }
-
-    for(int j = 0; j < d; j++) {
-      centroid[j] /= n;
     }
 
     return new Vector(centroid);
@@ -336,9 +273,9 @@ public final class DatabaseUtil {
    * @param database the database storing the objects
    * @return the covariance matrix of the specified objects
    */
-  public static <V extends NumberVector<?, ?>> Matrix covarianceMatrix(Relation<? extends V> database) {
+  public static <V extends NumberVector<? extends V, ?>> Matrix covarianceMatrix(Relation<? extends V> database) {
     // centroid
-    NumberVector<?, ?> centroid = centroidRelaxed(database);
+    V centroid = centroid(database);
 
     return covarianceMatrix(database, centroid);
   }
@@ -411,8 +348,8 @@ public final class DatabaseUtil {
    * @return the variances in each dimension of all objects stored in the given
    *         database
    */
-  public static double[] variances(Relation<? extends NumberVector<?, ?>> database) {
-    NumberVector<?, ?> centroid = centroidRelaxed(database);
+  public static <V extends NumberVector<? extends V, ?>> double[] variances(Relation<V> database) {
+    NumberVector<?, ?> centroid = centroid(database);
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -438,8 +375,8 @@ public final class DatabaseUtil {
    * @param ids the ids of the objects
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Relation<? extends NumberVector<?, ?>> database, DBIDs ids) {
-    return variances(database, centroidRelaxed(database, ids), ids);
+  public static <V extends NumberVector<? extends V, ?>> double[] variances(Relation<V> database, DBIDs ids) {
+    return variances(database, centroid(database, ids), ids);
   }
 
   /**
@@ -465,35 +402,6 @@ public final class DatabaseUtil {
 
       variances[d - 1] /= ids.size();
     }
-    return variances;
-  }
-
-  /**
-   * Determines the variances in each dimension of the specified objects stored
-   * in the given database.
-   * 
-   * @param database the database storing the objects
-   * @param ids the array of ids of the objects to be considered in each
-   *        dimension
-   * @param centroid the centroid or reference vector of the ids
-   * @return the variances in each dimension of the specified objects
-   */
-  public static double[] variances(Relation<? extends NumberVector<?, ?>> database, NumberVector<?, ?> centroid, DBIDs[] ids) {
-    double[] variances = new double[centroid.getDimensionality()];
-
-    for(int d = 1; d <= centroid.getDimensionality(); d++) {
-      double mu = centroid.doubleValue(d);
-
-      DBIDs ids_d = ids[d - 1];
-      for(DBID neighborID : ids_d) {
-        NumberVector<?, ?> neighbor = database.get(neighborID);
-        double diff = neighbor.doubleValue(d) - mu;
-        variances[d - 1] += diff * diff;
-      }
-
-      variances[d - 1] /= ids_d.size();
-    }
-
     return variances;
   }
 

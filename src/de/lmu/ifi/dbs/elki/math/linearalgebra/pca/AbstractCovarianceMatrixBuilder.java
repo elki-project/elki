@@ -20,9 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Erich Schubert
  *
  * @param <V> Vector class in use
- * @param <D> Distance type
  */
-public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends NumberDistance<D,?>> implements Parameterizable, CovarianceMatrixBuilder<V, D> {
+public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>> implements Parameterizable, CovarianceMatrixBuilder<V> {
   @Override
   public Matrix processDatabase(Relation<? extends V> database) {
     return processIds(database.getDBIDs(), database);
@@ -32,7 +31,7 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?, 
   public abstract Matrix processIds(DBIDs ids, Relation<? extends V> database);
 
   @Override
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
+  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
     ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && have < k; have++) {
@@ -42,7 +41,7 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?, 
   }
 
   @Override
-  final public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
+  final public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
     return processQueryResults(results, database, results.size());
   }
   
