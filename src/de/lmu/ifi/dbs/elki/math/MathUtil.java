@@ -94,27 +94,32 @@ public final class MathUtil {
     if(xdim <= 0) {
       throw new IllegalArgumentException("Invalid arguments: dimensionality not positive.");
     }
-    double sumSqX = 0;
-    double sumSqY = 0;
-    double sumCoproduct = 0;
+    double sumXX = 0;
+    double sumYY = 0;
+    double sumXY = 0;
     {
       // Incremental computation
       double meanX = x.doubleValue(1);
       double meanY = y.doubleValue(1);
       for(int i = 2; i < xdim; i++) {
-        final double sweep = (i - 1.0) / i;
+        // Delta to previous mean
         final double deltaX = x.doubleValue(i) - meanX;
         final double deltaY = y.doubleValue(i) - meanY;
-        sumSqX += deltaX * deltaX * sweep;
-        sumSqY += deltaY * deltaY * sweep;
-        sumCoproduct += deltaX * deltaY * sweep;
+        // Update means
         meanX += deltaX / i;
         meanY += deltaY / i;
+        // Delta to new mean
+        final double neltaX = x.doubleValue(i) - meanX;
+        final double neltaY = y.doubleValue(i) - meanY;
+        // Update
+        sumXX += deltaX * neltaX;
+        sumYY += deltaY * neltaY;
+        sumXY += deltaX * neltaY; // should equal deltaY * neltaX!
       }
     }
-    final double popSdX = Math.sqrt(sumSqX / xdim);
-    final double popSdY = Math.sqrt(sumSqY / ydim);
-    final double covXY = sumCoproduct / xdim;
+    final double popSdX = Math.sqrt(sumXX / xdim);
+    final double popSdY = Math.sqrt(sumYY / ydim);
+    final double covXY = sumXY / xdim;
     if(popSdX == 0 || popSdY == 0) {
       return 0;
     }
@@ -131,7 +136,6 @@ public final class MathUtil {
    * @param y second FeatureVector
    * @return the Pearson product-moment correlation coefficient for x and y
    */
-  // TODO: mathematically correct?
   public static double weightedPearsonCorrelationCoefficient(NumberVector<?, ?> x, NumberVector<?, ?> y, double[] weights) {
     final int xdim = x.getDimensionality();
     final int ydim = y.getDimensionality();
@@ -142,49 +146,40 @@ public final class MathUtil {
       throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
     }
     // Compute means
-    double sumW = 0.0;
-    double sumX = 0.0;
-    double sumY = 0.0;
-    double sumSqW = 0.0;
+    double sumWe;
+    double sumXX = 0;
+    double sumYY = 0;
+    double sumXY = 0;
     {
-      for(int i = 1; i < xdim; i++) {
+      // Incremental computation
+      double meanX = x.doubleValue(1);
+      double meanY = y.doubleValue(1);
+      sumWe = weights[0];
+      for(int i = 2; i < xdim; i++) {
         final double weight = weights[i - 1];
-        final double valX = x.doubleValue(i);
-        final double valY = y.doubleValue(i);
-
-        sumX += valX * weight;
-        sumY += valY * weight;
-        sumW += weight;
-        sumSqW += weight * weight;
-      }
-    }
-    final double meanX = sumX / sumW;
-    final double meanY = sumY / sumW;
-    // Compute stddevs
-    // TODO: can we do this in a single-pass but mathematically sound?
-    // Steiner Translation -- proof in Erichs DA?
-    double sumSqDX = 0.0;
-    double sumSqDY = 0.0;
-    double sumCo = 0.0;
-    {
-      for(int i = 1; i < xdim; i++) {
-        final double weight = weights[i - 1];
+        sumWe += weight;
+        // Delta to previous mean
         final double deltaX = x.doubleValue(i) - meanX;
         final double deltaY = y.doubleValue(i) - meanY;
-
-        sumSqDX += deltaX * deltaX * weight;
-        sumSqDY += deltaY * deltaY * weight;
-        sumCo += deltaX * deltaY * weight;
+        // Update means
+        meanX += deltaX * weight / sumWe;
+        meanY += deltaY * weight / sumWe;
+        // Delta to new mean
+        final double neltaX = x.doubleValue(i) - meanX;
+        final double neltaY = y.doubleValue(i) - meanY;
+        // Update
+        sumXX += weight * deltaX * neltaX;
+        sumYY += weight * deltaY * neltaY;
+        sumXY += weight * deltaX * neltaY; // should equal weight * deltaY * neltaX!
       }
     }
-    // (1-sumSqW) is a correction factor for using the sample mean.
-    double varX = (sumSqDX / sumW) / (1 - sumSqW);
-    double varY = (sumSqDY / sumW) / (1 - sumSqW);
-    final double covXY = (sumCo / sumW) / (1 - sumSqW);
-    if(varX <= 0 || varY <= 0) {
+    final double popSdX = Math.sqrt(sumXX / sumWe);
+    final double popSdY = Math.sqrt(sumYY / sumWe);
+    final double covXY = sumXY / sumWe;
+    if(popSdX == 0 || popSdY == 0) {
       return 0;
     }
-    return covXY / (Math.sqrt(varX) * Math.sqrt(varY));
+    return covXY / (popSdX * popSdY);
   }
 
   /**
