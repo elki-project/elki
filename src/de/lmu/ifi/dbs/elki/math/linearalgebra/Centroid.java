@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
@@ -25,51 +24,6 @@ public class Centroid extends Vector {
   public Centroid(int dim) {
     super(dim);
     this.wsum = 0;
-  }
-
-  /**
-   * Constructor from an existing matrix columns.
-   * 
-   * @param mat Matrix to use the columns from.
-   */
-  public Centroid(Matrix mat) {
-    this(mat.getRowDimensionality());
-    int n = mat.getColumnDimensionality();
-    for(int i = 0; i < n; i++) {
-      // TODO: avoid constructing the vector objects?
-      this.put(mat.getColumnVector(i));
-    }
-  }
-
-  /**
-   * Constructor from an existing relation.
-   * 
-   * @param relation Relation to use
-   */
-  public Centroid(Relation<? extends NumberVector<?, ?>> relation) {
-    this(DatabaseUtil.dimensionality(relation));
-    if(relation.size() == 0) {
-      throw new IllegalArgumentException("Cannot compute a centroid of an empty relation!");
-    }
-    for(DBID id : relation.iterDBIDs()) {
-      this.put(relation.get(id));
-    }
-  }
-
-  /**
-   * Constructor from an existing relation.
-   * 
-   * @param relation Relation to use
-   * @param ids IDs to use
-   */
-  public Centroid(Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
-    this(DatabaseUtil.dimensionality(relation));
-    if(ids.isEmpty()) {
-      throw new IllegalArgumentException("Cannot compute a centroid of an empty set!");
-    }
-    for(DBID id : ids) {
-      this.put(relation.get(id));
-    }
   }
 
   /**
@@ -158,7 +112,50 @@ public class Centroid extends Vector {
    * 
    * @return the data
    */
-  public <F extends NumberVector<? extends F, ?>> F getVector(F factory) {
-    return factory.newInstance(elements);
+  public <F extends NumberVector<? extends F, ?>> F toVector(Relation<? extends F> relation) {
+    return DatabaseUtil.assumeVectorField(relation).getFactory().newInstance(elements);
+  }
+
+  /**
+   * Static Constructor from an existing matrix columns.
+   * 
+   * @param mat Matrix to use the columns from.
+   */
+  public static Centroid make(Matrix mat) {
+    Centroid c = new Centroid(mat.getRowDimensionality());
+    int n = mat.getColumnDimensionality();
+    for(int i = 0; i < n; i++) {
+      // TODO: avoid constructing the vector objects?
+      c.put(mat.getColumnVector(i));
+    }
+    return c;
+  }
+
+  /**
+   * Static constructor from an existing relation.
+   * 
+   * @param relation Relation to use
+   * @return Centroid of relation
+   */
+  public static Centroid make(Relation<? extends NumberVector<?, ?>> relation) {
+    Centroid c = new Centroid(DatabaseUtil.dimensionality(relation));
+    for(DBID id : relation.iterDBIDs()) {
+      c.put(relation.get(id));
+    }
+    return c;
+  }
+
+  /**
+   * Static constructor from an existing relation.
+   * 
+   * @param relation Relation to use
+   * @param ids IDs to use
+   */
+  public static Centroid make(Relation<? extends NumberVector<?, ?>> relation, Iterable<DBID> ids) {
+    Centroid c = new Centroid(DatabaseUtil.dimensionality(relation));
+    for(DBID id : ids) {
+      c.put(relation.get(id));
+    }
+    return c;
   }
 }

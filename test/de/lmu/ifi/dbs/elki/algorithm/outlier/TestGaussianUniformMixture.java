@@ -30,7 +30,7 @@ public class TestGaussianUniformMixture extends AbstractSimpleAlgorithmTest impl
     // run GaussianUniformMixture on database
     OutlierResult result = gaussianUniformMixture.run(db);
 
-    testSingleScore(result, 1025, -14.61080862);
-    testAUC(db, "Noise", result, 0.928923076);
+    testSingleScore(result, 1025, -20.2862041);
+    testAUC(db, "Noise", result, 0.94404102);
   }
 }

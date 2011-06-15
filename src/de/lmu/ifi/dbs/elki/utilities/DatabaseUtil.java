@@ -27,9 +27,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.ConvertToStringView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectedCentroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -79,7 +79,7 @@ public final class DatabaseUtil {
    * @throws IllegalArgumentException if the database is empty
    */
   public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> relation) {
-    return assumeVectorField(relation).getFactory().newInstance(new Centroid(relation));
+    return Centroid.make(relation).toVector(relation);
   }
 
   /**
@@ -94,7 +94,7 @@ public final class DatabaseUtil {
    * @throws IllegalArgumentException if the id list is empty
    */
   public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> relation, DBIDs ids) {
-    return assumeVectorField(relation).getFactory().newInstance(new Centroid(relation, ids));
+    return Centroid.make(relation, ids).toVector(relation);
   }
 
   /**
@@ -104,15 +104,15 @@ public final class DatabaseUtil {
    * <code>NumberVector</code>.
    * 
    * @param <V> Vector type
-   * @param database the database storing the objects
+   * @param relation the database storing the objects
    * @param ids the identifiable objects
    * @param dimensions the BitSet representing the dimensions to be considered
    * @return the centroid of the specified objects stored in the given database
    *         w.r.t. the specified subspace
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> database, DBIDs ids, BitSet dimensions) {
-    return assumeVectorField(database).getFactory().newInstance(new ProjectedCentroid(dimensions, database, ids));
+  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> relation, DBIDs ids, BitSet dimensions) {
+    return ProjectedCentroid.make(dimensions, relation, ids).toVector(relation);
   }
 
   /**
@@ -125,73 +125,7 @@ public final class DatabaseUtil {
    * @return the covariance matrix of the specified objects
    */
   public static <V extends NumberVector<? extends V, ?>> Matrix covarianceMatrix(Relation<? extends V> database, DBIDs ids) {
-    // centroid
-    V centroid = centroid(database, ids);
-
-    // covariance matrixArray
-    int columns = centroid.getDimensionality();
-    int rows = ids.size();
-
-    double[][] matrixArray = new double[rows][columns];
-
-    int i = 0;
-    for(Iterator<DBID> it = ids.iterator(); it.hasNext(); i++) {
-      NumberVector<?, ?> obj = database.get(it.next());
-      for(int d = 0; d < columns; d++) {
-        matrixArray[i][d] = obj.doubleValue(d + 1) - centroid.doubleValue(d + 1);
-      }
-    }
-    Matrix centeredMatrix = new Matrix(matrixArray);
-    return centeredMatrix.transposeTimes(centeredMatrix);
-  }
-
-  /**
-   * Determines the covariance matrix of the objects stored in the given
-   * database.
-   * 
-   * @param <V> Vector type
-   * @param database the database storing the objects
-   * @return the covariance matrix of the specified objects
-   */
-  public static <V extends NumberVector<? extends V, ?>> Matrix covarianceMatrix(Relation<? extends V> database) {
-    // centroid
-    V centroid = centroid(database);
-
-    return covarianceMatrix(database, centroid);
-  }
-
-  /**
-   * <p>
-   * Determines the covariance matrix of the objects stored in the given
-   * database w.r.t. the given centroid.
-   * </p>
-   * 
-   * @param <V> Vector type
-   * @param database the database storing the objects
-   * @param centroid the centroid of the database
-   * @return the covariance matrix of the specified objects
-   */
-  public static <V extends NumberVector<?, ?>> Matrix covarianceMatrix(Relation<? extends V> database, V centroid) {
-    // centered matrix
-    int columns = centroid.getDimensionality();
-    int rows = database.size();
-    double[][] matrixArray = new double[rows][columns];
-
-    Iterator<DBID> it = database.iterDBIDs();
-    int i = 0;
-    while(it.hasNext()) {
-      NumberVector<?, ?> obj = database.get(it.next());
-      for(int d = 0; d < columns; d++) {
-        matrixArray[i][d] = obj.doubleValue(d + 1) - centroid.doubleValue(d + 1);
-      }
-      i++;
-    }
-    Matrix centeredMatrix = new Matrix(matrixArray);
-    // covariance matrix
-    Matrix cov = centeredMatrix.transposeTimes(centeredMatrix);
-    cov = cov.times(1.0 / database.size());
-
-    return cov;
+    return CovarianceMatrix.make(database, ids).destroyToNaiveMatrix();
   }
 
   /**
@@ -201,23 +135,7 @@ public final class DatabaseUtil {
    * @return the covariance matrix of the given data matrix.
    */
   public static Matrix covarianceMatrix(Matrix data) {
-    // centroid
-    Vector centroid = new Centroid(data);
-
-    // centered matrix
-    double[][] matrixArray = new double[data.getRowDimensionality()][data.getColumnDimensionality()];
-
-    for(int i = 0; i < data.getRowDimensionality(); i++) {
-      for(int j = 0; j < data.getColumnDimensionality(); j++) {
-        matrixArray[i][j] = data.get(i, j) - centroid.get(i);
-      }
-    }
-    Matrix centeredMatrix = new Matrix(matrixArray);
-    // covariance matrix
-    Matrix cov = centeredMatrix.timesTranspose(centeredMatrix);
-    cov = cov.times(1.0 / data.getColumnDimensionality());
-
-    return cov;
+    return CovarianceMatrix.make(data).destroyToNaiveMatrix();
   }
 
   /**

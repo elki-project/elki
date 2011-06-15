@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
@@ -89,15 +91,9 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    */
   @Override
   public Matrix processIds(DBIDs ids, Relation<? extends V> database) {
-    int dim = DatabaseUtil.dimensionality(database);
-    // collecting the sums in each dimension
-    double[] sums = new double[dim];
-    // collecting the products of any two dimensions
-    double[][] squares = new double[dim][dim];
-    // for collecting weights
-    double weightsum = 0.0;
-    // get centroid
-    V centroid = DatabaseUtil.centroid(database, ids);
+    final int dim = DatabaseUtil.dimensionality(database);
+    final CovarianceMatrix cmat = new CovarianceMatrix(dim);
+    final V centroid = Centroid.make(database, ids).toVector(database);
 
     // find maximum distance
     double maxdist = 0.0;
@@ -121,24 +117,11 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
     int i = 0;
     for(Iterator<DBID> it = ids.iterator(); it.hasNext(); i++) {
       V obj = database.get(it.next());
-      // TODO: hard coded distance... make parameterizable?
-      double distance = 0.0;
-      for(int d = 0; d < dim; d++) {
-        double delta = centroid.doubleValue(d + 1) - obj.doubleValue(d + 1);
-        distance += delta * delta;
-      }
-      distance = java.lang.Math.sqrt(distance);
+      double distance = weightDistance.distance(centroid, obj).doubleValue();
       double weight = weightfunction.getWeight(distance, maxdist, stddev);
-      for(int d1 = 0; d1 < dim; d1++) {
-        /* We're exploiting symmetry here, start with d2 == d1 */
-        for(int d2 = d1; d2 < dim; d2++) {
-          squares[d1][d2] += obj.doubleValue(d1 + 1) * obj.doubleValue(d2 + 1) * weight;
-        }
-        sums[d1] += obj.doubleValue(d1 + 1) * weight;
-      }
-      weightsum += weight;
+      cmat.put(obj, weight);
     }
-    return new Matrix(finishCovarianceMatrix(sums, squares, weightsum));
+    return cmat.destroyToNaiveMatrix();
   }
 
   /**
@@ -153,13 +136,8 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    */
   @Override
   public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
-    int dim = DatabaseUtil.dimensionality(database);
-    // collecting the sums in each dimension
-    double[] sums = new double[dim];
-    // collecting the products of any two dimensions
-    double[][] squares = new double[dim][dim];
-    // for collecting weights
-    double weightsum = 0.0;
+    final int dim = DatabaseUtil.dimensionality(database);
+    final CovarianceMatrix cmat = new CovarianceMatrix(dim);
 
     // avoid bad parameters
     if(k > results.size()) {
@@ -174,9 +152,10 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
       for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
         DistanceResultPair<D> res = it.next();
         final double dist;
-        if (res instanceof DoubleDistanceResultPair) {
+        if(res instanceof DoubleDistanceResultPair) {
           dist = ((DoubleDistanceResultPair) res).getDoubleDistance();
-        } else {
+        }
+        else {
           dist = res.getDistance().doubleValue();
         }
         stddev += dist * dist;
@@ -195,57 +174,18 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
       DistanceResultPair<? extends NumberDistance<?, ?>> res = it.next();
       final double dist;
-      if (res instanceof DoubleDistanceResultPair) {
+      if(res instanceof DoubleDistanceResultPair) {
         dist = ((DoubleDistanceResultPair) res).getDoubleDistance();
-      } else {
+      }
+      else {
         dist = res.getDistance().doubleValue();
       }
-      
-      V obj = database.get(res.getDBID());      
-      double weight = weightfunction.getWeight(dist, maxdist, stddev);
-      for(int d1 = 0; d1 < dim; d1++) {
-        /* We're exploiting symmetry here, start with d2 == d1 */
-        for(int d2 = d1; d2 < dim; d2++) {
-          squares[d1][d2] += obj.doubleValue(d1 + 1) * obj.doubleValue(d2 + 1) * weight;
-        }
-        sums[d1] += obj.doubleValue(d1 + 1) * weight;
-      }
-      weightsum += weight;
-    }
-    return new Matrix(finishCovarianceMatrix(sums, squares, weightsum));
-  }
 
-  /**
-   * Finish the Covariance matrix in array "squares".
-   * 
-   * @param sums Sums of values.
-   * @param squares Sums of squares. Contents are destroyed and replaced with
-   *        Covariance Matrix!
-   * @param weightsum Sum of weights.
-   * @return modified squares array
-   */
-  private double[][] finishCovarianceMatrix(double[] sums, double[][] squares, double weightsum) {
-    if(weightsum > 0) {
-      // reasonable weights - finish up matrix.
-      for(int d1 = 0; d1 < sums.length; d1++) {
-        for(int d2 = d1; d2 < sums.length; d2++) {
-          squares[d1][d2] = squares[d1][d2] - sums[d1] * sums[d2] / weightsum;
-          // use symmetry
-          squares[d2][d1] = squares[d1][d2];
-        }
-      }
+      V obj = database.get(res.getDBID());
+      double weight = weightfunction.getWeight(dist, maxdist, stddev);
+      cmat.put(obj, weight);
     }
-    else {
-      // No weights = no data. Use identity.
-      // TODO: Warn about a bad weight function? Fail?
-      for(int d1 = 0; d1 < sums.length; d1++) {
-        for(int d2 = d1 + 1; d2 < sums.length; d2++) {
-          squares[d1][d2] = 0;
-        }
-        squares[d1][d1] = 1;
-      }
-    }
-    return squares;
+    return cmat.destroyToNaiveMatrix();
   }
 
   /**

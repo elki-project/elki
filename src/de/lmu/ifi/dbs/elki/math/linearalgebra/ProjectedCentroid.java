@@ -4,7 +4,6 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
@@ -29,43 +28,6 @@ public class ProjectedCentroid extends Centroid {
     super(dim);
     this.dims = dims;
     assert (dims.size() <= dim);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param dims Dimensions to use (indexed with 0)
-   * @param relation Relation to process
-   */
-  public ProjectedCentroid(BitSet dims, Relation<? extends NumberVector<?, ?>> relation) {
-    this(dims, DatabaseUtil.dimensionality(relation));
-    this.dims = dims;
-    assert (dims.size() <= DatabaseUtil.dimensionality(relation));
-    if(relation.size() == 0) {
-      throw new IllegalArgumentException("Cannot compute a centroid of an empty relation!");
-    }
-    for(DBID id : relation.iterDBIDs()) {
-      this.put(relation.get(id));
-    }
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param dims Dimensions to use (indexed with 0)
-   * @param relation Relation to process
-   * @param ids IDs to process
-   */
-  public ProjectedCentroid(BitSet dims, Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
-    this(dims, DatabaseUtil.dimensionality(relation));
-    this.dims = dims;
-    assert (dims.size() <= DatabaseUtil.dimensionality(relation));
-    if(relation.size() == 0) {
-      throw new IllegalArgumentException("Cannot compute a centroid of an empty relation!");
-    }
-    for(DBID id : ids) {
-      this.put(relation.get(id));
-    }
   }
 
   /**
@@ -132,5 +94,36 @@ public class ProjectedCentroid extends Centroid {
       elements[i] += rval;
     }
     wsum = nwsum;
+  }
+
+  /**
+   * Static Constructor from a relation.
+   * 
+   * @param dims Dimensions to use (indexed with 0)
+   * @param relation Relation to process
+   */
+  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?, ?>> relation) {
+    ProjectedCentroid c = new ProjectedCentroid(dims, DatabaseUtil.dimensionality(relation));
+    assert (dims.size() <= DatabaseUtil.dimensionality(relation));
+    for(DBID id : relation.iterDBIDs()) {
+      c.put(relation.get(id));
+    }
+    return c;
+  }
+
+  /**
+   * Static Constructor from a relation.
+   * 
+   * @param dims Dimensions to use (indexed with 0)
+   * @param relation Relation to process
+   * @param ids IDs to process
+   */
+  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?, ?>> relation, Iterable<DBID> ids) {
+    ProjectedCentroid c = new ProjectedCentroid(dims, DatabaseUtil.dimensionality(relation));
+    assert (dims.size() <= DatabaseUtil.dimensionality(relation));
+    for(DBID id : ids) {
+      c.put(relation.get(id));
+    }
+    return c;
   }
 }

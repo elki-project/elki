@@ -36,7 +36,7 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
     // these parameters are not picked too smartly - room for improvement.
     params.addParameter(ORCLUS.K_ID, 3);
     params.addParameter(ORCLUS.L_ID, 1);
-    params.addParameter(ORCLUS.SEED_ID, 1);
+    params.addParameter(ORCLUS.SEED_ID, 2);
 
     // setup algorithm
     ORCLUS<DoubleVector> orclus = ClassGenericsUtil.parameterizeOrAbort(ORCLUS.class, params);
@@ -45,8 +45,8 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
 
-    testFMeasureHierarchical(db, result, 0.775313);
-    testClusterSizes(result, new int[] { 26, 27, 397 });
+    testFMeasureHierarchical(db, result, 0.789113);
+    testClusterSizes(result, new int[] { 22, 27, 401 });
   }
 
   /**
