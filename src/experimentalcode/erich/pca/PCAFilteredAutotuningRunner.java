@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  * @author Erich Schubert
  * @param <V> vector type
  */
-public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends PCAFilteredRunner<V, D> {
+public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>> extends PCAFilteredRunner<V> {
   /**
    * Constructor.
    *
@@ -41,7 +41,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>,
    * @param big
    * @param small
    */
-  public PCAFilteredAutotuningRunner(CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
+  public PCAFilteredAutotuningRunner(CovarianceMatrixBuilder<V> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
     super(covarianceMatrixBuilder, eigenPairFilter, big, small);
   }
 
@@ -67,7 +67,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>,
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
+  public <D extends NumberDistance<?, ?>> PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
     assertSortedByDistance(results);
     final int dim = DatabaseUtil.dimensionality(database);
 
@@ -187,7 +187,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>,
    * 
    * @param results
    */
-  private void assertSortedByDistance(Collection<DistanceResultPair<D>> results) {
+  private <D extends NumberDistance<?, ?>> void assertSortedByDistance(Collection<DistanceResultPair<D>> results) {
     // TODO: sort results instead?
     double dist = -1.0;
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext();) {
@@ -206,10 +206,10 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>,
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<? extends V, ?>, D extends NumberDistance<D, ?>> extends PCAFilteredRunner.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<? extends V, ?>> extends PCAFilteredRunner.Parameterizer<V> {
     @Override
-    protected PCAFilteredAutotuningRunner<V, D> makeInstance() {
-      return new PCAFilteredAutotuningRunner<V, D>(covarianceMatrixBuilder, eigenPairFilter, big, small);
+    protected PCAFilteredAutotuningRunner<V> makeInstance() {
+      return new PCAFilteredAutotuningRunner<V>(covarianceMatrixBuilder, eigenPairFilter, big, small);
     }
   }
 }

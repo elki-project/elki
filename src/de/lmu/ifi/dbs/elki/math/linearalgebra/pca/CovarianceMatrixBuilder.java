@@ -9,8 +9,14 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
-public interface CovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> {
-
+/**
+ * Interface for computing covariance matrixes on a data set.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <V> Vector base type
+ */
+public interface CovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>> {
   /**
    * Compute Covariance Matrix for a complete database
    * 
@@ -38,7 +44,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends
    * @param k the number of entries to process
    * @return Covariance Matrix
    */
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k);
+  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection
@@ -49,6 +55,5 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<?, ?>, D extends
    * @param database the database used
    * @return Covariance Matrix
    */
-  public Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database);
-
+  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database);
 }

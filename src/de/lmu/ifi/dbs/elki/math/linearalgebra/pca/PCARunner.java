@@ -33,9 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf CovarianceMatrixBuilder
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
-public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> implements Parameterizable {
+public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parameterizable {
   /**
    * Parameter to specify the class to compute the covariance matrix, must be a
    * subclass of {@link CovarianceMatrixBuilder}.
@@ -51,14 +50,14 @@ public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D,
   /**
    * The covariance computation class.
    */
-  protected CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder;
+  protected CovarianceMatrixBuilder<V> covarianceMatrixBuilder;
 
   /**
    * Constructor.
    * 
    * @param covarianceMatrixBuilder Class for computing the covariance matrix
    */
-  public PCARunner(CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder) {
+  public PCARunner(CovarianceMatrixBuilder<V> covarianceMatrixBuilder) {
     super();
     this.covarianceMatrixBuilder = covarianceMatrixBuilder;
   }
@@ -91,7 +90,7 @@ public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D,
    * @param database the database used
    * @return PCA result
    */
-  public PCAResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
+  public <D extends NumberDistance<?, ?>> PCAResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
@@ -123,7 +122,7 @@ public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D,
    * 
    * @return covariance matrix builder in use
    */
-  public CovarianceMatrixBuilder<V, D> getCovarianceMatrixBuilder() {
+  public CovarianceMatrixBuilder<V> getCovarianceMatrixBuilder() {
     return covarianceMatrixBuilder;
   }
 
@@ -132,7 +131,7 @@ public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D,
    * 
    * @param covarianceBuilder New covariance matrix builder.
    */
-  public void setCovarianceMatrixBuilder(CovarianceMatrixBuilder<V, D> covarianceBuilder) {
+  public void setCovarianceMatrixBuilder(CovarianceMatrixBuilder<V> covarianceBuilder) {
     this.covarianceMatrixBuilder = covarianceBuilder;
   }
 
@@ -143,24 +142,24 @@ public class PCARunner<V extends NumberVector<?, ?>, D extends NumberDistance<D,
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<? extends V, ?>> extends AbstractParameterizer {
     /**
      * The covariance computation class.
      */
-    protected CovarianceMatrixBuilder<V, D> covarianceMatrixBuilder;
+    protected CovarianceMatrixBuilder<V> covarianceMatrixBuilder;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<CovarianceMatrixBuilder<V, D>> covarianceP = new ObjectParameter<CovarianceMatrixBuilder<V, D>>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class);
+      ObjectParameter<CovarianceMatrixBuilder<V>> covarianceP = new ObjectParameter<CovarianceMatrixBuilder<V>>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class);
       if(config.grab(covarianceP)) {
         covarianceMatrixBuilder = covarianceP.instantiateClass(config);
       }
     }
 
     @Override
-    protected PCARunner<V, D> makeInstance() {
-      return new PCARunner<V, D>(covarianceMatrixBuilder);
+    protected PCARunner<V> makeInstance() {
+      return new PCARunner<V>(covarianceMatrixBuilder);
     }
   }
 }

@@ -39,11 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 // TODO: loosen DoubleDistance restriction.
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
-public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> extends AbstractPreprocessorIndex<NV, PCAFilteredResult> implements FilteredLocalPCAIndex<NV> {
+public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>> extends AbstractPreprocessorIndex<NV, PCAFilteredResult> implements FilteredLocalPCAIndex<NV> {
   /**
    * PCA utility object.
    */
-  final protected PCAFilteredRunner<? super NV, DoubleDistance> pca;
+  final protected PCAFilteredRunner<NV> pca;
 
   /**
    * Constructor.
@@ -51,7 +51,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
    * @param relation Relation to use
    * @param pca PCA runner to use
    */
-  public AbstractFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner<? super NV, DoubleDistance> pca) {
+  public AbstractFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner<NV> pca) {
     super(relation);
     this.pca = pca;
   }
@@ -124,7 +124,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractFilteredPCAIndex oneway - - «create»
    */
-  public static abstract class Factory<NV extends NumberVector<?, ?>, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
+  public static abstract class Factory<NV extends NumberVector<NV, ?>, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
     /**
      * Parameter to specify the distance function used for running PCA.
      * 
@@ -141,7 +141,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
     /**
      * PCA utility object.
      */
-    protected PCAFilteredRunner<NV, DoubleDistance> pca;
+    protected PCAFilteredRunner<NV> pca;
 
     /**
      * Constructor.
@@ -149,7 +149,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
      * @param pcaDistanceFunction distance Function
      * @param pca PCA runner
      */
-    public Factory(DistanceFunction<NV, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<NV, DoubleDistance> pca) {
+    public Factory(DistanceFunction<NV, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<NV> pca) {
       super();
       this.pcaDistanceFunction = pcaDistanceFunction;
       this.pca = pca;
@@ -170,7 +170,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
      * 
      * @apiviz.exclude
      */
-    public static abstract class Parameterizer<NV extends NumberVector<?, ?>, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
+    public static abstract class Parameterizer<NV extends NumberVector<NV, ?>, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
       /**
        * Holds the instance of the distance function specified by
        * {@link #PCA_DISTANCE_ID}.
@@ -180,7 +180,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
       /**
        * PCA utility object.
        */
-      protected PCAFilteredRunner<NV, DoubleDistance> pca;
+      protected PCAFilteredRunner<NV> pca;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -191,7 +191,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?, ?>> ex
           pcaDistanceFunction = pcaDistanceFunctionP.instantiateClass(config);
         }
 
-        Class<PCAFilteredRunner<NV, DoubleDistance>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+        Class<PCAFilteredRunner<NV>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
         pca = config.tryInstantiate(cls);
       }
     }
