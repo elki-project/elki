@@ -200,8 +200,9 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       synchronizedRedraw();
     }
     catch(Exception e) {
-      if(Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
-        LoggingUtil.exception("Thumbnail failed.", e);
+      final Logging logger = Logging.getLogger(task.getFactory().getClass());
+      if(logger != null && logger.isDebugging()) {
+        logger.exception("Thumbnail failed.", e);
       }
       else {
         LoggingUtil.warning("Thumbnail for " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");

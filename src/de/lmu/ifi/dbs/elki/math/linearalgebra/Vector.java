@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -506,6 +507,19 @@ public final class Vector implements MatrixLike<Vector> {
     return Math.sqrt(sqlen);
   }
 
+  /**
+   * Frobenius norm
+   * 
+   * @return sqrt of sum of squares of all elements.
+   */
+  public double normF() {
+    double f = 0;
+    for(int i = 0; i < elements.length; i++) {
+      f = MathUtil.hypotenuse(f, elements[i]);
+    }
+    return f;
+  }
+  
   /**
    * Normalizes this vector to the length of 1.0.
    */
