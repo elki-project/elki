@@ -63,7 +63,7 @@ public class ProjectedCentroid extends Centroid {
     if(relation.size() == 0) {
       throw new IllegalArgumentException("Cannot compute a centroid of an empty relation!");
     }
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBID id : ids) {
       this.put(relation.get(id));
     }
   }
