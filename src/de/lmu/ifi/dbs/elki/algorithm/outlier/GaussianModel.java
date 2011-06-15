@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -83,9 +84,10 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
 
     // Compute mean and covariance Matrix
-    V mean = DatabaseUtil.centroid(relation);
+    CovarianceMatrix temp = CovarianceMatrix.make(relation);
+    V mean = temp.getMeanVector(relation);
     // debugFine(mean.toString());
-    Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(relation, mean);
+    Matrix covarianceMatrix = temp.destroyToNaiveMatrix();
     // debugFine(covarianceMatrix.toString());
     Matrix covarianceTransposed = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
 

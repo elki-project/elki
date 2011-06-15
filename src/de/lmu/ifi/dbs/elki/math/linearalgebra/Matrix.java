@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @apiviz.uses MatrixLike oneway - - reads
  * @apiviz.uses Vector
  */
-public final class Matrix implements MatrixLike<Matrix> {
+public class Matrix implements MatrixLike<Matrix> {
   /**
    * Serial version
    */
