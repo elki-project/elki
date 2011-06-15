@@ -189,34 +189,8 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public Vector errorVectors(V p) {
-    return errorVectors(p.getColumnVector());
-  }
-
-  /**
-   * Returns the error vectors after projection.
-   * 
-   * @param p a vector in the space underlying this solution
-   * @return the error vectors
-   */
-  public Vector errorVectors(Vector p) {
-    return p.minus(centroid).projection(weakEigenvectors);
-  }
-
-  /**
-   * Returns the error vectors after projection.
-   * 
-   * @param p a vector in the space underlying this solution
-   * @return the error vectors
-   */
   public Vector errorVector(V p) {
-    Vector evs = errorVectors(p.getColumnVector());
-    Vector result = evs.getColumnVector(0);
-    // getColumnDimensionality == 1 anyway.
-    for(int i = 1; i < evs.getColumnDimensionality(); i++) {
-      result = result.minus(evs.getColumnVector(i));
-    }
-    return result;
+    return p.getColumnVector().minus(centroid).projection(weakEigenvectors);
   }
 
   /**
@@ -243,24 +217,8 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public Vector dataVectors(Vector p) {
-    return p.minus(centroid).projection(strongEigenvectors);
-  }
-
-  /**
-   * Returns the data vectors after projection.
-   * 
-   * @param p a vector in the space underlying this solution
-   * @return the error vectors
-   */
   public Vector dataVector(V p) {
-    Vector dvs = dataVectors(p.getColumnVector());
-    Vector result = dvs.getColumnVector(0);
-    // getColumnDimensionality == 1 anyway.
-    for(int i = 1; i < dvs.getColumnDimensionality(); i++) {
-      result = result.plus(dvs.getColumnVector(i));
-    }
-    return result;
+    return p.getColumnVector().minus(centroid).projection(strongEigenvectors);
   }
 
   /**

@@ -14,7 +14,7 @@ public class EigenPair implements Comparable<EigenPair> {
   /**
    * The eigenvector as a matrix.
    */
-  private Matrix eigenvector;
+  private Vector eigenvector;
 
   /**
    * The corresponding eigenvalue.
@@ -27,7 +27,7 @@ public class EigenPair implements Comparable<EigenPair> {
    * @param eigenvector the eigenvector as a matrix
    * @param eigenvalue the corresponding eigenvalue
    */
-  public EigenPair(Matrix eigenvector, double eigenvalue) {
+  public EigenPair(Vector eigenvector, double eigenvalue) {
     this.eigenvalue = eigenvalue;
     this.eigenvector = eigenvector;
   }
@@ -58,7 +58,7 @@ public class EigenPair implements Comparable<EigenPair> {
    * 
    * @return the eigenvector
    */
-  public Matrix getEigenvector() {
+  public Vector getEigenvector() {
     return eigenvector;
   }
 
@@ -78,6 +78,6 @@ public class EigenPair implements Comparable<EigenPair> {
    */
   @Override
   public String toString() {
-    return "(ew = " + FormatUtil.format(eigenvalue) + ", ev = [" + FormatUtil.format(eigenvector.getColumnPackedCopy()) + "])";
+    return "(ew = " + FormatUtil.format(eigenvalue) + ", ev = [" + FormatUtil.format(eigenvector) + "])";
   }
 }

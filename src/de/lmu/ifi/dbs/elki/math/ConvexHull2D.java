@@ -175,7 +175,7 @@ public class ConvexHull2D {
    * @return Manhattan distance
    */
   private double mdist(Vector a, Vector b) {
-    return Math.abs(a.get(0) - b.get(0)) + Math.abs(a.get(1) - b.get(1));
+    return Math.abs(a.get(0) * factor - b.get(0) * factor) + Math.abs(a.get(1) * factor - b.get(1) * factor);
   }
 
   /**
@@ -190,8 +190,7 @@ public class ConvexHull2D {
     // We're using factor to improve numerical contrast for small polygons.
     double area = (b.get(0) * factor - a.get(0) * factor) * (c.get(1) * factor - a.get(1) * factor) - (c.get(0) * factor - a.get(0) * factor) * (b.get(1) * factor - a.get(1) * factor);
     if(area == 0) {
-      boolean between = (mdist(b, c) >= mdist(a, b) + mdist(a, c));
-      return !between;
+      return (mdist(b, c) >= mdist(a, b) + mdist(a, c));
     }
     return (area < 0);
   }

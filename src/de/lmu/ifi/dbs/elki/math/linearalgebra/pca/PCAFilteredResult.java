@@ -83,7 +83,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   public PCAFilteredResult(SortedEigenPairs eigenPairs, FilteredEigenPairs filteredEigenPairs, double big, double small) {
     super(eigenPairs);
 
-    int dim = eigenPairs.getEigenPair(0).getEigenvector().getRowDimensionality();
+    int dim = eigenPairs.getEigenPair(0).getEigenvector().getDimensionality();
 
     double sumStrongEigenvalues = 0;
     double sumWeakEigenvalues = 0;
@@ -95,7 +95,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
       for(Iterator<EigenPair> it = strongEigenPairs.iterator(); it.hasNext(); i++) {
         EigenPair eigenPair = it.next();
         strongEigenvalues[i] = eigenPair.getEigenvalue();
-        strongEigenvectors.setColumn(i, eigenPair.getEigenvector());
+        strongEigenvectors.setColumnVector(i, eigenPair.getEigenvector());
         sumStrongEigenvalues += strongEigenvalues[i];
       }
     }
@@ -108,7 +108,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
       for(Iterator<EigenPair> it = weakEigenPairs.iterator(); it.hasNext(); i++) {
         EigenPair eigenPair = it.next();
         weakEigenvalues[i] = eigenPair.getEigenvalue();
-        weakEigenvectors.setColumn(i, eigenPair.getEigenvector());
+        weakEigenvectors.setColumnVector(i, eigenPair.getEigenvector());
         sumWeakEigenvalues += weakEigenvalues[i];
       }
     }
