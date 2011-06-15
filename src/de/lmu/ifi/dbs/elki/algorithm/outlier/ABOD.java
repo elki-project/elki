@@ -375,7 +375,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   }
 
   private double getAbofFilter(KernelMatrix kernelMatrix, DBID aKey, HashMap<DBID, Double> dists, double fulCounter, double counter, DBIDs neighbors) {
-    MeanVariance s = new MeanVariance();
+    double sum = 0.0;
+    double sqrSum = 0.0;
     double partCounter = 0;
     Iterator<DBID> iter = neighbors.iterator();
     while(iter.hasNext()) {
@@ -394,15 +395,16 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
           if(nenner != 0) {
             double tmp = calcNumerator(kernelMatrix, aKey, bKey, cKey) / nenner;
             double sqrtNenner = Math.sqrt(nenner);
-            s.put(tmp, 1 / sqrtNenner);
+            sum += tmp * (1 / sqrtNenner);
+            sqrSum += tmp * tmp * (1 / sqrtNenner);
             partCounter += (1 / (sqrtNenner * nenner));
           }
         }
       }
     }
     // TODO: Document the meaning / use of fulCounter, partCounter.
-    double mu = (s.sum + (fulCounter - partCounter)) / counter;
-    return (s.sqrSum / counter) - (mu * mu);
+    double mu = (sum + (fulCounter - partCounter)) / counter;
+    return (sqrSum / counter) - (mu * mu);
   }
 
   /**

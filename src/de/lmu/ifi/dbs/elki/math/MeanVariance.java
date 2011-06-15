@@ -19,19 +19,19 @@ package de.lmu.ifi.dbs.elki.math;
  */
 public final class MeanVariance {
   /**
-   * Sum of values
+   * Mean of values
    */
-  public double sum = 0.0;
+  public double mean = 0.0;
 
   /**
-   * Sum of Squares
+   * nVariance
    */
-  public double sqrSum = 0.0;
+  public double nvar = 0.0;
 
   /**
-   * Number of Samples.
+   * Weight sum (number of samples)
    */
-  public double count = 0.0;
+  public double wsum = 0;
 
   /**
    * Empty constructor
@@ -41,27 +41,27 @@ public final class MeanVariance {
   }
 
   /**
-   * Constructor from full internal data.
-   * 
-   * @param sum sum
-   * @param sqrSum sum of squared values
-   * @param count sum of weights
-   */
-  public MeanVariance(double sum, double sqrSum, double count) {
-    this.sum = sum;
-    this.sqrSum = sqrSum;
-    this.count = count;
-  }
-
-  /**
    * Constructor from other instance
    * 
    * @param other other instance to copy data from.
    */
   public MeanVariance(MeanVariance other) {
-    this.sum = other.sum;
-    this.sqrSum = other.sqrSum;
-    this.count = other.count;
+    this.mean = other.mean;
+    this.nvar = other.nvar;
+    this.wsum = other.wsum;
+  }
+
+  /**
+   * Add a single value with weight 1.0
+   * 
+   * @param val Value
+   */
+  public void put(double val) {
+    wsum += 1.0;
+    final double delta = val - mean;
+    mean += delta / wsum;
+    // The next line needs the *new* mean!
+    nvar += delta * (val - mean);
   }
 
   /**
@@ -71,20 +71,13 @@ public final class MeanVariance {
    * @param weight weight
    */
   public void put(double val, double weight) {
-    sum += weight * val;
-    sqrSum += weight * val * val;
-    count += weight;
-  }
-
-  /**
-   * Add a single value with weight 1.0
-   * 
-   * @param val Value
-   */
-  public void put(double val) {
-    sum += val;
-    sqrSum += val * val;
-    count += 1.0;
+    final double nwsum = weight + wsum;
+    final double delta = val - mean;
+    final double rval = delta * weight / nwsum;
+    mean += rval;
+    // Use old and new weight sum here:
+    nvar += wsum * delta * rval;
+    wsum = nwsum;
   }
 
   /**
@@ -93,9 +86,15 @@ public final class MeanVariance {
    * @param other Data to join with
    */
   public void put(MeanVariance other) {
-    this.sum += other.sum;
-    this.sqrSum += other.sqrSum;
-    this.count += other.count;
+    final double nwsum = other.wsum + this.wsum; 
+    final double delta = other.mean - this.mean;
+    final double rval = delta * other.wsum / nwsum;
+
+    // this.mean += rval;
+    // This supposedly is more numerically stable:
+    this.mean = (this.wsum * this.mean + other.wsum * other.mean) / nwsum;
+    this.nvar += other.nvar + delta * this.wsum * rval;
+    this.wsum = nwsum;
   }
 
   /**
@@ -104,7 +103,7 @@ public final class MeanVariance {
    * @return number of data points
    */
   public double getCount() {
-    return count;
+    return wsum;
   }
 
   /**
@@ -113,7 +112,7 @@ public final class MeanVariance {
    * @return mean
    */
   public double getMean() {
-    return sum / count;
+    return mean;
   }
 
   /**
@@ -124,8 +123,7 @@ public final class MeanVariance {
    * @return variance
    */
   public double getNaiveVariance() {
-    double mu = sum / count;
-    return (sqrSum / count) - (mu * mu);
+    return nvar / wsum;
   }
 
   /**
@@ -134,7 +132,8 @@ public final class MeanVariance {
    * @return sample variance
    */
   public double getSampleVariance() {
-    return (sqrSum - (sum * sum) / count) / (count - 1);
+    assert(wsum > 1);
+    return nvar / (wsum - 1);
   }
 
   /**
