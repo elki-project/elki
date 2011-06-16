@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
@@ -27,15 +28,22 @@ public class FilterByLabelFilter implements ObjectFilter {
    * The filter pattern
    */
   private final Pattern pattern;
+  
+  /**
+   * Inversion flag
+   */
+  private final boolean inverted;
 
   /**
    * Constructor.
    * 
    * @param pattern Filter pattern
+   * @param inverted Inversion flag
    */
-  public FilterByLabelFilter(Pattern pattern) {
+  public FilterByLabelFilter(Pattern pattern, boolean inverted) {
     super();
     this.pattern = pattern;
+    this.inverted = inverted;
   }
 
   @Override
@@ -71,7 +79,7 @@ public class FilterByLabelFilter implements ObjectFilter {
             break;
           }
         }
-        if(!good) {
+        if(good == inverted) {
           continue;
         }
       }
@@ -96,15 +104,28 @@ public class FilterByLabelFilter implements ObjectFilter {
     /**
      * Parameter that specifies the filter pattern (regular expression).
      * <p>
-     * Key: {@code -patternfilter}
+     * Key: {@code -patternfilter.pattern}
      * </p>
      */
-    public static final OptionID LABELFILTER_PATTERN_ID = OptionID.getOrCreateOptionID("patternfilter", "The filter pattern to use.");
+    public static final OptionID LABELFILTER_PATTERN_ID = OptionID.getOrCreateOptionID("patternfilter.pattern", "The filter pattern to use.");
+
+    /**
+     * Flag to use the pattern in inverted mode
+     * <p>
+     * Key: {@code -patternfilter.invert}
+     * </p>
+     */
+    public static final OptionID LABELFILTER_PATTERN_INVERT_ID = OptionID.getOrCreateOptionID("patternfilter.invert", "Flag to invert pattern.");
 
     /**
      * The pattern configured.
      */
     Pattern pattern = null;
+
+    /**
+     * Inversion flag
+     */
+    private boolean inverted = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -113,11 +134,15 @@ public class FilterByLabelFilter implements ObjectFilter {
       if(config.grab(patternP)) {
         pattern = patternP.getValue();
       }
+      final Flag invertedF = new Flag(LABELFILTER_PATTERN_INVERT_ID);
+      if(config.grab(invertedF)) {
+        inverted = invertedF.getValue();
+      }
     }
 
     @Override
     protected Object makeInstance() {
-      return new FilterByLabelFilter(pattern);
+      return new FilterByLabelFilter(pattern, inverted);
     }
   }
 }
