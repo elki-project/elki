@@ -16,15 +16,17 @@ public final class PageFileUtil {
    * @param buffer Buffer to append to
    */
   public static void appendPageFileStatistics(StringBuffer buffer, PageFileStatistics statistics) {
-    buffer.append("Page File Layer: ").append(statistics.getClass()).append("\n");
-    buffer.append("Read Operations: ").append(statistics.getReadOperations()).append("\n");
-    buffer.append("Write Operations: ").append(statistics.getWriteOperations()).append("\n");
-    PageFileStatistics inner = statistics.getInnerStatistics();
-    if(inner != null) {
-      appendPageFileStatistics(buffer, inner);
+    if(statistics != null) {
+      buffer.append("Page File Layer: ").append(statistics.getClass()).append("\n");
+      buffer.append("Read Operations: ").append(statistics.getReadOperations()).append("\n");
+      buffer.append("Write Operations: ").append(statistics.getWriteOperations()).append("\n");
+      PageFileStatistics inner = statistics.getInnerStatistics();
+      if(inner != null) {
+        appendPageFileStatistics(buffer, inner);
+      }
     }
   }
-  
+
   /**
    * Get the number of (logical) read operations (without caching).
    * 
@@ -34,7 +36,7 @@ public final class PageFileUtil {
   public static long getLogicalReadOperations(PageFileStatistics statistics) {
     return statistics.getReadOperations();
   }
-  
+
   /**
    * Get the number of (logical) write operations (without caching).
    * 
@@ -44,7 +46,7 @@ public final class PageFileUtil {
   public static long getLogicalWriteOperations(PageFileStatistics statistics) {
     return statistics.getWriteOperations();
   }
-  
+
   /**
    * Get the number of (physical) read operations (with caching).
    * 
@@ -58,7 +60,7 @@ public final class PageFileUtil {
     }
     return statistics.getReadOperations();
   }
-  
+
   /**
    * Get the number of (physical) write operations (with caching).
    * 
