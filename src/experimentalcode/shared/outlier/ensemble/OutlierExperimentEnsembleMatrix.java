@@ -119,7 +119,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
         double auc = ROC.computeAUC(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
         data[a][a] = auc;
         // minmax.put(auc);
-        logger.verbose(auc + " " + labels.get(ids.get(a)));
+        //logger.verbose(auc + " " + labels.get(ids.get(a)));
       }
       // Compare to others, exploiting symmetry
       for(int b = a + 1; b < size; b++) {
@@ -130,7 +130,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
         }
         Arrays.sort(combined, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
         double auc = ROC.computeAUC(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
-        logger.verbose(auc + " " + labels.get(ids.get(a)) + " " + labels.get(ids.get(b)));
+        //logger.verbose(auc + " " + labels.get(ids.get(a)) + " " + labels.get(ids.get(b)));
         data[a][b] = auc;
         data[b][a] = auc;
         // minmax.put(auc);
@@ -141,7 +141,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
         double ref = Math.max(data[a][a], data[b][b]);
         data[a][b] = (data[a][b] - ref) / (1 - ref);
         data[b][a] = (data[b][a] - ref) / (1 - ref);
-        logger.verbose(data[a][b] + " " + labels.get(ids.get(a)) + " " + labels.get(ids.get(b)));
+        //logger.verbose(data[a][b] + " " + labels.get(ids.get(a)) + " " + labels.get(ids.get(b)));
         minmax.put(data[a][b]);
       }
     }
