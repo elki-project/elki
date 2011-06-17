@@ -34,6 +34,6 @@ public class TestDBOutlierDetection extends AbstractSimpleAlgorithmTest implemen
     OutlierResult result = dbOutlierDetection.run(db);
 
     testSingleScore(result, 1025, 0.0);
-    testAUC(db, "Noise", result, 0.97386666);   
+    testAUC(db, "Noise", result, 0.97487179);   
   }
 }

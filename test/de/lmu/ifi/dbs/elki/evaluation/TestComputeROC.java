@@ -46,10 +46,10 @@ public class TestComputeROC implements JUnit4Test {
     distances.add(new Pair<Double, DBID>(6.0, DBIDUtil.importInteger(5)));
     
     List<DoubleDoublePair> roccurve = ROC.materializeROC(9, positive, distances.iterator());
-    //System.out.println(roccurve);
-    Assert.assertEquals("ROC curve too complex", 5, roccurve.size());
+    // System.out.println(roccurve);
+    Assert.assertEquals("ROC curve too complex", 6, roccurve.size());
     
     double auc = ROC.computeAUC(roccurve);
-    Assert.assertEquals("ROC AUC not right.", 0.5, auc, 0.0001);
+    Assert.assertEquals("ROC AUC not right.", 0.6, auc, 0.0001);
   }
 }

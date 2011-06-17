@@ -33,6 +33,6 @@ public class TestDBOutlierScore extends AbstractSimpleAlgorithmTest implements J
     OutlierResult result = dbOutlierScore.run(db);
 
     testSingleScore(result, 1025, 0.688780487804878);
-    testAUC(db, "Noise", result, 0.99217435);
+    testAUC(db, "Noise", result, 0.992565641);
   }
 }

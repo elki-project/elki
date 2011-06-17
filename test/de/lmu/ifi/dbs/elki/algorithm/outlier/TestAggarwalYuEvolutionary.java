@@ -35,6 +35,6 @@ public class TestAggarwalYuEvolutionary extends AbstractSimpleAlgorithmTest impl
     OutlierResult result = aggarwalYuEvolutionary.run(db);
 
     testSingleScore(result, 945, 16.6553612449883);
-    testAUC(db, "Noise", result, 0.5788796296296297);
+    testAUC(db, "Noise", result, 0.5799537037037);
   }
 }
