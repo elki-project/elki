@@ -101,7 +101,7 @@ public final class MathUtil {
       // Incremental computation
       double meanX = x.doubleValue(1);
       double meanY = y.doubleValue(1);
-      for(int i = 2; i < xdim; i++) {
+      for(int i = 2; i <= xdim; i++) {
         // Delta to previous mean
         final double deltaX = x.doubleValue(i) - meanX;
         final double deltaY = y.doubleValue(i) - meanY;
@@ -155,7 +155,7 @@ public final class MathUtil {
       double meanX = x.doubleValue(1);
       double meanY = y.doubleValue(1);
       sumWe = weights[0];
-      for(int i = 2; i < xdim; i++) {
+      for(int i = 2; i <= xdim; i++) {
         final double weight = weights[i - 1];
         sumWe += weight;
         // Delta to previous mean
@@ -167,6 +167,113 @@ public final class MathUtil {
         // Delta to new mean
         final double neltaX = x.doubleValue(i) - meanX;
         final double neltaY = y.doubleValue(i) - meanY;
+        // Update
+        sumXX += weight * deltaX * neltaX;
+        sumYY += weight * deltaY * neltaY;
+        sumXY += weight * deltaX * neltaY; // should equal weight * deltaY * neltaX!
+      }
+    }
+    final double popSdX = Math.sqrt(sumXX / sumWe);
+    final double popSdY = Math.sqrt(sumYY / sumWe);
+    final double covXY = sumXY / sumWe;
+    if(popSdX == 0 || popSdY == 0) {
+      return 0;
+    }
+    return covXY / (popSdX * popSdY);
+  }
+
+  /**
+   * <p>
+   * Provides the Pearson product-moment correlation coefficient for two
+   * FeatureVectors.
+   * </p>
+   * 
+   * @param x first FeatureVector
+   * @param y second FeatureVector
+   * @return the Pearson product-moment correlation coefficient for x and y
+   */
+  public static double pearsonCorrelationCoefficient(double[] x, double[] y) {
+    final int xdim = x.length;
+    final int ydim = y.length;
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
+    }
+    if(xdim <= 0) {
+      throw new IllegalArgumentException("Invalid arguments: dimensionality not positive.");
+    }
+    double sumXX = 0;
+    double sumYY = 0;
+    double sumXY = 0;
+    {
+      // Incremental computation
+      double meanX = x[0];
+      double meanY = y[0];
+      for(int i = 1; i < xdim; i++) {
+        // Delta to previous mean
+        final double deltaX = x[i] - meanX;
+        final double deltaY = y[i] - meanY;
+        // Update means
+        meanX += deltaX / i;
+        meanY += deltaY / i;
+        // Delta to new mean
+        final double neltaX = x[i] - meanX;
+        final double neltaY = y[i] - meanY;
+        // Update
+        sumXX += deltaX * neltaX;
+        sumYY += deltaY * neltaY;
+        sumXY += deltaX * neltaY; // should equal deltaY * neltaX!
+      }
+    }
+    final double popSdX = Math.sqrt(sumXX / xdim);
+    final double popSdY = Math.sqrt(sumYY / ydim);
+    final double covXY = sumXY / xdim;
+    if(popSdX == 0 || popSdY == 0) {
+      return 0;
+    }
+    return covXY / (popSdX * popSdY);
+  }
+
+  /**
+   * <p>
+   * Provides the Pearson product-moment correlation coefficient for two
+   * FeatureVectors.
+   * </p>
+   * 
+   * @param x first FeatureVector
+   * @param y second FeatureVector
+   * @return the Pearson product-moment correlation coefficient for x and y
+   */
+  public static double weightedPearsonCorrelationCoefficient(double[] x, double[] y, double[] weights) {
+    final int xdim = x.length;
+    final int ydim = y.length;
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
+    }
+    if(xdim != weights.length) {
+      throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
+    }
+    // Compute means
+    double sumWe;
+    double sumXX = 0;
+    double sumYY = 0;
+    double sumXY = 0;
+    {
+      // Incremental computation
+      double meanX = x[0];
+      double meanY = y[0];
+      sumWe = weights[0];
+      for(int i = 1; i < xdim; i++) {
+        final double weight = weights[i];
+        sumWe += weight;
+        // Delta to previous mean
+        final double deltaX = x[i] - meanX;
+        final double deltaY = y[i] - meanY;
+        // Update means
+        meanX += deltaX * weight / sumWe;
+        meanY += deltaY * weight / sumWe;
+        // Delta to new mean
+        final double neltaX = x[i] - meanX;
+        final double neltaY = y[i] - meanY;
         // Update
         sumXX += weight * deltaX * neltaX;
         sumYY += weight * deltaY * neltaY;
