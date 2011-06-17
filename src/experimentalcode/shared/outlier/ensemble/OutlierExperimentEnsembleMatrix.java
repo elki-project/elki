@@ -138,7 +138,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
     }
     for(int a = 0; a < size; a++) {
       for(int b = a + 1; b < size; b++) {
-        double ref = Math.min(data[a][a], data[b][b]);
+        double ref = Math.max(data[a][a], data[b][b]);
         data[a][b] = (data[a][b] - ref) / (1 - ref);
         data[b][a] = (data[b][a] - ref) / (1 - ref);
         logger.verbose(data[a][b] + " " + labels.get(ids.get(a)) + " " + labels.get(ids.get(b)));
