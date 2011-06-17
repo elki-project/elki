@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -52,12 +53,12 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
   /**
    * Parameter for the individual algorithms
    */
-  private ObjectListParameter<Algorithm> ALGORITHMS_PARAM = new ObjectListParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
+  private ObjectListParameter<OutlierAlgorithm> ALGORITHMS_PARAM = new ObjectListParameter<OutlierAlgorithm>(OptionID.ALGORITHM, OutlierAlgorithm.class);
 
   /**
    * The actual algorithms
    */
-  private List<Algorithm> algorithms;
+  private List<OutlierAlgorithm> algorithms;
 
   /**
    * Voting strategy to use in the ensemble.
