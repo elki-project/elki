@@ -58,7 +58,7 @@ public class ROC {
    * @return area under curve
    */
   public static <C extends Comparable<? super C>, T> List<DoubleDoublePair> materializeROC(int size, Set<? super T> ids, Iterator<? extends PairInterface<C, T>> nei) {
-    final double DELTA = 0.1 / (size*size);
+    final double DELTA = 0.01 / (size * size);
 
     int postot = ids.size();
     int negtot = size - postot;
@@ -71,6 +71,12 @@ public class ROC {
 
     PairInterface<C, T> prev = null;
     while(nei.hasNext()) {
+      // Previous positive rate - y axis
+      double curpos = ((double) poscnt) / postot;
+      // Previous negative rate - x axis
+      double curneg = ((double) negcnt) / negtot;
+
+      // Analyze next point
       PairInterface<C, T> cur = nei.next();
       // positive or negative match?
       if(ids.contains(cur.getSecond())) {
@@ -79,36 +85,34 @@ public class ROC {
       else {
         negcnt += 1;
       }
-      // defer calculation if this points distance equals the previous points
-      // distance
-      if((prev == null) || (prev.getFirst().compareTo(cur.getFirst()) != 0)) {
-        // positive rate - y axis
-        double curpos = ((double) poscnt) / postot;
-        // negative rate - x axis
-        double curneg = ((double) negcnt) / negtot;
-        // simplify curve when possible:
-        if(res.size() >= 2) {
-          DoubleDoublePair last1 = res.get(res.size() - 2);
-          DoubleDoublePair last2 = res.get(res.size() - 1);
-          // vertical simplification
-          if((last1.first == last2.first) && (last2.first == curneg)) {
-            res.remove(res.size() - 1);
-          }
-          // horizontal simplification
-          else if((last1.second == last2.second) && (last2.second == curpos)) {
-            res.remove(res.size() - 1);
-          }
-          // diagonal simplification
-          // TODO: Make a test.
-          else if(Math.abs((last2.first - last1.first) - (curneg - last2.first)) < DELTA && Math.abs((last2.second - last1.second) - (curpos - last2.second)) < DELTA) {
-            res.remove(res.size() - 1);
-          }
-        }
-        res.add(new DoubleDoublePair(curneg, curpos));
+      // defer calculation for ties
+      if((prev != null) && (prev.getFirst().compareTo(cur.getFirst()) == 0)) {
+        continue;
       }
+      // simplify curve when possible:
+      if(res.size() >= 2) {
+        DoubleDoublePair last1 = res.get(res.size() - 2);
+        DoubleDoublePair last2 = res.get(res.size() - 1);
+        // vertical simplification
+        if((last1.first == last2.first) && (last2.first == curneg)) {
+          res.remove(res.size() - 1);
+        }
+        // horizontal simplification
+        else if((last1.second == last2.second) && (last2.second == curpos)) {
+          res.remove(res.size() - 1);
+        }
+        // diagonal simplification
+        // TODO: Make a test.
+        else if(Math.abs((last2.first - last1.first) - (curneg - last2.first)) < DELTA && Math.abs((last2.second - last1.second) - (curpos - last2.second)) < DELTA) {
+          res.remove(res.size() - 1);
+        }
+      }
+      // Add a new point (for the previous entry!)
+      res.add(new DoubleDoublePair(curneg, curpos));
       prev = cur;
     }
     // ensure we end up in the top right corner.
+    // Since we didn't add a point for the last entry yet, this likely is needed.
     {
       DoubleDoublePair last = res.get(res.size() - 1);
       if(last.first < 1.0 || last.second < 1.0) {
@@ -220,7 +224,7 @@ public class ROC {
      * Original Iterator
      */
     private Iterator<DBID> iter;
-    
+
     /**
      * Outlier score
      */
@@ -228,7 +232,7 @@ public class ROC {
 
     /**
      * Constructor.
-     *
+     * 
      * @param ids Object IDs
      * @param o Result
      */
@@ -290,7 +294,7 @@ public class ROC {
   /**
    * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
    * 
-   * @param <D> Distance type 
+   * @param <D> Distance type
    * @param size Database size
    * @param clus Cluster object
    * @param nei Query result
