@@ -8,8 +8,8 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * 
  * @author Erich Schubert
  */
-public class LabelJoinDatabaseConnection implements DatabaseConnection, Parameterizable {
+public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection implements Parameterizable {
   /**
    * Logger
    */
@@ -34,10 +34,11 @@ public class LabelJoinDatabaseConnection implements DatabaseConnection, Paramete
   /**
    * Constructor.
    * 
+   * @param filters Filters to use.
    * @param sources Data sources to join.
    */
-  public LabelJoinDatabaseConnection(List<DatabaseConnection> sources) {
-    super();
+  public LabelJoinDatabaseConnection(List<ObjectFilter> filters, List<DatabaseConnection> sources) {
+    super(filters);
     this.sources = sources;
   }
 
@@ -162,6 +163,11 @@ public class LabelJoinDatabaseConnection implements DatabaseConnection, Paramete
     return first;
   }
 
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
+
   /**
    * Parameterization class.
    * 
@@ -169,7 +175,7 @@ public class LabelJoinDatabaseConnection implements DatabaseConnection, Paramete
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**
      * The static option ID
      */
@@ -183,6 +189,7 @@ public class LabelJoinDatabaseConnection implements DatabaseConnection, Paramete
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      super.configFilters(config);
       final ObjectListParameter<DatabaseConnection> sourcesParam = new ObjectListParameter<DatabaseConnection>(SOURCES_ID, DatabaseConnection.class);
       if(config.grab(sourcesParam)) {
         sources = sourcesParam.instantiateClasses(config);
@@ -191,7 +198,7 @@ public class LabelJoinDatabaseConnection implements DatabaseConnection, Paramete
 
     @Override
     protected LabelJoinDatabaseConnection makeInstance() {
-      return new LabelJoinDatabaseConnection(sources);
+      return new LabelJoinDatabaseConnection(filters, sources);
     }
   }
 }
