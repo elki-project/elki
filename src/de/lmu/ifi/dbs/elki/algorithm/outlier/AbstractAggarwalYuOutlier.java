@@ -113,10 +113,9 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
     }
     // Project
     for(DBID id : allids) {
+      final V obj = database.get(id);
       for(int d = 1; d <= dim; d++) {
-        double value = database.get(id).doubleValue(d);
-        FCPair<Double, DBID> point = new FCPair<Double, DBID>(value, id);
-        dbAxis.get(d - 1).add(point);
+        dbAxis.get(d - 1).add(new FCPair<Double, DBID>(obj.doubleValue(d), id));
       }
     }
     // Split into cells
