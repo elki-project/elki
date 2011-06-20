@@ -12,7 +12,7 @@
  * any {@link de.lmu.ifi.dbs.elki.KDDTask} will
  * use the {@link de.lmu.ifi.dbs.elki.database.StaticArrayDatabase} which,
  * in turn, will use a {@link de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection}
- * and a  * {@link de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser}
+ * and a {@link de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser}
  * to parse a specified data file creating
  * a {@link de.lmu.ifi.dbs.elki.database.StaticArrayDatabase}
  * containing {@link de.lmu.ifi.dbs.elki.data.DoubleVector}-Objects.</p>
