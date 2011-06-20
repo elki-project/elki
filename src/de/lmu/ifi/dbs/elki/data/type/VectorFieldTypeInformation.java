@@ -37,6 +37,18 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   }
 
   /**
+   * Constructor for a request with minimum and maximum dimensionality.
+   * 
+   * @param cls Vector restriction class.
+   * @param mindim Minimum dimensionality request
+   * @param maxdim Maximum dimensionality request
+   */
+  public VectorFieldTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
+    super(cls, mindim, maxdim);
+    this.factory = null;
+  }
+
+  /**
    * Constructor with given dimensionality and factory, so usually an instance.
    * 
    * @param cls Restriction java class

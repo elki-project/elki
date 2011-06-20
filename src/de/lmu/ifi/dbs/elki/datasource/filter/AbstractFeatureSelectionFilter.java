@@ -110,5 +110,4 @@ public abstract class AbstractFeatureSelectionFilter<V extends FeatureVector<?, 
       }
     }
   }
-
 }
