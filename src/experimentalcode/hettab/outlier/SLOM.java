@@ -20,9 +20,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -51,7 +51,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   /**
    * Parameter to specify the neighborhood predicate to use.
    */
-  public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("compare.neighborhood", "The neighborhood predicate to use in comparison step.");
+  public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("neighborhood", "The neighborhood predicate to use in comparison step.");
 
   /**
    * Our predicate to obtain the neighbors
@@ -162,7 +162,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
 
     //
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
+    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(Double.NaN, minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
 
   }
