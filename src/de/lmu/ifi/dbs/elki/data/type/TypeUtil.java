@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
@@ -77,6 +78,11 @@ public final class TypeUtil {
    * FIXME: Don't use String here!
    */
   public static final SimpleTypeInformation<String> EXTERNALID = SimpleTypeInformation.get(String.class);
+
+  /**
+   * Type for polygons
+   */
+  public static final SimpleTypeInformation<PolygonsObject> POLYGON_TYPE = SimpleTypeInformation.get(PolygonsObject.class);
 
   /**
    * Make a type array easily.
