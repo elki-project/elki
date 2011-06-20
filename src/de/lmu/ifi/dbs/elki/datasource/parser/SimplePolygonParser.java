@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -79,7 +78,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return MultipleObjectsBundle.makeSimple(SimpleTypeInformation.get(PolygonsObject.class), polys, TypeUtil.LABELLIST, labels);
+    return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.LABELLIST, labels);
   }
 
   /**
