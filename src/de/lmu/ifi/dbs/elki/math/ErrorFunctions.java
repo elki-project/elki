@@ -86,11 +86,6 @@ public final class ErrorFunctions {
    * @return erf(x)
    */
   public static final double erf(double x) {
-    if(x >= 0) {
-      return 1 - erfc(x);
-    }
-    else {
-      return erfc(x) - 1;
-    }
+    return 1 - erfc(x);
   }
 }
