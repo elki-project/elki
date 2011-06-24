@@ -2,8 +2,6 @@ package experimentalcode.hettab.outlier;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -24,12 +22,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
-import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate.Factory;
 
 /**
  * 
@@ -37,31 +31,11 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  *
  * @param <V> 
  */
-public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends MultipleAttributesSpatialOutlier<V>{
   /**
    * logger
    */
   public static final Logging logger = Logging.getLogger(MeanMultipleAttributes.class);
-
-  /**
-   * Parameter to specify the neighborhood predicate to use.
-   */
-  public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("neighborhood", "The neighborhood predicate to use.");
-
-  /**
-   * Parameter to specify the dimensions for non spatial attributes to use
-   */
-  public static final OptionID DIMS_ID = OptionID.getOrCreateOptionID("mma", "dimensions for non spatial atributtes");
-
-  /**
-   * Our predicate to obtain the neighbors
-   */
-  NeighborSetPredicate.Factory<Object> npredf = null;
-
-  /**
-   * dims Parameter
-   */
-  private List<Integer> dims;
 
   /**
    * The association id to associate the SCORE of an object for the algorithm.
@@ -74,10 +48,8 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
    * @param npredf
    * @param dims
    */
-  public MeanMultipleAttributes(Factory<Object> npredf, List<Integer> dims) {
-    super();
-    this.npredf = npredf;
-    this.dims = dims;
+  public MeanMultipleAttributes(NeighborSetPredicate.Factory<V> npredf, List<Integer> dims) {
+    super(npredf,dims);
   }
 
   @Override
@@ -86,11 +58,11 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
   }
 
   public OutlierResult run(Database database, Relation<V> relation) {
-    final NeighborSetPredicate npred = npredf.instantiate(relation);
-    Matrix hMatrix = new Matrix(dims.size(),relation.size());
-    Matrix hMeansMatrix = new Matrix(dims.size(),1);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
+    Matrix hMatrix = new Matrix(getListZ_Dims().size(),relation.size());
+    Matrix hMeansMatrix = new Matrix(getListZ_Dims().size(),1);
     int i = 0 ;
-    for(Integer dim : dims){
+    for(Integer dim : getListZ_Dims()){
         int j = 0 ;
         //h mean for each dim
         double hMeans = 0 ;
@@ -128,61 +100,41 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Abstra
       Matrix h_iT = h_i.transpose();
       Matrix m = h_iT.times(invSigma);
       Matrix sM = m.times(h_i);
-      System.out.println(sM);
       double score = sM.get(0, 0);
       minmax.put(score);
       scores.put(id, score);
       i++;
     }
     
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("MOF", "Trimmedmean-outlier", MMA_SCORE, scores);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("MOF", "mean-multipleattributes-outlier", MMA_SCORE, scores);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
-  }
-
-  /**
-   * 
-   * @author Ahmed Hettab
-   * 
-   * @param <V>
-   * 
-   */
-  public static <V extends NumberVector<?, ?>> MeanMultipleAttributes<V> parameterize(Parameterization config) {
-    final NeighborSetPredicate.Factory<Object> npredf = getNeighborPredicate(config);
-    final List<Integer> dims = getDims(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new MeanMultipleAttributes<V>(npredf, dims);
-  }
-
-  /**
-   * 
-   * @param config
-   * @return
-   */
-  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
-  }
-
-  /**
-   * 
-   */
-  public static List<Integer> getDims(Parameterization config) {
-    final IntListParameter param = new IntListParameter(DIMS_ID, false);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return null;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+  /**
+   * 
+   * @author hettab
+   *
+   * @param <V>
+   */
+  public static class Parameterizer<V extends NumberVector<?,?>> extends MultipleAttributesSpatialOutlier.Parameterizer<V>{
+   
+   
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+   
+    @Override
+    protected MeanMultipleAttributes<V> makeInstance() {
+      return new MeanMultipleAttributes<V> (npredf,z);
+    }
+    
   }
 
 }

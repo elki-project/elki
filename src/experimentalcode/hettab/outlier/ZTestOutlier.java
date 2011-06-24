@@ -1,7 +1,5 @@
 package experimentalcode.hettab.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -21,45 +19,23 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
-import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate.Factory;
 /**
  * 
  * @author Ahmed Hettab
  *
  * @param <V>
+ * @Title=("A Unified Approach to Spatial Outliers Detection")
+ * @Description("Spatial Outlier Detection Algorithm")
+ * author = "Shekhar, Shashi and Lu, Chang-Tien and Zhang, Pusheng", title = "A Unified Approach to Detecting Spatial Outliers" )
  */
-public class ZTestOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm{
+public class ZTestOutlier<V extends NumberVector<?,?>> extends SingleAttributeSpatialOutlier<V>{
 
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(ZTestOutlier.class);
-
-  /**
-   * Parameter to specify the neighborhood predicate to use.
-   */
-  public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("neighborhood", "The neighborhood to use");
-
-  /**
-   * Our predicate to obtain the neighbors
-   */
-  NeighborSetPredicate.Factory<Object> npredf = null;
-
-  /**
-   * 
-   * Holds the y value
-   */
-  private static final OptionID Y_ID = OptionID.getOrCreateOptionID("dim.y", "the dimension of non spatial attribut");
-
-  /**
-   * parameter y
-   */
-  private int y;
 
   /**
    * The association id to associate the SCORE of an object for the 
@@ -73,74 +49,36 @@ public class ZTestOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorith
    * @param npredf
    * @param z
    */
-  public ZTestOutlier(Factory<Object> npredf, int y) {
-    super();
-    this.npredf = npredf;
-    this.y = y;
+  public ZTestOutlier(NeighborSetPredicate.Factory<V> npredf, int z) {
+    super(npredf,z);
+
   }
 
-  /**
-   * 
-   * @param <V>
-   * @param config
-   * @return
-   */
-  public static <V extends NumberVector<V, ?>> ZTestOutlier<V> parameterize(Parameterization config) {
-    final NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
-    final int y = getParameterY(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new ZTestOutlier<V>(npred, y);
-  }
-
-  protected static int getParameterY(Parameterization config) {
-    final IntParameter param = new IntParameter(Y_ID);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 0;
-  }
-
-  /**
-   * 
-   * @param config
-   * @return
-   */
-  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
-  }
-
+ 
   public OutlierResult run(Database database, Relation<V> relation){
-    WritableDataStore<Double> si = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    final NeighborSetPredicate npred = npredf.instantiate(relation);
+    WritableDataStore<Double> diffFromlocalMean = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    MeanVariance diffFromMeanMV = new MeanVariance();
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
 
     for(DBID id : relation.getDBIDs()) {
       //
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      MeanVariance mv = new MeanVariance();
+      MeanVariance localMeanMV = new MeanVariance();
       // calculate and store mean
       for(DBID n : neighbors) {
-        mv.put(relation.get(n).doubleValue(y)) ;
+        localMeanMV.put(relation.get(n).doubleValue(z)) ;
       }
-      si.put(id, relation.get(id).doubleValue(y)-mv.getMean());
+      double diffFLM = relation.get(id).doubleValue(z) -localMeanMV.getMean() ;
+      diffFromlocalMean.put(id, diffFLM);
+      diffFromMeanMV.put(diffFLM);
+      
     }
-    // calculate mean and variance for statistic s
-    MeanVariance mv = new MeanVariance();
-    for(DBID id : relation.getDBIDs()) {
-      mv.put(si.get(id));
-    }
-    double mean = mv.getMean();
-    double variance = mv.getSampleVariance();
+    
 
     MinMax<Double> minmax = new MinMax<Double>();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     for(DBID id : relation.getDBIDs()) {
-      double score = Math.abs((si.get(id) - mean) / variance);
+      double score = Math.abs((diffFromlocalMean.get(id) - diffFromMeanMV.getMean()) / diffFromMeanMV.getSampleVariance());
       minmax.put(score);
       scores.put(id, score);
     }
@@ -158,6 +96,28 @@ public class ZTestOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorith
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+  
+  /**
+   * 
+   * @author hettab
+   *
+   * @param <V>
+   */
+  public static class Parameterizer<V extends NumberVector<?,?>> extends SingleAttributeSpatialOutlier.Parameterizer<V> {
+   
+   
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+   
+    @Override
+    protected ZTestOutlier<V> makeInstance() {
+      return new ZTestOutlier<V>(npredf,z);
+    }
+    
   }
 
 }
