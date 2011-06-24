@@ -2,8 +2,6 @@ package experimentalcode.hettab.outlier;
 
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -23,12 +21,8 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
-import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate.Factory;
 
 /**
  * 
@@ -36,127 +30,64 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  *
  * @param <V>
  */
-public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends SingleAttributeSpatialOutlier<V> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(ScatterplotOutlier.class);
-
-  /**
-   * Parameter to specify the neighborhood predicate to use.
-   */
-  public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("neighborhood", "The neighborhood predicate to use in comparison step.");
-
-  /**
-   * Our predicate to obtain the neighbors
-   */
-  NeighborSetPredicate.Factory<Object> npredf = null;
-
-  /**
-   * 
-   * Holds the Y value
-   */
-  private static final OptionID Y_ID = OptionID.getOrCreateOptionID("dim.y", "the dimension of non spatial attribut");
-
-  /**
-   * parameter y
-   */
-  private int y;
-
   /**
    * The association id to associate the SCORE of an object for the 
    * algorithm.
    */
   public static final AssociationID<Double> SCATTERPLOT_SCORE = AssociationID.getOrCreateAssociationID("score", Double.class);
-
   /**
    * Constructor
    * 
    * @param npredf
-   * @param y
+   * @param z
    */
-  public ScatterplotOutlier(Factory<Object> npredf, int y) {
-    super();
-    this.npredf = npredf;
-    this.y = y;
+  public ScatterplotOutlier(NeighborSetPredicate.Factory<V> npredf, int z) {
+    super(npredf,z);
   }
-
   /**
    * 
-   * @param <V>
-   * @param config
+   * @param database
+   * @param relation
    * @return
    */
-  public static <V extends NumberVector<V, ?>> ScatterplotOutlier<V> parameterize(Parameterization config) {
-    final NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
-    final int y = getParameterY(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new ScatterplotOutlier<V>(npred, y);
-  }
-
-  protected static int getParameterY(Parameterization config) {
-    final IntParameter param = new IntParameter(Y_ID);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 0;
-  }
-
-  /**
-   * 
-   * @param config
-   * @return
-   */
-  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
-  }
-
   public OutlierResult run(Database database, Relation<V> relation) {
     WritableDataStore<Double> means = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);   
     
-    
-    final NeighborSetPredicate npred = npredf.instantiate(relation);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
     
     //calculate average for each object
     for(DBID id : relation.getDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       double d = neighbors.size() ;
       double avg = 0 ;
-      for(DBIDs n : neighbors){
-         if(n.contains(id)){
-           d = neighbors.size() -1 ;
-           continue ;
+      for(DBID n : neighbors){
+           avg += relation.get(n).doubleValue(z);
          }
-         else{
-           avg += relation.get(id).doubleValue(y)/d;
-         }
-      }
-      means.put(id, avg);
+      means.put(id, avg/d);
     }
     
     //calculate errors using regression
     SimpleRegression regression = new SimpleRegression();
     for(DBID id : relation.getDBIDs()){
-      regression.addData(relation.get(id).doubleValue(y), means.get(id));
-    }
-    for(DBID id : relation.getDBIDs()){
-      double y_i = relation.get(id).doubleValue(y);
-      double e = means.get(id) - (regression.getIntercept()*y_i + regression.getSlope());
-      error.put(id, e);
+      regression.addData(relation.get(id).doubleValue(z), means.get(id));
     }
     
-    // calculate mean and variance for error
+ // calculate mean and variance for error
     MeanVariance mv = new MeanVariance();
-    for(DBID id : relation.getDBIDs()) {
-      mv.put(error.get(id));
+    for(DBID id : relation.getDBIDs()){
+      double y_i = relation.get(id).doubleValue(z);
+      double e = means.get(id) - (regression.getIntercept()*y_i + regression.getSlope());
+      error.put(id, e);
+      mv.put(e);
     }
+    
+   
     double mean = mv.getMean();
     double variance = mv.getSampleVariance();
     
@@ -183,6 +114,28 @@ public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends AbstractAl
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+  /**
+   * 
+   * @author hettab
+   *
+   * @param <V>
+   */
+  public static class Parameterizer<V extends NumberVector<?,?>> extends SingleAttributeSpatialOutlier.Parameterizer<V> {
+   
+
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      
+    }
+   
+    @Override
+    protected ScatterplotOutlier<V> makeInstance() {
+      return new ScatterplotOutlier<V>(npredf , z);
+    }
+    
   }
 
 }
