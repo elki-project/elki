@@ -157,6 +157,17 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     return "EuclideanDistance";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if (this.getClass().equals(obj.getClass())) {
+      return true;
+    }
+    return super.equals(obj);
+  }
+
   /**
    * Parameterization class.
    * 

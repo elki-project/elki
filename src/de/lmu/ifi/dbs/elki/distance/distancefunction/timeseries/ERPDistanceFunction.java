@@ -128,6 +128,14 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
     return Math.sqrt(curr[v2.getDimensionality() - 1]);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(!super.equals(obj)) {
+      return false;
+    }
+    return this.g == ((ERPDistanceFunction) obj).g;
+  }
+  
   /**
    * Parameterization class.
    * 

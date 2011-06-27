@@ -101,6 +101,18 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDDistanceFu
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
+    DiskCacheBasedDoubleDistanceFunction other = (DiskCacheBasedDoubleDistanceFunction) obj;
+    return this.cache.equals(other.cache);
+  }
+
   /**
    * Parameterization class.
    * 

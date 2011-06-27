@@ -65,6 +65,20 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
     return new Instance<T>(database, indexinst, this);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    if(this.indexFactory.equals(((LocallyWeightedDistanceFunction<?>) obj).indexFactory)) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Instance of this distance for a particular database.
    * 

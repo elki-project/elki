@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 /**
@@ -16,7 +18,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractVectorDoub
 
   /**
    * Constructor.
-   *
+   * 
    * @param weights
    */
   public WeightedSquaredEuclideanDistanceFunction(double[] weights) {
@@ -47,5 +49,28 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractVectorDoub
   @Override
   public boolean isMetric() {
     return false;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(!(obj instanceof WeightedSquaredEuclideanDistanceFunction)) {
+      if(obj.getClass().equals(SquaredEuclideanDistanceFunction.class)) {
+        for(double d : weights) {
+          if(d != 1.0) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return false;
+    }
+    WeightedSquaredEuclideanDistanceFunction other = (WeightedSquaredEuclideanDistanceFunction) obj;
+    return Arrays.equals(this.weights, other.weights);
   }
 }

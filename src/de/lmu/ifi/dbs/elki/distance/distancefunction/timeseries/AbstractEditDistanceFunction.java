@@ -43,6 +43,17 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if (!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    return this.bandSize == ((AbstractEditDistanceFunction) obj).bandSize;
+  }
+  
   /**
    * Parameterization class.
    * 

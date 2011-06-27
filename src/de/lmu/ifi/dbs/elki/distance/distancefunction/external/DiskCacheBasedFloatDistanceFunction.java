@@ -101,6 +101,18 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
     return FloatDistance.FACTORY;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
+    DiskCacheBasedFloatDistanceFunction other = (DiskCacheBasedFloatDistanceFunction) obj;
+    return this.cache.equals(other.cache);
+  }
+
   /**
    * Parameterization class.
    * 

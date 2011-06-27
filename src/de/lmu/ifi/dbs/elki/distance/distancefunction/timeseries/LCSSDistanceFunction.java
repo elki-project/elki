@@ -169,6 +169,17 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if (!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    return (this.pDelta == ((LCSSDistanceFunction) obj).pDelta) && (this.pEpsilon == ((LCSSDistanceFunction) obj).pEpsilon);
+  }
+  
   /**
    * Parameterization class.
    * 

@@ -82,4 +82,17 @@ public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBI
     }
     return dfun;
   }
+
+
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if (!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    ProxyDistanceFunction<?, ?> other = (ProxyDistanceFunction<?, ?>) obj;
+    return this.inner.equals(other.inner);
+  }
 }

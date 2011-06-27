@@ -183,6 +183,18 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     }
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if (!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    ERiCDistanceFunction other = (ERiCDistanceFunction) obj;
+    return (this.delta == other.delta) && (this.tau == other.tau);
+  }
+
   /**
    * The actual instance bound to a particular database.
    * 

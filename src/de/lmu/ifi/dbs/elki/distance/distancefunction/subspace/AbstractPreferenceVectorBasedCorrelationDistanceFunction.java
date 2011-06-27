@@ -66,6 +66,17 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     return epsilon;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    AbstractPreferenceVectorBasedCorrelationDistanceFunction<?, ?> other = (AbstractPreferenceVectorBasedCorrelationDistanceFunction<?, ?>) obj;
+    return (this.indexFactory.equals(other.indexFactory)) && this.epsilon == other.epsilon;
+  }
   /**
    * Instance to compute the distances on an actual database.
    * 

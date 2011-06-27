@@ -90,6 +90,17 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
     return "RandomDistance";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    return this.seed == ((RandomStableDistanceFunction) obj).seed;
+  }
+
   /**
    * Parameterization class.
    * 

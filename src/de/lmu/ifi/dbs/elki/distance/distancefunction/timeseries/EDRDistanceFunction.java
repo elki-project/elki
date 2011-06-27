@@ -116,14 +116,12 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
     return curr[v2.getDimensionality() - 1];
   }
 
-  /**
-   * Get parameter delta.
-   * 
-   * @param config Parameterization
-   * @return value
-   */
-  public static double getParameterDelta(Parameterization config) {
-    return 0.0;
+  @Override
+  public boolean equals(Object obj) {
+    if(!super.equals(obj)) {
+      return false;
+    }
+    return this.delta == ((EDRDistanceFunction) obj).delta;
   }
 
   /**
@@ -143,6 +141,16 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();
       }
+    }
+
+    /**
+     * Get parameter delta.
+     * 
+     * @param config Parameterization
+     * @return value
+     */
+    public static double getParameterDelta(Parameterization config) {
+      return 0.0;
     }
 
     @Override
