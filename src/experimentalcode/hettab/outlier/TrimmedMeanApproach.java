@@ -3,8 +3,6 @@ package experimentalcode.hettab.outlier;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.rank.Median;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -27,10 +25,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
 
 /**
@@ -42,44 +39,21 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
 
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
 @Description("a local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
-public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAttributeSpatialOutlier<V> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(TrimmedMeanApproach.class);
-
-  /**
-   * Parameter to specify the neighborhood predicate to use.
-   */
-  public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("neighborhood", "The neighborhood predicate to use");
-
-  /**
-   * Our predicate to obtain the neighbors
-   */
-  NeighborSetPredicate.Factory<Object> npredf = null;
-
   /**
    * 
    * Holds the p value
    */
-  private static final OptionID P_ID = OptionID.getOrCreateOptionID("tma.p", "the p parameter");
+  private static final OptionID P_ID = OptionID.getOrCreateOptionID("tma.p", "the percentil parameter");
 
   /**
    * the parameter p
    */
   private double p;
-
-  /**
-   * 
-   * Holds the y value
-   */
-  private static final OptionID Y_ID = OptionID.getOrCreateOptionID("dim.y", "the non spatial attribut");
-
-  /**
-   * Holds the dimension of y attribute
-   */
-  private int y;
-
   /**
    * The association id to associate the TR_SCORE of an object for the TR
    * algorithm.
@@ -92,10 +66,10 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
    * @param y
    * @param npredf
    */
-  protected TrimmedMeanApproach(double p, int y, NeighborSetPredicate.Factory<Object> npredf) {
+  protected TrimmedMeanApproach(NeighborSetPredicate.Factory<V> npredf,int z , double p) {
+    super(npredf,z);
     this.p = p;
-    this.y = y;
-    this.npredf = npredf;
+    
   }
 
   /**
@@ -109,7 +83,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
 
-    final NeighborSetPredicate npred = npredf.instantiate(relation);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
     
     //calculate the error Term
     Matrix temp1 = Matrix.identity(relation.size(), relation.size()).minus(getNeighborhoodMatrix(relation, npred));
@@ -190,7 +164,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
         int j = 0 ;
         double[] aValues = new double[neighbors.size()];
         for(DBID n :neighbors){
-          aValues[j] = relation.get(n).doubleValue(y);
+          aValues[j] = relation.get(n).doubleValue(z);
           j++ ;
         }
         m.set(i, 0, StatUtils.percentile(aValues, p*100));
@@ -207,67 +181,10 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
     Matrix m = new Matrix(relation.size(),1) ;
     int i = 0 ;
     for(DBID id : relation.iterDBIDs()) {
-      m.set(i, 0, relation.get(id).doubleValue(y));
+      m.set(i, 0, relation.get(id).doubleValue(z));
       i++ ;
     }  
    return m ;
-  }
-
-  /**
-   * 
-   * @param <V>
-   * @param config
-   * @return
-   */
-  public static <V extends NumberVector<V, ?>> TrimmedMeanApproach<V> parameterize(Parameterization config) {
-    final NeighborSetPredicate.Factory<Object> npred = getNeighborPredicate(config);
-    final double p = getParameterP(config);
-    final int y = getParameterY(config);
-    if(config.hasErrors()) {
-      return null;
-    }
-    return new TrimmedMeanApproach<V>(p, y, npred);
-  }
-
-  /**
-   * Get the p parameter
-   * 
-   * @param config Parameterization
-   * @return p parameter
-   */
-  protected static double getParameterP(Parameterization config) {
-    final DoubleParameter param = new DoubleParameter(P_ID);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 0.0;
-  }
-
-  /**
-   * Get the y parameter
-   * 
-   * @param config Parameterization
-   * @return y parameter
-   */
-  protected static int getParameterY(Parameterization config) {
-    final IntParameter param = new IntParameter(Y_ID);
-    if(config.grab(param)) {
-      return param.getValue();
-    }
-    return 0;
-  }
-
-  /**
-   * 
-   * @param config
-   * @return
-   */
-  public static NeighborSetPredicate.Factory<Object> getNeighborPredicate(Parameterization config) {
-    final ObjectParameter<NeighborSetPredicate.Factory<Object>> param = new ObjectParameter<NeighborSetPredicate.Factory<Object>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
-    if(config.grab(param)) {
-      return param.instantiateClass(config);
-    }
-    return null;
   }
 
   /**
@@ -281,5 +198,31 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends AbstractA
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+  
+  /**
+   * 
+   * @author hettab
+   *
+   * @param <V>
+   */
+  public static class Parameterizer<V extends NumberVector<?,?>> extends SingleAttributeSpatialOutlier.Parameterizer<V> {
+   
+    protected double p = 0.2 ;
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter pP = new DoubleParameter(P_ID,new GreaterConstraint(0.0));
+      if(config.grab(pP)){
+        p = pP.getValue() ;
+      }
+    }
+   
+    @Override
+    protected TrimmedMeanApproach<V> makeInstance() {
+      return new TrimmedMeanApproach<V>(npredf,z,p);
+    }
+    
   }
 }
