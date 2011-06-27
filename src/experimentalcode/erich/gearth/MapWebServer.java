@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -13,13 +14,13 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
-import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
+import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -36,20 +37,50 @@ public class MapWebServer {
 
   private HttpServer server;
 
-  private Map<String, PolygonsObject> polymap;
-
   private Map<String, DBID> lblmap;
 
   private Database db;
 
   private HierarchicalResult result;
 
-  public MapWebServer(int port, Map<String, DBID> lblmap, Map<String, PolygonsObject> polymap, Database db, HierarchicalResult result) {
+  public MapWebServer(int port, Database db, HierarchicalResult result) {
     super();
-    this.lblmap = lblmap;
-    this.polymap = polymap;
     this.db = db;
     this.result = result;
+
+    // Build a map for the main database, using external IDs
+    {
+      Relation<?> olq = null;
+      try {
+        olq = db.getRelation(TypeUtil.GUESSED_LABEL);
+      }
+      catch(NoSupportedDataTypeException e) {
+        // pass
+      }
+      Relation<String> eidq = null;
+      try {
+        eidq = db.getRelation(TypeUtil.EXTERNALID);
+      }
+      catch(NoSupportedDataTypeException e) {
+        // pass
+      }
+      int size = ((olq != null) ? olq.size() : 0) + ((eidq != null) ? eidq.size() : 0);
+      lblmap = new HashMap<String, DBID>(size);
+      for(DBID id : olq.iterDBIDs()) {
+        if(olq != null) {
+          String label = olq.get(id).toString();
+          if(label != null) {
+            lblmap.put(label, id);
+          }
+        }
+        if(eidq != null) {
+          String eid = eidq.get(id);
+          if(eid != null) {
+            lblmap.put(eid, id);
+          }
+        }
+      }
+    }
 
     try {
       InetSocketAddress addr = new InetSocketAddress(port);
@@ -75,37 +106,6 @@ public class MapWebServer {
   }
 
   protected void objectToJSON(StringBuffer re, String query) {
-    // Add actual response.
-    PolygonsObject polys = polymap.get(query);
-    if(polys != null) {
-      // logger.debugFinest("Polygon is: "+polys.toString());
-      re.append("\"polys\":[");
-      Iterator<Polygon> polyit = polys.getPolygons().iterator();
-      while(polyit.hasNext()) {
-        Polygon poly = polyit.next();
-        re.append("[");
-        Iterator<Vector> iter = poly.iterator();
-        while(iter.hasNext()) {
-          double[] data = iter.next().getArrayRef();
-          re.append("[");
-          for(int i = 0; i < data.length; i++) {
-            if(i > 0) {
-              re.append(",");
-            }
-            re.append(Double.toString(data[i]));
-          }
-          re.append("]");
-          if(iter.hasNext()) {
-            re.append(",");
-          }
-        }
-        re.append("]");
-        if(polyit.hasNext()) {
-          re.append(",");
-        }
-      }
-      re.append("],");
-    }
     DBID id = lblmap.get(query);
     if(id != null) {
       bundleToJSON(re, id);
