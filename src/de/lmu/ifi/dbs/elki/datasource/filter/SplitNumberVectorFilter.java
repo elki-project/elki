@@ -54,7 +54,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements Ob
       }
       // Should be a vector type after above test.
       @SuppressWarnings("unchecked")
-      final VectorFieldTypeInformation<V> vtype = (VectorFieldTypeInformation<V>) type;
+      final VectorFieldTypeInformation<V> vtype = VectorFieldTypeInformation.class.cast(type);
 
       // Get the replacement type informations
       VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<V>(type.getRestrictionClass(), dims.length, dims.length);
