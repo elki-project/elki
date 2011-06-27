@@ -77,6 +77,20 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
   @Override
   abstract public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Relation<T> database);
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    // Same subclass
+    if(!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    // Same similarity function
+    AbstractSimilarityAdapter<?> other = (AbstractSimilarityAdapter<?>) obj;
+    return other.similarityFunction.equals(other.similarityFunction);
+  }
+
   /**
    * Inner proxy class for SNN distance function.
    * 

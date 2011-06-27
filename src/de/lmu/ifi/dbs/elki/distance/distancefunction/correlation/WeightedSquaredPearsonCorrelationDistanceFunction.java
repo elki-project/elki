@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -56,5 +58,19 @@ public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractV
   public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     final double pcc = MathUtil.weightedPearsonCorrelationCoefficient(v1, v2, weights);
     return 1 - pcc * pcc;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if (!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    return Arrays.equals(this.weights, ((WeightedSquaredPearsonCorrelationDistanceFunction)obj).weights);
   }
 }

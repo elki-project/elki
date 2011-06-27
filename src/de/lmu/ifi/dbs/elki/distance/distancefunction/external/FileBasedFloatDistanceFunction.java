@@ -109,6 +109,18 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
     return FloatDistance.FACTORY;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
+    FileBasedFloatDistanceFunction other = (FileBasedFloatDistanceFunction) obj;
+    return this.cache.equals(other.cache);
+  }
+
   /**
    * Parameterization class.
    * 

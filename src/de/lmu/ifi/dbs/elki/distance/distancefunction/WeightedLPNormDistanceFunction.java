@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 /**
@@ -42,5 +44,28 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
       sqrDist += Math.pow(delta, p) * weights[i - 1];
     }
     return Math.pow(sqrDist, 1.0 / p);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(!(obj instanceof WeightedLPNormDistanceFunction)) {
+      if(obj instanceof LPNormDistanceFunction && super.equals(obj)) {
+        for(double d : weights) {
+          if(d != 1.0) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return false;
+    }
+    WeightedLPNormDistanceFunction other = (WeightedLPNormDistanceFunction) obj;
+    return Arrays.equals(this.weights, other.weights);
   }
 }

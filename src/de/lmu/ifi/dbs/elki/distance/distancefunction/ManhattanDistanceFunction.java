@@ -159,6 +159,17 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
     return "ManhattanDistance";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if (this.getClass().equals(obj.getClass())) {
+      return true;
+    }
+    return super.equals(obj);
+  }
+
   /**
    * Parameterization class.
    * 

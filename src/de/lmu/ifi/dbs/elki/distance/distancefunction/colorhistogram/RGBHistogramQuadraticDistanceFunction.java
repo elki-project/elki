@@ -71,6 +71,20 @@ public class RGBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
     return m;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if (!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    return this.weightMatrix.equals(((RGBHistogramQuadraticDistanceFunction)obj).weightMatrix);
+  }
+  
   /**
    * Parameterization class.
    * 

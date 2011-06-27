@@ -170,6 +170,18 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
   public TypeInformation getInputTypeRestriction() {
     return parentDistance.getInputTypeRestriction();
   }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if (!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    MinKDistance<?,?> other = (MinKDistance<?, ?>) obj;
+    return this.parentDistance.equals(other.parentDistance) && this.k == other.k;
+  }
 
   /**
    * Parameterization class.

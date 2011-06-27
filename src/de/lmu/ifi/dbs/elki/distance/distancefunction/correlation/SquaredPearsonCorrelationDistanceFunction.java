@@ -61,6 +61,14 @@ public class SquaredPearsonCorrelationDistanceFunction extends AbstractVectorDou
     return "SquaredPearsonCorrelationDistance";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    return this.getClass().equals(obj.getClass());
+  }
+
   /**
    * Parameterization class.
    * 

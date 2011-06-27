@@ -158,6 +158,14 @@ public class SquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistan
     return "SquaredEuclideanDistance";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    return this.getClass().equals(obj.getClass());
+  }
+
   /**
    * Parameterization class.
    * 

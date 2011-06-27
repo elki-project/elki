@@ -71,6 +71,17 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
     return DoubleDistance.FACTORY;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    return this.dimensions.equals(((AbstractDimensionsSelectingDoubleDistanceFunction<?>) obj).dimensions);
+  }
+
   /**
    * Parameterization class.
    * 

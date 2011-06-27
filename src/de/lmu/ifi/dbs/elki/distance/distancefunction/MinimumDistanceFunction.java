@@ -108,6 +108,14 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceFunctio
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    return this.getClass().equals(obj.getClass());
+  }
+
   /**
    * Parameterization class.
    * 

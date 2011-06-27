@@ -51,6 +51,14 @@ public class ArcCosineDistanceFunction extends AbstractCosineDistanceFunction {
     return "ArcCosineDistance";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    return this.getClass().equals(obj.getClass());
+  }
+
   /**
    * Parameterization class.
    * 

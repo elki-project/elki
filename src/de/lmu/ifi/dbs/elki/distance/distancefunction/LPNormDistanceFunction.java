@@ -77,7 +77,18 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public String toString() {
-    return "L_"+p+" Norm";
+    return "L_" + p + " Norm";
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(obj instanceof LPNormDistanceFunction) {
+      return this.p == ((LPNormDistanceFunction) obj).p;
+    }
+    return false;
   }
 
   /**

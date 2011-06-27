@@ -137,6 +137,17 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null) {
+      return false;
+    }
+    if(!this.getClass().equals(obj.getClass())) {
+      return false;
+    }
+    return this.dim == ((DimensionSelectingDistanceFunction) obj).dim;
+  }
+  
   /**
    * Parameterization class.
    * 
