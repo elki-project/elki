@@ -630,7 +630,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter xiP = new DoubleParameter(XI_ID, true);
+      DoubleParameter xiP = new DoubleParameter(XI_ID);
       xiP.addConstraint(new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
       if(config.grab(xiP)) {
         xi = xiP.getValue();
