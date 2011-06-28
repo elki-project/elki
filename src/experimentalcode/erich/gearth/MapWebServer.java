@@ -14,6 +14,9 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
+import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -21,6 +24,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -117,7 +121,51 @@ public class MapWebServer {
   protected void bundleToJSON(StringBuffer re, DBID id) {
     SingleObjectBundle bundle = db.getBundle(id);
     for(int j = 0; j < bundle.metaLength(); j++) {
-      re.append("\"" + jsonEscapeString(bundle.meta(j).toString()) + "\":\"" + jsonEscapeString(bundle.data(j).toString()) + "\",");
+      re.append("\"").append(jsonEscapeString(bundle.meta(j).toString())).append("\":");
+      final Object data = bundle.data(j);
+      // TODO: refactor to JSONFormatters!
+      if(data instanceof NumberVector) {
+        NumberVector<?, ?> v = (NumberVector<?, ?>) data;
+        re.append("[");
+        for(int i = 0; i < v.getDimensionality(); i++) {
+          if(i > 0) {
+            re.append(",");
+          }
+          re.append(v.doubleValue(i + 1));
+        }
+        re.append("]");
+      }
+      else if(data instanceof PolygonsObject) {
+        re.append("[");
+        boolean first = true;
+        for(Polygon p : ((PolygonsObject) data).getPolygons()) {
+          if(first) {
+            first = false;
+          }
+          else {
+            re.append(",");
+          }
+          re.append("[");
+          for(int i = 0; i < p.size(); i++) {
+            if(i > 0) {
+              re.append(",");
+            }
+            Vector point = p.get(i);
+            re.append(point.toStringNoWhitespace());
+          }
+          re.append("]");
+        }
+        re.append("]");
+      }
+      else {
+        re.append("\"");
+        re.append(jsonEscapeString(data.toString()));
+        re.append("\"");
+      }
+      re.append(",");
+      if(logger.isDebuggingFiner()) {
+        re.append("\n");
+      }
     }
   }
 
@@ -171,14 +219,18 @@ public class MapWebServer {
       }
     }
     if(cur instanceof OutlierResult) {
+      int offset = 0;
+      int pagesize = 50;
       re.append("\"scores\":[");
       OutlierResult or = (OutlierResult) cur;
       AnnotationResult<Double> scores = or.getScores();
       Iterator<DBID> iter = or.getOrdering().iter(db.getDBIDs()).iterator();
-      while(iter.hasNext()) {
+      for(int i = 0; i < offset && iter.hasNext(); i++) {
+        iter.next();
+      }
+      for(int i = 0; i < pagesize && iter.hasNext(); i++) {
         DBID id = iter.next();
         re.append("{");
-        re.append("\"dbid\":\"").append(id.toString()).append("\",");
         bundleToJSON(re, id);
         final Double val = scores.getValueFor(id);
         if(val != null) {
