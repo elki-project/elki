@@ -128,7 +128,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
     this.sizescale = sizescale;
     this.clusterRandom = clusterRandom;
     if(this.clusterRandom == null) {
-      clusterRandom = new Random();
+      this.clusterRandom = new Random();
     }
   }
 
