@@ -50,8 +50,11 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
     // run CASH on database
     Clustering<Model> result = cash.run(db);
 
-    testFMeasureHierarchical(db, result, 0.638727);
-    testClusterSizes(result, new int[] { 13, 65, 74, 75, 442 });
+    testFMeasureHierarchical(db, result, 0.64102);
+    testClusterSizes(result, new int[] { 37, 71, 76, 442 });
+    // Old heap scored worse?
+    // testFMeasureHierarchical(db, result, 0.638727);
+    // testClusterSizes(result, new int[] { 13, 65, 74, 75, 442 });
   }
 
   /**

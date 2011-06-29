@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import java.util.Arrays;
-import java.util.Vector;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
@@ -42,13 +42,13 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.IntegerPriorityObject;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -168,9 +168,9 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
   private ModifiableDBIDs processedIDs;
 
   /**
-   * The database holding the objects.
+   * The entire database
    */
-  private Relation<ParameterizationFunction> relation;
+  private Relation<ParameterizationFunction> fulldatabase;
 
   /**
    * Constructor.
@@ -198,7 +198,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @return Clustering result
    */
   public Clustering<Model> run(Database database, Relation<ParameterizationFunction> relation) {
-    this.relation = relation;
+    this.fulldatabase = relation;
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();
       msg.append("DB size: ").append(relation.size());
@@ -208,7 +208,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
 
     try {
       processedIDs = DBIDUtil.newHashSet(relation.size());
-      noiseDim = relation.get(relation.iterDBIDs().next()).getDimensionality();
+      noiseDim = DatabaseUtil.dimensionality(relation);
 
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", relation.size(), logger) : null;
       Clustering<Model> result = doRun(relation, progress);
@@ -246,7 +246,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * Runs the CASH algorithm on the specified database, this method is
    * recursively called until only noise is left.
    * 
-   * @param database the current database to run the CASH algorithm on
+   * @param relation the Relation to run the CASH algorithm on
    * @param progress the progress object for verbose messages
    * @return a mapping of subspace dimensionalities to clusters
    * @throws UnableToComplyException if an error according to the database
@@ -254,27 +254,27 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @throws ParameterException if the parameter setting is wrong
    * @throws NonNumericFeaturesException if non numeric feature vectors are used
    */
-  private Clustering<Model> doRun(Relation<ParameterizationFunction> database, FiniteProgress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
+  private Clustering<Model> doRun(Relation<ParameterizationFunction> relation, FiniteProgress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
     Clustering<Model> res = new Clustering<Model>("CASH clustering", "cash-clustering");
 
-    int dim = database.get(database.iterDBIDs().next()).getDimensionality();
+    final int dim = DatabaseUtil.dimensionality(relation);
 
     // init heap
-    DefaultHeap<Integer, CASHInterval> heap = new DefaultHeap<Integer, CASHInterval>(false);
-    ModifiableDBIDs noiseIDs = getDatabaseIDs(database);
-    initHeap(heap, database, dim, noiseIDs);
+    Heap<IntegerPriorityObject<CASHInterval>> heap = new Heap<IntegerPriorityObject<CASHInterval>>();
+    ModifiableDBIDs noiseIDs = DBIDUtil.newHashSet(relation.getDBIDs());
+    initHeap(heap, relation, dim, noiseIDs);
 
     if(logger.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
       msg.append("\nXXXX dim ").append(dim);
-      msg.append("\nXXXX database.size ").append(database.size());
+      msg.append("\nXXXX database.size ").append(relation.size());
       msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
       logger.debugFine(msg.toString());
     }
     else if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("XXXX dim ").append(dim).append(" database.size ").append(database.size());
+      msg.append("XXXX dim ").append(dim).append(" database.size ").append(relation.size());
       logger.verbose(msg.toString());
     }
 
@@ -300,7 +300,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
         Matrix basis_dim_minus_1;
         if(adjust) {
           ids = DBIDUtil.newHashSet();
-          basis_dim_minus_1 = runDerivator(database, dim, interval, ids);
+          basis_dim_minus_1 = runDerivator(relation, dim, interval, ids);
         }
         else {
           ids = interval.getIDs();
@@ -308,7 +308,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
         }
 
         if(ids.size() != 0) {
-          MaterializedRelation<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, database);
+          MaterializedRelation<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, relation);
           // add result of dim-1 to this result
           Clustering<Model> res_dim_minus_1 = doRun(db, progress);
           for(Cluster<Model> cluster : res_dim_minus_1.getAllClusters()) {
@@ -321,7 +321,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
       }
       // dim == minDim
       else {
-        LinearEquationSystem les = runDerivator(database, dim - 1, interval.getIDs());
+        LinearEquationSystem les = runDerivator(relation, dim - 1, interval.getIDs());
         Cluster<Model> c = new Cluster<Model>(interval.getIDs(), new LinearEquationModel(les));
         res.addCluster(c);
         noiseIDs.removeDBIDs(interval.getIDs());
@@ -329,14 +329,13 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
         processedIDs.addAll(interval.getIDs());
       }
 
-      // reorganize heap
-      Vector<HeapNode<Integer, CASHInterval>> heapVector = heap.copy();
-      heap.clear();
-      for(HeapNode<Integer, CASHInterval> heapNode : heapVector) {
-        CASHInterval currentInterval = heapNode.getValue();
+      // Rebuild heap
+      List<IntegerPriorityObject<CASHInterval>> heapVector = heap.toSortedArrayList();
+      for(IntegerPriorityObject<CASHInterval> pair : heapVector) {
+        CASHInterval currentInterval = pair.getObject();
         currentInterval.removeIDs(clusterIDs);
         if(currentInterval.getIDs().size() >= minPts) {
-          heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(currentInterval.priority(), currentInterval));
+          heap.add(new IntegerPriorityObject<CASHInterval>(currentInterval.priority(), currentInterval));
         }
       }
 
@@ -353,10 +352,8 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
         processedIDs.addAll(noiseIDs);
       }
       else if(noiseIDs.size() >= minPts) {
-        // TODO: use different class/model for noise, even when LES was
-        // computed?
-        LinearEquationSystem les = runDerivator(relation, dim - 1, noiseIDs);
-        Cluster<Model> c = new Cluster<Model>(noiseIDs, new LinearEquationModel(les));
+        LinearEquationSystem les = runDerivator(fulldatabase, dim - 1, noiseIDs);
+        Cluster<Model> c = new Cluster<Model>(noiseIDs, true, new LinearEquationModel(les));
         res.addCluster(c);
         processedIDs.addAll(noiseIDs);
       }
@@ -392,7 +389,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @param dim the dimensionality of the database
    * @param ids the ids of the database
    */
-  private void initHeap(DefaultHeap<Integer, CASHInterval> heap, Relation<ParameterizationFunction> relation, int dim, DBIDs ids) {
+  private void initHeap(Heap<IntegerPriorityObject<CASHInterval>> heap, Relation<ParameterizationFunction> relation, int dim, DBIDs ids) {
     CASHIntervalSplit split = new CASHIntervalSplit(relation, minPts);
 
     // determine minimum and maximum function value of all functions
@@ -447,7 +444,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
       ModifiableDBIDs intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
       if(intervalIDs != null && intervalIDs.size() >= minPts) {
         CASHInterval rootInterval = new CASHInterval(alphaMin, alphaMax, split, intervalIDs, 0, 0, d_mins[i], d_maxs[i]);
-        heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(rootInterval.priority(), rootInterval));
+        heap.add(new IntegerPriorityObject<CASHInterval>(rootInterval.priority(), rootInterval));
       }
     }
 
@@ -548,7 +545,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
-  private CASHInterval determineNextIntervalAtMaxLevel(DefaultHeap<Integer, CASHInterval> heap) {
+  private CASHInterval determineNextIntervalAtMaxLevel(Heap<IntegerPriorityObject<CASHInterval>> heap) {
     CASHInterval next = doDetermineNextIntervalAtMaxLevel(heap);
     // noise path was chosen
     while(next == null) {
@@ -568,8 +565,8 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
-  private CASHInterval doDetermineNextIntervalAtMaxLevel(DefaultHeap<Integer, CASHInterval> heap) {
-    CASHInterval interval = heap.getMinNode().getValue();
+  private CASHInterval doDetermineNextIntervalAtMaxLevel(Heap<IntegerPriorityObject<CASHInterval>> heap) {
+    CASHInterval interval = heap.poll().getObject();
     int dim = interval.getDimensionality();
     while(true) {
       // max level is reached
@@ -602,11 +599,11 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
         int comp = interval.getLeftChild().compareTo(interval.getRightChild());
         if(comp < 0) {
           bestInterval = interval.getRightChild();
-          heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(interval.getLeftChild().priority(), interval.getLeftChild()));
+          heap.add(new IntegerPriorityObject<CASHInterval>(interval.getLeftChild().priority(), interval.getLeftChild()));
         }
         else {
           bestInterval = interval.getLeftChild();
-          heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(interval.getRightChild().priority(), interval.getRightChild()));
+          heap.add(new IntegerPriorityObject<CASHInterval>(interval.getRightChild().priority(), interval.getRightChild()));
         }
       }
       else if(interval.getLeftChild() == null) {
@@ -618,16 +615,6 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
 
       interval = bestInterval;
     }
-  }
-
-  /**
-   * Returns the set of ids belonging to the specified database.
-   * 
-   * @param relation the database containing the parameterization functions.
-   * @return the set of ids belonging to the specified database
-   */
-  private ModifiableDBIDs getDatabaseIDs(Relation<ParameterizationFunction> relation) {
-    return DBIDUtil.newHashSet(relation.getDBIDs());
   }
 
   /**
