@@ -233,7 +233,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     if(min != pos) {
       // swap with minimal element
       swap(pos, min);
-      // recruse down
+      // recurse down
       heapifyDown(min);
     }
   }
