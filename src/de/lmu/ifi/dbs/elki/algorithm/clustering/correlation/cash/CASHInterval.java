@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * 
  * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit
  */
-public class CASHInterval extends HyperBoundingBox {
+public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInterval> {
   /**
    * Serial version number
    */
@@ -228,6 +228,7 @@ public class CASHInterval extends HyperBoundingBox {
    * @param other Object to compare to
    * @return comparison result
    */
+  @Override
   public int compareTo(CASHInterval other) {
     if(this.equals(other)) {
       return 0;
