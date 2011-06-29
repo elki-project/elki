@@ -2,6 +2,7 @@ package experimentalcode.hettab.outlier;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -49,7 +50,7 @@ public abstract class DistanceBasedSpatialOutlier<V extends NumberVector<?,?>,D 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistanceFunction<V, D>> distanceFunctionP = makeParameterDistanceFunction(DimensionsSelectingEuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<V, D>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
