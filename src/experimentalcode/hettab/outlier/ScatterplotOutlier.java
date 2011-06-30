@@ -1,5 +1,8 @@
 package experimentalcode.hettab.outlier;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -82,7 +85,7 @@ public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends SingleAttr
     MeanVariance mv = new MeanVariance();
     for(DBID id : relation.getDBIDs()){
       double y_i = relation.get(id).doubleValue(z);
-      double e = means.get(id) - (regression.getIntercept()*y_i + regression.getSlope());
+      double e = means.get(id) - (regression.getSlope()*y_i + regression.getIntercept());
       error.put(id, e);
       mv.put(e);
     }
@@ -91,20 +94,21 @@ public class ScatterplotOutlier<V extends NumberVector<?, ?>> extends SingleAttr
     double mean = mv.getMean();
     double variance = mv.getSampleVariance();
     
-    //calculate scores
     MinMax<Double> minmax = new MinMax<Double>();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     for(DBID id : relation.getDBIDs()) {
       double score = Math.abs((error.get(id) - mean) / variance);
       minmax.put(score);
       scores.put(id, score);
-    }
-    
+      
+    } 
     //build representation
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SPO", "Scatterplot-Outlier", SCATTERPLOT_SCORE, scores);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
-  }
+    }
+    
+  
 
   @Override
   protected Logging getLogger() {
