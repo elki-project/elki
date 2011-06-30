@@ -313,9 +313,9 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
           Clustering<Model> res_dim_minus_1 = doRun(db, progress);
           for(Cluster<Model> cluster : res_dim_minus_1.getAllClusters()) {
             res.addCluster(cluster);
-            noiseIDs.removeAll(cluster.getIDs().asCollection());
-            clusterIDs.addAll(cluster.getIDs().asCollection());
-            processedIDs.addAll(cluster.getIDs().asCollection());
+            noiseIDs.removeDBIDs(cluster.getIDs());
+            clusterIDs.addDBIDs(cluster.getIDs());
+            processedIDs.addDBIDs(cluster.getIDs());
           }
         }
       }
