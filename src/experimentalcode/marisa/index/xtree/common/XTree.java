@@ -72,7 +72,7 @@ public class XTree extends XTreeBase<XTreeNode, SpatialEntry> {
    */
   @Override
   protected XTreeNode createNewLeafNode(int capacity) {
-    return new XTreeNode(file, capacity, true, SpatialPointLeafEntry.class);
+    return new XTreeNode(capacity, true, SpatialPointLeafEntry.class);
   }
 
   /**
@@ -83,7 +83,7 @@ public class XTree extends XTreeBase<XTreeNode, SpatialEntry> {
    */
   @Override
   protected XTreeNode createNewDirectoryNode(int capacity) {
-    return new XTreeNode(file, capacity, false, XDirectoryEntry.class);
+    return new XTreeNode(capacity, false, XDirectoryEntry.class);
   }
 
   @Override

@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -55,13 +54,12 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
   /**
    * Creates a new XTreeNode with the specified parameters.
    * 
-   * @param file the file storing the X-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public XNode(PageFile<N> file, int capacity, boolean isLeaf, Class<? super E> eclass) {
-    super(file, capacity, isLeaf, eclass);
+  public XNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
+    super(capacity, isLeaf, eclass);
   }
 
   /**
