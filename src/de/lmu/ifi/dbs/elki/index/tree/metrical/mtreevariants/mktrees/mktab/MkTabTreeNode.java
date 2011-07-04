@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Represents a node in a MkMax-Tree.
@@ -34,13 +33,12 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
   /**
    * Creates a MkTabTreeNode object.
    * 
-   * @param file the file storing the MkTab-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public MkTabTreeNode(PageFile<MkTabTreeNode<O, D>> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf, MkTabEntry.class);
+  public MkTabTreeNode(int capacity, boolean isLeaf) {
+    super(capacity, isLeaf, MkTabEntry.class);
   }
 
   /**
@@ -51,7 +49,7 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    */
   @Override
   protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkTabTreeNode<O, D>(getFile(), capacity, true);
+    return new MkTabTreeNode<O, D>(capacity, true);
   }
 
   /**
@@ -62,7 +60,7 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    */
   @Override
   protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkTabTreeNode<O, D>(getFile(), capacity, false);
+    return new MkTabTreeNode<O, D>(capacity, false);
   }
 
   /**

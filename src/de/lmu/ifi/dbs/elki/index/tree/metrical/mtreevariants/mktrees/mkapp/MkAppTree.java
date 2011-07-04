@@ -143,7 +143,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
 
     if(extraIntegrityChecks) {
-      getRoot().integrityCheck(this, getRootEntry());
+      getRoot().integrityCheck(this.file, this, getRootEntry());
     }
   }
 
@@ -404,7 +404,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   protected MkAppTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkAppTreeNode<O, D>(file, capacity, true);
+    return new MkAppTreeNode<O, D>(capacity, true);
   }
 
   /**
@@ -415,7 +415,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   protected MkAppTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkAppTreeNode<O, D>(file, capacity, false);
+    return new MkAppTreeNode<O, D>(capacity, false);
   }
 
   /**

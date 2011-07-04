@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Represents a node in a flat R*-Tree.
@@ -10,6 +9,9 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Elke Achtert
  */
 public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, SpatialEntry> {
+  /**
+   * Serial version
+   */
   private static final long serialVersionUID = 1;
 
   /**
@@ -36,22 +38,21 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
   /**
    * Creates a new FlatRStarTreeNode with the specified parameters.
    * 
-   * @param file the file storing the R*-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public FlatRStarTreeNode(PageFile<FlatRStarTreeNode> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf, SpatialEntry.class);
+  public FlatRStarTreeNode(int capacity, boolean isLeaf) {
+    super(capacity, isLeaf, SpatialEntry.class);
   }
 
   @Override
   protected FlatRStarTreeNode createNewLeafNode(int capacity) {
-    return new FlatRStarTreeNode(getFile(), capacity, true);
+    return new FlatRStarTreeNode(capacity, true);
   }
 
   @Override
   protected FlatRStarTreeNode createNewDirectoryNode(int capacity) {
-    return new FlatRStarTreeNode(getFile(), capacity, false);
+    return new FlatRStarTreeNode(capacity, false);
   }
 }

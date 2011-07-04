@@ -156,9 +156,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     adjustKNNDistance(getRootEntry(), knnLists);
 
     // test
-    if(extraIntegrityChecks) {
-      getRoot().integrityCheck();
-    }
+    doExtraIntegrityChecks();
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -480,7 +478,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    */
   @Override
   protected RdKNNNode<D> createNewLeafNode(int capacity) {
-    return new RdKNNNode<D>(file, capacity, true);
+    return new RdKNNNode<D>(capacity, true);
   }
 
   /**
@@ -491,7 +489,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    */
   @Override
   protected RdKNNNode<D> createNewDirectoryNode(int capacity) {
-    return new RdKNNNode<D>(file, capacity, false);
+    return new RdKNNNode<D>(capacity, false);
   }
 
   /**

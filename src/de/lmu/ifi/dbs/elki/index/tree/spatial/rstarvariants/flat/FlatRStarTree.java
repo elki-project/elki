@@ -116,9 +116,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
       msg.append("\n  height = ").append(getHeight());
       logger.debugFine(msg.toString() + "\n");
     }
-    if(extraIntegrityChecks) {
-      getRoot().integrityCheck();
-    }
+    doExtraIntegrityChecks();
   }
 
   @Override
@@ -181,7 +179,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
    */
   @Override
   protected FlatRStarTreeNode createNewLeafNode(int capacity) {
-    return new FlatRStarTreeNode(file, capacity, true);
+    return new FlatRStarTreeNode(capacity, true);
   }
 
   /**
@@ -192,7 +190,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
    */
   @Override
   protected FlatRStarTreeNode createNewDirectoryNode(int capacity) {
-    return new FlatRStarTreeNode(file, capacity, false);
+    return new FlatRStarTreeNode(capacity, false);
   }
 
   @Override

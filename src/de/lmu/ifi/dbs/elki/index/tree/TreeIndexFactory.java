@@ -100,7 +100,7 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
    * @return Page file
    */
   // FIXME: make this single-shot when filename is set!
-  protected <N extends Page<N>> PageFile<N> makePageFile(Class<N> cls) {
+  protected <N extends Page> PageFile<N> makePageFile(Class<N> cls) {
     final PageFile<N> inner;
     if(fileName == null) {
       inner = new MemoryPageFile<N>(pageSize);

@@ -115,7 +115,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
    */
   @Override
   protected DeLiCluNode createNewLeafNode(int capacity) {
-    return new DeLiCluNode(file, capacity, true);
+    return new DeLiCluNode(capacity, true);
   }
 
   /**
@@ -126,7 +126,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
    */
   @Override
   protected DeLiCluNode createNewDirectoryNode(int capacity) {
-    return new DeLiCluNode(file, capacity, false);
+    return new DeLiCluNode(capacity, false);
   }
 
   /**

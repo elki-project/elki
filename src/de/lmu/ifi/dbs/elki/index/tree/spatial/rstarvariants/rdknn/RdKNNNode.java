@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Represents a node in a RDkNN-Tree.
@@ -27,13 +26,12 @@ public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTree
   /**
    * Creates a new RdKNNNode object.
    * 
-   * @param file the file storing the RdKNN-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public RdKNNNode(PageFile<RdKNNNode<D>> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf, RdKNNEntry.class);
+  public RdKNNNode(int capacity, boolean isLeaf) {
+    super(capacity, isLeaf, RdKNNEntry.class);
   }
 
   /**
@@ -58,7 +56,7 @@ public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTree
    */
   @Override
   protected RdKNNNode<D> createNewLeafNode(int capacity) {
-    return new RdKNNNode<D>(getFile(), capacity, true);
+    return new RdKNNNode<D>(capacity, true);
   }
 
   /**
@@ -69,7 +67,7 @@ public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTree
    */
   @Override
   protected RdKNNNode<D> createNewDirectoryNode(int capacity) {
-    return new RdKNNNode<D>(getFile(), capacity, false);
+    return new RdKNNNode<D>(capacity, false);
   }
 
   @Override

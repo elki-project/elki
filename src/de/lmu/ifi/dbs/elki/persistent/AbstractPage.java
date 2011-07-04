@@ -10,11 +10,9 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  * 
  * @apiviz.uses PageFile
- * 
- * @param <P> Self reference
  */
 // todo elke revise comments
-public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P> {
+public abstract class AbstractPage implements Page {
   /**
    * Serial version
    */
@@ -31,24 +29,10 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
   private boolean dirty;
 
   /**
-   * The file that stores the pages.
-   */
-  private PageFile<P> file;
-
-  /**
    * Empty constructor for Externalizable interface.
    */
   public AbstractPage() {
-    this(null);
-  }
-
-  /**
-   * Provides a new page object.
-   * 
-   * @param file the page file that stores the pages.
-   */
-  public AbstractPage(PageFile<P> file) {
-    this.file = file;
+    super();
   }
 
   /**
@@ -69,16 +53,6 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
   @Override
   public final void setPageID(int id) {
     this.id = id;
-  }
-
-  /**
-   * Sets the page file of this page.
-   * 
-   * @param file the page file to be set
-   */
-  @Override
-  public final void setFile(PageFile<P> file) {
-    this.file = file;
   }
 
   /**
@@ -152,15 +126,6 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
   }
 
   /**
-   * Returns the file that stores the pages.
-   * 
-   * @return the file that stores the pages
-   */
-  public final PageFile<P> getFile() {
-    return file;
-  }
-
-  /**
    * Indicates whether some other object is "equal to" this one.
    * 
    * @param o the object to be tested
@@ -168,7 +133,6 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
    *         entries as this node.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
     if(this == o) {
       return true;
@@ -177,7 +141,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
       return false;
     }
 
-    final P that = (P) o;
+    final AbstractPage that = (AbstractPage) o;
 
     return id.equals(that.getPageID());
   }

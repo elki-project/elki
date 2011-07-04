@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractPage<N> implements Node<N, E> {
+public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractPage implements Node<N, E> {
   /**
    * The number of entries in this node.
    */
@@ -51,14 +50,13 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   /**
    * Creates a new Node with the specified parameters.
    * 
-   * @param file the file storing the index
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    * @param eclass Entry class, to initialize array storage
    */
-  public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf, Class<? super E> eclass) {
-    super(file);
+  public AbstractNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
+    super();
     this.numEntries = 0;
     this.eclass = ClassGenericsUtil.uglyCastIntoSubclass(eclass);
     this.entries = ClassGenericsUtil.newArrayOfNull(capacity, this.eclass);

@@ -11,7 +11,7 @@ import java.util.Map;
  * 
  * @param <P> Page type
  */
-public class MemoryPageFile<P extends Page<P>> extends AbstractStoringPageFile<P> {
+public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
   /**
    * Holds the pages.
    */
