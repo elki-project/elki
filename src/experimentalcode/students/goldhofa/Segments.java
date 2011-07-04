@@ -14,14 +14,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
  * Creates segments of two or more clusterings. Segments are the equally paired database
- * objects of all given (2+) clusterings. Objects are combined by a string (segmentdID),
+ * objects of all given (2+) clusterings. Objects are combined by a string (segmentID),
  * so no database objects are saved.
  * 
  * Segments are created by adding each db object via the addObject() method and afterwards
- * converted to pairs by the convertToPairSegments() method.
+ * converted to pairs by convertToPairSegments().
  * 
  * @author goldhofer
  */
@@ -30,7 +31,7 @@ public class Segments {
   /**
    * if segments are converted into pairSegments
    */
-  private Boolean isPairSegments = false;
+  private boolean isPairSegments = false;
   
   /**
    * Clusterings
@@ -48,6 +49,12 @@ public class Segments {
   private int[] clusters;
   
   /**
+   * Number of Clusters for each clustering
+   */
+  //private int[] noiseclusters;
+  //private int[] noiseindex;
+  
+  /**
    * Total number of pairs
    */
   private int pairs;
@@ -62,8 +69,11 @@ public class Segments {
    */
   private TreeMap<SegmentID, Integer> pairSegments;
   
+  // TODO: flag noise clusters by clustering-cluster
+  
+  
   /**
-   * List of pair segments and their invovled object segments (helper)
+   * List of pair segments and their involved object segments (helper)
    */
   private TreeMap<SegmentID, SortedSet<SegmentID>> fragmentedSegments;
   
@@ -88,6 +98,10 @@ public class Segments {
     
     clusteringsCount    = clusterings.size();
     clusters            = new int[clusteringsCount];
+    
+    //noiseclusters       = new int[clusteringsCount];
+    //noiseindex          = new int[clusteringsCount];
+    
     clusterPaircount    = new ArrayList<TreeMap<Integer, Integer>>(this.clusteringsCount);
     
     // save count of clusters
@@ -95,8 +109,12 @@ public class Segments {
     for (Clustering<?> clr : clusterings) {
       
       clusterPaircount.add(new TreeMap<Integer, Integer>());
-      
+
       clusters[clusteringIndex] = clr.getAllClusters().size();     
+
+      // determine noise cluster
+      //noiseindex[clusteringIndex] = clusters[clusteringIndex];
+      
       clusteringIndex++;
     }
   }
@@ -291,10 +309,21 @@ public class Segments {
         
         if (cluster.getIDs().contains(objectID)) {
           
+          int index = currentCluster;
+          
+          /*
+          // determine index
+          if (cluster.isNoise()) {
+            
+            index = noiseindex[clusteringIndex];
+            noiseindex[clusteringIndex]++;
+          }
+          */
+          
           // search in next clusterings
           
           objectFound = true;
-          getSegment(objectID, tag.add(currentCluster), clusteringIndex+1);
+          getSegment(objectID, tag.add(index), clusteringIndex+1);
         }
          
          currentCluster++;
@@ -438,6 +467,37 @@ public class Segments {
     }
     
     return asPairs(totalObjects) - segmentPairs;
+  }
+  
+  
+  public Triple<Integer, Integer, Integer> getPaircount(int firstClustering, boolean firstClusterNoise, int secondClustering, boolean secondClusterNoise) {
+    
+    if ( pairSegments == null) return new Triple<Integer, Integer, Integer>(0,0,0);
+    
+    int inBoth = 0;
+    int inFirst = 0;
+    int inSecond = 0;
+    
+    for (SegmentID segment : pairSegments.keySet()) {
+     
+      if (segment.get(firstClustering) != 0) {
+        
+        if (segment.get(secondClustering) != 0) {
+          
+          inBoth += pairSegments.get(segment);
+          
+        } else {
+          
+          inFirst += pairSegments.get(segment);
+        }
+        
+      } else if (segment.get(secondClustering) != 0) {
+        
+        inSecond += pairSegments.get(segment);
+      } 
+    }
+    
+    return new Triple<Integer, Integer, Integer>(inBoth, inFirst, inSecond);
   }
   
   
@@ -588,7 +648,10 @@ public class Segments {
       SegmentID unclusteredPairs = new SegmentID(clusteringsCount);
       for (int i=0; i<clusteringsCount; i++) unclusteredPairs.add(0);
       
-      return pairs - pairSegments.get(unclusteredPairs);
+      if (pairSegments.containsKey(unclusteredPairs))
+        return pairs - pairSegments.get(unclusteredPairs);
+      else
+        return pairs;
     }
   }
 

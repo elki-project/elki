@@ -1,18 +1,23 @@
 package experimentalcode.students.goldhofa;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure.ScoreResult;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -78,7 +83,7 @@ public class ClusteringComparison implements Evaluator {
 
     measures = new ArrayList<MeasureIndex>();
 
-    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(MeasureIndex.class)) {
+    for (Class<?> c : InspectionUtil.cachedFindAllImplementations(MeasureIndex.class)) {
       try {
         MeasureIndex mi = ClassGenericsUtil.tryInstantiate(MeasureIndex.class, c, config);
         // if (mi.withSelfPairing()) withSelfPairing = true;
@@ -105,130 +110,132 @@ public class ClusteringComparison implements Evaluator {
 
     // result to save evaluations
     ClusteringComparisonResult thisResult = new ClusteringComparisonResult("ClusteringComparison", "cc", clusterings.get(0));
-
+    
     //
-    // calculate all measure values
+    // building clustering sets
+    //    
+    ArrayList<ClusteringInfo> clrsExt = new ArrayList<ClusteringInfo>();
+    
+    int index = 1;
+    for (Clustering<?> clustering : clusterings) {
+      
+      clrsExt.add(new ClusteringInfo(index, clustering));
+      index++;
+    }
+    
     //
-
-    SortedSet<MeasureResult> measureResults;
+    // calculate measure values with clusteringExtensions
+    //
+    
     if (measures.size() >= 1) {
-
-      measureResults = new TreeSet<MeasureResult>();
-
+      
+      // get total paircount
       int totalObjects = db.getDBIDs().size();
       int allPairs = (totalObjects * (totalObjects - 1)) / 2;
-      int allPairsSelfPaired = (totalObjects + 1) * totalObjects / 2;
-
-      // map hashcode to clustering name
-      Map<Integer, String> hashToClustering = new HashMap<Integer, String>(clusterings.size());
-      for(Clustering<?> c : clusterings) {
-        hashToClustering.put(c.hashCode(), c.getLongName());
-      }
-
-      // measure calculations for all clusterings and every direction
-      for(int first = 0; first < clusterings.size() - 1; first++) {
-
-        Clustering<?> firstClustering = clusterings.get(first);
-
-        for(int second = first + 1; second < clusterings.size(); second++) {
-
-          Clustering<?> secondClustering = clusterings.get(second);
-
-          Triple<Integer, Integer, Integer> countedPairs = PairCounting.countPairs(PairCounting.getPairGenerator(firstClustering), PairCounting.getPairGenerator(secondClustering));
-          Triple<Integer, Integer, Integer> countedPairsSelfPaired = PairCounting.countPairs(PairCounting.getPairGenerator(firstClustering, true), PairCounting.getPairGenerator(secondClustering, true));
-
-          // for all measures calculate index and average
-          for(MeasureIndex measureIndex : measures) {
+      
+    
+      // measure calculations for all clusterings, in every direction,
+      // both with paired and clustered noise clusters
+      for (int first = 0; first < clrsExt.size() - 1; first++) {
+        
+        // get basic clustering for measure index
+        ClusteringInfo firstClustering = clrsExt.get(first);
+        
+        // iterate over remaining clusterings for comparisson clustering
+        for (int second = first + 1; second < clusterings.size(); second++) {
+          
+          // get reference clustering
+          ClusteringInfo secondClustering = clrsExt.get(second);
+          
+          // calculate intersection in number of pairs
+          Triple<Integer, Integer, Integer> pairs = PairCounting.countPairs(firstClustering.pairsClustered, secondClustering.pairsClustered);
+          /*
+          Triple<Integer, Integer, Integer> pairsFirstPaired = PairCounting.countPairs(firstClustering.pairsClustered, secondClustering.pairsSelfPaired);
+          Triple<Integer, Integer, Integer> pairsSecondPaired = PairCounting.countPairs(firstClustering.pairsSelfPaired, secondClustering.pairsClustered);
+          Triple<Integer, Integer, Integer> pairsAllPaired = PairCounting.countPairs(firstClustering.pairsSelfPaired, secondClustering.pairsSelfPaired);
+          */
+          
+          //logger.verbose("pairs total: " + (pairs.first+pairs.second+pairs.third));
+          
+          // for all measures calculate index
+          for (MeasureIndex measureIndex : measures) {
 
             double first2Second;
             double second2First;
+            
+            // 
+            // First Clustering (Noise as cluster) <=> Second Clustering (Noise as cluster)
+            //
+            first2Second = measureIndex.measure(pairs.first, pairs.second, pairs.third, allPairs);
+            firstClustering.addMeasureResult(secondClustering, measureIndex, first2Second, true, true);
+            // vice versa
+            second2First = measureIndex.measure(pairs.first, pairs.third, pairs.second, allPairs);
+            secondClustering.addMeasureResult(firstClustering, measureIndex, second2First, true, true);
 
-            if(measureIndex.withSelfPairing()) {
+            /*
+            
+            // 
+            // First Clustering (Noise self paired) <=> Second Clustering (Noise as cluster)
+            //
+            if (firstClustering.hasNoise()) {
 
-              first2Second = measureIndex.measure(countedPairsSelfPaired.first, countedPairsSelfPaired.second, countedPairsSelfPaired.third, allPairsSelfPaired);
-              second2First = measureIndex.measure(countedPairsSelfPaired.first, countedPairsSelfPaired.third, countedPairsSelfPaired.second, allPairsSelfPaired);
-
+              first2Second = measureIndex.measure(pairsFirstPaired.first, pairsFirstPaired.second, pairsFirstPaired.third, allPairs);
+              firstClustering.addMeasureResult(secondClustering, measureIndex, first2Second, false, true);
+              // vice versa
+              second2First = measureIndex.measure(pairsFirstPaired.first, pairsFirstPaired.third, pairsFirstPaired.second, allPairs);
+              secondClustering.addMeasureResult(firstClustering, measureIndex, second2First, true, false);
             }
-            else {
-
-              first2Second = measureIndex.measure(countedPairs.first, countedPairs.second, countedPairs.third, allPairs);
-              second2First = measureIndex.measure(countedPairs.first, countedPairs.third, countedPairs.second, allPairs);
+            
+            // 
+            // First Clustering (Noise as cluster) <=> Second Clustering (Noise self paired)
+            //
+            if (secondClustering.hasNoise()) {
+              
+              first2Second = measureIndex.measure(pairsSecondPaired.first, pairsSecondPaired.second, pairsSecondPaired.third, allPairs);
+              firstClustering.addMeasureResult(secondClustering, measureIndex, first2Second, true, false);
+              // vice versa
+              second2First = measureIndex.measure(pairsSecondPaired.first, pairsSecondPaired.third, pairsSecondPaired.second, allPairs);
+              secondClustering.addMeasureResult(firstClustering, measureIndex, second2First, false, true);
+              
+              // 
+              // First Clustering (Noise self paired) <=> Second Clustering (Noise self paired)
+              //
+              if (firstClustering.hasNoise()) {
+                
+                first2Second = measureIndex.measure(pairsAllPaired.first, pairsAllPaired.second, pairsAllPaired.third, allPairs);
+                firstClustering.addMeasureResult(secondClustering, measureIndex, first2Second, false, false);
+                // vice versa
+                second2First = measureIndex.measure(pairsAllPaired.first, pairsAllPaired.third, pairsAllPaired.second, allPairs);
+                secondClustering.addMeasureResult(firstClustering, measureIndex, second2First, false, false);
+              }
             }
-
-            // Add results to list
-            measureResults.add(new MeasureResult(firstClustering.hashCode(), secondClustering.hashCode(), measureIndex.getName(), first2Second, measureIndex.inAverage()));
-            measureResults.add(new MeasureResult(secondClustering.hashCode(), firstClustering.hashCode(), measureIndex.getName(), second2First, measureIndex.inAverage()));
+            */
           }
-        }
-      }
-
-      // calculate average values
-      Map<Integer, Map<Integer, Double>> average = new HashMap<Integer, Map<Integer, Double>>(clusterings.size());
-      for(MeasureResult measure : measureResults) {
-
-        if(measure.inAverage) {
-
-          double valueToAdd = measure.measureValue / measures.size();
-
-          Map<Integer, Double> firstClustering;
-
-          if(!average.containsKey(measure.firstClustering)) {
-
-            firstClustering = new HashMap<Integer, Double>(clusterings.size());
-            average.put(measure.firstClustering, firstClustering);
-
-          }
-          else {
-
-            firstClustering = average.get(measure.firstClustering);
-          }
-
-          if(!firstClustering.containsKey(measure.secondClustering)) {
-
-            firstClustering.put(measure.secondClustering, valueToAdd);
-
-          }
-          else {
-
-            double value = firstClustering.get(measure.secondClustering);
-            firstClustering.put(measure.secondClustering, value + valueToAdd);
-          }
-        }
-      }
-
-      // add averages to measure results
-      for(Integer first : average.keySet()) {
-
-        for(Integer second : average.get(first).keySet()) {
-
-          measureResults.add(new MeasureResult(first, second, "average", average.get(first).get(second), false));
-        }
-      }
-      
-      // store measure results
-      thisResult.addMeasureResult(measureResults, hashToClustering);
-
-      // verbose
-      if (logger.isVerbose()) {
-
-        for (MeasureResult currentResult : measureResults) {
-
-          currentResult.print(logger, hashToClustering);
         }
       }
     }
-
+    
     //
-    // Compare Clusterings
+    // store measure results as table rows ordered by clusterings
     //
-    // TODO cluster nach größe sortieren? homogene Ausgabe...
+    
+    ArrayList<Tablerow> resultTable = new ArrayList<Tablerow>();
+    
+    for (ClusteringInfo clr : clrsExt) {
+      
+      clr.printMeasures(resultTable);
+      resultTable.add(new Tablerow("#"));
+      resultTable.add(new Tablerow("#"));
+      
+      clr.clearMeasures();
+    }
+    
+    db.getHierarchy().add(result, new ComparisonMeasureResult(resultTable));
+    
 
-    // List of clusterings to compare
-    // TODO sortby measure index
-    // List<Clustering<?>> clusterings =
-    // ResultUtil.getClusteringResults(result);
-    // clusterings.add(refcrs.get(0));
 
+    // 
+    // Build Segments
     //
     // collects all Objects into Segments and
     // converts ObjectSegments into PairSegments
@@ -243,11 +250,141 @@ public class ClusteringComparison implements Evaluator {
     }
 
     segments.convertToPairSegments();
+    
+    //
+    // calculate measure values through cluster segmentation
+    //
+    
+    int allPairs = segments.getPairCount(true);
+    
+    for (int first = 0; first < clrsExt.size() - 1; first++) {
+      
+      // get basic clustering for measure index
+      ClusteringInfo firstClustering = clrsExt.get(first);
+      
+      // iterate over remaining clusterings for comparison clustering
+      for (int second = first + 1; second < clusterings.size(); second++) {
+        
+        ClusteringInfo secondClustering = clrsExt.get(second);
+        
+        // get paircount
+        Triple<Integer, Integer, Integer> pairs = segments.getPaircount(first, true, second, true);
+        /*
+        Triple<Integer, Integer, Integer> pairsFirstPaired = segments.getPaircount(first, false, second, true);
+        Triple<Integer, Integer, Integer> pairsSecondPaired = segments.getPaircount(first, true, second, false);
+        Triple<Integer, Integer, Integer> pairsAllPaired = segments.getPaircount(first, false, second, false);
+        */
+        
+        for (MeasureIndex measureIndex : measures) {
+          
+          double first2Second;
+          double second2First;
+          
+          // 
+          // First Clustering (Noise as cluster) <=> Second Clustering (Noise as cluster)
+          //
+          first2Second = measureIndex.measure(pairs.first, pairs.second, pairs.third, allPairs);
+          firstClustering.addMeasureResult(secondClustering, measureIndex, first2Second, true, true);
+          // vice versa
+          second2First = measureIndex.measure(pairs.first, pairs.third, pairs.second, allPairs);
+          secondClustering.addMeasureResult(firstClustering, measureIndex, second2First, true, true);
 
+          // 
+          // First Clustering (Noise self paired) <=> Second Clustering (Noise as cluster)
+          //
+          
+          /*
+          
+          if (firstClustering.hasNoise()) {
+
+            first2Second = measureIndex.measure(pairsFirstPaired.first, pairsFirstPaired.second, pairsFirstPaired.third, allPairs);
+            firstClustering.addMeasureResult(secondClustering, measureIndex, first2Second, false, true);
+            // vice versa
+            second2First = measureIndex.measure(pairsFirstPaired.first, pairsFirstPaired.third, pairsFirstPaired.second, allPairs);
+            secondClustering.addMeasureResult(firstClustering, measureIndex, second2First, true, false);
+          }
+          
+          // 
+          // First Clustering (Noise as cluster) <=> Second Clustering (Noise self paired)
+          //
+          if (secondClustering.hasNoise()) {
+            
+            first2Second = measureIndex.measure(pairsSecondPaired.first, pairsSecondPaired.second, pairsSecondPaired.third, allPairs);
+            firstClustering.addMeasureResult(secondClustering, measureIndex, first2Second, true, false);
+            // vice versa
+            second2First = measureIndex.measure(pairsSecondPaired.first, pairsSecondPaired.third, pairsSecondPaired.second, allPairs);
+            secondClustering.addMeasureResult(firstClustering, measureIndex, second2First, false, true);
+            
+            // 
+            // First Clustering (Noise self paired) <=> Second Clustering (Noise self paired)
+            //
+            if (firstClustering.hasNoise()) {
+              
+              first2Second = measureIndex.measure(pairsAllPaired.first, pairsAllPaired.second, pairsAllPaired.third, allPairs);
+              firstClustering.addMeasureResult(secondClustering, measureIndex, first2Second, false, false);
+              // vice versa
+              second2First = measureIndex.measure(pairsAllPaired.first, pairsAllPaired.third, pairsAllPaired.second, allPairs);
+              secondClustering.addMeasureResult(firstClustering, measureIndex, second2First, false, false);
+            }
+          }
+          */
+        }
+      }
+    }
+    
+    
+    //
+    // store measure results as table rows ordered by clusterings
+    //
+    
+    ArrayList<Tablerow> segRes = new ArrayList<Tablerow>();
+    
+    // store measure results as table rows ordered by clusterings
+    for (ClusteringInfo clr : clrsExt) {
+      
+      clr.printMeasures(segRes);
+      resultTable.add(new Tablerow("#"));
+      resultTable.add(new Tablerow("#"));
+    }
+    
+    db.getHierarchy().add(result, new ComparisonMeasureResult(segRes, "comparison_by_segments"));
+    
+    // ---
+
+    // log segmentation info
     segments.print(logger);
-
+    
+    // add segmentation to result
     thisResult.add(segments);
-
+    
+    // store measure results (segments) in comparison result for visualization
+    thisResult.add(clrsExt);
+    
+    // and add comparison result to result tree
     db.getHierarchy().add(result, thisResult);
+  }
+  
+  /**
+   * Result object for outlier score judgements.
+   * 
+   * @author Erich Schubert
+   */
+  public static class ComparisonMeasureResult extends CollectionResult<Tablerow> {
+    /**
+     * Constructor.
+     * 
+     * @param col score result
+     */
+    public ComparisonMeasureResult(Collection<Tablerow> col) {
+      super("Clustering Comparison: measure indices", "comparison_measures", col);
+    }
+    /**
+     * Constructor.
+     * 
+     * @param col score result
+     */
+    public ComparisonMeasureResult(Collection<Tablerow> col, String filename) {
+      super("Clustering Comparison: measure indices", filename, col);
+    }
   }
 }
