@@ -35,14 +35,13 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
   /**
    * Creates a new MTreeNode with the specified parameters.
    * 
-   * @param file the file storing the M-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    * @param eclass Entry class, to initialize array storage
    */
-  public AbstractMTreeNode(PageFile<N> file, int capacity, boolean isLeaf, Class<? super E> eclass) {
-    super(file, capacity, isLeaf, eclass);
+  public AbstractMTreeNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
+    super(capacity, isLeaf, eclass);
   }
 
   /**
@@ -58,7 +57,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
 
     if(isLeaf()) {
       N newNode = createNewLeafNode(getCapacity());
-      getFile().writePage(newNode);
+      // getFile().writePage(newNode);
 
       deleteAllEntries();
 
@@ -84,7 +83,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
     }
     else {
       N newNode = createNewDirectoryNode(getCapacity());
-      getFile().writePage(newNode);
+      // getFile().writePage(newNode);
 
       deleteAllEntries();
 
@@ -159,7 +158,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    * @param entry the entry representing this node
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck(AbstractMTree<O, D, N, E> mTree, E entry) {
+  public final void integrityCheck(PageFile<N> pagefile, AbstractMTree<O, D, N, E> mTree, E entry) {
     // leaf node
     if(isLeaf()) {
       for(int i = 0; i < getCapacity(); i++) {
@@ -175,7 +174,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
 
     // dir node
     else {
-      N tmp = getFile().readPage(getEntry(0).getEntryID());
+      N tmp = pagefile.readPage(getEntry(0).getEntryID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -190,11 +189,11 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
         }
 
         if(e != null) {
-          N node = getFile().readPage(e.getEntryID());
+          N node = pagefile.readPage(e.getEntryID());
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              getFile().readPage(getEntry(k).getEntryID());
+              pagefile.readPage(getEntry(k).getEntryID());
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -206,7 +205,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
 
           // noinspection unchecked
           node.integrityCheckParameters(entry, (N) this, i, mTree);
-          node.integrityCheck(mTree, e);
+          node.integrityCheck(pagefile, mTree, e);
         }
       }
 

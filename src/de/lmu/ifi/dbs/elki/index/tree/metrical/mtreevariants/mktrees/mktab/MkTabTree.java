@@ -139,7 +139,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
   @Override
   protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkTabTreeNode<O, D>(file, capacity, true);
+    return new MkTabTreeNode<O, D>(capacity, true);
   }
 
   /**
@@ -150,7 +150,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkTabTreeNode<O, D>(file, capacity, false);
+    return new MkTabTreeNode<O, D>(capacity, false);
   }
 
   /**

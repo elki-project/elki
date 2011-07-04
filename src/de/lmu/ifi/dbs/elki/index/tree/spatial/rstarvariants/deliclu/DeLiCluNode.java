@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Represents a node in a DeLiClu-Tree.
@@ -23,13 +22,12 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
   /**
    * Creates a new DeLiCluNode with the specified parameters.
    * 
-   * @param file the file storing the DeLiClu-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public DeLiCluNode(PageFile<DeLiCluNode> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf, DeLiCluEntry.class);
+  public DeLiCluNode(int capacity, boolean isLeaf) {
+    super(capacity, isLeaf, DeLiCluEntry.class);
   }
 
   /**
@@ -74,7 +72,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    */
   @Override
   protected DeLiCluNode createNewLeafNode(int capacity) {
-    return new DeLiCluNode(getFile(), capacity, true);
+    return new DeLiCluNode(capacity, true);
   }
 
   /**
@@ -85,7 +83,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    */
   @Override
   protected DeLiCluNode createNewDirectoryNode(int capacity) {
-    return new DeLiCluNode(getFile(), capacity, false);
+    return new DeLiCluNode(capacity, false);
   }
 
   @Override

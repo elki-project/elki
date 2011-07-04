@@ -7,9 +7,8 @@ import java.io.Externalizable;
  * persistently saved.
  * 
  * @author Elke Achtert
- * @param <P> Self-reference
  */
-public interface Page<P extends Page<P>> extends Externalizable {
+public interface Page extends Externalizable {
   /**
    * Returns the unique id of this Page.
    * 
@@ -23,13 +22,6 @@ public interface Page<P extends Page<P>> extends Externalizable {
    * @param id the id to be set
    */
   void setPageID(int id);
-
-  /**
-   * Sets the page file of this page.
-   * 
-   * @param file the page file to be set
-   */
-  void setFile(PageFile<P> file);
 
   /**
    * Returns true if this page is dirty, false otherwise.

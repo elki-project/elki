@@ -37,14 +37,13 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   /**
    * Creates a new AbstractRStarTreeNode with the specified parameters.
    * 
-   * @param file the file storing the R*-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    * @param eclass Entry class, to initialize array storage
    */
-  public AbstractRStarTreeNode(PageFile<N> file, int capacity, boolean isLeaf, Class<? super E> eclass) {
-    super(file, capacity, isLeaf, eclass);
+  public AbstractRStarTreeNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
+    super(capacity, isLeaf, eclass);
   }
 
   @Override
@@ -157,7 +156,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
     if(isLeaf()) {
       N newNode = createNewLeafNode(getCapacity());
-      getFile().writePage(newNode);
+      // getFile().writePage(newNode);
 
       deleteAllEntries();
 
@@ -184,7 +183,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
     else {
       N newNode = createNewDirectoryNode(getCapacity());
-      getFile().writePage(newNode);
+      // getFile().writePage(newNode);
 
       deleteAllEntries();
 
@@ -214,7 +213,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * Tests this node (for debugging purposes).
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck() {
+  public final void integrityCheck(PageFile<N> pagefile) {
     // leaf node
     if(isLeaf()) {
       for(int i = 0; i < getCapacity(); i++) {
@@ -230,7 +229,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
     // dir node
     else {
-      N tmp = getFile().readPage(getEntry(0).getEntryID());
+      N tmp = pagefile.readPage(getEntry(0).getEntryID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -245,11 +244,11 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
 
         if(e != null) {
-          N node = getFile().readPage(e.getEntryID());
+          N node = pagefile.readPage(e.getEntryID());
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              getFile().readPage(getEntry(k).getEntryID());
+              pagefile.readPage(getEntry(k).getEntryID());
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -260,7 +259,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
           }
 
           node.integrityCheckParameters((N) this, i);
-          node.integrityCheck();
+          node.integrityCheck(pagefile);
         }
       }
 

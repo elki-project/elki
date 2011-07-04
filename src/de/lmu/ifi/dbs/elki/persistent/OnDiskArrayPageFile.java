@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @param <P> Page type
  */
-public class OnDiskArrayPageFile<P extends Page<P>> extends AbstractStoringPageFile<P> {
+public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile<P> {
   /**
    * Indicates an empty page.
    */
@@ -80,12 +80,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends AbstractStoringPageF
   public P readPage(int pageID) {
     try {
       readAccess++;
-      P page = byteBufferToPage(this.file.getRecordBuffer(pageID));
-      if(page != null) {
-        page.setFile(this);
-      }
-      return page;
-
+      return byteBufferToPage(this.file.getRecordBuffer(pageID));
     }
     catch(IOException e) {
       throw new RuntimeException("IOException occurred during reading of page " + pageID, e);

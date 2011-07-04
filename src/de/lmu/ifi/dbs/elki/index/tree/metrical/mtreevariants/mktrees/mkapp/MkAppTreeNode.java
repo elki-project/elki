@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -35,13 +34,12 @@ class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
   /**
    * Creates a MkAppTreeNode object.
    * 
-   * @param file the file storing the MCop-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public MkAppTreeNode(PageFile<MkAppTreeNode<O, D>> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf, MkAppEntry.class);
+  public MkAppTreeNode(int capacity, boolean isLeaf) {
+    super(capacity, isLeaf, MkAppEntry.class);
   }
 
   /**
@@ -52,7 +50,7 @@ class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
    */
   @Override
   protected MkAppTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkAppTreeNode<O, D>(getFile(), capacity, true);
+    return new MkAppTreeNode<O, D>(capacity, true);
   }
 
   /**
@@ -63,7 +61,7 @@ class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
    */
   @Override
   protected MkAppTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkAppTreeNode<O, D>(getFile(), capacity, false);
+    return new MkAppTreeNode<O, D>(capacity, false);
   }
 
   /**

@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @param <P> Page type
  */
-public class LRUCache<P extends Page<P>> extends AbstractPageFile<P> {
+public class LRUCache<P extends Page> extends AbstractPageFile<P> {
   /**
    * Our logger
    */

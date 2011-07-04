@@ -157,9 +157,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     preInsert(leaf);
     insertLeafEntry(leaf);
 
-    if(extraIntegrityChecks) {
-      getRoot().integrityCheck();
-    }
+    doExtraIntegrityChecks();
   }
 
   /**
@@ -1099,7 +1097,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   public void doExtraIntegrityChecks() {
     if(extraIntegrityChecks) {
-      getRoot().integrityCheck();
+      getRoot().integrityCheck(this.file);
     }
   }
 }

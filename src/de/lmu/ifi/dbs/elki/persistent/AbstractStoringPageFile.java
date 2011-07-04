@@ -13,7 +13,7 @@ import java.util.Stack;
  * 
  * @param <P> Page type
  */
-public abstract class AbstractStoringPageFile<P extends Page<P>> extends AbstractPageFile<P> {
+public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPageFile<P> {
   /**
    * A stack holding the empty page ids.
    */

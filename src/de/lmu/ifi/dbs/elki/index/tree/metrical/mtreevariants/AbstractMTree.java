@@ -189,7 +189,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // test
     if(extraIntegrityChecks) {
       if(withPreInsert) {
-        getRoot().integrityCheck(this, getRootEntry());
+        getRoot().integrityCheck(file, this, getRootEntry());
       }
     }
   }

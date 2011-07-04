@@ -8,7 +8,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * 
  * @param <P> page type
  */
-public abstract class AbstractPageFile<P extends Page<P>> implements PageFile<P> {
+public abstract class AbstractPageFile<P extends Page> implements PageFile<P> {
   /**
    * The read I/O-Access of this file.
    */

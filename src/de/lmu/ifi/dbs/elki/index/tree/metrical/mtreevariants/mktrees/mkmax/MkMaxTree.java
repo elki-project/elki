@@ -290,7 +290,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
       logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
-    // leafCapacity = (file.getPageSize() - overhead) / (objectID + parentDistance +
+    // leafCapacity = (file.getPageSize() - overhead) / (objectID +
+    // parentDistance +
     // knnDistance) + 1
     leafCapacity = (int) (file.getPageSize() - overhead) / (4 + 2 * distanceSize) + 1;
 
@@ -308,7 +309,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkMaxTreeNode<O, D>(file, capacity, true);
+    return new MkMaxTreeNode<O, D>(capacity, true);
   }
 
   /**
@@ -316,7 +317,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkMaxTreeNode<O, D>(file, capacity, false);
+    return new MkMaxTreeNode<O, D>(capacity, false);
   }
 
   /**

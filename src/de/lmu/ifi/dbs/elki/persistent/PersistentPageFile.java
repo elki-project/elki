@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @param <P> Page type
  */
-public class PersistentPageFile<P extends Page<P>> extends AbstractStoringPageFile<P> {
+public class PersistentPageFile<P extends Page> extends AbstractStoringPageFile<P> {
   /**
    * Our logger
    */
@@ -96,11 +96,7 @@ public class PersistentPageFile<P extends Page<P>> extends AbstractStoringPageFi
       byte[] buffer = new byte[pageSize];
       file.seek(offset);
       file.read(buffer);
-      P page = byteArrayToPage(buffer);
-      if(page != null) {
-        page.setFile(this);
-      }
-      return page;
+      return byteArrayToPage(buffer);
     }
     catch(IOException e) {
       throw new RuntimeException("IOException occurred during reading of page " + pageID + "\n", e);

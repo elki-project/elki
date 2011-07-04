@@ -60,7 +60,7 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry> {
    */
   @Override
   protected RStarTreeNode createNewLeafNode(int capacity) {
-    return new RStarTreeNode(file, capacity, true);
+    return new RStarTreeNode(capacity, true);
   }
 
   /**
@@ -71,7 +71,7 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry> {
    */
   @Override
   protected RStarTreeNode createNewDirectoryNode(int capacity) {
-    return new RStarTreeNode(file, capacity, false);
+    return new RStarTreeNode(capacity, false);
   }
 
   @Override

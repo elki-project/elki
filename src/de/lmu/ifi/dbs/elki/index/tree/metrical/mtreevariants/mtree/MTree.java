@@ -125,7 +125,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
    */
   @Override
   protected MTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MTreeNode<O, D>(file, capacity, true);
+    return new MTreeNode<O, D>(capacity, true);
   }
 
   /**
@@ -133,7 +133,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
    */
   @Override
   protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MTreeNode<O, D>(file, capacity, false);
+    return new MTreeNode<O, D>(capacity, false);
   }
 
   @Override

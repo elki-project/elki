@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * 
  * @param <P> Page file
  */
-public interface PageFile<P extends Page<P>> extends PageFileStatistics {
+public interface PageFile<P extends Page> extends PageFileStatistics {
   /**
    * Sets the id of the given page.
    * 
