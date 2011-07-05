@@ -473,23 +473,21 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
   /**
    * Creates a new leaf node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new leaf node
    */
   @Override
-  protected RdKNNNode<D> createNewLeafNode(int capacity) {
-    return new RdKNNNode<D>(capacity, true);
+  protected RdKNNNode<D> createNewLeafNode() {
+    return new RdKNNNode<D>(leafCapacity, true);
   }
 
   /**
    * Creates a new directory node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new directory node
    */
   @Override
-  protected RdKNNNode<D> createNewDirectoryNode(int capacity) {
-    return new RdKNNNode<D>(capacity, false);
+  protected RdKNNNode<D> createNewDirectoryNode() {
+    return new RdKNNNode<D>(dirCapacity, false);
   }
 
   /**

@@ -89,7 +89,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
 
   @Override
   protected void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
-    N root = createNewLeafNode(leafCapacity);
+    N root = createNewLeafNode();
     writeNode(root);
     setHeight(1);
   }
@@ -108,7 +108,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
 
     // root is leaf node
     if(spatialObjects.size() / (leafCapacity - 1.0) <= 1) {
-      N root = createNewLeafNode(leafCapacity);
+      N root = createNewLeafNode();
       root.setPageID(getRootID());
       writeNode(root);
       createRoot(root, spatialObjects);
@@ -120,7 +120,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
 
     // root is directory node
     else {
-      N root = createNewDirectoryNode(dirCapacity);
+      N root = createNewDirectoryNode();
       root.setPageID(getRootID());
       writeNode(root);
 
@@ -171,7 +171,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
 
     for(List<N> partition : partitions) {
       // create node
-      N dirNode = createNewDirectoryNode(dirCapacity);
+      N dirNode = createNewDirectoryNode();
       writeNode(dirNode);
       result.add(dirNode);
 

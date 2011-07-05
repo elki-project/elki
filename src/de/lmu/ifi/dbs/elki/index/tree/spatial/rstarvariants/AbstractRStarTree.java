@@ -425,7 +425,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     for(List<E> partition : partitions) {
       // create leaf node
-      N leafNode = createNewLeafNode(leafCapacity);
+      N leafNode = createNewLeafNode();
       result.add(leafNode);
 
       // insert data
@@ -775,9 +775,9 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // New node
     final N newNode;
     if (node.isLeaf()) {
-      newNode = createNewLeafNode(node.getCapacity());
+      newNode = createNewLeafNode();
     } else {
-      newNode = createNewDirectoryNode(node.getCapacity());
+      newNode = createNewDirectoryNode();
     }
     // do the split
     node.deleteAllEntries();
@@ -993,14 +993,14 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
         N child = getNode(node.getEntry(0));
         N newRoot;
         if(child.isLeaf()) {
-          newRoot = createNewLeafNode(leafCapacity);
+          newRoot = createNewLeafNode();
           newRoot.setPageID(getRootID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addLeafEntry(child.getEntry(i));
           }
         }
         else {
-          newRoot = createNewDirectoryNode(dirCapacity);
+          newRoot = createNewDirectoryNode();
           newRoot.setPageID(getRootID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addDirectoryEntry(child.getEntry(i));
@@ -1044,7 +1044,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    *         child nodes
    */
   protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode) {
-    N root = createNewDirectoryNode(dirCapacity);
+    N root = createNewDirectoryNode();
     writeNode(root);
 
     // switch the ids

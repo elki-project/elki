@@ -53,23 +53,21 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry> {
   /**
    * Creates a new leaf node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new leaf node
    */
   @Override
-  protected RStarTreeNode createNewLeafNode(int capacity) {
-    return new RStarTreeNode(capacity, true);
+  protected RStarTreeNode createNewLeafNode() {
+    return new RStarTreeNode(leafCapacity, true);
   }
 
   /**
    * Creates a new directory node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new directory node
    */
   @Override
-  protected RStarTreeNode createNewDirectoryNode(int capacity) {
-    return new RStarTreeNode(capacity, false);
+  protected RStarTreeNode createNewDirectoryNode() {
+    return new RStarTreeNode(dirCapacity, false);
   }
 
   @Override
