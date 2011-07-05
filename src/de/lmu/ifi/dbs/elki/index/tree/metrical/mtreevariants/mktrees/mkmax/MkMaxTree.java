@@ -308,16 +308,16 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @return a new MkMaxTreeNode which is a leaf node
    */
   @Override
-  protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkMaxTreeNode<O, D>(capacity, true);
+  protected MkMaxTreeNode<O, D> createNewLeafNode() {
+    return new MkMaxTreeNode<O, D>(leafCapacity, true);
   }
 
   /**
    * @return a new MkMaxTreeNode which is a directory node
    */
   @Override
-  protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkMaxTreeNode<O, D>(capacity, false);
+  protected MkMaxTreeNode<O, D> createNewDirectoryNode() {
+    return new MkMaxTreeNode<O, D>(dirCapacity, false);
   }
 
   /**

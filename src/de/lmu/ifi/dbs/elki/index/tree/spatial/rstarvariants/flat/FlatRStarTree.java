@@ -52,7 +52,8 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
     // reconstruct root
     int nextPageID = file.getNextPageID();
-    root = createNewDirectoryNode(nextPageID);
+    dirCapacity = nextPageID;
+    root = createNewDirectoryNode();
     for(int i = 1; i < nextPageID; i++) {
       FlatRStarTreeNode node = getNode(i);
       root.addDirectoryEntry(createNewDirectoryEntry(node));
@@ -101,7 +102,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
     }
 
     // create root
-    root = createNewDirectoryNode(numNodes);
+    root = createNewDirectoryNode();
     root.setPageID(getRootID());
     for(FlatRStarTreeNode node : nodes) {
       root.addDirectoryEntry(createNewDirectoryEntry(node));
@@ -121,11 +122,11 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
   @Override
   protected void createEmptyRoot(SpatialEntry exampleLeaf) {
-    root = createNewDirectoryNode(dirCapacity);
+    root = createNewDirectoryNode();
     root.setPageID(getRootID());
 
     getFile().setNextPageID(getRootID() + 1);
-    FlatRStarTreeNode leaf = createNewLeafNode(leafCapacity);
+    FlatRStarTreeNode leaf = createNewLeafNode();
     writeNode(leaf);
     HyperBoundingBox mbr = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
     root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getPageID(), mbr));
@@ -172,23 +173,21 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
   /**
    * Creates a new leaf node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new leaf node
    */
   @Override
-  protected FlatRStarTreeNode createNewLeafNode(int capacity) {
-    return new FlatRStarTreeNode(capacity, true);
+  protected FlatRStarTreeNode createNewLeafNode() {
+    return new FlatRStarTreeNode(leafCapacity, true);
   }
 
   /**
    * Creates a new directory node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new directory node
    */
   @Override
-  protected FlatRStarTreeNode createNewDirectoryNode(int capacity) {
-    return new FlatRStarTreeNode(capacity, false);
+  protected FlatRStarTreeNode createNewDirectoryNode() {
+    return new FlatRStarTreeNode(dirCapacity, false);
   }
 
   @Override

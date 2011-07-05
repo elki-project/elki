@@ -110,23 +110,21 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
   /**
    * Creates a new leaf node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new leaf node
    */
   @Override
-  protected DeLiCluNode createNewLeafNode(int capacity) {
-    return new DeLiCluNode(capacity, true);
+  protected DeLiCluNode createNewLeafNode() {
+    return new DeLiCluNode(leafCapacity, true);
   }
 
   /**
    * Creates a new directory node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new directory node
    */
   @Override
-  protected DeLiCluNode createNewDirectoryNode(int capacity) {
-    return new DeLiCluNode(capacity, false);
+  protected DeLiCluNode createNewDirectoryNode() {
+    return new DeLiCluNode(dirCapacity, false);
   }
 
   /**

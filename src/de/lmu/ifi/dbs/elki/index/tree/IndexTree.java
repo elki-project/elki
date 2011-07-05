@@ -265,18 +265,16 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   /**
    * Creates a new leaf node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected abstract N createNewLeafNode(int capacity);
+  protected abstract N createNewLeafNode();
 
   /**
    * Creates a new directory node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected abstract N createNewDirectoryNode(int capacity);
+  protected abstract N createNewDirectoryNode();
 
   /**
    * Performs necessary operations before inserting the specified entry.

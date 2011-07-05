@@ -138,19 +138,18 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
 
   @Override
-  protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkTabTreeNode<O, D>(capacity, true);
+  protected MkTabTreeNode<O, D> createNewLeafNode() {
+    return new MkTabTreeNode<O, D>(leafCapacity, true);
   }
 
   /**
    * Creates a new directory node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new directory node
    */
   @Override
-  protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkTabTreeNode<O, D>(capacity, false);
+  protected MkTabTreeNode<O, D> createNewDirectoryNode() {
+    return new MkTabTreeNode<O, D>(dirCapacity, false);
   }
 
   /**

@@ -210,7 +210,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
   @Override
   protected final void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
-    N root = createNewLeafNode(leafCapacity);
+    N root = createNewLeafNode();
     writeNode(root);
   }
 
@@ -482,10 +482,10 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     Assignments<D, E> assignments = split.getAssignments();
     final N newNode;
     if(node.isLeaf()) {
-      newNode = createNewLeafNode(node.getCapacity());
+      newNode = createNewLeafNode();
     }
     else {
-      newNode = createNewDirectoryNode(node.getCapacity());
+      newNode = createNewDirectoryNode();
     }
     node.splitTo(newNode, assignments.getFirstAssignments(), assignments.getSecondAssignments());
 
@@ -629,7 +629,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    *         child nodes
    */
   private IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode, DBID firstRoutingObjectID, DBID secondRoutingObjectID) {
-    N root = createNewDirectoryNode(dirCapacity);
+    N root = createNewDirectoryNode();
     writeNode(root);
 
     // switch the ids

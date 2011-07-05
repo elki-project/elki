@@ -398,23 +398,21 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * Creates a new leaf node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new leaf node
    */
   @Override
-  protected MkAppTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkAppTreeNode<O, D>(capacity, true);
+  protected MkAppTreeNode<O, D> createNewLeafNode() {
+    return new MkAppTreeNode<O, D>(leafCapacity, true);
   }
 
   /**
    * Creates a new directory node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new directory node
    */
   @Override
-  protected MkAppTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkAppTreeNode<O, D>(capacity, false);
+  protected MkAppTreeNode<O, D> createNewDirectoryNode() {
+    return new MkAppTreeNode<O, D>(dirCapacity, false);
   }
 
   /**
