@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -162,7 +163,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
     // dir node
     else {
-      N tmp = pagefile.readPage(getEntry(0).getEntryID());
+      N tmp = pagefile.readPage(((DirectoryEntry)getEntry(0)).getPageID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -177,11 +178,11 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
 
         if(e != null) {
-          N node = pagefile.readPage(e.getEntryID());
+          N node = pagefile.readPage(((DirectoryEntry)e).getPageID());
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              pagefile.readPage(getEntry(k).getEntryID());
+              pagefile.readPage(((DirectoryEntry)getEntry(k)).getPageID());
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);

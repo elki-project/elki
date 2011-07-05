@@ -64,7 +64,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
     final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootEntry().getEntryID()));
+    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootEntryID()));
 
     // search in tree
     while(!pq.isEmpty()) {

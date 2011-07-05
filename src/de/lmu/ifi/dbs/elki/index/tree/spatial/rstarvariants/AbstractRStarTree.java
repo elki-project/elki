@@ -565,7 +565,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if (node == null) {
-      throw new RuntimeException("Page file did not return node for node id: "+subtree.getLastPathComponent().getEntry().getEntryID());
+      throw new RuntimeException("Page file did not return node for node id: "+getPageID(subtree.getLastPathComponent().getEntry()));
     }
     if(node.isLeaf()) {
       return subtree;
@@ -971,7 +971,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       if(split != null) {
         // if root was split: create a new root that points the two
         // split nodes
-        if(node.getPageID().equals(getRootEntry().getEntryID())) {
+        if(node.getPageID().equals(getRootEntryID())) {
           IndexTreePath<E> newRootPath = createNewRoot(node, split);
           height++;
           adjustTree(newRootPath);
@@ -1001,7 +1001,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(!node.getPageID().equals(getRootEntry().getEntryID())) {
+      if(!node.getPageID().equals(getRootEntryID())) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         int index = subtree.getLastPathComponent().getIndex();
         lastInsertedEntry = node.adjustEntryIncremental(parent.getEntry(index), lastInsertedEntry);
@@ -1051,7 +1051,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   private void condenseTree(IndexTreePath<E> subtree, Stack<N> stack) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     // node is not root
-    if(!node.getPageID().equals(getRootEntry().getEntryID())) {
+    if(!node.getPageID().equals(getRootEntryID())) {
       N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
       int index = subtree.getLastPathComponent().getIndex();
       if(hasUnderflow(node)) {
@@ -1077,14 +1077,14 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
         N newRoot;
         if(child.isLeaf()) {
           newRoot = createNewLeafNode(leafCapacity);
-          newRoot.setPageID(getRootEntry().getEntryID());
+          newRoot.setPageID(getRootEntryID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addLeafEntry(child.getEntry(i));
           }
         }
         else {
           newRoot = createNewDirectoryNode(dirCapacity);
-          newRoot.setPageID(getRootEntry().getEntryID());
+          newRoot.setPageID(getRootEntryID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addDirectoryEntry(child.getEntry(i));
           }
@@ -1111,7 +1111,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        N child = file.readPage(node.getEntry(i).getEntryID());
+        N child = file.readPage(getPageID(node.getEntry(i)));
         getLeafNodes(child, result, (currentLevel - 1));
       }
     }
@@ -1139,7 +1139,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       }
     }
 
-    root.setPageID(getRootEntry().getEntryID());
+    root.setPageID(getRootEntryID());
     E oldRootEntry = createNewDirectoryEntry(oldRoot);
     E newNodeEntry = createNewDirectoryEntry(newNode);
     root.addDirectoryEntry(oldRootEntry);

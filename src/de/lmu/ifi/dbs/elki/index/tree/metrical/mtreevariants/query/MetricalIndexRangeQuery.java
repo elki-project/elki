@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -67,7 +68,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         if(diff.compareTo(sum) <= 0) {
           D d3 = distanceQuery.distance(o_r, q);
           if(d3.compareTo(sum) <= 0) {
-            AbstractMTreeNode<O, D, ?, ?> child = index.getNode(entry.getEntryID());
+            AbstractMTreeNode<O, D, ?, ?> child = index.getNode(((DirectoryEntry)entry).getPageID());
             doRangeQuery(o_r, child, q, r_q, result);
           }
         }
@@ -125,7 +126,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         if(diff.compareTo(sum) <= 0) {
           D d3 = distanceQuery.distance(o_r, q);
           if(d3.compareTo(sum) <= 0) {
-            AbstractMTreeNode<O, D, ?, ?> child = index.getNode(entry.getEntryID());
+            AbstractMTreeNode<O, D, ?, ?> child = index.getNode(((DirectoryEntry)entry).getPageID());
             doRangeQuery(o_r, child, q, r_q, result);
           }
         }

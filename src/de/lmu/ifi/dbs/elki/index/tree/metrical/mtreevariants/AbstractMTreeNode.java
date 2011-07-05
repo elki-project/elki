@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -109,7 +110,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
 
     // dir node
     else {
-      N tmp = pagefile.readPage(getEntry(0).getEntryID());
+      N tmp = pagefile.readPage(((DirectoryEntry)getEntry(0)).getPageID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -124,11 +125,11 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
         }
 
         if(e != null) {
-          N node = pagefile.readPage(e.getEntryID());
+          N node = pagefile.readPage(((DirectoryEntry)e).getPageID());
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              pagefile.readPage(getEntry(k).getEntryID());
+              pagefile.readPage(((DirectoryEntry)getEntry(k)).getPageID());
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -166,13 +167,13 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
     if(!entry.getParentDistance().equals(parentDistance)) {
       String soll = parentDistance.toString();
       String ist = entry.getParentDistance().toString();
-      throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
 
     // test if covering radius is correctly set
     D mincover = parentDistance.plus(entry.getCoveringRadius());
     if(parentEntry.getCoveringRadius().compareTo(mincover) < 0) {
-      String msg = "pcr < pd + cr \n" + parentEntry.getCoveringRadius() + " < " + parentDistance + " + " + entry.getCoveringRadius() + "in node " + parent.getPageID() + " at index " + index + " (child " + entry.getEntryID() + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
+      String msg = "pcr < pd + cr \n" + parentEntry.getCoveringRadius() + " < " + parentDistance + " + " + entry.getCoveringRadius() + "in node " + parent.getPageID() + " at index " + index + " (child " + entry + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
 
       // throw new RuntimeException(msg);
       if(parentDistance instanceof NumberDistance<?, ?>) {

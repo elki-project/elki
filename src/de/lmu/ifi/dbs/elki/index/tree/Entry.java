@@ -10,14 +10,6 @@ import java.io.Externalizable;
  */
 public interface Entry extends Externalizable {
   /**
-   * Returns the id of the node or data object that is represented by this
-   * entry.
-   * 
-   * @return the id of the node or data object that is represented by this entry
-   */
-  Integer getEntryID();
-
-  /**
    * Returns true if this entry is an entry in a leaf node (i.e. this entry
    * represents a data object), false otherwise.
    * 

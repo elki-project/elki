@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract super class for all tree based index classes.
@@ -90,6 +91,28 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   public final E getRootEntry() {
     return rootEntry;
   }
+  
+  /**
+   * Page ID of the root entry.
+   * 
+   * @return page id
+   */
+  public final Integer getRootEntryID() {
+    return getPageID(rootEntry);
+  }
+  
+  /**
+   * Convert a directory entry to its page id.
+   * 
+   * @param entry Entry
+   * @return Page ID
+   */
+  protected Integer getPageID(Entry entry) {
+    if (entry.isLeafEntry()) {
+      throw new AbortException("Leafs do not have page ids!");
+    }
+    return ((DirectoryEntry)entry).getPageID();
+  }
 
   /**
    * Returns the node with the specified id.
@@ -98,7 +121,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @return the node with the specified id
    */
   public N getNode(Integer nodeID) {
-    if(nodeID == rootEntry.getEntryID()) {
+    if(nodeID == getPageID(rootEntry)) {
       return getRoot();
     }
     else {
@@ -113,7 +136,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @return the node that is represented by the specified entry
    */
   public final N getNode(E entry) {
-    return getNode(entry.getEntryID());
+    return getNode(getPageID(entry));
   }
 
   /**
@@ -187,7 +210,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @return the root node of this index
    */
   public N getRoot() {
-    return file.readPage(rootEntry.getEntryID());
+    return file.readPage(getPageID(rootEntry));
   }
 
   /**

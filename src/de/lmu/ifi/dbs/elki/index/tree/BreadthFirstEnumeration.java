@@ -100,7 +100,7 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
       children = EMPTY_ENUMERATION;
     }
     else {
-      N node = index.getNode(nextPath.getLastPathComponent().getEntry().getEntryID());
+      N node = index.getNode(index.getPageID(nextPath.getLastPathComponent().getEntry()));
       children = node.children(nextPath);
     }
 

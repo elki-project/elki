@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericDistanceSearchCandidate;
@@ -73,7 +74,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     final Heap<GenericDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootEntry().getEntryID()));
+    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootEntryID()));
     D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
 
     // search in tree
@@ -104,7 +105,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
           D distance = distanceFunction.minDist(entry, object);
           tree.distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
-            pq.add(new GenericDistanceSearchCandidate<D>(distance, entry.getEntryID()));
+            pq.add(new GenericDistanceSearchCandidate<D>(distance, ((DirectoryEntry)entry).getPageID()));
           }
         }
       }
@@ -148,7 +149,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
             SpatialEntry entry = distEntry.getEntry();
-            AbstractRStarTreeNode<?, ?> child = tree.getNode(entry.getEntryID());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry)entry).getPageID());
             batchNN(child, knnLists);
             break;
           }

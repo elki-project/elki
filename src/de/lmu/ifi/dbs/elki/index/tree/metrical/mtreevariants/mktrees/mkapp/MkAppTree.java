@@ -228,7 +228,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootEntry().getEntryID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootEntryID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -250,7 +250,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
 
           if(minDist.compareTo(approximatedKnnDist) <= 0) {
-            pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, entry.getEntryID(), entry.getRoutingObjectID()));
+            pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, getPageID(entry), entry.getRoutingObjectID()));
           }
         }
       }
@@ -301,7 +301,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param knnLists a map of knn lists for each leaf entry
    */
   private void adjustApproximatedKNNDistances(MkAppEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
-    MkAppTreeNode<O, D> node = file.readPage(entry.getEntryID());
+    MkAppTreeNode<O, D> node = file.readPage(getPageID(entry));
 
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {

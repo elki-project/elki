@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -72,7 +73,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     final Heap<DoubleDistanceSearchCandidate> pq = new UpdatableHeap<DoubleDistanceSearchCandidate>();
 
     // push root
-    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootEntry().getEntryID()));
+    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootEntryID()));
     double maxDist = Double.MAX_VALUE;
 
     // search in tree
@@ -103,7 +104,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
           double distance = distanceFunction.doubleMinDist(entry, object);
           tree.distanceCalcs++;
           if(distance <= maxDist) {
-            pq.add(new DoubleDistanceSearchCandidate(distance, entry.getEntryID()));
+            pq.add(new DoubleDistanceSearchCandidate(distance, ((DirectoryEntry)entry).getPageID()));
           }
         }
       }
@@ -148,7 +149,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
           if(minDist <= knn_q_maxDist) {
             SpatialEntry entry = distEntry.entry;
-            AbstractRStarTreeNode<?, ?> child = tree.getNode(entry.getEntryID());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry)entry).getPageID());
             batchNN(child, knnLists);
             break;
           }

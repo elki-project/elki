@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFun
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluNode;
@@ -129,7 +130,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     clusterOrder.add(startID, null, distFunction.getDistanceFactory().infiniteDistance());
     int numHandled = 1;
     index.setHandled(startID, relation.get(startID));
-    SpatialEntry rootEntry = index.getRootEntry();
+    SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry)index.getRootEntry();
     SpatialObjectPair spatialObjectPair = new SpatialObjectPair(distFunction.getDistanceFactory().nullDistance(), rootEntry, rootEntry, true);
     heap.add(spatialObjectPair);
 
@@ -193,8 +194,8 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param knns the knn list
    */
   private void expandNodes(DeLiCluTree index, SpatialPrimitiveDistanceFunction<NV, D> distFunction, SpatialObjectPair nodePair, DataStore<KNNList<D>> knns) {
-    DeLiCluNode node1 = index.getNode(nodePair.entry1.getEntryID());
-    DeLiCluNode node2 = index.getNode(nodePair.entry2.getEntryID());
+    DeLiCluNode node1 = index.getNode(((SpatialDirectoryEntry)nodePair.entry1).getPageID());
+    DeLiCluNode node2 = index.getNode(((SpatialDirectoryEntry)nodePair.entry2).getPageID());
 
     if(node1.isLeaf()) {
       expandLeafNodes(distFunction, node1, node2, knns);
@@ -280,12 +281,12 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param knns the knn list
    */
   private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, DataStore<KNNList<D>> knns) {
-    SpatialEntry rootEntry = path.remove(0).getEntry();
+    SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry)path.remove(0).getEntry();
     reinsertExpanded(distFunction, index, path, 0, rootEntry, knns);
   }
 
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialEntry parentEntry, DataStore<KNNList<D>> knns) {
-    DeLiCluNode parentNode = index.getNode(parentEntry.getEntryID());
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialDirectoryEntry parentEntry, DataStore<KNNList<D>> knns) {
+    DeLiCluNode parentNode = index.getNode(parentEntry.getPageID());
     SpatialEntry entry2 = path.get(pos).getEntry();
 
     if(entry2.isLeafEntry()) {
@@ -303,10 +304,10 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     else {
       Set<Integer> expanded = index.getExpanded(entry2);
       for(int i = 0; i < parentNode.getNumEntries(); i++) {
-        SpatialEntry entry1 = parentNode.getEntry(i);
+        SpatialDirectoryEntry entry1 = (SpatialDirectoryEntry) parentNode.getEntry(i);
 
         // not yet expanded
-        if(!expanded.contains(entry1.getEntryID())) {
+        if(!expanded.contains(entry1.getPageID())) {
           D distance = distFunction.minDist(entry1, entry2);
           SpatialObjectPair nodePair = new SpatialObjectPair(distance, entry1, entry2, true);
           heap.add(nodePair);
@@ -415,9 +416,9 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     @Override
     public String toString() {
       if(!isExpandable) {
-        return entry1.getEntryID() + " - " + entry2.getEntryID();
+        return entry1 + " - " + entry2;
       }
-      return "n_" + entry1.getEntryID() + " - n_" + entry2.getEntryID();
+      return "n_" + entry1 + " - n_" + entry2;
     }
 
     /** equals is used in updating the heap! */

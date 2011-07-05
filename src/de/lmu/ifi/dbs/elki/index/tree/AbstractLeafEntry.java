@@ -40,17 +40,6 @@ public abstract class AbstractLeafEntry implements LeafEntry {
     return true;
   }
 
-  /**
-   * Returns the id of the node or data object that is represented by this
-   * entry.
-   * 
-   * @return the id of the node or data object that is represented by this entry
-   */
-  @Override
-  public final Integer getEntryID() {
-    return id.getIntegerID();
-  }
-
   @Override
   public DBID getDBID() {
     return id;
