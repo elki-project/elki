@@ -73,7 +73,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     final Heap<DoubleDistanceSearchCandidate> pq = new UpdatableHeap<DoubleDistanceSearchCandidate>();
 
     // push root
-    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootEntryID()));
+    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));
     double maxDist = Double.MAX_VALUE;
 
     // search in tree

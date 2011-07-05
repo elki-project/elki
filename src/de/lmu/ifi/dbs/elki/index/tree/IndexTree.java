@@ -20,7 +20,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   /**
    * The file storing the entries of this index.
    */
-  final protected PageFile<N> file;
+  final private PageFile<N> file;
 
   /**
    * True if this index is already initialized.
@@ -71,7 +71,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   public void initialize() {
     TreeIndexHeader header = createHeader();
     if(this.file.initialize(header)) {
-      initializeFromFile(header);
+      initializeFromFile(header, file);
     }
     rootEntry = createRootEntry();
   }
@@ -97,10 +97,29 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * 
    * @return page id
    */
-  public final Integer getRootEntryID() {
+  public final Integer getRootID() {
     return getPageID(rootEntry);
   }
   
+  /**
+   * Reads the root node of this index from the file.
+   * 
+   * @return the root node of this index
+   */
+  public N getRoot() {
+    return file.readPage(getPageID(rootEntry));
+  }
+  
+  /**
+   * Test if a given ID is the root.
+   * 
+   * @param page Page to test
+   * @return Whether the page ID is the root
+   */
+  protected boolean isRoot(N page) {
+    return getRootID().equals(page.getPageID());
+  }
+
   /**
    * Convert a directory entry to its page id.
    * 
@@ -138,6 +157,24 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   public final N getNode(E entry) {
     return getNode(getPageID(entry));
   }
+  
+  /**
+   * Write a node to the backing storage.
+   * 
+   * @param node Node to write
+   */
+  protected void writeNode(N node) {
+    file.writePage(node);
+  }
+
+  /**
+   * Delete a node from the backing storage.
+   * 
+   * @param node Node to delete
+   */
+  protected void deleteNode(N node) {
+    file.deletePage(node.getPageID());
+  }
 
   /**
    * Creates a header for this index structure which is an instance of
@@ -153,7 +190,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   /**
    * Initializes this index from an existing persistent file.
    */
-  public void initializeFromFile(TreeIndexHeader header) {
+  public void initializeFromFile(TreeIndexHeader header, PageFile<N> file) {
     this.dirCapacity = header.getDirCapacity();
     this.leafCapacity = header.getLeafCapacity();
     this.dirMinimum = header.getDirMinimum();
@@ -202,15 +239,6 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    */
   public final IndexTreePath<E> getRootPath() {
     return new IndexTreePath<E>(new TreeIndexPathComponent<E>(rootEntry, null));
-  }
-
-  /**
-   * Reads the root node of this index from the file.
-   * 
-   * @return the root node of this index
-   */
-  public N getRoot() {
-    return file.readPage(getPageID(rootEntry));
   }
 
   /**
@@ -274,6 +302,25 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @return access statistics
    */
   public PageFileStatistics getPageFileStatistics() {
+    return file;
+  }
+  
+  /**
+   * Get the page size of the backing storage.
+   * 
+   * @return Page size
+   */
+  protected int getPageSize() {
+    return file.getPageSize();
+  }
+
+  /**
+   * Directly access the backing page file.
+   * 
+   * @return the page file
+   */
+  @Deprecated
+  protected PageFile<N> getFile() {
     return file;
   }
 }

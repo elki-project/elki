@@ -81,7 +81,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
       E entry = node.getEntry(0);
-      node = getNode(getPageID(entry));
+      node = getNode(entry);
       height++;
     }
     return height;
@@ -90,7 +90,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
   @Override
   protected void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
     N root = createNewLeafNode(leafCapacity);
-    file.writePage(root);
+    writeNode(root);
     setHeight(1);
   }
 
@@ -109,8 +109,8 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     // root is leaf node
     if(spatialObjects.size() / (leafCapacity - 1.0) <= 1) {
       N root = createNewLeafNode(leafCapacity);
-      root.setPageID(getRootEntryID());
-      file.writePage(root);
+      root.setPageID(getRootID());
+      writeNode(root);
       createRoot(root, spatialObjects);
       setHeight(1);
       if(getLogger().isDebugging()) {
@@ -121,8 +121,8 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     // root is directory node
     else {
       N root = createNewDirectoryNode(dirCapacity);
-      root.setPageID(getRootEntryID());
-      file.writePage(root);
+      root.setPageID(getRootID());
+      writeNode(root);
 
       // create leaf nodes
       List<N> nodes = createBulkLeafNodes(spatialObjects);
@@ -172,7 +172,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     for(List<N> partition : partitions) {
       // create node
       N dirNode = createNewDirectoryNode(dirCapacity);
-      file.writePage(dirNode);
+      writeNode(dirNode);
       result.add(dirNode);
 
       // insert nodes
@@ -181,7 +181,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
       }
 
       // write to file
-      file.writePage(dirNode);
+      writeNode(dirNode);
       if(getLogger().isDebuggingFiner()) {
         StringBuffer msg = new StringBuffer();
         msg.append("\npageNo ").append(dirNode.getPageID());
@@ -219,7 +219,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     ((SpatialDirectoryEntry) getRootEntry()).setMBR(root.computeMBR());
 
     // write to file
-    file.writePage(root);
+    writeNode(root);
     if(getLogger().isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
       msg.append("pageNo ").append(root.getPageID());

@@ -7,9 +7,7 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
-import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Abstract super class for nodes in M-Tree variants.
@@ -94,7 +92,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    * @param entry the entry representing this node
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck(PageFile<N> pagefile, AbstractMTree<O, D, N, E> mTree, E entry) {
+  public final void integrityCheck(AbstractMTree<O, D, N, E> mTree, E entry) {
     // leaf node
     if(isLeaf()) {
       for(int i = 0; i < getCapacity(); i++) {
@@ -110,7 +108,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
 
     // dir node
     else {
-      N tmp = pagefile.readPage(((DirectoryEntry)getEntry(0)).getPageID());
+      N tmp = mTree.getNode(getEntry(0));
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -125,11 +123,11 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
         }
 
         if(e != null) {
-          N node = pagefile.readPage(((DirectoryEntry)e).getPageID());
+          N node = mTree.getNode(e);
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              pagefile.readPage(((DirectoryEntry)getEntry(k)).getPageID());
+              mTree.getNode(getEntry(k));
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -141,7 +139,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
 
           // noinspection unchecked
           node.integrityCheckParameters(entry, (N) this, i, mTree);
-          node.integrityCheck(pagefile, mTree, e);
+          node.integrityCheck(mTree, e);
         }
       }
 

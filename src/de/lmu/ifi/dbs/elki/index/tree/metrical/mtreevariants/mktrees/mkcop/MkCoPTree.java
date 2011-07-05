@@ -136,7 +136,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
 
     if(extraIntegrityChecks) {
-      getRoot().integrityCheck(this.file, this, getRootEntry());
+      getRoot().integrityCheck(this, getRootEntry());
     }
   }
 
@@ -219,16 +219,16 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(file.getPageSize() - overhead < 0) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+    if(getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     // dirCapacity = (file.getPageSize() - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance + consApprox) + 1
-    dirCapacity = (int) (file.getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + 10) + 1;
+    dirCapacity = (int) (getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + 10) + 1;
 
     if(dirCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -237,10 +237,10 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     // leafCapacity = (file.getPageSize() - overhead) / (objectID + parentDistance +
     // consApprox + progrApprox) + 1
-    leafCapacity = (int) (file.getPageSize() - overhead) / (4 + distanceSize + 2 * 10) + 1;
+    leafCapacity = (int) (getPageSize() - overhead) / (4 + distanceSize + 2 * 10) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -267,7 +267,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootEntryID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootID(), null));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -317,7 +317,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param knnLists a map of knn lists for each leaf entry
    */
   private void adjustApproximatedKNNDistances(MkCoPEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
-    MkCoPTreeNode<O, D> node = file.readPage(getPageID(entry));
+    MkCoPTreeNode<O, D> node = getNode(entry);
 
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {

@@ -141,7 +141,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     result.append(leafNodes).append(" Leaf Nodes \n");
     result.append(objects).append(" Objects \n");
 
-    PageFileUtil.appendPageFileStatistics(result, file);
+    PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     return result.toString();
   }
 
@@ -181,7 +181,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // get parent node
     N parent = getNode(parentEntry);
     parent.addLeafEntry(entry);
-    file.writePage(parent);
+    writeNode(parent);
 
     // adjust the tree from subtree to root
     adjustTree(subtree);
@@ -189,7 +189,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // test
     if(extraIntegrityChecks) {
       if(withPreInsert) {
-        getRoot().integrityCheck(file, this, getRootEntry());
+        getRoot().integrityCheck(this, getRootEntry());
       }
     }
   }
@@ -211,7 +211,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   @Override
   protected final void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
     N root = createNewLeafNode(leafCapacity);
-    file.writePage(root);
+    writeNode(root);
   }
 
   /**
@@ -226,7 +226,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootEntryID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -490,8 +490,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     node.splitTo(newNode, assignments.getFirstAssignments(), assignments.getSecondAssignments());
 
     // write changes to file
-    file.writePage(node);
-    file.writePage(newNode);
+    writeNode(node);
+    writeNode(newNode);
 
     if(getLogger().isDebugging()) {
       String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getPageID() + "\n" + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n" + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
@@ -549,7 +549,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
       // if root was split: create a new root that points the two split
       // nodes
-      if(node.getPageID() == getRootEntryID()) {
+      if(isRoot(node)) {
         // FIXME: stimmen die parentDistance der Kinder in node & splitNode?
         IndexTreePath<E> newRootPath = createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());
         adjustTree(newRootPath);
@@ -574,21 +574,21 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         node.adjustEntry(parent.getEntry(nodeIndex), assignments.getFirstRoutingObject(), parentDistance1, this);
 
         // write changes in parent to file
-        file.writePage(parent);
+        writeNode(parent);
         adjustTree(subtree.getParentPath());
       }
     }
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(node.getPageID() != getRootEntryID()) {
+      if(!isRoot(node)) {
         E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
         N parent = getNode(parentEntry);
         int index = subtree.getLastPathComponent().getIndex();
         E entry = parent.getEntry(index);
         node.adjustEntry(entry, entry.getRoutingObjectID(), entry.getParentDistance(), this);
         // write changes in parent to file
-        file.writePage(parent);
+        writeNode(parent);
         adjustTree(subtree.getParentPath());
       }
       // root level is reached
@@ -630,7 +630,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    */
   private IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode, DBID firstRoutingObjectID, DBID secondRoutingObjectID) {
     N root = createNewDirectoryNode(dirCapacity);
-    file.writePage(root);
+    writeNode(root);
 
     // switch the ids
     oldRoot.setPageID(root.getPageID());
@@ -638,11 +638,11 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       // FIXME: what is happening here?
       for(int i = 0; i < oldRoot.getNumEntries(); i++) {
         N node = getNode(oldRoot.getEntry(i));
-        file.writePage(node);
+        writeNode(node);
       }
     }
 
-    root.setPageID(getRootEntryID());
+    root.setPageID(getRootID());
     // FIXME: doesn't the root by definition not have a routing object?
     // D parentDistance1 = distance(getRootEntry().getRoutingObjectID(),
     // firstRoutingObjectID);
@@ -657,9 +657,9 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // oldRootEntry.toString() + "," + newRootEntry.toString() + " dists: " +
     // parentDistance1 + ", " + parentDistance2);
 
-    file.writePage(root);
-    file.writePage(oldRoot);
-    file.writePage(newNode);
+    writeNode(root);
+    writeNode(oldRoot);
+    writeNode(newNode);
     if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
       msg += "\nchild1 " + oldRoot;

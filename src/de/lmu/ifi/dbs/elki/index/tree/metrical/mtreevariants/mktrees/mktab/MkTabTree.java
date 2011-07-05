@@ -86,16 +86,16 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(file.getPageSize() - overhead < 0) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+    if(getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance + kmax + kmax * knnDistance) + 1
-    dirCapacity = (int) (file.getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + 4 + getKmax() * distanceSize) + 1;
+    dirCapacity = (int) (getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + 4 + getKmax() * distanceSize) + 1;
 
     if(dirCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -104,10 +104,10 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + +
     // kmax + kmax * knnDistance) + 1
-    leafCapacity = (int) (file.getPageSize() - overhead) / (4 + distanceSize + 4 + getKmax() * distanceSize) + 1;
+    leafCapacity = (int) (getPageSize() - overhead) / (4 + distanceSize + 4 + getKmax() * distanceSize) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -118,7 +118,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
   @Override
   protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    MkTabTreeNode<O, D> node = file.readPage(getPageID(entry));
+    MkTabTreeNode<O, D> node = getNode(entry);
     List<D> knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
@@ -210,7 +210,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if(minDist.compareTo(node_knnDist) <= 0) {
-          MkTabTreeNode<O, D> childNode = getNode(getPageID(entry));
+          MkTabTreeNode<O, D> childNode = getNode(entry);
           doReverseKNNQuery(k, q, entry, childNode, result);
         }
       }
