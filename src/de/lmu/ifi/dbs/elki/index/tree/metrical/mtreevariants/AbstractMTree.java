@@ -510,7 +510,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     if(node.isLeaf()) {
       N newNode = createNewLeafNode(node.getCapacity());
-      // getFile().writePage(newNode);
 
       node.deleteAllEntries();
 
@@ -536,7 +535,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     }
     else {
       N newNode = createNewDirectoryNode(node.getCapacity());
-      // getFile().writePage(newNode);
 
       node.deleteAllEntries();
 
