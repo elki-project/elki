@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
  * Object for a priority queue with integer priority. Can be used in the
- * {@link UpdatableHeap}, since hashcode and equality use the stored objects
+ * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap UpdatableHeap}, since hashcode and equality use the stored objects
  * only, not the priority.
  * 
  * @author Erich Schubert

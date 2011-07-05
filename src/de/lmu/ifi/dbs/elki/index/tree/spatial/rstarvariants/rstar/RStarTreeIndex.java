@@ -79,7 +79,7 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
    * Inserts the specified objects into this index. If a bulk load mode is
    * implemented, the objects are inserted in one bulk.
    * 
-   * @param objects the objects to be inserted
+   * @param ids the objects to be inserted
    */
   @Override
   public void insertAll(DBIDs ids) {

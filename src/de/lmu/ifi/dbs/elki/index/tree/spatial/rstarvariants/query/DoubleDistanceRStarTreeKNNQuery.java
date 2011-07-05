@@ -115,7 +115,6 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * Performs a batch knn query.
    * 
    * @param node the node for which the query should be performed
-   * @param distanceQuery the distance function for computing the distances
    * @param knnLists a map containing the knn lists for each query objects
    */
   protected void batchNN(AbstractRStarTreeNode<?, ?> node, Map<DBID, KNNHeap<DoubleDistance>> knnLists) {

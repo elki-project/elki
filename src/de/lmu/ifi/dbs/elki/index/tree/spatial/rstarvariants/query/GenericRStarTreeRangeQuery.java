@@ -44,7 +44,6 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
    * 
    * @param tree Index to use
    * @param distanceQuery Distance query to use
-   * @param distanceFunction Distance function
    */
   public GenericRStarTreeRangeQuery(AbstractRStarTree<?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery) {
     super( distanceQuery);

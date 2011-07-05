@@ -148,7 +148,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   /**
    * Inserts the specified object into this M-Tree.
    * 
-   * @param object the object to be inserted
+   * @param entry the entry to be inserted
    * @param withPreInsert if this flag is true, the preInsert method will be
    *        called before inserting the object
    */
@@ -291,8 +291,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * Chooses the best path of the specified subtree for insertion of the given
    * object.
    * 
+   * @param object the entry to search
    * @param subtree the subtree to be tested for insertion
-   * @param objectID the id of the object to be inserted
    * @return the path of the appropriate subtree to insert the given object
    */
   private IndexTreePath<E> choosePath(E object, IndexTreePath<E> subtree) {

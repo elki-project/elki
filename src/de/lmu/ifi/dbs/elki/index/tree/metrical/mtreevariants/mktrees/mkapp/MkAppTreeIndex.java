@@ -43,7 +43,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    * Constructor.
    * 
    * @param relation Relation to index
-   * @param pagefile Page file
+   * @param pageFile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    * @param k_max Maximum value of k supported
