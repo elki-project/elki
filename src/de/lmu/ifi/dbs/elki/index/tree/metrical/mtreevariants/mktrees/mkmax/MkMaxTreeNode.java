@@ -42,22 +42,6 @@ class MkMaxTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
   }
 
   /**
-   * @return a new MkMaxTreeNode which is a leaf node
-   */
-  @Override
-  protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkMaxTreeNode<O, D>(capacity, true);
-  }
-
-  /**
-   * @return a new MkMaxTreeNode which is a directory node
-   */
-  @Override
-  protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkMaxTreeNode<O, D>(capacity, false);
-  }
-
-  /**
    * Determines and returns the k-nearest neighbor distance of this node as the
    * maximum of the k-nearest neighbor distances of all entries.
    * 

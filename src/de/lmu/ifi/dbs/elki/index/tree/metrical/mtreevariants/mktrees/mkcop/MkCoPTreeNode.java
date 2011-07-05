@@ -43,28 +43,6 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
   }
 
   /**
-   * Creates a new leaf node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  @Override
-  protected MkCoPTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkCoPTreeNode<O, D>(capacity, true);
-  }
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  @Override
-  protected MkCoPTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkCoPTreeNode<O, D>(capacity, false);
-  }
-
-  /**
    * Determines and returns the conservative approximation for the knn distances
    * of this node as the maximum of the conservative approximations of all
    * entries.

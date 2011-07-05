@@ -42,28 +42,6 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
   }
 
   /**
-   * Creates a new leaf node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  @Override
-  protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkTabTreeNode<O, D>(capacity, true);
-  }
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  @Override
-  protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkTabTreeNode<O, D>(capacity, false);
-  }
-
-  /**
    * Determines and returns the knn distance of this node as the maximum knn
    * distance of all entries.
    * 

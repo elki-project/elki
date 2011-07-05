@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
@@ -34,6 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
@@ -798,10 +800,10 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // do the split
     N newNode;
     if(split.getBestSorting() == SpatialComparator.MIN) {
-      newNode = node.splitEntries(split.getMinSorting(), split.getSplitPoint());
+      newNode = splitEntries(node, split.getMinSorting(), split.getSplitPoint());
     }
     else if(split.getBestSorting() == SpatialComparator.MAX) {
-      newNode = node.splitEntries(split.getMaxSorting(), split.getSplitPoint());
+      newNode = splitEntries(node, split.getMaxSorting(), split.getSplitPoint());
     }
     else {
       throw new IllegalStateException("split.bestSort is undefined: " + split.getBestSorting());
@@ -823,6 +825,73 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     return newNode;
   }
 
+  /**
+   * Splits the entries of this node into a new node at the specified splitPoint
+   * and returns the newly created node.
+   * 
+   * @param node Node to split
+   * @param sorting the sorted entries of this node
+   * @param splitPoint the split point of the entries
+   * @return the newly created split node
+   */
+  protected N splitEntries(N node, List<E> sorting, int splitPoint) {
+    StringBuffer msg = new StringBuffer("\n");
+
+    if(node.isLeaf()) {
+      N newNode = createNewLeafNode(node.getCapacity());
+      // getFile().writePage(newNode);
+
+      node.deleteAllEntries();
+
+      for(int i = 0; i < splitPoint; i++) {
+        node.addLeafEntry(sorting.get(i));
+        if(LoggingConfiguration.DEBUG) {
+          msg.append("n_").append(node.getPageID()).append(" ");
+          msg.append(sorting.get(i)).append("\n");
+        }
+      }
+
+      for(int i = 0; i < sorting.size() - splitPoint; i++) {
+        newNode.addLeafEntry(sorting.get(splitPoint + i));
+        if(LoggingConfiguration.DEBUG) {
+          msg.append("n_").append(newNode.getPageID()).append(" ");
+          msg.append(sorting.get(splitPoint + i)).append("\n");
+        }
+      }
+      if(LoggingConfiguration.DEBUG) {
+        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+      }
+      return newNode;
+    }
+
+    else {
+      N newNode = createNewDirectoryNode(node.getCapacity());
+      // getFile().writePage(newNode);
+
+      node.deleteAllEntries();
+
+      for(int i = 0; i < splitPoint; i++) {
+        node.addDirectoryEntry(sorting.get(i));
+        if(LoggingConfiguration.DEBUG) {
+          msg.append("n_").append(node.getPageID()).append(" ");
+          msg.append(sorting.get(i)).append("\n");
+        }
+      }
+
+      for(int i = 0; i < sorting.size() - splitPoint; i++) {
+        newNode.addDirectoryEntry(sorting.get(splitPoint + i));
+        if(LoggingConfiguration.DEBUG) {
+          msg.append("n_").append(newNode.getPageID()).append(" ");
+          msg.append(sorting.get(splitPoint + i)).append("\n");
+        }
+      }
+      if(LoggingConfiguration.DEBUG) {
+        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+      }
+      return newNode;
+    }
+  }
+  
   /**
    * Reinserts the specified node at the specified level.
    * 

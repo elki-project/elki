@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.List;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -14,8 +13,8 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<N, E> implements SpatialNode<N, E> {
+public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<E> implements SpatialNode<N, E> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -140,72 +139,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       for(int i = start; i < reInsertEntries.length; i++) {
         addDirectoryEntry(reInsertEntries[i].getEntry());
       }
-    }
-  }
-
-  /**
-   * Splits the entries of this node into a new node at the specified splitPoint
-   * and returns the newly created node.
-   * 
-   * @param sorting the sorted entries of this node
-   * @param splitPoint the split point of the entries
-   * @return the newly created split node
-   */
-  public N splitEntries(List<E> sorting, int splitPoint) {
-    StringBuffer msg = new StringBuffer("\n");
-
-    if(isLeaf()) {
-      N newNode = createNewLeafNode(getCapacity());
-      // getFile().writePage(newNode);
-
-      deleteAllEntries();
-
-      for(int i = 0; i < splitPoint; i++) {
-        addLeafEntry(sorting.get(i));
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(getPageID()).append(" ");
-          msg.append(sorting.get(i)).append("\n");
-        }
-      }
-
-      for(int i = 0; i < sorting.size() - splitPoint; i++) {
-        newNode.addLeafEntry(sorting.get(splitPoint + i));
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getPageID()).append(" ");
-          msg.append(sorting.get(splitPoint + i)).append("\n");
-        }
-      }
-      if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
-      }
-      return newNode;
-    }
-
-    else {
-      N newNode = createNewDirectoryNode(getCapacity());
-      // getFile().writePage(newNode);
-
-      deleteAllEntries();
-
-      for(int i = 0; i < splitPoint; i++) {
-        addDirectoryEntry(sorting.get(i));
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(getPageID()).append(" ");
-          msg.append(sorting.get(i)).append("\n");
-        }
-      }
-
-      for(int i = 0; i < sorting.size() - splitPoint; i++) {
-        newNode.addDirectoryEntry(sorting.get(splitPoint + i));
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getPageID()).append(" ");
-          msg.append(sorting.get(splitPoint + i)).append("\n");
-        }
-      }
-      if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
-      }
-      return newNode;
     }
   }
 
@@ -340,24 +273,5 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         entries[i] = (E) s;
       }
     }
-
   }
-
-  /**
-   * Creates a new leaf node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  @Override
-  abstract protected N createNewLeafNode(int capacity);
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  @Override
-  abstract protected N createNewDirectoryNode(int capacity);
 }

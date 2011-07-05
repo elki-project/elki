@@ -16,7 +16,7 @@ import java.util.Queue;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public class BreadthFirstEnumeration<N extends Node<N, E>, E extends Entry> implements Enumeration<IndexTreePath<E>> {
+public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> implements Enumeration<IndexTreePath<E>> {
   /**
    * Represents an empty enumeration.
    */

@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class IndexTree<N extends Node<N, E>, E extends Entry> {
+public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   /**
    * The file storing the entries of this index.
    */
@@ -195,21 +195,21 @@ public abstract class IndexTree<N extends Node<N, E>, E extends Entry> {
    * 
    * @param exampleLeaf an object that will be stored in the index
    */
-  abstract protected void initializeCapacities(E exampleLeaf);
+  protected abstract void initializeCapacities(E exampleLeaf);
 
   /**
    * Creates an empty root node and writes it to file.
    * 
    * @param exampleLeaf an object that will be stored in the index
    */
-  abstract protected void createEmptyRoot(E exampleLeaf);
+  protected abstract void createEmptyRoot(E exampleLeaf);
 
   /**
    * Creates an entry representing the root node.
    * 
    * @return an entry representing the root node
    */
-  abstract protected E createRootEntry();
+  protected abstract E createRootEntry();
 
   /**
    * Creates a new leaf node with the specified capacity.
@@ -217,7 +217,7 @@ public abstract class IndexTree<N extends Node<N, E>, E extends Entry> {
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  abstract protected N createNewLeafNode(int capacity);
+  protected abstract N createNewLeafNode(int capacity);
 
   /**
    * Creates a new directory node with the specified capacity.
@@ -225,7 +225,7 @@ public abstract class IndexTree<N extends Node<N, E>, E extends Entry> {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  abstract protected N createNewDirectoryNode(int capacity);
+  protected abstract N createNewDirectoryNode(int capacity);
 
   /**
    * Performs necessary operations before inserting the specified entry.

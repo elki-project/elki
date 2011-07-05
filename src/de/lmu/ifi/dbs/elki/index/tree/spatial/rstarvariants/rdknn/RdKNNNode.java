@@ -48,28 +48,6 @@ public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTree
     return result;
   }
 
-  /**
-   * Creates a new leaf node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  @Override
-  protected RdKNNNode<D> createNewLeafNode(int capacity) {
-    return new RdKNNNode<D>(capacity, true);
-  }
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  @Override
-  protected RdKNNNode<D> createNewDirectoryNode(int capacity) {
-    return new RdKNNNode<D>(capacity, false);
-  }
-
   @Override
   public void adjustEntry(RdKNNEntry<D> entry) {
     super.adjustEntry(entry);
@@ -95,5 +73,4 @@ public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTree
       throw new RuntimeException("Wrong knnDistance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
   }
-
 }

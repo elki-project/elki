@@ -64,28 +64,6 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
     return false;
   }
 
-  /**
-   * Creates a new leaf node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  @Override
-  protected DeLiCluNode createNewLeafNode(int capacity) {
-    return new DeLiCluNode(capacity, true);
-  }
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  @Override
-  protected DeLiCluNode createNewDirectoryNode(int capacity) {
-    return new DeLiCluNode(capacity, false);
-  }
-
   @Override
   public void adjustEntry(DeLiCluEntry entry) {
     super.adjustEntry(entry);

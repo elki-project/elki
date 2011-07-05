@@ -45,14 +45,4 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
   public FlatRStarTreeNode(int capacity, boolean isLeaf) {
     super(capacity, isLeaf, SpatialEntry.class);
   }
-
-  @Override
-  protected FlatRStarTreeNode createNewLeafNode(int capacity) {
-    return new FlatRStarTreeNode(capacity, true);
-  }
-
-  @Override
-  protected FlatRStarTreeNode createNewDirectoryNode(int capacity) {
-    return new FlatRStarTreeNode(capacity, false);
-  }
 }

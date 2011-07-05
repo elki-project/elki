@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -20,6 +21,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
@@ -480,7 +482,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // todo split stratgey
     MTreeSplit<O, D, N, E> split = new MLBDistSplit<O, D, N, E>(node, distanceQuery);
     Assignments<D, E> assignments = split.getAssignments();
-    N newNode = node.splitEntries(assignments.getFirstAssignments(), assignments.getSecondAssignments());
+    N newNode = splitEntries(node, assignments.getFirstAssignments(), assignments.getSecondAssignments());
 
     // write changes to file
     file.writePage(node);
@@ -494,6 +496,70 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     return new SplitResult(split, newNode);
   }
 
+  /**
+   * Splits the entries of this node into a new node at the specified splitPoint
+   * and returns the newly created node.
+   * 
+   * @param node Node to split
+   * @param assignmentsToFirst the assignment to this node
+   * @param assignmentsToSecond the assignment to the new node
+   * @return the newly created split node
+   */
+  private N splitEntries(N node, List<E> assignmentsToFirst, List<E> assignmentsToSecond) {
+    StringBuffer msg = new StringBuffer();
+
+    if(node.isLeaf()) {
+      N newNode = createNewLeafNode(node.getCapacity());
+      // getFile().writePage(newNode);
+
+      node.deleteAllEntries();
+
+      // assignments to this node
+      for(E entry : assignmentsToFirst) {
+        if(LoggingConfiguration.DEBUG) {
+          msg.append("n_").append(node.getPageID()).append(" ").append(entry).append("\n");
+        }
+        node.addLeafEntry(entry);
+      }
+
+      // assignments to the new node
+      for(E entry : assignmentsToSecond) {
+        if(LoggingConfiguration.DEBUG) {
+          msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
+        }
+        newNode.addLeafEntry(entry);
+      }
+      if(LoggingConfiguration.DEBUG) {
+        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+      }
+      return newNode;
+    }
+    else {
+      N newNode = createNewDirectoryNode(node.getCapacity());
+      // getFile().writePage(newNode);
+
+      node.deleteAllEntries();
+
+      for(E entry : assignmentsToFirst) {
+        if(LoggingConfiguration.DEBUG) {
+          msg.append("n_").append(node.getPageID()).append(" ").append(entry).append("\n");
+        }
+        node.addDirectoryEntry(entry);
+      }
+
+      for(E entry : assignmentsToSecond) {
+        if(LoggingConfiguration.DEBUG) {
+          msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
+        }
+        newNode.addDirectoryEntry(entry);
+      }
+      if(LoggingConfiguration.DEBUG) {
+        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+      }
+      return newNode;
+    }
+  }
+  
   /**
    * Sorts the entries of the specified node according to their minimum distance
    * to the specified objects.
