@@ -839,7 +839,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     if(node.isLeaf()) {
       N newNode = createNewLeafNode(node.getCapacity());
-      // getFile().writePage(newNode);
 
       node.deleteAllEntries();
 
@@ -866,7 +865,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     else {
       N newNode = createNewDirectoryNode(node.getCapacity());
-      // getFile().writePage(newNode);
 
       node.deleteAllEntries();
 
