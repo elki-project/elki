@@ -30,11 +30,6 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
   protected E[] entries;
   
   /**
-   * Entry class.
-   */
-  protected Class<E> eclass;
-
-  /**
    * Indicates whether this node is a leaf node.
    */
   protected boolean isLeaf;
@@ -57,8 +52,8 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
   public AbstractNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
     super();
     this.numEntries = 0;
-    this.eclass = ClassGenericsUtil.uglyCastIntoSubclass(eclass);
-    this.entries = ClassGenericsUtil.newArrayOfNull(capacity, this.eclass);
+    Class<E> cls = ClassGenericsUtil.uglyCastIntoSubclass(eclass);
+    this.entries = ClassGenericsUtil.newArrayOfNull(capacity, cls);
     this.isLeaf = isLeaf;
   }
 
@@ -239,15 +234,6 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
   public final void deleteAllEntries() {
     Arrays.fill(entries, null);
     this.numEntries = 0;
-  }
-
-  /**
-   * Increases the length of the entries array to entries.length + 1.
-   */
-  public final void increaseEntries() {
-    E[] tmp = entries;
-    entries = ClassGenericsUtil.newArrayOfNull(tmp.length + 1, eclass);
-    System.arraycopy(tmp, 0, entries, 0, tmp.length);
   }
 
   /**
