@@ -36,6 +36,8 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    */
   private int capacity_to_be_filled = 0;
 
+  private Class<? extends E> eclass;
+
   /**
    * @return <code>true</code> if this node is a supernode.
    */
@@ -58,8 +60,10 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public XNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
-    super(capacity, isLeaf, eclass);
+  @SuppressWarnings("unchecked")
+  public XNode(int capacity, boolean isLeaf, Class<? extends E> eclass) {
+    super(capacity, isLeaf, (Class<? super E>) eclass);
+    this.eclass = eclass;
   }
 
   /**
@@ -130,7 +134,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(getPageID());
-    out.writeBoolean(isLeaf);
+    out.writeBoolean(isLeaf());
     out.writeBoolean(supernode);
     out.writeInt(numEntries);
     out.writeInt(entries.length);
@@ -157,8 +161,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    int tempid = in.readInt();
-    setPageID(tempid);
+    setPageID(in.readInt());
     isLeaf = in.readBoolean();
     supernode = in.readBoolean();
     numEntries = in.readInt();
@@ -171,7 +174,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
     }
     // the following causes a null pointer -- something is obviously missing
     // entries = (E[]) java.lang.reflect.Array.newInstance(eclass, capacity);
-    if(isLeaf) {
+    if(isLeaf()) {
       entries = (E[]) new SpatialPointLeafEntry[capacity];
     }
     else {
@@ -192,7 +195,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
         throw new UnsupportedOperationException("Cannot access class " + eclass.getName(), e);
       }
       catch(NullPointerException e) {
-        if(isLeaf) {
+        if(isLeaf()) {
           s = (E) new SpatialPointLeafEntry();
         }
         else {
@@ -323,7 +326,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
       String ist = (new HyperBoundingBox(entry)).toString();
       throw new RuntimeException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
-    if(isSuperNode() && isLeaf) {
+    if(isSuperNode() && isLeaf()) {
       throw new RuntimeException("Node " + toString() + " is a supernode and a leaf");
     }
     if(isSuperNode() && !parent.isSuperNode() && parent.getCapacity() >= getCapacity()) {

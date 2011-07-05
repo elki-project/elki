@@ -24,6 +24,6 @@ public class XTreeNode extends XNode<SpatialEntry, XTreeNode> {
    * @param isLeaf indicates whether this node is a leaf node
    */
   public XTreeNode(int capacity, boolean isLeaf, Class<? extends SpatialEntry> eclass) {
-    super(capacity, isLeaf, (Class<? super SpatialEntry>) eclass);
+    super(capacity, isLeaf, eclass);
   }
 }
