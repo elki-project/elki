@@ -208,7 +208,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
       E entry = node.getEntry(0);
-      node = getNode(entry.getEntryID());
+      node = getNode(getPageID(entry));
       tHeight++;
     }
     return tHeight;
@@ -735,7 +735,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     double multiOverlapInc = 0, multiOverlapMult = 1, mOOld = 1, mONew = 1;
     double ol, olT; // dimensional overlap
     for(E ej : entries) {
-      if(!ej.getEntryID().equals(ei.getEntryID())) {
+      if(!getPageID(ej).equals(getPageID(ei))) {
         multiOverlapMult = 1; // is constant for a unchanged dimension
         mOOld = 1; // overlap for old MBR on changed dimensions
         mONew = 1; // overlap on new MBR on changed dimension
@@ -807,7 +807,12 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     }
     if(split != null) {// do the split
       N newNode;
-      newNode = splitEntries(node, split.getSortedEntries(), split.getSplitPoint());
+      if (node.isLeaf()) {
+        newNode = createNewLeafNode(node.getCapacity());
+      } else {
+        newNode = createNewDirectoryNode(node.getCapacity());
+      }
+      node.splitTo(newNode, split.getSortedEntries(), split.getSplitPoint());
       // write changes to file
       file.writePage(node);
       file.writePage(newNode);
@@ -1023,7 +1028,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
     if(!hasOverflow(parent) && // no overflow treatment
-    (parent.getPageID() == getRootEntry().getEntryID() || // is root
+    (parent.getPageID() == getRootEntryID() || // is root
     // below: no changes in the MBR
     SpatialUtil.contains(subtree.getLastPathComponent().getEntry(), ((SpatialPointLeafEntry) entry).getValues()))) {
       return; // no need to adapt subtree
@@ -1054,7 +1059,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
     if(!hasOverflow(parent) && // no overflow treatment
-    (parent.getPageID() == getRootEntry().getEntryID() || // is root
+    (parent.getPageID() == getRootEntryID() || // is root
     // below: no changes in the MBR
     SpatialUtil.contains(subtree.getLastPathComponent().getEntry(), entry))) {
       return; // no need to adapt subtree
@@ -1083,7 +1088,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       if(node.isSuperNode()) {
         int new_capacity = node.growSuperNode();
         getLogger().finest("Extending supernode to new capacity " + new_capacity);
-        if(node.getPageID() == getRootEntry().getEntryID()) { // is root
+        if(node.getPageID() == getRootEntryID()) { // is root
           node.adjustEntry(getRootEntry());
         }
         else {
@@ -1108,7 +1113,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
         if(split != null) {
           // if the root was split: create a new root containing the two
           // split nodes
-          if(node.getPageID() == getRootEntry().getEntryID()) {
+          if(node.getPageID() == getRootEntryID()) {
             IndexTreePath<E> newRootPath = createNewRoot(node, split, splitAxis[0]);
             height++;
             adjustTree(newRootPath);
@@ -1160,7 +1165,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(node.getPageID() != getRootEntry().getEntryID()) {
+      if(node.getPageID() != getRootEntryID()) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
         HyperBoundingBox mbr = new HyperBoundingBox(e);
@@ -1213,11 +1218,11 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     }
     // adjust supernode id
     if(oldRoot.isSuperNode()) {
-      supernodes.remove(new Long(getRootEntry().getEntryID()));
+      supernodes.remove(new Long(getRootEntryID()));
       supernodes.put(new Long(oldRoot.getPageID()), oldRoot);
     }
 
-    root.setPageID(getRootEntry().getEntryID());
+    root.setPageID(getRootEntryID());
     E oldRootEntry = createNewDirectoryEntry(oldRoot);
     E newNodeEntry = createNewDirectoryEntry(newNode);
     ((SplitHistorySpatialEntry) oldRootEntry).setSplitHistory(sh);

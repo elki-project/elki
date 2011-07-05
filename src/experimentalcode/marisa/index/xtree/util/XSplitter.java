@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XNode;
@@ -832,7 +833,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
         }
       }
       else {
-        N node = tree.getNode(entry.getEntryID());
+        N node = tree.getNode(((DirectoryEntry)entry).getPageID());
         countXingDataEntries(node.getChildren(), mbr, numOf);
       }
     }
