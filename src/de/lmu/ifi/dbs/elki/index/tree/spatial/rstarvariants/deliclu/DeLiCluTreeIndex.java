@@ -67,7 +67,8 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
    * Marks the specified object as handled and returns the path of node ids from
    * the root to the objects's parent.
    * 
-   * @param o the object to be marked as handled
+   * @param id the objects id to be marked as handled
+   * @param obj the object to be marked as handled
    * @return the path of node ids from the root to the objects's parent
    */
   public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(DBID id, O obj) {
@@ -118,7 +119,7 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
    * Inserts the specified objects into this index. If a bulk load mode is
    * implemented, the objects are inserted in one bulk.
    * 
-   * @param objects the objects to be inserted
+   * @param ids the objects to be inserted
    */
   @Override
   public final void insertAll(DBIDs ids) {

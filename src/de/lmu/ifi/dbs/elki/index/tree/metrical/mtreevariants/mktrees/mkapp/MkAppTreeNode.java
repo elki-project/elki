@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @param <O> object type
  * @param <D> distance type
- * @param <N> number type
  */
 class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
   private static final long serialVersionUID = 1;

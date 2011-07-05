@@ -79,7 +79,7 @@ public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarT
    * Inserts the specified objects into this index. If a bulk load mode is
    * implemented, the objects are inserted in one bulk.
    * 
-   * @param objects the objects to be inserted
+   * @param ids the objects to be inserted
    */
   @Override
   public final void insertAll(DBIDs ids) {

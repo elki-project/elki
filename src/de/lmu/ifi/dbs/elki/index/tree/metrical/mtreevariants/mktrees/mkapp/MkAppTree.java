@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of NumberDistance used in the metrical index
- * @param <N> the type of Number used in the NumberDistance
  */
 public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
   /**
@@ -65,7 +64,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * Constructor.
    * 
-   * @param pagefile Page file
+   * @param pageFile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    * @param k_max Maximum value of k supported
@@ -100,7 +99,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * Inserts the specified objects into this MkApp-Tree.
    * 
-   * @param objects the object to be inserted
+   * @param entries the entries to be inserted
    */
   @Override
   public void insertAll(List<MkAppEntry<D>> entries) {

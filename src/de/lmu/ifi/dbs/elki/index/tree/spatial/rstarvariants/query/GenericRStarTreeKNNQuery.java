@@ -54,7 +54,6 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * 
    * @param tree Index to use
    * @param distanceQuery Distance query to use
-   * @param distanceFunction Distance function
    */
   public GenericRStarTreeKNNQuery(AbstractRStarTree<?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery) {
     super(distanceQuery);
@@ -116,7 +115,6 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * Performs a batch knn query.
    * 
    * @param node the node for which the query should be performed
-   * @param distanceQuery the distance function for computing the distances
    * @param knnLists a map containing the knn lists for each query objects
    */
   protected void batchNN(AbstractRStarTreeNode<?, ?> node, Map<DBID, KNNHeap<D>> knnLists) {
@@ -170,7 +168,6 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * 
    * @param node the node
    * @param ids the id of the objects
-   * @param distanceQuery the distance function for computing the distances
    * @return a list of the sorted entries
    */
   protected List<DistanceEntry<D, SpatialEntry>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, DBIDs ids) {

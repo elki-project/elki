@@ -18,8 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Elke Achtert
  * 
  * @apiviz.has RStarTreeNode oneway - - contains
- * 
- * @param <O> Object type
  */
 @Title("R*-Tree")
 @Description("Balanced index structure based on bounding rectangles.")

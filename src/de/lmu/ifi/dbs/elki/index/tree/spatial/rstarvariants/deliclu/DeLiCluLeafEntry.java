@@ -37,7 +37,7 @@ public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEn
    * Constructs a new LeafEntry object with the given parameters.
    *
    * @param id     the unique id of the underlying data object
-   * @param values the values of the underlying data object
+   * @param vector the vector to store
    */
   public DeLiCluLeafEntry(DBID id, NumberVector<?,?> vector) {
     super(id, vector);

@@ -309,7 +309,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
   /**
    * Splits the entries of this node into a new node using the given assignments
    * 
-   * @param node Node to split
+   * @param newNode Node to split to
    * @param assignmentsToFirst the assignment to this node
    * @param assignmentsToSecond the assignment to the new node
    */
