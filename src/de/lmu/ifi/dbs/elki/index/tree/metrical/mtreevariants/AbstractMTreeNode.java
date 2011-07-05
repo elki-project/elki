@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -8,7 +7,6 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
-import de.lmu.ifi.dbs.elki.index.tree.Node;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -24,7 +22,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
-public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<N, E> implements Node<N, E> {
+public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<E> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -42,69 +40,6 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    */
   public AbstractMTreeNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
     super(capacity, isLeaf, eclass);
-  }
-
-  /**
-   * Splits the entries of this node into a new node at the specified splitPoint
-   * and returns the newly created node.
-   * 
-   * @param assignmentsToFirst the assignment to this node
-   * @param assignmentsToSecond the assignment to the new node
-   * @return the newly created split node
-   */
-  public N splitEntries(List<E> assignmentsToFirst, List<E> assignmentsToSecond) {
-    StringBuffer msg = new StringBuffer();
-
-    if(isLeaf()) {
-      N newNode = createNewLeafNode(getCapacity());
-      // getFile().writePage(newNode);
-
-      deleteAllEntries();
-
-      // assignments to this node
-      for(E entry : assignmentsToFirst) {
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(getPageID()).append(" ").append(entry).append("\n");
-        }
-        addLeafEntry(entry);
-      }
-
-      // assignments to the new node
-      for(E entry : assignmentsToSecond) {
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
-        }
-        newNode.addLeafEntry(entry);
-      }
-      if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
-      }
-      return newNode;
-    }
-    else {
-      N newNode = createNewDirectoryNode(getCapacity());
-      // getFile().writePage(newNode);
-
-      deleteAllEntries();
-
-      for(E entry : assignmentsToFirst) {
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(getPageID()).append(" ").append(entry).append("\n");
-        }
-        addDirectoryEntry(entry);
-      }
-
-      for(E entry : assignmentsToSecond) {
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
-        }
-        newNode.addDirectoryEntry(entry);
-      }
-      if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
-      }
-      return newNode;
-    }
   }
 
   /**

@@ -34,20 +34,4 @@ public class MTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D,
   public MTreeNode(int capacity, boolean isLeaf) {
     super(capacity, isLeaf, MTreeEntry.class);
   }
-
-  /**
-   * @return a new MTreeNode which is a leaf node
-   */
-  @Override
-  protected MTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MTreeNode<O, D>(capacity, true);
-  }
-
-  /**
-   * @return a new MTreeNode which is a directory node
-   */
-  @Override
-  protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MTreeNode<O, D>(capacity, false);
-  }
 }

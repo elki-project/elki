@@ -11,12 +11,11 @@ import de.lmu.ifi.dbs.elki.persistent.Page;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.tree.Entry oneway - - contains
+ * @apiviz.composedOf Entry
  * 
- * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public interface Node<N extends Node<N, E>, E extends Entry> extends Page {
+public interface Node<E extends Entry> extends Page {
   /**
    * Returns an enumeration of the children paths of this node.
    * 

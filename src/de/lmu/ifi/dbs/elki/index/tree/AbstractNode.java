@@ -16,10 +16,9 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * Abstract superclass for nodes in an tree based index structure.
  * 
  * @author Elke Achtert
- * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractPage implements Node<N, E> {
+public abstract class AbstractNode<E extends Entry> extends AbstractPage implements Node<E> {
   /**
    * The number of entries in this node.
    */
@@ -138,7 +137,6 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * 
    * @see de.lmu.ifi.dbs.elki.persistent.AbstractPage#equals(Object)
    */
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
     if(this == o) {
@@ -152,7 +150,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
       return false;
     }
 
-    final N that = (N) o;
+    final AbstractNode<?> that = (AbstractNode<?>) o;
 
     return isLeaf == that.isLeaf && numEntries == that.numEntries && Arrays.equals(entries, that.entries);
   }
@@ -238,7 +236,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   /**
    * Deletes all entries in this node.
    */
-  protected final void deleteAllEntries() {
+  public final void deleteAllEntries() {
     Arrays.fill(entries, null);
     this.numEntries = 0;
   }
@@ -273,22 +271,6 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     }
     return result;
   }
-
-  /**
-   * Creates a new leaf node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  protected abstract N createNewLeafNode(int capacity);
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  protected abstract N createNewDirectoryNode(int capacity);
 
   /**
    * Adds the specified entry to the entries array and increases the numEntries
