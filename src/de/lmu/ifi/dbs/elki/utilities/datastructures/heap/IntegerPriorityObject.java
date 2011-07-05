@@ -13,13 +13,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  */
 public class IntegerPriorityObject<O> implements PairInterface<Integer, O>, Comparable<IntegerPriorityObject<?>> {
   /**
-   * Priority
+   * Priority.
    */
   int priority;
 
   /**
    * Stored object. Private; since changing this will break an
-   * {@link #UpdatableHeap}s Hash Map!
+   * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap UpdatableHeap}s Hash Map!
    */
   private O object;
 
