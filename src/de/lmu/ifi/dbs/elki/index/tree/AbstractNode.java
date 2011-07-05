@@ -8,7 +8,9 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
@@ -28,7 +30,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
    * The entries (children) of this node.
    */
   protected E[] entries;
-  
+
   /**
    * Indicates whether this node is a leaf node.
    */
@@ -232,8 +234,10 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
    * Deletes all entries in this node.
    */
   public final void deleteAllEntries() {
-    Arrays.fill(entries, null);
-    this.numEntries = 0;
+    if(numEntries > 0) {
+      Arrays.fill(entries, null);
+      this.numEntries = 0;
+    }
   }
 
   /**
@@ -268,5 +272,69 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
   private int addEntry(E entry) {
     entries[numEntries++] = entry;
     return numEntries - 1;
+  }
+
+  /**
+   * Redistribute entries according to the given sorting.
+   * 
+   * @param newNode Node to split to
+   * @param sorting Sorting to use
+   * @param splitPoint Split point
+   */
+  public final void splitTo(AbstractNode<E> newNode, List<E> sorting, int splitPoint) {
+    assert(isLeaf() == newNode.isLeaf());
+    deleteAllEntries();
+    StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer("\n") : null;
+
+    for(int i = 0; i < splitPoint; i++) {
+      addEntry(sorting.get(i));
+      if(msg != null) {
+        msg.append("n_").append(getPageID()).append(" ");
+        msg.append(sorting.get(i)).append("\n");
+      }
+    }
+
+    for(int i = splitPoint; i < sorting.size(); i++) {
+      newNode.addEntry(sorting.get(i));
+      if(msg != null) {
+        msg.append("n_").append(newNode.getPageID()).append(" ");
+        msg.append(sorting.get(i)).append("\n");
+      }
+    }
+    if(msg != null) {
+      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+    }
+  }
+
+  /**
+   * Splits the entries of this node into a new node using the given assignments
+   * 
+   * @param node Node to split
+   * @param assignmentsToFirst the assignment to this node
+   * @param assignmentsToSecond the assignment to the new node
+   */
+  public final void splitTo(AbstractNode<E> newNode, List<E> assignmentsToFirst, List<E> assignmentsToSecond) {
+    assert(isLeaf() == newNode.isLeaf());
+    deleteAllEntries();
+    StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer() : null;
+
+    // assignments to this node
+    for(E entry : assignmentsToFirst) {
+      if(msg != null) {
+        msg.append("n_").append(getPageID()).append(" ").append(entry).append("\n");
+      }
+      addEntry(entry);
+    }
+
+    // assignments to the new node
+    for(E entry : assignmentsToSecond) {
+      if(msg != null) {
+        msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
+      }
+      newNode.addEntry(entry);
+    }
+    if(msg != null) {
+      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+    }
   }
 }

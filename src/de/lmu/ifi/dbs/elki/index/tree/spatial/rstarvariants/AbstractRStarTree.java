@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
@@ -35,7 +34,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
@@ -654,7 +652,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry_i = node.getEntry(i);
-      HyperBoundingBox newMBR = union(mbr, entry_i);
+      HyperBoundingBox newMBR = SpatialUtil.unionTolerant(mbr, entry_i);
 
       double currOverlap = 0;
       double newOverlap = 0;
@@ -695,7 +693,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     TopBoundedHeap<FCPair<Double, E>> entriesToTest = new TopBoundedHeap<FCPair<Double, E>>(insertionCandidates, Collections.reverseOrder());
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry_i = node.getEntry(i);
-      HyperBoundingBox newMBR = union(mbr, entry_i);
+      HyperBoundingBox newMBR = SpatialUtil.unionTolerant(mbr, entry_i);
       double volume = /* entry_i.getMBR() == null ? 0 : */SpatialUtil.volume(entry_i);
       double inc_volume = SpatialUtil.volume(newMBR) - volume;
       entriesToTest.add(new FCPair<Double, E>(inc_volume, entry_i));
@@ -704,7 +702,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     while(!entriesToTest.isEmpty()) {
       E entry_i = entriesToTest.poll().getSecond();
       int index = -1;
-      HyperBoundingBox newMBR = union(mbr, entry_i);
+      HyperBoundingBox newMBR = SpatialUtil.unionTolerant(mbr, entry_i);
 
       double currOverlap = 0;
       double newOverlap = 0;
@@ -731,28 +729,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     assert min != null;
     return min.getPathComponent();
-  }
-
-  /**
-   * Returns the union of the two specified MBRs.
-   * 
-   * @param mbr1 the first MBR
-   * @param mbr2 the second MBR
-   * @return the union of the two specified MBRs
-   */
-  protected HyperBoundingBox union(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if(mbr1 == null && mbr2 == null) {
-      return null;
-    }
-    if(mbr1 == null) {
-      // Clone - intentionally
-      return new HyperBoundingBox(mbr2);
-    }
-    if(mbr2 == null) {
-      // Clone - intentionally
-      return new HyperBoundingBox(mbr1);
-    }
-    return SpatialUtil.union(mbr1, mbr2);
   }
 
   /**
@@ -797,13 +773,20 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
     TopologicalSplit<E> split = new TopologicalSplit<E>(node.getEntries(), minimum);
 
+    // New node
+    final N newNode;
+    if (node.isLeaf()) {
+      newNode = createNewLeafNode(node.getCapacity());
+    } else {
+      newNode = createNewDirectoryNode(node.getCapacity());
+    }
     // do the split
-    N newNode;
+    node.deleteAllEntries();
     if(split.getBestSorting() == SpatialComparator.MIN) {
-      newNode = splitEntries(node, split.getMinSorting(), split.getSplitPoint());
+      node.splitTo(newNode, split.getMinSorting(), split.getSplitPoint());
     }
     else if(split.getBestSorting() == SpatialComparator.MAX) {
-      newNode = splitEntries(node, split.getMaxSorting(), split.getSplitPoint());
+      node.splitTo(newNode, split.getMaxSorting(), split.getSplitPoint());
     }
     else {
       throw new IllegalStateException("split.bestSort is undefined: " + split.getBestSorting());
@@ -825,71 +808,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     return newNode;
   }
 
-  /**
-   * Splits the entries of this node into a new node at the specified splitPoint
-   * and returns the newly created node.
-   * 
-   * @param node Node to split
-   * @param sorting the sorted entries of this node
-   * @param splitPoint the split point of the entries
-   * @return the newly created split node
-   */
-  protected N splitEntries(N node, List<E> sorting, int splitPoint) {
-    StringBuffer msg = new StringBuffer("\n");
-
-    if(node.isLeaf()) {
-      N newNode = createNewLeafNode(node.getCapacity());
-
-      node.deleteAllEntries();
-
-      for(int i = 0; i < splitPoint; i++) {
-        node.addLeafEntry(sorting.get(i));
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(node.getPageID()).append(" ");
-          msg.append(sorting.get(i)).append("\n");
-        }
-      }
-
-      for(int i = 0; i < sorting.size() - splitPoint; i++) {
-        newNode.addLeafEntry(sorting.get(splitPoint + i));
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getPageID()).append(" ");
-          msg.append(sorting.get(splitPoint + i)).append("\n");
-        }
-      }
-      if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
-      }
-      return newNode;
-    }
-
-    else {
-      N newNode = createNewDirectoryNode(node.getCapacity());
-
-      node.deleteAllEntries();
-
-      for(int i = 0; i < splitPoint; i++) {
-        node.addDirectoryEntry(sorting.get(i));
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(node.getPageID()).append(" ");
-          msg.append(sorting.get(i)).append("\n");
-        }
-      }
-
-      for(int i = 0; i < sorting.size() - splitPoint; i++) {
-        newNode.addDirectoryEntry(sorting.get(splitPoint + i));
-        if(LoggingConfiguration.DEBUG) {
-          msg.append("n_").append(newNode.getPageID()).append(" ");
-          msg.append(sorting.get(splitPoint + i)).append("\n");
-        }
-      }
-      if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
-      }
-      return newNode;
-    }
-  }
-  
   /**
    * Reinserts the specified node at the specified level.
    * 
