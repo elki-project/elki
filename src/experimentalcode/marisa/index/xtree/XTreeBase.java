@@ -235,7 +235,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
 
   @Override
   protected void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
-    N root = createNewLeafNode(leafCapacity);
+    N root = createNewLeafNode();
     writeNode(root);
     setHeight(1);
   }
@@ -808,10 +808,10 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     if(split != null) {// do the split
       N newNode;
       if(node.isLeaf()) {
-        newNode = createNewLeafNode(node.getCapacity());
+        newNode = createNewLeafNode();
       }
       else {
-        newNode = createNewDirectoryNode(node.getCapacity());
+        newNode = createNewDirectoryNode();
       }
       node.splitTo(newNode, split.getSortedEntries(), split.getSplitPoint());
       // write changes to file
@@ -1197,7 +1197,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    *         child nodes
    */
   protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode, int splitAxis) {
-    N root = createNewDirectoryNode(dirCapacity);
+    N root = createNewDirectoryNode();
     writeNode(root);
     // get split history
     SplitHistory sh = null;

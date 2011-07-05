@@ -67,23 +67,21 @@ public class XTree extends XTreeBase<XTreeNode, SpatialEntry> {
   /**
    * Creates a new leaf node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new leaf node
    */
   @Override
-  protected XTreeNode createNewLeafNode(int capacity) {
-    return new XTreeNode(capacity, true, SpatialPointLeafEntry.class);
+  protected XTreeNode createNewLeafNode() {
+    return new XTreeNode(leafCapacity, true, SpatialPointLeafEntry.class);
   }
 
   /**
    * Creates a new directory node with the specified capacity.
    * 
-   * @param capacity the capacity of the new node
    * @return a new directory node
    */
   @Override
-  protected XTreeNode createNewDirectoryNode(int capacity) {
-    return new XTreeNode(capacity, false, XDirectoryEntry.class);
+  protected XTreeNode createNewDirectoryNode() {
+    return new XTreeNode(dirCapacity, false, XDirectoryEntry.class);
   }
 
   @Override
