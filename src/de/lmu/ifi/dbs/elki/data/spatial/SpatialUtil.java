@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  * Utility class with spatial functions.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.landmark
  * 
  * @apiviz.uses SpatialComparable oneway - - «compares»
@@ -203,6 +203,28 @@ public final class SpatialUtil {
       max[i - 1] = Math.max(box1.getMax(i), box2.getMax(i));
     }
     return new HyperBoundingBox(min, max);
+  }
+
+  /**
+   * Returns the union of the two specified MBRs. Tolerant of "null" values.
+   * 
+   * @param mbr1 the first MBR
+   * @param mbr2 the second MBR
+   * @return the union of the two specified MBRs
+   */
+  public static HyperBoundingBox unionTolerant(SpatialComparable mbr1, SpatialComparable mbr2) {
+    if(mbr1 == null && mbr2 == null) {
+      return null;
+    }
+    if(mbr1 == null) {
+      // Clone - intentionally
+      return new HyperBoundingBox(mbr2);
+    }
+    if(mbr2 == null) {
+      // Clone - intentionally
+      return new HyperBoundingBox(mbr1);
+    }
+    return union(mbr1, mbr2);
   }
 
   /**
