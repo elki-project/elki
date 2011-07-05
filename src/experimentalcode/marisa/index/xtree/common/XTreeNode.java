@@ -1,8 +1,6 @@
 package experimentalcode.marisa.index.xtree.common;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
-import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XNode;
 
 /**
@@ -26,30 +24,6 @@ public class XTreeNode extends XNode<SpatialEntry, XTreeNode> {
    * @param isLeaf indicates whether this node is a leaf node
    */
   public XTreeNode(int capacity, boolean isLeaf, Class<? extends SpatialEntry> eclass) {
-    super( capacity, isLeaf, (Class<? super SpatialEntry>) eclass);
-  }
-
-  /**
-   * Creates a new leaf node with the specified capacity. Subclasses have to
-   * overwrite this method.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  @Override
-  protected XTreeNode createNewLeafNode(int capacity) {
-    return new XTreeNode(capacity, true, SpatialPointLeafEntry.class);
-  }
-
-  /**
-   * Creates a new directory node with the specified capacity. Subclasses have
-   * to overwrite this method.
-   * 
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  @Override
-  protected XTreeNode createNewDirectoryNode(int capacity) {
-    return new XTreeNode(capacity, false, XDirectoryEntry.class);
+    super(capacity, isLeaf, (Class<? super SpatialEntry>) eclass);
   }
 }

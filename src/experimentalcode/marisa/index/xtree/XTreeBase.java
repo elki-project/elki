@@ -807,7 +807,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     }
     if(split != null) {// do the split
       N newNode;
-      newNode = node.splitEntries(split.getSortedEntries(), split.getSplitPoint());
+      newNode = splitEntries(node, split.getSortedEntries(), split.getSplitPoint());
       // write changes to file
       file.writePage(node);
       file.writePage(newNode);
