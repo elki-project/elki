@@ -138,12 +138,12 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    MkMaxTreeNode<O, D> node = file.readPage(entry.getEntryID());
+    MkMaxTreeNode<O, D> node = file.readPage(getPageID(entry));
     D knnDist_node = getDistanceQuery().nullDistance();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> leafEntry = node.getEntry(i);
-        leafEntry.setKnnDistance(knnLists.get(leafEntry.getEntryID()).getKNNDistance());
+        leafEntry.setKnnDistance(knnLists.get(getPageID(leafEntry)).getKNNDistance());
         knnDist_node = DistanceUtil.max(knnDist_node, leafEntry.getKnnDistance());
       }
     }
@@ -190,7 +190,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if(minDist.compareTo(node_knnDist) <= 0) {
-          MkMaxTreeNode<O, D> childNode = getNode(entry.getEntryID());
+          MkMaxTreeNode<O, D> childNode = getNode(getPageID(entry));
           doReverseKNNQuery(q, childNode, entry, result);
         }
       }
@@ -210,7 +210,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
 
     D knnDist_q = knns_q.getKNNDistance();
-    MkMaxTreeNode<O, D> node = file.readPage(nodeEntry.getEntryID());
+    MkMaxTreeNode<O, D> node = file.readPage(getPageID(nodeEntry));
     D knnDist_node = getDistanceQuery().nullDistance();
 
     // leaf node

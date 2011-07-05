@@ -228,7 +228,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootEntry().getEntryID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootEntryID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -259,7 +259,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
             D d3 = distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), getDistanceFactory().nullDistance());
             if(d_min.compareTo(d_k) <= 0) {
-              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, entry.getEntryID(), o_r));
+              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, getPageID(entry), o_r));
             }
           }
         }
@@ -606,7 +606,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
       // if root was split: create a new root that points the two split
       // nodes
-      if(node.getPageID() == getRootEntry().getEntryID()) {
+      if(node.getPageID() == getRootEntryID()) {
         // FIXME: stimmen die parentDistance der Kinder in node & splitNode?
         IndexTreePath<E> newRootPath = createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());
         adjustTree(newRootPath);
@@ -638,7 +638,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(node.getPageID() != getRootEntry().getEntryID()) {
+      if(node.getPageID() != getRootEntryID()) {
         E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
         N parent = getNode(parentEntry);
         int index = subtree.getLastPathComponent().getIndex();
@@ -699,7 +699,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
 
-    root.setPageID(getRootEntry().getEntryID());
+    root.setPageID(getRootEntryID());
     // FIXME: doesn't the root by definition not have a routing object?
     // D parentDistance1 = distance(getRootEntry().getRoutingObjectID(),
     // firstRoutingObjectID);

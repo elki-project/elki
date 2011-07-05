@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -58,7 +59,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), index.getRootEntry().getEntryID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), index.getRootEntryID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -89,7 +90,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
             D d3 = distanceQuery.distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), getDistanceFactory().nullDistance());
             if(d_min.compareTo(d_k) <= 0) {
-              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, entry.getEntryID(), o_r));
+              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, ((DirectoryEntry)entry).getPageID(), o_r));
             }
           }
         }

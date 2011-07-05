@@ -321,7 +321,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    */
   private void preInsert(RdKNNEntry<D> q, RdKNNEntry<D> nodeEntry, KNNHeap<D> knns_q) {
     D knnDist_q = knns_q.getKNNDistance();
-    RdKNNNode<D> node = file.readPage(nodeEntry.getEntryID());
+    RdKNNNode<D> node = file.readPage(getPageID(nodeEntry));
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
 
     // leaf node
@@ -448,7 +448,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    * @param knnLists a map of knn lists for each leaf entry
    */
   private void adjustKNNDistance(RdKNNEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    RdKNNNode<D> node = file.readPage(entry.getEntryID());
+    RdKNNNode<D> node = file.readPage(getPageID(entry));
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {

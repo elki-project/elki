@@ -93,7 +93,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
       initialize(spatialObjects.get(0));
     }
     // create leaf nodes
-    file.setNextPageID(getRootEntry().getEntryID() + 1);
+    file.setNextPageID(getRootEntryID() + 1);
     List<FlatRStarTreeNode> nodes = createBulkLeafNodes(spatialObjects);
     int numNodes = nodes.size();
     if(logger.isDebugging()) {
@@ -102,7 +102,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
     // create root
     root = createNewDirectoryNode(numNodes);
-    root.setPageID(getRootEntry().getEntryID());
+    root.setPageID(getRootEntryID());
     for(FlatRStarTreeNode node : nodes) {
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
@@ -122,10 +122,10 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
   @Override
   protected void createEmptyRoot(SpatialEntry exampleLeaf) {
     root = createNewDirectoryNode(dirCapacity);
-    root.setPageID(getRootEntry().getEntryID());
+    root.setPageID(getRootEntryID());
 
     // noinspection PointlessArithmeticExpression
-    file.setNextPageID(getRootEntry().getEntryID() + 1);
+    file.setNextPageID(getRootEntryID() + 1);
     FlatRStarTreeNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
     HyperBoundingBox mbr = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);

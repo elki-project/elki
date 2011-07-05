@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
 
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 
@@ -81,7 +82,7 @@ public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargeme
       return +1;
     }
 
-    return this.pathComponent.getEntry().getEntryID() - other.pathComponent.getEntry().getEntryID();
+    return ((DirectoryEntry)this.pathComponent.getEntry()).getPageID() - ((DirectoryEntry)other.pathComponent.getEntry()).getPageID();
   }
 
   /**

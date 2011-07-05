@@ -52,12 +52,12 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
    * @param entry2 the second node
    */
   public void setExpanded(SpatialEntry entry1, SpatialEntry entry2) {
-    HashSet<Integer> exp1 = expanded.get(entry1.getEntryID());
+    HashSet<Integer> exp1 = expanded.get(getPageID(entry1));
     if(exp1 == null) {
       exp1 = new HashSet<Integer>();
-      expanded.put(entry1.getEntryID(), exp1);
+      expanded.put(getPageID(entry1), exp1);
     }
-    exp1.add(entry2.getEntryID());
+    exp1.add(getPageID(entry2));
   }
 
   /**
@@ -67,7 +67,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
    * @return the nodes which are already expanded with the specified node
    */
   public Set<Integer> getExpanded(SpatialEntry entry) {
-    HashSet<Integer> exp = expanded.get(entry.getEntryID());
+    HashSet<Integer> exp = expanded.get(getPageID(entry));
     if(exp != null) {
       return exp;
     }

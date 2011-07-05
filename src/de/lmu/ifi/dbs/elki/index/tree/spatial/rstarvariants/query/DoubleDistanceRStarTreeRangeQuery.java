@@ -64,7 +64,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
     final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>();
 
     // push root
-    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootEntry().getEntryID()));
+    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootEntryID()));
 
     // search in tree
     while(!pq.isEmpty()) {
