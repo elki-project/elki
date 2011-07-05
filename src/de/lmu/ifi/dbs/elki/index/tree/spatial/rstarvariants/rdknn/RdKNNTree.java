@@ -256,7 +256,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
 
   @Override
   protected TreeIndexHeader createHeader() {
-    return new RdKNNTreeHeader(file.getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafCapacity, k_max);
+    return new RdKNNTreeHeader(getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafCapacity, k_max);
   }
 
   @Override
@@ -267,16 +267,16 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
 
     // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
     double overhead = 16.125;
-    if(file.getPageSize() - overhead < 0) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+    if(getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     // dirCapacity = (pageSize - overhead) / (childID + childMBR + knnDistance)
     // + 1
-    dirCapacity = (int) ((file.getPageSize() - overhead) / (4 + 16 * dimensionality + distanceSize)) + 1;
+    dirCapacity = (int) ((getPageSize() - overhead) / (4 + 16 * dimensionality + distanceSize)) + 1;
 
     if(dirCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -291,10 +291,10 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
 
     // leafCapacity = (pageSize - overhead) / (childID + childValues +
     // knnDistance) + 1
-    leafCapacity = (int) ((file.getPageSize() - overhead) / (4 + 8 * dimensionality + distanceSize)) + 1;
+    leafCapacity = (int) ((getPageSize() - overhead) / (4 + 8 * dimensionality + distanceSize)) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -321,7 +321,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    */
   private void preInsert(RdKNNEntry<D> q, RdKNNEntry<D> nodeEntry, KNNHeap<D> knns_q) {
     D knnDist_q = knns_q.getKNNDistance();
-    RdKNNNode<D> node = file.readPage(getPageID(nodeEntry));
+    RdKNNNode<D> node = getNode(nodeEntry);
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
 
     // leaf node
@@ -398,7 +398,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
         RdKNNDirectoryEntry<D> entry = (RdKNNDirectoryEntry<D>) node.getEntry(i);
         D minDist = distanceQuery.minDist(entry, oid);
         if(minDist.compareTo(entry.getKnnDistance()) <= 0) {
-          doReverseKNN(file.readPage(entry.getEntryID()), oid, result);
+          doReverseKNN(getNode(entry), oid, result);
         }
       }
     }
@@ -434,7 +434,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
             candidates.add(id);
           }
           if(!candidates.isEmpty()) {
-            doBulkReverseKNN(file.readPage(entry.getEntryID()), candidates, result);
+            doBulkReverseKNN(getNode(entry), candidates, result);
           }
         }
       }
@@ -448,7 +448,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    * @param knnLists a map of knn lists for each leaf entry
    */
   private void adjustKNNDistance(RdKNNEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    RdKNNNode<D> node = file.readPage(getPageID(entry));
+    RdKNNNode<D> node = getNode(entry);
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {

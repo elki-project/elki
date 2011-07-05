@@ -10,14 +10,12 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
-import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Abstract superclass for nodes in a R*-Tree.
@@ -147,7 +145,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * Tests this node (for debugging purposes).
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck(PageFile<N> pagefile) {
+  public final void integrityCheck(AbstractRStarTree<N, E> tree) {
     // leaf node
     if(isLeaf()) {
       for(int i = 0; i < getCapacity(); i++) {
@@ -163,7 +161,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
     // dir node
     else {
-      N tmp = pagefile.readPage(((DirectoryEntry)getEntry(0)).getPageID());
+      N tmp = tree.getNode(getEntry(0));
       boolean childIsLeaf = tmp.isLeaf();
 
       for(int i = 0; i < getCapacity(); i++) {
@@ -178,11 +176,11 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
 
         if(e != null) {
-          N node = pagefile.readPage(((DirectoryEntry)e).getPageID());
+          N node = tree.getNode(e);
 
           if(childIsLeaf && !node.isLeaf()) {
             for(int k = 0; k < getNumEntries(); k++) {
-              pagefile.readPage(((DirectoryEntry)getEntry(k)).getPageID());
+              tree.getNode(getEntry(k));
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -193,7 +191,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
           }
 
           node.integrityCheckParameters((N) this, i);
-          node.integrityCheck(pagefile);
+          node.integrityCheck(tree);
         }
       }
 

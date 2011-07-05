@@ -176,7 +176,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
     parent.addLeafEntry(entry);
-    file.writePage(parent);
+    writeNode(parent);
 
     // adjust the tree from subtree to root
     adjustTree(subtree);
@@ -199,7 +199,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
     parent.addDirectoryEntry(entry);
-    file.writePage(parent);
+    writeNode(parent);
 
     // adjust the tree from subtree to root
     adjustTree(subtree);
@@ -217,7 +217,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // delete o
     E entry = leaf.getEntry(index);
     leaf.deleteEntry(index);
-    file.writePage(leaf);
+    writeNode(leaf);
 
     // condense the tree
     Stack<N> stack = new Stack<N>();
@@ -237,7 +237,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
           stack.push(getNode(node.getEntry(i)));
         }
       }
-      file.deletePage(node.getPageID());
+      deleteNode(node);
     }
     postDelete(entry);
 
@@ -279,7 +279,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     int objects = 0;
     int levels = 0;
 
-    if(file != null && initialized) {
+    if(initialized) {
       N node = getRoot();
       int dim = node.getDimensionality();
 
@@ -312,7 +312,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
       result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
       result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");
-      PageFileUtil.appendPageFileStatistics(result, file);
+      PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     }
     else {
       result.append(getClass().getName()).append(" is empty!\n");
@@ -325,8 +325,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * Initializes this R*-Tree from an existing persistent file.
    */
   @Override
-  public void initializeFromFile(TreeIndexHeader header) {
-    super.initializeFromFile(header);
+  public void initializeFromFile(TreeIndexHeader header, PageFile<N> file) {
+    super.initializeFromFile(header, file);
     // compute height
     this.height = computeHeight();
 
@@ -346,7 +346,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       SpatialPointLeafEntry sl = new SpatialPointLeafEntry(DBIDUtil.importInteger(0), new double[exampleLeaf.getDimensionality()]);
-      while(baos.size() <= file.getPageSize()) {
+      while(baos.size() <= getPageSize()) {
         sl.writeExternal(oos);
         oos.flush();
         cap++;
@@ -365,7 +365,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       HyperBoundingBox hb = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
       SpatialDirectoryEntry sl = new SpatialDirectoryEntry(0, hb);
-      while(baos.size() <= file.getPageSize()) {
+      while(baos.size() <= getPageSize()) {
         sl.writeExternal(oos);
         oos.flush();
         cap++;
@@ -377,7 +377,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     if(dirCapacity <= 1) {
-      throw new IllegalArgumentException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new IllegalArgumentException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -391,7 +391,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     if(leafCapacity <= 1) {
-      throw new IllegalArgumentException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new IllegalArgumentException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
@@ -426,7 +426,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     for(List<E> partition : partitions) {
       // create leaf node
       N leafNode = createNewLeafNode(leafCapacity);
-      file.writePage(leafNode);
       result.add(leafNode);
 
       // insert data
@@ -435,7 +434,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       }
 
       // write to file
-      file.writePage(leafNode);
+      writeNode(leafNode);
 
       if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
@@ -793,8 +792,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     // write changes to file
-    file.writePage(node);
-    file.writePage(newNode);
+    writeNode(node);
+    writeNode(newNode);
 
     if(getLogger().isDebugging()) {
       StringBuffer msg = new StringBuffer();
@@ -835,7 +834,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // initialize the reinsertion operation: move the remaining entries
     // forward
     node.initReInsert(start, reInsertEntries);
-    file.writePage(node);
+    writeNode(node);
 
     // and adapt the mbrs
     IndexTreePath<E> childPath = path;
@@ -844,7 +843,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       N parent = getNode(childPath.getParentPath().getLastPathComponent().getEntry());
       int indexOfChild = childPath.getLastPathComponent().getIndex();
       child.adjustEntry(parent.getEntry(indexOfChild));
-      file.writePage(parent);
+      writeNode(parent);
       childPath = childPath.getParentPath();
       child = parent;
     }
@@ -889,7 +888,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       if(split != null) {
         // if root was split: create a new root that points the two
         // split nodes
-        if(node.getPageID().equals(getRootEntryID())) {
+        if(isRoot(node)) {
           IndexTreePath<E> newRootPath = createNewRoot(node, split);
           height++;
           adjustTree(newRootPath);
@@ -911,7 +910,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
           node.adjustEntry(parent.getEntry(subtree.getLastPathComponent().getIndex()));
 
           // write changes in parent to file
-          file.writePage(parent);
+          writeNode(parent);
           adjustTree(subtree.getParentPath());
         }
       }
@@ -919,13 +918,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(!node.getPageID().equals(getRootEntryID())) {
+      if(!isRoot(node)) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         int index = subtree.getLastPathComponent().getIndex();
         lastInsertedEntry = node.adjustEntryIncremental(parent.getEntry(index), lastInsertedEntry);
         // node.adjustEntry(parent.getEntry(index));
         // write changes in parent to file
-        file.writePage(parent);
+        writeNode(parent);
         adjustTree(subtree.getParentPath());
       }
       // root level is reached
@@ -969,7 +968,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   private void condenseTree(IndexTreePath<E> subtree, Stack<N> stack) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     // node is not root
-    if(!node.getPageID().equals(getRootEntryID())) {
+    if(!isRoot(node)) {
       N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
       int index = subtree.getLastPathComponent().getIndex();
       if(hasUnderflow(node)) {
@@ -983,7 +982,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       else {
         node.adjustEntry(parent.getEntry(index));
       }
-      file.writePage(parent);
+      writeNode(parent);
       // get subtree to parent
       condenseTree(subtree.getParentPath(), stack);
     }
@@ -995,19 +994,19 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
         N newRoot;
         if(child.isLeaf()) {
           newRoot = createNewLeafNode(leafCapacity);
-          newRoot.setPageID(getRootEntryID());
+          newRoot.setPageID(getRootID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addLeafEntry(child.getEntry(i));
           }
         }
         else {
           newRoot = createNewDirectoryNode(dirCapacity);
-          newRoot.setPageID(getRootEntryID());
+          newRoot.setPageID(getRootID());
           for(int i = 0; i < child.getNumEntries(); i++) {
             newRoot.addDirectoryEntry(child.getEntry(i));
           }
         }
-        file.writePage(newRoot);
+        writeNode(newRoot);
         height--;
       }
     }
@@ -1029,7 +1028,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        N child = file.readPage(getPageID(node.getEntry(i)));
+        N child = getNode(node.getEntry(i));
         getLeafNodes(child, result, (currentLevel - 1));
       }
     }
@@ -1046,26 +1045,26 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode) {
     N root = createNewDirectoryNode(dirCapacity);
-    file.writePage(root);
+    writeNode(root);
 
     // switch the ids
     oldRoot.setPageID(root.getPageID());
     if(!oldRoot.isLeaf()) {
       for(int i = 0; i < oldRoot.getNumEntries(); i++) {
         N node = getNode(oldRoot.getEntry(i));
-        file.writePage(node);
+        writeNode(node);
       }
     }
 
-    root.setPageID(getRootEntryID());
+    root.setPageID(getRootID());
     E oldRootEntry = createNewDirectoryEntry(oldRoot);
     E newNodeEntry = createNewDirectoryEntry(newNode);
     root.addDirectoryEntry(oldRootEntry);
     root.addDirectoryEntry(newNodeEntry);
 
-    file.writePage(root);
-    file.writePage(oldRoot);
-    file.writePage(newNode);
+    writeNode(root);
+    writeNode(oldRoot);
+    writeNode(newNode);
     if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
       msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRoot) + " " + new HyperBoundingBox(oldRootEntry);
@@ -1082,7 +1081,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   public void doExtraIntegrityChecks() {
     if(extraIntegrityChecks) {
-      getRoot().integrityCheck(this.file);
+      getRoot().integrityCheck(this);
     }
   }
 }

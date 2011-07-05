@@ -47,14 +47,14 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
    * Initializes the flat RTree from an existing persistent file.
    */
   @Override
-  public void initializeFromFile(TreeIndexHeader header) {
-    super.initializeFromFile(header);
+  public void initializeFromFile(TreeIndexHeader header, PageFile<FlatRStarTreeNode> file) {
+    super.initializeFromFile(header, file);
 
     // reconstruct root
     int nextPageID = file.getNextPageID();
     root = createNewDirectoryNode(nextPageID);
     for(int i = 1; i < nextPageID; i++) {
-      FlatRStarTreeNode node = file.readPage(i);
+      FlatRStarTreeNode node = getNode(i);
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
 
@@ -93,7 +93,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
       initialize(spatialObjects.get(0));
     }
     // create leaf nodes
-    file.setNextPageID(getRootEntryID() + 1);
+    getFile().setNextPageID(getRootID() + 1);
     List<FlatRStarTreeNode> nodes = createBulkLeafNodes(spatialObjects);
     int numNodes = nodes.size();
     if(logger.isDebugging()) {
@@ -102,7 +102,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
     // create root
     root = createNewDirectoryNode(numNodes);
-    root.setPageID(getRootEntryID());
+    root.setPageID(getRootID());
     for(FlatRStarTreeNode node : nodes) {
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
@@ -122,14 +122,12 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
   @Override
   protected void createEmptyRoot(SpatialEntry exampleLeaf) {
     root = createNewDirectoryNode(dirCapacity);
-    root.setPageID(getRootEntryID());
+    root.setPageID(getRootID());
 
-    // noinspection PointlessArithmeticExpression
-    file.setNextPageID(getRootEntryID() + 1);
+    getFile().setNextPageID(getRootID() + 1);
     FlatRStarTreeNode leaf = createNewLeafNode(leafCapacity);
-    file.writePage(leaf);
+    writeNode(leaf);
     HyperBoundingBox mbr = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
-    // noinspection unchecked
     root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getPageID(), mbr));
 
     setHeight(2);

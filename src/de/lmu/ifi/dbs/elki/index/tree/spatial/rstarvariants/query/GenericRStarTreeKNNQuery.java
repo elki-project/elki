@@ -74,7 +74,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     final Heap<GenericDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootEntryID()));
+    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
     D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
 
     // search in tree

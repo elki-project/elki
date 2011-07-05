@@ -138,7 +138,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
-    MkMaxTreeNode<O, D> node = file.readPage(getPageID(entry));
+    MkMaxTreeNode<O, D> node = getNode(entry);
     D knnDist_node = getDistanceQuery().nullDistance();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
@@ -190,7 +190,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if(minDist.compareTo(node_knnDist) <= 0) {
-          MkMaxTreeNode<O, D> childNode = getNode(getPageID(entry));
+          MkMaxTreeNode<O, D> childNode = getNode(entry);
           doReverseKNNQuery(q, childNode, entry, result);
         }
       }
@@ -210,7 +210,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
 
     D knnDist_q = knns_q.getKNNDistance();
-    MkMaxTreeNode<O, D> node = file.readPage(getPageID(nodeEntry));
+    MkMaxTreeNode<O, D> node = getNode(nodeEntry);
     D knnDist_node = getDistanceQuery().nullDistance();
 
     // leaf node
@@ -274,16 +274,16 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(file.getPageSize() - overhead < 0) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+    if(getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     // dirCapacity = (file.getPageSize() - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance + knnDistance) + 1
-    dirCapacity = (int) (file.getPageSize() - overhead) / (4 + 4 + 3 * distanceSize) + 1;
+    dirCapacity = (int) (getPageSize() - overhead) / (4 + 4 + 3 * distanceSize) + 1;
 
     if(dirCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -293,10 +293,10 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     // leafCapacity = (file.getPageSize() - overhead) / (objectID +
     // parentDistance +
     // knnDistance) + 1
-    leafCapacity = (int) (file.getPageSize() - overhead) / (4 + 2 * distanceSize) + 1;
+    leafCapacity = (int) (getPageSize() - overhead) / (4 + 2 * distanceSize) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {

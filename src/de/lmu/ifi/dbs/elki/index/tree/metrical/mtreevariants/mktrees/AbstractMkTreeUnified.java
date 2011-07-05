@@ -54,7 +54,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    */
   @Override
   protected TreeIndexHeader createHeader() {
-    return new MkTreeHeader(file.getPageSize(), dirCapacity, leafCapacity, k_max);
+    return new MkTreeHeader(getPageSize(), dirCapacity, leafCapacity, k_max);
   }
 
   @Override
@@ -88,7 +88,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
     kNNdistanceAdjustment(getRootEntry(), knnLists);
 
     if(extraIntegrityChecks) {
-      getRoot().integrityCheck(this.file, this, getRootEntry());
+      getRoot().integrityCheck(this, getRootEntry());
     }
   }
 

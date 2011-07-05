@@ -62,8 +62,8 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(file.getPageSize() - overhead < 0) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+    if(getPageSize() - overhead < 0) {
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
@@ -73,10 +73,10 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
 
     // dirCapacity = (pageSize - overhead) / (nodeID + **object feature size** +
     // coveringRadius + parentDistance) + 1
-    dirCapacity = (int) (file.getPageSize() - overhead) / (4 + featuresize + distanceSize + distanceSize) + 1;
+    dirCapacity = (int) (getPageSize() - overhead) / (4 + featuresize + distanceSize + distanceSize) + 1;
 
     if(dirCapacity <= 2) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(dirCapacity < 10) {
@@ -88,10 +88,10 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
     // leafCapacity = (pageSize - overhead) / (objectID + ** object size ** +
     // parentDistance) +
     // 1
-    leafCapacity = (int) (file.getPageSize() - overhead) / (4 + featuresize + distanceSize) + 1;
+    leafCapacity = (int) (getPageSize() - overhead) / (4 + featuresize + distanceSize) + 1;
 
     if(leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + file.getPageSize() + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
     if(leafCapacity < 10) {
