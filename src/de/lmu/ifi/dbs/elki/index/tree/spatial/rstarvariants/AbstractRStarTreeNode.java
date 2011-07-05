@@ -257,7 +257,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
     // TODO: do we need to write/read the capacity?
     final int capacity = in.readInt();
-    if(isLeaf) {
+    if(isLeaf()) {
       entries = (E[]) new SpatialPointLeafEntry[capacity];
       for(int i = 0; i < numEntries; i++) {
         SpatialPointLeafEntry s = new SpatialPointLeafEntry();

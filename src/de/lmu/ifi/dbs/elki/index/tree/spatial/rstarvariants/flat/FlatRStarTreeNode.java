@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Represents a node in a flat R*-Tree.
@@ -44,5 +45,14 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
    */
   public FlatRStarTreeNode(int capacity, boolean isLeaf) {
     super(capacity, isLeaf, SpatialEntry.class);
+  }
+
+  /**
+   * Increases the length of the entries array to entries.length + 1.
+   */
+  public final void increaseEntries() {
+    SpatialEntry[] tmp = entries;
+    entries = ClassGenericsUtil.newArrayOfNull(tmp.length + 1, SpatialEntry.class);
+    System.arraycopy(tmp, 0, entries, 0, tmp.length);
   }
 }
