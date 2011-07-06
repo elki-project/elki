@@ -127,7 +127,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
 
     double heightPlot = scale / opticsplot.getRatio();
 
-    DragableArea drag = new DragableArea(svgp, 0 - scale * 0.1, 0, scale + 1.1, heightPlot, this);
+    DragableArea drag = new DragableArea(svgp, 0 - scale * 0.1, 0, scale * 1.1, heightPlot, this);
     etag = drag.getElement();
 
     addMarker();
