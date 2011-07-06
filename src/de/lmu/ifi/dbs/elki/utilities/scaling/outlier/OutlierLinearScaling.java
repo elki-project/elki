@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * maximum values.
  * 
  * @author Erich Schubert
- * 
  */
 public class OutlierLinearScaling implements OutlierScalingFunction {
   /**

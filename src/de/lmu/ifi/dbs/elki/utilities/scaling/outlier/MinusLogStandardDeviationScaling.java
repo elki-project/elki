@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -17,8 +18,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * this mean.
  * 
  * @author Erich Schubert
- * 
  */
+@Reference(authors="H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title="Interpreting and Unifying Outlier Scores", booktitle="Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url="http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
 public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   /**
    * Constructor.

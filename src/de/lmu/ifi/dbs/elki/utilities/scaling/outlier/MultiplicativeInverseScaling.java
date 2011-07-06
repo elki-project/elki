@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Scaling function to invert values basically by computing 1/x, but in a variation
@@ -16,6 +17,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * 
  * @author Erich Schubert
  */
+@Reference(authors="H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title="Interpreting and Unifying Outlier Scores", booktitle="Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url="http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
 public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   /**
    * Constructor, adhering to
