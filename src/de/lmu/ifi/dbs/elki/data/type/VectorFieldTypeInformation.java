@@ -125,8 +125,8 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
 
   @Override
   public String toString() {
-    if(mindim != maxdim) {
-      return super.toString() + ",mindim==maxdim";
+    if(mindim == maxdim) {
+      return getRestrictionClass().getSimpleName() + ",dim=" + mindim;
     }
     else {
       return super.toString();
