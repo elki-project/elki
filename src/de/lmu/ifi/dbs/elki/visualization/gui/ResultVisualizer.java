@@ -1,9 +1,12 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
+import java.util.List;
+
 import javax.swing.JFrame;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -90,7 +93,16 @@ public class ResultVisualizer implements ResultHandler {
 
   @Override
   public void processResult(final Database db, final Result result) {
-    ResultUtil.ensureClusteringResult(db, db);
+    HierarchicalResult top = db;
+    while (true) {
+      List<Result> parents = top.getHierarchy().getParents(top);
+      if (parents.size() > 0 && parents.get(0) instanceof HierarchicalResult) {
+        top = (HierarchicalResult) parents.get(0);
+      } else {
+        break;
+      }
+    }
+    ResultUtil.ensureClusteringResult(db, top);
     ResultUtil.ensureSelectionResult(db, db);
 
     final VisualizerContext context = manager.newContext(db, result);

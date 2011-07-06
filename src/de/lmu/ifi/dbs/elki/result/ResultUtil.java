@@ -261,12 +261,11 @@ public class ResultUtil {
    * @param db Database to process
    * @param result result
    */
-  public static <O> void ensureClusteringResult(final Database db, final HierarchicalResult result) {
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(db, Clustering.class);
+  public static <O> void ensureClusteringResult(final Database db, final Result result) {
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     if(clusterings.size() == 0) {
       try {
-        //ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
-        ClusteringAlgorithm<Clustering<Model>> split = new TrivialAllInOne();
+        ClusteringAlgorithm<Clustering<Model>> split = new ByLabelHierarchicalClustering();
         Clustering<Model> c = split.run(db);
         addChildResult(db, c);
       }
@@ -283,7 +282,7 @@ public class ResultUtil {
    * @param db Database
    * @param result Result
    */
-  public static void ensureSelectionResult(final Database db, final HierarchicalResult result) {
+  public static void ensureSelectionResult(final Database db, final Result result) {
     Collection<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
     if(selections.size() == 0) {
       addChildResult(db, new SelectionResult());
