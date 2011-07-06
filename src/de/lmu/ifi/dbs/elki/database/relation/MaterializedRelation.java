@@ -50,7 +50,9 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   /**
    * Constructor.
    * 
-   * @param type
+   * @param database Database
+   * @param type Type information
+   * @param ids IDs
    */
   public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids) {
     super();
@@ -58,6 +60,22 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, type.getRestrictionClass());
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param database Database
+   * @param type Type information
+   * @param ids IDs
+   * @param content Content
+   */
+  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, WritableDataStore<O> content) {
+    super();
+    this.database = database;
+    this.type = type;
+    this.ids = DBIDUtil.makeUnmodifiable(ids);
+    this.content = content;
   }
 
   @Override
