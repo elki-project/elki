@@ -4,22 +4,30 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Scaling function to invert values by computing -1 * Math.log(x)
  * 
+ * Useful for example for scaling
+ * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD}, but see
+ * {@link MinusLogStandardDeviationScaling} and {@link MinusLogGammaScaling} for
+ * more advanced scalings for this algorithm.
+ * 
  * @author Erich Schubert
  */
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
 public class OutlierMinusLogScaling implements OutlierScalingFunction {
   /**
    * Maximum value seen, set by {@link #prepare}
    */
   double max;
+
   /**
    * Maximum -log value seen, set by {@link #prepare}
    */
   double mlogmax;
-  
+
   /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -30,14 +38,14 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
-    return - Math.log(value / max) / mlogmax;
+    return -Math.log(value / max) / mlogmax;
   }
 
   @Override
   public double getMin() {
     return 0.0;
   }
-  
+
   @Override
   public double getMax() {
     return 1.0;
@@ -51,6 +59,6 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
       mm.put(val);
     }
     max = mm.getMax();
-    mlogmax = - Math.log(mm.getMin() / max);
+    mlogmax = -Math.log(mm.getMin() / max);
   }
 }
