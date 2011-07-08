@@ -48,6 +48,11 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   private final StaticDBIDs ids;
 
   /**
+   * The relation name.
+   */
+  private String name;
+
+  /**
    * Constructor.
    * 
    * @param database Database
@@ -55,11 +60,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * @param ids IDs
    */
   public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids) {
-    super();
-    this.database = database;
-    this.type = type;
-    this.ids = DBIDUtil.makeUnmodifiable(ids);
-    this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, type.getRestrictionClass());
+    this(database, type, ids, null);
   }
 
   /**
@@ -68,13 +69,27 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * @param database Database
    * @param type Type information
    * @param ids IDs
+   * @param name Name
+   */
+  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name) {
+    this(database, type, ids, name, DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, type.getRestrictionClass()));
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param database Database
+   * @param type Type information
+   * @param ids IDs
+   * @param name Name
    * @param content Content
    */
-  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, WritableDataStore<O> content) {
+  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name, WritableDataStore<O> content) {
     super();
     this.database = database;
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
+    this.name = name;
     this.content = content;
   }
 
@@ -127,11 +142,14 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
 
   @Override
   public String getLongName() {
+    if(name != null) {
+      return name;
+    }
     return type.toString();
   }
 
   @Override
   public String getShortName() {
-    return "representation";
+    return "relation";
   }
 }
