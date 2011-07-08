@@ -45,16 +45,6 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   }
 
   @Override
-  public String getLongName() {
-    return "Database IDs";
-  }
-
-  @Override
-  public String getShortName() {
-    return "DBID";
-  }
-
-  @Override
   public DBID get(DBID id) {
     assert (ids.contains(id));
     return id;
@@ -94,5 +84,15 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   @Override
   public int size() {
     return ids.size();
+  }
+
+  @Override
+  public String getLongName() {
+    return "Database IDs";
+  }
+
+  @Override
+  public String getShortName() {
+    return "DBID";
   }
 }
