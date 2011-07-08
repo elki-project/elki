@@ -11,11 +11,11 @@ import de.lmu.ifi.dbs.elki.data.IntegerVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.frankenb.model.DistanceList;
 import experimentalcode.frankenb.model.KDTree;
-import experimentalcode.frankenb.model.ifaces.IDataSet;
 
 /**
  * No description given.
@@ -37,7 +37,7 @@ public class KDTreeTest {
     items.add(new IntegerVector(new int[] { 4, 1 }));
     items.add(new IntegerVector(new int[] { 7, -6 }));
     items.add(new IntegerVector(new int[] { 9, -3 }));
-    IDataSet dataSet = null; // new ListDataSet(2, items);
+    Relation<NumberVector<?, ?>> dataSet = null; // new ListDataSet(2, items);
 
     KDTree tree = new KDTree(dataSet);
 

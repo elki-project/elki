@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
- * Projects a given {@link IDataSet} to another {@link IDataSet}
+ * Projects a given Relation
  * 
  * @author Florian Frankenberger
  */
