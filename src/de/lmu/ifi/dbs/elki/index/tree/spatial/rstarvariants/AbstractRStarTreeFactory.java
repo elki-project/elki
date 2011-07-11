@@ -6,9 +6,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.LeastOverlapInsertionStrategy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -34,10 +36,9 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
   public static final OptionID BULK_SPLIT_ID = OptionID.getOrCreateOptionID("spatial.bulkstrategy", "The class to perform the bulk split with.");
 
   /**
-   * Defines how many children are tested for finding the child generating the
-   * least overlap when inserting an object. Default 0 means all children
+   * Strategy to find the insertion node with.
    */
-  protected int insertionCandidates = 0;
+  protected InsertionStrategy insertionStrategy;
 
   /**
    * The strategy for bulk load.
@@ -51,11 +52,11 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
    * @param pageSize
    * @param cacheSize
    * @param bulkSplitter the strategy to use for bulk splitting
-   * @param insertionCandidates
+   * @param insertionStrategy the strategy to find the insertion child
    */
-  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, int insertionCandidates) {
+  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
     super(fileName, pageSize, cacheSize);
-    this.insertionCandidates = insertionCandidates;
+    this.insertionStrategy = insertionStrategy;
     this.bulkSplitter = bulkSplitter;
   }
 
@@ -74,15 +75,15 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
   public static abstract class Parameterizer<O extends NumberVector<O, ?>> extends TreeIndexFactory.Parameterizer<O> {
     protected BulkSplit bulkSplitter = null;
 
-    protected int insertionCandidates = 0;
+    protected InsertionStrategy insertionStrategy = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configBulkLoad(config);
-      IntParameter insertionCandidatesP = new IntParameter(INSERTION_CANDIDATES_ID, true);
-      if(config.grab(insertionCandidatesP)) {
-        insertionCandidates = insertionCandidatesP.getValue();
+      ClassParameter<InsertionStrategy> insertionStrategyP = new ClassParameter<InsertionStrategy>(INSERTION_CANDIDATES_ID, InsertionStrategy.class, LeastOverlapInsertionStrategy.class);
+      if(config.grab(insertionStrategyP)) {
+        insertionStrategy = insertionStrategyP.instantiateClass(config);
       }
     }
 

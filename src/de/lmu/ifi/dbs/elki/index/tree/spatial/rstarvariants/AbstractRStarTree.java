@@ -32,12 +32,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.LeastOverlapInsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -81,12 +81,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   public int distanceCalcs = 0;
 
   /**
-   * Defines how many children are tested for finding the child generating the
-   * least overlap when inserting an object. Default 0 means all children
-   */
-  int insertionCandidates = 0;
-
-  /**
    * The last inserted entry
    */
   E lastInsertedEntry = null;
@@ -102,16 +96,21 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected TopologicalSplitter nodeSplitter = new TopologicalSplitter();
 
   /**
+   * The insertion strategy to use
+   */
+  protected InsertionStrategy insertionStrategy = new LeastOverlapInsertionStrategy();
+
+  /**
    * Constructor
    * 
    * @param pagefile Page file
    * @param bulkSplitter bulk load strategy
-   * @param insertionCandidates insertion candidate set size
+   * @param insertionStrategy the strategy for finding the insertion candidate.
    */
-  public AbstractRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, int insertionCandidates) {
+  public AbstractRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
     super(pagefile);
     this.bulkSplitter = bulkSplitter;
-    this.insertionCandidates = insertionCandidates;
+    this.insertionStrategy = insertionStrategy;
   }
 
   /**
@@ -592,13 +591,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // children are leafs
     if(childNode.isLeaf()) {
       if(height - subtree.getPathCount() == level) {
-        TreeIndexPathComponent<E> comp = null;
-        if(insertionCandidates == 0) {
-          comp = getChildWithLeastOverlap(node, mbr);
-        }
-        else {
-          comp = getChildWithLeastOverlapFast(node, mbr);
-        }
+        TreeIndexPathComponent<E> comp = insertionStrategy.findInsertChild(node, mbr);
         return subtree.pathByAddingChild(comp);
       }
       else {
@@ -636,99 +629,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       HyperBoundingBox newMBR = SpatialUtil.union(entry, mbr);
       double inc = SpatialUtil.volume(newMBR) - volume;
       Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry, i), volume, inc, 0);
-
-      if(min == null || min.compareTo(enlargement) > 0) {
-        min = enlargement;
-      }
-    }
-
-    assert min != null;
-    return min.getPathComponent();
-  }
-
-  /**
-   * Returns the path information of the entry of the specified node which needs
-   * least overlap enlargement if the given mbr would be inserted into.
-   * 
-   * @param node the node of which the children should be tested
-   * @param mbr the mbr to be inserted into the children
-   * @return the path information of the entry which needs least overlap
-   *         enlargement if the given mbr would be inserted into
-   */
-  protected TreeIndexPathComponent<E> getChildWithLeastOverlap(N node, SpatialComparable mbr) {
-    Enlargement<E> min = null;
-
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      E entry_i = node.getEntry(i);
-      HyperBoundingBox newMBR = SpatialUtil.unionTolerant(mbr, entry_i);
-
-      double currOverlap = 0;
-      double newOverlap = 0;
-      for(int k = 0; k < node.getNumEntries(); k++) {
-        if(i != k) {
-          E entry_k = node.getEntry(k);
-          currOverlap += SpatialUtil.relativeOverlap(entry_i, entry_k);
-          newOverlap += SpatialUtil.relativeOverlap(newMBR, entry_k);
-        }
-      }
-
-      double volume = /* entry_i.getMBR() == null ? 0 : */SpatialUtil.volume(entry_i);
-      double inc_volume = SpatialUtil.volume(newMBR) - volume;
-      double inc_overlap = newOverlap - currOverlap;
-      Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, i), volume, inc_volume, inc_overlap);
-
-      if(min == null || min.compareTo(enlargement) > 0) {
-        min = enlargement;
-      }
-    }
-
-    assert min != null;
-    return min.getPathComponent();
-  }
-
-  /**
-   * Returns the path information of the entry of the specified node which needs
-   * least overlap enlargement if the given mbr would be inserted into.
-   * 
-   * @param node the node of which the children should be tested
-   * @param mbr the mbr to be inserted into the children
-   * @return the path information of the entry which needs least overlap
-   *         enlargement if the given mbr would be inserted into
-   */
-  protected TreeIndexPathComponent<E> getChildWithLeastOverlapFast(N node, SpatialComparable mbr) {
-    Enlargement<E> min = null;
-
-    TopBoundedHeap<FCPair<Double, E>> entriesToTest = new TopBoundedHeap<FCPair<Double, E>>(insertionCandidates, Collections.reverseOrder());
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      E entry_i = node.getEntry(i);
-      HyperBoundingBox newMBR = SpatialUtil.unionTolerant(mbr, entry_i);
-      double volume = /* entry_i.getMBR() == null ? 0 : */SpatialUtil.volume(entry_i);
-      double inc_volume = SpatialUtil.volume(newMBR) - volume;
-      entriesToTest.add(new FCPair<Double, E>(inc_volume, entry_i));
-    }
-
-    while(!entriesToTest.isEmpty()) {
-      E entry_i = entriesToTest.poll().getSecond();
-      int index = -1;
-      HyperBoundingBox newMBR = SpatialUtil.unionTolerant(mbr, entry_i);
-
-      double currOverlap = 0;
-      double newOverlap = 0;
-      for(int k = 0; k < node.getNumEntries(); k++) {
-        E entry_k = node.getEntry(k);
-        if(entry_i != entry_k) {
-          currOverlap += SpatialUtil.relativeOverlap(entry_i, entry_k);
-          newOverlap += SpatialUtil.relativeOverlap(newMBR, entry_k);
-        }
-        else {
-          index = k;
-        }
-      }
-
-      double volume = /* entry_i.getMBR() == null ? 0 : */SpatialUtil.volume(entry_i);
-      double inc_volume = SpatialUtil.volume(newMBR) - volume;
-      double inc_overlap = newOverlap - currOverlap;
-      Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry_i, index), volume, inc_volume, inc_overlap);
 
       if(min == null || min.compareTo(enlargement) > 0) {
         min = enlargement;
