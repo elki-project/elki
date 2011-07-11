@@ -239,6 +239,11 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     writeNode(root);
     setHeight(1);
   }
+  
+  @Override
+  public boolean canBulkLoad() {
+    return false;
+  }
 
   /**
    * TODO: This does not work at all for supernodes!
