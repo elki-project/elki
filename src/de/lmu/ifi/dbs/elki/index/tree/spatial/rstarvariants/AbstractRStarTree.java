@@ -92,6 +92,16 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   E lastInsertedEntry = null;
 
   /**
+   * If true, a bulk load will be performed.
+   */
+  protected boolean bulk;
+
+  /**
+   * The strategy for bulk load.
+   */
+  protected BulkSplit.Strategy bulkLoadStrategy;
+
+  /**
    * Constructor
    * 
    * @param pagefile Page file
@@ -100,7 +110,9 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param insertionCandidates insertion candidate set size
    */
   public AbstractRStarTree(PageFile<N> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(pagefile, bulk, bulkLoadStrategy);
+    super(pagefile);
+    this.bulk = bulk;
+    this.bulkLoadStrategy = bulkLoadStrategy;
     this.insertionCandidates = insertionCandidates;
   }
 

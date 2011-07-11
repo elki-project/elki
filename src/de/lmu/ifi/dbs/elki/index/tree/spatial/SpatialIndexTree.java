@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.index.tree.IndexTree;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -19,39 +18,27 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  */
 public abstract class SpatialIndexTree<N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexTree<N, E> {
   /**
-   * If true, a bulk load will be performed.
-   */
-  protected boolean bulk;
-
-  /**
-   * The strategy for bulk load.
-   */
-  protected BulkSplit.Strategy bulkLoadStrategy;
-
-  /**
    * Constructor.
    * 
    * @param pagefile Page file
-   * @param bulk bulk flag
-   * @param bulkLoadStrategy bulk load strategy
    */
-  public SpatialIndexTree(PageFile<N> pagefile, boolean bulk, Strategy bulkLoadStrategy) {
+  public SpatialIndexTree(PageFile<N> pagefile) {
     super(pagefile);
-    this.bulk = bulk;
-    this.bulkLoadStrategy = bulkLoadStrategy;
   }
-  
+
   /**
-   * Add a new leaf to the tree.
+   * Add a new leaf entry to the tree.
    * 
-   * @param leaf Leaf
+   * @param leaf Leaf entry
    */
   public abstract void insertLeaf(E leaf);
 
   /**
-   * Returns a list of entries pointing to the leaf nodes of this spatial index.
+   * Returns a list of entries pointing to the leaf entries of this spatial
+   * index.
    * 
-   * @return a list of entries pointing to the leaf nodes of this spatial index
+   * @return a list of entries pointing to the leaf entries of this spatial
+   *         index
    */
   public abstract List<E> getLeaves();
 }
