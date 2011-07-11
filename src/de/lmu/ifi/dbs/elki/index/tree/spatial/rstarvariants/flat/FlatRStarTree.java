@@ -4,10 +4,10 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -35,12 +35,11 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
    * Constructor.
    * 
    * @param pagefile Page file
-   * @param bulk bulk flag
-   * @param bulkLoadStrategy bulk load strategy
+   * @param bulkSplitter bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public FlatRStarTree(PageFile<FlatRStarTreeNode> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
+  public FlatRStarTree(PageFile<FlatRStarTreeNode> pagefile, BulkSplit bulkSplitter, int insertionCandidates) {
+    super(pagefile, bulkSplitter, insertionCandidates);
   }
 
   /**

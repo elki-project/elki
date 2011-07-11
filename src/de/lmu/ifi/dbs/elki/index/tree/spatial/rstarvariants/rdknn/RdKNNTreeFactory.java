@@ -5,8 +5,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -57,14 +57,13 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
    * @param fileName
    * @param pageSize
    * @param cacheSize
-   * @param bulk
-   * @param bulkLoadStrategy
+   * @param bulkSplitter Bulk loading strategy
    * @param insertionCandidates
    * @param k_max
    * @param distanceFunction
    */
-  public RdKNNTreeFactory(String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
-    super(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public RdKNNTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, int insertionCandidates, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionCandidates);
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
   }
@@ -72,7 +71,7 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
   @Override
   public RdKNNTree<O, D> instantiate(Relation<O> relation) {
     PageFile<RdKNNNode<D>> pagefile = makePageFile(getNodeClass());
-    return new RdKNNTree<O, D>(relation, pagefile, bulk, bulkLoadStrategy, insertionCandidates, k_max, distanceFunction, distanceFunction.instantiate(relation));
+    return new RdKNNTree<O, D>(relation, pagefile, bulkSplitter, insertionCandidates, k_max, distanceFunction, distanceFunction.instantiate(relation));
   }
 
   protected Class<RdKNNNode<D>> getNodeClass() {
@@ -113,7 +112,7 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
 
     @Override
     protected RdKNNTreeFactory<O, D> makeInstance() {
-      return new RdKNNTreeFactory<O, D>(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates, k_max, distanceFunction);
+      return new RdKNNTreeFactory<O, D>(fileName, pageSize, cacheSize, bulkSplitter, insertionCandidates, k_max, distanceFunction);
     }
   }
 }

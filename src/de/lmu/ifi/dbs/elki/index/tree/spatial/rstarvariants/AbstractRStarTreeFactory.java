@@ -5,15 +5,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract factory for R*-Tree based trees.
@@ -33,14 +29,9 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
   public static OptionID INSERTION_CANDIDATES_ID = OptionID.getOrCreateOptionID("rtree.insertion-candidates", "defines how many children are tested for finding the child generating the least overlap when inserting an object. Default 0 means all children.");
 
   /**
-   * Parameter for bulk loading
-   */
-  public static final OptionID BULK_LOAD_ID = OptionID.getOrCreateOptionID("spatial.bulk", "flag to specify bulk load (default is no bulk load)");
-
-  /**
    * Parameter for bulk strategy
    */
-  public static final OptionID BULK_LOAD_STRATEGY_ID = OptionID.getOrCreateOptionID("spatial.bulkstrategy", "the strategy for bulk load, available strategies are: [" + BulkSplit.Strategy.MAX_EXTENSION + "| " + BulkSplit.Strategy.ZCURVE + "]" + "(default is " + BulkSplit.Strategy.ZCURVE + ")");
+  public static final OptionID BULK_SPLIT_ID = OptionID.getOrCreateOptionID("spatial.bulkstrategy", "The class to perform the bulk split with.");
 
   /**
    * Defines how many children are tested for finding the child generating the
@@ -49,14 +40,9 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
   protected int insertionCandidates = 0;
 
   /**
-   * If true, a bulk load will be performed.
-   */
-  protected boolean bulk;
-
-  /**
    * The strategy for bulk load.
    */
-  protected BulkSplit.Strategy bulkLoadStrategy;
+  protected BulkSplit bulkSplitter;
 
   /**
    * Constructor.
@@ -64,17 +50,15 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
    * @param fileName
    * @param pageSize
    * @param cacheSize
-   * @param bulk
-   * @param bulkLoadStrategy
+   * @param bulkSplitter the strategy to use for bulk splitting
    * @param insertionCandidates
    */
-  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, int insertionCandidates) {
     super(fileName, pageSize, cacheSize);
     this.insertionCandidates = insertionCandidates;
-    this.bulk = bulk;
-    this.bulkLoadStrategy = bulkLoadStrategy;
+    this.bulkSplitter = bulkSplitter;
   }
-  
+
   @Override
   public TypeInformation getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
@@ -88,9 +72,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
    * @apiviz.exclude
    */
   public static abstract class Parameterizer<O extends NumberVector<O, ?>> extends TreeIndexFactory.Parameterizer<O> {
-    protected boolean bulk = false;
-
-    protected BulkSplit.Strategy bulkLoadStrategy = null;
+    protected BulkSplit bulkSplitter = null;
 
     protected int insertionCandidates = 0;
 
@@ -110,25 +92,9 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
      * @param config Parameterization
      */
     protected void configBulkLoad(Parameterization config) {
-      Flag BULK_LOAD_FLAG = new Flag(BULK_LOAD_ID);
-      if(config.grab(BULK_LOAD_FLAG)) {
-        bulk = BULK_LOAD_FLAG.getValue();
-      }
-
-      StringParameter BULK_LOAD_STRATEGY_PARAM = new StringParameter(BULK_LOAD_STRATEGY_ID, new EqualStringConstraint(new String[] { BulkSplit.Strategy.MAX_EXTENSION.toString(), BulkSplit.Strategy.ZCURVE.toString() }), BulkSplit.Strategy.ZCURVE.toString());
-      config.grab(BULK_LOAD_STRATEGY_PARAM);
-      if(bulk) {
-        String strategy = BULK_LOAD_STRATEGY_PARAM.getValue();
-
-        if(strategy.equals(BulkSplit.Strategy.MAX_EXTENSION.toString())) {
-          bulkLoadStrategy = BulkSplit.Strategy.MAX_EXTENSION;
-        }
-        else if(strategy.equals(BulkSplit.Strategy.ZCURVE.toString())) {
-          bulkLoadStrategy = BulkSplit.Strategy.ZCURVE;
-        }
-        else {
-          config.reportError(new WrongParameterValueException(BULK_LOAD_STRATEGY_PARAM, strategy));
-        }
+      ObjectParameter<BulkSplit> bulkSplitP = new ObjectParameter<BulkSplit>(BULK_SPLIT_ID, BulkSplit.class, true);
+      if(config.grab(bulkSplitP)) {
+        bulkSplitter = bulkSplitP.instantiateClass(config);
       }
     }
 

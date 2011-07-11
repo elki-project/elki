@@ -26,13 +26,12 @@ import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
@@ -92,27 +91,20 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   E lastInsertedEntry = null;
 
   /**
-   * If true, a bulk load will be performed.
-   */
-  protected boolean bulk;
-
-  /**
    * The strategy for bulk load.
    */
-  protected BulkSplit.Strategy bulkLoadStrategy;
+  protected BulkSplit bulkSplitter;
 
   /**
    * Constructor
    * 
    * @param pagefile Page file
-   * @param bulk bulk flag
-   * @param bulkLoadStrategy bulk load strategy
+   * @param bulkSplitter bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public AbstractRStarTree(PageFile<N> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
+  public AbstractRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, int insertionCandidates) {
     super(pagefile);
-    this.bulk = bulk;
-    this.bulkLoadStrategy = bulkLoadStrategy;
+    this.bulkSplitter = bulkSplitter;
     this.insertionCandidates = insertionCandidates;
   }
 
@@ -122,7 +114,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @return Success code
    */
   public boolean canBulkLoad() {
-    return (bulk && !initialized);
+    return (bulkSplitter != null && !initialized);
   }
 
   /**
@@ -432,8 +424,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     int maxEntries = leafCapacity - 1;
 
     ArrayList<N> result = new ArrayList<N>();
-    BulkSplit<E> split = new BulkSplit<E>();
-    List<List<E>> partitions = split.partition(objects, minEntries, maxEntries, bulkLoadStrategy);
+    List<List<E>> partitions = bulkSplitter.partition(objects, minEntries, maxEntries);
 
     for(List<E> partition : partitions) {
       // create leaf node
