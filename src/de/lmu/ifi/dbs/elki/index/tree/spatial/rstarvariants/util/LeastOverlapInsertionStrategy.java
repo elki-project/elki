@@ -12,9 +12,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  * when inserting.
  * 
  * @author Elke Achtert
- * 
- * @param <N> Node type
- * @param <E> Entry type
  */
 public class LeastOverlapInsertionStrategy implements InsertionStrategy {
   /**

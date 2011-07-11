@@ -23,9 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
  * @author Elke Achtert
  * @author Franz Graf
  * @author Marisa Petri
- * 
- * @param <N> Node type
- * @param <E> Entry type
  */
 public class ApproximateLeastOverlapInsertionStrategy implements InsertionStrategy {
   /**
