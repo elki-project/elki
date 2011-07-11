@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
@@ -40,15 +41,15 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, X extends A
    * @param pageSize
    * @param cacheSize
    * @param bulkSplitter bulk loading strategy
-   * @param insertionCandidates
+   * @param insertionStrategy
    * @param relativeMinEntries
    * @param relativeMinFanout
    * @param reinsert_fraction
    * @param max_overlap
    * @param overlap_type
    */
-  public XTreeBaseFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionCandidates);
+  public XTreeBaseFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
@@ -119,15 +120,15 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * 
    * @param pagefile the page file
    * @param bulkSplitter bulk loading strategy
-   * @param insertionCandidates
+   * @param insertionStrategy
    * @param relativeMinEntries
    * @param relativeMinFanout
    * @param reinsert_fraction
    * @param max_overlap
    * @param overlap_type
    */
-  public XTreeBase(PageFile<N> pagefile, BulkSplit bulkSplitter, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(pagefile, bulkSplitter, insertionCandidates);
+  public XTreeBase(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(pagefile, bulkSplitter, insertionStrategy);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;

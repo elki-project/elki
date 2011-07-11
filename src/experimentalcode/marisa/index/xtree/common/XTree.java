@@ -3,6 +3,7 @@ package experimentalcode.marisa.index.xtree.common;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -39,15 +40,15 @@ public class XTree extends XTreeBase<XTreeNode, SpatialEntry> {
    * 
    * @param pagefile Page file
    * @param bulkSplitter Bulk loading strategy
-   * @param insertionCandidates
+   * @param insertionStrategy
    * @param relativeMinEntries
    * @param relativeMinFanout
    * @param reinsert_fraction
    * @param max_overlap
    * @param overlap_type
    */
-  public XTree(PageFile<XTreeNode> pagefile, BulkSplit bulkSplitter, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(pagefile, bulkSplitter, insertionCandidates, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+  public XTree(PageFile<XTreeNode> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(pagefile, bulkSplitter, insertionStrategy, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
   }
 
   /**
