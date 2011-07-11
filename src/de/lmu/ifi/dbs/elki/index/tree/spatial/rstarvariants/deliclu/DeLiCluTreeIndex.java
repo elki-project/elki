@@ -41,7 +41,7 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
    * @param relation Relation to index
    * @param pagefile Page file
    * @param bulkSplitter bulk load strategy
-   * @param insertionCandidates insertion candidate set size
+   * @param insertionStrategy the strategy to find the insertion child
    */
   public DeLiCluTreeIndex(Relation<O> relation, PageFile<DeLiCluNode> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
     super(pagefile, bulkSplitter, insertionStrategy);
