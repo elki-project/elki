@@ -27,11 +27,11 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
@@ -118,8 +118,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * Constructor.
    * 
    * @param pagefile the page file
-   * @param bulk
-   * @param bulkLoadStrategy
+   * @param bulkSplitter bulk loading strategy
    * @param insertionCandidates
    * @param relativeMinEntries
    * @param relativeMinFanout
@@ -127,8 +126,8 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * @param max_overlap
    * @param overlap_type
    */
-  public XTreeBase(PageFile<N> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
+  public XTreeBase(PageFile<N> pagefile, BulkSplit bulkSplitter, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(pagefile, bulkSplitter, insertionCandidates);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;

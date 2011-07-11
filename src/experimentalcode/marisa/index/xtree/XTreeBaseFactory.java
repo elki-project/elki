@@ -2,9 +2,9 @@ package experimentalcode.marisa.index.xtree;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.Index;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
@@ -39,8 +39,7 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, X extends A
    * @param fileName
    * @param pageSize
    * @param cacheSize
-   * @param bulk
-   * @param bulkLoadStrategy
+   * @param bulkSplitter bulk loading strategy
    * @param insertionCandidates
    * @param relativeMinEntries
    * @param relativeMinFanout
@@ -48,8 +47,8 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, X extends A
    * @param max_overlap
    * @param overlap_type
    */
-  public XTreeBaseFactory(String fileName, int pageSize, long cacheSize, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(fileName, pageSize, cacheSize, bulk, bulkLoadStrategy, insertionCandidates);
+  public XTreeBaseFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, int insertionCandidates, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionCandidates);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;
@@ -121,6 +120,8 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, X extends A
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      // Bulk loads are not supported yet:
+      // super.configBulkLoad(config);
       final DoubleParameter MIN_ENTRIES_PARAMETER = new DoubleParameter(MIN_ENTRIES_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.OPEN), 0.4);
       if(config.grab(MIN_ENTRIES_PARAMETER)) {
         relativeMinEntries = MIN_ENTRIES_PARAMETER.getValue();
