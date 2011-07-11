@@ -355,13 +355,19 @@ public class Segments {
     for (SegmentID segment : objectSegments.keySet()) {
       
       int pairs = asPairs(objectSegments.get(segment));
-      pairSegments.put(segment, pairs);
       
-      // cluster pair count
-      addPairsToCluster(segment, pairs);
       
-      // total pairs count
-      this.pairs += pairs;
+      // FIXME: Ein Objekt geclustered => Fehlende Paarbezüge
+      if (pairs != 0) {
+        
+        pairSegments.put(segment, pairs);
+        
+        // cluster pair count
+        addPairsToCluster(segment, pairs);
+        
+        // total pairs count
+        this.pairs += pairs;
+      }
     }
     
     // getPaircount of new segments
