@@ -26,18 +26,19 @@ import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -96,6 +97,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected BulkSplit bulkSplitter;
 
   /**
+   * The split strategy
+   */
+  protected TopologicalSplitter nodeSplitter = new TopologicalSplitter();
+
+  /**
    * Constructor
    * 
    * @param pagefile Page file
@@ -150,7 +156,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
     return null;
   }
-  
+
   @Override
   public void insertLeaf(E leaf) {
     if(!initialized) {
@@ -208,7 +214,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // adjust the tree from subtree to root
     adjustTree(subtree);
   }
-  
+
   /**
    * Delete a leaf at a given path - deletions for non-leaves are not supported!
    * 
@@ -564,8 +570,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     N node = getNode(subtree.getLastPathComponent().getEntry());
-    if (node == null) {
-      throw new RuntimeException("Page file did not return node for node id: "+getPageID(subtree.getLastPathComponent().getEntry()));
+    if(node == null) {
+      throw new RuntimeException("Page file did not return node for node id: " + getPageID(subtree.getLastPathComponent().getEntry()));
     }
     if(node.isLeaf()) {
       return subtree;
@@ -773,39 +779,32 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   private N split(N node) {
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
-    TopologicalSplit<E> split = new TopologicalSplit<E>(node.getEntries(), minimum);
+    Pair<List<E>, List<E>> split = nodeSplitter.split(node.getEntries(), minimum);
 
     // New node
     final N newNode;
-    if (node.isLeaf()) {
+    if(node.isLeaf()) {
       newNode = createNewLeafNode();
-    } else {
+    }
+    else {
       newNode = createNewDirectoryNode();
     }
     // do the split
     node.deleteAllEntries();
-    if(split.getBestSorting() == SpatialComparator.MIN) {
-      node.splitTo(newNode, split.getMinSorting(), split.getSplitPoint());
-    }
-    else if(split.getBestSorting() == SpatialComparator.MAX) {
-      node.splitTo(newNode, split.getMaxSorting(), split.getSplitPoint());
-    }
-    else {
-      throw new IllegalStateException("split.bestSort is undefined: " + split.getBestSorting());
-    }
+    node.splitTo(newNode, split.first, split.second);
 
     // write changes to file
     writeNode(node);
     writeNode(newNode);
 
-    if(getLogger().isDebugging()) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
-      msg.append("      splitAxis ").append(split.getSplitAxis()).append("\n");
-      msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
-      msg.append("      newNode ").append(newNode.getPageID()).append("\n");
-      getLogger().debugFine(msg.toString());
-    }
+    // if(getLogger().isDebugging()) {
+    // StringBuffer msg = new StringBuffer();
+    // msg.append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
+    // msg.append("      splitAxis ").append(split.getSplitAxis()).append("\n");
+    // msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
+    // msg.append("      newNode ").append(newNode.getPageID()).append("\n");
+    // getLogger().debugFine(msg.toString());
+    // }
 
     return newNode;
   }
