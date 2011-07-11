@@ -9,6 +9,11 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
@@ -30,8 +35,8 @@ public class ApproximateLeastOverlapInsertionStrategy implements InsertionStrate
   private int insertionCandidates = 0;
 
   /**
-   * Constructor.
-   *s 
+   * Constructor. s
+   * 
    * @param insertionCandidates Number of children to test.
    */
   public ApproximateLeastOverlapInsertionStrategy(int insertionCandidates) {
@@ -91,5 +96,35 @@ public class ApproximateLeastOverlapInsertionStrategy implements InsertionStrate
 
     assert min != null;
     return min.getPathComponent();
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Fast-insertion parameter. Optional.
+     */
+    public static OptionID INSERTION_CANDIDATES_ID = OptionID.getOrCreateOptionID("rtree.insertion-candidates", "defines how many children are tested for finding the child generating the least overlap when inserting an object.");
+
+    int insertionCandidates = 0;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter insertionCandidatesP = new IntParameter(INSERTION_CANDIDATES_ID, new GreaterConstraint(0));
+      if(config.grab(insertionCandidatesP)) {
+        insertionCandidates = insertionCandidatesP.getValue();
+      }
+    }
+
+    @Override
+    protected Object makeInstance() {
+      return new ApproximateLeastOverlapInsertionStrategy(insertionCandidates);
+    }
   }
 }

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.LeastOverlapInsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
@@ -52,7 +53,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.has AbstractRStarTreeNode oneway - - contains
  * @apiviz.uses Enlargement
  * @apiviz.composedOf BulkSplit
- * @apiviz.composedOf TopologicalSplit
+ * @apiviz.composedOf SplitStrategy
+ * @apiviz.composedOf InsertionStrategy
  * 
  * @param <N> Node type
  * @param <E> Entry type
@@ -93,7 +95,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * The split strategy
    */
-  protected TopologicalSplitter nodeSplitter = new TopologicalSplitter();
+  protected SplitStrategy<? super E> nodeSplitter = new TopologicalSplitter();
 
   /**
    * The insertion strategy to use
