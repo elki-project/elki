@@ -6,9 +6,9 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -37,12 +37,11 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
    * Constructor.
    * 
    * @param pagefile Page file
-   * @param bulk bulk flag
-   * @param bulkLoadStrategy bulk load strategy
+   * @param bulkSplitter bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public DeLiCluTree(PageFile<DeLiCluNode> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
+  public DeLiCluTree(PageFile<DeLiCluNode> pagefile, BulkSplit bulkSplitter, int insertionCandidates) {
+    super(pagefile, bulkSplitter, insertionCandidates);
   }
 
   /**

@@ -15,9 +15,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -45,12 +45,11 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
    * 
    * @param relation Relation to index
    * @param pagefile Page file
-   * @param bulk bulk flag
-   * @param bulkLoadStrategy bulk load strategy
+   * @param bulkSplitter bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public RStarTreeIndex(Relation<O> relation, PageFile<RStarTreeNode> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
+  public RStarTreeIndex(Relation<O> relation, PageFile<RStarTreeNode> pagefile, BulkSplit bulkSplitter, int insertionCandidates) {
+    super(pagefile, bulkSplitter, insertionCandidates);
     this.relation = relation;
     this.initialize();
   }

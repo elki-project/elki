@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit.Strategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -24,12 +23,11 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
    * Constructor.
    * 
    * @param pagefile Page file
-   * @param bulk bulk flag
-   * @param bulkLoadStrategy bulk load strategy
+   * @param bulkSplitter bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public NonFlatRStarTree(PageFile<N> pagefile, boolean bulk, Strategy bulkLoadStrategy, int insertionCandidates) {
-    super(pagefile, bulk, bulkLoadStrategy, insertionCandidates);
+  public NonFlatRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, int insertionCandidates) {
+    super(pagefile, bulkSplitter, insertionCandidates);
   }
 
   /**
@@ -103,21 +101,20 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     if(!initialized) {
       initialize(spatialObjects.get(0));
     }
-    
-    StringBuffer msg = new StringBuffer();
 
-    // root is leaf node
-    if(spatialObjects.size() / (leafCapacity - 1.0) <= 1) {
+    StringBuffer msg = getLogger().isDebuggingFine() ? new StringBuffer() : null;
+
+    // Tiny tree that fit into a single page
+    if(spatialObjects.size() <= leafCapacity) {
       N root = createNewLeafNode();
       root.setPageID(getRootID());
       writeNode(root);
       createRoot(root, spatialObjects);
       setHeight(1);
-      if(getLogger().isDebugging()) {
+      if(msg != null) {
         msg.append("\n  numNodes = 1");
       }
     }
-
     // root is directory node
     else {
       N root = createNewDirectoryNode();
@@ -128,7 +125,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
       List<N> nodes = createBulkLeafNodes(spatialObjects);
 
       int numNodes = nodes.size();
-      if(getLogger().isDebugging()) {
+      if(msg != null) {
         msg.append("\n  numLeafNodes = ").append(numNodes);
       }
       setHeight(1);
@@ -144,11 +141,11 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
       createRoot(root, new ArrayList<N>(nodes));
       numNodes++;
       setHeight(getHeight() + 1);
-      if(getLogger().isDebugging()) {
+      if(msg != null) {
         msg.append("\n  numNodes = ").append(numNodes);
       }
     }
-    if(getLogger().isDebugging()) {
+    if(msg != null) {
       msg.append("\n  height = ").append(getHeight());
       msg.append("\n  root " + getRoot());
       getLogger().debugFine(msg.toString() + "\n");
@@ -166,8 +163,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     int maxEntries = dirCapacity - 1;
 
     ArrayList<N> result = new ArrayList<N>();
-    BulkSplit<N> split = new BulkSplit<N>();
-    List<List<N>> partitions = split.partition(nodes, minEntries, maxEntries, bulkLoadStrategy);
+    List<List<N>> partitions = bulkSplitter.partition(nodes, minEntries, maxEntries);
 
     for(List<N> partition : partitions) {
       // create node
