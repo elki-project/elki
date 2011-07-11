@@ -123,7 +123,7 @@ public class ApproximateLeastOverlapInsertionStrategy implements InsertionStrate
     }
 
     @Override
-    protected Object makeInstance() {
+    protected ApproximateLeastOverlapInsertionStrategy makeInstance() {
       return new ApproximateLeastOverlapInsertionStrategy(insertionCandidates);
     }
   }
