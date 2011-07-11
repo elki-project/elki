@@ -7,7 +7,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -109,7 +108,6 @@ public class TopologicalSplitter implements SplitStrategy<SpatialEntry> {
         SpatialComparable mbr_max_right = maxSorting.get(maxSorting.size() - 1);
 
         for(int k = 1; k < entries.size() - minEntries; k++) {
-
           mbr_min_left = SpatialUtil.union(mbr_min_left, minSorting.get(k));
           mbr_min_right = SpatialUtil.union(mbr_min_right, minSorting.get(minSorting.size() - 1 - k));
           mbr_max_left = SpatialUtil.union(mbr_max_left, maxSorting.get(k));

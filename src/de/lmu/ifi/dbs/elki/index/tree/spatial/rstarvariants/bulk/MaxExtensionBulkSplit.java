@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SpatialComparator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**

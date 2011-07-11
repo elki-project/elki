@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
 
 import java.util.Comparator;
 
