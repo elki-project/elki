@@ -28,7 +28,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
   /**
    * Fast-insertion parameter. Optional.
    */
-  public static OptionID INSERTION_CANDIDATES_ID = OptionID.getOrCreateOptionID("rtree.insertion-candidates", "defines how many children are tested for finding the child generating the least overlap when inserting an object. Default 0 means all children.");
+  public static OptionID INSERTION_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.insertionstrategy", "The strategy to use for object insertion.");
 
   /**
    * Parameter for bulk strategy
@@ -81,7 +81,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configBulkLoad(config);
-      ClassParameter<InsertionStrategy> insertionStrategyP = new ClassParameter<InsertionStrategy>(INSERTION_CANDIDATES_ID, InsertionStrategy.class, LeastOverlapInsertionStrategy.class);
+      ClassParameter<InsertionStrategy> insertionStrategyP = new ClassParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, LeastOverlapInsertionStrategy.class);
       if(config.grab(insertionStrategyP)) {
         insertionStrategy = insertionStrategyP.instantiateClass(config);
       }
