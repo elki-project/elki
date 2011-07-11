@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -24,17 +25,16 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
    * @param pageSize
    * @param cacheSize
    * @param bulkSplitter Bulk loading strategy
-   * @param insertionCandidates
+   * @param insertionStrategy the strategy to find the insertion child
    */
-  public FlatRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, int insertionCandidates) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionCandidates);
-    // TODO Auto-generated constructor stub
+  public FlatRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy);
   }
 
   @Override
   public FlatRStarTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<FlatRStarTreeNode> pagefile = makePageFile(getNodeClass());
-    return new FlatRStarTreeIndex<O>(relation, pagefile, bulkSplitter, insertionCandidates);
+    return new FlatRStarTreeIndex<O>(relation, pagefile, bulkSplitter, insertionStrategy);
   }
 
   protected Class<FlatRStarTreeNode> getNodeClass() {
@@ -51,7 +51,7 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
   public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected FlatRStarTreeFactory<O> makeInstance() {
-      return new FlatRStarTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionCandidates);
+      return new FlatRStarTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy);
     }
   }
 }

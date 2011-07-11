@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -24,16 +25,16 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
    * @param pageSize
    * @param cacheSize
    * @param bulkSplitter Bulk loading strategy
-   * @param insertionCandidates
+   * @param insertionStrategy the strategy to find the insertion child
    */
-  public DeLiCluTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, int insertionCandidates) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionCandidates);
+  public DeLiCluTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy);
   }
 
   @Override
   public DeLiCluTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<DeLiCluNode> pagefile = makePageFile(getNodeClass());
-    return new DeLiCluTreeIndex<O>(relation, pagefile, bulkSplitter, insertionCandidates);
+    return new DeLiCluTreeIndex<O>(relation, pagefile, bulkSplitter, insertionStrategy);
   }
 
   protected Class<DeLiCluNode> getNodeClass() {
@@ -50,7 +51,7 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
   public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected DeLiCluTreeFactory<O> makeInstance() {
-      return new DeLiCluTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionCandidates);
+      return new DeLiCluTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy);
     }
   }
 }

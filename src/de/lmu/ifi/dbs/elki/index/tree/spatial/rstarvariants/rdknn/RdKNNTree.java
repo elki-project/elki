@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -88,13 +89,13 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    * Constructor.
    * 
    * @param bulkSplitter bulk loading strategy
-   * @param insertionCandidates Insertion candidates limit
+   * @param insertionStrategy the strategy to find the insertion child
    * @param k_max max k
    * @param distanceFunction distance function
    * @param distanceQuery distance query
    */
-  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode<D>> pagefile, BulkSplit bulkSplitter, int insertionCandidates, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SpatialDistanceQuery<O, D> distanceQuery) {
-    super(pagefile, bulkSplitter, insertionCandidates);
+  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode<D>> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SpatialDistanceQuery<O, D> distanceQuery) {
+    super(pagefile, bulkSplitter, insertionStrategy);
     this.relation = relation;
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;

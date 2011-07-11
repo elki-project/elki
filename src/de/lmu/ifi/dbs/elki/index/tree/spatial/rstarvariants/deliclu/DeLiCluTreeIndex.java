@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -42,8 +43,8 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
    * @param bulkSplitter bulk load strategy
    * @param insertionCandidates insertion candidate set size
    */
-  public DeLiCluTreeIndex(Relation<O> relation, PageFile<DeLiCluNode> pagefile, BulkSplit bulkSplitter, int insertionCandidates) {
-    super(pagefile, bulkSplitter, insertionCandidates);
+  public DeLiCluTreeIndex(Relation<O> relation, PageFile<DeLiCluNode> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
+    super(pagefile, bulkSplitter, insertionStrategy);
     this.relation = relation;
     this.initialize();
   }

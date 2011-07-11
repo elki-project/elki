@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -36,10 +37,10 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
    * 
    * @param pagefile Page file
    * @param bulkSplitter bulk load strategy
-   * @param insertionCandidates insertion candidate set size
+   * @param insertionStrategy the strategy to find the insertion child
    */
-  public FlatRStarTree(PageFile<FlatRStarTreeNode> pagefile, BulkSplit bulkSplitter, int insertionCandidates) {
-    super(pagefile, bulkSplitter, insertionCandidates);
+  public FlatRStarTree(PageFile<FlatRStarTreeNode> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
+    super(pagefile, bulkSplitter, insertionStrategy);
   }
 
   /**
