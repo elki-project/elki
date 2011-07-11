@@ -72,7 +72,13 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * @param name Name
    */
   public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name) {
-    this(database, type, ids, name, DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, type.getRestrictionClass()));
+    // We can't call this() since we'll have generics issues then.
+    super();
+    this.database = database;
+    this.type = type;
+    this.ids = DBIDUtil.makeUnmodifiable(ids);
+    this.name = name;
+    this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, type.getRestrictionClass());
   }
 
   /**
