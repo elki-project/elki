@@ -98,7 +98,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * The insertion strategy to use
    */
-  protected InsertionStrategy insertionStrategy = new LeastOverlapInsertionStrategy();
+  protected final InsertionStrategy insertionStrategy;
 
   /**
    * Constructor
@@ -110,7 +110,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   public AbstractRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
     super(pagefile);
     this.bulkSplitter = bulkSplitter;
-    this.insertionStrategy = insertionStrategy;
+    if(insertionStrategy != null) {
+      this.insertionStrategy = insertionStrategy;
+    }
+    else {
+      getLogger().warning("No insertion strategy given - falling back to " + LeastOverlapInsertionStrategy.class.getSimpleName());
+      this.insertionStrategy = new LeastOverlapInsertionStrategy();
+    }
   }
 
   /**
