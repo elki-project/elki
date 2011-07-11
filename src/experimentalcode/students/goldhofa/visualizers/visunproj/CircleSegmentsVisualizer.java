@@ -348,7 +348,14 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     addCSSClasses(svgp);
     
     // create Color shades for clusters
+    // TODO: Auskommentieren falls Probleme mit Beamer
+    //*
     String[] clusterColorShades = getGradient(clusterSize, Color.getColorSet(Color.ColorSet.GREY));
+    /*/
+    String[] clusterColorShades = getGradient(clusterSize, Color.getColorSet(Color.ColorSet.BLUE));
+    //*/
+    
+    
     cssClr = new CSSClass[clusterSize];
     for (int i=0; i<clusterSize; i++) {
       cssClr[i] = new CSSClass(this, CLUSTERID+"_"+(i+1));
@@ -533,12 +540,13 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
       return colorShades;
     }
     
+    // steps to use between each colour
     int colorDelta = shades/(colorCount-1);
     
     for (int s=0; s<shades; s++) {
       
       int from = s/colorDelta;
-      int to = (s/colorDelta)+1;
+      int to = ((s/colorDelta)+1)%colorCount;
       int step = s%colorDelta;
       
       int r = colors[from][0] - ((colors[from][0] - colors[to][0]) / colorDelta) * step;
