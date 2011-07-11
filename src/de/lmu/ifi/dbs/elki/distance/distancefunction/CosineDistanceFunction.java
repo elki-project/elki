@@ -16,7 +16,7 @@ public class CosineDistanceFunction extends AbstractCosineDistanceFunction {
   /**
    * Static instance
    */
-  public static final AbstractCosineDistanceFunction STATIC = new CosineDistanceFunction();
+  public static final CosineDistanceFunction STATIC = new CosineDistanceFunction();
 
   /**
    * Provides a CosineDistanceFunction.
@@ -69,7 +69,7 @@ public class CosineDistanceFunction extends AbstractCosineDistanceFunction {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected AbstractCosineDistanceFunction makeInstance() {
+    protected CosineDistanceFunction makeInstance() {
       return CosineDistanceFunction.STATIC;
     }
   }
