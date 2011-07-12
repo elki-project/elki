@@ -3,6 +3,7 @@ package experimentalcode.shared.index.xtree.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +16,9 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import experimentalcode.marisa.utils.PriorityQueue;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import experimentalcode.shared.index.xtree.XDirectoryEntry;
 import experimentalcode.shared.index.xtree.XNode;
 import experimentalcode.shared.index.xtree.XTreeBase;
@@ -112,7 +115,6 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return the sum of all first and second MBRs' surfaces for the tested entry
    *         distributions
    */
-  @SuppressWarnings("unchecked")
   private double getSurfaceSums4Sorting(int minEntries, int maxEntries, Integer[] entrySorting, int dim) {
     // avoid multiple MBR calculations by updating min/max-logs for the two
     // collections' bounds:
@@ -121,17 +123,19 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     double[] pqUBFirst = new double[dim];
     Arrays.fill(pqUBFirst, Double.NEGATIVE_INFINITY);
     // maintain the second entries' upper bounds
-    PriorityQueue<Integer>[] pqUBSecond = new PriorityQueue[dim];
-    for(int i = 0; i < pqUBSecond.length; i++) {
-      pqUBSecond[i] = new PriorityQueue<Integer>(false, maxEntries);
+    List<Heap<DoubleIntPair>> pqUBSecond = new ArrayList<Heap<DoubleIntPair>>(dim);
+    for(int i = 0; i < dim; i++) {
+      // Descending heap
+      pqUBSecond.add(new TopBoundedHeap<DoubleIntPair>(maxEntries, Collections.reverseOrder()));
     }
     // the first entries' minimum lower bounds
     double[] pqLBFirst = new double[dim];
     Arrays.fill(pqLBFirst, Double.POSITIVE_INFINITY);
     // maintain the second entries' minimum lower bounds
-    PriorityQueue<Integer>[] pqLBSecond = new PriorityQueue[dim];
-    for(int i = 0; i < pqLBSecond.length; i++) {
-      pqLBSecond[i] = new PriorityQueue<Integer>(true, maxEntries);
+    List<Heap<DoubleIntPair>> pqLBSecond = new ArrayList<Heap<DoubleIntPair>>(dim);
+    for(int i = 0; i < dim; i++) {
+      // Ascending heap
+      pqLBSecond.add(new TopBoundedHeap<DoubleIntPair>(maxEntries));
     }
     // initialize bounds for first entry collection
     for(int index = 0; index < minEntries; index++) {
@@ -150,18 +154,18 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     for(int index = maxEntries; index < entrySorting.length; index++) {
       add2MBR(entrySorting, maxSecond, minSecond, index);
     }
-    for(int i = 0; i < pqLBSecond.length; i++) {
+    for(int i = 0; i < dim; i++) {
       // with index entrySorting.length => never to be removed
-      pqLBSecond[i].add(minSecond[i], entrySorting.length);
-      pqUBSecond[i].add(maxSecond[i], entrySorting.length);
+      pqLBSecond.get(i).add(new DoubleIntPair(minSecond[i], entrySorting.length));
+      pqUBSecond.get(i).add(new DoubleIntPair(maxSecond[i], entrySorting.length));
     }
     // add the entries to be removed later on
     for(int index = minEntries; index < maxEntries; index++) {
       add2MBR(entrySorting, pqUBSecond, pqLBSecond, index);
     }
     for(int i = 0; i < minSecond.length; i++) {
-      minSecond[i] = pqLBSecond[i].firstPriority();
-      maxSecond[i] = pqUBSecond[i].firstPriority();
+      minSecond[i] = pqLBSecond.get(i).peek().first;
+      maxSecond[i] = pqUBSecond.get(i).peek().first;
     }
     ModifiableHyperBoundingBox mbr2 = new ModifiableHyperBoundingBox(minSecond, maxSecond);
     double surfaceSum = SpatialUtil.perimeter(mbr1) + SpatialUtil.perimeter(mbr2);
@@ -197,30 +201,30 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *        <code>mbr</code>.
    * @param mbr The MBR to be adapted to a smaller entry list.
    */
-  private void removeFromMBR(PriorityQueue<Integer>[] pqUB, PriorityQueue<Integer>[] pqLB, Integer index, ModifiableHyperBoundingBox mbr) {
+  private void removeFromMBR(List<Heap<DoubleIntPair>> pqUB, List<Heap<DoubleIntPair>> pqLB, int index, ModifiableHyperBoundingBox mbr) {
     boolean change = false;
-    PriorityQueue<Integer>.Pair<Integer> pqPair;
+    DoubleIntPair pqPair;
     for(int d = 1; d <= mbr.getDimensionality(); d++) {
       // remove all relevant upper bound entries belonging to the first set
-      pqPair = pqUB[d - 1].getFirstEntry();
-      while(pqPair.getValue().compareTo(index) <= 0) {
+      pqPair = pqUB.get(d - 1).peek();
+      while(pqPair.second <= index) {
         change = true;
-        pqUB[d - 1].removeFirst();
-        pqPair = pqUB[d - 1].getFirstEntry();
+        pqUB.get(d - 1).poll();
+        pqPair = pqUB.get(d - 1).peek();
       }
       if(change) { // there probably was a change, as an entry has been removed
-        mbr.setMax(d, pqPair.getPriority());
+        mbr.setMax(d, pqPair.first);
       }
       change = false;
       // remove all relevant lower bound entries belonging to the first set
-      pqPair = pqLB[d - 1].getFirstEntry();
-      while(pqPair.getValue().compareTo(index) <= 0) {
+      pqPair = pqLB.get(d - 1).peek();
+      while(pqPair.second <= index) {
         change = true;
-        pqLB[d - 1].removeFirst();
-        pqPair = pqLB[d - 1].getFirstEntry();
+        pqLB.get(d - 1).poll();
+        pqPair = pqLB.get(d - 1).peek();
       }
       if(change) { // there probably was a change, as an entry has been removed
-        mbr.setMin(d, pqPair.getPriority());
+        mbr.setMin(d, pqPair.first);
       }
       change = false;
     }
@@ -273,14 +277,14 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *        <code>mbr</code>.
    * @param index the index in the sorting referencing the entry to be added
    */
-  private void add2MBR(Integer[] entrySorting, PriorityQueue<Integer>[] pqUB, PriorityQueue<Integer>[] pqLB, int index) {
+  private void add2MBR(Integer[] entrySorting, List<Heap<DoubleIntPair>> pqUB, List<Heap<DoubleIntPair>> pqLB, int index) {
     SpatialComparable currMBR = this.entries.get(entrySorting[index]);
     double min, max;
     for(int d = 1; d <= currMBR.getDimensionality(); d++) {
       max = currMBR.getMax(d);
-      pqUB[d - 1].add(max, index);
+      pqUB.get(d - 1).add(new DoubleIntPair(max, index));
       min = currMBR.getMin(d);
-      pqLB[d - 1].add(min, index);
+      pqLB.get(d - 1).add(new DoubleIntPair(min, index));
     }
   }
 
@@ -329,6 +333,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     /**
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
+    @Override
     public int compare(Integer o1, Integer o2) {
       if(lb) {
         d1 = entries.get(o1).getMin(dimension + 1);
