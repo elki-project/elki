@@ -17,8 +17,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -122,15 +120,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   }
 
   /**
-   * Test whether a bulk insert is still possible.
-   * 
-   * @return Success code
-   */
-  public boolean canBulkLoad() {
-    return (bulkSplitter != null && !initialized);
-  }
-
-  /**
    * Returns the path to the leaf entry in the specified subtree that represents
    * the data object with the specified mbr and id.
    * 
@@ -227,7 +216,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * 
    * @param deletionPath Path to delete
    */
-  public void deletePath(IndexTreePath<E> deletionPath) {
+  protected void deletePath(IndexTreePath<E> deletionPath) {
     N leaf = getNode(deletionPath.getParentPath().getLastPathComponent().getEntry());
     int index = deletionPath.getLastPathComponent().getIndex();
 
@@ -259,83 +248,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     postDelete(entry);
 
     doExtraIntegrityChecks();
-  }
-
-  @Override
-  public final List<E> getLeaves() {
-    List<E> result = new ArrayList<E>();
-
-    if(height == 1) {
-      result.add(getRootEntry());
-      return result;
-    }
-
-    getLeafNodes(getRoot(), result, height);
-    return result;
-  }
-
-  /**
-   * Returns the height of this R*-Tree.
-   * 
-   * @return the height of this R*-Tree
-   */
-  public final int getHeight() {
-    return height;
-  }
-
-  /**
-   * Returns a string representation of this R*-Tree.
-   * 
-   * @return a string representation of this R*-Tree
-   */
-  @Override
-  public String toString() {
-    StringBuffer result = new StringBuffer();
-    int dirNodes = 0;
-    int leafNodes = 0;
-    int objects = 0;
-    int levels = 0;
-
-    if(initialized) {
-      N node = getRoot();
-      int dim = node.getDimensionality();
-
-      while(!node.isLeaf()) {
-        if(node.getNumEntries() > 0) {
-          E entry = node.getEntry(0);
-          node = getNode(entry);
-          levels++;
-        }
-      }
-
-      BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
-      while(enumeration.hasMoreElements()) {
-        IndexTreePath<E> indexPath = enumeration.nextElement();
-        E entry = indexPath.getLastPathComponent().getEntry();
-        if(entry.isLeafEntry()) {
-          objects++;
-        }
-        else {
-          node = getNode(entry);
-          if(node.isLeaf()) {
-            leafNodes++;
-          }
-          else {
-            dirNodes++;
-          }
-        }
-      }
-      result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n");
-      result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
-      result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
-      result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");
-      PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
-    }
-    else {
-      result.append(getClass().getName()).append(" is empty!\n");
-    }
-
-    return result.toString();
   }
 
   /**
@@ -427,6 +339,15 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   }
 
   /**
+   * Test whether a bulk insert is still possible.
+   * 
+   * @return Success code
+   */
+  public boolean canBulkLoad() {
+    return (bulkSplitter != null && !initialized);
+  }
+
+  /**
    * Creates and returns the leaf nodes for bulk load.
    * 
    * @param objects the objects to be inserted
@@ -435,34 +356,49 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected List<N> createBulkLeafNodes(List<E> objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
-
+  
     ArrayList<N> result = new ArrayList<N>();
     List<List<E>> partitions = bulkSplitter.partition(objects, minEntries, maxEntries);
-
+  
     for(List<E> partition : partitions) {
       // create leaf node
       N leafNode = createNewLeafNode();
       result.add(leafNode);
-
+  
       // insert data
       for(E o : partition) {
         leafNode.addLeafEntry(o);
       }
-
+  
       // write to file
       writeNode(leafNode);
-
+  
       if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append("pageNo ").append(leafNode.getPageID()).append("\n");
         getLogger().debugFine(msg.toString());
       }
     }
-
+  
     if(getLogger().isDebugging()) {
       getLogger().debugFine("numDataPages = " + result.size());
     }
     return result;
+  }
+
+  /**
+   * Performs a bulk load on this RTree with the specified data. Is called by
+   * the constructor.
+   */
+  abstract protected void bulkLoad(List<E> entrys);
+
+  /**
+   * Returns the height of this R*-Tree.
+   * 
+   * @return the height of this R*-Tree
+   */
+  public final int getHeight() {
+    return height;
   }
 
   /**
@@ -473,6 +409,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected void setHeight(int height) {
     this.height = height;
   }
+
+  /**
+   * Computes the height of this RTree. Is called by the constructor.
+   * 
+   * @return the height of this RTree
+   */
+  abstract protected int computeHeight();
 
   /**
    * Clears the reinsertions.
@@ -501,25 +444,54 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   abstract protected boolean hasUnderflow(N node);
 
   /**
-   * Computes the height of this RTree. Is called by the constructor.
-   * 
-   * @return the height of this RTree
-   */
-  abstract protected int computeHeight();
-
-  /**
-   * Performs a bulk load on this RTree with the specified data. Is called by
-   * the constructor.
-   */
-  abstract protected void bulkLoad(List<E> entrys);
-
-  /**
    * Creates a new directory entry representing the specified node.
    * 
    * @param node the node to be represented by the new entry
    * @return the newly created directory entry
    */
   abstract protected E createNewDirectoryEntry(N node);
+
+  /**
+   * Creates a new root node that points to the two specified child nodes and
+   * return the path to the new root.
+   * 
+   * @param oldRoot the old root of this RTree
+   * @param newNode the new split node
+   * @return the path to the new root node that points to the two specified
+   *         child nodes
+   */
+  protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode) {
+    N root = createNewDirectoryNode();
+    writeNode(root);
+  
+    // switch the ids
+    oldRoot.setPageID(root.getPageID());
+    if(!oldRoot.isLeaf()) {
+      for(int i = 0; i < oldRoot.getNumEntries(); i++) {
+        N node = getNode(oldRoot.getEntry(i));
+        writeNode(node);
+      }
+    }
+  
+    root.setPageID(getRootID());
+    E oldRootEntry = createNewDirectoryEntry(oldRoot);
+    E newNodeEntry = createNewDirectoryEntry(newNode);
+    root.addDirectoryEntry(oldRootEntry);
+    root.addDirectoryEntry(newNodeEntry);
+  
+    writeNode(root);
+    writeNode(oldRoot);
+    writeNode(newNode);
+    if(getLogger().isDebugging()) {
+      String msg = "Create new Root: ID=" + root.getPageID();
+      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRoot) + " " + new HyperBoundingBox(oldRootEntry);
+      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNode) + " " + new HyperBoundingBox(newNodeEntry);
+      msg += "\n";
+      getLogger().debugFine(msg);
+    }
+  
+    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
+  }
 
   /**
    * Test on whether or not any child of <code>node</code> contains
@@ -845,30 +817,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   }
 
   /**
-   * Sorts the entries of the specified node according to their minimum distance
-   * to the specified object.
-   * 
-   * @param node the node
-   * @param q the query object
-   * @param distanceFunction the distance function for computing the distances
-   * @return a list of the sorted entries
-   */
-  // TODO: move somewhere else?
-  protected <D extends Distance<D>> List<DistanceEntry<D, E>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistanceFunction<?, D> distanceFunction) {
-    List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
-
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      @SuppressWarnings("unchecked")
-      E entry = (E) node.getEntry(i);
-      D minDist = distanceFunction.minDist(entry, q);
-      result.add(new DistanceEntry<D, E>(entry, minDist, i));
-    }
-
-    Collections.sort(result);
-    return result;
-  }
-
-  /**
    * Condenses the tree after deletion of some nodes.
    * 
    * @param subtree the subtree to be condensed
@@ -922,6 +870,19 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
   }
 
+  @Override
+  public final List<E> getLeaves() {
+    List<E> result = new ArrayList<E>();
+  
+    if(height == 1) {
+      result.add(getRootEntry());
+      return result;
+    }
+  
+    getLeafNodes(getRoot(), result, height);
+    return result;
+  }
+
   /**
    * Determines the entries pointing to the leaf nodes of the specified subtree
    * 
@@ -945,53 +906,66 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   }
 
   /**
-   * Creates a new root node that points to the two specified child nodes and
-   * return the path to the new root.
-   * 
-   * @param oldRoot the old root of this RTree
-   * @param newNode the new split node
-   * @return the path to the new root node that points to the two specified
-   *         child nodes
-   */
-  protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode) {
-    N root = createNewDirectoryNode();
-    writeNode(root);
-
-    // switch the ids
-    oldRoot.setPageID(root.getPageID());
-    if(!oldRoot.isLeaf()) {
-      for(int i = 0; i < oldRoot.getNumEntries(); i++) {
-        N node = getNode(oldRoot.getEntry(i));
-        writeNode(node);
-      }
-    }
-
-    root.setPageID(getRootID());
-    E oldRootEntry = createNewDirectoryEntry(oldRoot);
-    E newNodeEntry = createNewDirectoryEntry(newNode);
-    root.addDirectoryEntry(oldRootEntry);
-    root.addDirectoryEntry(newNodeEntry);
-
-    writeNode(root);
-    writeNode(oldRoot);
-    writeNode(newNode);
-    if(getLogger().isDebugging()) {
-      String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRoot) + " " + new HyperBoundingBox(oldRootEntry);
-      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNode) + " " + new HyperBoundingBox(newNodeEntry);
-      msg += "\n";
-      getLogger().debugFine(msg);
-    }
-
-    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
-  }
-
-  /**
    * Perform additional integrity checks.
    */
   public void doExtraIntegrityChecks() {
     if(extraIntegrityChecks) {
       getRoot().integrityCheck(this);
     }
+  }
+
+  /**
+   * Returns a string representation of this R*-Tree.
+   * 
+   * @return a string representation of this R*-Tree
+   */
+  @Override
+  public String toString() {
+    StringBuffer result = new StringBuffer();
+    int dirNodes = 0;
+    int leafNodes = 0;
+    int objects = 0;
+    int levels = 0;
+  
+    if(initialized) {
+      N node = getRoot();
+      int dim = node.getDimensionality();
+  
+      while(!node.isLeaf()) {
+        if(node.getNumEntries() > 0) {
+          E entry = node.getEntry(0);
+          node = getNode(entry);
+          levels++;
+        }
+      }
+  
+      BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
+      while(enumeration.hasMoreElements()) {
+        IndexTreePath<E> indexPath = enumeration.nextElement();
+        E entry = indexPath.getLastPathComponent().getEntry();
+        if(entry.isLeafEntry()) {
+          objects++;
+        }
+        else {
+          node = getNode(entry);
+          if(node.isLeaf()) {
+            leafNodes++;
+          }
+          else {
+            dirNodes++;
+          }
+        }
+      }
+      result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n");
+      result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
+      result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
+      result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");
+      PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
+    }
+    else {
+      result.append(getClass().getName()).append(" is empty!\n");
+    }
+  
+    return result.toString();
   }
 }
