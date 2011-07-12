@@ -89,9 +89,8 @@
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
 	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
-		<exclude name="de/lmu/ifi/dbs/elki/index/tree/spatial/rstarvariants/rdknn/**" />
+		<exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/rdknn/**" />
 		<exclude name="experimentalcode/attenberger/**" />
-		<exclude name="experimentalcode/erich/gearth/**" />
 		<exclude name="experimentalcode/erich/newdblayer/**" />
 		<exclude name="experimentalcode/demel/**" />
 		<exclude name="experimentalcode/frankenb/**" />
@@ -101,8 +100,8 @@
 		<exclude name="experimentalcode/marisa/**" />
 		<exclude name="experimentalcode/missbichler/**" />
 		<exclude name="experimentalcode/moennig/**" />
+		<exclude name="experimentalcode/shared/index/subspace/**" />
 		<exclude name="experimentalcode/shared/kernelbased/**" />
-		<exclude name="experimentalcode/shared/guidraft1/**" />
 		<exclude name="experimentalcode/shared/converter/bibtex/**" />
 		<exclude name="experimentalcode/students/**" />
 		<exclude name="experimentalcode/thomas/**" />
@@ -113,6 +112,8 @@
 		<exclude name="experimentalcode/**" />
 		<!-- currently only contains an abstract biclustering algorithm -->
 		<exclude name="${ELKI_DIR}/algorithm/clustering/biclustering/**" />
+		<!-- exclude rdknn which is untested/incomplete --> 
+		<exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/rdknn/**" />
 		<!-- Flat Rstar tree -->
 		<exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**" />
 		<!-- currently empty -->
@@ -210,7 +211,7 @@
 			doclet="org.jboss.apiviz.APIviz"
 			docletpath="${build.lib}/apiviz-1.3.1.GA-erich.jar"
 			windowtitle="${ELKI_LONG}"
-			additionalparam="-nopackagediagram -group 'Algorithms' de.lmu.ifi.dbs.elki.algorithm* -group 'Databases and Index Structures' de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.parser*:de.lmu.ifi.dbs.elki.normalization*:de.lmu.ifi.dbs.elki.persistent* -group 'Datatypes and Distance Functions' de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance* -group 'Evaluation' de.lmu.ifi.dbs.elki.evalu* -group 'GUI and Visualization' de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis* -group 'Utilities and Miscellaneous' de.lmu.ifi.dbs.elki* -group 'Shared Experimental Code' experimentalcode:experimentalcode.shared* -group 'User Experimental Code' experimentalcode*">
+			additionalparam="-nopackagediagram -group 'Algorithms' de.lmu.ifi.dbs.elki.algorithm* -group 'Databases and Index Structures' de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.datasource*:de.lmu.ifi.dbs.elki.persistent* -group 'Datatypes and Distance Functions' de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance* -group 'Evaluation' de.lmu.ifi.dbs.elki.evalu* -group 'GUI and Visualization' de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis* -group 'Utilities and Miscellaneous' de.lmu.ifi.dbs.elki* -group 'Shared Experimental Code' experimentalcode:experimentalcode.shared* -group 'User Experimental Code' experimentalcode*">
 			<classpath refid="build.classpath.built" />
 			<packageset dir="${source}">
 				<patternset refid="${build.patternset}" />
