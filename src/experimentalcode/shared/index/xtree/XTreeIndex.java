@@ -1,4 +1,4 @@
-package experimentalcode.marisa.index.xtree.common;
+package experimentalcode.shared.index.xtree;
 
 import java.util.ArrayList;
 import java.util.List;

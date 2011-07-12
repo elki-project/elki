@@ -1,4 +1,4 @@
-package experimentalcode.marisa.index.xtree;
+package experimentalcode.shared.index.xtree;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import experimentalcode.marisa.index.xtree.util.SplitHistory;
-import experimentalcode.marisa.index.xtree.util.XSplitter;
+import experimentalcode.shared.index.xtree.util.SplitHistory;
+import experimentalcode.shared.index.xtree.util.XSplitter;
 
 /**
  * Base class for XTree implementations and other extensions; derived from

@@ -1,4 +1,4 @@
-package experimentalcode.marisa.index.xtree.common;
+package experimentalcode.shared.index.xtree;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFac
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import experimentalcode.marisa.index.xtree.XTreeBaseFactory;
 
 public class XTreeFactory<O extends NumberVector<O, ?>> extends XTreeBaseFactory<O, XTreeIndex<O>> {
   public XTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {

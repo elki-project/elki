@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import experimentalcode.marisa.index.xtree.util.LargeProperties;
+import experimentalcode.shared.index.xtree.util.LargeProperties;
 
 public class LPTests {
 

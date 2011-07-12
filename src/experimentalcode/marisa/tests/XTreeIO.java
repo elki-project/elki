@@ -13,8 +13,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
-import experimentalcode.marisa.index.xtree.common.XTree;
 import experimentalcode.marisa.utils.Zeit;
+import experimentalcode.shared.index.xtree.XTree;
 
 public class XTreeIO {
 
@@ -28,7 +28,7 @@ public class XTreeIO {
 
   public static int VERBOSE_STEP = 1000;
 
-  public static XTree<DoubleVector> buildXTree(String csvInputFile, String outputFile, int pageSize, double maxOverlap, double minFanoutFraction, long numInstances, boolean commit) throws ParameterException, NumberFormatException, IOException {
+  public static XTree buildXTree(String csvInputFile, String outputFile, int pageSize, double maxOverlap, double minFanoutFraction, long numInstances, boolean commit) throws ParameterException, NumberFormatException, IOException {
 
     // parameters
     String paramStr = "-treeindex.pagesize " + pageSize + " " + "-treeindex.cachesize " + CACHE_SIZE + " -xtree.max_overlap_fraction " + maxOverlap;
@@ -44,7 +44,7 @@ public class XTreeIO {
 
     // init xTree
     SerializedParameterization config = new SerializedParameterization(split);
-    XTree<DoubleVector> xTree = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
+    XTree xTree = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
 
 //    xTree.initializeTree(new DoubleVector(new double[15]));
@@ -73,10 +73,10 @@ public class XTreeIO {
     return xTree;
   }
 
-  public static XTree<DoubleVector> loadXTree(String xtFilename) throws ParameterException {
+  public static XTree loadXTree(String xtFilename) throws ParameterException {
     String[] split = ("-treeindex.file " + xtFilename + " " + "-treeindex.cachesize " + CACHE_SIZE).split("\\s");
     SerializedParameterization config = new SerializedParameterization(Arrays.asList(split));
-    XTree<DoubleVector> xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
+    XTree xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
     xt.initializeFromFile();
     return xt;
@@ -114,7 +114,7 @@ public class XTreeIO {
               }
               if(VERBOSE)
                 System.out.println("Building XTree '" + fn + "'");
-              XTree<DoubleVector> xt = buildXTree(csvInputFile, fn, pageSizes[i], maxOverlaps[j], minFanoutFractions[l], numInstances[m], true);
+              XTree xt = buildXTree(csvInputFile, fn, pageSizes[i], maxOverlaps[j], minFanoutFractions[l], numInstances[m], true);
               if(VERBOSE)
                 System.out.println(xt.toString());
               xt.commit();

@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
-import experimentalcode.marisa.index.xtree.common.XTree;
 import experimentalcode.marisa.utils.Zeit;
+import experimentalcode.shared.index.xtree.XTree;
 
 public class XTreeTests {
 
@@ -21,7 +21,7 @@ public class XTreeTests {
 
   public static boolean verbose = true;
 
-  public static XTree<DoubleVector> buildXTree() throws ParameterException, NumberFormatException, IOException {
+  public static XTree buildXTree() throws ParameterException, NumberFormatException, IOException {
     String csvInputFile = "C:/WORK/Theseus/data/synthetic/15DUniform.csv";
     // String outputFile = "15DUniformXTree_default_mO1_ps4300";
     String outputFile = "15DUniformXTree_default_mO1";
@@ -36,7 +36,7 @@ public class XTreeTests {
 
     // init xTree
     SerializedParameterization config = new SerializedParameterization(split);
-    XTree<DoubleVector> xTree = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
+    XTree xTree = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
 
     FileInputStream fis = new FileInputStream(csvInputFile);
@@ -93,34 +93,34 @@ public class XTreeTests {
     return new DoubleVector(coords);
   }
 
-  public static XTree<DoubleVector> loadXTree() throws ParameterException {
+  public static XTree loadXTree() throws ParameterException {
     String outputFile = "15DUniformXTree_default_mO1";
     // String outputFile = "15DUniformXTree_default_mO1";
     String[] split = ("-treeindex.file C:/WORK/Theseus/Experimente/xtrees/" + outputFile + " " + "-treeindex.cachesize " + CACHE_SIZE).split("\\s");
     SerializedParameterization config = new SerializedParameterization(Arrays.asList(split));
-    XTree<DoubleVector> xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
+    XTree xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
     xt.initializeFromFile();
     return xt;
   }
 
-  public static XTree<DoubleVector> loadXTree(String xtFilename) throws ParameterException {
+  public static XTree loadXTree(String xtFilename) throws ParameterException {
     String[] split = ("-treeindex.file " + xtFilename + " " + "-treeindex.cachesize " + CACHE_SIZE).split("\\s");
     SerializedParameterization config = new SerializedParameterization(Arrays.asList(split));
-    XTree<DoubleVector> xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
+    XTree xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
     xt.initializeFromFile();
     return xt;
   }
 
-  public static XTree<DoubleVector> buildXTree(String csvInputFile, String outputFile, int pageSize, double maxOverlap, long numInstances) throws ParameterException, NumberFormatException, IOException {
+  public static XTree buildXTree(String csvInputFile, String outputFile, int pageSize, double maxOverlap, long numInstances) throws ParameterException, NumberFormatException, IOException {
 
     // parameter
     String[] split = ("-treeindex.pagesize " + pageSize + " " + "-treeindex.file " + outputFile + " " + "-treeindex.cachesize " + CACHE_SIZE + " -xtree.max_overlap_fraction " + maxOverlap).split("\\s");
 
     // init xTree
     SerializedParameterization config = new SerializedParameterization(split);
-    XTree<DoubleVector> xTree = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
+    XTree xTree = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
 
     FileInputStream fis = new FileInputStream(csvInputFile);
@@ -148,8 +148,7 @@ public class XTreeTests {
     // LoggingConfiguration.reconfigureLogging("experimentalcode.marisa.tests",
     // "logging-cli.properties");
     LoggingConfiguration.DEBUG = true;
-    XTree<DoubleVector> xt;
-    xt = buildXTree();
+    XTree xt = buildXTree();
     System.out.println("XT: " + xt.toString());
     xt.close();
 

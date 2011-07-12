@@ -1,4 +1,4 @@
-package experimentalcode.marisa.index.xtree;
+package experimentalcode.shared.index.xtree;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.Index;

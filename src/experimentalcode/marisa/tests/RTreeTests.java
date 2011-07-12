@@ -17,7 +17,7 @@ import experimentalcode.marisa.utils.Zeit;
 
 public class RTreeTests {
 
-  public static RStarTree<DoubleVector> buildRStarTree() throws ParameterException, NumberFormatException, IOException {
+  public static RStarTree buildRStarTree() throws ParameterException, NumberFormatException, IOException {
     String csvInputFile = "C:/WORK/Theseus/data/synthetic/15DUniform.csv";
     String outputFile = "15DUniformRSTree_default";
     
@@ -27,7 +27,7 @@ public class RTreeTests {
 
     //init RTrees
     SerializedParameterization config = new SerializedParameterization(splitted);
-    RStarTree<DoubleVector> rTree = ClassGenericsUtil.parameterizeOrAbort(RStarTree.class, config);
+    RStarTree rTree = ClassGenericsUtil.parameterizeOrAbort(RStarTree.class, config);
     config.failOnErrors();
     
     FileInputStream fis = new FileInputStream(csvInputFile);
@@ -61,18 +61,18 @@ public class RTreeTests {
     return new DoubleVector(coords);
   }
   
-  public static RStarTree<DoubleVector> loadRStarTree() throws ParameterException {
+  public static RStarTree loadRStarTree() throws ParameterException {
     String outputFile = "15DUniformRSTree_default";
     String[] split = ("-treeindex.pagesize 4096 " + "-treeindex.file C:/WORK/Theseus/Experimente/rstartrees/"+outputFile+" " + "-treeindex.cachesize 409600000").split("\\s");
     SerializedParameterization config = new SerializedParameterization(split);
-    RStarTree<DoubleVector> rt = ClassGenericsUtil.parameterizeOrAbort(RStarTree.class, config);
+    RStarTree rt = ClassGenericsUtil.parameterizeOrAbort(RStarTree.class, config);
     config.failOnErrors();
     rt.insertAll(DBIDUtil.EMPTYDBIDS, new ArrayList<DoubleVector>());
     return rt;
   }
   
   public static void main(String[] args) throws NumberFormatException, ParameterException, IOException {
-    RStarTree<DoubleVector> rt;
+    RStarTree rt;
     rt = buildRStarTree();
     System.out.println("RT: "+rt.toString());
     rt.close();

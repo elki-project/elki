@@ -1,4 +1,4 @@
-package experimentalcode.marisa.index.xtree;
+package experimentalcode.shared.index.xtree;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

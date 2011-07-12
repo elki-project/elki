@@ -1,7 +1,6 @@
-package experimentalcode.marisa.index.xtree.common;
+package experimentalcode.shared.index.xtree;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import experimentalcode.marisa.index.xtree.XNode;
 
 /**
  * Represents a node in an X-Tree.

@@ -1,4 +1,4 @@
-package experimentalcode.marisa.index.xtree.common;
+package experimentalcode.shared.index.xtree;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
@@ -9,8 +9,6 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import experimentalcode.marisa.index.xtree.XDirectoryEntry;
-import experimentalcode.marisa.index.xtree.XTreeBase;
 
 /**
  * The XTree is a spatial index structure extending the R*-Tree.
