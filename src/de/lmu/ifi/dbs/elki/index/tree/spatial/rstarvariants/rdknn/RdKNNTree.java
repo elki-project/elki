@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -30,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
@@ -310,6 +312,30 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     if(logger.isVerbose()) {
       logger.verbose("Directory Capacity: " + dirCapacity + "\nLeaf Capacity: " + leafCapacity);
     }
+  }
+
+  /**
+   * Sorts the entries of the specified node according to their minimum distance
+   * to the specified object.
+   * 
+   * @param node the node
+   * @param q the query object
+   * @param distanceFunction the distance function for computing the distances
+   * @return a list of the sorted entries
+   */
+  // TODO: move somewhere else?
+  protected List<DistanceEntry<D, RdKNNEntry<D>>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistanceFunction<?, D> distanceFunction) {
+    List<DistanceEntry<D, RdKNNEntry<D>>> result = new ArrayList<DistanceEntry<D, RdKNNEntry<D>>>();
+
+    for(int i = 0; i < node.getNumEntries(); i++) {
+      @SuppressWarnings("unchecked")
+      RdKNNEntry<D> entry = (RdKNNEntry<D>) node.getEntry(i);
+      D minDist = distanceFunction.minDist(entry, q);
+      result.add(new DistanceEntry<D, RdKNNEntry<D>>(entry, minDist, i));
+    }
+
+    Collections.sort(result);
+    return result;
   }
 
   /**
