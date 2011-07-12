@@ -802,8 +802,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     else {
       if(!isRoot(node)) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
-        int index = subtree.getLastPathComponent().getIndex();
-        lastInsertedEntry = node.adjustEntryIncremental(parent.getEntry(index), lastInsertedEntry);
+        E entry = parent.getEntry(subtree.getLastPathComponent().getIndex());
+        lastInsertedEntry = node.adjustEntryIncremental(entry, lastInsertedEntry);
         // node.adjustEntry(parent.getEntry(index));
         // write changes in parent to file
         writeNode(parent);
