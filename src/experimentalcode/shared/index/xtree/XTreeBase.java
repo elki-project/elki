@@ -239,7 +239,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     writeNode(root);
     setHeight(1);
   }
-  
+
   @Override
   public boolean canBulkLoad() {
     return false;
@@ -381,11 +381,6 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
   protected void preInsert(@SuppressWarnings("unused") E entry) {
     // TODO: can we do this somewhere else?
     num_elements++;
-  }
-
-  public boolean initializeTree(E dataObject) {
-    super.initialize(dataObject);
-    return true;
   }
 
   /**
@@ -1171,7 +1166,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(isRoot(node)) {
+      if(!isRoot(node)) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
         HyperBoundingBox mbr = new HyperBoundingBox(e);
