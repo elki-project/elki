@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -49,9 +49,9 @@ public class SOF<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>
   public OutlierResult run(Database database, Relation<N> spatial, Relation<V> relation) throws IllegalStateException {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
 
+    WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     WritableDataStore<Double> lofs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    MinMax<Double> lofminmax = new MinMax<Double>();
+    DoubleMinMax lofminmax = new DoubleMinMax();
 
     for(DBID id : relation.iterDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
@@ -68,8 +68,9 @@ public class SOF<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>
       for(DBID n : neighbors) {
         avg += lrds.get(n);
       }
-      lofs.put(id, (avg / neighbors.size()) / lrds.get(id));
-      lofminmax.put((avg / neighbors.size()) / lrds.get(id));
+      final double lrd = (avg / neighbors.size()) / lrds.get(id);
+      lofs.put(id, lrd);
+      lofminmax.put(lrd);
     }
 
     // Build result representation.
@@ -77,7 +78,6 @@ public class SOF<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;
-
   }
 
   @Override
