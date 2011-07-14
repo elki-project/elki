@@ -1,5 +1,6 @@
 package experimentalcode.shared.outlier.generalized.neighbors;
 
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -35,5 +36,12 @@ public interface NeighborSetPredicate {
      * @return instance
      */
     public NeighborSetPredicate instantiate(Relation<? extends O> database);
+
+    /**
+     * Get the input type information
+     * 
+     * @return input type
+     */
+    public TypeInformation getInputTypeRestriction();
   }
 }

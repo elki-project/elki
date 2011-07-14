@@ -2,6 +2,7 @@ package experimentalcode.shared.outlier.generalized.neighbors;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -112,6 +113,11 @@ public class KNearestNeighborNeighborhood<D extends Distance<D>> implements Neig
       return new KNearestNeighborNeighborhood<D>(s);
     }
 
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return distFunc.getInputTypeRestriction();
+    }
+    
     /**
      * Factory method for {@link Parameterizable}
      * 
