@@ -31,7 +31,7 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * @param <D>
  *   reachDist(o,p) = dist(o,p)
  */
-public class SOF<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends DistanceBasedSpatialOutlier<V, D> {
+public class SOF<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<V, D> {
   /**
    * The logger for this class.
    */
@@ -104,7 +104,7 @@ public class SOF<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   /**
    * 
    */
-  public static class Parameterizer<V extends NumberVector<V,?>,D extends NumberDistance<D, ?>> extends DistanceBasedSpatialOutlier.Parameterizer<V, D>{
+  public static class Parameterizer<V extends NumberVector<V,?>,D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<V, D>{
 
     @Override
     protected void makeOptions(Parameterization config) {

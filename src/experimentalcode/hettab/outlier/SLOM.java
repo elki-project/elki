@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -23,11 +23,17 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
 
 /**
- * SLOM Algorithm
+ * SLOM: a new measure for local spatial outliers
+ * 
+ * <p>
+ * Reference:<br>
+ * Sanjay Chawla and Pei Sun<br>
+ * SLOM: a new measure for local spatial outliers<br>
+ * in Knowledge and Information Systems 2005
+ * </p>
  * 
  * @author Ahmed Hettab
  * 
@@ -35,40 +41,42 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * @param <D> the type of Distance used for non spatial attributes
  */
 @Title("SLOM: a new measure for local spatial outliers")
-@Description("spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
-@Reference(authors = "Sanjay Chawla and  Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 2005", url = "http://rp-www.cs.usyd.edu.au/~chawlarg/papers/KAIS_online.pdf")
-public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends DistanceBasedSpatialOutlier<V, D> {
+@Description("Spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
+@Reference(authors = "Sanjay Chawla and Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 2005", url = "http://rp-www.cs.usyd.edu.au/~chawlarg/papers/KAIS_online.pdf")
+public class SLOM<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<V, D> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SLOM.class);
 
-   /**
+  /**
    * The association id to associate the SLOM_SCORE of an object for the SLOM
    * algorithm.
    */
   public static final AssociationID<Double> SLOM_SCORE = AssociationID.getOrCreateAssociationID("slom", Double.class);
 
   /**
+   * Constructor.
    * 
-   * @param config
+   * @param npred Neighborhood predicate
+   * @param nonSpatialDistanceFunction Distance function to use on the
+   *        non-spatial attributes
    */
-  protected SLOM(NeighborSetPredicate.Factory<V> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
-    super(npred,nonSpatialDistanceFunction);
+  public SLOM(NeighborSetPredicate.Factory<V> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
+    super(npred, nonSpatialDistanceFunction);
   }
-  
+
   /**
-   * 
-   * @param database
-   * @param relation
-   * @return
+   * @param database Database to process
+   * @param relation Relation to use.
+   * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<V> relation) {
     WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-  
+
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
 
     // calculate D-Tilde
@@ -76,7 +84,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
       double sum = 0;
       double maxDist = 0;
 
-     final DBIDs  neighbors= npred.getNeighborDBIDs(id);
+      final DBIDs neighbors = npred.getNeighborDBIDs(id);
       for(DBID neighbor : neighbors) {
         if(id.getIntegerID() == neighbor.getIntegerID()) {
           continue;
@@ -98,7 +106,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
       double avgPlus = 0;
       double avg = 0;
 
-      final DBIDs  neighbors= npred.getNeighborDBIDs(id);
+      final DBIDs neighbors = npred.getNeighborDBIDs(id);
       // compute avg
       for(DBID neighbor : neighbors) {
         if(neighbor.getIntegerID() == id.getIntegerID()) {
@@ -118,7 +126,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
     // compute beta
     for(DBID id : relation.getDBIDs()) {
       double beta = 0;
-      final DBIDs  neighbors= npred.getNeighborDBIDs(id);
+      final DBIDs neighbors = npred.getNeighborDBIDs(id);
       for(DBID neighbor : neighbors) {
         if(modifiedDistance.get(neighbor).doubleValue() > avgModifiedDistancePlus.get(id)) {
           beta++;
@@ -133,7 +141,7 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
       betaList.put(id, beta);
     }
 
-    MinMax<Double> minmax = new MinMax<Double>();
+    DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : relation.getDBIDs()) {
       double slom = betaList.get(id) * modifiedDistance.get(id);
@@ -141,16 +149,11 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
       minmax.put(slom);
     }
 
-    //
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(Double.NaN, minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
-
   }
 
-  /**
-   * 
-   */
   @Override
   protected Logging getLogger() {
     return logger;
@@ -160,20 +163,18 @@ public class SLOM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> 
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
-  /**
-   * 
-   */
-  public static class Parameterizer<V extends NumberVector<V,?>,D extends NumberDistance<D, ?>> extends DistanceBasedSpatialOutlier.Parameterizer<V, D>{
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Ahmed Hettab
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<V, D> {
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    protected SLOM<V, D> makeInstance() {
+      return new SLOM<V, D>(npredf, distanceFunction);
     }
-   
-    @Override
-    protected SLOM<V,D> makeInstance() {
-      return new SLOM<V,D>(npredf,distanceFunction);
-    }
-    
   }
 }

@@ -2,20 +2,22 @@ package experimentalcode.hettab.outlier;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
+
 /**
+ * Abstract base class for spatial outlier detection methods using a spatial
+ * neighborhood.
  * 
  * @author Ahmed Hettab
- *
- * @param <V>
+ * 
+ * @param <O> Object type
  */
-public abstract class AbstractNeighborhoodOutlier<V extends NumberVector<?, ?>>  extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm  {
+public abstract class AbstractNeighborhoodOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter to specify the neighborhood predicate to use.
    */
@@ -24,21 +26,24 @@ public abstract class AbstractNeighborhoodOutlier<V extends NumberVector<?, ?>> 
   /**
    * Our predicate to obtain the neighbors
    */
-  private NeighborSetPredicate.Factory<V> npredf = null;
+  private NeighborSetPredicate.Factory<O> npredf = null;
+
   /**
    * Constructor
    * 
-   * @param npredf
+   * @param npredf Neighborhood predicate
    */
-  public AbstractNeighborhoodOutlier(NeighborSetPredicate.Factory<V> npredf) {
+  public AbstractNeighborhoodOutlier(NeighborSetPredicate.Factory<O> npredf) {
     super();
     this.npredf = npredf;
   }
 
   /**
-   * return the Neighborsetpredicate Factory
+   * Get the predicate to obtain the neighbors.
+   * 
+   * @return predicate to obtain the neighbors
    */
-  public NeighborSetPredicate.Factory<V> getNeighborSetPredicateFactory() {
+  protected NeighborSetPredicate.Factory<O> getNeighborSetPredicateFactory() {
     return npredf;
   }
 
@@ -49,20 +54,19 @@ public abstract class AbstractNeighborhoodOutlier<V extends NumberVector<?, ?>> 
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<V extends NumberVector<?,?>> extends AbstractParameterizer {
-    
-    protected NeighborSetPredicate.Factory<V> npredf = null ;
+  public static abstract class Parameterizer<O> extends AbstractParameterizer {
+    /**
+     * The predicate to obtain the neighbors.
+     */
+    protected NeighborSetPredicate.Factory<O> npredf = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
-
-      final ObjectParameter<NeighborSetPredicate.Factory<V>> param = new ObjectParameter<NeighborSetPredicate.Factory<V>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class, true);
+      super.makeOptions(config);
+      final ObjectParameter<NeighborSetPredicate.Factory<O>> param = new ObjectParameter<NeighborSetPredicate.Factory<O>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class);
       if(config.grab(param)) {
         npredf = param.instantiateClass(config);
       }
-
     }
   }
-
 }
-
