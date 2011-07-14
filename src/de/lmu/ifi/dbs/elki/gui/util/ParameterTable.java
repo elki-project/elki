@@ -394,6 +394,12 @@ public class ParameterTable extends JTable {
         String newClass = (String) combo.getSelectedItem();
         if(newClass != null && newClass.length() > 0) {
           String val = textfield.getText();
+          if(val.equals(DynamicParameters.STRING_OPTIONAL)) {
+            val = "";
+          }
+          if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+            val = "";
+          }
           if(val.length() > 0) {
             val = val + ClassListParameter.LIST_SEP + newClass;
           }
