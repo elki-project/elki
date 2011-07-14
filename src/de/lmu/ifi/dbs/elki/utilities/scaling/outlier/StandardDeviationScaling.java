@@ -82,6 +82,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
+    assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
     if(value <= mean) {
       return 0;
     }

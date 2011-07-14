@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  */
-@Reference(authors="H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title="Interpreting and Unifying Outlier Scores", booktitle="Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url="http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
 public class OutlierGammaScaling implements OutlierScalingFunction {
   /**
    * Normalization flag.
@@ -69,6 +69,7 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
+    assert (theta > 0) : "prepare() was not run prior to using the scaling function.";
     try {
       value = preScale(value);
       if(Double.isNaN(value) || Double.isInfinite(value)) {

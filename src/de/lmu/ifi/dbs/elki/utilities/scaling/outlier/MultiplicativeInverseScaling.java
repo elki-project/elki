@@ -30,10 +30,11 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   /**
    * Scaling value, set by {@link #prepare}.
    */
-  double scaleval;
+  double scaleval = 0;
 
   @Override
   public double getScaled(double value) {
+    assert (scaleval != 0) : "prepare() was not run prior to using the scaling function.";
     try {
       return 1.0 / (value * scaleval);
     }

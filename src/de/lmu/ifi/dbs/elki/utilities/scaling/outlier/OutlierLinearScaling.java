@@ -103,6 +103,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
+    assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
     if(value <= min) {
       return 0;
     }

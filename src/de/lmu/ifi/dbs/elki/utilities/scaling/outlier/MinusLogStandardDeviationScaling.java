@@ -33,6 +33,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
 
   @Override
   public double getScaled(double value) {
+    assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
     final double mlogv = -Math.log(value);
     if(mlogv < mean || Double.isNaN(mlogv)) {
       return 0.0;

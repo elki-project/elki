@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * This is a pseudo outlier scoring obtained by only considering the ranks of
- * the objects. However, the ranks are not mapped linarly to scores, but using
+ * the objects. However, the ranks are not mapped linearly to scores, but using
  * a normal distribution.
  * 
  * @author Erich Schubert
@@ -21,6 +21,9 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
    */
   private double[] scores;
 
+  /**
+   * Use inverted ranking
+   */
   private boolean inverted = false;
 
   @Override
@@ -28,7 +31,7 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
     // collect all outlier scores
     scores = new double[ids.size()];
     int pos = 0;
-    if (or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
+    if(or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
       inverted = true;
     }
     for(DBID id : ids) {
@@ -55,6 +58,7 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
+    assert (scores != null) : "prepare() was not run prior to using the scaling function.";
     int pos = Arrays.binarySearch(scores, value);
     if(inverted) {
       return 1.0 - ((double) pos) / scores.length;

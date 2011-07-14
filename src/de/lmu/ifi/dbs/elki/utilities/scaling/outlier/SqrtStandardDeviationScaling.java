@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  */
-@Reference(authors="H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title="Interpreting and Unifying Outlier Scores", booktitle="Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url="http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
 public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   /**
    * Parameter to specify the fixed minimum to use.
@@ -75,7 +75,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
 
   /**
    * Constructor.
-   *
+   * 
    * @param min
    * @param mean
    * @param lambda
@@ -89,6 +89,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
+    assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
     if(value <= min) {
       return 0;
     }

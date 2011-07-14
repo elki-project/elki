@@ -18,18 +18,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors="H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title="Interpreting and Unifying Outlier Scores", booktitle="Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url="http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://www.dbs.ifi.lmu.de/~zimek/publications/SDM2011/SDM11-outlier-preprint.pdf")
 public class MinusLogGammaScaling extends OutlierGammaScaling {
   /**
    * Maximum value seen
    */
-  double max;
-  
+  double max = 0;
+
   /**
    * Minimum value (after log step, so maximum again)
    */
   double mlogmax;
-  
+
   /**
    * Constructor.
    */
@@ -39,7 +39,8 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
 
   @Override
   protected double preScale(double score) {
-    return - Math.log(score / max) / mlogmax;
+    assert (max > 0) : "prepare() was not run prior to using the scaling function.";
+    return -Math.log(score / max) / mlogmax;
   }
 
   @Override
@@ -52,7 +53,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
       mm.put(score);
     }
     max = mm.getMax();
-    mlogmax = - Math.log(mm.getMin() / max);
+    mlogmax = -Math.log(mm.getMin() / max);
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
     for(DBID id : ids) {
@@ -64,15 +65,15 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     }
     final double mean = mv.getMean();
     final double var = mv.getSampleVariance();
-    k = (mean*mean) / var;
+    k = (mean * mean) / var;
     theta = var / mean;
     try {
-      atmean = Gamma.regularizedGammaP(k, mean/theta);
+      atmean = Gamma.regularizedGammaP(k, mean / theta);
     }
     catch(MathException e) {
       LoggingUtil.exception(e);
     }
-    //logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
+    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
   }
 
   /**
