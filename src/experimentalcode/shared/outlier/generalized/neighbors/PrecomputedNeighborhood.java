@@ -42,7 +42,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
   /**
    * Logger
    */
-  protected static final Logging logger = Logging.getLogger(PrecomputedNeighborhood.class);
+  private static final Logging logger = Logging.getLogger(PrecomputedNeighborhood.class);
 
   /**
    * Parameter to specify the neighborhood file
@@ -57,7 +57,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
   /**
    * Data store for the loaded result.
    */
-  DataStore<DBIDs> store;
+  private DataStore<DBIDs> store;
 
   /**
    * Constructor.
@@ -82,6 +82,16 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
       return reference;
     }
   }
+  
+  @Override
+  public String getLongName() {
+    return "Precomputed Neighborhood";
+  }
+
+  @Override
+  public String getShortName() {
+    return "precomputed-neighborhood";
+  }
 
   /**
    * Factory class.
@@ -89,6 +99,11 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
    * @author Erich Schubert
    */
   public static class Factory implements NeighborSetPredicate.Factory<Object> {
+    /**
+     * Logger
+     */
+    private static final Logging logger = Logging.getLogger(PrecomputedNeighborhood.class);
+    
     /**
      * The input file.
      */
@@ -273,15 +288,5 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
       }
       return 1;
     }
-  }
-
-  @Override
-  public String getLongName() {
-    return "Precomputed Neighborhood";
-  }
-
-  @Override
-  public String getShortName() {
-    return "precomputed-neighborhood";
   }
 }
