@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.evaluation;
 
-import de.lmu.ifi.dbs.elki.result.ResultHandler;
+import de.lmu.ifi.dbs.elki.result.ResultProcessor;
 
 /**
  * Interface for post-algorithm evaluations, such as histograms, outlier score
@@ -8,6 +8,6 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
  * 
  * @author Erich Schubert
  */
-public interface Evaluator extends ResultHandler {
-  // Empty now - uses ResultHandler API. Remove?
+public interface Evaluator extends ResultProcessor {
+  // Empty now - uses ResultProcessor API and serves merely UI purposes.
 }
