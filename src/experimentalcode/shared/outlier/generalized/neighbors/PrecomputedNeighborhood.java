@@ -11,6 +11,8 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -135,6 +137,11 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
         hier.add(database, neighborhood);
       }
       return neighborhood;
+    }
+
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return TypeUtil.ANY;
     }
 
     /**

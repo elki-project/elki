@@ -37,13 +37,14 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * 
  * @author Ahmed Hettab
  * 
- * @param <O> the type of DatabaseObjects handled by the algorithm
+ * @param <N> the type the spatial neighborhood is defined over
+ * @param <V> the type of DatabaseObjects handled by the algorithm
  * @param <D> the type of Distance used for non spatial attributes
  */
 @Title("SLOM: a new measure for local spatial outliers")
 @Description("Spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
 @Reference(authors = "Sanjay Chawla and Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 2005", url = "http://rp-www.cs.usyd.edu.au/~chawlarg/papers/KAIS_online.pdf")
-public class SLOM<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<V, D> {
+public class SLOM<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, V, D> {
   /**
    * The logger for this class.
    */
@@ -62,95 +63,79 @@ public class SLOM<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> 
    * @param nonSpatialDistanceFunction Distance function to use on the
    *        non-spatial attributes
    */
-  public SLOM(NeighborSetPredicate.Factory<V> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
+  public SLOM(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
     super(npred, nonSpatialDistanceFunction);
   }
 
   /**
    * @param database Database to process
+   * @param spatial Spatial Relation to use.
    * @param relation Relation to use.
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<V> relation) {
+  public OutlierResult run(Database database, Relation<N> spatial, Relation<V> relation) {
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
+
     WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> avgModifiedDistancePlus = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> avgModifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> betaList = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
-
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
-
     // calculate D-Tilde
     for(DBID id : relation.getDBIDs()) {
       double sum = 0;
       double maxDist = 0;
+      int cnt = 0;
 
       final DBIDs neighbors = npred.getNeighborDBIDs(id);
       for(DBID neighbor : neighbors) {
-        if(id.getIntegerID() == neighbor.getIntegerID()) {
+        if(id.equals(neighbor)) {
           continue;
         }
         double dist = getNonSpatialDistanceFunction().distance(relation.get(id), relation.get(neighbor)).doubleValue();
-        if(maxDist < dist) {
-          maxDist = dist;
-        }
         sum += dist;
+        cnt++;
+        maxDist = Math.max(maxDist, dist);
       }
-      modifiedDistance.put(id, ((sum - maxDist) / (neighbors.size() - 2)));
+      modifiedDistance.put(id, ((sum - maxDist) / (cnt - 1)));
     }
 
-    // second step :
-    // compute average modified distance of id neighborhood and id it's self
-    // compute average modified distance of only id neighborhood
+    // Second step - compute actual SLOM values
+    DoubleMinMax slomminmax = new DoubleMinMax();
+    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
 
     for(DBID id : relation.getDBIDs()) {
-      double avgPlus = 0;
-      double avg = 0;
+      double sum = 0;
+      int cnt = 0;
 
       final DBIDs neighbors = npred.getNeighborDBIDs(id);
-      // compute avg
       for(DBID neighbor : neighbors) {
-        if(neighbor.getIntegerID() == id.getIntegerID()) {
-          avgPlus = avgPlus + modifiedDistance.get(neighbor);
+        if(neighbor.equals(id)) {
+          continue;
         }
-        else {
-          avgPlus = avgPlus + modifiedDistance.get(neighbor);
-          avg = avg + modifiedDistance.get(neighbor);
-        }
+        sum += modifiedDistance.get(neighbor);
+        cnt++;
       }
-      avgPlus = avgPlus / (neighbors.size());
-      avg = avg / (neighbors.size() - 1);
-      avgModifiedDistancePlus.put(id, avgPlus);
-      avgModifiedDistance.put(id, avg);
-    }
+      // TODO: assert that neighbors contained the object itself.
+      double avgPlus = (sum + modifiedDistance.get(id)) / (cnt + 1);
+      double avg = sum / cnt;
 
-    // compute beta
-    for(DBID id : relation.getDBIDs()) {
       double beta = 0;
-      final DBIDs neighbors = npred.getNeighborDBIDs(id);
       for(DBID neighbor : neighbors) {
-        if(modifiedDistance.get(neighbor).doubleValue() > avgModifiedDistancePlus.get(id)) {
-          beta++;
+        if(modifiedDistance.get(neighbor).doubleValue() > avgPlus) {
+          beta += 1;
         }
-        if(modifiedDistance.get(neighbor).doubleValue() < avgModifiedDistancePlus.get(id)) {
-          beta--;
+        if(modifiedDistance.get(neighbor).doubleValue() < avgPlus) {
+          beta -= 1;
         }
       }
       beta = Math.abs(beta);
-      beta = (Math.max(beta, 1) / (neighbors.size() - 2));
-      beta = beta / (1 + avgModifiedDistance.get(id));
-      betaList.put(id, beta);
-    }
+      beta = Math.max(beta, 1) / (cnt - 2);
+      beta = beta / (1 + avg);
 
-    DoubleMinMax minmax = new DoubleMinMax();
-    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : relation.getDBIDs()) {
-      double slom = betaList.get(id) * modifiedDistance.get(id);
+      double slom = beta * modifiedDistance.get(id);
       sloms.put(id, slom);
-      minmax.put(slom);
+      slomminmax.put(slom);
     }
 
     AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms);
-    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(Double.NaN, minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
+    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(slomminmax.getMin(), slomminmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
@@ -161,7 +146,7 @@ public class SLOM<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> 
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -171,10 +156,10 @@ public class SLOM<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<V, D> {
+  public static class Parameterizer<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, V, D> {
     @Override
-    protected SLOM<V, D> makeInstance() {
-      return new SLOM<V, D>(npredf, distanceFunction);
+    protected SLOM<N, V, D> makeInstance() {
+      return new SLOM<N, V, D>(npredf, distanceFunction);
     }
   }
 }

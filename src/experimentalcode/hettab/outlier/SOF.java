@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
 
 /**
@@ -28,63 +27,49 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * @author Ahmed Hettab
  * 
  * @param <V>
- * @param <D>
- *   reachDist(o,p) = dist(o,p)
+ * @param <D> reachDist(o,p) = dist(o,p)
  */
-public class SOF<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<V, D> {
+public class SOF<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, V, D> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SOF.class);
-  /**
-   * 
-   */
+
   public static final AssociationID<Double> LOF_SCORE = AssociationID.getOrCreateAssociationID("lof", Double.class);
 
-  /**
-   * Constructor.
-   * 
-   * @param
-   * 
-   */
-  public SOF(NeighborSetPredicate.Factory<V> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
-    super(npred,nonSpatialDistanceFunction);
+  public SOF(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
+    super(npred, nonSpatialDistanceFunction);
   }
 
-
-  
   @Override
   protected Logging getLogger() {
     return logger;
   }
 
-  
-   public OutlierResult run(Database database , Relation<V> relation) throws IllegalStateException {
-    
+  public OutlierResult run(Database database, Relation<N> spatial, Relation<V> relation) throws IllegalStateException {
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
 
-    
     WritableDataStore<Double> lofs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     MinMax<Double> lofminmax = new MinMax<Double>();
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
 
     for(DBID id : relation.iterDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      double avg = 0 ;
+      double avg = 0;
       for(DBID n : neighbors) {
-       avg += getNonSpatialDistanceFunction().distance(relation.get(id), relation.get(n)).doubleValue();
+        avg += getNonSpatialDistanceFunction().distance(relation.get(id), relation.get(n)).doubleValue();
       }
-      lrds.put(id, 1/(avg/neighbors.size()));
+      lrds.put(id, 1 / (avg / neighbors.size()));
     }
-    
+
     for(DBID id : relation.iterDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      double avg = 0 ;
+      double avg = 0;
       for(DBID n : neighbors) {
-       avg += lrds.get(n);
+        avg += lrds.get(n);
       }
-      lofs.put(id, (avg/neighbors.size())/lrds.get(id));
-      lofminmax.put((avg/neighbors.size())/lrds.get(id));
+      lofs.put(id, (avg / neighbors.size()) / lrds.get(id));
+      lofminmax.put((avg / neighbors.size()) / lrds.get(id));
     }
 
     // Build result representation.
@@ -95,28 +80,15 @@ public class SOF<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   }
 
-
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  /**
-   * 
-   */
-  public static class Parameterizer<V extends NumberVector<V,?>,D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<V, D>{
-
+  public static class Parameterizer<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, V, D> {
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    protected SOF<N, V, D> makeInstance() {
+      return new SOF<N, V, D>(npredf, distanceFunction);
     }
-   
-    @Override
-    protected SOF<V,D> makeInstance() {
-      return new SOF<V,D>(npredf,distanceFunction);
-    }
-    
   }
 }
-
-

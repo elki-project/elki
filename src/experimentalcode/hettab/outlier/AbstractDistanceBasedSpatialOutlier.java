@@ -13,10 +13,11 @@ import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicat
  * 
  * @author Ahmed Hettab
  * 
- * @param <O> Vector type
+ * @param <N> Object type for neighborhood
+ * @param <O> Non-spatial object type
  * @param <D> Distance value type
  */
-public abstract class AbstractDistanceBasedSpatialOutlier<O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier<O> {
+public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Parameter to specify the non spatial distance function to use
    */
@@ -33,7 +34,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<O, D extends NumberDis
    * @param npredf Neighborhood predicate factory
    * @param nonSpatialDistanceFunction Distance function to use on the non-spatial attributes.
    */
-  public AbstractDistanceBasedSpatialOutlier(NeighborSetPredicate.Factory<O> npredf, PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction) {
+  public AbstractDistanceBasedSpatialOutlier(NeighborSetPredicate.Factory<N> npredf, PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction) {
     super(npredf);
     this.nonSpatialDistanceFunction = nonSpatialDistanceFunction;
   }
@@ -54,7 +55,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<O, D extends NumberDis
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<O> {
+  public static abstract class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     /**
      * The distance function to use on the non-spatial attributes.
      */
