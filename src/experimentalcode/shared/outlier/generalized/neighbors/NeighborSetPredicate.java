@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  */
-// TODO: differentiate similarly to KNNQuery? Make this a super-interface of KNNQuery?
 public interface NeighborSetPredicate {
   /**
    * Get the neighbors of a reference object for DBSCAN.
