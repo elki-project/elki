@@ -10,6 +10,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * {@link de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction#prepare
  * prepare} to invoke the preprocessing step!
  * 
+ * Outside of an outlier context, you probably want to use
+ * {@link StaticScalingFunction} instead, which may not require a
+ * {@code prepare} statement.
+ * 
  * @author Erich Schubert
  */
 public interface ScalingFunction extends Parameterizable {
