@@ -48,6 +48,9 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
    */
   public final static double ONEBYSQRT2PI = 1.0 / MathUtil.SQRTTWOPI;
 
+  /**
+   * Convergence parameter
+   */
   private static final double DELTA = 0.0001;
 
   /**

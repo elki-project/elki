@@ -21,7 +21,7 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
   /**
    * Maximum value seen, set by {@link #prepare}
    */
-  double max;
+  double max = 0.0;
 
   /**
    * Maximum -log value seen, set by {@link #prepare}
@@ -38,6 +38,7 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
+    assert (max != 0) : "prepare() was not run prior to using the scaling function.";
     return -Math.log(value / max) / mlogmax;
   }
 
