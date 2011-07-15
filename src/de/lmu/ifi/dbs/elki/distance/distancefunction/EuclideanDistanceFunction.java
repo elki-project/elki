@@ -162,6 +162,9 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     if(obj == null) {
       return false;
     }
+    if(obj == this) {
+      return true;
+    }
     if (this.getClass().equals(obj.getClass())) {
       return true;
     }
