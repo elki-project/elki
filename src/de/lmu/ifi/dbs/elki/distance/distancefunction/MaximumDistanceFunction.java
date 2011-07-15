@@ -115,7 +115,10 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
     if(obj == null) {
       return false;
     }
-    if (this.getClass().equals(obj.getClass())) {
+    if(obj == this) {
+      return true;
+    }
+   if (this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);

@@ -113,6 +113,9 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceFunctio
     if(obj == null) {
       return false;
     }
+    if(obj == this) {
+      return true;
+    }
     return this.getClass().equals(obj.getClass());
   }
 
