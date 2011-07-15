@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.data;
 
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -115,20 +114,5 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
     assert (values != null) : "newInstace(null) is not allowed.";
     assert (values.size() == 1) : "Incorrect dimensionality for 1-dimensional vector.";
     return new OneDimensionalDoubleVector(values.get(0));
-  }
-
-  @Override
-  public OneDimensionalDoubleVector randomInstance(Random random) {
-    return new OneDimensionalDoubleVector(random.nextDouble());
-  }
-
-  @Override
-  public OneDimensionalDoubleVector randomInstance(Double min, Double max, Random random) {
-    return new OneDimensionalDoubleVector(random.nextDouble() * (max - min) + min);
-  }
-
-  @Override
-  public OneDimensionalDoubleVector randomInstance(OneDimensionalDoubleVector min, OneDimensionalDoubleVector max, Random random) {
-    return randomInstance(min.val, max.val, random);
   }
 }

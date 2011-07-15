@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Utility functions for use with vectors.
@@ -27,5 +30,28 @@ public final class VectorUtil {
     }
 
     return minmax;
+  }
+
+  /**
+   * Produce a new vector based on random numbers in [0:1] of the same type and
+   * dimensionality as the given vector.
+   * 
+   * @param template existing instance of wanted dimensionality.
+   * @param r Random generator
+   * @return new instance
+   */
+  public static <V extends NumberVector<V, ?>> V randomVector(V template, Random r) {
+    return template.newInstance(MathUtil.randomDoubleArray(template.getDimensionality(), r));
+  }
+
+  /**
+   * Produce a new vector based on random numbers in [0:1] of the same type and
+   * dimensionality as the given vector.
+   * 
+   * @param template existing instance of wanted dimensionality.
+   * @return new instance
+   */
+  public static <V extends NumberVector<V, ?>> V randomVector(V template) {
+    return randomVector(template, new Random());
   }
 }

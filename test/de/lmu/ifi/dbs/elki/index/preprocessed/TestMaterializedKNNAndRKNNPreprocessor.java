@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
@@ -109,7 +110,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     DoubleVector o = DatabaseUtil.assumeVectorField(rep).getFactory();
     Random random = new Random(seed);
     for(int i = 0; i < updatesize; i++) {
-      DoubleVector obj = o.randomInstance(random);
+      DoubleVector obj = VectorUtil.randomVector(o, random);
       insertions.add(obj);
     }
     System.out.println("Insert " + insertions);

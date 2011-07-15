@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -82,41 +81,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
     for(int i = 0; i < values.length; i++) {
       values[i] = (float) columnMatrix.get(i, 0);
     }
-  }
-
-  /**
-   * @return a new FloatVector with random values between 0 and 1
-   */
-  @Override
-  public FloatVector randomInstance(Random random) {
-    float[] randomValues = new float[getDimensionality()];
-    for(int i = 0; i < randomValues.length; i++) {
-      randomValues[i] = random.nextFloat();
-    }
-    return new FloatVector(randomValues, true);
-  }
-
-  @Override
-  public FloatVector randomInstance(Float min, Float max, Random random) {
-    float[] randomValues = new float[getDimensionality()];
-    for(int i = 0; i < randomValues.length; i++) {
-      randomValues[i] = random.nextFloat() * (max - min) + min;
-    }
-    return new FloatVector(randomValues, true);
-  }
-
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector,
-   *      de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
-   */
-  @Override
-  public FloatVector randomInstance(FloatVector min, FloatVector max, Random random) {
-    float[] randomValues = new float[getDimensionality()];
-    for(int i = 0; i < randomValues.length; i++) {
-      randomValues[i] = random.nextFloat() * (max.getValue(i + 1) - min.getValue(i + 1)) + min.getValue(i + 1);
-    }
-    return new FloatVector(randomValues, true);
   }
 
   @Override

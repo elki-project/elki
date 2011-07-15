@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -90,43 +89,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    */
   public IntegerVector(Vector values) {
     this(values.getArrayRef());
-  }
-
-  /**
-   * Returns a new IntegerVector with random values between 0 and 1.
-   */
-  @Override
-  public IntegerVector randomInstance(Random random) {
-    int[] randomValues = new int[getDimensionality()];
-    for(int i = 0; i < randomValues.length; i++) {
-      // int multiplier = random.nextBoolean() ? 1 : -1;
-      // randomValues[i] = random.nextDouble() * Double.MAX_VALUE * multiplier;
-      randomValues[i] = random.nextInt();
-    }
-    return new IntegerVector(randomValues, true);
-  }
-
-  @Override
-  public IntegerVector randomInstance(Integer min, Integer max, Random random) {
-    int[] randomValues = new int[getDimensionality()];
-    for(int i = 0; i < randomValues.length; i++) {
-      randomValues[i] = (int) (random.nextDouble() * (max - min) + min);
-    }
-    return new IntegerVector(randomValues, true);
-  }
-
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector,
-   *      de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
-   */
-  @Override
-  public IntegerVector randomInstance(IntegerVector min, IntegerVector max, Random random) {
-    int[] randomValues = new int[getDimensionality()];
-    for(int i = 0; i < randomValues.length; i++) {
-      randomValues[i] = (int) (random.nextDouble() * (max.getValue(i + 1) - min.getValue(i + 1)) + min.getValue(i + 1));
-    }
-    return new IntegerVector(randomValues, true);
   }
 
   @Override

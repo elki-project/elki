@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -70,51 +69,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
       i++;
     }
     this.dimensionality = bits.size();
-  }
-
-  /**
-   * Returns a BitVector with random values.
-   * 
-   * @param random an instance of random to facilitate random values
-   * @return a new instance of this BitVector with random values
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.util.Random)
-   */
-  @Override
-  public BitVector randomInstance(Random random) {
-    Bit[] randomBits = new Bit[getDimensionality()];
-    for(int i = 0; i < randomBits.length; i++) {
-      randomBits[i] = new Bit(random.nextBoolean());
-    }
-    return new BitVector(randomBits);
-  }
-
-  /**
-   * Returns the same as {@link de.lmu.ifi.dbs.elki.data.BitVector#randomInstance(Random)
-   * randomInstance(random)}.
-   * 
-   * @param min unused
-   * @param max unused
-   * @param random as in {@link de.lmu.ifi.dbs.elki.data.BitVector#randomInstance(Random)
-   *        randomInstance(random)}
-   */
-  @Override
-  public BitVector randomInstance(Bit min, Bit max, Random random) {
-    return randomInstance(random);
-  }
-
-  /**
-   * Returns the same as {@link de.lmu.ifi.dbs.elki.data.BitVector#randomInstance(Random)
-   * randomInstance(random)}.
-   * 
-   * @param min unused
-   * @param max unused
-   * @param random as in {@link de.lmu.ifi.dbs.elki.data.BitVector#randomInstance(Random)
-   *        randomInstance(random)}
-   */
-  @Override
-  public BitVector randomInstance(BitVector min, BitVector max, Random random) {
-    return randomInstance(random);
   }
 
   /**

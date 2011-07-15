@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -144,7 +145,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         logger.verbose("initializing random vectors");
       }
       for(int i = 0; i < k; i++) {
-        V randomVector = randomBase.randomInstance(random);
+        V randomVector = VectorUtil.randomVector(randomBase, random);
         try {
           means.add(normalization.restore(randomVector));
         }
