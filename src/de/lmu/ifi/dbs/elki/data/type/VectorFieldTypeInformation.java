@@ -112,11 +112,11 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
 
   /**
    * Pseudo constructor that is often convenient to use when T is not completely
-   * known.
+   * known, but the dimensionality is fixed.
    * 
    * @param <T> Type
    * @param cls Class restriction
-   * @param dim Dimensionality
+   * @param dim Dimensionality (exact)
    * @return Type
    */
   public static <T extends FeatureVector<?, ?>> VectorFieldTypeInformation<T> get(Class<T> cls, int dim) {

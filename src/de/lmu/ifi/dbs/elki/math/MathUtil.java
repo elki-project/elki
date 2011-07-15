@@ -444,4 +444,54 @@ public final class MathUtil {
     }
     return ret;
   }
+
+  /**
+   * Convert Degree to Radians
+   * 
+   * @param deg Degree value
+   * @return Radian value
+   */
+  public static double deg2rad(double deg) {
+    return deg * Math.PI / 180.0;
+  }
+
+  /**
+   * Radians to Degree
+   * 
+   * @param rad Radians value
+   * @return Degree value
+   */
+  public static double rad2deg(double rad) {
+    return rad * 180 / Math.PI;
+  }
+
+  /**
+   * Compute the approximate on-earth-surface distance of two points.
+   * 
+   * @param lat1 Latitude of first point in degree
+   * @param lon1 Longitude of first point in degree
+   * @param lat2 Latitude of second point in degree
+   * @param lon2 Longitude of second point in degree
+   * @return Distance in km (approximately)
+   */
+  public static double latlngDistance(double lat1, double lon1, double lat2, double lon2) {
+    final double EARTH_RADIUS = 6371; // km.
+    // Work in radians
+    lat1 = MathUtil.deg2rad(lat1);
+    lat2 = MathUtil.deg2rad(lat2);
+    lon1 = MathUtil.deg2rad(lon1);
+    lon2 = MathUtil.deg2rad(lon2);
+    // Delta
+    // final double dlat = lat1 - lat2;
+    final double dlon = lon1 - lon2;
+
+    // Spherical Law of Cosines
+    double dist = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(dlon);
+    return EARTH_RADIUS * Math.atan(dist);
+    // Alternative: Havestine formula, higher precision at < 1 meters:
+    // final double a = Math.sin(dlat / 2) * Math.sin(dlat / 2) + Math.sin(dlon
+    // / 2) * Math.sin(dlon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    // final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    // return EARTH_RADIUS * c;
+  }
 }
