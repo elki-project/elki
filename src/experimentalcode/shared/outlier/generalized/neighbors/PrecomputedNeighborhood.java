@@ -223,7 +223,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
 
         // Expand multiple steps
         if(steps > 0) {
-          FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Expanding neighborhoods.", database.size(), logger) : null;
+          FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Expanding neighborhoods", database.size(), logger) : null;
           for(final DBID id : database.iterDBIDs()) {
             DBIDs cur = id;
             for(int i = 0; i < steps; i++) {
