@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -70,13 +69,13 @@ public final class OptionUtil {
    * @param parameters the list of number parameters
    * @return the names and the values of the parameters
    */
-  public static <N extends NumberParameter<?>> String parameterNamesAndValuesToString(List<N> parameters) {
+  public static <N extends Parameter<?, ?>> String parameterNamesAndValuesToString(List<N> parameters) {
     StringBuffer buffer = new StringBuffer();
     buffer.append("[");
     for(int i = 0; i < parameters.size(); i++) {
       buffer.append(parameters.get(i).getName());
       buffer.append(":");
-      buffer.append(parameters.get(i).getValue().doubleValue());
+      buffer.append(parameters.get(i).getValueAsString());
       if(i != parameters.size() - 1) {
         buffer.append(", ");
       }
@@ -138,7 +137,7 @@ public final class OptionUtil {
    */
   public static StringBuffer describeParameterizable(StringBuffer buf, Class<?> pcls, int width, String indent) {
     try {
-      println(buf, width, "Description for class "+pcls.getName(), "");
+      println(buf, width, "Description for class " + pcls.getName(), "");
 
       String title = DocumentationUtil.getTitle(pcls);
       if(title != null && title.length() > 0) {
@@ -155,11 +154,11 @@ public final class OptionUtil {
         if(ref.prefix().length() > 0) {
           println(buf, width, ref.prefix(), "");
         }
-        println(buf, width, ref.authors()+":", "");
+        println(buf, width, ref.authors() + ":", "");
         println(buf, width, ref.title(), "  ");
-        println(buf, width, "in: "+ ref.booktitle(), "");
-        if (ref.url().length() > 0) {
-          println(buf, width, "see also: "+ref.url(), "");
+        println(buf, width, "in: " + ref.booktitle(), "");
+        if(ref.url().length() > 0) {
+          println(buf, width, "see also: " + ref.url(), "");
         }
       }
 
