@@ -4,11 +4,10 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.datasource.parser.SparseFloatVectorLabelParser;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.datasource.parser.SparseFloatVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
@@ -141,38 +140,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
         }
       }
     }
-  }
-
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.util.Random)
-   */
-  @Override
-  public SparseFloatVector randomInstance(Random random) {
-    return randomInstance(0.0f, 1.0f, random);
-  }
-
-  @Override
-  public SparseFloatVector randomInstance(Float min, Float max, Random random) {
-    float[] randomValues = new float[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      randomValues[i] = random.nextFloat() * (max - min) + min;
-    }
-    return new SparseFloatVector(randomValues);
-  }
-
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector,
-   *      de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
-   */
-  @Override
-  public SparseFloatVector randomInstance(SparseFloatVector min, SparseFloatVector max, Random random) {
-    float[] randomValues = new float[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      randomValues[i] = random.nextFloat() * (max.getValue(i + 1) - min.getValue(i + 1)) + min.getValue(i + 1);
-    }
-    return new SparseFloatVector(randomValues);
   }
 
   @Override

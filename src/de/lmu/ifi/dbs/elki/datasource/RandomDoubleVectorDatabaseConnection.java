@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
@@ -70,7 +71,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     // Produce random vectors
     DoubleVector factory = new DoubleVector(new double[dim]);
     for(int i = 0; i < size; i++) {
-      vectors.add(factory.randomInstance(rand));
+      vectors.add(VectorUtil.randomVector(factory, rand));
     }
 
     return MultipleObjectsBundle.makeSimple(type, vectors);

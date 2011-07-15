@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -20,111 +18,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @apiviz.has Vector
  */
 public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V, N>, SpatialComparable {
-  /**
-   * Returns a NumberVector of V with uniformly distributed (0-1) random values.
-   * 
-   * @param random a Random instance
-   * @return a NumberVector of V with random values
-   */
-  V randomInstance(Random random);
-
-  /**
-   * Returns a NumberVector of V with random values between min and max.
-   * 
-   * @param min minimum of random value
-   * @param max maximum of random value
-   * @param random a random instance
-   * @return a NumberVector of V with random values between min and max
-   */
-  V randomInstance(N min, N max, Random random);
-
-  /**
-   * Returns a NumberVector of V with random values between min and max.
-   * 
-   * @param min minimum of random value for each axis
-   * @param max maximum of random value for each axis
-   * @param random a random instance
-   * @return a NumberVector of V with random values between min and max
-   */
-  V randomInstance(V min, V max, Random random);
-
-  /**
-   * Returns a Vector representing in one column and
-   * <code>getDimensionality()</code> rows the values of this NumberVector of V.
-   * 
-   * @return a Matrix representing in one column and
-   *         <code>getDimensionality()</code> rows the values of this
-   *         NumberVector of V
-   */
-  Vector getColumnVector();
-
-  /**
-   * Returns a Matrix representing in one row and
-   * <code>getDimensionality()</code> columns the values of this NumberVector of
-   * V.
-   * 
-   * @return a Matrix representing in one row and
-   *         <code>getDimensionality()</code> columns the values of this
-   *         NumberVector of V
-   */
-  Matrix getRowVector();
-
-  /**
-   * Returns a new NumberVector of V that is the sum of this NumberVector of V
-   * and the given NumberVector of V.
-   * 
-   * @param fv a NumberVector of V to be added to this NumberVector of V
-   * @return a new NumberVector of V that is the sum of this NumberVector of V
-   *         and the given NumberVector of V
-   */
-  V plus(V fv);
-
-  /**
-   * Returns a new NumberVector of V that is the sum of this NumberVector of V
-   * and the negativeVector() of given NumberVector of V.
-   * 
-   * @param fv a NumberVector of V to be subtracted to this NumberVector of V
-   * @return a new NumberVector of V that is the sum of this NumberVector of V
-   *         and the negative of given NumberVector of V
-   */
-  V minus(V fv);
-
-  /**
-   * Provides the scalar product (inner product) of this NumberVector of V and
-   * the given NumberVector of V.
-   * 
-   * @param fv the NumberVector of V to compute the scalar product for
-   * @return the scalar product (inner product) of this and the given
-   *         NumberVector of V
-   */
-  N scalarProduct(V fv);
-
-  /**
-   * Provides a null vector of the same Vector Space as this NumberVector of V
-   * (that is, of the same dimensionality).
-   * 
-   * @return a null vector of the same Vector Space as this NumberVector of V
-   *         (that is, of the same dimensionality)
-   */
-  V nullVector();
-
-  /**
-   * Returns the additive inverse to this NumberVector of V.
-   * 
-   * @return the additive inverse to this NumberVector of V
-   */
-  V negativeVector();
-
-  /**
-   * Returns a new NumberVector of V that is the result of a scalar
-   * multiplication with the given scalar.
-   * 
-   * @param k a scalar to multiply this NumberVector of V with
-   * @return a new NumberVector of V that is the result of a scalar
-   *         multiplication with the given scalar
-   */
-  V multiplicate(double k);
-
   /**
    * Returns the value in the specified dimension as double.
    * 
@@ -202,6 +95,83 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
    * @return the value in the specified dimension
    */
   byte byteValue(int dimension);
+
+  /**
+   * Returns a Vector representing in one column and
+   * <code>getDimensionality()</code> rows the values of this NumberVector of V.
+   * 
+   * @return a Matrix representing in one column and
+   *         <code>getDimensionality()</code> rows the values of this
+   *         NumberVector of V
+   */
+  Vector getColumnVector();
+
+  /**
+   * Returns a Matrix representing in one row and
+   * <code>getDimensionality()</code> columns the values of this NumberVector of
+   * V.
+   * 
+   * @return a Matrix representing in one row and
+   *         <code>getDimensionality()</code> columns the values of this
+   *         NumberVector of V
+   */
+  Matrix getRowVector();
+
+  /**
+   * Provides a null vector of the same Vector Space as this NumberVector of V
+   * (that is, of the same dimensionality).
+   * 
+   * @return a null vector of the same Vector Space as this NumberVector of V
+   *         (that is, of the same dimensionality)
+   */
+  V nullVector();
+
+  /**
+   * Returns the additive inverse to this NumberVector of V.
+   * 
+   * @return the additive inverse to this NumberVector of V
+   */
+  V negativeVector();
+
+  /**
+   * Returns a new NumberVector of V that is the sum of this NumberVector of V
+   * and the given NumberVector of V.
+   * 
+   * @param fv a NumberVector of V to be added to this NumberVector of V
+   * @return a new NumberVector of V that is the sum of this NumberVector of V
+   *         and the given NumberVector of V
+   */
+  V plus(V fv);
+
+  /**
+   * Returns a new NumberVector of V that is the sum of this NumberVector of V
+   * and the negativeVector() of given NumberVector of V.
+   * 
+   * @param fv a NumberVector of V to be subtracted to this NumberVector of V
+   * @return a new NumberVector of V that is the sum of this NumberVector of V
+   *         and the negative of given NumberVector of V
+   */
+  V minus(V fv);
+
+  /**
+   * Provides the scalar product (inner product) of this NumberVector of V and
+   * the given NumberVector of V.
+   * 
+   * @param fv the NumberVector of V to compute the scalar product for
+   * @return the scalar product (inner product) of this and the given
+   *         NumberVector of V
+   */
+  N scalarProduct(V fv);
+
+  /**
+   * Returns a new NumberVector of V that is the result of a scalar
+   * multiplication with the given scalar.
+   * 
+   * @param k a scalar to multiply this NumberVector of V with
+   * @return a new NumberVector of V that is the result of a scalar
+   *         multiplication with the given scalar
+   */
+  V multiplicate(double k);
 
   /**
    * Returns a new NumberVector of N for the given values.

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.math;
 
 import java.math.BigInteger;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -170,7 +171,8 @@ public final class MathUtil {
         // Update
         sumXX += weight * deltaX * neltaX;
         sumYY += weight * deltaY * neltaY;
-        sumXY += weight * deltaX * neltaY; // should equal weight * deltaY * neltaX!
+        sumXY += weight * deltaX * neltaY; // should equal weight * deltaY *
+                                           // neltaX!
       }
     }
     final double popSdX = Math.sqrt(sumXX / sumWe);
@@ -277,7 +279,8 @@ public final class MathUtil {
         // Update
         sumXX += weight * deltaX * neltaX;
         sumYY += weight * deltaY * neltaY;
-        sumXY += weight * deltaX * neltaY; // should equal weight * deltaY * neltaX!
+        sumXY += weight * deltaX * neltaY; // should equal weight * deltaY *
+                                           // neltaX!
       }
     }
     final double popSdX = Math.sqrt(sumXX / sumWe);
@@ -415,5 +418,30 @@ public final class MathUtil {
    */
   public static long sumFirstIntegers(final long i) {
     return ((i - 1L) * i) / 2;
+  }
+
+  /**
+   * Produce an array of random numbers in [0:1]
+   * 
+   * @param len Length
+   * @return Array
+   */
+  public static double[] randomDoubleArray(int len) {
+    return randomDoubleArray(len, new Random());
+  }
+
+  /**
+   * Produce an array of random numbers in [0:1]
+   * 
+   * @param len Length
+   * @param r Random generator
+   * @return Array
+   */
+  public static double[] randomDoubleArray(int len, Random r) {
+    final double[] ret = new double[len];
+    for(int i = 0; i < len; i++) {
+      ret[i] = r.nextDouble();
+    }
+    return ret;
   }
 }
