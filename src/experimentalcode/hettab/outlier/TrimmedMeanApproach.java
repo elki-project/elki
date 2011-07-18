@@ -32,28 +32,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * A Trimmed Mean Approach to finding Spatial Outliers
- *  
+ * 
  * @author Ahmed Hettab
  * @param <V>
  */
-
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
 @Description("a local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
+// FIXME: Reference
 public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAttributeSpatialOutlier<V> {
   /**
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(TrimmedMeanApproach.class);
-  /**
-   * 
-   * Holds the p value
-   */
-  private static final OptionID P_ID = OptionID.getOrCreateOptionID("tma.p", "the percentil parameter");
 
-  /**
-   * the parameter p
-   */
-  private double p;
   /**
    * The association id to associate the TR_SCORE of an object for the TR
    * algorithm.
@@ -61,35 +52,40 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
   public static final AssociationID<Double> TR_SCORE = AssociationID.getOrCreateAssociationID("tr", Double.class);
 
   /**
-   * Constructor
-   * @param p
-   * @param y
-   * @param npredf
+   * the parameter p
    */
-  protected TrimmedMeanApproach(NeighborSetPredicate.Factory<V> npredf,int z , double p) {
-    super(npredf,z);
+  private double p;
+
+  /**
+   * Constructor
+   * 
+   * @param p P arameter
+   * @param z Z parameter
+   * @param npredf Neighborhood factory.
+   */
+  protected TrimmedMeanApproach(NeighborSetPredicate.Factory<V> npredf, int z, double p) {
+    super(npredf, z);
     this.p = p;
-    
   }
 
   /**
+   * Run the algorithm
    * 
-   * @param database
-   * @param relation
-   * @return
+   * @param database Database
+   * @param neighbors Neighborhood relation
+   * @param relation Relation
+   * @return Outlier detection result
    */
-    public OutlierResult run(Database database, Relation<V> relation) {
-   
+  public OutlierResult run(Database database, Relation<V> neighbors, Relation<V> relation) {
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
 
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
-    
-    //calculate the error Term
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(neighbors);
+
+    // calculate the error Term
     Matrix temp1 = Matrix.identity(relation.size(), relation.size()).minus(getNeighborhoodMatrix(relation, npred));
     Matrix temp2 = getSpatialAttributMatrix(relation).minus(getLocalTrimmedMeanMatrix(relation, npred));
     Matrix E = temp1.times(temp2);
-
 
     // calculate the median of error Term
     int i = 0;
@@ -104,7 +100,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
 
     // calculate MAD
     double MAD;
-    i= 0;
+    i = 0;
     double[] temp = new double[relation.size()];
     for(DBID id : relation.getDBIDs()) {
       temp[i] = Math.abs(error.get(id) - median_i);
@@ -128,68 +124,65 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
     return new OutlierResult(scoreMeta, scoreResult);
 
   }
-  
+
   /**
-   *  the neighborhood Matrix 
-   *   
+   * the neighborhood Matrix
+   * 
    */
-  public Matrix getNeighborhoodMatrix(Relation<V> relation , NeighborSetPredicate npred){
-    Matrix m = new Matrix(relation.size(),relation.size());
-    int i = 0 ;
-    for(DBID id : relation.iterDBIDs()){
-      int j = 0 ;
-      for(DBID n : relation.iterDBIDs()){
-        if(npred.getNeighborDBIDs(id).contains(n)){
+  public Matrix getNeighborhoodMatrix(Relation<V> relation, NeighborSetPredicate npred) {
+    Matrix m = new Matrix(relation.size(), relation.size());
+    int i = 0;
+    for(DBID id : relation.iterDBIDs()) {
+      int j = 0;
+      for(DBID n : relation.iterDBIDs()) {
+        if(npred.getNeighborDBIDs(id).contains(n)) {
           m.set(i, j, 1);
         }
-        else{
+        else {
           m.set(i, j, 0);
         }
         j++;
       }
-      i++ ;
+      i++;
     }
-   m.normalizeColumns();
-   return m ;
+    m.normalizeColumns();
+    return m;
   }
-  
+
   /**
    * return the Local trimmed Mean Matrix
    */
-  public Matrix getLocalTrimmedMeanMatrix(Relation<V> relation , NeighborSetPredicate npred){
-    Matrix m = new Matrix(relation.size(),1);
-    int i = 0 ;
-    for(DBID id : relation.iterDBIDs()){
-        DBIDs neighbors = npred.getNeighborDBIDs(id);
-        int j = 0 ;
-        double[] aValues = new double[neighbors.size()];
-        for(DBID n :neighbors){
-          aValues[j] = relation.get(n).doubleValue(z);
-          j++ ;
-        }
-        m.set(i, 0, StatUtils.percentile(aValues, p*100));
-        i++ ;
+  public Matrix getLocalTrimmedMeanMatrix(Relation<V> relation, NeighborSetPredicate npred) {
+    Matrix m = new Matrix(relation.size(), 1);
+    int i = 0;
+    for(DBID id : relation.iterDBIDs()) {
+      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      int j = 0;
+      double[] aValues = new double[neighbors.size()];
+      for(DBID n : neighbors) {
+        aValues[j] = relation.get(n).doubleValue(z);
+        j++;
+      }
+      m.set(i, 0, StatUtils.percentile(aValues, p * 100));
+      i++;
     }
-    return m ;
+    return m;
   }
-  
+
   /**
    * return the non Spatial atribut value Matrix
    * 
    */
-  public Matrix getSpatialAttributMatrix(Relation<V> relation){
-    Matrix m = new Matrix(relation.size(),1) ;
-    int i = 0 ;
+  public Matrix getSpatialAttributMatrix(Relation<V> relation) {
+    Matrix m = new Matrix(relation.size(), 1);
+    int i = 0;
     for(DBID id : relation.iterDBIDs()) {
       m.set(i, 0, relation.get(id).doubleValue(z));
-      i++ ;
-    }  
-   return m ;
+      i++;
+    }
+    return m;
   }
 
-  /**
-   * 
-   */
   @Override
   protected Logging getLogger() {
     return logger;
@@ -197,32 +190,42 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
-  
+
   /**
+   * Parameterizer
    * 
-   * @author hettab
-   *
-   * @param <V>
+   * @author Ahmed Hettab
+   * 
+   * @apiviz.exclude
+   * 
+   * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector<?,?>> extends SingleAttributeSpatialOutlier.Parameterizer<V> {
-   
-    protected double p = 0.2 ;
-    
+  public static class Parameterizer<V extends NumberVector<?, ?>> extends SingleAttributeSpatialOutlier.Parameterizer<V> {
+    /**
+     * Parameter for the percentile value p
+     */
+    public static final OptionID P_ID = OptionID.getOrCreateOptionID("tma.p", "the percentile parameter");
+
+    /**
+     * Percentile parameter p
+     */
+    protected double p = 0.2;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter pP = new DoubleParameter(P_ID,new GreaterConstraint(0.0));
-      if(config.grab(pP)){
-        p = pP.getValue() ;
+      DoubleParameter pP = new DoubleParameter(P_ID, new GreaterConstraint(0.0));
+      if(config.grab(pP)) {
+        p = pP.getValue();
       }
     }
-   
+
     @Override
     protected TrimmedMeanApproach<V> makeInstance() {
-      return new TrimmedMeanApproach<V>(npredf,z,p);
+      return new TrimmedMeanApproach<V>(npredf, z, p);
     }
-    
+
   }
 }
