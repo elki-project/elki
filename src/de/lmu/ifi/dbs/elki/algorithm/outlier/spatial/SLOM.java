@@ -192,6 +192,10 @@ public class SLOM<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?
    * @author Ahmed Hettab
    * 
    * @apiviz.exclude
+   * 
+   * @param <N> Neighborhood type
+   * @param <V> Vector type
+   * @param <D> Distance type
    */
   public static class Parameterizer<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, V, D> {
     @Override

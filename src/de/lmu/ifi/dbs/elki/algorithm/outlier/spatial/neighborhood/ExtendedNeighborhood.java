@@ -50,6 +50,9 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
    * Factory class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.stereotype factory
+   * @apiviz.has ExtendedNeighborhood
    */
   public static class Factory<O> extends AbstractPrecomputedNeighborhood.Factory<O> {
     /**
@@ -135,7 +138,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.hidden
+     * @apiviz.exclude
      */
     public static class Parameterizer<O> extends AbstractParameterizer {
       /**

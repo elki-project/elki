@@ -53,6 +53,8 @@ public abstract class AbstractNeighborhoodOutlier<O> extends AbstractAlgorithm<O
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
   public static abstract class Parameterizer<O> extends AbstractParameterizer {
     /**
