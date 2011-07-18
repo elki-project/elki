@@ -21,30 +21,27 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * A precomputed neighborhood.
+ * A precomputed neighborhood, loaded from an external file.
  * 
  * @author Erich Schubert
  */
-public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
+public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implements Result {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(PrecomputedNeighborhood.class);
+  private static final Logging logger = Logging.getLogger(ExternalNeighborhood.class);
 
   /**
    * Parameter to specify the neighborhood file
@@ -52,47 +49,27 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
   public static final OptionID NEIGHBORHOOD_FILE_ID = OptionID.getOrCreateOptionID("externalneighbors.file", "The file listing the neighbors.");
 
   /**
-   * Parameter to specify the number of steps allowed
-   */
-  public static final OptionID STEPS_ID = OptionID.getOrCreateOptionID("externalneighbors.steps", "The number of steps allowed in the neighborhood graph.");
-
-  /**
-   * Data store for the loaded result.
-   */
-  private DataStore<DBIDs> store;
-
-  /**
    * Constructor.
    * 
    * @param store Store to access
    */
-  public PrecomputedNeighborhood(DataStore<DBIDs> store) {
-    this.store = store;
+  public ExternalNeighborhood(DataStore<DBIDs> store) {
+    super(store);
   }
 
   @Override
-  public DBIDs getNeighborDBIDs(DBID reference) {
-    DBIDs neighbors = store.get(reference);
-    if(neighbors != null) {
-      return neighbors;
-    }
-    else {
-      // Use just the object itself.
-      if(logger.isDebugging()) {
-        logger.warning("No neighbors for object " + reference);
-      }
-      return reference;
-    }
-  }
-  
-  @Override
   public String getLongName() {
-    return "Precomputed Neighborhood";
+    return "External Neighborhood";
   }
 
   @Override
   public String getShortName() {
-    return "precomputed-neighborhood";
+    return "external-neighborhood";
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
   }
 
   /**
@@ -100,38 +77,31 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
    * 
    * @author Erich Schubert
    */
-  public static class Factory implements NeighborSetPredicate.Factory<Object> {
+  public static class Factory extends AbstractPrecomputedNeighborhood.Factory<Object> {
     /**
      * Logger
      */
-    private static final Logging logger = Logging.getLogger(PrecomputedNeighborhood.class);
-    
+    private static final Logging logger = Logging.getLogger(ExternalNeighborhood.class);
+
     /**
      * The input file.
      */
     private File file;
 
     /**
-     * Number of steps to do
-     */
-    private int steps;
-
-    /**
      * Constructor.
      * 
      * @param file File to load
-     * @param steps Number of steps to do
      */
-    public Factory(File file, int steps) {
+    public Factory(File file) {
       super();
       this.file = file;
-      this.steps = steps;
     }
 
     @Override
     public NeighborSetPredicate instantiate(Relation<?> database) {
       DataStore<DBIDs> store = loadNeighbors(database);
-      PrecomputedNeighborhood neighborhood = new PrecomputedNeighborhood(store);
+      ExternalNeighborhood neighborhood = new ExternalNeighborhood(store);
       ResultHierarchy hier = database.getHierarchy();
       if(hier != null) {
         hier.add(database, neighborhood);
@@ -149,14 +119,6 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
      */
     private DataStore<DBIDs> loadNeighbors(Relation<?> database) {
       final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
-      final WritableDataStore<DBIDs> tstore;
-      // TStore is temporary when we need to do multi-step
-      if(steps <= 1) {
-        tstore = store;
-      }
-      else {
-        tstore = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
-      }
 
       if(logger.isVerbose()) {
         logger.verbose("Loading external neighborhoods.");
@@ -182,7 +144,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
           if(olq != null) {
             LabelList label = olq.get(id);
             if(label != null) {
-              for (String lbl: label) {
+              for(String lbl : label) {
                 lblmap.put(lbl, id);
               }
             }
@@ -197,8 +159,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
         InputStream in = new FileInputStream(file);
         in = FileUtil.tryGzipInput(in);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        int lineNumber = 0;
-        for(String line; (line = br.readLine()) != null; lineNumber++) {
+        for(String line; (line = br.readLine()) != null; ) {
           ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
           String[] entries = line.split(" ");
           DBID id = lblmap.get(entries[0]);
@@ -212,7 +173,7 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
                 logger.warning("No object found for label " + entries[i]);
               }
             }
-            tstore.put(id, neighbours);
+            store.put(id, neighbours);
           }
           else {
             logger.warning("No object found for label " + entries[0]);
@@ -220,31 +181,6 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
         }
         br.close();
         in.close();
-
-        // Expand multiple steps
-        if(steps > 0) {
-          FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Expanding neighborhoods", database.size(), logger) : null;
-          for(final DBID id : database.iterDBIDs()) {
-            DBIDs cur = id;
-            for(int i = 0; i < steps; i++) {
-              ModifiableDBIDs upd = DBIDUtil.newHashSet(cur);
-              for(final DBID oid : cur) {
-                DBIDs add = tstore.get(oid);
-                if(add != null) {
-                  upd.addDBIDs(add);
-                }
-              }
-              cur = upd;
-            }
-            store.put(id, cur);
-            if(progress != null) {
-              progress.incrementProcessed(logger);
-            }
-          }
-          if(progress != null) {
-            progress.ensureCompleted(logger);
-          }
-        }
 
         return store;
       }
@@ -254,46 +190,42 @@ public class PrecomputedNeighborhood implements NeighborSetPredicate, Result {
     }
 
     /**
-     * Factory method for {@link Parameterizable}
+     * Parameterization class.
      * 
-     * @param config Parameterization
-     * @return instance
+     * @author Erich Schubert
+     * 
+     * @apiviz.hidden
      */
-    public static PrecomputedNeighborhood.Factory parameterize(Parameterization config) {
-      File file = getParameterNeighborhoodFile(config);
-      int steps = getParameterSteps(config);
-      if(config.hasErrors()) {
+    public static class Parameterizer extends AbstractParameterizer {
+      /**
+       * The input file.
+       */
+      File file;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        file = getParameterNeighborhoodFile(config);
+      }
+
+      /**
+       * Get the neighborhood parameter.
+       * 
+       * @param config Parameterization
+       * @return Instance or null
+       */
+      protected static File getParameterNeighborhoodFile(Parameterization config) {
+        final FileParameter param = new FileParameter(NEIGHBORHOOD_FILE_ID, FileParameter.FileType.INPUT_FILE);
+        if(config.grab(param)) {
+          return param.getValue();
+        }
         return null;
       }
-      return new PrecomputedNeighborhood.Factory(file, steps);
-    }
 
-    /**
-     * Get the neighborhood parameter.
-     * 
-     * @param config Parameterization
-     * @return Instance or null
-     */
-    public static File getParameterNeighborhoodFile(Parameterization config) {
-      final FileParameter param = new FileParameter(NEIGHBORHOOD_FILE_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(param)) {
-        return param.getValue();
+      @Override
+      protected ExternalNeighborhood.Factory makeInstance() {
+        return new ExternalNeighborhood.Factory(file);
       }
-      return null;
-    }
-
-    /**
-     * Get the number of steps to do in the neighborhood graph.
-     * 
-     * @param config Parameterization
-     * @return number of steps, default 1
-     */
-    public static int getParameterSteps(Parameterization config) {
-      final IntParameter param = new IntParameter(STEPS_ID, 1);
-      if(config.grab(param)) {
-        return param.getValue();
-      }
-      return 1;
     }
   }
 }
