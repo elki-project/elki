@@ -30,9 +30,10 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
 
   /**
    * Constructor.
-   *
+   * 
    * @param npredf Neighborhood predicate factory
-   * @param nonSpatialDistanceFunction Distance function to use on the non-spatial attributes.
+   * @param nonSpatialDistanceFunction Distance function to use on the
+   *        non-spatial attributes.
    */
   public AbstractDistanceBasedSpatialOutlier(NeighborSetPredicate.Factory<N> npredf, PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction) {
     super(npredf);
@@ -54,6 +55,10 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
    * @author Ahmed Hettab
    * 
    * @apiviz.exclude
+   * 
+   * @param <N> Object type for neighborhood
+   * @param <O> Non-spatial object type
+   * @param <D> Distance value type
    */
   public static abstract class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     /**

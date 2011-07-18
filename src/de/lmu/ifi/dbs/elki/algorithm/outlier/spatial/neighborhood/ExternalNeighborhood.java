@@ -76,6 +76,9 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implem
    * Factory class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.stereotype factory
+   * @apiviz.has ExternalNeighborhood
    */
   public static class Factory extends AbstractPrecomputedNeighborhood.Factory<Object> {
     /**
@@ -194,7 +197,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implem
      * 
      * @author Erich Schubert
      * 
-     * @apiviz.hidden
+     * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**

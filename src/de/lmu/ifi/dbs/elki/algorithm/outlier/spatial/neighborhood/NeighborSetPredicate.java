@@ -25,6 +25,9 @@ public interface NeighborSetPredicate {
    * 
    * @author Erich Schubert
    *
+   * @apiviz.stereotype factory
+   * @apiviz.has NeighborhoodSetPredicate
+   * 
    * @param <O> Object type
    */
   public static interface Factory<O> extends Parameterizable {

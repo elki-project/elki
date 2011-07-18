@@ -52,6 +52,9 @@ public abstract class AbstractPrecomputedNeighborhood implements NeighborSetPred
    * Factory class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.stereotype factory
+   * @apiviz.has AbstractPrecomputedNeighborhood
    */
   public abstract static class Factory<O> implements NeighborSetPredicate.Factory<O> {
     // Nothing to add.

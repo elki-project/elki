@@ -130,6 +130,8 @@ public class SOF<N, V, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    * 
    * @author Ahmed Hettab
    * 
+   * @apiviz.exclude
+   * 
    * @param <N> Neighborhood type
    * @param <V> Attribute type
    * @param <D> Distance type
