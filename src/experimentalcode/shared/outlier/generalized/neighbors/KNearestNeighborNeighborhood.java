@@ -25,11 +25,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
+ * Neighborhoods based on k nearest neighbors.
  * 
  * @author Ahmed Hettab
  * 
  * @param <D> Distance to use
  */
+// TODO: make a version that doesn't require precomputing them?
 public class KNearestNeighborNeighborhood<D extends Distance<D>> implements NeighborSetPredicate, Result {
   /**
    * Parameter k
