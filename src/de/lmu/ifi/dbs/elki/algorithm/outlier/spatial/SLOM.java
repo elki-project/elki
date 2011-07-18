@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -43,13 +42,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Ahmed Hettab
  * 
  * @param <N> the type the spatial neighborhood is defined over
- * @param <V> the type of DatabaseObjects handled by the algorithm
+ * @param <O> the type of objects handled by the algorithm
  * @param <D> the type of Distance used for non spatial attributes
  */
 @Title("SLOM: a new measure for local spatial outliers")
 @Description("Spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
 @Reference(authors = "Sanjay Chawla and Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 2005", url = "http://rp-www.cs.usyd.edu.au/~chawlarg/papers/KAIS_online.pdf")
-public class SLOM<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, V, D> implements OutlierAlgorithm {
+public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, O, D> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -68,7 +67,7 @@ public class SLOM<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?
    * @param nonSpatialDistanceFunction Distance function to use on the
    *        non-spatial attributes
    */
-  public SLOM(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
+  public SLOM(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction) {
     super(npred, nonSpatialDistanceFunction);
   }
 
@@ -78,7 +77,7 @@ public class SLOM<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?
    * @param relation Relation to use.
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<N> spatial, Relation<V> relation) {
+  public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
 
     WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
@@ -194,13 +193,13 @@ public class SLOM<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?
    * @apiviz.exclude
    * 
    * @param <N> Neighborhood type
-   * @param <V> Vector type
+   * @param <O> Data Object type
    * @param <D> Distance type
    */
-  public static class Parameterizer<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, V, D> {
+  public static class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, O, D> {
     @Override
-    protected SLOM<N, V, D> makeInstance() {
-      return new SLOM<N, V, D>(npredf, distanceFunction);
+    protected SLOM<N, O, D> makeInstance() {
+      return new SLOM<N, O, D>(npredf, distanceFunction);
     }
   }
 }
