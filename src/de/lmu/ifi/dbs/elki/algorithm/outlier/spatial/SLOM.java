@@ -35,6 +35,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * in Knowledge and Information Systems 2005
  * </p>
  * 
+ * This implementation works around some corner cases in SLOM, in particular
+ * when an object has none or a single neighbor only (albeit the results will
+ * still not be too useful then), which will result in divisions by zero.
+ * 
  * @author Ahmed Hettab
  * 
  * @param <N> the type the spatial neighborhood is defined over
@@ -93,7 +97,14 @@ public class SLOM<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?
         cnt++;
         maxDist = Math.max(maxDist, dist);
       }
-      modifiedDistance.put(id, ((sum - maxDist) / (cnt - 1)));
+      if(cnt > 1) {
+        modifiedDistance.put(id, ((sum - maxDist) / (cnt - 1)));
+      }
+      else {
+        // Use regular distance when the d-tilde trick is undefined.
+        // Note: this can be 0 when there were no neighbors.
+        modifiedDistance.put(id, maxDist);
+      }
     }
 
     // Second step - compute actual SLOM values
@@ -112,24 +123,49 @@ public class SLOM<N, V extends NumberVector<?, ?>, D extends NumberDistance<D, ?
         sum += modifiedDistance.get(neighbor);
         cnt++;
       }
-      // TODO: assert that neighbors contained the object itself.
-      double avgPlus = (sum + modifiedDistance.get(id)) / (cnt + 1);
-      double avg = sum / cnt;
+      double slom;
+      if(cnt > 0) {
+        // With and without the object itself:
+        double avgPlus = (sum + modifiedDistance.get(id)) / (cnt + 1);
+        double avg = sum / cnt;
 
-      double beta = 0;
-      for(DBID neighbor : neighbors) {
-        if(modifiedDistance.get(neighbor).doubleValue() > avgPlus) {
-          beta += 1;
+        double beta = 0;
+        for(DBID neighbor : neighbors) {
+          final double dist = modifiedDistance.get(neighbor).doubleValue();
+          if(dist > avgPlus) {
+            beta += 1;
+          }
+          else if(dist < avgPlus) {
+            beta -= 1;
+          }
         }
-        if(modifiedDistance.get(neighbor).doubleValue() < avgPlus) {
-          beta -= 1;
+        // Include object itself
+        if(!neighbors.contains(id)) {
+          final double dist = modifiedDistance.get(id).doubleValue();
+          if(dist > avgPlus) {
+            beta += 1;
+          }
+          else if(dist < avgPlus) {
+            beta -= 1;
+          }
         }
+        beta = Math.abs(beta);
+        // note: cnt == size of N(x), not N+(x)
+        if(cnt > 1) {
+          beta = Math.max(beta, 1.0) / (cnt - 1);
+        }
+        else {
+          // Workaround insufficiency in SLOM paper - div by zero
+          beta = 1.0;
+        }
+        beta = beta / (1 + avg);
+
+        slom = beta * modifiedDistance.get(id);
       }
-      beta = Math.abs(beta);
-      beta = Math.max(beta, 1) / (cnt - 2);
-      beta = beta / (1 + avg);
-
-      double slom = beta * modifiedDistance.get(id);
+      else {
+        // No neighbors to compare to - no score.
+        slom = 0.0;
+      }
       sloms.put(id, slom);
       slomminmax.put(slom);
     }
