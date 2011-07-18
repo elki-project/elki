@@ -3,10 +3,12 @@ package experimentalcode.hettab.outlier;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.rank.Median;
 
+import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractNeighborhoodOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -23,6 +25,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -34,12 +37,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * A Trimmed Mean Approach to finding Spatial Outliers
  * 
  * @author Ahmed Hettab
- * @param <V>
+ * @param <N> Neighborhood object type
  */
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
 @Description("a local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
 // FIXME: Reference
-public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAttributeSpatialOutlier<V> {
+public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
    */
@@ -59,12 +62,11 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
   /**
    * Constructor
    * 
-   * @param p P arameter
-   * @param z Z parameter
+   * @param p Parameter p
    * @param npredf Neighborhood factory.
    */
-  protected TrimmedMeanApproach(NeighborSetPredicate.Factory<V> npredf, int z, double p) {
-    super(npredf, z);
+  protected TrimmedMeanApproach(NeighborSetPredicate.Factory<N> npredf, double p) {
+    super(npredf);
     this.p = p;
   }
 
@@ -76,15 +78,16 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
    * @param relation Relation
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<V> neighbors, Relation<V> relation) {
+  public OutlierResult run(Database database, Relation<N> neighbors, Relation<? extends NumberVector<?, ?>> relation) {
+    assert (DatabaseUtil.dimensionality(relation) == 1) : "TrimmedMean can only process one-dimensional data sets.";
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(neighbors);
+
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
 
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(neighbors);
-
     // calculate the error Term
     Matrix temp1 = Matrix.identity(relation.size(), relation.size()).minus(getNeighborhoodMatrix(relation, npred));
-    Matrix temp2 = getSpatialAttributMatrix(relation).minus(getLocalTrimmedMeanMatrix(relation, npred));
+    Matrix temp2 = getSpatialAttributeMatrix(relation).minus(getLocalTrimmedMeanMatrix(relation, npred));
     Matrix E = temp1.times(temp2);
 
     // calculate the median of error Term
@@ -129,7 +132,8 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
    * the neighborhood Matrix
    * 
    */
-  public Matrix getNeighborhoodMatrix(Relation<V> relation, NeighborSetPredicate npred) {
+  // TODO: can we do this more efficiently?
+  public Matrix getNeighborhoodMatrix(Relation<? extends NumberVector<?, ?>> relation, NeighborSetPredicate npred) {
     Matrix m = new Matrix(relation.size(), relation.size());
     int i = 0;
     for(DBID id : relation.iterDBIDs()) {
@@ -152,7 +156,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
   /**
    * return the Local trimmed Mean Matrix
    */
-  public Matrix getLocalTrimmedMeanMatrix(Relation<V> relation, NeighborSetPredicate npred) {
+  public Matrix getLocalTrimmedMeanMatrix(Relation<? extends NumberVector<?, ?>> relation, NeighborSetPredicate npred) {
     Matrix m = new Matrix(relation.size(), 1);
     int i = 0;
     for(DBID id : relation.iterDBIDs()) {
@@ -160,7 +164,7 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
       int j = 0;
       double[] aValues = new double[neighbors.size()];
       for(DBID n : neighbors) {
-        aValues[j] = relation.get(n).doubleValue(z);
+        aValues[j] = relation.get(n).doubleValue(1);
         j++;
       }
       m.set(i, 0, StatUtils.percentile(aValues, p * 100));
@@ -173,11 +177,11 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
    * return the non Spatial atribut value Matrix
    * 
    */
-  public Matrix getSpatialAttributMatrix(Relation<V> relation) {
+  public Matrix getSpatialAttributeMatrix(Relation<? extends NumberVector<?, ?>> relation) {
     Matrix m = new Matrix(relation.size(), 1);
     int i = 0;
     for(DBID id : relation.iterDBIDs()) {
-      m.set(i, 0, relation.get(id).doubleValue(z));
+      m.set(i, 0, relation.get(id).doubleValue(1));
       i++;
     }
     return m;
@@ -190,7 +194,8 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+    // Get one dimensional attribute for analysis.
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
   }
 
   /**
@@ -200,9 +205,9 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
    * 
    * @apiviz.exclude
    * 
-   * @param <V> Vector type
+   * @param <N> Neighborhood object type
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>> extends SingleAttributeSpatialOutlier.Parameterizer<V> {
+  public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     /**
      * Parameter for the percentile value p
      */
@@ -223,8 +228,8 @@ public class TrimmedMeanApproach<V extends NumberVector<?, ?>> extends SingleAtt
     }
 
     @Override
-    protected TrimmedMeanApproach<V> makeInstance() {
-      return new TrimmedMeanApproach<V>(npredf, z, p);
+    protected TrimmedMeanApproach<N> makeInstance() {
+      return new TrimmedMeanApproach<N>(npredf, p);
     }
 
   }
