@@ -43,13 +43,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * @author Ahmed Hettab
  * 
- * @param <N> Neighborhood type
- * @param <V> Object type
+ * @param <N> Neighborhood object type
+ * @param <O> Attribute object type
  * @param <D> Distance type
  */
 @Title("Spatial Outlier Factor")
 @Reference(authors = "Huang, T., Qin, X.", title = "Detecting outliers in spatial database", booktitle = "Proceedings of the 3rd International Conference on Image and Graphics", url = "http://dx.doi.org/10.1109/ICIG.2004.53")
-public class SOF<N, V, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, V, D> implements OutlierAlgorithm {
+public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, O, D> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -67,7 +67,7 @@ public class SOF<N, V, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    * @param nonSpatialDistanceFunction Distance function on non-spatial
    *        attributes
    */
-  public SOF(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<V, D> nonSpatialDistanceFunction) {
+  public SOF(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction) {
     super(npred, nonSpatialDistanceFunction);
   }
 
@@ -84,7 +84,7 @@ public class SOF<N, V, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    * @param relation Attributes to evaluate
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<N> spatial, Relation<V> relation) {
+  public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
 
     WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
@@ -133,13 +133,13 @@ public class SOF<N, V, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    * @apiviz.exclude
    * 
    * @param <N> Neighborhood type
-   * @param <V> Attribute type
+   * @param <O> Attribute object type
    * @param <D> Distance type
    */
-  public static class Parameterizer<N, V, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, V, D> {
+  public static class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, O, D> {
     @Override
-    protected SOF<N, V, D> makeInstance() {
-      return new SOF<N, V, D>(npredf, distanceFunction);
+    protected SOF<N, O, D> makeInstance() {
+      return new SOF<N, O, D>(npredf, distanceFunction);
     }
   }
 }
