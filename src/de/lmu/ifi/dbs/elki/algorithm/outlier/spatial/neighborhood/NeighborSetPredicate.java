@@ -31,11 +31,11 @@ public interface NeighborSetPredicate {
     /**
      * Instantiation method.
      * 
-     * @param rep Database to instantiate for.
+     * @param relation Relation to instantiate for.
      * 
      * @return instance
      */
-    public NeighborSetPredicate instantiate(Relation<? extends O> database);
+    public NeighborSetPredicate instantiate(Relation<? extends O> relation);
 
     /**
      * Get the input type information
