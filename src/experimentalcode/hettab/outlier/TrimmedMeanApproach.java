@@ -3,6 +3,7 @@ package experimentalcode.hettab.outlier;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.rank.Median;
 
+import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -28,7 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import experimentalcode.shared.outlier.generalized.neighbors.NeighborSetPredicate;
 
 /**
  * A Trimmed Mean Approach to finding Spatial Outliers
