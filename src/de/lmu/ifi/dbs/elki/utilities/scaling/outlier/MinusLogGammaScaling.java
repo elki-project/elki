@@ -6,8 +6,8 @@ import org.apache.commons.math.special.Gamma;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -47,7 +47,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
   public void prepare(DBIDs ids, OutlierResult or) {
     meta = or.getOutlierMeta();
     // Determine Minimum and Maximum.
-    MinMax<Double> mm = new MinMax<Double>();
+    DoubleMinMax mm = new DoubleMinMax();
     for(DBID id : ids) {
       double score = or.getScores().getValueFor(id);
       mm.put(score);

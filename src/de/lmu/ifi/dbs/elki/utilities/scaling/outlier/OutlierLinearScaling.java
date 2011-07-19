@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -114,7 +114,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
   public void prepare(DBIDs ids, OutlierResult or) {
     if(usemean) {
       MeanVariance mv = new MeanVariance();
-      MinMax<Double> mm = (max == null) ? new MinMax<Double>() : null;
+      DoubleMinMax mm = (max == null) ? new DoubleMinMax() : null;
       boolean skippedzeros = false;
       for(DBID id : ids) {
         double val = or.getScores().getValueFor(id);
@@ -139,7 +139,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     else {
       if(min == null || max == null) {
         boolean skippedzeros = false;
-        MinMax<Double> mm = new MinMax<Double>();
+        DoubleMinMax mm = new DoubleMinMax();
         for(DBID id : ids) {
           double val = or.getScores().getValueFor(id);
           if(nozeros && val == 0.0) {
