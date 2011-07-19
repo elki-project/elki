@@ -130,6 +130,8 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
       this.put(SELECTION, selections.get(0));
     }
     
+    result.getHierarchy().add(result, this);
+    
     // Add visualizers.
     processResult(result, result);
     
