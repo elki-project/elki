@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -90,7 +89,6 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
     double opacity = 0.25;
 
     Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
-    int clusterID = 0;
 
     for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
       Cluster<?> clus = ci.next();
@@ -118,7 +116,6 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
         SVGUtil.addCSSClass(hulls, CONVEXHULL + cnum);
         layer.appendChild(hulls);
       }
-      clusterID++;
     }
   }
 
@@ -173,7 +170,6 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         // Find clusterings we can visualize:
@@ -182,7 +178,7 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
           final VisualizationTask task = new VisualizationTask(NAME, c, rep, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          context.addVisualizer(c, task);
+          baseResult.getHierarchy().add(c, task);
         }
       }
     }

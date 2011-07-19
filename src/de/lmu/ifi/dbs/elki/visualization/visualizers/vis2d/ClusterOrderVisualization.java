@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -119,7 +118,6 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
@@ -127,7 +125,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
           final VisualizationTask task = new VisualizationTask(NAME, co, rep, this, P2DVisualization.class);
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
-          context.addVisualizer(co, task);
+          baseResult.getHierarchy().add(co, task);
         }
       }
     }

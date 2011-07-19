@@ -21,8 +21,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize a similarity matrix with object labels
@@ -126,13 +124,12 @@ public class SimilarityMatrixVisualizer extends AbstractVisualization {
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
       for(ComputeSimilarityMatrixImage.SimilarityMatrix pr : prs) {
         // Add plots, attach visualizer
         final VisualizationTask task = new VisualizationTask(NAME, pr, null, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-        context.addVisualizer(pr, task);
+        baseResult.getHierarchy().add(pr, task);
       }
     }
 

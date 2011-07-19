@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -166,7 +165,6 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         // TODO: we can also visualize other scores!
@@ -174,7 +172,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
         for(OutlierResult o : ors) {
           final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), rep, this, P2DVisualization.class);
           task.put(VisualizationTask.META_TOOL, true);
-          context.addVisualizer(o.getScores(), task);
+          baseResult.getHierarchy().add(o.getScores(), task);
         }
       }
     }

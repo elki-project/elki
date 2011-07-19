@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -113,7 +112,6 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       ArrayList<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
       boolean hasClustering = (cs.size() > 0);
 
@@ -124,7 +122,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
         if(hasClustering) {
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
         }
-        context.addVisualizer(rep, task);
+        baseResult.getHierarchy().add(rep, task);
       }
     }
 

@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualizer to draw histograms.
@@ -145,12 +144,11 @@ public class HistogramVisFactory extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    VisualizerContext context = VisualizerUtil.getContext(baseResult);
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(newResult, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
       final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-      context.addVisualizer(histogram, task);
+      baseResult.getHierarchy().add(histogram, task);
     }
   }
 

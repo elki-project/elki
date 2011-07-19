@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -159,7 +158,6 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> vreps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> vrep : IterableUtil.fromIterator(vreps)) {
         ArrayList<Relation<?>> reps = ResultUtil.filterResults(result, Relation.class);
@@ -167,17 +165,17 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
           if (DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
             final VisualizationTask task = new VisualizationTask(NAME_ID, rep, vrep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_TOOL, true);
-            context.addVisualizer(rep, task);
+            baseResult.getHierarchy().add(rep, task);
           }
           if (ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
             final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, vrep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_TOOL, true);
-            context.addVisualizer(rep, task);
+            baseResult.getHierarchy().add(rep, task);
           }
           if (LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
             final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, vrep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_TOOL, true);
-            context.addVisualizer(rep, task);
+            baseResult.getHierarchy().add(rep, task);
           }
           // TODO: external IDs separate?
         }

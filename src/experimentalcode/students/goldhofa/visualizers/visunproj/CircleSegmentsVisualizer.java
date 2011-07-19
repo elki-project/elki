@@ -9,7 +9,6 @@ import java.util.TreeSet;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.Event;
@@ -36,8 +35,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.goldhofa.CCConstants;
 import experimentalcode.students.goldhofa.ClusteringComparison;
@@ -312,15 +309,13 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    final VisualizerContext context = VisualizerUtil.getContext(baseResult);
-    
     // If no comparison result found abort
     List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
     if (ccr.size() != 1) return;
     
     final VisualizationTask task = new VisualizationTask(NAME, ccr.get(0), null, this, null);
     task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-    context.addVisualizer(ccr.get(0), task);
+    baseResult.getHierarchy().add(ccr.get(0), task);
   }
 
   @Override

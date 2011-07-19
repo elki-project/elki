@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -356,13 +355,12 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> rels = VisualizerUtil.iterateVectorFieldRepresentations(result);
       for(Relation<? extends NumberVector<?, ?>> rel : IterableUtil.fromIterator(rels)) {
         // register self
         final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P1DHistogramVisualizer.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-        context.addVisualizer(rel, task);
+        baseResult.getHierarchy().add(rel, task);
       }
       ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
@@ -372,7 +370,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
           final VisualizationTask task = new VisualizationTask(NAME, rel2, rel2, this, P1DHistogramVisualizer.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           task.put(KEY_CLUSTERING, c);
-          context.addVisualizer(c, task);
+          baseResult.getHierarchy().add(c, task);
         }
       }
     }

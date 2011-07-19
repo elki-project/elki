@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -94,10 +93,9 @@ public class KDDTask implements Parameterizable {
 
     // Algorithms - Data Mining Step
     result = algorithmStep.runAlgorithms(db);
-    ResultHierarchy hierarchy = result.getHierarchy();
 
     // TODO: this could be nicer
-    hierarchy.add(result, new SettingsResult(settings));
+    result.getHierarchy().add(result, new SettingsResult(settings));
 
     // Evaluation
     evaluationStep.runEvaluators(result, db);

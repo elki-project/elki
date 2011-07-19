@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -260,7 +259,6 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         ArrayList<AbstractMTree<NV, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
@@ -268,7 +266,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
           if(canVisualize(tree) && tree instanceof Result) {
             final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, rep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
-            context.addVisualizer((Result) tree, task);
+            baseResult.getHierarchy().add((Result) tree, task);
           }
         }
       }

@@ -124,7 +124,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
         if(plot != null) {
           final VisualizationTask task = new VisualizationTask(NAME, plot, null, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-          context.addVisualizer(plot, task);
+          baseResult.getHierarchy().add(plot, task);
         }
       }
     }

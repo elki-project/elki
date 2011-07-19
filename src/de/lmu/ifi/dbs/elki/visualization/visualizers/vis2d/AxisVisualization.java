@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -128,12 +127,11 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
       for(Relation<? extends NumberVector<?, ?>> rel : IterableUtil.fromIterator(reps)) {
         final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
-        context.addVisualizer(rel, task);
+        baseResult.getHierarchy().add(rel, task);
       }
     }
 
