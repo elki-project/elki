@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -187,8 +188,10 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    */
   public OutlierResult run(Database database, Relation<V> relation) {
     HashMap<DBID, SingleObjectBundle> outliers = new HashMap<DBID, SingleObjectBundle>();
-    //
-    Pair<DBID, Double> candidate = getCandidate(relation, database);
+    
+    // FIXME: use a ProxyRelation to virtually add/remove objects! 
+    
+    Pair<DBID, Double> candidate = getCandidate(relation);
 
     // Note: removing/inserting is rather expensive - can't this be done
     // *virtually* only?
@@ -197,7 +200,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       outlierNumber++;
       outliers.put(candidate.first, database.getBundle(candidate.first));
       database.delete(candidate.first);
-      candidate = getCandidate(relation, database);
+      candidate = getCandidate(relation);
     }
 
     // add removed Objects to database
@@ -236,7 +239,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * @param outlier
    */
   // TODO test
-  private Pair<DBID, Double> getCandidate(Relation<V> relation, Database database) {
+  private Pair<DBID, Double> getCandidate(Relation<V> relation) {
     KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, spatialDistanceFunction, k);
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
 
