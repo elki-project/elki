@@ -84,7 +84,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
       emo_score.put(id, maxProb);
       globmax = Math.max(maxProb, globmax);
     }
-    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("EM outlier scores", "em-outlier", EMOD_MAXCPROB, emo_score);
+    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("EM outlier scores", "em-outlier", EMOD_MAXCPROB, emo_score, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0.0, globmax);
     // combine results.
     OutlierResult result = new OutlierResult(meta, scoreres);

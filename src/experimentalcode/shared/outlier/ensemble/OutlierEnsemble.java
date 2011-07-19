@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -105,6 +107,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
   public OutlierResult run(Database database) throws IllegalStateException {
     int num = algorithms.size();
     // Run inner outlier algorithms
+    ModifiableDBIDs ids = DBIDUtil.newHashSet();
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
     {
       FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, logger) : null;
@@ -112,6 +115,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
         Result res = alg.run(database);
         for(OutlierResult ors : ResultUtil.getOutlierResults(res)) {
           results.add(ors);
+          ids.addDBIDs(ors.getScores().getDBIDs());
         }
         if(prog != null) {
           prog.incrementProcessed(logger);
@@ -122,11 +126,11 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
       }
     }
     // Combine
-    WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
     DoubleMinMax minmax = new DoubleMinMax();
     {
-      FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", database.size(), logger) : null;
-      for(DBID id : database.getDBIDs()) {
+      FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", ids.size(), logger) : null;
+      for(DBID id : ids) {
         ArrayList<Double> scores = new ArrayList<Double>(num);
         for(OutlierResult r : results) {
           Double score = r.getScores().getValueFor(id);
@@ -154,7 +158,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>("Outlier Ensemble", "ensemble-outlier", OUTLIERENSEMBLE_ID, sumscore);
+    AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>("Outlier Ensemble", "ensemble-outlier", OUTLIERENSEMBLE_ID, sumscore, ids);
     return new OutlierResult(meta, scores);
   }
 

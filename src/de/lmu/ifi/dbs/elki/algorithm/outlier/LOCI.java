@@ -255,11 +255,11 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(logger);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LOCI normalized MDEF", "loci-outlier", LOCI_MDEF_NORM, mdef_norm);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LOCI normalized MDEF", "loci-outlier", LOCI_MDEF_NORM, mdef_norm, relation.getDBIDs());
     // TODO: actually provide min and max?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(new AnnotationFromDataStore<Double>("LOCI MDEF Radius", "loci-outlier", LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
+    result.addChildResult(new AnnotationFromDataStore<Double>("LOCI MDEF Radius", "loci-outlier", LOCI_MDEF_CRITICAL_RADIUS, mdef_radius, relation.getDBIDs()));
     return result;
   }
 

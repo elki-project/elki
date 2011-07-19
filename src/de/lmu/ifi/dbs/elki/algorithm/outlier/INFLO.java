@@ -199,7 +199,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Influence Outlier Score", "info-outlier", INFLO_SCORE, inflos);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Influence Outlier Score", "info-outlier", INFLO_SCORE, inflos, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
@@ -55,6 +56,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
   private HashMap<DBID, ClusterOrderEntry<D>> map;
 
   /**
+   * The DBIDs we are defined for
+   */
+  private ModifiableDBIDs dbids;
+
+  /**
    * Constructor
    * 
    * @param name The long name (for pretty printing)
@@ -64,10 +70,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     super(name, shortname);
     clusterOrder = new ArrayList<ClusterOrderEntry<D>>();
     map = new HashMap<DBID, ClusterOrderEntry<D>>();
+    dbids = DBIDUtil.newHashSet();
 
     addChildResult(new ClusterOrderAdapter(clusterOrder));
-    addChildResult(new ReachabilityDistanceAdapter(map));
-    addChildResult(new PredecessorAdapter(map));
+    addChildResult(new ReachabilityDistanceAdapter(map, dbids));
+    addChildResult(new PredecessorAdapter(map, dbids));
   }
 
   /**
@@ -96,6 +103,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
    */
   public void add(DBID id, DBID predecessor, D reachability) {
     add(new GenericClusterOrderEntry<D>(id, predecessor, reachability));
+    dbids.add(id);
   }
 
   /**
@@ -106,6 +114,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
   public void add(ClusterOrderEntry<D> ce) {
     clusterOrder.add(ce);
     map.put(ce.getID(), ce);
+    dbids.add(ce.getID());
   }
 
   /**
@@ -183,15 +192,22 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
      * Access reference.
      */
     private HashMap<DBID, ClusterOrderEntry<D>> map;
+    
+    /**
+     * DBIDs
+     */
+    private DBIDs dbids;
 
     /**
      * Constructor.
      * 
      * @param map Map that stores the results.
+     * @param dbids DBIDs we are defined for. 
      */
-    public ReachabilityDistanceAdapter(HashMap<DBID, ClusterOrderEntry<D>> map) {
+    public ReachabilityDistanceAdapter(HashMap<DBID, ClusterOrderEntry<D>> map, DBIDs dbids) {
       super();
       this.map = map;
+      this.dbids = dbids;
     }
 
     @SuppressWarnings("unchecked")
@@ -214,6 +230,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     public String getShortName() {
       return "reachability";
     }
+
+    @Override
+    public DBIDs getDBIDs() {
+      return DBIDUtil.makeUnmodifiable(dbids);
+    }
   }
 
   /**
@@ -226,15 +247,22 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
      * Access reference.
      */
     private HashMap<DBID, ClusterOrderEntry<D>> map;
+    
+    /**
+     * Database IDs
+     */
+    private DBIDs dbids;
 
     /**
      * Constructor.
      * 
      * @param map Map that stores the results.
+     * @param dbids DBIDs we are defined for
      */
-    public PredecessorAdapter(HashMap<DBID, ClusterOrderEntry<D>> map) {
+    public PredecessorAdapter(HashMap<DBID, ClusterOrderEntry<D>> map, DBIDs dbids) {
       super();
       this.map = map;
+      this.dbids = dbids;
     }
 
     @Override
@@ -255,6 +283,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     @Override
     public String getShortName() {
       return "predecessor";
+    }
+
+    @Override
+    public DBIDs getDBIDs() {
+      return DBIDUtil.makeUnmodifiable(dbids);
     }
   }
 }

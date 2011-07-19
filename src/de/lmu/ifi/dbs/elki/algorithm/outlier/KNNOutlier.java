@@ -119,7 +119,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
     if(progressKNNDistance != null) {
       progressKNNDistance.ensureCompleted(logger);
     }
-    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("kNN Outlier Score", "knn-outlier", KNNO_KNNDISTANCE, knno_score);
+    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("kNN Outlier Score", "knn-outlier", KNNO_KNNDISTANCE, knno_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxodegree, 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(meta, scoreres);
   }

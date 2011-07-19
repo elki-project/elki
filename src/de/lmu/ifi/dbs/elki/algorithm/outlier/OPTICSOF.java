@@ -148,7 +148,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
       ofminmax.put(of);
     }
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("OPTICS Outlier Scores", "optics-outlier", OPTICS_OF_SCORE, ofs);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("OPTICS Outlier Scores", "optics-outlier", OPTICS_OF_SCORE, ofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

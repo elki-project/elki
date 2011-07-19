@@ -158,8 +158,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     int minc = minclusters != null ? minclusters : distQuery.getRelation().size();
     result = extractClusters(distQuery.getRelation().getDBIDs(), pi, lambda, minc);
 
-    result.addChildResult(new AnnotationFromDataStore<DBID>("SLINK pi", "slink-order", SLINK_PI, pi));
-    result.addChildResult(new AnnotationFromDataStore<Distance<?>>("SLINK lambda", "slink-order", SLINK_LAMBDA, lambda));
+    result.addChildResult(new AnnotationFromDataStore<DBID>("SLINK pi", "slink-order", SLINK_PI, pi, processedIDs));
+    result.addChildResult(new AnnotationFromDataStore<Distance<?>>("SLINK lambda", "slink-order", SLINK_LAMBDA, lambda, processedIDs));
     result.addChildResult(new OrderingFromDataStore<D>("SLINK order", "slink-order", lambda));
     return result;
   }

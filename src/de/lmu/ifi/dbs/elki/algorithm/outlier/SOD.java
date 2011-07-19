@@ -139,9 +139,9 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       progress.ensureCompleted(logger);
     }
     // combine results.
-    AnnotationResult<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>("Subspace Outlier Model", "sod-outlier", SOD_MODEL, sod_models);
+    AnnotationResult<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>("Subspace Outlier Model", "sod-outlier", SOD_MODEL, sod_models, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models));
+    OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models, relation.getDBIDs()));
     // also add the models.
     sodResult.addChildResult(models);
     return sodResult;
@@ -301,15 +301,22 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
      * Model result this is a proxy for.
      */
     AnnotationResult<SODModel<?>> models;
+    
+    /**
+     * The IDs we are defined for
+     */
+    DBIDs dbids;
 
     /**
      * Constructor.
      * 
      * @param models Models result
+     * @param dbids IDs we are defined for 
      */
-    public SODProxyScoreResult(AnnotationResult<SODModel<?>> models) {
+    public SODProxyScoreResult(AnnotationResult<SODModel<?>> models, DBIDs dbids) {
       super();
       this.models = models;
+      this.dbids = dbids;
     }
 
     @Override
@@ -330,6 +337,11 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     @Override
     public String getShortName() {
       return "sod-outlier";
+    }
+
+    @Override
+    public DBIDs getDBIDs() {
+      return dbids;
     }
   }
 

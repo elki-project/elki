@@ -141,7 +141,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
       }
       minmax.put(val);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("AggarwalYuEvolutionary", "aggarwal-yu-outlier", AGGARWAL_YU_SCORE, outlierScore);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("AggarwalYuEvolutionary", "aggarwal-yu-outlier", AGGARWAL_YU_SCORE, outlierScore, relation.getDBIDs());
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreResult);
   }

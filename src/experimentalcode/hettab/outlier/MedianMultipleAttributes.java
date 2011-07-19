@@ -114,7 +114,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Mult
       i++;
     }
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("MOF", "median-multipleattributes-outlier", MMA_SCORE, scores);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("MOF", "median-multipleattributes-outlier", MMA_SCORE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

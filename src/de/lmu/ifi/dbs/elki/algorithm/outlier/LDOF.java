@@ -146,7 +146,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LDOF Outlier Score", "ldof-outlier", LDOF_SCORE, ldofs);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LDOF Outlier Score", "ldof-outlier", LDOF_SCORE, ldofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult);
   }
