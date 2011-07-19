@@ -10,9 +10,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
+ * Note: Unused, see {@link DoubleMinMax} specialization.
+ * 
  * @param <T> Data type
  */
-public class MinMax<T extends Comparable<? super T>> extends Pair<T,T> {
+public class MinMax<T extends Comparable<? super T>> extends Pair<T, T> {
   /**
    * Constructor without starting values.
    * 
@@ -46,10 +48,10 @@ public class MinMax<T extends Comparable<? super T>> extends Pair<T,T> {
    * @param data New value
    */
   public void put(T data) {
-    if (this.first == null || this.first.compareTo(data) > 0) {
+    if(this.first == null || this.first.compareTo(data) > 0) {
       this.first = data;
     }
-    if (this.second == null || this.second.compareTo(data) < 0) {
+    if(this.second == null || this.second.compareTo(data) < 0) {
       this.second = data;
     }
   }
@@ -100,7 +102,7 @@ public class MinMax<T extends Comparable<? super T>> extends Pair<T,T> {
    * @param data Data to process
    */
   public void put(SortedSet<T> data) {
-    if (!data.isEmpty()) {
+    if(!data.isEmpty()) {
       this.put(data.first());
       this.put(data.last());
     }
@@ -141,7 +143,7 @@ public class MinMax<T extends Comparable<? super T>> extends Pair<T,T> {
   public Object[] asArray() {
     return new Object[] { this.getMin(), this.getMax() };
   }
-  
+
   /**
    * New array of MinMax objects for a given type.
    * 
@@ -152,7 +154,7 @@ public class MinMax<T extends Comparable<? super T>> extends Pair<T,T> {
   public static <N extends Comparable<N>> MinMax<N>[] newArray(int size) {
     Class<MinMax<N>> mmcls = ClassGenericsUtil.uglyCastIntoSubclass(MinMax.class);
     MinMax<N>[] mms = ClassGenericsUtil.newArrayOfNull(size, mmcls);
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       mms[i] = new MinMax<N>();
     }
     return mms;
