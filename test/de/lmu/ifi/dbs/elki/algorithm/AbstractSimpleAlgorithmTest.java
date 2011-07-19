@@ -10,8 +10,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;

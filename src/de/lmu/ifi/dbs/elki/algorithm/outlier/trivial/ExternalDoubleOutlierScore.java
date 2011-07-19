@@ -1,4 +1,4 @@
-package experimentalcode.shared.outlier.ensemble;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.trivial;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -31,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -42,16 +44,15 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 /**
- * External outlier detection, loading outlier scores from an external file.
+ * External outlier detection scores, loading outlier scores from an external
+ * file.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has ScalingFunction
  * @apiviz.has File
- * 
- * @param <O> Database object type
  */
-public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -63,67 +64,9 @@ public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<OutlierResu
   public static final String COMMENT = "#";
 
   /**
-   * OptionID for {@link #FILE_PARAM}
+   * The default pattern for matching ID lines.
    */
-  public static final OptionID FILE_ID = OptionID.getOrCreateOptionID("externaloutlier.file", "The file name containing the (external) outlier scores.");
-
-  /**
-   * Parameter that specifies the name of the file to be re-parsed.
-   * <p>
-   * Key: {@code -externaloutlier.file}
-   * </p>
-   */
-  private final FileParameter FILE_PARAM = new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE);
-
-  /**
-   * OptionID for {@link #ID_PARAM}
-   */
-  public static final OptionID ID_ID = OptionID.getOrCreateOptionID("externaloutlier.idpattern", "The pattern to match object ID prefix");
-
-  /**
-   * Parameter that specifies the object ID pattern
-   * <p>
-   * Key: {@code -externaloutlier.idpattern}<br />
-   * Default: ^ID=
-   * </p>
-   */
-  private final PatternParameter ID_PARAM = new PatternParameter(ID_ID, "^ID=");
-
-  /**
-   * OptionID for {@link #SCORE_PARAM}
-   */
-  public static final OptionID SCORE_ID = OptionID.getOrCreateOptionID("externaloutlier.scorepattern", "The pattern to match object score prefix");
-
-  /**
-   * Parameter that specifies the object score pattern
-   * <p>
-   * Key: {@code -externaloutlier.scorepattern}<br />
-   * </p>
-   */
-  private final PatternParameter SCORE_PARAM = new PatternParameter(SCORE_ID);
-
-  /**
-   * OptionID for {@link #SCALING_PARAM}
-   */
-  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("externaloutlier.scaling", "Class to use as scaling function.");
-
-  /**
-   * Parameter to specify a scaling function to use.
-   * <p>
-   * Key: {@code -externaloutlier.scaling}
-   * </p>
-   */
-  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
-
-  /**
-   * Parameter to signal an inverted outlier score
-   */
-  public static final OptionID INVERTED_ID = OptionID.getOrCreateOptionID("externaloutlier.inverted", "Flag to signal an inverted outlier score.");
-
-  /**
-   * Flag parameter for inverted scores.
-   */
-  private final Flag INVERTED_FLAG = new Flag(INVERTED_ID);
+  public static final String ID_PATTERN_DEFAULT = "^ID=";
 
   /**
    * The ID the result is tagged as.
@@ -156,34 +99,32 @@ public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<OutlierResu
   private boolean inverted = false;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    * 
-   * @param config Parameterization
+   * @param file File to load
+   * @param idpattern Pattern to match IDs
+   * @param scorepattern Pattern to match scores with
+   * @param inverted Inversion flag
+   * @param scaling Score scaling function
    */
-  public ExternalDoubleOutlierScore(Parameterization config) {
+  public ExternalDoubleOutlierScore(File file, Pattern idpattern, Pattern scorepattern, boolean inverted, ScalingFunction scaling) {
     super();
-    config = config.descend(this);
-    if(config.grab(FILE_PARAM)) {
-      file = FILE_PARAM.getValue();
-    }
-    if(config.grab(ID_PARAM)) {
-      idpattern = ID_PARAM.getValue();
-    }
-    if(config.grab(SCORE_PARAM)) {
-      scorepattern = SCORE_PARAM.getValue();
-    }
-    if(config.grab(INVERTED_FLAG)) {
-      inverted = INVERTED_FLAG.getValue();
-    }
-    if(config.grab(SCALING_PARAM)) {
-      scaling = SCALING_PARAM.instantiateClass(config);
-    }
+    this.file = file;
+    this.idpattern = idpattern;
+    this.scorepattern = scorepattern;
+    this.inverted = inverted;
+    this.scaling = scaling;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+  /**
+   * Run the algorithm.
+   * 
+   * @param database Database to use
+   * @param relation Relation to use
+   * @return Result
+   */
+  public OutlierResult run(Database database, Relation<?> relation) {
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
 
     Pattern colSep = Pattern.compile(AbstractParser.WHITESPACE_PATTERN);
     DoubleMinMax minmax = new DoubleMinMax();
@@ -250,10 +191,10 @@ public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<OutlierResu
 
     // Apply scaling
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(database.getDBIDs(), or);
+      ((OutlierScalingFunction) scaling).prepare(relation.getDBIDs(), or);
     }
     DoubleMinMax mm = new DoubleMinMax();
-    for(DBID id : database.getDBIDs()) {
+    for(DBID id : relation.getDBIDs()) {
       double val = scoresult.getValueFor(id); // scores.get(id);
       val = scaling.getScaled(val);
       scores.put(id, val);
@@ -273,5 +214,112 @@ public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<OutlierResu
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.ANY);
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter that specifies the name of the file to be re-parsed.
+     * <p>
+     * Key: {@code -externaloutlier.file}
+     * </p>
+     */
+    public static final OptionID FILE_ID = OptionID.getOrCreateOptionID("externaloutlier.file", "The file name containing the (external) outlier scores.");
+
+    /**
+     * Parameter that specifies the object ID pattern
+     * <p>
+     * Key: {@code -externaloutlier.idpattern}<br />
+     * Default: ^ID=
+     * </p>
+     */
+    public static final OptionID ID_ID = OptionID.getOrCreateOptionID("externaloutlier.idpattern", "The pattern to match object ID prefix");
+
+    /**
+     * Parameter that specifies the object score pattern
+     * <p>
+     * Key: {@code -externaloutlier.scorepattern}<br />
+     * </p>
+     */
+    public static final OptionID SCORE_ID = OptionID.getOrCreateOptionID("externaloutlier.scorepattern", "The pattern to match object score prefix");
+
+    /**
+     * Parameter to specify a scaling function to use.
+     * <p>
+     * Key: {@code -externaloutlier.scaling}
+     * </p>
+     */
+    public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("externaloutlier.scaling", "Class to use as scaling function.");
+
+    /**
+     * Flag parameter for inverted scores.
+     */
+    public static final OptionID INVERTED_ID = OptionID.getOrCreateOptionID("externaloutlier.inverted", "Flag to signal an inverted outlier score.");
+
+    /**
+     * The file to be reparsed
+     */
+    private File file;
+
+    /**
+     * object id pattern
+     */
+    private Pattern idpattern;
+
+    /**
+     * object score pattern
+     */
+    private Pattern scorepattern;
+
+    /**
+     * Scaling function to use
+     */
+    private ScalingFunction scaling;
+
+    /**
+     * Inversion flag.
+     */
+    private boolean inverted = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      FileParameter fileP = new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE);
+      if(config.grab(fileP)) {
+        file = fileP.getValue();
+      }
+
+      PatternParameter idP = new PatternParameter(ID_ID, ID_PATTERN_DEFAULT);
+      if(config.grab(idP)) {
+        idpattern = idP.getValue();
+      }
+
+      PatternParameter scoreP = new PatternParameter(SCORE_ID);
+      if(config.grab(scoreP)) {
+        scorepattern = scoreP.getValue();
+      }
+
+      Flag inverstedF = new Flag(INVERTED_ID);
+      if(config.grab(inverstedF)) {
+        inverted = inverstedF.getValue();
+      }
+
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+      if(config.grab(scalingP)) {
+        scaling = scalingP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected Object makeInstance() {
+      return new ExternalDoubleOutlierScore(file, idpattern, scorepattern, inverted, scaling);
+    }
   }
 }

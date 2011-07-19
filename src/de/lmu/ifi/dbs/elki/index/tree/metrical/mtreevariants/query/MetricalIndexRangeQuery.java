@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex
+ * @apiviz.uses AbstractMTree
  */
 public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
   /**

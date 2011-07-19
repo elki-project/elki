@@ -1,8 +1,9 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.trivial;
 
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;

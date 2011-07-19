@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -21,7 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.OneItemIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 
 /**
  * Utilities for handling result objects

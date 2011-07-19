@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;

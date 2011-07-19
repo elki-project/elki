@@ -6,9 +6,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllNoise;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;

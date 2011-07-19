@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualization oneway - - «create»
- * @apiviz.has EvaluatePairCountingFMeasure.ScoreResult oneway - - visualizes
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure.ScoreResult oneway - - visualizes
  */
 public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   /**
