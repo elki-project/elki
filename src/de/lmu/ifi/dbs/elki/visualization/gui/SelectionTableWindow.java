@@ -107,7 +107,6 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
    * 
    * @param context The Context
    */
-  @SuppressWarnings("unchecked")
   public SelectionTableWindow(VisualizerContext context) {
     super(NAME);
     this.context = context;

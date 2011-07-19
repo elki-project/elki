@@ -127,7 +127,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     for(VisualizationTask task : visi) {
       if(VisualizerUtil.isVisible(task)) {
         try {
-          Visualization v = task.getFactory().makeVisualization(task.clone(this, visi.proj, width, height));
+          Visualization v = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
           layers.add(v);
           layermap.put(task, v);
         }
@@ -265,7 +265,7 @@ public class DetailView extends SVGPlot implements ResultListener {
       // Only materialize when becoming visible
       if(VisualizerUtil.isVisible(task)) {
         // LoggingUtil.warning("Need to recreate a missing layer for " + v);
-        vis = task.getFactory().makeVisualization(task.clone(this, visi.proj, width, height));
+        vis = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
         layermap.put(task, vis);
         this.scheduleUpdate(new InsertVisualization(vis));
       }

@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -26,6 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualizer to draw histograms.
@@ -142,10 +144,11 @@ public class HistogramVisFactory extends AbstractVisFactory {
   }
 
   @Override
-  public void addVisualizers(VisualizerContext context, Result result) {
-    List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(result, HistogramResult.class);
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    VisualizerContext context = VisualizerUtil.getContext(baseResult);
+    List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(newResult, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, histogram, null, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(histogram, task);
     }

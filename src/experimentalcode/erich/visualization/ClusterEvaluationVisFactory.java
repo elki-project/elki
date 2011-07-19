@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -19,6 +20,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
@@ -44,10 +46,11 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   }
   
   @Override
-  public void addVisualizers(VisualizerContext context, Result result) {
-    final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(result, EvaluatePairCountingFMeasure.ScoreResult.class);
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+    final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(sr, task);
     }

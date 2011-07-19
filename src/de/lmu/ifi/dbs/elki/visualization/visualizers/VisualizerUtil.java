@@ -6,9 +6,11 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Visualizer utilities.
@@ -18,6 +20,21 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
  * @apiviz.uses VisualizationTask - - inspects
  */
 public final class VisualizerUtil {
+  /**
+   * Find the visualizer context in a result tree.
+   * 
+   * @param baseResult base result to start searching at.
+   * @return Visualizer context
+   */
+  public static VisualizerContext getContext(HierarchicalResult baseResult) {
+    IterableIterator<VisualizerContext> iter = ResultUtil.filteredResults(baseResult, VisualizerContext.class);
+    if (iter.hasNext()) {
+      return iter.next();
+    } else {
+      return null;
+    }
+  }
+
   /**
    * Utility function to test for Visualizer visibility.
    * 

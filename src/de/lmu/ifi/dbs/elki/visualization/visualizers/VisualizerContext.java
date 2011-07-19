@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
@@ -42,7 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * @apiviz.composedOf ResultHierarchy
  * @apiviz.composedOf EventListenerList
  */
-public class VisualizerContext extends AnyMap<String> implements DataStoreListener, ResultListener {
+public class VisualizerContext extends AnyMap<String> implements DataStoreListener, ResultListener, Result {
   /**
    * Serial version.
    */
@@ -61,7 +62,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   /**
    * The full result object
    */
-  private Result result;
+  private HierarchicalResult result;
 
   /**
    * The event listeners for this context.
@@ -112,7 +113,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * @param factories Visualizer Factories to use
    * @param hideVisualizers Pattern to hide visualizers
    */
-  public VisualizerContext(Database database, Result result, StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerContext(Database database, HierarchicalResult result, StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
     super();
     this.database = database;
     this.result = result;
@@ -130,7 +131,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
     }
     
     // Add visualizers.
-    processResult(result);
+    processResult(result, result);
     
     // For proxying events.
     this.database.addDataStoreListener(this);
@@ -143,6 +144,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @return Database
    */
+  @Deprecated
   public Database getDatabase() {
     return database;
   }
@@ -152,7 +154,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @return result object
    */
-  public Result getResult() {
+  public HierarchicalResult getResult() {
     return result;
   }
 
@@ -321,11 +323,11 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @param result Result
    */
-  private void processResult(Result result) {
+  private void processResult(HierarchicalResult baseResult, Result newResult) {
     // Collect all visualizers.
     for(VisFactory f : factories) {
       try {
-        f.addVisualizers(this, result);
+        f.processNewResult(baseResult, newResult);
       }
       catch(Throwable e) {
         logger.warning("AlgorithmAdapter " + f.getClass().getCanonicalName() + " failed:", e);
@@ -478,7 +480,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
 
   @Override
   public void resultAdded(Result child, @SuppressWarnings("unused") Result parent) {
-    processResult(child);
+    processResult(getResult(), child);
   }
 
   @SuppressWarnings("unused")
@@ -491,5 +493,15 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   @Override
   public void resultRemoved(Result child, Result parent) {
     // FIXME: implement
+  }
+
+  @Override
+  public String getLongName() {
+    return "Visualizer context";
+  }
+
+  @Override
+  public String getShortName() {
+    return "vis-context";
   }
 }

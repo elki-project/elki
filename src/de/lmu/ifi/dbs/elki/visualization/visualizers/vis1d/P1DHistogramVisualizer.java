@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -354,20 +355,21 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> rels = VisualizerUtil.iterateVectorFieldRepresentations(result);
       for(Relation<? extends NumberVector<?, ?>> rel : IterableUtil.fromIterator(rels)) {
         // register self
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), rel, this, P1DHistogramVisualizer.class);
+        final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P1DHistogramVisualizer.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         context.addVisualizer(rel, task);
       }
       ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
-        Iterator<Relation<? extends NumberVector<?, ?>>> rels2 = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+        Iterator<Relation<? extends NumberVector<?, ?>>> rels2 = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
         for(Relation<? extends NumberVector<?, ?>> rel2 : IterableUtil.fromIterator(rels2)) {
           // register self
-          final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), rel2, this, P1DHistogramVisualizer.class);
+          final VisualizationTask task = new VisualizationTask(NAME, rel2, rel2, this, P1DHistogramVisualizer.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           task.put(KEY_CLUSTERING, c);
           context.addVisualizer(c, task);

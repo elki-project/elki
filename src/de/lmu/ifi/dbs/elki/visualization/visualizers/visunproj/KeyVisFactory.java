@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -21,6 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that gives the key for a clustering.
@@ -78,12 +80,13 @@ public class KeyVisFactory extends AbstractVisFactory {
   }
 
   @Override
-  public void addVisualizers(VisualizerContext context, Result result) {
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    VisualizerContext context = VisualizerUtil.getContext(baseResult);
     // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, c, null, this, null);
+        final VisualizationTask task = new VisualizationTask(NAME, c, null, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         context.addVisualizer(c, task);
       }

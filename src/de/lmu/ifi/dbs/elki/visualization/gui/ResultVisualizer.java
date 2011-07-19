@@ -95,7 +95,8 @@ public class ResultVisualizer implements ResultHandler {
     ResultUtil.ensureClusteringResult(db, top);
     ResultUtil.ensureSelectionResult(db, db);
 
-    final VisualizerContext context = manager.newContext(db, result);
+    // FIXME: not really re-entrant to generate new contexts...
+    final VisualizerContext context = manager.newContext(db, top);
 
     if(title == null) {
       title = VisualizerParameterizer.getTitle(db, result);

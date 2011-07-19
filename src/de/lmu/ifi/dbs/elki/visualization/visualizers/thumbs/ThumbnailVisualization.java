@@ -186,7 +186,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + task.getWidth() + " " + task.getHeight());
 
       // Work on a clone
-      VisualizationTask clone = task.clone(plot);
+      VisualizationTask clone = task.clone(plot, context);
       clone.put(VisualizationTask.THUMBNAIL, false);
       Visualization vis = visFactory.makeVisualization(clone);
 

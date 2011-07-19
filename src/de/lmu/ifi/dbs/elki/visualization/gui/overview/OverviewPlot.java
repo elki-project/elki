@@ -326,7 +326,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    */
   private void makeThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
     if(VisualizerUtil.isVisible(task) && VisualizerUtil.thumbnailEnabled(task)) {
-      VisualizationTask thumbtask = task.clone(this, it.proj, it.w, it.h);
+      VisualizationTask thumbtask = task.clone(this, context, it.proj, it.w, it.h);
       thumbtask.put(VisualizationTask.THUMBNAIL, true);
       thumbtask.put(VisualizationTask.THUMBNAIL_RESOLUTION, thumbsize);
       Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
