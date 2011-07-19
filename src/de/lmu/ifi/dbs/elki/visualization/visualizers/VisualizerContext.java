@@ -10,7 +10,6 @@ import javax.swing.event.EventListenerList;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -53,11 +52,6 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * Logger.
    */
   private static final Logging logger = Logging.getLogger(VisualizerContext.class);
-
-  /**
-   * The database
-   */
-  private Database database;
 
   /**
    * The full result object
@@ -107,15 +101,13 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   /**
    * Constructor. We currently require a Database and a Result.
    * 
-   * @param database Database
    * @param result Result
    * @param stylelib Style library
    * @param factories Visualizer Factories to use
    * @param hideVisualizers Pattern to hide visualizers
    */
-  public VisualizerContext(Database database, HierarchicalResult result, StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerContext(HierarchicalResult result, StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
     super();
-    this.database = database;
     this.result = result;
     this.stylelib = stylelib;
     this.factories = factories;
@@ -133,22 +125,13 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
     result.getHierarchy().add(result, this);
     
     // Add visualizers.
-    processResult(result, result);
+    processNewResult(result, result);
     
     // For proxying events.
-    this.database.addDataStoreListener(this);
+    // FIXME: RELEASE4
+    // this.database.addDataStoreListener(this);
     // Add ourselves as RL
     addResultListener(this);
-  }
-
-  /**
-   * Get the database itself
-   * 
-   * @return Database
-   */
-  @Deprecated
-  public Database getDatabase() {
-    return database;
   }
 
   /**
@@ -166,7 +149,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * @return hierarchy object
    */
   public ResultHierarchy getHierarchy() {
-    return getDatabase().getHierarchy();
+    return result.getHierarchy();
   }
 
   /**
@@ -206,7 +189,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   private Clustering<Model> generateDefaultClustering() {
     // Cluster by labels
     ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
-    Clustering<Model> c = split.run(getDatabase());
+    Clustering<Model> c = split.run(ResultUtil.findDatabase(getResult()));
     // store.
     put(CLUSTERING_FALLBACK, c);
     return c;
@@ -325,7 +308,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @param result Result
    */
-  private void processResult(HierarchicalResult baseResult, Result newResult) {
+  private void processNewResult(HierarchicalResult baseResult, Result newResult) {
     // Collect all visualizers.
     for(VisFactory f : factories) {
       try {
@@ -482,7 +465,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
 
   @Override
   public void resultAdded(Result child, @SuppressWarnings("unused") Result parent) {
-    processResult(getResult(), child);
+    processNewResult(getResult(), child);
   }
 
   @SuppressWarnings("unused")

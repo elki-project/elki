@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -110,7 +111,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
   public SelectionTableWindow(VisualizerContext context) {
     super(NAME);
     this.context = context;
-    this.database = context.getDatabase();
+    this.database = ResultUtil.findDatabase(context.getResult());
     // FIXME: re-add labels
     this.crep = null; //database.getClassLabelQuery();
     this.orep = null; //database.getObjectLabelQuery();

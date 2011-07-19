@@ -195,7 +195,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
       scores.put(id, score);
       minmax.put(score);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("randomwalkec", "RandomWalkEC", RW_EC_SCORE, scores);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("randomwalkec", "RandomWalkEC", RW_EC_SCORE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

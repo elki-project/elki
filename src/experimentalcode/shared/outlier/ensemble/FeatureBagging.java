@@ -229,7 +229,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
         }
       }
       OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-      AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>("Feature bagging", "fb-outlier", FEATUREBAGGING_ID, sumscore);
+      AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>("Feature bagging", "fb-outlier", FEATUREBAGGING_ID, sumscore, relation.getDBIDs());
       result = new OutlierResult(meta, scores);
     }
     return result;

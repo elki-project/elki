@@ -170,7 +170,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     // visualizer to find the reference points in the result
     ReferencePointsResult<V> refp = new ReferencePointsResult<V>("Reference points", "reference-points", refPoints);
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Reference-points Outlier Scores", "reference-outlier", REFOD_SCORE, rbod_score);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Reference-points Outlier Scores", "reference-outlier", REFOD_SCORE, rbod_score, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     result.addChildResult(refp);

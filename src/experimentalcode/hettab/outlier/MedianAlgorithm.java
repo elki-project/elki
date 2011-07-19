@@ -99,7 +99,7 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
       scores.put(id, score);
     }
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("MOF", "Median-single-attribut-outlier", MEDIAN_SCORE, scores);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("MOF", "Median-single-attribut-outlier", MEDIAN_SCORE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -117,7 +117,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     else {
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY);
     }
-    AnnotationResult<Double> res = new AnnotationFromDataStore<Double>("Gaussian Model Outlier Score", "gaussian-model-outlier", GMOD_PROB, oscores);
+    AnnotationResult<Double> res = new AnnotationFromDataStore<Double>("Gaussian Model Outlier Score", "gaussian-model-outlier", GMOD_PROB, oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 

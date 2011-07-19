@@ -227,7 +227,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
     //System.out.println(relation.getDBIDs());
     //
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("GLSSODBackward", "GLSSODbackward-outlier", GLSBS_SCORE, scores);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("GLSSODBackward", "GLSSODbackward-outlier", GLSBS_SCORE, scores, relation.getDBIDs());
     // FIXME: Accurate maximum?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.1, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);

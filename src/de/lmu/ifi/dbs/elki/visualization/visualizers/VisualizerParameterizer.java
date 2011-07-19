@@ -105,12 +105,11 @@ public class VisualizerParameterizer implements Parameterizable {
   /**
    * Make a new visualization context
    * 
-   * @param db Database
    * @param result Base result
    * @return New context
    */
-  public VisualizerContext newContext(Database db, HierarchicalResult result) {
-    VisualizerContext context = new VisualizerContext(db, result, stylelib, factories, hideVisualizers);
+  public VisualizerContext newContext(HierarchicalResult result) {
+    VisualizerContext context = new VisualizerContext(result, stylelib, factories, hideVisualizers);
     return context;
   }
 

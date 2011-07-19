@@ -186,7 +186,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
     SimilarityMatrix smat = new ComputeSimilarityMatrixImage.SimilarityMatrix(img, relation, ids);
     database.getHierarchy().add(database, smat);
 
-    VisualizerContext context = vispar.newContext(database, database);
+    VisualizerContext context = vispar.newContext(database);
 
     // Attach visualizers to results
     SimilarityMatrixVisualizer.Factory factory = new SimilarityMatrixVisualizer.Factory();

@@ -98,7 +98,7 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       }
     }
 
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("MoranOutlier", "Moran Scatterplot Outlier", SCORE, scores);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("MoranOutlier", "Moran Scatterplot Outlier", SCORE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

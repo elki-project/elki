@@ -80,13 +80,13 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
 
     OutlierResult or = getOutlierResult(innerresult);
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(database.getDBIDs(), or);
+      ((OutlierScalingFunction) scaling).prepare(or.getScores().getDBIDs(), or);
     }
 
-    WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(or.getScores().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : database.getDBIDs()) {
+    for(DBID id : or.getScores().getDBIDs()) {
       double val = or.getScores().getValueFor(id);
       val = scaling.getScaled(val);
       scaledscores.put(id, val);
@@ -94,7 +94,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), scaling.getMin(), scaling.getMax());
-    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("Scaled Outlier", "scaled-outlier", SCALED_SCORE, scaledscores);
+    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("Scaled Outlier", "scaled-outlier", SCALED_SCORE, scaledscores, or.getScores().getDBIDs());
     OutlierResult result = new OutlierResult(meta, scoresult);
     result.addChildResult(innerresult);
 

@@ -113,7 +113,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Spatial Outlier Factor", "sof-outlier", SOF_SCORE, lofs);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Spatial Outlier Factor", "sof-outlier", SOF_SCORE, lofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;

@@ -70,7 +70,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
     DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Density-Based Outlier Detection", "db-outlier", DBOD_SCORE, dbodscore);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Density-Based Outlier Detection", "db-outlier", DBOD_SCORE, dbodscore, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }

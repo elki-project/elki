@@ -186,7 +186,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     else {
       meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     }
-    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("External Outlier", "external-outlier", EXTERNAL_OUTLIER_SCORES_ID, scores);
+    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("External Outlier", "external-outlier", EXTERNAL_OUTLIER_SCORES_ID, scores, relation.getDBIDs());
     OutlierResult or = new OutlierResult(meta, scoresult);
 
     // Apply scaling
