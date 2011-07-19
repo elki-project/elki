@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
@@ -201,7 +201,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       pq.add(new FCPair<Double, DBID>(s.getNaiveVariance(), objKey));
     }
 
-    MinMax<Double> minmaxabod = new MinMax<Double>();
+    DoubleMinMax minmaxabod = new DoubleMinMax();
     WritableDataStore<Double> abodvalues = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(FCPair<Double, DBID> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
@@ -308,7 +308,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
     }
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
-    MinMax<Double> minmaxabod = new MinMax<Double>();
+    DoubleMinMax minmaxabod = new DoubleMinMax();
     WritableDataStore<Double> abodvalues = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(FCPair<Double, DBID> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
