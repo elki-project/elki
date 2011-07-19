@@ -3,8 +3,6 @@ package experimentalcode.hettab.outlier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.math.stat.descriptive.moment.GeometricMean;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
@@ -23,7 +21,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -39,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
+ * FIXME: Documentation, Reference
  * 
  * @author Ahmed Hettab
  * 
@@ -106,7 +105,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
    * @param c
    * @param z
    */
-  protected RandomWalkEC(DistanceFunction<V, D> distanceFunction, NeighborSetPredicate.Factory<V> npredf, double alpha, double c, int z) {
+  public RandomWalkEC(DistanceFunction<V, D> distanceFunction, NeighborSetPredicate.Factory<V> npredf, double alpha, double c, int z) {
     super(distanceFunction);
     this.npredf = npredf;
     this.alpha = alpha;
@@ -149,8 +148,8 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
     E.times(c);
     Matrix temp = Matrix.identity(relation.size(), relation.size());
     temp.minus(E);
-    temp.times((1-c));
-    Matrix w = temp.inverse() ;
+    temp.times((1 - c));
+    Matrix w = temp.inverse();
 
     // compute similarity vector for each Object
     int count = 0;
@@ -183,16 +182,16 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
       }
       simScores.put(id, sim);
     }
-    
-    MinMax<Double> minmax = new MinMax<Double>();
+
+    DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : relation.iterDBIDs()) {
       List<Pair<DBID, Double>> simScore = simScores.get(id);
-      double score = 1 ;
+      double score = 1;
       for(Pair<DBID, Double> pair : simScore) {
-        score *= pair.second ;
+        score *= pair.second;
       }
-      System.out.println(id.getIntegerID()+":"+score);
+      // System.out.println(id.getIntegerID() + ":" + score);
       scores.put(id, score);
       minmax.put(score);
     }
@@ -205,20 +204,22 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
    * Computes the cosine similarity for two given feature vectors.
    */
   private static double cosineSimilarity(Vector v1, Vector v2) {
-    double p = 0 ;
-    double p1 = 0 ;
-    double p2 = 0 ;
-    for(int i =0 ; i<v1.getDimensionality();i++){
-    	p += v1.get(i)*v2.get(i);
-    	p1 += v1.get(i)*v1.get(i);
-    	p2 += v2.get(i)*v2.get(i);
+    double p = 0;
+    double p1 = 0;
+    double p2 = 0;
+    for(int i = 0; i < v1.getDimensionality(); i++) {
+      p += v1.get(i) * v2.get(i);
+      p1 += v1.get(i) * v1.get(i);
+      p2 += v2.get(i) * v2.get(i);
     }
-    return (p/(Math.sqrt(p1)*Math.sqrt(p2)));
+    return (p / (Math.sqrt(p1) * Math.sqrt(p2)));
   }
 
-  /**
-   * 
-   */
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   @Override
   protected Logging getLogger() {
     return logger;
@@ -227,7 +228,14 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
   /**
    * Parameterization class.
    * 
+   * FIXME: Documentation
+   * 
+   * @author Ahmed Hettab
+   * 
    * @apiviz.exclude
+   * 
+   * @param <V>
+   * @param <D>
    */
   public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
     NeighborSetPredicate.Factory<V> npred = null;
@@ -302,10 +310,5 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
     protected RandomWalkEC<V, D> makeInstance() {
       return new RandomWalkEC<V, D>(distanceFunction, npred, alpha, c, z);
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 }

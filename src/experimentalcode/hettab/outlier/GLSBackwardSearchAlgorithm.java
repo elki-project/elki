@@ -44,8 +44,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * GLSBackwardSearchAlgorithm provides the GLS-SOD Algorithm, an Algorithm to detect
- * Spatial Outlier
+ * FIXME: Documentation, Reference
+ * 
+ * GLSBackwardSearchAlgorithm provides the GLS-SOD Algorithm, an Algorithm to
+ * detect Spatial Outlier
  * 
  * @author Ahmed Hettab
  * 
@@ -59,7 +61,6 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   private static final Logging logger = Logging.getLogger(GLSBackwardSearchAlgorithm.class);
 
   /**
-   * 
    * Holds the Y value
    */
   private static final OptionID Y_ID = OptionID.getOrCreateOptionID("dim.y", "the dimension of non spatial attribut");
@@ -121,7 +122,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * The parameter k
    */
   private int k;
-  
+
   /**
    * Parameter to specify the k nearest neighbor
    */
@@ -131,16 +132,17 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * The parameter k
    */
   private int m;
-  
+
   /**
    * Parameter to specify the vector of trend parameters
    */
-  public static final OptionID BETA_ID = OptionID.getOrCreateOptionID("glsbs.beta","vector of parameters for the trends model");
-  
+  public static final OptionID BETA_ID = OptionID.getOrCreateOptionID("glsbs.beta", "vector of parameters for the trends model");
+
   /**
    * Holds the trend parameters
    */
-  private List<Integer> beta ;
+  private List<Integer> beta;
+
   /**
    * The association id to associate the SCORE of an object for the algorithm.
    */
@@ -155,16 +157,16 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * @param alpha
    * @param k
    */
-  public GLSBackwardSearchAlgorithm(int x1, int x2, int y,List<Integer> beta , PrimitiveDistanceFunction<V, D> spatialDistanceFunction, int k, double alpha , int m) {
+  public GLSBackwardSearchAlgorithm(int x1, int x2, int y, List<Integer> beta, PrimitiveDistanceFunction<V, D> spatialDistanceFunction, int k, double alpha, int m) {
     super();
     this.y = y;
     this.x1 = x1;
     this.x2 = x2;
     this.alpha = alpha;
     this.k = k;
-    this.beta = beta ;
+    this.beta = beta;
     this.spatialDistanceFunction = spatialDistanceFunction;
-    this.m = m ;
+    this.m = m;
   }
 
   @Override
@@ -184,24 +186,24 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * @return
    */
   public OutlierResult run(Database database, Relation<V> relation) {
-    
-    HashMap<DBID,SingleObjectBundle> outliers = new HashMap<DBID,SingleObjectBundle>();
+    HashMap<DBID, SingleObjectBundle> outliers = new HashMap<DBID, SingleObjectBundle>();
     //
-    Pair<DBID,Double> candidate = getCandidate(relation,database);
-    
-    // Note: removing/inserting is rather expensive - can't this be done *virtually* only?
-    int outlierNumber = 0 ;
-    while(candidate.second > alpha && m > outlierNumber){
-      outlierNumber ++ ;
+    Pair<DBID, Double> candidate = getCandidate(relation, database);
+
+    // Note: removing/inserting is rather expensive - can't this be done
+    // *virtually* only?
+    int outlierNumber = 0;
+    while(candidate.second > alpha && m > outlierNumber) {
+      outlierNumber++;
       outliers.put(candidate.first, database.getBundle(candidate.first));
       database.delete(candidate.first);
-      candidate = getCandidate(relation , database);
+      candidate = getCandidate(relation, database);
     }
-    
-    //add removed Objects to database
+
+    // add removed Objects to database
     Collection<DBID> ids = outliers.keySet();
     System.out.println(ids);
-    for(DBID id : ids){
+    for(DBID id : ids) {
       try {
         database.insert(outliers.get(id));
       }
@@ -209,32 +211,33 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
         logger.verbose("insert removed Objects failed");
       }
     }
-     
-    System.out.println(relation.size());
+
+    //System.out.println(relation.size());
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : relation.getDBIDs()){
-      if(outliers.containsKey(id)){
+    for(DBID id : relation.getDBIDs()) {
+      if(outliers.containsKey(id)) {
         scores.put(id, 1.0);
       }
-      else{
+      else {
         scores.put(id, 0.0);
       }
     }
-    System.out.println(relation.getDBIDs());
+    //System.out.println(relation.getDBIDs());
     //
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("GLSSODBackward", "GLSSODbackward-outlier",GLSBS_SCORE, scores);
+    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("GLSSODBackward", "GLSSODbackward-outlier", GLSBS_SCORE, scores);
+    // FIXME: Accurate maximum?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.1, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
-   
+
   /**
    * 
    * @param database
    * @param outlier
    */
-  //TODO test
-  private Pair<DBID, Double> getCandidate(Relation<V> relation , Database database) {
-    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, spatialDistanceFunction, k); 
+  // TODO test
+  private Pair<DBID, Double> getCandidate(Relation<V> relation, Database database) {
+    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, spatialDistanceFunction, k);
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
 
     // init F,X,Z
@@ -260,11 +263,11 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       double idx2 = relation.get(id).doubleValue(x2);
       double idy = relation.get(id).doubleValue(y);
       X.set(i, 0, beta.get(0));
-      X.set(i, 1, beta.get(1)*idx1);
-      X.set(i, 2, beta.get(2)*idx2);
-      X.set(i, 3, beta.get(3)*idx1 * idx2);
-      X.set(i, 4, beta.get(4)*idx1 * idx1);
-      X.set(i, 5, beta.get(5)*idx2 * idx2);
+      X.set(i, 1, beta.get(1) * idx1);
+      X.set(i, 2, beta.get(2) * idx2);
+      X.set(i, 3, beta.get(3) * idx1 * idx2);
+      X.set(i, 4, beta.get(4) * idx1 * idx1);
+      X.set(i, 5, beta.get(5) * idx2 * idx2);
       Y.set(i, 0, idy);
       for(DBID n : relation.getDBIDs()) {
         double weight = 0;
@@ -328,6 +331,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   }
 
   /**
+   * FIXME: use a Parameterizer class!
    * 
    * @param <V>
    * @param config
@@ -345,7 +349,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     if(config.hasErrors()) {
       return null;
     }
-    return new GLSBackwardSearchAlgorithm<V, D>(x1, x2, y,beta, spatialDistanceFunction, k, alpha,m);
+    return new GLSBackwardSearchAlgorithm<V, D>(x1, x2, y, beta, spatialDistanceFunction, k, alpha, m);
   }
 
   /**
@@ -417,7 +421,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
     return 0;
   }
-  
+
   /**
    * Get the m parameter
    * 
@@ -445,13 +449,13 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
     return null;
   }
-  
-  protected static List<Integer> getParameterBeta (Parameterization config){
+
+  protected static List<Integer> getParameterBeta(Parameterization config) {
     final IntListParameter param = new IntListParameter(BETA_ID);
     if(config.grab(param)) {
       return param.getValue();
     }
-    return null ;
+    return null;
   }
 
 }

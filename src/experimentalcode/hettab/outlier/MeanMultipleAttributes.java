@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -23,13 +23,13 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
+ * FIXME: Documentation, Reference
  * 
  * @author Ahmed Hettab
- *
- * @param <V> 
+ * 
+ * @param <V>
  */
 public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends MultipleAttributesSpatialOutlier<V>{
   /**
@@ -92,7 +92,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Multip
     Matrix invSigma = sigma.inverse() ;
     
        
-    MinMax<Double> minmax = new MinMax<Double>();
+    DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     i = 0 ;
     for(DBID id : relation.getDBIDs()) {
@@ -115,26 +115,18 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Multip
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
+
   /**
+   * FIXME: Documentation
    * 
    * @author hettab
    *
    * @param <V>
    */
   public static class Parameterizer<V extends NumberVector<?,?>> extends MultipleAttributesSpatialOutlier.Parameterizer<V>{
-   
-   
-    
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-   
     @Override
     protected MeanMultipleAttributes<V> makeInstance() {
       return new MeanMultipleAttributes<V> (npredf,z);
     }
-    
   }
-
 }
