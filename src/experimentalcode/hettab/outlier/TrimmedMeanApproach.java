@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
+ * FIXME: Documentation, Reference
+ * 
  * A Trimmed Mean Approach to finding Spatial Outliers
  * 
  * @author Ahmed Hettab
@@ -41,7 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
 @Description("a local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
-// FIXME: Reference
 public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
