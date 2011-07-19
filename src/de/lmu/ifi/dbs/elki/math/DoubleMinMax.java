@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.elki.math;
 
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+
 
 /**
  * Class to find the minimum and maximum double values in data.
  * 
  * @author Erich Schubert
- * 
- * TODO: refactor, and store double instead of Double?
  */
-public class DoubleMinMax extends MinMax<Double> {
+public class DoubleMinMax extends DoubleDoublePair {
   /**
    * Constructor without starting values.
    * 
@@ -66,12 +66,39 @@ public class DoubleMinMax extends MinMax<Double> {
   }
 
   /**
+   * Get the current minimum.
+   * 
+   * @return current minimum.
+   */
+  public double getMin() {
+    return this.first;
+  }
+
+  /**
+   * Get the current maximum.
+   * 
+   * @return current maximum.
+   */
+  public double getMax() {
+    return this.second;
+  }
+  
+  /**
    * Return the difference between minimum and maximum.
    * 
    * @return Difference of current Minimum and Maximum.
    */
   public double getDiff() {
     return this.getMax() - this.getMin();
+  }
+  
+  /**
+   * Test whether the result is defined.
+   * 
+   * @return true when at least one value has been added
+   */
+  public boolean isValid() {
+    return (first <= second);
   }
 
   /**
@@ -89,7 +116,6 @@ public class DoubleMinMax extends MinMax<Double> {
    * @param size Array size
    * @return initialized array
    */
-  @SuppressWarnings("unchecked")
   public static DoubleMinMax[] newArray(int size) {
     DoubleMinMax ret[] = new DoubleMinMax[size];
     for (int i = 0; i < size; i++) {
