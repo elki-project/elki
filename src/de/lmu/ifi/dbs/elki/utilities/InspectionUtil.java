@@ -344,6 +344,8 @@ public class InspectionUtil {
    * Sort classes by their class name. Package first, then class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class ClassSorter implements Comparator<Class<?>> {
     @Override

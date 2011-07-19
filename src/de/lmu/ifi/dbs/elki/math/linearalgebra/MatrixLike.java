@@ -7,6 +7,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * 
  * @param M the actual type
  * 
+ * @apiviz.landmark
+ * 
  * @author Elke Achtert
  * @author Erich Schubert
  */

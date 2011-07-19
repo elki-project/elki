@@ -10,9 +10,20 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 /**
  * Centroid only using a subset of dimensions.
  * 
+ * This class abstracts the mathematics of efficient and numerically stable
+ * computation of projected centroids.
+ * 
+ * See {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil DatabaseUtil} for
+ * easier to use APIs.
+ * 
  * @author Erich Schubert
  */
 public class ProjectedCentroid extends Centroid {
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * The selected dimensions.
    */

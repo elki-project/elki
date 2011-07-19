@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Reasonable default choice for a {@link CovarianceMatrixBuilder}
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses CovarianceMatrix
  *
  * @param <V> Vector class to use.
  */

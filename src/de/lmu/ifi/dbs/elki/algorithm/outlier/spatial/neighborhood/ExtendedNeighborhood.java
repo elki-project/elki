@@ -52,7 +52,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has ExtendedNeighborhood
+   * @apiviz.has ExtendedNeighborhood oneway - - «produces»
    */
   public static class Factory<O> extends AbstractPrecomputedNeighborhood.Factory<O> {
     /**

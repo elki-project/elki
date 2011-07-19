@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @apiviz.has WeightFunction
  * @apiviz.has PrimitiveDistanceFunction
+ * @apiviz.uses CovarianceMatrix
  * 
  * @param <V> Vector class to use
  */
