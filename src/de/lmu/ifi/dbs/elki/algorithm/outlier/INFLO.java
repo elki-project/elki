@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -171,7 +171,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
 
     // Calculate INFLO for any Object
     // IF Object is pruned INFLO=1.0
-    MinMax<Double> inflominmax = new MinMax<Double>();
+    DoubleMinMax inflominmax = new DoubleMinMax();
     WritableDataStore<Double> inflos = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : distFunc.getRelation().iterDBIDs()) {
       if(!pruned.contains(id)) {

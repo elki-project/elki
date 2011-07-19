@@ -18,8 +18,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
@@ -132,7 +132,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     // normalObjs.size()));
     // logger.debugFine(logLike + " loglike beginning" +
     // loglikelihoodNormal(normalObjs, database));
-    MinMax<Double> minmax = new MinMax<Double>();
+    DoubleMinMax minmax = new DoubleMinMax();
     for(int i = 0; i < objids.size(); i++) {
       // logger.debugFine("i     " + i);
       // Change mask to make the current object anomalous
