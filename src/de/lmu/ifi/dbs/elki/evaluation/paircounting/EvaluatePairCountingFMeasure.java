@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGenerator
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -72,7 +73,8 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
   }
 
   @Override
-  public void processResult(Database db, Result result) {
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Database db = ResultUtil.findDatabase(baseResult);
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs == null || crs.size() < 1) {
       // logger.warning("No clustering results found - nothing to evaluate!");

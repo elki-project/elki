@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure.
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -99,7 +100,8 @@ public class ClusteringComparison implements Evaluator {
    * Perform clusterings evaluation
    */
   @Override
-  public void processResult(Database db, Result result) {
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    final Database db = ResultUtil.findDatabase(baseResult);
 
     // get all clustering
     List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);

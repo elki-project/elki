@@ -46,7 +46,7 @@ public class OutputStep implements WorkflowStep {
   public void runResultHandlers(Result result, Database db) {
     // Run result handlers
     for(ResultHandler resulthandler : resulthandlers) {
-      resulthandler.processResult(db, result);
+      resulthandler.processNewResult(db, result);
     }
   }
 

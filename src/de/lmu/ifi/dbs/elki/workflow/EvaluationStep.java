@@ -89,7 +89,7 @@ public class EvaluationStep implements WorkflowStep {
         /*
          * if(normalizationUndo) { evaluator.setNormalization(normalization); }
          */
-        evaluator.processResult(database, r);
+        evaluator.processNewResult(database, r);
       }
     }
 
