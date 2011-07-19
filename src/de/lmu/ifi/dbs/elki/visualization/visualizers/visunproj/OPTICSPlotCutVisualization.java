@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
@@ -28,6 +29,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
@@ -285,12 +287,13 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      VisualizerContext context = VisualizerUtil.getContext(baseResult);
       List<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, co, null, this, plot);
+          final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
           context.addVisualizer(plot, task);
         }

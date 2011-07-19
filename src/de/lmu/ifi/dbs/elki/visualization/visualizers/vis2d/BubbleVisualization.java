@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -250,12 +251,13 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
         for(OutlierResult o : ors) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, o, rep, this, P2DVisualization.class);
+          final VisualizationTask task = new VisualizationTask(NAME, o, rep, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           context.addVisualizer(o, task);
         }

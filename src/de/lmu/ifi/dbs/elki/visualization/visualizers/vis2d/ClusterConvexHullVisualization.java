@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.ConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
@@ -171,13 +172,14 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         // Find clusterings we can visualize:
         Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
         for(Clustering<?> c : clusterings) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, c, rep, this, P2DVisualization.class);
+          final VisualizationTask task = new VisualizationTask(NAME, c, rep, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           context.addVisualizer(c, task);

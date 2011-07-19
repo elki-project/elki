@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -111,13 +112,14 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       ArrayList<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
       boolean hasClustering = (cs.size() > 0);
 
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, rep, rep, this, P2DVisualization.class);
+        final VisualizationTask task = new VisualizationTask(NAME, rep, rep, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
         if(hasClustering) {
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);

@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -31,6 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
@@ -199,11 +201,12 @@ public class CurveVisFactory extends AbstractVisFactory {
   }
 
   @Override
-  public void addVisualizers(VisualizerContext context, Result result) {
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    final VisualizerContext context = VisualizerUtil.getContext(baseResult);
     final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
     final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, curve, null, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, curve, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(curve, task);
     }

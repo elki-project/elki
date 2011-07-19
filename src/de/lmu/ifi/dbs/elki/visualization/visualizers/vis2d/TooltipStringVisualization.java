@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
@@ -157,23 +158,24 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> vreps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+      Iterator<Relation<? extends NumberVector<?, ?>>> vreps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> vrep : IterableUtil.fromIterator(vreps)) {
         ArrayList<Relation<?>> reps = ResultUtil.filterResults(result, Relation.class);
         for(Relation<?> rep : reps) {
           if (DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-            final VisualizationTask task = new VisualizationTask(NAME_ID, context, rep, vrep, this, P2DVisualization.class);
+            final VisualizationTask task = new VisualizationTask(NAME_ID, rep, vrep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_TOOL, true);
             context.addVisualizer(rep, task);
           }
           if (ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-            final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, rep, vrep, this, P2DVisualization.class);
+            final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, vrep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_TOOL, true);
             context.addVisualizer(rep, task);
           }
           if (LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-            final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, rep, vrep, this, P2DVisualization.class);
+            final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, vrep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_TOOL, true);
             context.addVisualizer(rep, task);
           }

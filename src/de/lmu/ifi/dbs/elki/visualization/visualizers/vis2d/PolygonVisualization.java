@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -24,6 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Renders PolygonsObject in the data set.
@@ -128,11 +130,12 @@ public class PolygonVisualization extends AbstractVisualization implements DataS
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       ArrayList<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
       for(Relation<?> rel : results) {
         if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel, this, P2DVisualization.class);
+          final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           context.addVisualizer(rel, task);
         }

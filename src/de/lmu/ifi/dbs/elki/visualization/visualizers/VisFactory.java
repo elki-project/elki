@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultProcessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
@@ -16,14 +18,15 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
  * @apiviz.uses Visualization - - «create»
  * @apiviz.uses VisualizationTask - - «create»
  */
-public interface VisFactory extends Parameterizable {
+public interface VisFactory extends ResultProcessor, Parameterizable {
   /**
    * Add visualizers for the given result (tree) to the context.
    * 
-   * @param context Context to work with
-   * @param result Result to process
+   * @param baseResult Context to work with
+   * @param newResult Result to process
    */
-  public void addVisualizers(VisualizerContext context, Result result);
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result newResult);
 
   /**
    * Produce a visualization instance for the given task

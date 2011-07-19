@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -149,8 +150,9 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         if(DatabaseUtil.dimensionality(rep) > 2) {
           return;
@@ -162,7 +164,7 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
             // Does the cluster have a model with cluster means?
             Clustering<MeanModel<NV>> mcls = findMeanModel(c);
             if(mcls != null) {
-              final VisualizationTask task = new VisualizationTask(NAME, context, c, rep, this, P2DVisualization.class);
+              final VisualizationTask task = new VisualizationTask(NAME, c, rep, this, P2DVisualization.class);
               task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
               context.addVisualizer(c, task);
             }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
@@ -21,6 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that lists the settings of the algorithm-
@@ -114,10 +116,11 @@ public class SettingsVisFactory extends AbstractVisFactory {
   }
 
   @Override
-  public void addVisualizers(VisualizerContext context, Result result) {
-    final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(result, SettingsResult.class);
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    VisualizerContext context = VisualizerUtil.getContext(baseResult);
+    final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(newResult, SettingsResult.class);
     for(SettingsResult sr : settingsResults) {
-      final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       context.addVisualizer(sr, task);
     }

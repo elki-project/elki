@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
@@ -25,6 +26,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize the steep areas found in an OPTICS plot
@@ -186,7 +188,8 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
         // Add plots, attach visualizer
@@ -194,7 +197,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
         if(plot != null) {
           final SteepAreaResult steep = findSteepAreaResult(co);
           if(steep != null) {
-            final VisualizationTask task = new VisualizationTask(NAME, context, co, null, this, plot);
+            final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
             task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             context.addVisualizer(steep, task);

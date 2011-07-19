@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
@@ -201,10 +202,11 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, rep, rep, this, P2DVisualization.class);
+        final VisualizationTask task = new VisualizationTask(NAME, rep, rep, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_TOOL, true);
         task.put(VisualizationTask.META_NOTHUMB, true);

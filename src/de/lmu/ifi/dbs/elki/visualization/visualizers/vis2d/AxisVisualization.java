@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
@@ -126,12 +127,13 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
-      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getDatabase(), rep, this, P2DVisualization.class);
+      for(Relation<? extends NumberVector<?, ?>> rel : IterableUtil.fromIterator(reps)) {
+        final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
-        context.addVisualizer(rep, task);
+        context.addVisualizer(rel, task);
       }
     }
 

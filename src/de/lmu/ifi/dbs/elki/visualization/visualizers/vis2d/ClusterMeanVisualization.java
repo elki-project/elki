@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
@@ -135,8 +136,9 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         // Find clusterings we can visualize:
         Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
@@ -145,7 +147,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
             // Does the cluster have a model with cluster means?
             Clustering<MeanModel<NV>> mcls = findMeanModel(c);
             if(mcls != null) {
-              final VisualizationTask task = new VisualizationTask(NAME, context, c, rep, this, P2DVisualization.class);
+              final VisualizationTask task = new VisualizationTask(NAME, c, rep, this, P2DVisualization.class);
               task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
               context.addVisualizer(c, task);
             }

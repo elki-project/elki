@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.visualization.gui.SimpleSVGViewer;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -191,25 +190,26 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
 
     // Attach visualizers to results
     SimilarityMatrixVisualizer.Factory factory = new SimilarityMatrixVisualizer.Factory();
-    factory.addVisualizers(context, database);
+    factory.processNewResult(database, database);
 
     List<VisualizationTask> tasks = ResultUtil.filterResults(database, VisualizationTask.class);
     for(VisualizationTask task : tasks) {
       if(task.getFactory() == factory) {
-        showVisualization(factory, task);
+        showVisualization(context, factory, task);
       }
     }
   }
 
   /**
    * Show a single visualization.
+   * @param context 
    * 
    * @param factory
    * @param task
    */
-  private void showVisualization(SimilarityMatrixVisualizer.Factory factory, VisualizationTask task) {
+  private void showVisualization(VisualizerContext context, SimilarityMatrixVisualizer.Factory factory, VisualizationTask task) {
     SVGPlot plot = new SVGPlot();
-    Visualization vis = factory.makeVisualization(task.clone(plot, null, 1.0, 1.0));
+    Visualization vis = factory.makeVisualization(task.clone(plot, context, null, 1.0, 1.0));
     plot.getRoot().appendChild(vis.getLayer());
     plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "20cm");

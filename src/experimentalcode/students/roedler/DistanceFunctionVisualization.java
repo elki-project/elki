@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
@@ -276,12 +277,13 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         final ArrayList<MaterializeKNNPreprocessor<NV, D>> kNNIndex = ResultUtil.filterResults(result, MaterializeKNNPreprocessor.class);
         for(AbstractMaterializeKNNPreprocessor<NV, D> kNN : kNNIndex) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rep, this, P2DVisualization.class);
+          final VisualizationTask task = new VisualizationTask(NAME, kNN, rep, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
           context.addVisualizer(kNN, task);
         }

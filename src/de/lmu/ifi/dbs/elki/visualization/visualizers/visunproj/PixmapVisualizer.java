@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -17,6 +18,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize an arbitrary pixmap result.
@@ -95,11 +97,12 @@ public class PixmapVisualizer extends AbstractVisualization {
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Collection<PixmapResult> prs = ResultUtil.filterResults(result, PixmapResult.class);
       for(PixmapResult pr : prs) {
         // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, this, null);
+        final VisualizationTask task = new VisualizationTask(NAME, pr, null, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         context.addVisualizer(pr, task);
       }

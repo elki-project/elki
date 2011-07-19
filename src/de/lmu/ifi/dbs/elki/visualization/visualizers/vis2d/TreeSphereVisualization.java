@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
@@ -258,13 +259,14 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(context.getDatabase());
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         ArrayList<AbstractMTree<NV, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
         for(AbstractMTree<NV, DoubleDistance, ?, ?> tree : trees) {
           if(canVisualize(tree) && tree instanceof Result) {
-            final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, rep, this, P2DVisualization.class);
+            final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, rep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
             context.addVisualizer((Result) tree, task);
           }

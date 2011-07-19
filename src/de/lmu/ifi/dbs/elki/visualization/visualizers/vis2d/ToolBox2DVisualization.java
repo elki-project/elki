@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
@@ -282,10 +283,11 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     }
 
     @Override
-    public void addVisualizers(VisualizerContext context, Result result) {
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, rep, rep, this, P2DVisualization.class);
+        final VisualizationTask task = new VisualizationTask(NAME, rep, rep, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_NOTHUMB, true);
         task.put(VisualizationTask.META_NOEXPORT, true);

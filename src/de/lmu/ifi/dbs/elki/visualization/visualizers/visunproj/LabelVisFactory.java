@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -49,7 +50,7 @@ public class LabelVisFactory extends AbstractVisFactory {
 
   @SuppressWarnings("unused")
   @Override
-  public void addVisualizers(VisualizerContext context, Result result) {
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     // No auto discovery supported.
   }
 

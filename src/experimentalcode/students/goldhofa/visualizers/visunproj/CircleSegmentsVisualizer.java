@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -35,6 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.goldhofa.CCConstants;
@@ -309,13 +311,14 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   }
   
   @Override
-  public void addVisualizers(VisualizerContext context, Result result) {
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    final VisualizerContext context = VisualizerUtil.getContext(baseResult);
     
     // If no comparison result found abort
     List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
     if (ccr.size() != 1) return;
     
-    final VisualizationTask task = new VisualizationTask(NAME, context, ccr.get(0), null, this, null);
+    final VisualizationTask task = new VisualizationTask(NAME, ccr.get(0), null, this, null);
     task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
     context.addVisualizer(ccr.get(0), task);
   }

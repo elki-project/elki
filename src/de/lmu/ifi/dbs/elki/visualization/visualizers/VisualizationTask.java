@@ -159,16 +159,14 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * Visualization task.
    * 
    * @param name Name
-   * @param context Context
    * @param result Result
    * @param relation Relation to use
    * @param factory Factory
    * @param stack Stack
    */
-  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory, Object stack) {
+  public VisualizationTask(String name, Result result, Relation<?> relation, VisFactory factory, Object stack) {
     super();
     this.name = name;
-    this.context = context;
     this.result = result;
     this.relation = relation;
     this.factory = factory;
@@ -267,11 +265,13 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * Special clone operation that replaces the target plot.
    * 
    * @param newplot Replacement plot to use
+   * @param context Visualizer context
    * @return clone with different plot
    */
-  public VisualizationTask clone(SVGPlot newplot) {
+  public VisualizationTask clone(SVGPlot newplot, VisualizerContext context) {
     VisualizationTask obj = this.clone();
     obj.svgp = newplot;
+    obj.context = context;
     return obj;
   }
 
@@ -284,9 +284,10 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param height Height
    * @return clone with different plot
    */
-  public VisualizationTask clone(SVGPlot plot, Projection p, double width, double height) {
+  public VisualizationTask clone(SVGPlot plot, VisualizerContext context, Projection p, double width, double height) {
     VisualizationTask obj = this.clone();
     obj.svgp = plot;
+    obj.context = context;
     obj.proj = p;
     obj.width = width;
     obj.height = height;
