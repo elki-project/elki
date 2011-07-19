@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -123,7 +123,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
     }
     // Combine
     WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    MinMax<Double> minmax = new MinMax<Double>();
+    DoubleMinMax minmax = new DoubleMinMax();
     {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", database.size(), logger) : null;
       for(DBID id : database.getDBIDs()) {

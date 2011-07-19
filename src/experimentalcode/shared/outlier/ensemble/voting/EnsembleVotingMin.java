@@ -2,7 +2,7 @@ package experimentalcode.shared.outlier.ensemble.voting;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 
 /**
  * Simple combination rule, by taking the median.
@@ -21,7 +21,7 @@ public class EnsembleVotingMin implements EnsembleVoting {
 
   @Override
   public double combine(List<Double> scores) {
-    MinMax<Double> mm = new MinMax<Double>();
+    DoubleMinMax mm = new DoubleMinMax();
     mm.put(scores);
     return mm.getMin();
   }

@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
@@ -204,7 +204,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * @return Scale for value range of cluster order
    */
   protected LinearScale computeScale(List<ClusterOrderEntry<D>> order) {
-    MinMax<Double> range = new MinMax<Double>();
+    DoubleMinMax range = new DoubleMinMax();
     // calculate range
     for(ClusterOrderEntry<D> coe : order) {
       double reach = distanceAdapter.getDoubleForEntry(coe);
@@ -212,8 +212,8 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
         range.put(reach);
       }
     }
-    // Avoid a null pointer exception when we don't have valid range values.
-    if(range.getMin() == null) {
+    // Ensure we have a valid range
+    if(range.isValid()) {
       range.put(0.0);
       range.put(1.0);
     }
