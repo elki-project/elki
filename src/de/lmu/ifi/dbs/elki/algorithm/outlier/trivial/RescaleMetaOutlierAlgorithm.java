@@ -1,4 +1,4 @@
-package experimentalcode.erich.histogram;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.trivial;
 
 import java.util.List;
 
@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -20,25 +21,23 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 /**
- * Scale an outlier score using a given scaling function.
+ * Scale another outlier score using the given scaling function.
  * 
  * @author Erich Schubert
- * 
- * @param <O>
  */
-public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<OutlierResult> {
+public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(NormalizeOutlierScoreMetaAlgorithm.class);
+  private static final Logging logger = Logging.getLogger(RescaleMetaOutlierAlgorithm.class);
 
   /**
    * Association ID for scaled values
@@ -46,26 +45,12 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<Out
   public static final AssociationID<Double> SCALED_SCORE = AssociationID.getOrCreateAssociationID("SCALED_SCORE", Double.class);
 
   /**
-   * OptionID for {@link #SCALING_PARAM}
-   */
-  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("comphist.scaling", "Class to use as scaling function.");
-
-  /**
-   * Parameter to specify the algorithm to be applied, must extend
-   * {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}.
-   * <p>
-   * Key: {@code -algorithm}
-   * </p>
-   */
-  private final ObjectParameter<Algorithm> ALGORITHM_PARAM = new ObjectParameter<Algorithm>(OptionID.ALGORITHM, OutlierAlgorithm.class);
-
-  /**
    * Parameter to specify a scaling function to use.
    * <p>
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  private final ObjectParameter<ScalingFunction> SCALING_PARAM = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("metaoutlier.scaling", "Class to use as scaling function.");
 
   /**
    * Holds the algorithm to run.
@@ -78,19 +63,15 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<Out
   private ScalingFunction scaling;
 
   /**
-   * Constructor
+   * Constructor.
    * 
-   * @param config Parameters
+   * @param algorithm Inner algorithm
+   * @param scaling Scaling to apply.
    */
-  public NormalizeOutlierScoreMetaAlgorithm(Parameterization config) {
+  public RescaleMetaOutlierAlgorithm(Algorithm algorithm, ScalingFunction scaling) {
     super();
-    config = config.descend(this);
-    if(config.grab(ALGORITHM_PARAM)) {
-      algorithm = ALGORITHM_PARAM.instantiateClass(config);
-    }
-    if(config.grab(SCALING_PARAM)) {
-      scaling = SCALING_PARAM.instantiateClass(config);
-    }
+    this.algorithm = algorithm;
+    this.scaling = scaling;
   }
 
   @Override
@@ -104,13 +85,15 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<Out
 
     WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
+    DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : database.getDBIDs()) {
       double val = or.getScores().getValueFor(id);
       val = scaling.getScaled(val);
       scaledscores.put(id, val);
+      minmax.put(val);
     }
 
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0, 1.0);
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), scaling.getMin(), scaling.getMax());
     AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("Scaled Outlier", "scaled-outlier", SCALED_SCORE, scaledscores);
     OutlierResult result = new OutlierResult(meta, scoresult);
     result.addChildResult(innerresult);
@@ -140,5 +123,44 @@ public class NormalizeOutlierScoreMetaAlgorithm<O> extends AbstractAlgorithm<Out
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return algorithm.getInputTypeRestriction();
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Holds the algorithm to run.
+     */
+    private Algorithm algorithm;
+
+    /**
+     * Scaling function to use
+     */
+    private ScalingFunction scaling;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      ObjectParameter<Algorithm> algP = new ObjectParameter<Algorithm>(OptionID.ALGORITHM, OutlierAlgorithm.class);
+      if(config.grab(algP)) {
+        algorithm = algP.instantiateClass(config);
+      }
+
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class);
+      if(config.grab(scalingP)) {
+        scaling = scalingP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected Object makeInstance() {
+      return new RescaleMetaOutlierAlgorithm(algorithm, scaling);
+    }
   }
 }

@@ -26,9 +26,9 @@ public interface NeighborSetPredicate {
    * @author Erich Schubert
    *
    * @apiviz.stereotype factory
-   * @apiviz.has NeighborhoodSetPredicate
+   * @apiviz.has NeighborSetPredicate
    * 
-   * @param <O> Object type
+   * @param <O> Input relation object type restriction
    */
   public static interface Factory<O> extends Parameterizable {
     /**

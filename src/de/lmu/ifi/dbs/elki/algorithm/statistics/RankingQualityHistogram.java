@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;

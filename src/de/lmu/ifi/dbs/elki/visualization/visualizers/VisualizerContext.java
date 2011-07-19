@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.event.EventListenerList;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;

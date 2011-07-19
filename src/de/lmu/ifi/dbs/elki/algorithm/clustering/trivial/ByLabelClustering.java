@@ -1,10 +1,11 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.trivial;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;

@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @apiviz.composedOf AlgorithmStep
  * @apiviz.composedOf EvaluationStep
  * @apiviz.composedOf OutputStep
- * @apiviz.composedOf LoggingStep
  */
 public class KDDTask implements Parameterizable {
   /**
