@@ -112,7 +112,7 @@ public class EvaluationStep implements WorkflowStep {
     }
   }
 
-  public Result getResult() {
+  public HierarchicalResult getResult() {
     return result;
   }
 

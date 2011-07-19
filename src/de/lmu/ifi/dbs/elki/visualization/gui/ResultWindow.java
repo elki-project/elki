@@ -106,6 +106,8 @@ public class ResultWindow extends JFrame implements ResultListener {
    */
   private DetailView currentSubplot = null;
 
+  private Result result;
+
   /**
    * Constructor.
    * 
@@ -118,6 +120,7 @@ public class ResultWindow extends JFrame implements ResultListener {
   public ResultWindow(String title, Database db, Result result, int maxdim, VisualizerContext context) {
     super(title);
     this.context = context;
+    this.result = result;
 
     // close handler
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -323,7 +326,7 @@ public class ResultWindow extends JFrame implements ResultListener {
   private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
     ResultHierarchy hier = context.getHierarchy();
-    for(Result child : hier.getChildren(context.getResult())) {
+    for(Result child : hier.getChildren(result)) {
       recursiveBuildMenu(visualizersMenu, child);
     }
   }

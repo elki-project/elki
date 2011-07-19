@@ -103,7 +103,7 @@ public class KDDTask implements Parameterizable {
     evaluationStep.runEvaluators(result, db);
 
     // Output / Visualization
-    outputStep.runResultHandlers(result, db);
+    outputStep.runResultHandlers(result);
   }
 
   /**

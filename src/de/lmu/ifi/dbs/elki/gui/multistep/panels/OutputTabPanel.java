@@ -2,8 +2,7 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
 import java.lang.ref.WeakReference;
 
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -77,9 +76,8 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
       throw new AbortException("Evaluation failed.");
     }
     // Get the database and run the algorithms
-    Database database = input.getInputStep().getDatabase();
-    Result result = evals.getEvaluationStep().getResult();
-    outs.runResultHandlers(result, database);
+    HierarchicalResult result = evals.getEvaluationStep().getResult();
+    outs.runResultHandlers(result);
     basedOnResult = new WeakReference<Object>(result);
   }
 
