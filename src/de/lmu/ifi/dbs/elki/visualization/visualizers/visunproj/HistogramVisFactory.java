@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -71,8 +71,8 @@ public class HistogramVisFactory extends AbstractVisFactory {
     
     // find maximum, determine step size
     Integer dim = null;
-    MinMax<Double> xminmax = new MinMax<Double>();
-    MinMax<Double> yminmax = new MinMax<Double>();
+    DoubleMinMax xminmax = new DoubleMinMax();
+    DoubleMinMax yminmax = new DoubleMinMax();
     for(NumberVector<?, ?> vec : curve) {
       xminmax.put(vec.doubleValue(1));
       if(dim == null) {

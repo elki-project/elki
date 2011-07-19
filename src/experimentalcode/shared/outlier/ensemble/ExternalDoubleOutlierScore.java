@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -186,7 +186,7 @@ public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<OutlierResu
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
     Pattern colSep = Pattern.compile(AbstractParser.WHITESPACE_PATTERN);
-    MinMax<Double> minmax = new MinMax<Double>();
+    DoubleMinMax minmax = new DoubleMinMax();
     InputStream in;
     try {
       in = FileUtil.tryGzipInput(new FileInputStream(file));
@@ -252,7 +252,7 @@ public class ExternalDoubleOutlierScore<O> extends AbstractAlgorithm<OutlierResu
     if(scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) scaling).prepare(database.getDBIDs(), or);
     }
-    MinMax<Double> mm = new MinMax<Double>();
+    DoubleMinMax mm = new DoubleMinMax();
     for(DBID id : database.getDBIDs()) {
       double val = scoresult.getValueFor(id); // scores.get(id);
       val = scaling.getScaled(val);
