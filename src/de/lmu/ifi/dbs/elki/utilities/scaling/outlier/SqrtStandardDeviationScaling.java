@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -103,7 +103,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   @Override
   public void prepare(DBIDs ids, OutlierResult or) {
     if(min == null) {
-      MinMax<Double> mm = new MinMax<Double>();
+      DoubleMinMax mm = new DoubleMinMax();
       for(DBID id : ids) {
         double val = or.getScores().getValueFor(id);
         mm.put(val);
