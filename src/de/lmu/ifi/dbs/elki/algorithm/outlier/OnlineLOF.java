@@ -371,12 +371,12 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       DoubleMinMax new_lofminmax = lofsAndMax.getSecond();
 
       // Actualize meta info
-      if(new_lofminmax.getMax() != null && lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) {
+      if(new_lofminmax.isValid() && lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) {
         BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
         scoreMeta.setActualMaximum(new_lofminmax.getMax());
       }
 
-      if(new_lofminmax.getMin() != null && lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin()) {
+      if(new_lofminmax.isValid() && lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin()) {
         BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
         scoreMeta.setActualMinimum(new_lofminmax.getMin());
       }
