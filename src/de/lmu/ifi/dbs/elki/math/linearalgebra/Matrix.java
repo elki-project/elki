@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import java.io.BufferedReader;
+import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -24,8 +25,9 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.uses MatrixLike oneway - - reads
  * @apiviz.uses Vector
+ * @apiviz.landmark
  */
-public class Matrix implements MatrixLike<Matrix> {
+public class Matrix implements MatrixLike<Matrix>, Serializable {
   /**
    * Serial version
    */

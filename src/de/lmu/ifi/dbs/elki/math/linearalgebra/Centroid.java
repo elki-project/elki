@@ -8,9 +8,20 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 /**
  * Class to compute the centroid of some data.
  * 
+ * Note: this class abstracts the efficient and numerical stable computation of
+ * centroids.
+ * 
+ * See {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil DatabaseUtil} for
+ * easier to use APIs.
+ * 
  * @author Erich Schubert
  */
 public class Centroid extends Vector {
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * The current weight
    */

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -9,8 +10,10 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * Provides a vector object that encapsulates an m x 1 - matrix object.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.landmark
  */
-public class Vector implements MatrixLike<Vector> {
+public class Vector implements MatrixLike<Vector>, Serializable {
   /**
    * Serial version
    */

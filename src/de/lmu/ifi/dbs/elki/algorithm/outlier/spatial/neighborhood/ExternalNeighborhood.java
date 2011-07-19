@@ -78,7 +78,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implem
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has ExternalNeighborhood
+   * @apiviz.has ExternalNeighborhood oneway - - «produces»
    */
   public static class Factory extends AbstractPrecomputedNeighborhood.Factory<Object> {
     /**

@@ -37,6 +37,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * covariances etc.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.uses Centroid
+ * @apiviz.uses ProjectedCentroid
+ * @apiviz.uses CovarianceMatrix
  */
 public final class DatabaseUtil {
   /**

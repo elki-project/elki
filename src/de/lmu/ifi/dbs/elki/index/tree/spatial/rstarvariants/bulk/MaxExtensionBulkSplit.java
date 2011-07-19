@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * dimensions with maximum extension.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses SpatialComparator
  */
 public class MaxExtensionBulkSplit extends AbstractBulkSplit {
   /**

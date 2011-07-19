@@ -6,9 +6,23 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
 /**
- * Class for computing covariance matrixes.
+ * Class for computing covariance matrixes using stable mean and variance
+ * computations.
+ * 
+ * This class encapsulates the mathematical aspects of computing this matrix.
+ * 
+ * See {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil DatabaseUtil} for
+ * easier to use APIs.
+ * 
+ * For use in algorithms, it is more appropriate to use
+ * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder StandardCovarianceMatrixBuilder}
+ * since this class can be overriden with a stabilized covariance matrix builder!
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses Vector oneway
+ * @apiviz.uses NumberVector oneway
+ * @apiviz.has Matrix oneway - - «produces»
  */
 public class CovarianceMatrix {
   /**
