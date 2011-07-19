@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Spatial Outlier Factor")
 @Reference(authors = "Huang, T., Qin, X.", title = "Detecting outliers in spatial database", booktitle = "Proceedings of the 3rd International Conference on Image and Graphics", url = "http://dx.doi.org/10.1109/ICIG.2004.53")
-public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, O, D> implements OutlierAlgorithm {
+public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, O, D> {
   /**
    * The logger for this class.
    */

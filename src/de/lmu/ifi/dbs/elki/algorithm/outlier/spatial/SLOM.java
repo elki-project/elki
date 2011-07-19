@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -48,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("SLOM: a new measure for local spatial outliers")
 @Description("Spatial local outlier measure (SLOM), which captures the local behaviour of datum in their spatial neighbourhood")
 @Reference(authors = "Sanjay Chawla and Pei Sun", title = "SLOM: a new measure for local spatial outliers", booktitle = "Knowledge and Information Systems 2005", url = "http://rp-www.cs.usyd.edu.au/~chawlarg/papers/KAIS_online.pdf")
-public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, O, D> implements OutlierAlgorithm {
+public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, O, D> {
   /**
    * The logger for this class.
    */
