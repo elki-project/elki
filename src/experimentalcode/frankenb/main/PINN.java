@@ -97,13 +97,13 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
     logger.verbose("Calculating ROC ...");
 
     BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
-    rocComputer.processResult(database, result);
+    rocComputer.processNewResult(database, result);
 
     this.outputFile.mkdirs();
     ResultWriter resultWriter = getResultWriter(this.outputFile);
 
     for(Result aResult : totalResult.getHierarchy().iterDescendants(result)) {
-      resultWriter.processResult(database, aResult);
+      resultWriter.processNewResult(database, aResult);
     }
     logger.verbose("Writing results to dir " + this.outputFile);
 
