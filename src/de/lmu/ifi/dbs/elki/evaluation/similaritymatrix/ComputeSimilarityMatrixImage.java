@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
@@ -192,7 +193,8 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   }
 
   @Override
-  public void processResult(Database db, Result result) {
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Database db = ResultUtil.findDatabase(baseResult);
     boolean nonefound = true;
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);

@@ -1,6 +1,5 @@
 package experimentalcode.erich;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -19,13 +18,13 @@ public class LogResultStructure implements ResultHandler {
   Logging logger = Logging.getLogger(LogResultStructure.class);
 
   @Override
-  public void processResult(@SuppressWarnings("unused") Database db, Result result) {
+  public void processNewResult(@SuppressWarnings("unused") HierarchicalResult baseResult, Result newResult) {
     if(logger.isVerbose()) {
-      if(result instanceof HierarchicalResult) {
-        Hierarchy<Result> hier = ((HierarchicalResult) result).getHierarchy();
+      if(newResult instanceof HierarchicalResult) {
+        Hierarchy<Result> hier = ((HierarchicalResult) newResult).getHierarchy();
         if(hier != null) {
           StringBuffer buf = new StringBuffer();
-          recursiveLogResult(buf, hier, result, 0);
+          recursiveLogResult(buf, hier, newResult, 0);
           logger.verbose(buf.toString());
         }
       }

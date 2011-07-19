@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 
 /**
  * Interface for any class that can handle results
@@ -13,8 +12,8 @@ public interface ResultProcessor {
   /**
    * Process a result.
    * 
-   * @param db Database the result is for
-   * @param result Result object
+   * @param baseResult The base of the result tree.
+   * @param newResult Newly added result subtree.
    */
-  public abstract void processResult(Database db, Result result);
+  public abstract void processNewResult(final HierarchicalResult baseResult, final Result newResult);
 }

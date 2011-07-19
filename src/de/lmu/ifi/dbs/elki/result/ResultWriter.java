@@ -72,14 +72,8 @@ public class ResultWriter implements ResultHandler {
     this.warnoverwrite = warnoverwrite;
   }
 
-  /**
-   * Process a single result.
-   * 
-   * @param db Database
-   * @param result Result
-   */
   @Override
-  public void processResult(Database db, Result result) {
+  public void processNewResult(HierarchicalResult baseresult, Result result) {
     TextWriter writer = new TextWriter();
 
     StreamFactory output;
@@ -110,6 +104,7 @@ public class ResultWriter implements ResultHandler {
       throw new IllegalStateException("Error opening output.", e);
     }
     try {
+      Database db = ResultUtil.findDatabase(baseresult);
       writer.output(db, result, output);
     }
     catch(IOException e) {

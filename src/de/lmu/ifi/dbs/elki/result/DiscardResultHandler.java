@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 
 /**
  * A dummy result handler that discards the actual result, for use in
@@ -16,14 +15,9 @@ public class DiscardResultHandler implements ResultHandler {
     // empty constructor
   }
 
-  /**
-   * Process the result... by discarding
-   * 
-   * @param db discarded
-   * @param result discarded
-   */
+  @SuppressWarnings("unused")
   @Override
-  public void processResult(Database db, Result result) {
-    // discard the result.
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    // always ignore the new result.
   }
 }

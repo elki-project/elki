@@ -298,4 +298,20 @@ public class ResultUtil {
   public static void addChildResult(HierarchicalResult parent, Result child) {
     parent.getHierarchy().add(parent, child);
   }
+
+  /**
+   * Find the first database result in the tree.
+   * 
+   * @param baseresult Result tree base.
+   * @return Database
+   */
+  public static Database findDatabase(Result baseresult) {
+    final IterableIterator<Database> iter = filteredResults(baseresult, Database.class);
+    if(iter.hasNext()) {
+      return iter.next();
+    }
+    else {
+      return null;
+    }
+  }
 }
