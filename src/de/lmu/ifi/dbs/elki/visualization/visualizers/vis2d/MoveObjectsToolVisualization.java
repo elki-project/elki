@@ -8,11 +8,13 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -26,7 +28,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
@@ -101,28 +102,22 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
   // TODO: move to DatabaseUtil?
   private void updateDB(DBIDs dbids, Vector movingVector) {
     throw new AbortException("FIXME: INCOMPLETE TRANSITION");
-    /* database.accumulateDataStoreEvents();
-    Representation<DatabaseObjectMetadata> mrep = database.getMetadataQuery();
-    for(DBID dbid : dbids) {
-      NV obj = database.get(dbid);
-      // Copy metadata to keep
-      DatabaseObjectMetadata meta = mrep.get(dbid);
-
-      Vector v = proj.projectDataToRenderSpace(obj);
-      v.set(0, v.get(0) + movingVector.get(0));
-      v.set(1, v.get(1) + movingVector.get(1));
-      NV nv = proj.projectRenderToDataSpace(v, obj);
-      nv.setID(obj.getID());
-
-      try {
-        database.delete(dbid);
-        database.insert(new Pair<NV, DatabaseObjectMetadata>(nv, meta));
-      }
-      catch(UnableToComplyException e) {
-        de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-      }
-    }
-    database.flushDataStoreEvents(); */
+    /*
+     * database.accumulateDataStoreEvents();
+     * Representation<DatabaseObjectMetadata> mrep =
+     * database.getMetadataQuery(); for(DBID dbid : dbids) { NV obj =
+     * database.get(dbid); // Copy metadata to keep DatabaseObjectMetadata meta
+     * = mrep.get(dbid);
+     * 
+     * Vector v = proj.projectDataToRenderSpace(obj); v.set(0, v.get(0) +
+     * movingVector.get(0)); v.set(1, v.get(1) + movingVector.get(1)); NV nv =
+     * proj.projectRenderToDataSpace(v, obj); nv.setID(obj.getID());
+     * 
+     * try { database.delete(dbid); database.insert(new Pair<NV,
+     * DatabaseObjectMetadata>(nv, meta)); } catch(UnableToComplyException e) {
+     * de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e); } }
+     * database.flushDataStoreEvents();
+     */
   }
 
   /**
@@ -203,7 +198,10 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
+      Iterator<UpdatableDatabase> dbs = ResultUtil.filteredResults(baseResult, UpdatableDatabase.class);
+      if(!dbs.hasNext()) {
+        return;
+      }
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         final VisualizationTask task = new VisualizationTask(NAME, rep, rep, this, P2DVisualization.class);
@@ -211,7 +209,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
         task.put(VisualizationTask.META_TOOL, true);
         task.put(VisualizationTask.META_NOTHUMB, true);
         task.put(VisualizationTask.META_NOEXPORT, true);
-        context.addVisualizer(rep, task);
+        baseResult.getHierarchy().add(rep, task);
       }
     }
 

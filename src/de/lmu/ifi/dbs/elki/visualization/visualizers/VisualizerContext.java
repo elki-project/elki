@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -121,12 +120,12 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
     if(selections.size() > 0) {
       this.put(SELECTION, selections.get(0));
     }
-    
+
     result.getHierarchy().add(result, this);
-    
+
     // Add visualizers.
     processNewResult(result, result);
-    
+
     // For proxying events.
     // FIXME: RELEASE4
     // this.database.addDataStoreListener(this);
@@ -311,6 +310,9 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   private void processNewResult(HierarchicalResult baseResult, Result newResult) {
     // Collect all visualizers.
     for(VisFactory f : factories) {
+      if(hideVisualizers.matcher(f.getClass().getName()).find()) {
+        continue;
+      }
       try {
         f.processNewResult(baseResult, newResult);
       }
@@ -321,47 +323,12 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   }
 
   /**
-   * Attach a visualization to a result.
-   * 
-   * @param result Result to add the visualization to
-   * @param task Visualization task to add
-   */
-  public void addVisualizer(Result result, VisualizationTask task) {
-    if(result == null) {
-      LoggingUtil.warning("Visualizer added to null result: " + task, new Throwable());
-      return;
-    }
-    // TODO: solve this in a better way
-    if(VisualizerUtil.isTool(task) && VisualizerUtil.isVisible(task)) {
-      task.put(VisualizationTask.META_VISIBLE, false);
-    }
-    // Hide visualizers that match a regexp.
-    if(hideVisualizers != null) {
-      if(hideVisualizers.matcher(task.getFactory().getClass().getName()).find()) {
-        task.put(VisualizationTask.META_VISIBLE, false);
-      }
-    }
-    getHierarchy().add(result, task);
-  }
-
-  /**
    * Get an iterator over all visualizers.
    * 
    * @return Iterator
    */
   public IterableIterator<VisualizationTask> iterVisualizers() {
     return new VisualizerIterator();
-  }
-
-  /**
-   * Get the visualizers for a particular result.
-   * 
-   * @param r Result
-   * @return Visualizers
-   */
-  public Iterator<VisualizationTask> getVisualizers(Result r) {
-    final List<Result> children = getHierarchy().getChildren(r);
-    return new TypeFilterIterator<Result, VisualizationTask>(VisualizationTask.class, children);
   }
 
   /**

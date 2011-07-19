@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
@@ -284,14 +283,13 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         final VisualizationTask task = new VisualizationTask(NAME, rep, rep, this, P2DVisualization.class);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_NOTHUMB, true);
         task.put(VisualizationTask.META_NOEXPORT, true);
-        context.addVisualizer(rep, task);
+        baseResult.getHierarchy().add(rep, task);
       }
     }
 

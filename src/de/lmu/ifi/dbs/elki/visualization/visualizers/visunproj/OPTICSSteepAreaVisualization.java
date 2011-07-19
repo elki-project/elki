@@ -200,7 +200,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
             final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
             task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-            context.addVisualizer(steep, task);
+            baseResult.getHierarchy().add(steep, task);
           }
         }
       }

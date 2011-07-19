@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that lists the settings of the algorithm-
@@ -117,12 +116,11 @@ public class SettingsVisFactory extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    VisualizerContext context = VisualizerUtil.getContext(baseResult);
     final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(newResult, SettingsResult.class);
     for(SettingsResult sr : settingsResults) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-      context.addVisualizer(sr, task);
+      baseResult.getHierarchy().add(sr, task);
     }
   }
 

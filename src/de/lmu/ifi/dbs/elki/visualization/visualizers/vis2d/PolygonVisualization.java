@@ -24,8 +24,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Renders PolygonsObject in the data set.
@@ -131,13 +129,12 @@ public class PolygonVisualization extends AbstractVisualization implements DataS
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       ArrayList<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
       for(Relation<?> rel : results) {
         if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
           final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P2DVisualization.class);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          context.addVisualizer(rel, task);
+          baseResult.getHierarchy().add(rel, task);
         }
       }
     }

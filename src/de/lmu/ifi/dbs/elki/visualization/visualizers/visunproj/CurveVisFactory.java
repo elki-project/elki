@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
@@ -202,13 +201,12 @@ public class CurveVisFactory extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    final VisualizerContext context = VisualizerUtil.getContext(baseResult);
     final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
     final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
       final VisualizationTask task = new VisualizationTask(NAME, curve, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-      context.addVisualizer(curve, task);
+      baseResult.getHierarchy().add(curve, task);
     }
   }
 

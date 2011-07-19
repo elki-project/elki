@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
@@ -260,7 +259,6 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
@@ -270,7 +268,7 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
           task.put(VisualizationTask.META_TOOL, true);
           task.put(VisualizationTask.META_NOTHUMB, true);
           task.put(VisualizationTask.META_NOEXPORT, true);
-          context.addVisualizer(selres, task);
+          baseResult.getHierarchy().add(selres, task);
         }
       }
     }

@@ -19,8 +19,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
@@ -47,12 +45,11 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    final VisualizerContext context = VisualizerUtil.getContext(baseResult);
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this, null);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-      context.addVisualizer(sr, task);
+      baseResult.getHierarchy().add(sr, task);
     }
   }
 

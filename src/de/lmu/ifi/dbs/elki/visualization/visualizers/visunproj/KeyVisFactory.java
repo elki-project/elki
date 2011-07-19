@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that gives the key for a clustering.
@@ -81,14 +80,13 @@ public class KeyVisFactory extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    VisualizerContext context = VisualizerUtil.getContext(baseResult);
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
         final VisualizationTask task = new VisualizationTask(NAME, c, null, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-        context.addVisualizer(c, task);
+        baseResult.getHierarchy().add(c, task);
       }
     }
   }

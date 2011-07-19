@@ -201,7 +201,7 @@ public class OPTICSClusterVisualization extends AbstractVisualization {
         if(plot != null && findOPTICSClustering(co) != null) {
           final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-          context.addVisualizer(plot, task);
+          baseResult.getHierarchy().add(plot, task);
         }
       }
     }

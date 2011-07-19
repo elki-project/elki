@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -117,7 +116,6 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
       for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
         // Find clusterings we can visualize:
@@ -126,7 +124,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
           if(c.getAllClusters().size() > 0) {
             final VisualizationTask task = new VisualizationTask(NAME, c, rep, this, P2DVisualization.class);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-            context.addVisualizer(c, task);
+            baseResult.getHierarchy().add(c, task);
           }
         }
       }

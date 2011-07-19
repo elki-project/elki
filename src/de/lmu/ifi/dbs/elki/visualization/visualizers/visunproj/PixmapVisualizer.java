@@ -17,8 +17,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize an arbitrary pixmap result.
@@ -98,13 +96,12 @@ public class PixmapVisualizer extends AbstractVisualization {
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      VisualizerContext context = VisualizerUtil.getContext(baseResult);
       Collection<PixmapResult> prs = ResultUtil.filterResults(result, PixmapResult.class);
       for(PixmapResult pr : prs) {
         // Add plots, attach visualizer
         final VisualizationTask task = new VisualizationTask(NAME, pr, null, this, null);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-        context.addVisualizer(pr, task);
+        baseResult.getHierarchy().add(pr, task);
       }
     }
 
