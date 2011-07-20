@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 
 /**
@@ -19,22 +21,22 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   /**
    * The standard association id to associate a label to an object.
    */
-  public static final AssociationID<String> LABEL = new AssociationID<String>("label", String.class);
+  public static final AssociationID<String> LABEL = new AssociationID<String>("label", TypeUtil.STRING);
 
   /**
    * The association id to associate a class (class label) to an object.
    */
-  public static final AssociationID<ClassLabel> CLASS = new AssociationID<ClassLabel>("class", ClassLabel.class);
+  public static final AssociationID<ClassLabel> CLASS = new AssociationID<ClassLabel>("class", TypeUtil.CLASSLABEL);
 
   /**
    * The association id to associate an external id to an object.
    */
-  public static final AssociationID<String> EXTERNAL_ID = new AssociationID<String>("externalID", String.class);
+  public static final AssociationID<String> EXTERNAL_ID = new AssociationID<String>("externalID", TypeUtil.STRING);
 
   /**
    * The Class type related to this AssociationID.
    */
-  private Class<C> type;
+  private SimpleTypeInformation<C> type;
 
   /**
    * Provides a new AssociationID of the given name and type.
@@ -46,17 +48,9 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * @param type class of the objects that are associated under this
    *        AssociationID
    */
-  @SuppressWarnings("unchecked")
-  private AssociationID(final String name, final Class<?> type) {
-    // It's more useful to use Class<?> here to allow the use of nested
-    // Generics such as List<Foo<Bar>>
+  private AssociationID(final String name, final SimpleTypeInformation<C> type) {
     super(name);
-    try {
-      this.type = (Class<C>) Class.forName(type.getName());
-    }
-    catch(ClassNotFoundException e) {
-      throw new IllegalArgumentException("Invalid class name \"" + type.getName() + "\" for property \"" + name + "\".");
-    }
+    this.type = type;
   }
 
   /**
@@ -64,14 +58,8 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * 
    * @return the type of the AssociationID
    */
-  @SuppressWarnings("unchecked")
-  public Class<C> getType() {
-    try {
-      return (Class<C>) Class.forName(type.getName());
-    }
-    catch(ClassNotFoundException e) {
-      throw new IllegalStateException("Invalid class name \"" + type.getName() + "\" for property \"" + this.getName() + "\".");
-    }
+  public SimpleTypeInformation<C> getType() {
+    return type;
   }
 
   /**
@@ -82,7 +70,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    */
   // We extensively suppress warnings because of compiler differences in what
   // warning they generate here - including "unneeded suppressWarnings". Argh.
-  @SuppressWarnings( { "unchecked", "cast", "all" })
+  @SuppressWarnings({ "unchecked", "cast", "all" })
   public static AssociationID<?> getAssociationID(final String name) {
     return (AssociationID<?>) AssociationID.lookup(AssociationID.class, name);
   }
@@ -96,7 +84,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * @return the AssociationID for the given name
    */
   @SuppressWarnings("unchecked")
-  public static <C> AssociationID<C> getOrCreateAssociationID(final String name, final Class<C> type) {
+  public static <C> AssociationID<C> getOrCreateAssociationID(final String name, final SimpleTypeInformation<C> type) {
     AssociationID<C> associationID = (AssociationID<C>) getAssociationID(name);
     if(associationID == null) {
       associationID = new AssociationID<C>(name, type);
@@ -114,7 +102,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * @return the AssociationID for the given name
    */
   @SuppressWarnings("unchecked")
-  public static <C> AssociationID<C> getOrCreateAssociationIDGenerics(final String name, final Class<?> type) {
+  public static <C> AssociationID<C> getOrCreateAssociationIDGenerics(final String name, final SimpleTypeInformation<C> type) {
     AssociationID<C> associationID = (AssociationID<C>) getAssociationID(name);
     if(associationID == null) {
       associationID = new AssociationID<C>(name, type);

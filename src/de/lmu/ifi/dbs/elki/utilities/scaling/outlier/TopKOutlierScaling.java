@@ -83,7 +83,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
         return;
       }
       DBID cur = order.next();
-      cutoff = or.getScores().getValueFor(cur);
+      cutoff = or.getScores().get(cur);
     }
     max = or.getOutlierMeta().getActualMaximum();
     ground = or.getOutlierMeta().getTheoreticalBaseline();

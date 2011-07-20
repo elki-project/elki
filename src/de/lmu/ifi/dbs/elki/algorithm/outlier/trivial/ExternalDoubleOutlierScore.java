@@ -71,7 +71,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
   /**
    * The ID the result is tagged as.
    */
-  private static final AssociationID<Double> EXTERNAL_OUTLIER_SCORES_ID = AssociationID.getOrCreateAssociationID("EXTERNAL_SCORE", Double.class);
+  private static final AssociationID<Double> EXTERNAL_OUTLIER_SCORES_ID = AssociationID.getOrCreateAssociationID("EXTERNAL_SCORE", TypeUtil.DOUBLE);
 
   /**
    * The file to be reparsed
@@ -195,7 +195,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     }
     DoubleMinMax mm = new DoubleMinMax();
     for(DBID id : relation.getDBIDs()) {
-      double val = scoresult.getValueFor(id); // scores.get(id);
+      double val = scoresult.get(id); // scores.get(id);
       val = scaling.getScaled(val);
       scores.put(id, val);
       mm.put(val);

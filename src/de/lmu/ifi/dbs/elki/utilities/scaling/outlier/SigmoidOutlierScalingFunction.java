@@ -40,7 +40,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
     for(DBID id : dbids) {
-      double val = or.getScores().getValueFor(id);
+      double val = or.getScores().get(id);
       mv.put(val);
     }
     double a = 1.0;
@@ -54,7 +54,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
       changing = false;
       // E-Step
       for(int i = 0; i < ids.size(); i++) {
-        double val = or.getScores().getValueFor(ids.get(i));
+        double val = or.getScores().get(ids.get(i));
         double targ = a * val + b;
         if(targ > 0) {
           if (!t.get(i)) { 
@@ -128,7 +128,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
     //b = Math.log((prior0 + 1.0) / (prior1 + 1.0));
     double fval = 0.0;
     for(int i = 0; i < ids.size(); i++) {
-      final double val = scores.getValueFor(ids.get(i));
+      final double val = scores.get(ids.get(i));
       final double fApB = val * a + b;
       final double ti = t.get(i) ? hiTarget : loTarget;
       if(fApB >= 0) {
@@ -147,7 +147,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
       double g1 = 0.0;
       double g2 = 0.0;
       for(int i = 0; i < ids.size(); i++) {
-        final double val = scores.getValueFor(ids.get(i));
+        final double val = scores.get(ids.get(i));
         final double fApB = val * a + b;
         final double p;
         final double q;
@@ -182,7 +182,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
         final double newB = b + stepsize * dB;
         double newf = 0.0;
         for(int i = 0; i < ids.size(); i++) {
-          final double val = scores.getValueFor(ids.get(i));
+          final double val = scores.get(ids.get(i));
           final double fApB = val * newA + newB;
           final double ti = t.get(i) ? hiTarget : loTarget;
           if(fApB >= 0) {

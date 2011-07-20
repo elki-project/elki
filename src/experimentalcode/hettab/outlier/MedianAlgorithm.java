@@ -47,7 +47,7 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The association id to associate the SCORE of an object for the algorithm.
    */
-  public static final AssociationID<Double> MEDIAN_SCORE = AssociationID.getOrCreateAssociationID("score", Double.class);
+  public static final AssociationID<Double> MEDIAN_SCORE = AssociationID.getOrCreateAssociationID("score", TypeUtil.DOUBLE);
 
   /**
    * Constructor

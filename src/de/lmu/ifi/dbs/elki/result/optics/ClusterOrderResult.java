@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -17,8 +20,10 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
 /**
  * Class to store the result of an ordering clustering algorithm such as OPTICS.
@@ -38,12 +43,12 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
   /**
    * Association ID for reachability distance.
    */
-  public static final AssociationID<? extends Distance<?>> REACHABILITY_ID = AssociationID.getOrCreateAssociationIDGenerics("reachability", Distance.class);
+  public static final AssociationID<? extends Distance<?>> REACHABILITY_ID = AssociationID.getOrCreateAssociationIDGenerics("reachability", new SimpleTypeInformation<Distance<?>>(Distance.class));
 
   /**
    * Predecessor ID for reachability distance.
    */
-  public static final AssociationID<DBID> PREDECESSOR_ID = AssociationID.getOrCreateAssociationID("predecessor", DBID.class);
+  public static final AssociationID<DBID> PREDECESSOR_ID = AssociationID.getOrCreateAssociationID("predecessor", TypeUtil.DBID);
 
   /**
    * Cluster order storage
@@ -192,7 +197,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
      * Access reference.
      */
     private HashMap<DBID, ClusterOrderEntry<D>> map;
-    
+
     /**
      * DBIDs
      */
@@ -202,7 +207,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
      * Constructor.
      * 
      * @param map Map that stores the results.
-     * @param dbids DBIDs we are defined for. 
+     * @param dbids DBIDs we are defined for.
      */
     public ReachabilityDistanceAdapter(HashMap<DBID, ClusterOrderEntry<D>> map, DBIDs dbids) {
       super();
@@ -217,7 +222,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     }
 
     @Override
-    public D getValueFor(DBID objID) {
+    public D get(DBID objID) {
       return map.get(objID).getReachability();
     }
 
@@ -235,6 +240,48 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     public DBIDs getDBIDs() {
       return DBIDUtil.makeUnmodifiable(dbids);
     }
+
+    @Override
+    public IterableIterator<DBID> iterDBIDs() {
+      return IterableUtil.fromIterator(dbids.iterator());
+    }
+
+    @Override
+    public int size() {
+      return dbids.size();
+    }
+
+    @Override
+    public Database getDatabase() {
+      return null; // FIXME
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void set(DBID id, D val) {
+      throw new UnsupportedOperationException();
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void delete(DBID id) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SimpleTypeInformation<D> getDataTypeInformation() {
+      return new SimpleTypeInformation<D>(Distance.class);
+    }
+
+    @Override
+    public ResultHierarchy getHierarchy() {
+      return ClusterOrderResult.this.getHierarchy();
+    }
+
+    @Override
+    public void setHierarchy(ResultHierarchy hierarchy) {
+      ClusterOrderResult.this.setHierarchy(hierarchy);
+    }
   }
 
   /**
@@ -247,7 +294,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
      * Access reference.
      */
     private HashMap<DBID, ClusterOrderEntry<D>> map;
-    
+
     /**
      * Database IDs
      */
@@ -271,7 +318,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     }
 
     @Override
-    public DBID getValueFor(DBID objID) {
+    public DBID get(DBID objID) {
       return map.get(objID).getPredecessorID();
     }
 
@@ -288,6 +335,48 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     @Override
     public DBIDs getDBIDs() {
       return DBIDUtil.makeUnmodifiable(dbids);
+    }
+
+    @Override
+    public IterableIterator<DBID> iterDBIDs() {
+      return IterableUtil.fromIterator(dbids.iterator());
+    }
+
+    @Override
+    public int size() {
+      return dbids.size();
+    }
+
+    @Override
+    public Database getDatabase() {
+      return null; // FIXME
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void set(DBID id, DBID val) {
+      throw new UnsupportedOperationException();
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void delete(DBID id) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SimpleTypeInformation<DBID> getDataTypeInformation() {
+      return TypeUtil.DBID;
+    }
+
+    @Override
+    public ResultHierarchy getHierarchy() {
+      return ClusterOrderResult.this.getHierarchy();
+    }
+
+    @Override
+    public void setHierarchy(ResultHierarchy hierarchy) {
+      ClusterOrderResult.this.setHierarchy(hierarchy);
     }
   }
 }

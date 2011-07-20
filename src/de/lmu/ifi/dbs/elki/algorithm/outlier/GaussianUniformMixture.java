@@ -67,7 +67,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
    * The association id to associate the MMOD_OFLAF of an object for the
    * GaussianUniformMixture algorithm.
    */
-  public static final AssociationID<Double> MMOD_OFLAG = AssociationID.getOrCreateAssociationID("mmod.oflag", Double.class);
+  public static final AssociationID<Double> MMOD_OFLAG = AssociationID.getOrCreateAssociationID("mmod.oflag", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the fraction of expected outliers.

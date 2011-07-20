@@ -75,7 +75,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
    * The association id to associate the REFOD_SCORE of an object for the
    * Reference based outlier detection algorithm.
    */
-  public static final AssociationID<Double> REFOD_SCORE = AssociationID.getOrCreateAssociationID("REFOD_SCORE", Double.class);
+  public static final AssociationID<Double> REFOD_SCORE = AssociationID.getOrCreateAssociationID("REFOD_SCORE", TypeUtil.DOUBLE);
 
   /**
    * Parameter for the reference points heuristic.

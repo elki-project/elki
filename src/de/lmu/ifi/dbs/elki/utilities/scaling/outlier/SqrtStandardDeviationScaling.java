@@ -105,7 +105,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
     if(min == null) {
       DoubleMinMax mm = new DoubleMinMax();
       for(DBID id : ids) {
-        double val = or.getScores().getValueFor(id);
+        double val = or.getScores().get(id);
         mm.put(val);
       }
       min = mm.getMin();
@@ -113,7 +113,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
     if(mean == null) {
       MeanVariance mv = new MeanVariance();
       for(DBID id : ids) {
-        double val = or.getScores().getValueFor(id);
+        double val = or.getScores().get(id);
         val = (val <= min) ? 0 : Math.sqrt(val - min);
         mv.put(val);
       }
@@ -124,7 +124,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
       double sqsum = 0;
       int cnt = 0;
       for(DBID id : ids) {
-        double val = or.getScores().getValueFor(id);
+        double val = or.getScores().get(id);
         val = (val <= min) ? 0 : Math.sqrt(val - min);
         sqsum += (val - mean) * (val - mean);
         cnt += 1;

@@ -164,12 +164,12 @@ public class ComputeOutlierHistogram implements Evaluator {
     ids.removeDBIDs(outlierIds);
     // fill histogram with values of each object
     for(DBID id : ids) {
-      double result = or.getScores().getValueFor(id);
+      double result = or.getScores().get(id);
       result = scaling.getScaled(result);
       hist.aggregate(result, negative);
     }
     for(DBID id : outlierIds) {
-      double result = or.getScores().getValueFor(id);
+      double result = or.getScores().get(id);
       result = scaling.getScaled(result);
       hist.aggregate(result, positive);
     }

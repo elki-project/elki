@@ -110,7 +110,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * The association id to associate the LOF_SCORE of an object for the
    * LOF_SCORE algorithm.
    */
-  public static final AssociationID<Double> LOF_SCORE = AssociationID.getOrCreateAssociationID("lof", Double.class);
+  public static final AssociationID<Double> LOF_SCORE = AssociationID.getOrCreateAssociationID("lof", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be

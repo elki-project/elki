@@ -70,7 +70,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
    * The association id to associate the LOOP_SCORE of an object for the
    * LOOP_SCORE algorithm.
    */
-  public static final AssociationID<Double> LOOP_SCORE = AssociationID.getOrCreateAssociationID("loop", Double.class);
+  public static final AssociationID<Double> LOOP_SCORE = AssociationID.getOrCreateAssociationID("loop", TypeUtil.DOUBLE);
 
   /**
    * The distance function to determine the reachability distance between

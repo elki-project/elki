@@ -1,16 +1,20 @@
 package de.lmu.ifi.dbs.elki.result;
 
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
 /**
  * Annotations backed by a DataStore.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <T> Data type to store.
  */
 // TODO: make serializable.
@@ -19,7 +23,7 @@ public class AnnotationFromDataStore<T> extends BasicResult implements Annotatio
    * Store the hashmap for results.
    */
   private DataStore<? extends T> map;
-  
+
   /**
    * Store Association ID
    */
@@ -52,12 +56,44 @@ public class AnnotationFromDataStore<T> extends BasicResult implements Annotatio
   }
 
   @Override
-  public T getValueFor(DBID objID) {
+  public T get(DBID objID) {
     return map.get(objID);
   }
 
   @Override
   public DBIDs getDBIDs() {
     return DBIDUtil.makeUnmodifiable(dbids);
+  }
+
+  @Override
+  public IterableIterator<DBID> iterDBIDs() {
+    return IterableUtil.fromIterator(dbids.iterator());
+  }
+
+  @Override
+  public int size() {
+    return dbids.size();
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void set(DBID id, T val) {
+    throw new UnsupportedOperationException();
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void delete(DBID id) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Database getDatabase() {
+    return null;
+  }
+
+  @Override
+  public SimpleTypeInformation<T> getDataTypeInformation() {
+    return assoc.getType();
   }
 }

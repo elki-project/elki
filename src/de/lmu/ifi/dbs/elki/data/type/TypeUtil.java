@@ -85,6 +85,11 @@ public final class TypeUtil {
   public static final SimpleTypeInformation<PolygonsObject> POLYGON_TYPE = SimpleTypeInformation.get(PolygonsObject.class);
 
   /**
+   * Double type, outlier scores etc.
+   */
+  public static final SimpleTypeInformation<Double> DOUBLE = SimpleTypeInformation.get(Double.class);
+
+  /**
    * Make a type array easily.
    * 
    * @param ts Types

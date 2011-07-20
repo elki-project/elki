@@ -58,7 +58,7 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   private static double getScaleValue(DBIDs ids, OutlierResult or) {
     double max = Double.MIN_VALUE;
     for(DBID id : ids) {
-      double val = or.getScores().getValueFor(id);
+      double val = or.getScores().get(id);
       double inv = Math.abs(1.0 / val);
       if(!Double.isInfinite(inv) && !Double.isNaN(inv)) {
         max = Math.max(max, inv);

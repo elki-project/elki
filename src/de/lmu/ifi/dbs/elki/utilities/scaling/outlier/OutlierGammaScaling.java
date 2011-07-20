@@ -88,7 +88,7 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
     meta = or.getOutlierMeta();
     MeanVariance mv = new MeanVariance();
     for(DBID id : ids) {
-      double score = or.getScores().getValueFor(id);
+      double score = or.getScores().get(id);
       score = preScale(score);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);

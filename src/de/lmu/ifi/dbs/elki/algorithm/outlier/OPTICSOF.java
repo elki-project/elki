@@ -71,7 +71,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
    * The association id to associate the OPTICS_OF_SCORE of an object for the OF
    * algorithm.
    */
-  public static final AssociationID<Double> OPTICS_OF_SCORE = AssociationID.getOrCreateAssociationID("optics-of", Double.class);
+  public static final AssociationID<Double> OPTICS_OF_SCORE = AssociationID.getOrCreateAssociationID("optics-of", TypeUtil.DOUBLE);
 
   /**
    * Constructor with parameters.

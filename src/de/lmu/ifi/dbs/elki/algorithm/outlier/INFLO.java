@@ -92,7 +92,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
    * The association id to associate the INFLO_SCORE of an object for the INFLO
    * algorithm.
    */
-  public static final AssociationID<Double> INFLO_SCORE = AssociationID.getOrCreateAssociationID("inflo", Double.class);
+  public static final AssociationID<Double> INFLO_SCORE = AssociationID.getOrCreateAssociationID("inflo", TypeUtil.DOUBLE);
 
   /**
    * Constructor with parameters.

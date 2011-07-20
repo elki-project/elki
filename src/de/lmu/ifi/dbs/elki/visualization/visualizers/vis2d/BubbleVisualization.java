@@ -177,7 +177,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
    *         the given scales.
    */
   protected Double getScaledForId(DBID id) {
-    Double d = result.getScores().getValueFor(id).doubleValue();
+    Double d = result.getScores().get(id).doubleValue();
     if(d == null) {
       return 0.0;
     }

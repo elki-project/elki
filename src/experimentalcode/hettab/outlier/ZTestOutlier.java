@@ -45,7 +45,7 @@ public class ZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The association id to associate the SCORE of an object for the algorithm.
    */
-  public static final AssociationID<Double> ZTEST_SCORE = AssociationID.getOrCreateAssociationID("score", Double.class);
+  public static final AssociationID<Double> ZTEST_SCORE = AssociationID.getOrCreateAssociationID("score", TypeUtil.DOUBLE);
 
   /**
    * Constructor

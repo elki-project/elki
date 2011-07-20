@@ -84,8 +84,8 @@ public class TestOnlineLOF implements JUnit4Test {
     AnnotationResult<Double> scores2 = result2.getScores();
 
     for(DBID id : db.getDBIDs()) {
-      Double lof1 = scores1.getValueFor(id);
-      Double lof2 = scores2.getValueFor(id);
+      Double lof1 = scores1.get(id);
+      Double lof2 = scores2.get(id);
       assertTrue("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " + lof2, lof1.equals(lof2));
     }
   }

@@ -250,7 +250,7 @@ public class ROC {
     @Override
     public DoubleObjPair<DBID> next() {
       DBID id = this.iter.next();
-      return new DoubleObjPair<DBID>(scores.getValueFor(id), id);
+      return new DoubleObjPair<DBID>(scores.get(id), id);
     }
 
     @Override

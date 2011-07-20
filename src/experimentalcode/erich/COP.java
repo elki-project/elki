@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -80,31 +81,31 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * The association id to associate the Correlation Outlier Probability of an
    * object
    */
-  public static final AssociationID<Double> COP_SCORE = AssociationID.getOrCreateAssociationID("cop", Double.class);
+  public static final AssociationID<Double> COP_SCORE = AssociationID.getOrCreateAssociationID("cop", TypeUtil.DOUBLE);
 
   /**
    * The association id to associate the COP_SCORE error vector of an object for
    * the COP_SCORE algorithm.
    */
-  public static final AssociationID<Vector> COP_ERROR_VECTOR = AssociationID.getOrCreateAssociationID("cop error vector", Vector.class);
+  public static final AssociationID<Vector> COP_ERROR_VECTOR = AssociationID.getOrCreateAssociationID("cop error vector", SimpleTypeInformation.get(Vector.class));
 
   /**
    * The association id to associate the COP_SCORE data vector of an object for
    * the COP_SCORE algorithm.
    */
   // TODO: use or remove.
-  public static final AssociationID<Matrix> COP_DATA_VECTORS = AssociationID.getOrCreateAssociationID("cop data vectors", Matrix.class);
+  public static final AssociationID<Matrix> COP_DATA_VECTORS = AssociationID.getOrCreateAssociationID("cop data vectors", SimpleTypeInformation.get(Matrix.class));
 
   /**
    * The association id to associate the COP_SCORE correlation dimensionality of
    * an object for the COP_SCORE algorithm.
    */
-  public static final AssociationID<Integer> COP_DIM = AssociationID.getOrCreateAssociationID("cop dim", Integer.class);
+  public static final AssociationID<Integer> COP_DIM = AssociationID.getOrCreateAssociationID("cop dim", SimpleTypeInformation.get(Integer.class));
 
   /**
    * The association id to associate the COP_SCORE correlation solution
    */
-  public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = AssociationID.getOrCreateAssociationIDGenerics("cop sol", CorrelationAnalysisSolution.class);
+  public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = AssociationID.getOrCreateAssociationIDGenerics("cop sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class));
 
   /**
    * Constructor.

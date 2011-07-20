@@ -298,7 +298,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
     out.append(label);
     AnnotationResult<Double> scores = result.getScores();
     for(DBID id : ids) {
-      final double value = scaling.getScaled(scores.getValueFor(id));
+      final double value = scaling.getScaled(scores.get(id));
       out.append(" ").append(FormatUtil.format(value, FormatUtil.NF8));
     }
     out.append(FormatUtil.NEWLINE);

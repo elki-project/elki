@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -42,7 +43,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
   /**
    * Association ID for scaled values
    */
-  public static final AssociationID<Double> SCALED_SCORE = AssociationID.getOrCreateAssociationID("SCALED_SCORE", Double.class);
+  public static final AssociationID<Double> SCALED_SCORE = AssociationID.getOrCreateAssociationID("SCALED_SCORE", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify a scaling function to use.
@@ -87,7 +88,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
 
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : or.getScores().getDBIDs()) {
-      double val = or.getScores().getValueFor(id);
+      double val = or.getScores().get(id);
       val = scaling.getScaled(val);
       scaledscores.put(id, val);
       minmax.put(val);

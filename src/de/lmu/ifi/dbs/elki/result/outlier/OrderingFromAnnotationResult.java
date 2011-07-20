@@ -71,8 +71,8 @@ public class OrderingFromAnnotationResult implements OrderingResult {
   protected final class ImpliedComparator implements Comparator<DBID> {
     @Override
     public int compare(DBID id1, DBID id2) {
-      Double k1 = scores.getValueFor(id1);
-      Double k2 = scores.getValueFor(id2);
+      Double k1 = scores.get(id1);
+      Double k2 = scores.get(id2);
       assert (k1 != null);
       assert (k2 != null);
       return ascending * k2.compareTo(k1);

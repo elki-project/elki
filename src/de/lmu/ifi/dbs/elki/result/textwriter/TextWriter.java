@@ -288,7 +288,7 @@ public class TextWriter {
     if(ra != null) {
       for(AnnotationResult<?> a : ra) {
         String label = a.getAssociationID().getLabel();
-        Object value = a.getValueFor(objID);
+        Object value = a.get(objID);
         if(value == null) {
           continue;
         }
