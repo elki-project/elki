@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution;
 
 import java.util.Random;
 
-import org.apache.commons.math.special.Gamma;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Simple generator for a Gamma Distribution
@@ -67,7 +67,7 @@ public final class GammaDistribution implements Distribution {
       return Math.exp(-x * theta) * theta;
     }
 
-    return Math.exp((k - 1.0) * Math.log(x * theta) - x * theta - Gamma.logGamma(k)) * theta;
+    return Math.exp((k - 1.0) * Math.log(x * theta) - x * theta - MathUtil.logGamma(k)) * theta;
   }
 
   /**
