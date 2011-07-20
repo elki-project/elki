@@ -65,7 +65,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
   /**
    * Association ID for the Gaussian model outlier probability
    */
-  public static final AssociationID<Double> GMOD_PROB = AssociationID.getOrCreateAssociationID("gmod.prob", Double.class);
+  public static final AssociationID<Double> GMOD_PROB = AssociationID.getOrCreateAssociationID("gmod.prob", TypeUtil.DOUBLE);
 
   /**
    * Constructor with actual parameters.

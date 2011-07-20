@@ -53,7 +53,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
    * The association id to associate the TR_SCORE of an object for the TR
    * algorithm.
    */
-  public static final AssociationID<Double> TR_SCORE = AssociationID.getOrCreateAssociationID("tr", Double.class);
+  public static final AssociationID<Double> TR_SCORE = AssociationID.getOrCreateAssociationID("tr", TypeUtil.DOUBLE);
 
   /**
    * the parameter p

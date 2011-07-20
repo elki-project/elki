@@ -36,7 +36,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
   /**
    * Association ID for DBOD.
    */
-  public static final AssociationID<Double> DBOD_SCORE = AssociationID.getOrCreateAssociationID("dbod.score", Double.class);
+  public static final AssociationID<Double> DBOD_SCORE = AssociationID.getOrCreateAssociationID("dbod.score", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the size of the D-neighborhood

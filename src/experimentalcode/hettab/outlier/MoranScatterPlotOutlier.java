@@ -41,7 +41,7 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    * The association id to associate the SLOM_SCORE of an object for the SLOM
    * algorithm.
    */
-  public static final AssociationID<Double> SCORE = AssociationID.getOrCreateAssociationID("Moran-Outlier", Double.class);
+  public static final AssociationID<Double> SCORE = AssociationID.getOrCreateAssociationID("Moran-Outlier", TypeUtil.DOUBLE);
 
   /**
    * Constructor

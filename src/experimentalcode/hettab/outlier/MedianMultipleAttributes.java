@@ -42,7 +42,7 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Mult
   /**
    * The association id to associate the SCORE of an object for the algorithm.
    */
-  public static final AssociationID<Double> MMA_SCORE = AssociationID.getOrCreateAssociationID("mma-outlier-score", Double.class);
+  public static final AssociationID<Double> MMA_SCORE = AssociationID.getOrCreateAssociationID("mma-outlier-score", TypeUtil.DOUBLE);
 
   /**
    * Constructor

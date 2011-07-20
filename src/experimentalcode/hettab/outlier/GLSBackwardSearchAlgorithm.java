@@ -147,7 +147,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   /**
    * The association id to associate the SCORE of an object for the algorithm.
    */
-  public static final AssociationID<Double> GLSBS_SCORE = AssociationID.getOrCreateAssociationID("glsbs", Double.class);
+  public static final AssociationID<Double> GLSBS_SCORE = AssociationID.getOrCreateAssociationID("glsbs", TypeUtil.DOUBLE);
 
   /**
    * Constructor

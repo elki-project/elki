@@ -5,9 +5,11 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -26,6 +28,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -38,6 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -67,12 +72,12 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   /**
    * The association id to associate a subspace outlier degree.
    */
-  public static final AssociationID<SODModel<?>> SOD_MODEL = AssociationID.getOrCreateAssociationIDGenerics("SOD", SODModel.class);
+  public static final AssociationID<SODModel<?>> SOD_MODEL = AssociationID.getOrCreateAssociationIDGenerics("SOD", new SimpleTypeInformation<SODModel<?>>(SODModel.class));
 
   /**
    * The association id for the raw scores.
    */
-  public static final AssociationID<Double> SOD_SCORE = AssociationID.getOrCreateAssociationID("SOD_SCORE", Double.class);
+  public static final AssociationID<Double> SOD_SCORE = AssociationID.getOrCreateAssociationID("SOD_SCORE", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the number of shared nearest neighbors to be
@@ -326,8 +331,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     }
 
     @Override
-    public Double getValueFor(DBID objID) {
-      return models.getValueFor(objID).getSod();
+    public Double get(DBID objID) {
+      return models.get(objID).getSod();
     }
 
     @Override
@@ -343,6 +348,48 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     @Override
     public DBIDs getDBIDs() {
       return dbids;
+    }
+    
+    @Override
+    public IterableIterator<DBID> iterDBIDs() {
+      return IterableUtil.fromIterator(dbids.iterator());
+    }
+
+    @Override
+    public Database getDatabase() {
+      return null; // FIXME
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void set(DBID id, Double val) {
+      throw new UnsupportedOperationException();
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void delete(DBID id) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SimpleTypeInformation<Double> getDataTypeInformation() {
+      return TypeUtil.DOUBLE;
+    }
+
+    @Override
+    public int size() {
+      return dbids.size();
+    }
+
+    @Override
+    public ResultHierarchy getHierarchy() {
+      return models.getHierarchy();
+    }
+
+    @Override
+    public void setHierarchy(ResultHierarchy hierarchy) {
+      models.setHierarchy(hierarchy);
     }
   }
 

@@ -57,7 +57,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
   /**
    * Association ID used for output
    */
-  public static final AssociationID<Double> SOF_SCORE = AssociationID.getOrCreateAssociationID("sof", Double.class);
+  public static final AssociationID<Double> SOF_SCORE = AssociationID.getOrCreateAssociationID("sof", TypeUtil.DOUBLE);
 
   /**
    * Constructor.

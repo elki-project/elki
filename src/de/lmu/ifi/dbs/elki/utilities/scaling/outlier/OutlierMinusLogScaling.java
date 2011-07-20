@@ -56,7 +56,7 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
   public void prepare(DBIDs ids, OutlierResult or) {
     DoubleMinMax mm = new DoubleMinMax();
     for(DBID id : ids) {
-      double val = or.getScores().getValueFor(id);
+      double val = or.getScores().get(id);
       mm.put(val);
     }
     max = mm.getMax();

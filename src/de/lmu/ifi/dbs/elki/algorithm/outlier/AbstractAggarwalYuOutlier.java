@@ -67,7 +67,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
    * The association id to associate the AGGARWAL_YU_SCORE of an object for the
    * BruteForce algorithm.
    */
-  public static final AssociationID<Double> AGGARWAL_YU_SCORE = AssociationID.getOrCreateAssociationID("aggarwal-yu", Double.class);
+  public static final AssociationID<Double> AGGARWAL_YU_SCORE = AssociationID.getOrCreateAssociationID("aggarwal-yu", TypeUtil.DOUBLE);
 
   /**
    * The number of partitions for each dimension

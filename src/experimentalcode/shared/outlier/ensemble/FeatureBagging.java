@@ -98,7 +98,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
   /**
    * Feature bagging result ID
    */
-  public static final AssociationID<Double> FEATUREBAGGING_ID = AssociationID.getOrCreateAssociationID("fbagging", Double.class);
+  public static final AssociationID<Double> FEATUREBAGGING_ID = AssociationID.getOrCreateAssociationID("fbagging", TypeUtil.DOUBLE);
 
   /**
    * The flag for {@link #BREADTH_ID}.
@@ -216,7 +216,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
         for(DBID id : relation.iterDBIDs()) {
           double sum = 0.0;
           for(OutlierResult r : results) {
-            sum += r.getScores().getValueFor(id);
+            sum += r.getScores().get(id);
           }
           sumscore.put(id, sum);
           minmax.put(sum);

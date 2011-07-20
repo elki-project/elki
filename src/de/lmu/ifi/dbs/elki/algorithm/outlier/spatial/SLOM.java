@@ -57,7 +57,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
    * The association id to associate the SLOM_SCORE of an object for the SLOM
    * algorithm.
    */
-  public static final AssociationID<Double> SLOM_SCORE = AssociationID.getOrCreateAssociationID("slom", Double.class);
+  public static final AssociationID<Double> SLOM_SCORE = AssociationID.getOrCreateAssociationID("slom", TypeUtil.DOUBLE);
 
   /**
    * Constructor.

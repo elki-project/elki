@@ -94,7 +94,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
       for(DBID id : ids) {
-        double val = or.getScores().getValueFor(id);
+        double val = or.getScores().get(id);
         mv.put(val);
       }
       mean = mv.getMean();
@@ -105,7 +105,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
       double sqsum = 0;
       int cnt = 0;
       for(DBID id : ids) {
-        double val = or.getScores().getValueFor(id);
+        double val = or.getScores().get(id);
         sqsum += (val - mean) * (val - mean);
         cnt += 1;
       }

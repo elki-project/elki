@@ -76,7 +76,7 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
     if(min == null || max == null) {
       DoubleMinMax mm = new DoubleMinMax();
       for(DBID id : ids) {
-        double val = or.getScores().getValueFor(id);
+        double val = or.getScores().get(id);
         mm.put(val);
       }
       if(min == null) {

@@ -99,7 +99,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
     for(DBID id : dbids) {
-      double val = or.getScores().getValueFor(id);
+      double val = or.getScores().get(id);
       mv.put(val);
     }
     double curMu = mv.getMean() * 2;
@@ -124,7 +124,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
       // Weighted deviation from previous mean
       double sqsum = 0.0;
       for(int i = 0; i < ids.size(); i++) {
-        double val = or.getScores().getValueFor(ids.get(i));
+        double val = or.getScores().get(ids.get(i));
         // E-Step
         double ti = calcPosterior(val, curAlpha, curMu, curSigma, curLambda);
         // M-Step

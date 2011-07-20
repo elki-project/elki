@@ -78,7 +78,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
 
   @Override
   protected Element makeTooltip(DBID id, double x, double y, double dotsize) {
-    return svgp.svgText(x + dotsize, y + fontsize * 0.07, nf.format(result.getValueFor(id).doubleValue()));
+    return svgp.svgText(x + dotsize, y + fontsize * 0.07, nf.format(result.get(id).doubleValue()));
   }
 
   /**

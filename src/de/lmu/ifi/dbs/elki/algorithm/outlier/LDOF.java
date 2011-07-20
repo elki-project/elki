@@ -66,7 +66,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * The association id to associate the LDOF_SCORE of an object for the LDOF
    * algorithm.
    */
-  public static final AssociationID<Double> LDOF_SCORE = AssociationID.getOrCreateAssociationID("ldof", Double.class);
+  public static final AssociationID<Double> LDOF_SCORE = AssociationID.getOrCreateAssociationID("ldof", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be

@@ -49,7 +49,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
   /**
    * Association id to associate
    */
-  public static final AssociationID<Double> LABEL_OUT = AssociationID.getOrCreateAssociationID("label_outlier", Double.class);
+  public static final AssociationID<Double> LABEL_OUT = AssociationID.getOrCreateAssociationID("label_outlier", TypeUtil.DOUBLE);
   
   /**
    * Constructor.

@@ -46,7 +46,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
       for(DBID id : ids) {
-        double val = -Math.log(or.getScores().getValueFor(id));
+        double val = -Math.log(or.getScores().get(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
@@ -59,7 +59,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
       double sqsum = 0;
       int cnt = 0;
       for(DBID id : ids) {
-        double val = -Math.log(or.getScores().getValueFor(id));
+        double val = -Math.log(or.getScores().get(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum += (val - mean) * (val - mean);
           cnt += 1;

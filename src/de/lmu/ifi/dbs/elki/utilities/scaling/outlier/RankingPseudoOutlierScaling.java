@@ -35,7 +35,7 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
       inverted = true;
     }
     for(DBID id : ids) {
-      scores[pos] = or.getScores().getValueFor(id);
+      scores[pos] = or.getScores().get(id);
       pos++;
     }
     if(pos != ids.size()) {

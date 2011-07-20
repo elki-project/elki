@@ -94,7 +94,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
    * The association id to associate the SCORE of an object for the RandomWalkEC
    * algorithm algorithm.
    */
-  public static final AssociationID<Double> RW_EC_SCORE = AssociationID.getOrCreateAssociationID("outlier-score", Double.class);
+  public static final AssociationID<Double> RW_EC_SCORE = AssociationID.getOrCreateAssociationID("outlier-score", TypeUtil.DOUBLE);
 
   /**
    * Constructor

@@ -55,7 +55,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
   /**
    * Association id to associate
    */
-  public static final AssociationID<Double> EMOD_MAXCPROB = AssociationID.getOrCreateAssociationID("emod_maxcprob", Double.class);
+  public static final AssociationID<Double> EMOD_MAXCPROB = AssociationID.getOrCreateAssociationID("emod_maxcprob", TypeUtil.DOUBLE);
 
   /**
    * Constructor with an existing em clustering algorithm.

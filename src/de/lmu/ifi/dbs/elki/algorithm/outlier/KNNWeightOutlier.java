@@ -63,7 +63,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
   /**
    * Association ID for the KNN Weight Outlier Detection
    */
-  public static final AssociationID<Double> KNNWOD_WEIGHT = AssociationID.getOrCreateAssociationID("knnwod_weight", Double.class);
+  public static final AssociationID<Double> KNNWOD_WEIGHT = AssociationID.getOrCreateAssociationID("knnwod_weight", TypeUtil.DOUBLE);
 
   /**
    * The kNN query used.

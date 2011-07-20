@@ -33,7 +33,7 @@ public class TrivialAllOutlier extends AbstractAlgorithm<OutlierResult> implemen
   /**
    * Association id to associate
    */
-  public static final AssociationID<Double> TRIVIAL_ALL_OUT = AssociationID.getOrCreateAssociationID("trivial_alloutliers", Double.class);
+  public static final AssociationID<Double> TRIVIAL_ALL_OUT = AssociationID.getOrCreateAssociationID("trivial_alloutliers", TypeUtil.DOUBLE);
 
   /**
    * Constructor.

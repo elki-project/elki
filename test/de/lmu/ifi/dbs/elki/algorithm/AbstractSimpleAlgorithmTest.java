@@ -227,8 +227,8 @@ public abstract class AbstractSimpleAlgorithmTest {
     org.junit.Assert.assertNotNull("No outlier result", result);
     org.junit.Assert.assertNotNull("No score result.", result.getScores());
     final DBID dbid = DBIDUtil.importInteger(id);
-    org.junit.Assert.assertNotNull("No result for ID " + id, result.getScores().getValueFor(dbid));
-    double actual = result.getScores().getValueFor(dbid);
+    org.junit.Assert.assertNotNull("No result for ID " + id, result.getScores().get(dbid));
+    double actual = result.getScores().get(dbid);
     org.junit.Assert.assertEquals("Outlier score of object " + id + " doesn't match.", expected, actual, 0.0001);
   }
 }

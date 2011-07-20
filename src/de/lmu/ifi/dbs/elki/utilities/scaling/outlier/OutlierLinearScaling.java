@@ -117,7 +117,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
       DoubleMinMax mm = (max == null) ? new DoubleMinMax() : null;
       boolean skippedzeros = false;
       for(DBID id : ids) {
-        double val = or.getScores().getValueFor(id);
+        double val = or.getScores().get(id);
         if(nozeros && val == 0.0) {
           skippedzeros = true;
           continue;
@@ -141,7 +141,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
         boolean skippedzeros = false;
         DoubleMinMax mm = new DoubleMinMax();
         for(DBID id : ids) {
-          double val = or.getScores().getValueFor(id);
+          double val = or.getScores().get(id);
           if(nozeros && val == 0.0) {
             skippedzeros = true;
             continue;

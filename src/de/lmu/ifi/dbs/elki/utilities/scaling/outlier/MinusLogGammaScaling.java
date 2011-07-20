@@ -49,7 +49,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     // Determine Minimum and Maximum.
     DoubleMinMax mm = new DoubleMinMax();
     for(DBID id : ids) {
-      double score = or.getScores().getValueFor(id);
+      double score = or.getScores().get(id);
       mm.put(score);
     }
     max = mm.getMax();
@@ -57,7 +57,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
     for(DBID id : ids) {
-      double score = or.getScores().getValueFor(id);
+      double score = or.getScores().get(id);
       score = preScale(score);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);

@@ -100,12 +100,12 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   /**
    * The LOCI MDEF / SigmaMDEF maximum values radius
    */
-  public static final AssociationID<Double> LOCI_MDEF_CRITICAL_RADIUS = AssociationID.getOrCreateAssociationID("loci.mdefrad", Double.class);
+  public static final AssociationID<Double> LOCI_MDEF_CRITICAL_RADIUS = AssociationID.getOrCreateAssociationID("loci.mdefrad", TypeUtil.DOUBLE);
 
   /**
    * The LOCI MDEF / SigmaMDEF maximum value (normalized MDEF)
    */
-  public static final AssociationID<Double> LOCI_MDEF_NORM = AssociationID.getOrCreateAssociationID("loci.mdefnorm", Double.class);
+  public static final AssociationID<Double> LOCI_MDEF_NORM = AssociationID.getOrCreateAssociationID("loci.mdefnorm", TypeUtil.DOUBLE);
 
   /**
    * Constructor.

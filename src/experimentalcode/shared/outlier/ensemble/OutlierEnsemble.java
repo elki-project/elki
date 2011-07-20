@@ -80,7 +80,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
   /**
    * Feature bagging result ID
    */
-  public static final AssociationID<Double> OUTLIERENSEMBLE_ID = AssociationID.getOrCreateAssociationID("ensemble-score", Double.class);
+  public static final AssociationID<Double> OUTLIERENSEMBLE_ID = AssociationID.getOrCreateAssociationID("ensemble-score", TypeUtil.DOUBLE);
 
   /**
    * Constructor, adhering to
@@ -133,7 +133,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
       for(DBID id : ids) {
         ArrayList<Double> scores = new ArrayList<Double>(num);
         for(OutlierResult r : results) {
-          Double score = r.getScores().getValueFor(id);
+          Double score = r.getScores().get(id);
           if(score != null) {
             scores.add(score);
           }

@@ -232,7 +232,7 @@ public class MapWebServer {
         DBID id = iter.next();
         re.append("{");
         bundleToJSON(re, id);
-        final Double val = scores.getValueFor(id);
+        final Double val = scores.get(id);
         if(val != null) {
           re.append("\"score\":\"").append(val).append("\"");
         }

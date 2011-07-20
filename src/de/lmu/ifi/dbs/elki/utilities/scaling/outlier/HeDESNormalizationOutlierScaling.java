@@ -40,7 +40,7 @@ public class HeDESNormalizationOutlierScaling implements OutlierScalingFunction 
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(DBID id : ids) {
-      double val = or.getScores().getValueFor(id);
+      double val = or.getScores().get(id);
       mv.put(val);
       minmax.put(val);
     }

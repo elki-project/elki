@@ -64,7 +64,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
    * The association id to associate the KNNO_KNNDISTANCE of an object for the
    * KNN outlier detection algorithm.
    */
-  public static final AssociationID<Double> KNNO_KNNDISTANCE = AssociationID.getOrCreateAssociationID("knno_knndistance", Double.class);
+  public static final AssociationID<Double> KNNO_KNNDISTANCE = AssociationID.getOrCreateAssociationID("knno_knndistance", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the k nearest neighbor
