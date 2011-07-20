@@ -411,6 +411,41 @@ public final class MathUtil {
   }
 
   /**
+   * LANCZOS-Coefficients for Gamma approximation.
+   * 
+   * These have slightly higher precision than those in "Numerical Recipes".
+   * They probably come from
+   * 
+   * Paul Godfrey: http://my.fit.edu/~gabdo/gamma.txt
+   */
+  public static final double[] LANCZOS = { 0.99999999999999709182, 57.156235665862923517, -59.597960355475491248, 14.136097974741747174, -0.49191381609762019978, .33994649984811888699e-4, .46523628927048575665e-4, -.98374475304879564677e-4, .15808870322491248884e-3, -.21026444172410488319e-3, .21743961811521264320e-3, -.16431810653676389022e-3, .84418223983852743293e-4, -.26190838401581408670e-4, .36899182659531622704e-5, };
+
+  /**
+   * Compute logGamma.
+   * 
+   * Based loosely on "Numerical Recpies" and the work of Paul Godfrey at
+   * http://my.fit.edu/~gabdo/gamma.txt
+   * 
+   * TODO: find out which approximation really is the best...
+   * 
+   * @param x Parameter x
+   * @return @return log(&#915;(x))
+   */
+  public static double logGamma(final double x) {
+    if(Double.isNaN(x) || (x <= 0.0)) {
+      return Double.NaN;
+    }
+    double g = 607.0 / 128.0;
+    double tmp = x + g + .5;
+    tmp = (x + 0.5) * Math.log(tmp) - tmp;
+    double ser = LANCZOS[0];
+    for(int i = LANCZOS.length - 1; i > 0; --i) {
+      ser += LANCZOS[i] / (x + i);
+    }
+    return tmp + Math.log(SQRTTWOPI * ser / x);
+  }
+
+  /**
    * Compute the sum of the i first integers.
    * 
    * @param i maximum summand
