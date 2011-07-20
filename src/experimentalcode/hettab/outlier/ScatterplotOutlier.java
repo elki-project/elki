@@ -23,14 +23,33 @@ import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * FIXME: Documentation, Reference
+ * Scatterplot-Outlier
+ * <p>
+ * Reference: <br>
+ * S. Shekhar and C.-T. Lu and P. Zhang <br>
+ * A Unified Approach to Detecting Spatial Outliers<br>
+ * in in GeoInformatica 7-2, 2003.
+ * </p>
+ * 
+ * <p>
+ * Scatterplot shows attribute values on the X-axis and the average of the
+ * attribute values in the neighborhood on the Y-axis. Best fit regression line
+ * is used to identify spatial outliers. Vertical difference of a data point
+ * tells about outlierness.
+ * </p>
  * 
  * @author Ahmed Hettab
  * 
  * @param <N> Neighborhood object type
  */
+@Title("A Unified Approach to Spatial Outliers Detection")
+@Description("Spatial Outlier Detection Algorithm")
+@Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003")
 public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
@@ -91,7 +110,7 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     }
 
     double mean = mv.getMean();
-    double variance = mv.getSampleVariance();
+    double variance = mv.getNaiveStddev();
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);

@@ -28,7 +28,21 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * FIXME: Documentation
+ * <p>
+ * Reference: <br>
+ * Chang-Tien Lu, Dechang Chen, Yufeng Kou, Algorithms for Spatial Outlier
+ * Detection<br>
+ * in IEEE International Conference on Data Mining (ICDM'03), 2003.
+ * </p>
+ * <p>
+ * Description: <br>
+ * Median Algorithm uses median to represent the average non-spatial attribute
+ * value of neighbors. <br>
+ * The Difference e = non-spatial-Attribut-Value - median (Neighborhood) is
+ * computed.<br>
+ * The Spatial Objects with the highest standarized e value are Spatial
+ * Outliers.
+ * </p>
  * 
  * @author Ahmed Hettab
  * 
@@ -93,7 +107,7 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
 
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.getDBIDs()) {
-      double score = Math.abs((hi.get(id) - mv.getMean()) / mv.getNaiveVariance());
+      double score = Math.abs((hi.get(id) - mv.getMean()) / mv.getNaiveStddev());
       minmax.put(score);
       scores.put(id, score);
     }

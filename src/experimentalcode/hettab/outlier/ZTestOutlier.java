@@ -26,7 +26,21 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * FIXME: Documentation
+ * <p>
+ * Reference: <br>
+ * S. Shekhar and C.-T. Lu and P. Zhang <br>
+ * A Unified Approach to Detecting Spatial Outliers<br>
+ * in in GeoInformatica 7-2, 2003.
+ * </p>
+ * <p>
+ * Description: <br>
+ * Z-Test Algorithm uses mean to represent the average non-spatial attribute
+ * value of neighbors. <br>
+ * The Difference e = non-spatial-Attribut-Value - mean (Neighborhood) is
+ * computed.<br>
+ * The Spatial Objects with the highest standarized e value are Spatial
+ * Outliers.
+ * </p>
  * 
  * @author Ahmed Hettab
  * 
@@ -84,7 +98,7 @@ public class ZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : relation.getDBIDs()) {
-      double score = Math.abs((diffFromlocalMean.get(id) - diffFromMeanMV.getMean()) / diffFromMeanMV.getSampleVariance());
+      double score = Math.abs((diffFromlocalMean.get(id) - diffFromMeanMV.getMean()) / diffFromMeanMV.getSampleStddev());
       minmax.put(score);
       scores.put(id, score);
     }
