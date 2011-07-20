@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.batik.util.SVG12Constants;
 import org.apache.batik.util.SVGConstants;
@@ -28,8 +28,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
@@ -288,15 +286,12 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      VisualizerContext context = VisualizerUtil.getContext(baseResult);
-      List<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
-      for(ClusterOrderResult<DoubleDistance> co : cos) {
-        OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
-        if(plot != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-          baseResult.getHierarchy().add(plot, task);
-        }
+      Collection<OPTICSPlot<?>> plots = ResultUtil.filterResults(result, OPTICSPlot.class);
+      for(OPTICSPlot<?> plot : plots) {
+        ClusterOrderResult<?> co = plot.getClusterOrder();
+        final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+        baseResult.getHierarchy().add(plot, task);
       }
     }
 

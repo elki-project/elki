@@ -343,4 +343,13 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
     co.addChildResult(opticsplot);
     return opticsplot;
   }
+
+  /**
+   * Get the cluster order we are attached to.
+   * 
+   * @return Cluster order
+   */
+  public ClusterOrderResult<D> getClusterOrder() {
+    return co;
+  }
 }

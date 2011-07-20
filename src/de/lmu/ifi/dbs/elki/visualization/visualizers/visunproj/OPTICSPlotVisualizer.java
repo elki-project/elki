@@ -117,8 +117,8 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractVisuali
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       VisualizerContext context = VisualizerUtil.getContext(baseResult);
-      Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
-      for(ClusterOrderResult<DoubleDistance> co : cos) {
+      Collection<ClusterOrderResult<?>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
+      for(ClusterOrderResult<?> co : cos) {
         // Add plots, attach visualizer
         OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
         if(plot != null) {
