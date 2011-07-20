@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @author Erich Schubert
  */
-public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult> {
+public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
