@@ -9,8 +9,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -20,7 +18,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -49,12 +47,6 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   private static final Logging logger = Logging.getLogger(TrimmedMeanApproach.class);
 
   /**
-   * The association id to associate the TR_SCORE of an object for the TR
-   * algorithm.
-   */
-  public static final AssociationID<Double> TR_SCORE = AssociationID.getOrCreateAssociationID("tr", TypeUtil.DOUBLE);
-
-  /**
    * the parameter p
    */
   private double p;
@@ -73,12 +65,11 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Run the algorithm
    * 
-   * @param database Database
    * @param neighbors Neighborhood relation
    * @param relation Relation
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<N> neighbors, Relation<? extends NumberVector<?, ?>> relation) {
+  public OutlierResult run(Relation<N> neighbors, Relation<? extends NumberVector<?, ?>> relation) {
     assert (DatabaseUtil.dimensionality(relation) == 1) : "TrimmedMean can only process one-dimensional data sets.";
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(neighbors);
 
@@ -121,7 +112,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       i++;
     }
     //
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("OTR", "Trimmedmean-outlier", TR_SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("OTR", "Trimmedmean-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

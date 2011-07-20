@@ -5,10 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -64,11 +62,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * integer greater than 0. Default value: 1.
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnjoin.k", "Specifies the k-nearest neighbors to be assigned.");
-
-  /**
-   * Association ID for KNNLists.
-   */
-  public static final AssociationID<KNNList<?>> KNNLIST = AssociationID.getOrCreateAssociationIDGenerics("KNNS", new SimpleTypeInformation<KNNList<?>>(KNNList.class));
 
   /**
    * The k parameter

@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -21,7 +20,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -61,12 +60,6 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(GaussianUniformMixture.class);
-
-  /**
-   * The association id to associate the MMOD_OFLAF of an object for the
-   * GaussianUniformMixture algorithm.
-   */
-  public static final AssociationID<Double> MMOD_OFLAG = AssociationID.getOrCreateAssociationID("mmod.oflag", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the fraction of expected outliers.
@@ -163,7 +156,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0);
-    Relation<Double> res = new AnnotationFromDataStore<Double>("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", MMOD_OFLAG, oscores, relation.getDBIDs());
+    Relation<Double> res = new MaterializedRelation<Double>("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", TypeUtil.DOUBLE, oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 

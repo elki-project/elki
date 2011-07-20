@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -16,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -39,11 +38,6 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(RescaleMetaOutlierAlgorithm.class);
-
-  /**
-   * Association ID for scaled values
-   */
-  public static final AssociationID<Double> SCALED_SCORE = AssociationID.getOrCreateAssociationID("SCALED_SCORE", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify a scaling function to use.
@@ -95,7 +89,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), scaling.getMin(), scaling.getMax());
-    Relation<Double> scoresult = new AnnotationFromDataStore<Double>("Scaled Outlier", "scaled-outlier", SCALED_SCORE, scaledscores, or.getScores().getDBIDs());
+    Relation<Double> scoresult = new MaterializedRelation<Double>("Scaled Outlier", "scaled-outlier", TypeUtil.DOUBLE, scaledscores, or.getScores().getDBIDs());
     OutlierResult result = new OutlierResult(meta, scoresult);
     result.addChildResult(innerresult);
 

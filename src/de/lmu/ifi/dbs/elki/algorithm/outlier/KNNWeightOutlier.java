@@ -5,7 +5,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -58,11 +57,6 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
    * Parameter to specify the k nearest neighbor
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnwod.k", "k nearest neighbor");
-
-  /**
-   * Association ID for the KNN Weight Outlier Detection
-   */
-  public static final AssociationID<Double> KNNWOD_WEIGHT = AssociationID.getOrCreateAssociationID("knnwod_weight", TypeUtil.DOUBLE);
 
   /**
    * The kNN query used.
@@ -124,11 +118,11 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
       progressKNNWeight.ensureCompleted(logger);
     }
 
-    Relation<Double> res = new AnnotationFromDataStore<Double>("Weighted kNN Outlier Score", "knnw-outlier", KNNWOD_WEIGHT, knnw_score, relation.getDBIDs());
+    Relation<Double> res = new MaterializedRelation<Double>("Weighted kNN Outlier Score", "knnw-outlier", TypeUtil.DOUBLE, knnw_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxweight, 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(meta, res);
   }
-  
+
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
@@ -141,9 +135,9 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {

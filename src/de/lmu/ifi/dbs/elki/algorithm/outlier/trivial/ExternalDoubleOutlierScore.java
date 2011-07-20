@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -24,7 +23,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -66,11 +65,6 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
    * The default pattern for matching ID lines.
    */
   public static final String ID_PATTERN_DEFAULT = "^ID=";
-
-  /**
-   * The ID the result is tagged as.
-   */
-  private static final AssociationID<Double> EXTERNAL_OUTLIER_SCORES_ID = AssociationID.getOrCreateAssociationID("EXTERNAL_SCORE", TypeUtil.DOUBLE);
 
   /**
    * The file to be reparsed
@@ -185,7 +179,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     else {
       meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     }
-    Relation<Double> scoresult = new AnnotationFromDataStore<Double>("External Outlier", "external-outlier", EXTERNAL_OUTLIER_SCORES_ID, scores, relation.getDBIDs());
+    Relation<Double> scoresult = new MaterializedRelation<Double>("External Outlier", "external-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierResult or = new OutlierResult(meta, scoresult);
 
     // Apply scaling

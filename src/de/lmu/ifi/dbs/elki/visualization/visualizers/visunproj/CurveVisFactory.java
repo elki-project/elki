@@ -108,7 +108,7 @@ public class CurveVisFactory extends AbstractVisFactory {
       Collection<String> header = ((ROCResult) curve).getHeader();
       for(String str : header) {
         String[] parts = str.split(":\\s*");
-        if(parts[0].equals(ComputeROCCurve.ROC_AUC.getLabel()) && parts.length == 2) {
+        if(parts[0].equals(ComputeROCCurve.ROCAUC_LABEL) && parts.length == 2) {
           double rocauc = Double.parseDouble(parts[1]);
           StyleLibrary style = context.getStyleLibrary();
           CSSClass cls = new CSSClass(svgp, "unmanaged");

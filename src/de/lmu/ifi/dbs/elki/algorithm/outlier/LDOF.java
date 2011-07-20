@@ -5,7 +5,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -60,12 +59,6 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(LDOF.class);
-
-  /**
-   * The association id to associate the LDOF_SCORE of an object for the LDOF
-   * algorithm.
-   */
-  public static final AssociationID<Double> LDOF_SCORE = AssociationID.getOrCreateAssociationID("ldof", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
@@ -145,7 +138,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("LDOF Outlier Score", "ldof-outlier", LDOF_SCORE, ldofs, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("LDOF Outlier Score", "ldof-outlier", TypeUtil.DOUBLE, ldofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -6,8 +6,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPre
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -17,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -37,11 +35,6 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Multip
   public static final Logging logger = Logging.getLogger(MeanMultipleAttributes.class);
 
   /**
-   * The association id to associate the SCORE of an object for the algorithm.
-   */
-  public static final AssociationID<Double> MMA_SCORE = AssociationID.getOrCreateAssociationID("mma-outlier-score", TypeUtil.DOUBLE);
-
-  /**
    * Constructor
    * 
    * @param npredf
@@ -56,7 +49,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Multip
     return logger;
   }
 
-  public OutlierResult run(Database database, Relation<V> relation) {
+  public OutlierResult run(Relation<V> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(relation);
     Matrix hMatrix = new Matrix(getListZ_Dims().size(),relation.size());
     Matrix hMeansMatrix = new Matrix(getListZ_Dims().size(),1);
@@ -105,7 +98,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Multip
       i++;
     }
     
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("MOF", "mean-multipleattributes-outlier", MMA_SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("MOF", "mean-multipleattributes-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -23,7 +22,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -65,12 +64,6 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
    * Parameter to specify the threshold MinPts.
    */
   private int minpts;
-
-  /**
-   * The association id to associate the OPTICS_OF_SCORE of an object for the OF
-   * algorithm.
-   */
-  public static final AssociationID<Double> OPTICS_OF_SCORE = AssociationID.getOrCreateAssociationID("optics-of", TypeUtil.DOUBLE);
 
   /**
    * Constructor with parameters.
@@ -147,7 +140,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
       ofminmax.put(of);
     }
     // Build result representation.
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("OPTICS Outlier Scores", "optics-outlier", OPTICS_OF_SCORE, ofs, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("OPTICS Outlier Scores", "optics-outlier", TypeUtil.DOUBLE, ofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -52,11 +51,6 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
   private EM<V> emClustering;
 
   /**
-   * Association id to associate
-   */
-  public static final AssociationID<Double> EMOD_MAXCPROB = AssociationID.getOrCreateAssociationID("emod_maxcprob", TypeUtil.DOUBLE);
-
-  /**
    * Constructor with an existing em clustering algorithm.
    * 
    * @param emClustering EM clustering algorithm to use.
@@ -83,7 +77,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
       emo_score.put(id, maxProb);
       globmax = Math.max(maxProb, globmax);
     }
-    Relation<Double> scoreres = new AnnotationFromDataStore<Double>("EM outlier scores", "em-outlier", EMOD_MAXCPROB, emo_score, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<Double>("EM outlier scores", "em-outlier", TypeUtil.DOUBLE, emo_score, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0.0, globmax);
     // combine results.
     OutlierResult result = new OutlierResult(meta, scoreres);

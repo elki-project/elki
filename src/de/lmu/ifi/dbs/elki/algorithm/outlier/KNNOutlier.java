@@ -5,7 +5,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -58,12 +57,6 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(KNNOutlier.class);
-
-  /**
-   * The association id to associate the KNNO_KNNDISTANCE of an object for the
-   * KNN outlier detection algorithm.
-   */
-  public static final AssociationID<Double> KNNO_KNNDISTANCE = AssociationID.getOrCreateAssociationID("knno_knndistance", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the k nearest neighbor
@@ -118,7 +111,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
     if(progressKNNDistance != null) {
       progressKNNDistance.ensureCompleted(logger);
     }
-    Relation<Double> scoreres = new AnnotationFromDataStore<Double>("kNN Outlier Score", "knn-outlier", KNNO_KNNDISTANCE, knno_score, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<Double>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, knno_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxodegree, 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(meta, scoreres);
   }

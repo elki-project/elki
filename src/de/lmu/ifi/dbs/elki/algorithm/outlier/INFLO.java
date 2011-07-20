@@ -5,7 +5,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -22,7 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -86,12 +85,6 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
    * Holds the value of {@link #K_ID}.
    */
   private int k;
-
-  /**
-   * The association id to associate the INFLO_SCORE of an object for the INFLO
-   * algorithm.
-   */
-  public static final AssociationID<Double> INFLO_SCORE = AssociationID.getOrCreateAssociationID("inflo", TypeUtil.DOUBLE);
 
   /**
    * Constructor with parameters.
@@ -198,7 +191,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Influence Outlier Score", "info-outlier", INFLO_SCORE, inflos, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Influence Outlier Score", "inflo-outlier", TypeUtil.DOUBLE, inflos, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

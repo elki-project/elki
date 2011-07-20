@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -25,7 +24,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -93,11 +92,6 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
    * OptionID for {@link #BREADTH_FLAG}
    */
   public static final OptionID BREADTH_ID = OptionID.getOrCreateOptionID("fbagging.breadth", "Use the breadth first combinations instead of the cumulative sum approach");
-
-  /**
-   * Feature bagging result ID
-   */
-  public static final AssociationID<Double> FEATUREBAGGING_ID = AssociationID.getOrCreateAssociationID("fbagging", TypeUtil.DOUBLE);
 
   /**
    * The flag for {@link #BREADTH_ID}.
@@ -228,7 +222,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
         }
       }
       OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-      Relation<Double> scores = new AnnotationFromDataStore<Double>("Feature bagging", "fb-outlier", FEATUREBAGGING_ID, sumscore, relation.getDBIDs());
+      Relation<Double> scores = new MaterializedRelation<Double>("Feature bagging", "fb-outlier", TypeUtil.DOUBLE, sumscore, relation.getDBIDs());
       result = new OutlierResult(meta, scores);
     }
     return result;

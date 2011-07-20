@@ -3,14 +3,13 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -32,11 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @param <D> the type of Distance used by this Algorithm
  */
 public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
-  /**
-   * Association ID for DBOD.
-   */
-  public static final AssociationID<Double> DBOD_SCORE = AssociationID.getOrCreateAssociationID("dbod.score", TypeUtil.DOUBLE);
-
   /**
    * Parameter to specify the size of the D-neighborhood
    */
@@ -69,7 +63,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
     DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
 
     // Build result representation.
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Density-Based Outlier Detection", "db-outlier", DBOD_SCORE, dbodscore, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Density-Based Outlier Detection", "db-outlier", TypeUtil.DOUBLE, dbodscore, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }

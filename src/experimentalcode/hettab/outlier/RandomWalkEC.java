@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPre
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -24,7 +23,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -88,12 +87,6 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
    * Our predicate to obtain the neighbors
    */
   NeighborSetPredicate.Factory<V> npredf = null;
-
-  /**
-   * The association id to associate the SCORE of an object for the RandomWalkEC
-   * algorithm algorithm.
-   */
-  public static final AssociationID<Double> RW_EC_SCORE = AssociationID.getOrCreateAssociationID("outlier-score", TypeUtil.DOUBLE);
 
   /**
    * Constructor
@@ -194,7 +187,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
       scores.put(id, score);
       minmax.put(score);
     }
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("randomwalkec", "RandomWalkEC", RW_EC_SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("randomwalkec", "RandomWalkEC", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

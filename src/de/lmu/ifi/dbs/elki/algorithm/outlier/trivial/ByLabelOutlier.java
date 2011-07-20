@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -14,7 +13,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -45,11 +44,6 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
    */
   final Pattern pattern;
 
-  /**
-   * Association id to associate
-   */
-  public static final AssociationID<Double> LABEL_OUT = AssociationID.getOrCreateAssociationID("label_outlier", TypeUtil.DOUBLE);
-  
   /**
    * Constructor.
    * 
@@ -84,7 +78,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
       }
       scores.put(id, score);
     }
-    Relation<Double> scoreres = new AnnotationFromDataStore<Double>("By label outlier scores", "label-outlier", LABEL_OUT, scores, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<Double>("By label outlier scores", "label-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
     return new OutlierResult(meta, scoreres);
   }

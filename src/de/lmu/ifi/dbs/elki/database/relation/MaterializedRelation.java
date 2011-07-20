@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -38,7 +39,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   /**
    * Map to hold the objects of the database.
    */
-  private final WritableDataStore<O> content;
+  private final DataStore<O> content;
 
   /**
    * The DBIDs this is supposed to be defined for.
@@ -51,6 +52,11 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * The relation name.
    */
   private String name;
+
+  /**
+   * The relation name (short version)
+   */
+  private String shortname = "relation";
 
   /**
    * Constructor.
@@ -90,12 +96,30 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * @param name Name
    * @param content Content
    */
-  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name, WritableDataStore<O> content) {
+  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name, DataStore<O> content) {
     super();
     this.database = database;
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
+    this.content = content;
+  }
+
+  /**
+   * Constructor.
+   * @param name Name
+   * @param shortname Short name of the result
+   * @param type Type information
+   * @param content Content
+   * @param ids IDs
+   */
+  public MaterializedRelation(String name, String shortname, SimpleTypeInformation<O> type, DataStore<O> content, DBIDs ids) {
+    super();
+    this.database = null;
+    this.type = type;
+    this.ids = DBIDUtil.makeUnmodifiable(ids);
+    this.name = name;
+    this.shortname = shortname;
     this.content = content;
   }
 
@@ -112,7 +136,9 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   @Override
   public void set(DBID id, O val) {
     assert (ids.contains(id));
-    content.put(id, val);
+    if(content instanceof WritableDataStore) {
+      ((WritableDataStore<O>) content).put(id, val);
+    }
   }
 
   /**
@@ -123,7 +149,9 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   @Override
   public void delete(DBID id) {
     assert (!ids.contains(id));
-    content.delete(id);
+    if(content instanceof WritableDataStore) {
+      ((WritableDataStore<O>) content).delete(id);
+    }
   }
 
   @Override
@@ -156,6 +184,6 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
 
   @Override
   public String getShortName() {
-    return "relation";
+    return shortname;
   }
 }
