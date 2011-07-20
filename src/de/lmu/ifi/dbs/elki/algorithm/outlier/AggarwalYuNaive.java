@@ -68,10 +68,9 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
    * Run the algorithm on the given relation.
    * 
    * @param relation Relation
-   * @return
-   * @throws IllegalStateException
+   * @return Outlier detection result
    */
-  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
+  public OutlierResult run(Relation<V> relation) {
     final int dimensionality = DatabaseUtil.dimensionality(relation);
     final int size = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
