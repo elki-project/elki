@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -29,7 +28,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -75,36 +74,6 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * Holds the object performing the dependency derivation
    */
   private DependencyDerivator<V, D> dependencyDerivator;
-
-  /**
-   * The association id to associate the Correlation Outlier Probability of an
-   * object
-   */
-  public static final AssociationID<Double> COP_SCORE = AssociationID.getOrCreateAssociationID("cop", TypeUtil.DOUBLE);
-
-  /**
-   * The association id to associate the COP_SCORE error vector of an object for
-   * the COP_SCORE algorithm.
-   */
-  public static final AssociationID<Vector> COP_ERROR_VECTOR = AssociationID.getOrCreateAssociationID("cop error vector", SimpleTypeInformation.get(Vector.class));
-
-  /**
-   * The association id to associate the COP_SCORE data vector of an object for
-   * the COP_SCORE algorithm.
-   */
-  // TODO: use or remove.
-  public static final AssociationID<Matrix> COP_DATA_VECTORS = AssociationID.getOrCreateAssociationID("cop data vectors", SimpleTypeInformation.get(Matrix.class));
-
-  /**
-   * The association id to associate the COP_SCORE correlation dimensionality of
-   * an object for the COP_SCORE algorithm.
-   */
-  public static final AssociationID<Integer> COP_DIM = AssociationID.getOrCreateAssociationID("cop dim", SimpleTypeInformation.get(Integer.class));
-
-  /**
-   * The association id to associate the COP_SCORE correlation solution
-   */
-  public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = AssociationID.getOrCreateAssociationIDGenerics("cop sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class));
 
   /**
    * Constructor.
@@ -178,14 +147,14 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       }
     }
     // combine results.
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Correlation Outlier Probabilities", "cop-outlier", COP_SCORE, cop_score, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Correlation Outlier Probabilities", "cop-outlier", TypeUtil.DOUBLE, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
-    result.addChildResult(new AnnotationFromDataStore<Integer>("Local Dimensionality", "cop-dim", COP_DIM, cop_dim, ids));
-    result.addChildResult(new AnnotationFromDataStore<Vector>("Error vectors", "cop-errorvec", COP_ERROR_VECTOR, cop_err_v, ids));
-    result.addChildResult(new AnnotationFromDataStore<Matrix>("Data vectors", "cop-datavec", COP_DATA_VECTORS, cop_datav, ids));
-    result.addChildResult(new AnnotationFromDataStore<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", COP_SOL, cop_sol, ids));
+    result.addChildResult(new MaterializedRelation<Integer>("Local Dimensionality", "cop-dim", TypeUtil.INTEGER, cop_dim, ids));
+    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", "cop-errorvec", SimpleTypeInformation.get(Vector.class), cop_err_v, ids));
+    result.addChildResult(new MaterializedRelation<Matrix>("Data vectors", "cop-datavec", SimpleTypeInformation.get(Matrix.class), cop_datav, ids));
+    result.addChildResult(new MaterializedRelation<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
     return result;
   }
 

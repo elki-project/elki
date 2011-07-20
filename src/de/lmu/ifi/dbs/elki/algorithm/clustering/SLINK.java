@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -31,13 +30,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -72,16 +71,6 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SLINK.class);
-
-  /**
-   * Association ID for SLINK pi pointer
-   */
-  private static final AssociationID<DBID> SLINK_PI = AssociationID.getOrCreateAssociationID("SLINK pi", TypeUtil.DBID);
-
-  /**
-   * Association ID for SLINK lambda value
-   */
-  private static final AssociationID<Distance<?>> SLINK_LAMBDA = AssociationID.getOrCreateAssociationIDGenerics("SLINK lambda", new SimpleTypeInformation<Distance<?>>(Distance.class));
 
   /**
    * The minimum number of clusters to extract
@@ -159,8 +148,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     int minc = minclusters != null ? minclusters : distQuery.getRelation().size();
     result = extractClusters(distQuery.getRelation().getDBIDs(), pi, lambda, minc);
 
-    result.addChildResult(new AnnotationFromDataStore<DBID>("SLINK pi", "slink-order", SLINK_PI, pi, processedIDs));
-    result.addChildResult(new AnnotationFromDataStore<Distance<?>>("SLINK lambda", "slink-order", SLINK_LAMBDA, lambda, processedIDs));
+    result.addChildResult(new MaterializedRelation<DBID>("SLINK pi", "slink-order", TypeUtil.DBID, pi, processedIDs));
+    result.addChildResult(new MaterializedRelation<D>("SLINK lambda", "slink-order", new SimpleTypeInformation<D>(distCls), lambda, processedIDs));
     result.addChildResult(new OrderingFromDataStore<D>("SLINK order", "slink-order", lambda));
     return result;
   }

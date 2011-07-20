@@ -13,14 +13,12 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -30,7 +28,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -144,11 +142,6 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   private List<Integer> beta;
 
   /**
-   * The association id to associate the SCORE of an object for the algorithm.
-   */
-  public static final AssociationID<Double> GLSBS_SCORE = AssociationID.getOrCreateAssociationID("glsbs", TypeUtil.DOUBLE);
-
-  /**
    * Constructor
    * 
    * @param y
@@ -226,7 +219,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
     //System.out.println(relation.getDBIDs());
     //
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("GLSSODBackward", "GLSSODbackward-outlier", GLSBS_SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("GLSSODBackward", "GLSSODbackward-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     // FIXME: Accurate maximum?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.1, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);

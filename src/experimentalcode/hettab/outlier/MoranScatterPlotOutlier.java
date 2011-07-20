@@ -7,8 +7,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -17,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -31,12 +29,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * S. Shekhar and C.-T. Lu and P. Zhang <br>
  * A Unified Approach to Detecting Spatial Outliers <br>
  * in GeoInformatica 7-2, 2003
- * </p>
- * <p>
- * Moran scatterplot is a plot of normalized attribute values against the
- * neighborhood average of normalized attribute values. Spatial Objects on the
- * upper left or lower right are Spatial Outliers.
- * </p>
+ * 
+ *<p> Moran scatterplot is a plot of normalized attribute values 
+ * against the neighborhood average of normalized attribute values. 
+ * Spatial Objects on the upper left or lower right are Spatial Outliers.
  * 
  * @author Ahmed Hettab
  * 
@@ -52,13 +48,6 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   private static final Logging logger = Logging.getLogger(MoranScatterPlotOutlier.class);
 
   /**
-   * 
-   * The association id to associate the SCORE of an object for the
-   * MoranScatterplotOutlier algorithm.
-   */
-  public static final AssociationID<Double> SCORE = AssociationID.getOrCreateAssociationID("Moran-Outlier", TypeUtil.DOUBLE);
-
-  /**
    * Constructor
    * 
    * @param npredf
@@ -70,12 +59,11 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Main method
    * 
-   * @param database Database
    * @param nrel Neighborhood relation
    * @param relation Data relation (1d!)
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
+  public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
     WritableDataStore<Double> stdZ = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> neighborStdZ = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
@@ -114,7 +102,7 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       }
     }
 
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("MoranOutlier", "Moran Scatterplot Outlier", SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("MoranOutlier", "Moran Scatterplot Outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -51,12 +50,6 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SLOM.class);
-
-  /**
-   * The association id to associate the SLOM_SCORE of an object for the SLOM
-   * algorithm.
-   */
-  public static final AssociationID<Double> SLOM_SCORE = AssociationID.getOrCreateAssociationID("slom", TypeUtil.DOUBLE);
 
   /**
    * Constructor.
@@ -168,7 +161,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
       slomminmax.put(slom);
     }
 
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("SLOM", "SLOM-outlier", SLOM_SCORE, sloms, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("SLOM", "slom-outlier", TypeUtil.DOUBLE, sloms, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(slomminmax.getMin(), slomminmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }

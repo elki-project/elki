@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -24,7 +23,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -69,12 +68,6 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(ReferenceBasedOutlierDetection.class);
-
-  /**
-   * The association id to associate the REFOD_SCORE of an object for the
-   * Reference based outlier detection algorithm.
-   */
-  public static final AssociationID<Double> REFOD_SCORE = AssociationID.getOrCreateAssociationID("REFOD_SCORE", TypeUtil.DOUBLE);
 
   /**
    * Parameter for the reference points heuristic.
@@ -174,7 +167,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     // visualizer to find the reference points in the result
     ReferencePointsResult<V> refp = new ReferencePointsResult<V>("Reference points", "reference-points", refPoints);
 
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Reference-points Outlier Scores", "reference-outlier", REFOD_SCORE, rbod_score, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Reference-points Outlier Scores", "reference-outlier", TypeUtil.DOUBLE, rbod_score, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     result.addChildResult(refp);

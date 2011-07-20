@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -62,12 +61,6 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
    * 0 currently!
    */
   public static final int DONT_CARE = 0;
-
-  /**
-   * The association id to associate the AGGARWAL_YU_SCORE of an object for the
-   * BruteForce algorithm.
-   */
-  public static final AssociationID<Double> AGGARWAL_YU_SCORE = AssociationID.getOrCreateAssociationID("aggarwal-yu", TypeUtil.DOUBLE);
 
   /**
    * The number of partitions for each dimension

@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -21,7 +20,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -76,11 +75,6 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
    * The voting in use.
    */
   private EnsembleVoting voting;
-
-  /**
-   * Feature bagging result ID
-   */
-  public static final AssociationID<Double> OUTLIERENSEMBLE_ID = AssociationID.getOrCreateAssociationID("ensemble-score", TypeUtil.DOUBLE);
 
   /**
    * Constructor, adhering to
@@ -158,7 +152,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    Relation<Double> scores = new AnnotationFromDataStore<Double>("Outlier Ensemble", "ensemble-outlier", OUTLIERENSEMBLE_ID, sumscore, ids);
+    Relation<Double> scores = new MaterializedRelation<Double>("Outlier Ensemble", "ensemble-outlier", TypeUtil.DOUBLE, sumscore, ids);
     return new OutlierResult(meta, scores);
   }
 

@@ -7,7 +7,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -22,7 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -95,16 +94,6 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * Holds the value of {@link #ALPHA_ID}.
    */
   private double alpha;
-
-  /**
-   * The LOCI MDEF / SigmaMDEF maximum values radius
-   */
-  public static final AssociationID<Double> LOCI_MDEF_CRITICAL_RADIUS = AssociationID.getOrCreateAssociationID("loci.mdefrad", TypeUtil.DOUBLE);
-
-  /**
-   * The LOCI MDEF / SigmaMDEF maximum value (normalized MDEF)
-   */
-  public static final AssociationID<Double> LOCI_MDEF_NORM = AssociationID.getOrCreateAssociationID("loci.mdefnorm", TypeUtil.DOUBLE);
 
   /**
    * Constructor.
@@ -254,11 +243,11 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(logger);
     }
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("LOCI normalized MDEF", "loci-outlier", LOCI_MDEF_NORM, mdef_norm, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("LOCI normalized MDEF", "loci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
     // TODO: actually provide min and max?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(new AnnotationFromDataStore<Double>("LOCI MDEF Radius", "loci-outlier", LOCI_MDEF_CRITICAL_RADIUS, mdef_radius, relation.getDBIDs()));
+    result.addChildResult(new MaterializedRelation<Double>("LOCI MDEF Radius", "loci-critical-radius", TypeUtil.DOUBLE, mdef_radius, relation.getDBIDs()));
     return result;
   }
 

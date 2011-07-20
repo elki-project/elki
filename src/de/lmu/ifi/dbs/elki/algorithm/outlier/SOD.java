@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimi
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -67,16 +66,6 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SOD.class);
-
-  /**
-   * The association id to associate a subspace outlier degree.
-   */
-  public static final AssociationID<SODModel<?>> SOD_MODEL = AssociationID.getOrCreateAssociationIDGenerics("SOD", new SimpleTypeInformation<SODModel<?>>(SODModel.class));
-
-  /**
-   * The association id for the raw scores.
-   */
-  public static final AssociationID<Double> SOD_SCORE = AssociationID.getOrCreateAssociationID("SOD_SCORE", TypeUtil.DOUBLE);
 
   /**
    * Parameter to specify the number of shared nearest neighbors to be
@@ -144,7 +133,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       progress.ensureCompleted(logger);
     }
     // combine results.
-    Relation<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>("Subspace Outlier Model", "sod-outlier", SOD_MODEL, sod_models, relation.getDBIDs());
+    Relation<SODModel<?>> models = new MaterializedRelation<SODModel<?>>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<SODModel<?>>(SODModel.class), sod_models, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models, relation.getDBIDs()));
     // also add the models.

@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -49,6 +47,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 // TODO: maybe add a way to process clustering results as well?
 public class ComputeROCCurve implements Evaluator {
   /**
+   * The label we use for marking ROCAUC values.
+   */
+  public static final String ROCAUC_LABEL = "ROCAUC";
+
+  /**
    * The logger.
    */
   static final Logging logger = Logging.getLogger(ComputeROCCurve.class);
@@ -66,11 +69,6 @@ public class ComputeROCCurve implements Evaluator {
    * Stores the "positive" class.
    */
   private Pattern positiveClassName;
-
-  /**
-   * The association id to associate the ROC Area-under-Curve.
-   */
-  public static final AssociationID<Double> ROC_AUC = AssociationID.getOrCreateAssociationID("ROC AUC", TypeUtil.DOUBLE);
 
   /**
    * Constructor.
@@ -99,11 +97,11 @@ public class ComputeROCCurve implements Evaluator {
     List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.SimpleAdapter(order.iterator()));
     double rocauc = ROC.computeAUC(roccurve);
     if(logger.isVerbose()) {
-      logger.verbose("ROCAUC: " + rocauc);
+      logger.verbose(ROCAUC_LABEL +": " + rocauc);
     }
 
     List<String> header = new ArrayList<String>(1);
-    header.add(ROC_AUC.getLabel() + ": " + rocauc);
+    header.add(ROCAUC_LABEL+": " + rocauc);
     final ROCResult rocresult = new ROCResult(roccurve, header, rocauc);
 
     return rocresult;
@@ -113,11 +111,11 @@ public class ComputeROCCurve implements Evaluator {
     List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.OutlierScoreAdapter(database.getDBIDs(), or));
     double rocauc = ROC.computeAUC(roccurve);
     if(logger.isVerbose()) {
-      logger.verbose("ROCAUC: " + rocauc);
+      logger.verbose(ROCAUC_LABEL+": " + rocauc);
     }
 
     List<String> header = new ArrayList<String>(1);
-    header.add(ROC_AUC.getLabel() + ": " + rocauc);
+    header.add(ROCAUC_LABEL+": " + rocauc);
     final ROCResult rocresult = new ROCResult(roccurve, header, rocauc);
 
     return rocresult;

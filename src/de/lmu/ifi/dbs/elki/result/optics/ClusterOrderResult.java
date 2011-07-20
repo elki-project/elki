@@ -7,7 +7,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -40,16 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
  * @param <D> distance type.
  */
 public class ClusterOrderResult<D extends Distance<D>> extends BasicResult implements IterableResult<ClusterOrderEntry<D>> {
-  /**
-   * Association ID for reachability distance.
-   */
-  public static final AssociationID<? extends Distance<?>> REACHABILITY_ID = AssociationID.getOrCreateAssociationIDGenerics("reachability", new SimpleTypeInformation<Distance<?>>(Distance.class));
-
-  /**
-   * Predecessor ID for reachability distance.
-   */
-  public static final AssociationID<DBID> PREDECESSOR_ID = AssociationID.getOrCreateAssociationID("predecessor", TypeUtil.DBID);
-
   /**
    * Cluster order storage
    */

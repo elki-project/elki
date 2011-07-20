@@ -8,8 +8,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -19,7 +17,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -57,11 +55,6 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   private static final Logging logger = Logging.getLogger(ScatterplotOutlier.class);
 
   /**
-   * The association id to associate the SCORE of an object for the algorithm.
-   */
-  public static final AssociationID<Double> SCATTERPLOT_SCORE = AssociationID.getOrCreateAssociationID("score", TypeUtil.DOUBLE);
-
-  /**
    * Constructor
    * 
    * @param npredf
@@ -73,12 +66,11 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Main method
    * 
-   * @param database Database
    * @param nrel Neighborhood relation
    * @param relation Data relation (1d!)
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
+  public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
     WritableDataStore<Double> means = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
@@ -121,7 +113,7 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
     }
     // build representation
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("SPO", "Scatterplot-Outlier", SCATTERPLOT_SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("SPO", "Scatterplot-Outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

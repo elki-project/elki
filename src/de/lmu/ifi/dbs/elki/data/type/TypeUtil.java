@@ -90,6 +90,11 @@ public final class TypeUtil {
   public static final SimpleTypeInformation<Double> DOUBLE = SimpleTypeInformation.get(Double.class);
 
   /**
+   * Integer type.
+   */
+  public static final SimpleTypeInformation<Integer> INTEGER = SimpleTypeInformation.get(Integer.class);
+
+  /**
    * Make a type array easily.
    * 
    * @param ts Types

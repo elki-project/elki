@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -16,7 +15,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -60,11 +59,6 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
    * Invert the result
    */
   private boolean invert = false;
-
-  /**
-   * Association ID for the Gaussian model outlier probability
-   */
-  public static final AssociationID<Double> GMOD_PROB = AssociationID.getOrCreateAssociationID("gmod.prob", TypeUtil.DOUBLE);
 
   /**
    * Constructor with actual parameters.
@@ -115,7 +109,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     else {
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY);
     }
-    Relation<Double> res = new AnnotationFromDataStore<Double>("Gaussian Model Outlier Score", "gaussian-model-outlier", GMOD_PROB, oscores, relation.getDBIDs());
+    Relation<Double> res = new MaterializedRelation<Double>("Gaussian Model Outlier Score", "gaussian-model-outlier", TypeUtil.DOUBLE, oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 

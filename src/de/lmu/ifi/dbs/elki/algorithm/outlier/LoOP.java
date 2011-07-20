@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -27,7 +26,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -64,12 +63,6 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(LoOP.class);
-
-  /**
-   * The association id to associate the LOOP_SCORE of an object for the
-   * LOOP_SCORE algorithm.
-   */
-  public static final AssociationID<Double> LOOP_SCORE = AssociationID.getOrCreateAssociationID("loop", TypeUtil.DOUBLE);
 
   /**
    * The distance function to determine the reachability distance between
@@ -301,7 +294,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Local Outlier Probabilities", "loop-outlier", LOOP_SCORE, loops, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Local Outlier Probabilities", "loop-outlier", TypeUtil.DOUBLE, loops, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }

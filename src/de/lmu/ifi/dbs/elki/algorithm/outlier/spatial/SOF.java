@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -52,11 +51,6 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(SOF.class);
-
-  /**
-   * Association ID used for output
-   */
-  public static final AssociationID<Double> SOF_SCORE = AssociationID.getOrCreateAssociationID("sof", TypeUtil.DOUBLE);
 
   /**
    * Constructor.
@@ -112,7 +106,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Spatial Outlier Factor", "sof-outlier", SOF_SCORE, lofs, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Spatial Outlier Factor", "sof-outlier", TypeUtil.DOUBLE, lofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;
