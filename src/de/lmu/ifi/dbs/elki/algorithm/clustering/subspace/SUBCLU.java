@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -136,8 +135,11 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
 
   /**
    * Performs the SUBCLU algorithm on the given database.
+   * 
+   * @param relation Relation to process
+   * @return Clustering result
    */
-  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<SubspaceModel<V>> run(Relation<V> relation) throws IllegalStateException {
     final int dimensionality = DatabaseUtil.dimensionality(relation);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(dimensionality) : null;

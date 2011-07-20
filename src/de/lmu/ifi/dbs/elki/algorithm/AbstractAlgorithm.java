@@ -36,43 +36,99 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
   @SuppressWarnings("unchecked")
   @Override
   public R run(Database database) {
-    final TypeInformation[] inputs = getInputTypeRestriction();
-    final Object[] relations = new Object[inputs.length + 1];
-    final Class<?>[] signature = new Class<?>[inputs.length + 1];
-    // First parameter is the database
-    relations[0] = database;
-    signature[0] = Database.class;
-    // Other parameters are the bound relations
-    for(int i = 0; i < inputs.length; i++) {
-      // FIXME: don't bind the same relation twice?
-      relations[i + 1] = database.getRelation(inputs[i]);
-      signature[i + 1] = Relation.class;
-    }
-    final Method runmethod;
-    try {
-      runmethod = this.getClass().getMethod("run", signature);
-    }
-    catch(Exception e) {
-      throw new APIViolationException("Algorithm is missing a 'run' method matching its input signature.", e);
-    }
-    try {
-      StringBuffer buf = new StringBuffer();
-      for (Class<?> cls : signature) {
-        buf.append(cls.toString()).append(",");
+    final Object[] relations1;
+    final Class<?>[] signature1;
+    final Object[] relations2;
+    final Class<?>[] signature2;
+    // Build candidate method signatures
+    {
+      final TypeInformation[] inputs = getInputTypeRestriction();
+      relations1 = new Object[inputs.length + 1];
+      signature1 = new Class<?>[inputs.length + 1];
+      relations2 = new Object[inputs.length];
+      signature2 = new Class<?>[inputs.length];
+      // First parameter is the database
+      relations1[0] = database;
+      signature1[0] = Database.class;
+      // Other parameters are the bound relations
+      for(int i = 0; i < inputs.length; i++) {
+        // TODO: don't bind the same relation twice?
+        // But sometimes this is wanted (e.g. using projected distances)
+        relations1[i + 1] = database.getRelation(inputs[i]);
+        signature1[i + 1] = Relation.class;
+        relations2[i] = database.getRelation(inputs[i]);
+        signature2[i] = Relation.class;
       }
-      return (R) runmethod.invoke(this, relations);
     }
-    catch(IllegalArgumentException e) {
-      throw new APIViolationException("Invoking the real 'run' method failed.", e);
+
+    // Find appropriate run method.
+    Method runmethod1 = null;
+    Method runmethod2 = null;
+    try {
+      runmethod1 = this.getClass().getMethod("run", signature1);
+      runmethod2 = null;
     }
-    catch(IllegalAccessException e) {
-      throw new APIViolationException("Invoking the real 'run' method failed.", e);
+    catch(SecurityException e) {
+      throw new APIViolationException("Security exception finding an appropriate 'run' method.", e);
     }
-    catch(InvocationTargetException e) {
-      if (e.getTargetException() instanceof RuntimeException) {
-        throw (RuntimeException) e.getTargetException();
+    catch(NoSuchMethodException e) {
+      runmethod1 = null;
+      // Try without "database" parameter.
+      try {
+        runmethod2 = this.getClass().getMethod("run", signature2);
       }
-      throw new APIViolationException("Invoking the real 'run' method failed: "+e.getTargetException().toString(), e.getTargetException());
+      catch(NoSuchMethodException e2) {
+        runmethod2 = null;
+      }
+      catch(SecurityException e2) {
+        throw new APIViolationException("Security exception finding an appropriate 'run' method.", e2);
+      }
+    }
+
+    if(runmethod1 != null) {
+      try {
+        StringBuffer buf = new StringBuffer();
+        for(Class<?> cls : signature1) {
+          buf.append(cls.toString()).append(",");
+        }
+        return (R) runmethod1.invoke(this, relations1);
+      }
+      catch(IllegalArgumentException e) {
+        throw new APIViolationException("Invoking the real 'run' method failed.", e);
+      }
+      catch(IllegalAccessException e) {
+        throw new APIViolationException("Invoking the real 'run' method failed.", e);
+      }
+      catch(InvocationTargetException e) {
+        if(e.getTargetException() instanceof RuntimeException) {
+          throw (RuntimeException) e.getTargetException();
+        }
+        throw new APIViolationException("Invoking the real 'run' method failed: " + e.getTargetException().toString(), e.getTargetException());
+      }
+    }
+    else if(runmethod2 != null) {
+      try {
+        StringBuffer buf = new StringBuffer();
+        for(Class<?> cls : signature1) {
+          buf.append(cls.toString()).append(",");
+        }
+        return (R) runmethod2.invoke(this, relations2);
+      }
+      catch(IllegalArgumentException e) {
+        throw new APIViolationException("Invoking the real 'run' method failed.", e);
+      }
+      catch(IllegalAccessException e) {
+        throw new APIViolationException("Invoking the real 'run' method failed.", e);
+      }
+      catch(InvocationTargetException e) {
+        if(e.getTargetException() instanceof RuntimeException) {
+          throw (RuntimeException) e.getTargetException();
+        }
+        throw new APIViolationException("Invoking the real 'run' method failed: " + e.getTargetException().toString(), e.getTargetException());
+      }
+    }
+    else {
+      throw new APIViolationException("No appropriate 'run' method found.");
     }
   }
 

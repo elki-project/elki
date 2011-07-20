@@ -83,8 +83,10 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * Any concrete algorithm should be implemented within method
    * {@link #biclustering()} by an inheriting biclustering approach.
    * 
+   * @param relation Relation to process
+   * @return Clustering result
    */
-  public final Clustering<M> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public final Clustering<M> run(Relation<V> relation) throws IllegalStateException {
     this.relation = relation;
     if(this.relation == null || this.relation.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);

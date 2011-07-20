@@ -76,11 +76,9 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     }
 
     ArrayList<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>(labelmap.size());
-    int i = 0;
     for(Entry<String, ModifiableDBIDs> entry : labelmap.entrySet()) {
       Cluster<Model> clus = new Cluster<Model>(entry.getKey(), entry.getValue(), ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
       clusters.add(clus);
-      i++;
     }
 
     for(Cluster<Model> cur : clusters) {

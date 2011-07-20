@@ -259,7 +259,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     // refine Candidates
     PriorityQueue<FCPair<Double, DBID>> resqueue = new PriorityQueue<FCPair<Double, DBID>>(k);
     // System.out.println(pq.size() + " objects ordered into candidate list.");
-    int v = 0;
+    // int v = 0;
     while(!pq.isEmpty()) {
       if(resqueue.size() == k && pq.peek().getFirst() > resqueue.peek().getFirst()) {
         break;
@@ -273,7 +273,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       // System.out.println("Best Candidate " + aKey+" : " + pq.firstPriority()
       // + " worst result: " + Double.MAX_VALUE);
       // }
-      v++;
+      // v++;
       MeanVariance s = new MeanVariance();
       for(DBID bKey : relation.iterDBIDs()) {
         if(bKey.equals(aKey)) {

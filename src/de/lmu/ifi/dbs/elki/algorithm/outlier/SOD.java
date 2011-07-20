@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -119,8 +118,10 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
 
   /**
    * Performs the SOD algorithm on the given database.
+   * 
+   * @param relation Data relation to process
    */
-  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
+  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
     SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(relation);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), logger) : null;
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);

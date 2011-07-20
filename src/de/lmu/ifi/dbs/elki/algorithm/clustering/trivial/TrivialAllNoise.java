@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -38,7 +37,7 @@ public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implem
     super();
   }
 
-  public Clustering<Model> run(Database database, Relation<?> relation) {
+  public Clustering<Model> run(Relation<?> relation) {
     final DBIDs ids = relation.getDBIDs();
     Clustering<Model> result = new Clustering<Model>("All-in-noise trivial Clustering", "allinnoise-clustering");
     Cluster<Model> c = new Cluster<Model>(ids, true, ClusterModel.CLUSTER);

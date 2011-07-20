@@ -23,11 +23,6 @@ public class CSSClassManager {
   private HashMap<String, CSSClass> store = new HashMap<String, CSSClass>();
   
   /**
-   * Serial version.
-   */
-  private static final long serialVersionUID = 8807736974456191901L;
-
-  /**
    * Add a single class to the map.
    * 
    * @param clss new CSS class

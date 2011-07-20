@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -119,8 +118,14 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     this.refp = refp;
   }
 
-  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
-    DistanceQuery<V, D> distFunc = database.getDistanceQuery(relation, distanceFunction);
+  /**
+   * Run the algorithm on the given relation.
+   * 
+   * @param relation Relation to process
+   * @return Outlier result
+   */
+  public OutlierResult run(Relation<V> relation) {
+    DistanceQuery<V, D> distFunc = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
     Collection<V> refPoints = refp.getReferencePoints(relation);
 
     DBIDs ids = relation.getDBIDs();
@@ -262,7 +267,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
-  
+
   @Override
   protected Logging getLogger() {
     return logger;
@@ -270,9 +275,9 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {

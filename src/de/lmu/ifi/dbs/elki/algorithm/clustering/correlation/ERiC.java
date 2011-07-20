@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -92,8 +91,11 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
 
   /**
    * Performs the ERiC algorithm on the given database.
+   * 
+   * @param relation Relation to process
+   * @return Clustering result
    */
-  public Clustering<CorrelationModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<CorrelationModel<V>> run(Relation<V> relation) throws IllegalStateException {
     final int dimensionality = DatabaseUtil.dimensionality(relation);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
@@ -102,7 +104,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
     if(stepprog != null) {
       stepprog.beginStep(1, "Preprocessing local correlation dimensionalities and partitioning data", logger);
     }
-    Clustering<Model> copacResult = copacAlgorithm.run(database, relation);
+    Clustering<Model> copacResult = copacAlgorithm.run(relation);
 
     DistanceQuery<V, IntegerDistance> query = copacAlgorithm.getPartitionDistanceQuery();
 
