@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import java.util.ArrayList;
 
@@ -36,8 +36,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   private static final String NAME = "Cluster Evaluation";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public ClusterEvaluationVisFactory() {
     super();
@@ -59,8 +58,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
     EvaluatePairCountingFMeasure.ScoreResult sr = task.getResult();
     
-    // FIXME: use CSSClass and StyleLibrary
-
+    // TODO: use CSSClass and StyleLibrary
     int i = 0;
     {
       Element object = svgp.svgText(0, i + 0.7, "Same-cluster object pairs");
