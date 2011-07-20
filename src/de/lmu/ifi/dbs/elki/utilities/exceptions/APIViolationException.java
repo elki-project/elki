@@ -23,6 +23,15 @@ public class APIViolationException extends AbortException {
    * Constructor.
    * 
    * @param message Error message
+   */
+  public APIViolationException(String message) {
+    super(message);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param message Error message
    * @param cause Reason
    */
   public APIViolationException(String message, Throwable cause) {

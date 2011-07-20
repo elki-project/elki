@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -65,7 +64,14 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
     super(k, phi);
   }
 
-  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
+  /**
+   * Run the algorithm on the given relation.
+   * 
+   * @param relation Relation
+   * @return
+   * @throws IllegalStateException
+   */
+  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
     final int dimensionality = DatabaseUtil.dimensionality(relation);
     final int size = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);

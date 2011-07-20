@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -141,8 +140,11 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
 
   /**
    * Performs the CLIQUE algorithm on the given database.
+   * 
+   * @param relation Data relation to process
+   * @return Clustering result
    */
-  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<SubspaceModel<V>> run(Relation<V> relation) {
     // 1. Identification of subspaces that contain clusters
     // TODO: use step logging.
     if(logger.isVerbose()) {

@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -149,9 +148,12 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
 
   /**
    * Performs the COPAC algorithm on the given database.
+   * 
+   * @param relation Relation to process
+   * @return Clustering result
    */
   @SuppressWarnings("unchecked")
-  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<Model> run(Relation<V> relation) throws IllegalStateException {
     if(logger.isVerbose()) {
       logger.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + DatabaseUtil.dimensionality(relation));
     }

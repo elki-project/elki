@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -114,7 +113,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     this.c = c;
   }
 
-  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
+  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
     // Use an array list of object IDs for fast random access by an offset
     ArrayDBIDs objids = DBIDUtil.ensureArray(relation.getDBIDs());
     // A bit set to flag objects as anomalous, none at the beginning

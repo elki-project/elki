@@ -32,11 +32,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   public static final AssociationID<String> EXTERNAL_ID = new AssociationID<String>("externalID", String.class);
 
   /**
-   * The serial version UID.
-   */
-  private static final long serialVersionUID = 8115554038339292192L;
-
-  /**
    * The Class type related to this AssociationID.
    */
   private Class<C> type;

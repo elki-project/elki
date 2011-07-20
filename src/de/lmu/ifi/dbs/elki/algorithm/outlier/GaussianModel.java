@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -78,7 +77,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     this.invert = invert;
   }
 
-  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
+  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
     DoubleMinMax mm = new DoubleMinMax();
     // resulting scores
     WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
