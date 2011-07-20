@@ -305,7 +305,8 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   /**
    * Process a particular result.
    * 
-   * @param result Result
+   * @param baseResult Base Result
+   * @param newResult Newly added Result
    */
   private void processNewResult(HierarchicalResult baseResult, Result newResult) {
     // Collect all visualizers.
