@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -145,7 +144,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
       progress.ensureCompleted(logger);
     }
     // combine results.
-    AnnotationResult<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>("Subspace Outlier Model", "sod-outlier", SOD_MODEL, sod_models, relation.getDBIDs());
+    Relation<SODModel<?>> models = new AnnotationFromDataStore<SODModel<?>>("Subspace Outlier Model", "sod-outlier", SOD_MODEL, sod_models, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models, relation.getDBIDs()));
     // also add the models.
@@ -302,11 +301,11 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * 
    * @apiviz.exclude
    */
-  protected static class SODProxyScoreResult implements AnnotationResult<Double> {
+  protected static class SODProxyScoreResult implements Relation<Double> {
     /**
      * Model result this is a proxy for.
      */
-    AnnotationResult<SODModel<?>> models;
+    Relation<SODModel<?>> models;
     
     /**
      * The IDs we are defined for
@@ -319,15 +318,10 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
      * @param models Models result
      * @param dbids IDs we are defined for 
      */
-    public SODProxyScoreResult(AnnotationResult<SODModel<?>> models, DBIDs dbids) {
+    public SODProxyScoreResult(Relation<SODModel<?>> models, DBIDs dbids) {
       super();
       this.models = models;
       this.dbids = dbids;
-    }
-
-    @Override
-    public AssociationID<Double> getAssociationID() {
-      return SOD_SCORE;
     }
 
     @Override

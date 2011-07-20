@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -227,7 +226,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
     //System.out.println(relation.getDBIDs());
     //
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("GLSSODBackward", "GLSSODbackward-outlier", GLSBS_SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("GLSSODBackward", "GLSSODbackward-outlier", GLSBS_SCORE, scores, relation.getDBIDs());
     // FIXME: Accurate maximum?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.1, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);

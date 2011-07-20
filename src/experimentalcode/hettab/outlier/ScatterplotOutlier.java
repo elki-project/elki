@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -103,7 +102,7 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
     }
     // build representation
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("SPO", "Scatterplot-Outlier", SCATTERPLOT_SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("SPO", "Scatterplot-Outlier", SCATTERPLOT_SCORE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

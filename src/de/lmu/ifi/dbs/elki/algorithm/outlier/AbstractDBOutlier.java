@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -70,7 +69,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
     DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Density-Based Outlier Detection", "db-outlier", DBOD_SCORE, dbodscore, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Density-Based Outlier Detection", "db-outlier", DBOD_SCORE, dbodscore, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }

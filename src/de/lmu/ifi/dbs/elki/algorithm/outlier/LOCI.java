@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -255,7 +254,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(logger);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LOCI normalized MDEF", "loci-outlier", LOCI_MDEF_NORM, mdef_norm, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("LOCI normalized MDEF", "loci-outlier", LOCI_MDEF_NORM, mdef_norm, relation.getDBIDs());
     // TODO: actually provide min and max?
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);

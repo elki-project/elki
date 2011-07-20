@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -179,7 +178,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       }
     }
     // combine results.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Correlation Outlier Probabilities", "cop-outlier", COP_SCORE, cop_score, ids);
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Correlation Outlier Probabilities", "cop-outlier", COP_SCORE, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results

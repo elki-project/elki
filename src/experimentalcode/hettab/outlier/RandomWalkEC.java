@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -195,7 +194,7 @@ public class RandomWalkEC<V extends NumberVector<?, ?>, D extends NumberDistance
       scores.put(id, score);
       minmax.put(score);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("randomwalkec", "RandomWalkEC", RW_EC_SCORE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("randomwalkec", "RandomWalkEC", RW_EC_SCORE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

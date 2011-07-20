@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -164,7 +163,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0);
-    AnnotationResult<Double> res = new AnnotationFromDataStore<Double>("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", MMOD_OFLAG, oscores, relation.getDBIDs());
+    Relation<Double> res = new AnnotationFromDataStore<Double>("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", MMOD_OFLAG, oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 

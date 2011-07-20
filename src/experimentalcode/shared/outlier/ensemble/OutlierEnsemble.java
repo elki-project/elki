@@ -17,11 +17,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -158,7 +158,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>("Outlier Ensemble", "ensemble-outlier", OUTLIERENSEMBLE_ID, sumscore, ids);
+    Relation<Double> scores = new AnnotationFromDataStore<Double>("Outlier Ensemble", "ensemble-outlier", OUTLIERENSEMBLE_ID, sumscore, ids);
     return new OutlierResult(meta, scores);
   }
 

@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -80,10 +79,10 @@ public class TestOnlineLOF implements JUnit4Test {
     OutlierResult result2 = runOnlineLOF(db);
 
     // 3. Compare results
-    AnnotationResult<Double> scores1 = result1.getScores();
-    AnnotationResult<Double> scores2 = result2.getScores();
+    Relation<Double> scores1 = result1.getScores();
+    Relation<Double> scores2 = result2.getScores();
 
-    for(DBID id : db.getDBIDs()) {
+    for(DBID id : scores1.getDBIDs()) {
       Double lof1 = scores1.get(id);
       Double lof2 = scores2.get(id);
       assertTrue("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " + lof2, lof1.equals(lof2));

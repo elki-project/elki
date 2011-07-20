@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -143,7 +142,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       }
       minmax.put(val);
     }
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("AggarwalYuNaive", "aggarwal-yu-outlier", AGGARWAL_YU_SCORE, sparsity, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("AggarwalYuNaive", "aggarwal-yu-outlier", AGGARWAL_YU_SCORE, sparsity, relation.getDBIDs());
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreResult);
   }

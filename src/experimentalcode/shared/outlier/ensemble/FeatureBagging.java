@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -229,7 +228,7 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
         }
       }
       OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-      AnnotationResult<Double> scores = new AnnotationFromDataStore<Double>("Feature bagging", "fb-outlier", FEATUREBAGGING_ID, sumscore, relation.getDBIDs());
+      Relation<Double> scores = new AnnotationFromDataStore<Double>("Feature bagging", "fb-outlier", FEATUREBAGGING_ID, sumscore, relation.getDBIDs());
       result = new OutlierResult(meta, scores);
     }
     return result;
