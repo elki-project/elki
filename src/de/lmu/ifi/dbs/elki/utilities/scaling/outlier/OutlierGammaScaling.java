@@ -1,11 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.special.Gamma;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -70,17 +67,11 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
     assert (theta > 0) : "prepare() was not run prior to using the scaling function.";
-    try {
-      value = preScale(value);
-      if(Double.isNaN(value) || Double.isInfinite(value)) {
-        return 1.0;
-      }
-      return Math.max(0, (Gamma.regularizedGammaP(k, value / theta) - atmean) / (1 - atmean));
-    }
-    catch(MathException e) {
-      LoggingUtil.exception(e);
+    value = preScale(value);
+    if(Double.isNaN(value) || Double.isInfinite(value)) {
       return 1.0;
     }
+    return Math.max(0, (MathUtil.regularizedGammaP(k, value / theta) - atmean) / (1 - atmean));
   }
 
   @Override
@@ -98,12 +89,7 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
     final double var = mv.getSampleVariance();
     k = (mean * mean) / var;
     theta = var / mean;
-    try {
-      atmean = Gamma.regularizedGammaP(k, mean / theta);
-    }
-    catch(MathException e) {
-      LoggingUtil.exception(e);
-    }
+    atmean = MathUtil.regularizedGammaP(k, mean / theta);
     // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
   }
 

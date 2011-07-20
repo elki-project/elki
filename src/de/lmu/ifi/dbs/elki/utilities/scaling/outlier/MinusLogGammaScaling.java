@@ -1,12 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.special.Gamma;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -67,12 +64,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     final double var = mv.getSampleVariance();
     k = (mean * mean) / var;
     theta = var / mean;
-    try {
-      atmean = Gamma.regularizedGammaP(k, mean / theta);
-    }
-    catch(MathException e) {
-      LoggingUtil.exception(e);
-    }
+    atmean = MathUtil.regularizedGammaP(k, mean / theta);
     // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
   }
 
