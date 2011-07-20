@@ -31,10 +31,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * S. Shekhar and C.-T. Lu and P. Zhang <br>
  * A Unified Approach to Detecting Spatial Outliers <br>
  * in GeoInformatica 7-2, 2003
- * 
- *<p> Moran scatterplot is a plot of normalized attribute values 
- * against the neighborhood average of normalized attribute values. 
- * Spatial Objects on the upper left or lower right are Spatial Outliers.
+ * </p>
+ * <p>
+ * Moran scatterplot is a plot of normalized attribute values against the
+ * neighborhood average of normalized attribute values. Spatial Objects on the
+ * upper left or lower right are Spatial Outliers.
+ * </p>
  * 
  * @author Ahmed Hettab
  * 
@@ -51,8 +53,8 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
   /**
    * 
-   * The association id to associate the SCORE of an object for the MoranScatterplotOutlier
-   * algorithm.
+   * The association id to associate the SCORE of an object for the
+   * MoranScatterplotOutlier algorithm.
    */
   public static final AssociationID<Double> SCORE = AssociationID.getOrCreateAssociationID("Moran-Outlier", TypeUtil.DOUBLE);
 
@@ -77,16 +79,15 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
     WritableDataStore<Double> stdZ = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> neighborStdZ = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
-    
-    // add non-spatial value to MeanVariance 
-    MeanVariance stdZMV = new MeanVariance();    
+
+    // add non-spatial value to MeanVariance
+    MeanVariance stdZMV = new MeanVariance();
     for(DBID id : relation.getDBIDs()) {
       stdZMV.put(relation.get(id).doubleValue(1));
     }
 
-    
-    // calculate normalized attribute values 
-    //calculate neighborhood average of normalized attribute values.
+    // calculate normalized attribute values
+    // calculate neighborhood average of normalized attribute values.
     for(DBID id : relation.getDBIDs()) {
       double zValue = (relation.get(id).doubleValue(1) - stdZMV.getMean()) / stdZMV.getNaiveStddev();
       stdZ.put(id, zValue);
@@ -96,9 +97,9 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       }
       neighborStdZ.put(id, neighborZValue / npred.getNeighborDBIDs(id).size());
     }
-    
+
     // compute score
-    //Spatial Object with score=1 are Spatial Outlier
+    // Spatial Object with score=1 are Spatial Outlier
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(DBID id : relation.getDBIDs()) {
