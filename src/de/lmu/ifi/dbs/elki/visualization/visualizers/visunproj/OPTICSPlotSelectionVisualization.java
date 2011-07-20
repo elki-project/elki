@@ -33,8 +33,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -359,16 +357,12 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      VisualizerContext context = VisualizerUtil.getContext(baseResult);
-      Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
-      for(ClusterOrderResult<DoubleDistance> co : cos) {
-        // Add plots, attach visualizer
-        OPTICSPlot<?> plot = OPTICSPlot.plotForClusterOrder(co, context);
-        if(plot != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-          baseResult.getHierarchy().add(plot, task);
-        }
+      Collection<OPTICSPlot<?>> plots = ResultUtil.filterResults(result, OPTICSPlot.class);
+      for(OPTICSPlot<?> plot : plots) {
+        ClusterOrderResult<?> co = plot.getClusterOrder();
+        final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+        baseResult.getHierarchy().add(plot, task);
       }
     }
 

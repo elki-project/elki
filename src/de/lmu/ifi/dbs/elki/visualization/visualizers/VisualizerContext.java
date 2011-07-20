@@ -310,7 +310,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   private void processNewResult(HierarchicalResult baseResult, Result newResult) {
     // Collect all visualizers.
     for(VisFactory f : factories) {
-      if(hideVisualizers.matcher(f.getClass().getName()).find()) {
+      if(hideVisualizers != null && hideVisualizers.matcher(f.getClass().getName()).find()) {
         continue;
       }
       try {
