@@ -9,21 +9,22 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -31,15 +32,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * FIXME: Documentation, Reference
+ *<p>
+ *Reference: <br>
+ * Tianming Hu and Sam Yuan Sung<br>
+ * A Trimmed Mean Approach to finding Spatial Outliers<br>
+ * in Intelligent Data Analysis, Volume 8, 2004.
+ * </p>
  * 
- * A Trimmed Mean Approach to finding Spatial Outliers
- * 
+ * <p>
+ * the contiguity Matrix is definit as <br>
+ * wij = 1/k if j is neighbor of i, k is the neighbors size of i.
+ * </p>
  * @author Ahmed Hettab
  * @param <N> Neighborhood object type
  */
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
 @Description("a local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
+@Reference(authors = "Tianming Hu and Sam Yuan Sung", title = "A trimmed mean approach to finding spatial outliers", booktitle = "Intell. Data Anal. pages 79-95 ,2004 volume8 ")
 public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
@@ -65,29 +74,39 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Run the algorithm
    * 
+   * @param database Database
    * @param neighbors Neighborhood relation
    * @param relation Relation
    * @return Outlier detection result
    */
-  public OutlierResult run(Relation<N> neighbors, Relation<? extends NumberVector<?, ?>> relation) {
+  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     assert (DatabaseUtil.dimensionality(relation) == 1) : "TrimmedMean can only process one-dimensional data sets.";
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(neighbors);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
 
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-
-    // calculate the error Term
-    Matrix temp1 = Matrix.identity(relation.size(), relation.size()).minus(getNeighborhoodMatrix(relation, npred));
-    Matrix temp2 = getSpatialAttributeMatrix(relation).minus(getLocalTrimmedMeanMatrix(relation, npred));
-    Matrix E = temp1.times(temp2);
-
+    
+    for(DBID id : relation.getDBIDs()) {
+      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      int i = 0 ;
+      double[] values = new double[neighbors.size()];
+      // calculate trimmedMean
+      for(DBID n : neighbors) {
+        values[i] = relation.get(n).doubleValue(1);
+        i++ ;
+      }
+      // calculate local trimmed Mean and error term
+      double tm = StatUtils.percentile(values, p);
+      error.put(id, relation.get(id).doubleValue(1)-tm);
+    }
+    
+    
     // calculate the median of error Term
     int i = 0;
     double[] ei = new double[relation.size()];
     Median median = new Median();
     for(DBID id : relation.getDBIDs()) {
-      error.put(id, E.get(i, 0));
-      ei[i] = E.get(i, 0);
+      ei[i] = error.get(id);
       i++;
     }
     double median_i = median.evaluate(ei);
@@ -112,70 +131,12 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       i++;
     }
     //
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("OTR", "Trimmedmean-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("TrimmedMean", "Trimmed Mean Score", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  /**
-   * the neighborhood Matrix
-   * 
-   */
-  // TODO: can we do this more efficiently?
-  public Matrix getNeighborhoodMatrix(Relation<? extends NumberVector<?, ?>> relation, NeighborSetPredicate npred) {
-    Matrix m = new Matrix(relation.size(), relation.size());
-    int i = 0;
-    for(DBID id : relation.iterDBIDs()) {
-      int j = 0;
-      for(DBID n : relation.iterDBIDs()) {
-        if(npred.getNeighborDBIDs(id).contains(n)) {
-          m.set(i, j, 1);
-        }
-        else {
-          m.set(i, j, 0);
-        }
-        j++;
-      }
-      i++;
-    }
-    m.normalizeColumns();
-    return m;
-  }
-
-  /**
-   * return the Local trimmed Mean Matrix
-   */
-  public Matrix getLocalTrimmedMeanMatrix(Relation<? extends NumberVector<?, ?>> relation, NeighborSetPredicate npred) {
-    Matrix m = new Matrix(relation.size(), 1);
-    int i = 0;
-    for(DBID id : relation.iterDBIDs()) {
-      DBIDs neighbors = npred.getNeighborDBIDs(id);
-      int j = 0;
-      double[] aValues = new double[neighbors.size()];
-      for(DBID n : neighbors) {
-        aValues[j] = relation.get(n).doubleValue(1);
-        j++;
-      }
-      m.set(i, 0, StatUtils.percentile(aValues, p * 100));
-      i++;
-    }
-    return m;
-  }
-
-  /**
-   * return the non Spatial atribut value Matrix
-   * 
-   */
-  public Matrix getSpatialAttributeMatrix(Relation<? extends NumberVector<?, ?>> relation) {
-    Matrix m = new Matrix(relation.size(), 1);
-    int i = 0;
-    for(DBID id : relation.iterDBIDs()) {
-      m.set(i, 0, relation.get(id).doubleValue(1));
-      i++;
-    }
-    return m;
-  }
-
+ 
   @Override
   protected Logging getLogger() {
     return logger;
