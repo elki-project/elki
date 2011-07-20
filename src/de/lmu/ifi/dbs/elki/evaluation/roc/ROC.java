@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
@@ -228,7 +228,7 @@ public class ROC {
     /**
      * Outlier score
      */
-    private AnnotationResult<Double> scores;
+    private Relation<Double> scores;
 
     /**
      * Constructor.

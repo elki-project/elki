@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -85,7 +84,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
       }
       scores.put(id, score);
     }
-    AnnotationResult<Double> scoreres = new AnnotationFromDataStore<Double>("By label outlier scores", "label-outlier", LABEL_OUT, scores, relation.getDBIDs());
+    Relation<Double> scoreres = new AnnotationFromDataStore<Double>("By label outlier scores", "label-outlier", LABEL_OUT, scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
     return new OutlierResult(meta, scoreres);
   }

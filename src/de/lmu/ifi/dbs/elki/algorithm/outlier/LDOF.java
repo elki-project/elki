@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -146,7 +145,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("LDOF Outlier Score", "ldof-outlier", LDOF_SCORE, ldofs, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("LDOF Outlier Score", "ldof-outlier", LDOF_SCORE, ldofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult);
   }

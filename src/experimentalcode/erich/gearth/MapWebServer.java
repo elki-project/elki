@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -223,8 +222,8 @@ public class MapWebServer {
       int pagesize = 50;
       re.append("\"scores\":[");
       OutlierResult or = (OutlierResult) cur;
-      AnnotationResult<Double> scores = or.getScores();
-      Iterator<DBID> iter = or.getOrdering().iter(db.getDBIDs()).iterator();
+      Relation<Double> scores = or.getScores();
+      Iterator<DBID> iter = or.getOrdering().iter(scores.getDBIDs()).iterator();
       for(int i = 0; i < offset && iter.hasNext(); i++) {
         iter.next();
       }

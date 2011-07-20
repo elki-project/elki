@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -116,7 +115,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     else {
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY);
     }
-    AnnotationResult<Double> res = new AnnotationFromDataStore<Double>("Gaussian Model Outlier Score", "gaussian-model-outlier", GMOD_PROB, oscores, relation.getDBIDs());
+    Relation<Double> res = new AnnotationFromDataStore<Double>("Gaussian Model Outlier Score", "gaussian-model-outlier", GMOD_PROB, oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 

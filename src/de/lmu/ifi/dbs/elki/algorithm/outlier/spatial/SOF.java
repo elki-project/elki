@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -113,7 +112,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Spatial Outlier Factor", "sof-outlier", SOF_SCORE, lofs, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Spatial Outlier Factor", "sof-outlier", SOF_SCORE, lofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;

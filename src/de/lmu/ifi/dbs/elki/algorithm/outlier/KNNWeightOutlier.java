@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -125,7 +124,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
       progressKNNWeight.ensureCompleted(logger);
     }
 
-    AnnotationResult<Double> res = new AnnotationFromDataStore<Double>("Weighted kNN Outlier Score", "knnw-outlier", KNNWOD_WEIGHT, knnw_score, relation.getDBIDs());
+    Relation<Double> res = new AnnotationFromDataStore<Double>("Weighted kNN Outlier Score", "knnw-outlier", KNNWOD_WEIGHT, knnw_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxweight, 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(meta, res);
   }

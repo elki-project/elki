@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
@@ -17,13 +17,13 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses AnnotationResult
+ * @apiviz.uses Relation
  */
-public class OrderingFromAnnotationResult implements OrderingResult {
+public class OrderingFromRelation implements OrderingResult {
   /**
    * Outlier scores.
    */
-  protected AnnotationResult<Double> scores;
+  protected Relation<Double> scores;
 
   /**
    * Factor for ascending (+1) and descending (-1) ordering.
@@ -36,7 +36,7 @@ public class OrderingFromAnnotationResult implements OrderingResult {
    * @param scores outlier score result
    * @param ascending Ascending when {@code true}, descending otherwise
    */
-  public OrderingFromAnnotationResult(AnnotationResult<Double> scores, boolean ascending) {
+  public OrderingFromRelation(Relation<Double> scores, boolean ascending) {
     super();
     this.scores = scores;
     this.ascending = ascending ? +1 : -1;
@@ -47,7 +47,7 @@ public class OrderingFromAnnotationResult implements OrderingResult {
    * 
    * @param scores
    */
-  public OrderingFromAnnotationResult(AnnotationResult<Double> scores) {
+  public OrderingFromRelation(Relation<Double> scores) {
     this(scores, true);
   }
 

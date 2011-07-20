@@ -6,9 +6,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -110,7 +110,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
    * @param scores Scores
    * @return new values for A and B.
    */
-  private final double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, BitSet t, AnnotationResult<Double> scores) {
+  private final double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, BitSet t, Relation<Double> scores) {
     final int prior1 = t.cardinality();
     final int prior0 = ids.size() - prior1;
 

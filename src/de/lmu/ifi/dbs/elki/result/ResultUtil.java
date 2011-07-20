@@ -7,11 +7,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
@@ -20,66 +22,29 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.OneItemIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 
 /**
  * Utilities for handling result objects
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.result.Result oneway - - filters
+ * @apiviz.uses Result oneway - - filters
  */
 public class ResultUtil {
-  /**
-   * (Try to) find an association of the given ID in the result.
-   * 
-   * @param <T> Association result type
-   * @param result Result to find associations in
-   * @param assoc Association
-   * @return First matching annotation result or null
-   */
-  public static final <T> AnnotationResult<T> findAnnotationResult(Result result, AssociationID<T> assoc) {
-    List<AnnotationResult<?>> anns = getAnnotationResults(result);
-    return findAnnotationResult(anns, assoc);
-  }
-
-  /**
-   * (Try to) find an association of the given ID in the result.
-   * 
-   * @param <T> Association result type
-   * @param anns List of Results
-   * @param assoc Association
-   * @return First matching annotation result or null
-   */
-  @SuppressWarnings("unchecked")
-  public static final <T> AnnotationResult<T> findAnnotationResult(List<AnnotationResult<?>> anns, AssociationID<T> assoc) {
-    if(anns == null) {
-      return null;
-    }
-    for(AnnotationResult<?> a : anns) {
-      if(a.getAssociationID() == assoc) { // == okay to use: association IDs are
-        // unique objects
-        return (AnnotationResult<T>) a;
-      }
-    }
-    return null;
-  }
-
   /**
    * Collect all Annotation results from a Result
    * 
    * @param r Result
    * @return List of all annotation results
    */
-  public static List<AnnotationResult<?>> getAnnotationResults(Result r) {
-    if(r instanceof AnnotationResult<?>) {
-      List<AnnotationResult<?>> anns = new ArrayList<AnnotationResult<?>>(1);
-      anns.add((AnnotationResult<?>) r);
+  public static List<Relation<?>> getRelations(Result r) {
+    if(r instanceof Relation<?>) {
+      List<Relation<?>> anns = new ArrayList<Relation<?>>(1);
+      anns.add((Relation<?>) r);
       return anns;
     }
     if(r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, AnnotationResult.class));
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, Relation.class));
     }
     return Collections.emptyList();
   }

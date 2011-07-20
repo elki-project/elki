@@ -14,8 +14,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
@@ -192,7 +192,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
    * 
    * @author Erich Schubert
    */
-  class ReachabilityDistanceAdapter implements AnnotationResult<D>, ResultAdapter {
+  class ReachabilityDistanceAdapter implements Relation<D>, ResultAdapter {
     /**
      * Access reference.
      */
@@ -213,12 +213,6 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
       super();
       this.map = map;
       this.dbids = dbids;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public AssociationID<D> getAssociationID() {
-      return (AssociationID<D>) REACHABILITY_ID;
     }
 
     @Override
@@ -289,7 +283,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
    * 
    * @author Erich Schubert
    */
-  class PredecessorAdapter implements AnnotationResult<DBID>, ResultAdapter {
+  class PredecessorAdapter implements Relation<DBID>, ResultAdapter {
     /**
      * Access reference.
      */
@@ -310,11 +304,6 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
       super();
       this.map = map;
       this.dbids = dbids;
-    }
-
-    @Override
-    public AssociationID<DBID> getAssociationID() {
-      return PREDECESSOR_ID;
     }
 
     @Override

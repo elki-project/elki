@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -296,7 +295,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    */
   void writeResult(PrintStream out, DBIDs ids, OutlierResult result, ScalingFunction scaling, String label) {
     out.append(label);
-    AnnotationResult<Double> scores = result.getScores();
+    Relation<Double> scores = result.getScores();
     for(DBID id : ids) {
       final double value = scaling.getScaled(scores.get(id));
       out.append(" ").append(FormatUtil.format(value, FormatUtil.NF8));

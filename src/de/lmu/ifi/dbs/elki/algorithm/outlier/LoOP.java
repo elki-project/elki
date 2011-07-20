@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -302,7 +301,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Local Outlier Probabilities", "loop-outlier", LOOP_SCORE, loops, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Local Outlier Probabilities", "loop-outlier", LOOP_SCORE, loops, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }

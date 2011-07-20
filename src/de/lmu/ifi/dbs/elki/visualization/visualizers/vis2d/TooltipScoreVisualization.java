@@ -11,7 +11,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -55,7 +54,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends T
   /**
    * Number value to visualize
    */
-  private AnnotationResult<? extends Number> result;
+  private Relation<? extends Number> result;
 
   /**
    * Font size to use.

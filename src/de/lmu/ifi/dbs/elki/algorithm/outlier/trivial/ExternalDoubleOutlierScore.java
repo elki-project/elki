@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -186,7 +185,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     else {
       meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     }
-    AnnotationResult<Double> scoresult = new AnnotationFromDataStore<Double>("External Outlier", "external-outlier", EXTERNAL_OUTLIER_SCORES_ID, scores, relation.getDBIDs());
+    Relation<Double> scoresult = new AnnotationFromDataStore<Double>("External Outlier", "external-outlier", EXTERNAL_OUTLIER_SCORES_ID, scores, relation.getDBIDs());
     OutlierResult or = new OutlierResult(meta, scoresult);
 
     // Apply scaling

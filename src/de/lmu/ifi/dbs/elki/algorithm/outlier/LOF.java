@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -245,7 +244,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Local Outlier Factor", "lof-outlier", LOF_SCORE, lofs, kNNRefer.getRelation().getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Local Outlier Factor", "lof-outlier", LOF_SCORE, lofs, kNNRefer.getRelation().getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 

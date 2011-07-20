@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
@@ -18,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
  * @param <T> Data type to store.
  */
 // TODO: make serializable.
-public class AnnotationFromDataStore<T> extends BasicResult implements AnnotationResult<T> {
+public class AnnotationFromDataStore<T> extends BasicResult implements Relation<T> {
   /**
    * Store the hashmap for results.
    */
@@ -48,11 +49,6 @@ public class AnnotationFromDataStore<T> extends BasicResult implements Annotatio
     this.map = map;
     this.assoc = assoc;
     this.dbids = dbids;
-  }
-
-  @Override
-  public AssociationID<T> getAssociationID() {
-    return assoc;
   }
 
   @Override

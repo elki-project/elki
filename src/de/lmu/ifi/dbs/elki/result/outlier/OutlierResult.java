@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.result.outlier;
 
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
 /**
  * Wrap a typical Outlier result, keeping direct references to the main result
@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf OutlierScoreMeta
- * @apiviz.composedOf AnnotationResult oneway - - contains
+ * @apiviz.composedOf Relation oneway - - contains
  * @apiviz.composedOf OrderingFromAnnotationResult
  */
 public class OutlierResult extends BasicResult {
@@ -23,7 +23,7 @@ public class OutlierResult extends BasicResult {
   /**
    * Outlier scores.
    */
-  private AnnotationResult<Double> scores;
+  private Relation<Double> scores;
 
   /**
    * Outlier ordering.
@@ -36,11 +36,11 @@ public class OutlierResult extends BasicResult {
    * @param meta Outlier score metadata.
    * @param scores Scores result.
    */
-  public OutlierResult(OutlierScoreMeta meta, AnnotationResult<Double> scores) {
+  public OutlierResult(OutlierScoreMeta meta, Relation<Double> scores) {
     super(scores.getLongName(), scores.getShortName());
     this.meta = meta;
     this.scores = scores;
-    this.ordering = new OrderingFromAnnotationResult(scores, !(meta instanceof InvertedOutlierScoreMeta));
+    this.ordering = new OrderingFromRelation(scores, !(meta instanceof InvertedOutlierScoreMeta));
     this.addChildResult(scores);
     this.addChildResult(ordering);
     this.addChildResult(meta);
@@ -60,7 +60,7 @@ public class OutlierResult extends BasicResult {
    * 
    * @return the scores
    */
-  public AnnotationResult<Double> getScores() {
+  public Relation<Double> getScores() {
     return scores;
   }
 

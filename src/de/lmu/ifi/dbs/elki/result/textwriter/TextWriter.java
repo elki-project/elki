@@ -22,11 +22,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
@@ -207,14 +207,14 @@ public class TextWriter {
    * @throws IOException on IO error
    */
   public void output(Database db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
-    List<AnnotationResult<?>> ra = null;
+    List<Relation<?>> ra = null;
     List<OrderingResult> ro = null;
     List<Clustering<? extends Model>> rc = null;
     List<IterableResult<?>> ri = null;
     List<SettingsResult> rs = null;
     HashSet<Result> otherres = null;
 
-    ra = ResultUtil.getAnnotationResults(r);
+    ra = ResultUtil.getRelations(r);
     ro = ResultUtil.getOrderingResults(r);
     rc = ResultUtil.getClusteringResults(r);
     ri = ResultUtil.getIterableResults(r);
@@ -267,7 +267,7 @@ public class TextWriter {
     }
   }
 
-  private void printObject(TextWriterStream out, Database db, final DBID objID, List<AnnotationResult<?>> ra) throws UnableToComplyException, IOException {
+  private void printObject(TextWriterStream out, Database db, final DBID objID, List<Relation<?>> ra) throws UnableToComplyException, IOException {
     SingleObjectBundle bundle = db.getBundle(objID);
     // Write database element itself.
     for(int i = 0; i < bundle.metaLength(); i++) {
@@ -286,8 +286,8 @@ public class TextWriter {
 
     // print the annotations
     if(ra != null) {
-      for(AnnotationResult<?> a : ra) {
-        String label = a.getAssociationID().getLabel();
+      for(Relation<?> a : ra) {
+        String label = a.getShortName();
         Object value = a.get(objID);
         if(value == null) {
           continue;
@@ -318,7 +318,7 @@ public class TextWriter {
     out.flush();
   }
 
-  private void writeClusterResult(Database db, StreamFactory streamOpener, Cluster<?> clus, List<AnnotationResult<?>> ra, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeClusterResult(Database db, StreamFactory streamOpener, Cluster<?> clus, List<Relation<?>> ra, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     if(naming != null) {
       filename = filenameFromLabel(naming.getNameFor(clus));
@@ -390,7 +390,7 @@ public class TextWriter {
     out.flush();
   }
 
-  private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<AnnotationResult<?>> ra, List<SettingsResult> sr) throws IOException, UnableToComplyException {
+  private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<Relation<?>> ra, List<SettingsResult> sr) throws IOException, UnableToComplyException {
     PrintStream outStream = streamOpener.openStream(getFilename(or, or.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
     printSettings(out, sr);

@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDataStore;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -208,7 +207,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       minmaxabod.put(pair.getFirst());
     }
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Angle-based Outlier Degree", "abod-outlier", ABOD_SCORE, abodvalues, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Angle-based Outlier Degree", "abod-outlier", ABOD_SCORE, abodvalues, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -315,7 +314,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       minmaxabod.put(pair.getFirst());
     }
     // Build result representation.
-    AnnotationResult<Double> scoreResult = new AnnotationFromDataStore<Double>("Angle-based Outlier Detection", "abod-outlier", ABOD_SCORE, abodvalues, relation.getDBIDs());
+    Relation<Double> scoreResult = new AnnotationFromDataStore<Double>("Angle-based Outlier Detection", "abod-outlier", ABOD_SCORE, abodvalues, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }
