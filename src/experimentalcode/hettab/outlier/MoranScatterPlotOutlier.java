@@ -76,15 +76,31 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
     // calculate normalized attribute values
     // calculate neighborhood average of normalized attribute values.
+    // if s has no neighbors  ====> Wzi = zi  ;
     for(DBID id : relation.getDBIDs()) {
       double zValue = (relation.get(id).doubleValue(1) - stdZMV.getMean()) / stdZMV.getNaiveStddev();
       stdZ.put(id, zValue);
       double neighborZValue = 0;
+      int cnt = 0 ;
       for(DBID n : npred.getNeighborDBIDs(id)) {
+        if(id.equals(n)){
+          continue ;
+        }
+        else{
         neighborZValue += (relation.get(n).doubleValue(1) - stdZMV.getMean()) / stdZMV.getNaiveStddev();
+        cnt ++ ;
+        }
       }
-      neighborStdZ.put(id, neighborZValue / npred.getNeighborDBIDs(id).size());
-    }
+       //if neighors.size == 0  
+        if(cnt>0){
+          neighborStdZ.put(id, neighborZValue / npred.getNeighborDBIDs(id).size());
+        }
+        else{
+          neighborStdZ.put(id, zValue);
+        }
+      }
+      
+    
 
     // compute score
     // Spatial Object with score=1 are Spatial Outlier
@@ -95,10 +111,12 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       if(score < 0) {
         minmax.put(1.0);
         scores.put(id, 1.0);
+        System.out.println(id+" "+1.0);
       }
       else {
         minmax.put(0.0);
         scores.put(id, 0.0);
+        System.out.println(id+" "+0.0);
       }
     }
 
