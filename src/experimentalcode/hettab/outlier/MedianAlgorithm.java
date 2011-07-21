@@ -1,6 +1,7 @@
 package experimentalcode.hettab.outlier;
 
-import org.apache.commons.math.stat.descriptive.rank.Median;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractNeighborhoodOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
@@ -14,11 +15,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -26,9 +27,21 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
-/**
- * FIXME: Documentation
+/**<p>
+ * Reference: <br>
+ * Chang-Tien Lu <br>
+ * Algorithms for Spatial Outlier Detection <br>
+ * in Third IEEE International Conference on Data Mining <br>
+ * </p>
  * 
+ *Description: <br>
+ * Median Algorithm uses Median to represent the average non-spatial attribute
+ * value of neighbors. <br>
+ * The Difference e = non-spatial-Attribut-Value - Median (Neighborhood) is
+ * computed.<br>
+ * The Spatial Objects with the highest standarized e value are Spatial
+ * Outliers.
+ * </p>
  * @author Ahmed Hettab
  * 
  * @param <N> Neighborhood type
@@ -69,20 +82,27 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     for(DBID id : relation.getDBIDs()) {
       //
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      int size = neighbors.size();
-      double[] fi = new double[size];
-      Median m = new Median();
-      int i = 0;
+      ArrayList<Double> fi = new ArrayList<Double>();
       // calculate and store Median of neighborhood
       for(DBID n : neighbors) {
-        fi[i] = relation.get(n).doubleValue(1);
-        i++;
+        if(id.equals(n)){
+          continue ;
+        }
+        fi.add( relation.get(n).doubleValue(1));
       }
-      double median = m.evaluate(fi);
+      
+      if(fi.size()>0){
+      double median = getMean(fi);
       gi.put(id, median);
       double h = relation.get(id).doubleValue(1) - median;
       hi.put(id, h);
       mv.put(h);
+      }
+      else{
+        gi.put(id,relation.get(id).doubleValue(1));
+        hi.put(id,0.0);
+        mv.put(0.0);
+      }
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
@@ -96,7 +116,25 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
+  
+  /**
+   * 
+   * @param values
+   * @return
+   */
+  public static double getMean(ArrayList<Double> values){
+    Collections.sort(values);
+    int middle = values.size() / 2;
+    if(values.size() % 2 == 1) {
 
+      return values.get(middle);
+    }
+    else {
+
+      return (values.get(middle - 1) + values.get(middle)) / 2.0;
+    }
+  }
+  
   @Override
   protected Logging getLogger() {
     return logger;
