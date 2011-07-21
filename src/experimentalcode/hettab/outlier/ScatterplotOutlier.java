@@ -76,14 +76,24 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
 
     // calculate average for each object
+    // if object id has no neighbors ==> avg = non-spatial attribut of id
     for(DBID id : relation.getDBIDs()) {
+      int cnt = 0 ;
+      double avg = 0 ;
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      double d = neighbors.size();
-      double avg = 0;
       for(DBID n : neighbors) {
+        if(id.equals(n)){
+          continue ;
+        }
         avg += relation.get(n).doubleValue(1);
+        cnt++ ;
       }
-      means.put(id, avg / d);
+      if(cnt>0){
+        means.put(id,  avg/cnt) ;
+      }
+      else{
+        means.put(id,relation.get(id).doubleValue(1));
+      }
     }
 
     // calculate errors using regression
