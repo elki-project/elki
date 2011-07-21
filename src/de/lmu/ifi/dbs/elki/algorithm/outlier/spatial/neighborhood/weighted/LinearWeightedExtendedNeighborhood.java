@@ -1,60 +1,96 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.weighted;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Neighborhood obtained by computing the k-fold closure of an existing
- * neighborhood.
+ * neighborhood. Objects are weighted linearly by their distance: the object
+ * itself has a weight of 1 and this decreases linearly to 1/(n+1) for the
+ * nth-step neighbors.
+ * 
+ * TODO: make actual weighting parameterizable?
  * 
  * @author Erich Schubert
  */
-public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood implements Result {
+public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPredicate {
   /**
-   * The logger to use.
+   * The data store to use
    */
-  private static final Logging logger = Logging.getLogger(ExtendedNeighborhood.class);
+  private NeighborSetPredicate inner;
+
+  /**
+   * The number of steps to extend to.
+   */
+  private int steps;
 
   /**
    * Constructor.
    * 
    * @param store The materialized data.
    */
-  public ExtendedNeighborhood(DataStore<DBIDs> store) {
-    super(store);
+  public LinearWeightedExtendedNeighborhood(NeighborSetPredicate inner, int steps) {
+    super();
+    this.inner = inner;
+    this.steps = steps;
+  }
+
+  /**
+   * Compute the weight from the number of steps needed.
+   * 
+   * @param tsteps steps to target
+   * @return weight
+   */
+  private double computeWeight(int tsteps) {
+    return 1.0 - (tsteps / (float) (steps + 1));
   }
 
   @Override
-  protected Logging getLogger() {
-    return logger;
-  }
+  public Collection<DoubleObjPair<DBID>> getWeightedNeighbors(DBID reference) {
+    ModifiableDBIDs seen = DBIDUtil.newHashSet();
+    List<DoubleObjPair<DBID>> result = new ArrayList<DoubleObjPair<DBID>>();
 
-  @Override
-  public String getLongName() {
-    return "Extended Neighborhood";
-  }
-
-  @Override
-  public String getShortName() {
-    return "extended-neighborhood";
+    // Add starting object
+    result.add(new DoubleObjPair<DBID>(computeWeight(0), reference));
+    seen.add(reference);
+    // Extend.
+    DBIDs cur = reference;
+    for(int i = 1; i <= steps; i++) {
+      final double weight = computeWeight(i);
+      // Collect newly discovered IDs
+      ModifiableDBIDs add = DBIDUtil.newHashSet();
+      for(DBID id : cur) {
+        for(DBID nid : inner.getNeighborDBIDs(id)) {
+          // Seen before?
+          if(seen.contains(nid)) {
+            continue;
+          }
+          add.add(nid);
+          result.add(new DoubleObjPair<DBID>(weight, nid));
+        }
+      }
+      if(add.size() == 0) {
+        break;
+      }
+      cur = add;
+    }
+    return result;
   }
 
   /**
@@ -65,12 +101,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood implem
    * @apiviz.stereotype factory
    * @apiviz.has ExtendedNeighborhood oneway - - «produces»
    */
-  public static class Factory<O> extends AbstractPrecomputedNeighborhood.Factory<O> {
-    /**
-     * Logger
-     */
-    private static final Logging logger = Logging.getLogger(ExtendedNeighborhood.class);
-
+  public static class Factory<O> implements WeightedNeighborSetPredicate.Factory<O> {
     /**
      * Inner neighbor set predicate
      */
@@ -94,63 +125,13 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood implem
     }
 
     @Override
-    public NeighborSetPredicate instantiate(Relation<? extends O> database) {
-      DataStore<DBIDs> store = extendNeighborhood(database);
-      ExtendedNeighborhood neighborhood = new ExtendedNeighborhood(store);
-      ResultHierarchy hier = database.getHierarchy();
-      if(hier != null) {
-        hier.add(database, neighborhood);
-      }
-      return neighborhood;
+    public LinearWeightedExtendedNeighborhood instantiate(Relation<? extends O> database) {
+      return new LinearWeightedExtendedNeighborhood(inner.instantiate(database), steps);
     }
 
     @Override
     public TypeInformation getInputTypeRestriction() {
       return inner.getInputTypeRestriction();
-    }
-
-    /**
-     * Method to load the external neighbors.
-     */
-    private DataStore<DBIDs> extendNeighborhood(Relation<? extends O> database) {
-      NeighborSetPredicate innerinst = inner.instantiate(database);
-
-      final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
-
-      // Expand multiple steps
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Expanding neighborhoods", database.size(), logger) : null;
-      for(final DBID id : database.iterDBIDs()) {
-        ModifiableDBIDs res = DBIDUtil.newHashSet(id);
-        DBIDs todo = id;
-        for(int i = 0; i < steps; i++) {
-          ModifiableDBIDs ntodo = DBIDUtil.newHashSet();
-          for(final DBID oid : todo) {
-            DBIDs add = innerinst.getNeighborDBIDs(oid);
-            if(add != null) {
-              for (DBID nid: add) {
-                if (res.contains(add)) {
-                  continue;
-                }
-                ntodo.add(nid);
-                res.add(nid);
-              }
-            }
-          }
-          if (ntodo.size() == 0) {
-            continue;
-          }
-          todo = ntodo;
-        }
-        store.put(id, res);
-        if(progress != null) {
-          progress.incrementProcessed(logger);
-        }
-      }
-      if(progress != null) {
-        progress.ensureCompleted(logger);
-      }
-
-      return store;
     }
 
     /**
@@ -217,8 +198,8 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood implem
       }
 
       @Override
-      protected ExtendedNeighborhood.Factory<O> makeInstance() {
-        return new ExtendedNeighborhood.Factory<O>(inner, steps);
+      protected LinearWeightedExtendedNeighborhood.Factory<O> makeInstance() {
+        return new LinearWeightedExtendedNeighborhood.Factory<O>(inner, steps);
       }
     }
   }
