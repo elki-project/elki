@@ -79,14 +79,28 @@ public class ZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     for(DBID id : relation.getDBIDs()) {
       //
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      MeanVariance localMeanMV = new MeanVariance();
+      double mean = 0 ;
       // calculate and store mean
+      int i = 0 ;
       for(DBID n : neighbors) {
-        localMeanMV.put(relation.get(n).doubleValue(1));
+        if(id.equals(n)){
+          continue ;
+        }
+        else{
+        mean += relation.get(n).doubleValue(1);
+        i++ ;
+        }
+        
       }
-      double diffFLM = relation.get(id).doubleValue(1) - localMeanMV.getMean();
+      if(i>0){
+      double diffFLM = relation.get(id).doubleValue(1) - mean/i;
       diffFromlocalMean.put(id, diffFLM);
       diffFromMeanMV.put(diffFLM);
+      }
+      else{
+        diffFromlocalMean.put(id,0.0);
+        diffFromMeanMV.put(0.0); 
+      }
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
