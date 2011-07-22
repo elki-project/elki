@@ -267,11 +267,11 @@ public class ResultUtil {
   /**
    * Find the first database result in the tree.
    * 
-   * @param baseresult Result tree base.
+   * @param baseResult Result tree base.
    * @return Database
    */
-  public static Database findDatabase(Result baseresult) {
-    final IterableIterator<Database> iter = filteredResults(baseresult, Database.class);
+  public static Database findDatabase(Result baseResult) {
+    final IterableIterator<Database> iter = filteredResults(baseResult, Database.class);
     if(iter.hasNext()) {
       return iter.next();
     }

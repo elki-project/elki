@@ -86,6 +86,13 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
 
   /**
    * Constructor.
+   */
+  public OutlierLinearScaling() {
+    this(null, null, false, false);
+  }
+
+  /**
+   * Constructor.
    * 
    * @param min
    * @param max
@@ -98,7 +105,9 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     this.max = max;
     this.usemean = usemean;
     this.nozeros = nozeros;
-    this.factor = (max - min);
+    if (min != null && max != null) {
+      this.factor = (max - min);
+    }
   }
 
   @Override
