@@ -1,8 +1,5 @@
 package experimentalcode.hettab.outlier;
 
-import org.apache.commons.math.stat.StatUtils;
-import org.apache.commons.math.stat.descriptive.rank.Median;
-
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractNeighborhoodOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -19,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.statistics.QuickSelect;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -32,8 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- *<p>
- *Reference: <br>
+ * <p>
+ * Reference: <br>
  * Tianming Hu and Sam Yuan Sung<br>
  * A Trimmed Mean Approach to finding Spatial Outliers<br>
  * in Intelligent Data Analysis, Volume 8, 2004.
@@ -43,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * the contiguity Matrix is definit as <br>
  * wij = 1/k if j is neighbor of i, k is the neighbors size of i.
  * </p>
+ * 
  * @author Ahmed Hettab
  * @param <N> Neighborhood object type
  */
@@ -85,50 +84,49 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
 
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    
+
     for(DBID id : relation.getDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      int i = 0 ;
+      int i = 0;
       double[] values = new double[neighbors.size()];
       // calculate trimmedMean
       for(DBID n : neighbors) {
         values[i] = relation.get(n).doubleValue(1);
-        i++ ;
+        i++;
       }
       // calculate local trimmed Mean and error term
-      double tm = StatUtils.percentile(values, p);
-      error.put(id, relation.get(id).doubleValue(1)-tm);
+      double tm = QuickSelect.quantile(values, p);
+      error.put(id, relation.get(id).doubleValue(1) - tm);
     }
-    
-    
+
     // calculate the median of error Term
-    int i = 0;
     double[] ei = new double[relation.size()];
-    Median median = new Median();
-    for(DBID id : relation.getDBIDs()) {
-      ei[i] = error.get(id);
-      i++;
+    {
+      int i = 0;
+      for(DBID id : relation.getDBIDs()) {
+        ei[i] = error.get(id);
+        i++;
+      }
     }
-    double median_i = median.evaluate(ei);
+    double median_i = QuickSelect.median(ei);
 
     // calculate MAD
-    double MAD;
-    i = 0;
     double[] temp = new double[relation.size()];
-    for(DBID id : relation.getDBIDs()) {
-      temp[i] = Math.abs(error.get(id) - median_i);
-      i++;
+    {
+      int i = 0;
+      for(DBID id : relation.getDBIDs()) {
+        temp[i] = Math.abs(error.get(id) - median_i);
+        i++;
+      }
     }
-    MAD = median.evaluate(temp);
+    double MAD = QuickSelect.median(temp);
 
     // calculate score
     DoubleMinMax minmax = new DoubleMinMax();
-    i = 0;
     for(DBID id : relation.getDBIDs()) {
-      double score = temp[i] * 0.6745 / MAD;
+      double score = error.get(id) * 0.6745 / MAD;
       scores.put(id, score);
       minmax.put(score);
-      i++;
     }
     //
     Relation<Double> scoreResult = new MaterializedRelation<Double>("TrimmedMean", "Trimmed Mean Score", TypeUtil.DOUBLE, scores, relation.getDBIDs());
@@ -136,7 +134,6 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
- 
   @Override
   protected Logging getLogger() {
     return logger;
