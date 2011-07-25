@@ -48,18 +48,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("Moran Scatterplot Outlier")
 @Description("Spatial Outlier detection based on the standardized deviation from the local means.")
 @Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003")
-public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
+public class MoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MoranScatterPlotOutlier.class);
+  private static final Logging logger = Logging.getLogger(MoranScatterplotOutlier.class);
 
   /**
    * Constructor
    * 
    * @param npredf Neighborhood
    */
-  public MoranScatterPlotOutlier(Factory<N> npredf) {
+  public MoranScatterplotOutlier(Factory<N> npredf) {
     super(npredf);
   }
 
@@ -138,8 +138,8 @@ public class MoranScatterPlotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
-    protected MoranScatterPlotOutlier<N> makeInstance() {
-      return new MoranScatterPlotOutlier<N>(npredf);
+    protected MoranScatterplotOutlier<N> makeInstance() {
+      return new MoranScatterplotOutlier<N>(npredf);
     }
   }
 }
