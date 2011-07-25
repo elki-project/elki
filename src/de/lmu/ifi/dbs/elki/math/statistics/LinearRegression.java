@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * @author Arthur Zimek
  */
 // TODO: arthur comment
+// TODO: use covariance matrix, add incremental API?
 public class LinearRegression {
   private double t;
 

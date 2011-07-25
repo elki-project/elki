@@ -1,8 +1,5 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
-import org.apache.commons.math.stat.regression.SimpleRegression;
-
-import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractNeighborhoodOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -13,11 +10,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -26,7 +26,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Scatterplot-Outlier
+ * Scatterplot-outlier is a spatial outlier detection method that performs a
+ * linear regression of object attributes and their neighbors average value.
+ * 
  * <p>
  * Reference: <br>
  * S. Shekhar and C.-T. Lu and P. Zhang <br>
@@ -45,8 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * @param <N> Neighborhood object type
  */
-@Title("A Unified Approach to Spatial Outliers Detection")
-@Description("Spatial Outlier Detection Algorithm")
+@Title("Scatterplot Spatial Outlier")
+@Description("Spatial Outlier Detection Algorithm using linear regression of attributes and the mean of their neighbors.")
 @Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003")
 public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
@@ -57,7 +59,7 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Constructor
    * 
-   * @param npredf
+   * @param npredf Neighborhood predicate
    */
   public ScatterplotOutlier(NeighborSetPredicate.Factory<N> npredf) {
     super(npredf);
@@ -73,54 +75,65 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
     WritableDataStore<Double> means = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
 
-    // calculate average for each object
-    // if object id has no neighbors ==> avg = non-spatial attribut of id
+    // Calculate average of neighborhood for each object and perform a linear
+    // regression using the covariance matrix
+    CovarianceMatrix covm = new CovarianceMatrix(2);
     for(DBID id : relation.getDBIDs()) {
-      int cnt = 0 ;
-      double avg = 0 ;
+      final double local = relation.get(id).doubleValue(1);
+      // Compute mean of neighbors
+      Mean mean = new Mean();
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       for(DBID n : neighbors) {
-        if(id.equals(n)){
-          continue ;
+        if(id.equals(n)) {
+          continue;
         }
-        avg += relation.get(n).doubleValue(1);
-        cnt++ ;
+        mean.put(relation.get(n).doubleValue(1));
       }
-      if(cnt>0){
-        means.put(id,  avg/cnt) ;
+      final double m;
+      if(mean.getCount() > 0) {
+        m = mean.getMean();
       }
-      else{
-        means.put(id,relation.get(id).doubleValue(1));
+      else {
+        // if object id has no neighbors ==> avg = non-spatial attribute of id
+        m = local;
       }
+      // Store the mean for the score calculation
+      means.put(id, m);
+      covm.put(new double[] { local, m });
     }
-
-    // calculate errors using regression
-    SimpleRegression regression = new SimpleRegression();
-    for(DBID id : relation.getDBIDs()) {
-      regression.addData(relation.get(id).doubleValue(1), means.get(id));
+    // Finalize covariance matrix, compute linear regression
+    final double slope, inter;
+    {
+      double[] meanv = covm.getMeanVector().getArrayRef();
+      Matrix fmat = covm.destroyToSampleMatrix();
+      final double covxx = fmat.get(0, 0);
+      final double covxy = fmat.get(0, 1);
+      slope = covxy / covxx;
+      inter = meanv[1] - slope * meanv[0];
     }
 
     // calculate mean and variance for error
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     MeanVariance mv = new MeanVariance();
     for(DBID id : relation.getDBIDs()) {
+      // Compute the error from the linear regression
       double y_i = relation.get(id).doubleValue(1);
-      double e = means.get(id) - (regression.getSlope() * y_i + regression.getIntercept());
-      error.put(id, e);
+      double e = means.get(id) - (slope * y_i + inter);
+      scores.put(id, e);
       mv.put(e);
     }
 
-    double mean = mv.getMean();
-    double variance = mv.getNaiveStddev();
-
+    // Normalize scores
     DoubleMinMax minmax = new DoubleMinMax();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : relation.getDBIDs()) {
-      double score = Math.abs((error.get(id) - mean) / variance);
-      minmax.put(score);
-      scores.put(id, score);
-
+    {
+      final double mean = mv.getMean();
+      final double variance = mv.getNaiveStddev();
+      for(DBID id : relation.getDBIDs()) {
+        double score = Math.abs((scores.get(id) - mean) / variance);
+        minmax.put(score);
+        scores.put(id, score);
+      }
     }
     // build representation
     Relation<Double> scoreResult = new MaterializedRelation<Double>("SPO", "Scatterplot-Outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
