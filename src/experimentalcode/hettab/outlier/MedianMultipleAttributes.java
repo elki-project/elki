@@ -2,8 +2,6 @@ package experimentalcode.hettab.outlier;
 
 import java.util.List;
 
-import org.apache.commons.math.stat.descriptive.rank.Median;
-
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -17,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.statistics.QuickSelect;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -69,13 +68,14 @@ public class MedianMultipleAttributes<V extends NumberVector<?, ?>> extends Mult
         int nSize = neighbors.size();
         // g value
         double g[] = new double[nSize];
-        Median m = new Median();
-        int k = 0;
-        for(DBID n : neighbors) {
-          g[k] = relation.get(n).doubleValue(dim);
-          k++;
+        {
+          int k = 0;
+          for(DBID n : neighbors) {
+            g[k] = relation.get(n).doubleValue(dim);
+            k++;
+          }
         }
-        double gm = m.evaluate(g);
+        double gm = QuickSelect.median(g);
         double h = f - gm;
         // add to h Matrix
         hMatrix.set(i, j, h);
