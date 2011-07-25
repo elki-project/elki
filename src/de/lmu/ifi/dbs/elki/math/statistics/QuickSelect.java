@@ -40,15 +40,30 @@ public class QuickSelect {
    * @return
    */
   public static double median(double[] data) {
-    assert (data.length > 0);
+    return median(data, 0, data.length - 1);
+  }
+
+  /**
+   * Compute the median of an array efficiently using the QuickSelect method.
+   * 
+   * Note: the array is <b>modified</b> by this.
+   * 
+   * @param data Data to process
+   * @param begin Begin of valid values
+   * @param end End of valid values (inclusive!)
+   * @return
+   */
+  public static double median(double[] data, int begin, int end) {
+    final int length = (end + 1) - begin;
+    assert (length > 0);
     // Integer division is "floor" since we are non-negative.
-    final int left = (data.length - 1) / 2;
-    quickSelect(data, left);
-    if(data.length % 2 == 1) {
+    final int left = begin + (length - 1) / 2;
+    quickSelect(data, begin, end, left);
+    if(length % 2 == 1) {
       return data[left];
     }
     else {
-      quickSelect(data, left + 1);
+      quickSelect(data, begin, end, left + 1);
       return data[left] + (data[left + 1] - data[left]) / 2;
     }
   }
@@ -59,21 +74,38 @@ public class QuickSelect {
    * Note: the array is <b>modified</b> by this.
    * 
    * @param data Data to process
-   * @return
+   * @param quant Quantile to compute
+   * @return Value at quantile
    */
   public static double quantile(double[] data, double quant) {
-    assert (data.length > 0);
+    return quantile(data, 0, data.length - 1, quant);
+  }
+
+  /**
+   * Compute the median of an array efficiently using the QuickSelect method.
+   * 
+   * Note: the array is <b>modified</b> by this.
+   * 
+   * @param data Data to process
+   * @param begin Begin of valid values
+   * @param end End of valid values (inclusive!)
+   * @param quant Quantile to compute
+   * @return Value at quantile
+   */
+  public static double quantile(double[] data, int begin, int end, double quant) {
+    final int length = (end + 1) - begin;
+    assert (length > 0);
     // Integer division is "floor" since we are non-negative.
-    final double dleft = (data.length + 1) * quant - 1;
+    final double dleft = begin + (length + 1) * quant - 1;
     final int ileft = (int) Math.floor(dleft);
     final double err = dleft - ileft;
 
-    quickSelect(data, ileft);
+    quickSelect(data, begin, end, ileft);
     if(err <= Double.MIN_NORMAL) {
       return data[ileft];
     }
     else {
-      quickSelect(data, ileft + 1);
+      quickSelect(data, begin, end, ileft + 1);
       // Mix:
       double mix = data[ileft] + (data[ileft + 1] - data[ileft]) * err;
       return mix;
@@ -89,7 +121,7 @@ public class QuickSelect {
    * @param end Interval end (inclusive)
    * @param rank rank position we are interested in (starting at 0)
    */
-  private static void quickSelect(double[] data, int start, int end, int rank) {
+  public static void quickSelect(double[] data, int start, int end, int rank) {
     // Optimization for small arrays
     // This also ensures a minimum size below
     if(start + SMALL > end) {
