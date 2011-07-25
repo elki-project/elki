@@ -191,13 +191,3 @@ Comment: Apache Commons Logging from FOP Transcoder package
 Implementation-Title: Apache Commons Logging
 Implementation-Vendor: Apache Software Foundation
 Implementation-URL: http://commons.apache.org/logging/
-
-Name: org/apache/commons/math
-Comment: Apache Commons Math
-Implementation-Title: Commons Math
-Implementation-Vendor: The Apache Software Foundation
-Implementation-Vendor-Id: org.apache
-Implementation-Version: 2.0
-Specification-Title: Commons Math
-Specification-Vendor: The Apache Software Foundation
-Specification-Version: 2.0
