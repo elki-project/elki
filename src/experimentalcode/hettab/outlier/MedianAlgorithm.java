@@ -152,7 +152,7 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
    * 
    * @apiviz.exclude
    * 
-   * @param <N> Neighbordhood object type
+   * @param <N> Neighborhood object type
    */
   public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
