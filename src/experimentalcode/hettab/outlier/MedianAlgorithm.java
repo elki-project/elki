@@ -58,7 +58,7 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Constructor
    * 
-   * @param npredf
+   * @param npredf Neighborhood predicate
    */
   public MedianAlgorithm(NeighborSetPredicate.Factory<N> npredf) {
     super(npredf);
