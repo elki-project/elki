@@ -37,7 +37,7 @@ public class QuickSelect {
    * Note: the array is <b>modified</b> by this.
    * 
    * @param data Data to process
-   * @return
+   * @return Median value
    */
   public static double median(double[] data) {
     return median(data, 0, data.length - 1);
@@ -51,7 +51,7 @@ public class QuickSelect {
    * @param data Data to process
    * @param begin Begin of valid values
    * @param end End of valid values (inclusive!)
-   * @return
+   * @return Median value
    */
   public static double median(double[] data, int begin, int end) {
     final int length = (end + 1) - begin;
