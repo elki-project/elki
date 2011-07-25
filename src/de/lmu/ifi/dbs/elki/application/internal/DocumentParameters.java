@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * @apiviz.uses Parameter
  */
 public class DocumentParameters {
-  private static final Logging logger = Logging.getLogger(DocumentParameters.class);
+  static final Logging logger = Logging.getLogger(DocumentParameters.class);
 
   private static final String HEADER_PARAMETER_FOR = "Parameter for: ";
 
@@ -185,9 +185,15 @@ public class DocumentParameters {
               options.add(pair);
             }
           }
+          catch(java.lang.NoSuchMethodException e) {
+            logger.warning("Could not instantiate class "+cls.getName()+" - no appropriate constructor or parameterizer found.");
+          }
           catch(java.lang.reflect.InvocationTargetException e) {
             if(e.getCause() instanceof RuntimeException) {
               throw (RuntimeException) e.getCause();
+            }
+            if(e.getCause() instanceof Error) {
+              throw (Error) e.getCause();
             }
             throw new RuntimeException(e.getCause());
           }
