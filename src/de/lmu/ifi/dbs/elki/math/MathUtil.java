@@ -460,7 +460,7 @@ public final class MathUtil {
    * 
    * @param a Parameter a
    * @param x Parameter x
-   * @return
+   * @return Gamma value
    */
   public static double regularizedGammaP(final double a, final double x) {
     // Special cases
