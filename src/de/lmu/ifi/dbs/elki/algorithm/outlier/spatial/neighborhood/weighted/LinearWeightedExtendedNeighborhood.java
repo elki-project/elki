@@ -43,7 +43,8 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
   /**
    * Constructor.
    * 
-   * @param store The materialized data.
+   * @param inner Inner neighborhood
+   * @param steps Number of steps to expand
    */
   public LinearWeightedExtendedNeighborhood(NeighborSetPredicate inner, int steps) {
     super();
