@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.math;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Do some simple statistics (mean, variance) using a numerically stable online
@@ -34,21 +35,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  */
 @Reference(authors = "B. P. Welford", title = "Note on a method for calculating corrected sums of squares and products", booktitle = "Technometrics 4(3)")
-public final class MeanVariance {
-  /**
-   * Mean of values
-   */
-  public double mean = 0.0;
-
+public class MeanVariance extends Mean {
   /**
    * nVariance
    */
-  public double nvar = 0.0;
-
-  /**
-   * Weight sum (number of samples)
-   */
-  public double wsum = 0;
+  protected double nvar = 0.0;
 
   /**
    * Empty constructor
@@ -73,6 +64,7 @@ public final class MeanVariance {
    * 
    * @param val Value
    */
+  @Override
   public void put(double val) {
     wsum += 1.0;
     final double delta = val - mean;
@@ -90,6 +82,7 @@ public final class MeanVariance {
    * @param val data
    * @param weight weight
    */
+  @Override
   public void put(double val, double weight) {
     final double nwsum = weight + wsum;
     final double delta = val - mean;
@@ -105,16 +98,22 @@ public final class MeanVariance {
    * 
    * @param other Data to join with
    */
-  public void put(MeanVariance other) {
-    final double nwsum = other.wsum + this.wsum;
-    final double delta = other.mean - this.mean;
-    final double rval = delta * other.wsum / nwsum;
+  @Override
+  public void put(Mean other) {
+    if(other instanceof MeanVariance) {
+      final double nwsum = other.wsum + this.wsum;
+      final double delta = other.mean - this.mean;
+      final double rval = delta * other.wsum / nwsum;
 
-    // this.mean += rval;
-    // This supposedly is more numerically stable:
-    this.mean = (this.wsum * this.mean + other.wsum * other.mean) / nwsum;
-    this.nvar += other.nvar + delta * this.wsum * rval;
-    this.wsum = nwsum;
+      // this.mean += rval;
+      // This supposedly is more numerically stable:
+      this.mean = (this.wsum * this.mean + other.wsum * other.mean) / nwsum;
+      this.nvar += ((MeanVariance) other).nvar + delta * this.wsum * rval;
+      this.wsum = nwsum;
+    }
+    else {
+      throw new AbortException("I cannot combine Mean and MeanVariance to a MeanVariance.");
+    }
   }
 
   /**
@@ -122,6 +121,7 @@ public final class MeanVariance {
    * 
    * @return number of data points
    */
+  @Override
   public double getCount() {
     return wsum;
   }
@@ -131,6 +131,7 @@ public final class MeanVariance {
    * 
    * @return mean
    */
+  @Override
   public double getMean() {
     return mean;
   }
