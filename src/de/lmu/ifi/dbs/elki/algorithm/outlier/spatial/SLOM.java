@@ -73,7 +73,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
 
     WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     // calculate D-Tilde
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double sum = 0;
       double maxDist = 0;
       int cnt = 0;
@@ -102,7 +102,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
     DoubleMinMax slomminmax = new DoubleMinMax();
     WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
 
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double sum = 0;
       int cnt = 0;
 

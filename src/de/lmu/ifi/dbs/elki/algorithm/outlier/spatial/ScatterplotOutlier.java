@@ -79,7 +79,7 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     // Calculate average of neighborhood for each object and perform a linear
     // regression using the covariance matrix
     CovarianceMatrix covm = new CovarianceMatrix(2);
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       final double local = relation.get(id).doubleValue(1);
       // Compute mean of neighbors
       Mean mean = new Mean();
@@ -116,7 +116,7 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     // calculate mean and variance for error
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     MeanVariance mv = new MeanVariance();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       // Compute the error from the linear regression
       double y_i = relation.get(id).doubleValue(1);
       double e = means.get(id) - (slope * y_i + inter);
@@ -129,7 +129,7 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     {
       final double mean = mv.getMean();
       final double variance = mv.getNaiveStddev();
-      for(DBID id : relation.getDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         double score = Math.abs((scores.get(id) - mean) / variance);
         minmax.put(score);
         scores.put(id, score);

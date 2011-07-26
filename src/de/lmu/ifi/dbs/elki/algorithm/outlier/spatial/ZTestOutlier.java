@@ -79,7 +79,7 @@ public class ZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
 
     MeanVariance zmv = new MeanVariance();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       // Compute Mean of neighborhood
       Mean localmean = new Mean();
@@ -104,7 +104,7 @@ public class ZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
     // Normalize scores using mean and variance
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double score = Math.abs(scores.get(id) - zmv.getMean()) / zmv.getSampleStddev();
       minmax.put(score);
       scores.put(id, score);

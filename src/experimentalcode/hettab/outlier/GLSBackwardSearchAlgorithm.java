@@ -209,7 +209,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
 
     //System.out.println(relation.size());
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       if(outliers.containsKey(id)) {
         scores.put(id, 1.0);
       }
@@ -240,7 +240,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     Matrix F = new Matrix(relation.size(), relation.size());
     Matrix Y = new Matrix(relation.size(), 1);
     int i = 0;
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       int j = 0;
 
       // remove id from his neighborhood
@@ -264,7 +264,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       X.set(i, 4, beta.get(4) * idx1 * idx1);
       X.set(i, 5, beta.get(5) * idx2 * idx2);
       Y.set(i, 0, idy);
-      for(DBID n : relation.getDBIDs()) {
+      for(DBID n : relation.iterDBIDs()) {
         double weight = 0;
         if(n.getIntegerID() == id.getIntegerID()) {
           weight = 1;
@@ -308,7 +308,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     int c = 0;
     Map<Double, DBID> invError = new HashMap<Double, DBID>();
     Vector<Double> errors = new Vector<Double>();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       error.put(id, Math.abs(E.get(c, 0)));
       invError.put(Math.abs(E.get(c, 0)), id);
       errors.add(Math.abs(E.get(c, 0)));

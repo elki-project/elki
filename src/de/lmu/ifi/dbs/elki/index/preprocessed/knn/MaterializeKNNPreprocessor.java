@@ -239,7 +239,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   private ArrayDBIDs updateKNNsAfterDeletion(DBIDs ids) {
     TreeSetModifiableDBIDs idsSet = DBIDUtil.newTreeSet(ids);
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
-    for(DBID id1 : relation.getDBIDs()) {
+    for(DBID id1 : relation.iterDBIDs()) {
       List<DistanceResultPair<D>> kNNs = storage.get(id1);
       for(DistanceResultPair<D> kNN : kNNs) {
         if(idsSet.contains(kNN.getDBID())) {

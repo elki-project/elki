@@ -134,7 +134,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         logger.warning("Error in internal parameterization: " + e.getMessage());
       }
       List<V> list = new ArrayList<V>(relation.size());
-      for(DBID id : relation.getDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         list.add(relation.get(id));
       }
       normalization.normalize(list);

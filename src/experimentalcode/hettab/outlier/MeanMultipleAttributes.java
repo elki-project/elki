@@ -58,7 +58,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Multip
         int j = 0 ;
         //h mean for each dim
         double hMeans = 0 ;
-         for(DBID id : relation.getDBIDs()){
+         for(DBID id : relation.iterDBIDs()){
             // f value
             double f = relation.get(id).doubleValue(dim);
             DBIDs neighbors = npred.getNeighborDBIDs(id);
@@ -87,7 +87,7 @@ public class MeanMultipleAttributes<V extends NumberVector<?, ?>> extends Multip
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     i = 0 ;
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       Matrix h_i = hMatrix.getColumn(i).minus(hMeansMatrix) ;
       Matrix h_iT = h_i.transpose();
       Matrix m = h_iT.times(invSigma);

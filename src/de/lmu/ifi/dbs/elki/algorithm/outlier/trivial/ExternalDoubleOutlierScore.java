@@ -187,7 +187,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
       ((OutlierScalingFunction) scaling).prepare(relation.getDBIDs(), or);
     }
     DoubleMinMax mm = new DoubleMinMax();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double val = scoresult.get(id); // scores.get(id);
       val = scaling.getScaled(val);
       scores.put(id, val);

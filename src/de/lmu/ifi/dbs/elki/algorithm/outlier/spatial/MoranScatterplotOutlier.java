@@ -75,7 +75,7 @@ public class MoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
     // Compute the global mean and variance
     MeanVariance globalmv = new MeanVariance();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       globalmv.put(relation.get(id).doubleValue(1));
     }
 
@@ -84,7 +84,7 @@ public class MoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
     // calculate normalized attribute values
     // calculate neighborhood average of normalized attribute values.
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       // Compute global z score
       final double globalZ = (relation.get(id).doubleValue(1) - globalmv.getMean()) / globalmv.getNaiveStddev();
       // Compute local average z score

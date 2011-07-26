@@ -68,7 +68,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
 
     double globmax = 0.0;
     WritableDataStore<Double> emo_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double maxProb = Double.POSITIVE_INFINITY;
       double[] probs = emClustering.getProbClusterIGivenX(id);
       for(double prob : probs) {

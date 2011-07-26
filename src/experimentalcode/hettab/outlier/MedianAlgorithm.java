@@ -78,7 +78,7 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     //
     MeanVariance mv = new MeanVariance();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       //
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       final double median;
@@ -109,7 +109,7 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double score = Math.abs((hi.get(id) - mv.getMean()) / mv.getNaiveStddev());
       minmax.put(score);
       scores.put(id, score);
