@@ -94,9 +94,9 @@ public class QuickSelect {
    */
   public static double quantile(double[] data, int begin, int end, double quant) {
     final int length = (end + 1) - begin;
-    assert (length > 0);
+    assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
-    final double dleft = begin + (length + 1) * quant - 1;
+    final double dleft = begin + (length - 1) * quant;
     final int ileft = (int) Math.floor(dleft);
     final double err = dleft - ileft;
 
