@@ -1,6 +1,7 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractNeighborhoodOutlier;
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -17,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.statistics.QuickSelect;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -26,7 +28,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -47,8 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <N> Neighborhood object type
  */
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
-@Description("a local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
-@Reference(authors = "Tianming Hu and Sam Yuan Sung", title = "A trimmed mean approach to finding spatial outliers", booktitle = "Intell. Data Anal. pages 79-95 ,2004 volume8 ")
+@Description("A local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
+@Reference(authors = "Tianming Hu and Sam Yuan Sung", title = "A trimmed mean approach to finding spatial outliers", booktitle = "Intelligent Data Analysis, Volume 8, 2004")
 public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
@@ -76,74 +79,83 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
    * 
    * @param database Database
    * @param neighbors Neighborhood relation
-   * @param relation Relation
+   * @param relation Data Relation (1 dimensional!)
    * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     assert (DatabaseUtil.dimensionality(relation) == 1) : "TrimmedMean can only process one-dimensional data sets.";
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
 
-    WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
+    WritableDataStore<Double> errors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing trimmed means", relation.size(), logger) : null;
     for(DBID id : relation.iterDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      int i = 0;
+      int num = 0;
       double[] values = new double[neighbors.size()];
       // calculate trimmedMean
       for(DBID n : neighbors) {
-        values[i] = relation.get(n).doubleValue(1);
-        i++;
+        values[num] = relation.get(n).doubleValue(1);
+        num++;
       }
-      
+
       // calculate local trimmed Mean and error term
-      double tm = (i > 0) ? QuickSelect.quantile(values, 0, i - 1, p) : relation.get(id).doubleValue(1);
-      error.put(id, relation.get(id).doubleValue(1) - tm);
-      
-      if (progress != null) {
+      final double tm;
+      if(num > 0) {
+        int left = (int) Math.floor(p * (num - 1));
+        int right = (int) Math.floor((1 - p) * (num - 1));
+        Arrays.sort(values, 0, num);
+        Mean mean = new Mean();
+        for(int i = left; i <= right; i++) {
+          mean.put(values[i]);
+        }
+        tm = mean.getMean();
+      }
+      else {
+        tm = relation.get(id).doubleValue(1);
+      }
+      // Error: deviation from trimmed mean
+      errors.put(id, relation.get(id).doubleValue(1) - tm);
+
+      if(progress != null) {
         progress.incrementProcessed(logger);
       }
     }
-    if (progress != null) {
+    if(progress != null) {
       progress.ensureCompleted(logger);
     }
 
-    if (logger.isVerbose()) {
+    if(logger.isVerbose()) {
       logger.verbose("Computing median error.");
     }
-    // calculate the median of error Term
-    double[] ei = new double[relation.size()];
+    double median_dev_from_median;
     {
-      int i = 0;
-      for(DBID id : relation.iterDBIDs()) {
-        ei[i] = error.get(id);
-        i++;
+      // calculate the median error
+      double[] ei = new double[relation.size()];
+      {
+        int i = 0;
+        for(DBID id : relation.iterDBIDs()) {
+          ei[i] = errors.get(id);
+          i++;
+        }
       }
-    }
-    double median_i = QuickSelect.median(ei);
-
-    if (logger.isVerbose()) {
-      logger.verbose("Computing median average deviation.");
-    }
-    // calculate MAD
-    double[] temp = new double[relation.size()];
-    {
-      int i = 0;
-      for(DBID id : relation.iterDBIDs()) {
-        temp[i] = Math.abs(error.get(id) - median_i);
-        i++;
+      double median_i = QuickSelect.median(ei);
+      // Update to deviation from median
+      for(int i = 0; i < ei.length; i++) {
+        ei[i] = Math.abs(ei[i] - median_i);
       }
+      // Again, extract median
+      median_dev_from_median = QuickSelect.median(ei);
     }
-    double MAD = QuickSelect.median(temp);
 
-    if (logger.isVerbose()) {
+    if(logger.isVerbose()) {
       logger.verbose("Normalizing scores.");
     }
     // calculate score
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
-      double score = error.get(id) * 0.6745 / MAD;
+      double score = errors.get(id) * 0.6745 / median_dev_from_median;
       scores.put(id, score);
       minmax.put(score);
     }
@@ -187,7 +199,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter pP = new DoubleParameter(P_ID, new GreaterConstraint(0.0));
+      DoubleParameter pP = new DoubleParameter(P_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 0.5, IntervalBoundary.OPEN));
       if(config.grab(pP)) {
         p = pP.getValue();
       }
@@ -197,6 +209,5 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     protected TrimmedMeanApproach<N> makeInstance() {
       return new TrimmedMeanApproach<N>(npredf, p);
     }
-
   }
 }
