@@ -211,7 +211,7 @@ public class PartialVAFile extends AbstractVAFile implements SubspaceIndex {
 
   /*
    * (non-Javadoc)
-   * @see experimentalcode.tobias.subspace.SubspaceIndex#getStatisitcs()
+   * @see experimentalcode.shared.index.subspace.SubspaceIndex#getStatisitcs()
    */
   @Override
   public IndexStatistics getStatisitcs() {
@@ -226,7 +226,7 @@ public class PartialVAFile extends AbstractVAFile implements SubspaceIndex {
 
   /*
    * (non-Javadoc)
-   * @see experimentalcode.tobias.subspace.SubspaceIndex#resetStatisitcs()
+   * @see experimentalcode.shared.index.subspace.SubspaceIndex#resetStatisitcs()
    */
   @Override
   public void resetStatisitcs() {
@@ -244,9 +244,9 @@ public class PartialVAFile extends AbstractVAFile implements SubspaceIndex {
   /*
    * (non-Javadoc)
    * @see
-   * experimentalcode.tobias.subspace.SubspaceIndex#subSpaceKnnQuery(de.lmu
+   * experimentalcode.shared.index.subspace.SubspaceIndex#subSpaceKnnQuery(de.lmu
    * .ifi.dbs.elki.data.DoubleVector,
-   * experimentalcode.tobias.subspace.SubSpace, int)
+   * experimentalcode.shared.index.subspace.SubSpace, int)
    */
   @Override
   public ArrayDBIDs subSpaceKnnQuery(DoubleVector query, SubSpace subspace, int k) {
@@ -400,9 +400,9 @@ public class PartialVAFile extends AbstractVAFile implements SubspaceIndex {
   /*
    * (non-Javadoc)
    * @see
-   * experimentalcode.tobias.subspace.SubspaceIndex#subSpaceRangeQuery(de.
+   * experimentalcode.shared.index.subspace.SubspaceIndex#subSpaceRangeQuery(de.
    * lmu.ifi.dbs.elki.data.DoubleVector,
-   * experimentalcode.tobias.subspace.SubSpace, double)
+   * experimentalcode.shared.index.subspace.SubSpace, double)
    */
   @Override
   public DBIDs subSpaceRangeQuery(DoubleVector query, SubSpace subspace, double epsilon) {
