@@ -80,4 +80,11 @@ public class TestQuickSelect implements JUnit4Test {
     // Note: do not change the order, since this modifies the array.
     assertEquals("Full median incorrect.", 0.95, QuickSelect.median(data), Double.MIN_VALUE);
   }
+
+
+  @Test
+  public void testTies() {
+    double data[] = new double[] { 0.1, 0.1, 0.9, 0.9, 0.5, 0.9, 0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9, 0.1, 0.1 };
+    assertEquals("Full median incorrect.", 0.5, QuickSelect.median(data), Double.MIN_VALUE);
+  }
 }
