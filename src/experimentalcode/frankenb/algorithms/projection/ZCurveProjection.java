@@ -36,7 +36,7 @@ public class ZCurveProjection<V extends NumberVector<V, ?>> implements IProjecti
 
       V factory = DatabaseUtil.assumeVectorField(dataSet).getFactory();
 
-      for(DBID id : dataSet.getDBIDs()) {
+      for(DBID id : dataSet.iterDBIDs()) {
         double doubleProjection = projection.asBigInteger(dataSet.get(id)).doubleValue();
         resultDataSet.set(id, factory.newInstance(new double[] { doubleProjection }));
       }
