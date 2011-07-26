@@ -152,10 +152,10 @@ public class QuickSelect {
     int i = start + 1, j = end - 2;
     // This is classic quicksort stuff
     while(true) {
-      while(data[i] < pivot) {
+      while(data[i] <= pivot && i <= j) {
         i++;
       }
-      while(data[j] > pivot) {
+      while(data[j] >= pivot && j >= i) {
         j--;
       }
       if(i >= j) {

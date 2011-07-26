@@ -23,6 +23,9 @@ public class TestQuickSelect implements JUnit4Test {
 
   @Test
   public void testRandomDoubles() {
+    for(int i = 1; i < 10; i++) {
+      testQuickSelect(i);
+    }
     testQuickSelect(SIZE);
     testQuickSelect(SIZE + 1);
   }
