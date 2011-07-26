@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.statistics.QuickSelect;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -85,7 +86,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDataStore<Double> error = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, double.class);
 
-    for(DBID id : relation.getDBIDs()) {
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing trimmed means", relation.size(), logger) : null;
+    for(DBID id : relation.iterDBIDs()) {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       int i = 0;
       double[] values = new double[neighbors.size()];
@@ -94,36 +96,53 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
         values[i] = relation.get(n).doubleValue(1);
         i++;
       }
+      
       // calculate local trimmed Mean and error term
-      double tm = QuickSelect.quantile(values, p);
+      double tm = (i > 0) ? QuickSelect.quantile(values, 0, i - 1, p) : relation.get(id).doubleValue(1);
       error.put(id, relation.get(id).doubleValue(1) - tm);
+      
+      if (progress != null) {
+        progress.incrementProcessed(logger);
+      }
+    }
+    if (progress != null) {
+      progress.ensureCompleted(logger);
     }
 
+    if (logger.isVerbose()) {
+      logger.verbose("Computing median error.");
+    }
     // calculate the median of error Term
     double[] ei = new double[relation.size()];
     {
       int i = 0;
-      for(DBID id : relation.getDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         ei[i] = error.get(id);
         i++;
       }
     }
     double median_i = QuickSelect.median(ei);
 
+    if (logger.isVerbose()) {
+      logger.verbose("Computing median average deviation.");
+    }
     // calculate MAD
     double[] temp = new double[relation.size()];
     {
       int i = 0;
-      for(DBID id : relation.getDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         temp[i] = Math.abs(error.get(id) - median_i);
         i++;
       }
     }
     double MAD = QuickSelect.median(temp);
 
+    if (logger.isVerbose()) {
+      logger.verbose("Normalizing scores.");
+    }
     // calculate score
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : relation.getDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       double score = error.get(id) * 0.6745 / MAD;
       scores.put(id, score);
       minmax.put(score);

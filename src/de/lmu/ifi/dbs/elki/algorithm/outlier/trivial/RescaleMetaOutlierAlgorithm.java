@@ -74,22 +74,23 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     Result innerresult = algorithm.run(database);
 
     OutlierResult or = getOutlierResult(innerresult);
+    final Relation<Double> scores = or.getScores();
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(or.getScores().getDBIDs(), or);
+      ((OutlierScalingFunction) scaling).prepare(scores.getDBIDs(), or);
     }
 
-    WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(or.getScores().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(scores.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
 
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : or.getScores().getDBIDs()) {
-      double val = or.getScores().get(id);
+    for(DBID id : scores.iterDBIDs()) {
+      double val = scores.get(id);
       val = scaling.getScaled(val);
       scaledscores.put(id, val);
       minmax.put(val);
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), scaling.getMin(), scaling.getMax());
-    Relation<Double> scoresult = new MaterializedRelation<Double>("Scaled Outlier", "scaled-outlier", TypeUtil.DOUBLE, scaledscores, or.getScores().getDBIDs());
+    Relation<Double> scoresult = new MaterializedRelation<Double>("Scaled Outlier", "scaled-outlier", TypeUtil.DOUBLE, scaledscores, scores.getDBIDs());
     OutlierResult result = new OutlierResult(meta, scoresult);
     result.addChildResult(innerresult);
 
