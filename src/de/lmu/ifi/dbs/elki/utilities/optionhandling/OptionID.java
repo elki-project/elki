@@ -74,22 +74,12 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID OUTPUT = new OptionID("out", "Directory name (or name of an existing file) to write the obtained results in. " + "If this parameter is omitted, per default the output will sequentially be given to STDOUT.");
 
   /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep}
-   */
-  public static final OptionID NORMALIZATION = new OptionID("norm", "Normalization class in order to normalize values in the database.");
-
-  /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.workflow.InputStep}
-   */
-  public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo", "Revert normalization result to original values - " + "invalid option if no normalization has been performed.");
-
-  /**
    * Flag to allow verbose messages while running the application.
    * <p>
    * Key: {@code -verbose}
    * </p>
    */
-  public static final OptionID ALGORITHM_VERBOSE = new OptionID("verbose", "Enable verbose messages while performing the algorithm.");
+  public static final OptionID VERBOSE_FLAG = new OptionID("verbose", "Enable verbose messages.");
 
   /**
    * The description of the OptionID.
