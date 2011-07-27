@@ -189,7 +189,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     fireKNNsInserted(ids, rkNN_ids);
 
     if(stepprog != null) {
-      stepprog.ensureCompleted(getLogger());
+      stepprog.setCompleted(getLogger());
     }
   }
 
