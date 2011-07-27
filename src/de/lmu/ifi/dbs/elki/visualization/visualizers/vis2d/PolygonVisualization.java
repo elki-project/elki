@@ -2,8 +2,11 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
 
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -16,12 +19,13 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
@@ -32,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * 
  * @apiviz.has PolygonsObject - - visualizes
  */
-public class PolygonVisualization extends AbstractVisualization implements DataStoreListener {
+public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisualization<V> implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -74,17 +78,29 @@ public class PolygonVisualization extends AbstractVisualization implements DataS
 
   @Override
   public void redraw() {
+    CSSClass css = new CSSClass(svgp, MARKER);
+    css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+    css.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+    svgp.addCSSClassOrLogError(css);
+    svgp.updateStyleElement();
+
     // draw data
     for(DBID id : rep.iterDBIDs()) {
       try {
         PolygonsObject poly = rep.get(id);
+        if(poly == null) {
+          continue;
+        }
         SVGPath path = new SVGPath();
         for(Polygon ppoly : poly.getPolygons()) {
           Vector first = ppoly.get(0);
           double[] f = proj.fastProjectDataToRenderSpace(first);
           path.moveTo(f[0], f[1]);
-          for(int i = 1; i < ppoly.size(); i++) {
-            double[] p = proj.fastProjectDataToRenderSpace(first);
+          for(Vector v : ppoly) {
+            if(v == first) {
+              continue;
+            }
+            double[] p = proj.fastProjectDataToRenderSpace(v);
             path.drawTo(p[0], p[1]);
           }
           // close path.
@@ -97,7 +113,6 @@ public class PolygonVisualization extends AbstractVisualization implements DataS
       catch(ObjectNotFoundException e) {
         // ignore.
       }
-
     }
   }
 
@@ -124,7 +139,7 @@ public class PolygonVisualization extends AbstractVisualization implements DataS
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new PolygonVisualization(task);
+      return new PolygonVisualization<DoubleVector>(task);
     }
 
     @Override
