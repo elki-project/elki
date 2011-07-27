@@ -615,16 +615,18 @@ public final class MathUtil {
     lon1 = MathUtil.deg2rad(lon1);
     lon2 = MathUtil.deg2rad(lon2);
     // Delta
-    // final double dlat = lat1 - lat2;
+    final double dlat = lat1 - lat2;
     final double dlon = lon1 - lon2;
 
     // Spherical Law of Cosines
-    double dist = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(dlon);
-    return EARTH_RADIUS * Math.atan(dist);
+    // NOTE: there seems to be a signedness issue in this code!
+    // double dist = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) *
+    // Math.cos(lat2) * Math.cos(dlon);
+    // return EARTH_RADIUS * Math.atan(dist);
+
     // Alternative: Havestine formula, higher precision at < 1 meters:
-    // final double a = Math.sin(dlat / 2) * Math.sin(dlat / 2) + Math.sin(dlon
-    // / 2) * Math.sin(dlon / 2) * Math.cos(lat1) * Math.cos(lat2);
-    // final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    // return EARTH_RADIUS * c;
+    final double a = Math.sin(dlat / 2) * Math.sin(dlat / 2) + Math.sin(dlon / 2) * Math.sin(dlon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return EARTH_RADIUS * c;
   }
 }
