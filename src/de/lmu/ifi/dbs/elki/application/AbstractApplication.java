@@ -52,7 +52,7 @@ public abstract class AbstractApplication implements Parameterizable {
   /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "ELKI Version 0.3 (2010, March)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "Elke Achtert, Hans-Peter Kriegel, Lisa Reichert, Erich Schubert, Remigius Wojdanowski, Arthur Zimek:" + NEWLINE + "Visual Evaluation of Outlier Detection Models." + NEWLINE + "In Proc. 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010." + NEWLINE;
+  public static final String INFORMATION = "ELKI Version 0.4 (2011, August)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Spatial Outlier Detection: Data, Algorithms, Visualizations." + NEWLINE + "In Proceedings of the 12th International Symposium on" + NEWLINE + "Spatial and Temporal Databases (SSTD), Minneapolis, MN, 2011." + NEWLINE;
 
   /**
    * Parameter that specifies the name of the output file.
@@ -251,7 +251,7 @@ public abstract class AbstractApplication implements Parameterizable {
      * @param config Parameterization
      */
     protected void configVerbose(Parameterization config) {
-      final Flag verboseF = new Flag(OptionID.ALGORITHM_VERBOSE);
+      final Flag verboseF = new Flag(OptionID.VERBOSE_FLAG);
       if(config.grab(verboseF)) {
         verbose = verboseF.getValue();
       }

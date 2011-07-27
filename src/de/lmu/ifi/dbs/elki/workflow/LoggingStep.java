@@ -76,7 +76,7 @@ public class LoggingStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final Flag verboseF = new Flag(OptionID.ALGORITHM_VERBOSE);
+      final Flag verboseF = new Flag(OptionID.VERBOSE_FLAG);
       if(config.grab(verboseF)) {
         verbose = verboseF.getValue();
       }

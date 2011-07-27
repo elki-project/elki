@@ -29,7 +29,7 @@ public class LoggingTabPanel extends ParameterTabPanel {
   @Override
   protected synchronized void configureStep(Parameterization config) {
     StringParameter debugParam = new StringParameter(OptionID.DEBUG, true);
-    Flag verboseFlag = new Flag(OptionID.ALGORITHM_VERBOSE);
+    Flag verboseFlag = new Flag(OptionID.VERBOSE_FLAG);
     // Verbose mode is a lot simpler
     if (config.grab(verboseFlag) && verboseFlag.getValue()) {
       LoggingConfiguration.setVerbose(true);
