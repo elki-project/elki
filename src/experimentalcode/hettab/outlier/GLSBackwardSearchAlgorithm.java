@@ -1,6 +1,5 @@
 package experimentalcode.hettab.outlier;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,20 +18,22 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -179,49 +180,35 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * @return
    */
   public OutlierResult run(Database database, Relation<V> relation) {
-    HashMap<DBID, SingleObjectBundle> outliers = new HashMap<DBID, SingleObjectBundle>();
-    
-    // FIXME: use a ProxyRelation to virtually add/remove objects! 
-    
-    Pair<DBID, Double> candidate = getCandidate(relation);
-
-    // Note: removing/inserting is rather expensive - can't this be done
-    // *virtually* only?
-    int outlierNumber = 0;
-    while(candidate.second > alpha && m > outlierNumber) {
-      outlierNumber++;
-      outliers.put(candidate.first, database.getBundle(candidate.first));
-      database.delete(candidate.first);
-      candidate = getCandidate(relation);
-    }
-
-    // add removed Objects to database
-    Collection<DBID> ids = outliers.keySet();
-    System.out.println(ids);
-    for(DBID id : ids) {
-      try {
-        database.insert(outliers.get(id));
-      }
-      catch(UnableToComplyException e) {
-        logger.verbose("insert removed Objects failed");
-      }
-    }
-
-    //System.out.println(relation.size());
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : relation.iterDBIDs()) {
-      if(outliers.containsKey(id)) {
-        scores.put(id, 1.0);
+    DoubleMinMax mm = new DoubleMinMax(0.0, 0.0);
+    
+    // Outlier detection loop
+    {
+      ModifiableDBIDs idview = DBIDUtil.newHashSet(relation.getDBIDs());
+      ProxyView<V> proxy = new ProxyView<V>(database, idview, relation);
+
+      // Detect up to m outliers
+      for(int numout = 0; numout < m; numout++) {
+        Pair<DBID, Double> candidate = getCandidate(proxy);
+        if(candidate.second < alpha) {
+          break;
+        }
+        scores.put(candidate.first, candidate.second);
+        mm.put(candidate.second);
+        idview.remove(candidate.first);
+        // sanity check, in case proxyview changes behaviour
+        assert (proxy.size() + numout + 1 == relation.size());
       }
-      else {
+      
+      // Remaining objects are inliers
+      for (DBID id : idview) {
         scores.put(id, 0.0);
       }
     }
-    //System.out.println(relation.getDBIDs());
-    //
+    
     Relation<Double> scoreResult = new MaterializedRelation<Double>("GLSSODBackward", "GLSSODbackward-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
-    // FIXME: Accurate maximum?
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, 1.0, 0.1, Double.POSITIVE_INFINITY, 0);
+    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
