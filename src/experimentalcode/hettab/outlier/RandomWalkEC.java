@@ -1,18 +1,17 @@
 package experimentalcode.hettab.outlier;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -31,140 +30,146 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.hettab.neighborhood.DistanceBasedNeighborSetPredicate;
-
 
 /**
  * <p>
- * Random Walk on Exhaustive Combination
- * <br>
- * Liu, Xutong and Lu, Chang-Tien and Chen, Feng,
- * <br>
- * Spatial outlier detection: random walk based approaches,
- * <br>
- * in Proceedings of the 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems,2010  
+ * Random Walk on Exhaustive Combination <br>
+ * Liu, Xutong and Lu, Chang-Tien and Chen, Feng, <br>
+ * Spatial outlier detection: random walk based approaches, <br>
+ * in Proceedings of the 18th SIGSPATIAL International Conference on Advances in
+ * Geographic Information Systems,2010
+ * 
  * @author Ahmed Hettab
  * 
  * @param <N> Spatial Vector
- * @param<O>  non Spatial Vector
+ * @param<O> non Spatial Vector
  * @param <D> Distance to use
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Random Walk on Exhaustive Combination, which detect spatial Outlier")
 @Reference(authors = "Liu, Xutong and Lu, Chang-Tien and Chen, Feng", title = "Spatial outlier detection: random walk based approaches", booktitle = "in Proceedings of the 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems,2010")
-public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedNeighborhoodOutlier<N,D> {
+public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedNeighborhoodOutlier<N, D> {
   /**
    * Logger
    */
   private static final Logging logger = Logging.getLogger(RandomWalkEC.class);
+
   /**
    * Parameter alpha
    */
   private double alpha;
+
   /**
    * parameter c
    */
   private double c;
+
   /**
    * Constructor
+   * 
    * @param npredf
    * @param alpha
    * @param c
    */
-  public RandomWalkEC(DistanceBasedNeighborSetPredicate.Factory<N,D> npredf, double alpha, double c) {
-  super(npredf);
-	this.alpha = alpha;
-	this.c = c;
-}
+  public RandomWalkEC(DistanceBasedNeighborSetPredicate.Factory<N, D> npredf, double alpha, double c) {
+    super(npredf);
+    this.alpha = alpha;
+    this.c = c;
+  }
 
   /**
+   * Run the algorithm
    * 
-   * @param nrel
-   * @param relation
-   * @return
+   * @param spatial Spatial neighborhood relation
+   * @param relation Attribute value relation
+   * @return Outlier result
    */
-public OutlierResult run(Database database, Relation<N> spatial, Relation<? extends NumberVector<?, ?>> relation) {
+  public OutlierResult run(Relation<N> spatial, Relation<? extends NumberVector<?, ?>> relation) {
     final DistanceBasedNeighborSetPredicate<N, D> npred = getNeighborSetPredicateFactory().instantiate(spatial);
-    PrimitiveDistanceFunction<N,D> distFunc = getNeighborSetPredicateFactory().getSpatialDistanceFunction();
-    WritableDataStore<Matrix> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, Matrix.class);
-    WritableDataStore<List<Pair<DBID, Double>>> simScores = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, List.class);
-    
+    PrimitiveDistanceFunction<N, D> distFunc = getNeighborSetPredicateFactory().getSpatialDistanceFunction();
+    WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
+
+    // Make a static IDs array for matrix column indexing
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // construct the relation Matrix of the ec-graph
-    Matrix E = new Matrix(spatial.size(), spatial.size());
-    int i = 0;
-    for(DBID id : spatial.iterDBIDs()) {
-      int j = 0;
-      for(DBID n : spatial.iterDBIDs()) {
-        double e;
+    Matrix E = new Matrix(ids.size(), ids.size());
+    for(int i = 0; i < ids.size(); i++) {
+      final DBID id = ids.get(i);
+      final double val = relation.get(id).doubleValue(1);
+      for(int j = 0; j < ids.size(); j++) {
+        final DBID n = ids.get(j);
+        final double e;
         if(n.equals(id)) {
           e = 0;
         }
         else {
-          double dist = distFunc.distance(spatial.get(id), spatial.get(n)).doubleValue() ;
-          double diff = Math.abs(relation.get(id).doubleValue(1) - relation.get(n).doubleValue(1));
-          diff = (Math.pow(diff,alpha));
-          double exp = Math.exp(diff);
-          e = (1/exp) * (1/dist);
+          double dist = distFunc.distance(spatial.get(id), spatial.get(n)).doubleValue();
+          if(dist == 0) {
+            e = 0;
+          }
+          else {
+            double diff = Math.abs(val - relation.get(n).doubleValue(1));
+            double exp = Math.exp(-Math.pow(diff, alpha));
+            e = exp / dist;
+          }
         }
         E.set(i, j, e);
-        j++;
       }
-      i++;
     }
     // normalize the adjacent Matrix
-    E.normalizeColumns() ;
-    Matrix I = Matrix.identity(spatial.size(), spatial.size());
-    Matrix temp1 = E.times(-c) ;
-    Matrix temp2 = I.minus(temp1);
-    temp2 .inverse() ;
-    Matrix W = temp2.times((1-c));
-    
-    
-    // compute similarity vector for each Object
-    int count = 0;
-    for(DBID id : spatial.iterDBIDs()) {
-     Matrix ei = new Matrix(relation.size(),1);
-     ei.set(count, 0, 1);
-     Matrix sim = W.times(ei);
-     similarityVectors.put(id, sim);
-     count ++ ;
-    }
-    //compute the relevance scores between specified Object and its neighbors   
-    for(DBID id : spatial.iterDBIDs()){
-      Collection<DoubleObjPair<DBID>> neighbours = npred.getDistanceBasedNeighbors(id);
-      ArrayList<Pair<DBID, Double>> value = new ArrayList<Pair<DBID,Double>>();
-      for(DoubleObjPair<DBID> n : neighbours){
-        double sim = cosineSimilarity(similarityVectors.get(id).getColumnVector(0), similarityVectors.get(n.second).getColumnVector(0));
-        Pair<DBID,Double> pair = new Pair<DBID, Double>(n.second, sim);
-        value.add(pair);
+    // Sum based normalization - don't use E.normalizeColumns()
+    // Which normalized to Euclidean length 1.0!
+    // Also do the -c multiplication
+    for(int i = 0; i < E.getColumnDimensionality(); i++) {
+      double sum = 0.0;
+      for(int j = 0; j < E.getRowDimensionality(); j++) {
+        sum += E.get(j, i);
       }
-      simScores.put(id, value);
+      if(sum == 0) {
+        sum = 1.0;
+      }
+      for(int j = 0; j < E.getRowDimensionality(); j++) {
+        E.set(j, i, -c * E.get(j, i) / sum);
+      }
     }
-    
-    //compute geometric mean
+    // Add identity matrix. The diagonal should still be 0s, so this is trivial.
+    assert (E.getRowDimensionality() == E.getColumnDimensionality());
+    for(int col = 0; col < E.getColumnDimensionality(); col++) {
+      assert (E.get(col, col) == 0.0);
+      E.set(col, col, 1.0);
+    }
+    E = E.inverse().timesEquals(1 - c);
+
+    // Split the matrix into columns
+    for(int i = 0; i < ids.size(); i++) {
+      DBID id = ids.get(i);
+      // Note: matrix times ith unit vector = ith column
+      Vector sim = E.getColumnVector(i);
+      similarityVectors.put(id, sim);
+    }
+    E = null;
+    // compute the relevance scores between specified Object and its neighbors
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : spatial.iterDBIDs()) {
-      List<Pair<DBID, Double>> simScore = simScores.get(id);
-      double score = 1 ;
-      double cnt = 0 ;
-      for(Pair<DBID,Double> pair : simScore){
-        if(id.equals(pair.first)){
-          continue ;
+    for(int i = 0; i < ids.size(); i++) {
+      DBID id = ids.get(i);
+      Collection<DoubleObjPair<DBID>> neighbours = npred.getDistanceBasedNeighbors(id);
+      double gmean = 1.0;
+      int cnt = 0;
+      for(DoubleObjPair<DBID> n : neighbours) {
+        if(id.equals(n.second)) {
+          continue;
         }
-        else{
-          score *= pair.second ;
-          cnt ++ ;
-        }
+        double sim = cosineSimilarity(similarityVectors.get(id), similarityVectors.get(n.second));
+        gmean *= sim;
+        cnt++;
       }
-      //add Scores
-      double s = Math.pow(score, 1/cnt);
-      minmax.put(s);
-      scores.put(id,s);
-      System.out.println(s);
-      }
-    
+      final double score = Math.pow(gmean, 1.0 / cnt);
+      minmax.put(score);
+      scores.put(id, score);
+    }
+
     Relation<Double> scoreResult = new MaterializedRelation<Double>("randomwalkec", "RandomWalkEC", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
@@ -173,16 +178,8 @@ public OutlierResult run(Database database, Relation<N> spatial, Relation<? exte
   /**
    * Computes the cosine similarity for two given feature vectors.
    */
-  private static double cosineSimilarity(Vector v1, Vector v2) {
-    double p = 0;
-    double p1 = 0;
-    double p2 = 0;
-    for(int i = 0; i < v1.getDimensionality(); i++) {
-      p += v1.get(i) * v2.get(i);
-      p1 += v1.get(i) * v1.get(i);
-      p2 += v2.get(i) * v2.get(i);
-    }
-    return (p / (Math.sqrt(p1) * Math.sqrt(p2)));
+  private static final double cosineSimilarity(Vector v1, Vector v2) {
+    return v1.scalarProduct(v2) / (v1.euclideanLength() * v2.euclideanLength());
   }
 
   @Override
@@ -208,27 +205,28 @@ public OutlierResult run(Database database, Relation<N> spatial, Relation<? exte
    * @param <D>
    */
   public static class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedNeighborhoodOutlier.Parameterizer<N, D> {
-    
-    
+
     /**
      * Parameter to specify alpha
      */
     public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("randomwalkec.alpha", "helps compute more accurate edge value");
+
     /**
      * Parameter to specify the c
      */
     public static final OptionID C_ID = OptionID.getOrCreateOptionID("randomwalkec.c", "the Parameter c");
+
     /**
      * 
      */
-    double alpha = 0.5;   
+    double alpha = 0.5;
+
     /**
      * 
      */
     double c = 0.9;
-    /**
-     * 
-     */
+
+    @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configAlpha(config);
@@ -261,11 +259,9 @@ public OutlierResult run(Database database, Relation<N> spatial, Relation<? exte
       }
     }
 
-    
     @Override
-    protected RandomWalkEC<N,O, D> makeInstance() {
-      return new RandomWalkEC<N,O, D>( npredf, alpha, c);
+    protected RandomWalkEC<N, O, D> makeInstance() {
+      return new RandomWalkEC<N, O, D>(npredf, alpha, c);
     }
   }
-  
 }
