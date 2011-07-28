@@ -52,10 +52,10 @@ public class ClassLabelFilter implements ObjectFilter {
    * The class label class to use.
    */
   private final Class<? extends ClassLabel> classLabelClass;
-  
+
   /**
    * Constructor.
-   *
+   * 
    * @param classLabelIndex The index to convert
    * @param classLabelClass The class label class to use
    */
@@ -70,6 +70,7 @@ public class ClassLabelFilter implements ObjectFilter {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     // Find a labellist column
     boolean done = false;
+    boolean keeplabelcol = false;
     for(int i = 0; i < objects.metaLength(); i++) {
       SimpleTypeInformation<?> meta = objects.meta(i);
       // Skip non-labellist columns - or if we already had a labellist
@@ -78,12 +79,10 @@ public class ClassLabelFilter implements ObjectFilter {
         continue;
       }
       done = true;
-      
+
       // We split the label column into two parts
       List<ClassLabel> clscol = new ArrayList<ClassLabel>(objects.dataLength());
       List<LabelList> lblcol = new ArrayList<LabelList>(objects.dataLength());
-      bundle.appendColumn(TypeUtil.CLASSLABEL, clscol);
-      bundle.appendColumn(meta, lblcol);
 
       // Split the column
       for(Object obj : objects.getColumn(i)) {
@@ -98,11 +97,19 @@ public class ClassLabelFilter implements ObjectFilter {
             throw new AbortException("Cannot initialize class labels.");
           }
           lblcol.add(ll);
+          if(ll.size() > 0) {
+            keeplabelcol = true;
+          }
         }
         else {
           clscol.add(null);
           lblcol.add(null);
         }
+      }
+      bundle.appendColumn(TypeUtil.CLASSLABEL, clscol);
+      // Only add the label column when it's not empty.
+      if(keeplabelcol) {
+        bundle.appendColumn(meta, lblcol);
       }
     }
     return bundle;
@@ -117,8 +124,8 @@ public class ClassLabelFilter implements ObjectFilter {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * The index of the label to be used as class label, null if no class label is
-     * specified.
+     * The index of the label to be used as class label, null if no class label
+     * is specified.
      */
     protected Integer classLabelIndex;
 
