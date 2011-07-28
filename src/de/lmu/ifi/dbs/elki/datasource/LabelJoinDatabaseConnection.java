@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -156,6 +157,26 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
           List<Object> col = dcol.get(d);
           assert (col != null);
           col.set(row, cur.data(i, d));
+        }
+      }
+    }
+    for(int i = 0; i < first.dataLength(); i++) {
+      for(int d = 0; d < first.metaLength(); d++) {
+        if(first.data(i, d) == null) {
+          StringBuffer buf = new StringBuffer();
+          for(int d2 = 0; d2 < first.metaLength(); d2++) {
+            if(buf.length() > 0) {
+              buf.append(", ");
+            }
+            if(first.data(i, d2) == null) {
+              buf.append("null");
+            }
+            else {
+              buf.append(first.data(i, d2));
+            }
+          }
+          logger.warning("null value in joined data, row " + i + " column " + d + FormatUtil.NEWLINE + "[" + buf.toString() + "]");
+          break;
         }
       }
     }
