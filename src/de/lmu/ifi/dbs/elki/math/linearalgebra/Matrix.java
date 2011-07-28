@@ -135,6 +135,15 @@ public class Matrix implements MatrixLike<Matrix>, Serializable {
   }
 
   /**
+   * Constructor, cloning an existing matrix.
+   *
+   * @param mat Matrix to clone
+   */
+  public Matrix(Matrix mat) {
+    this(mat.getArrayCopy());
+  }
+
+  /**
    * Construct a matrix from a copy of a 2-D array.
    * 
    * @param A Two-dimensional array of doubles.
