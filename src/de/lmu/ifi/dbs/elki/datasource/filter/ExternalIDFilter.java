@@ -51,6 +51,7 @@ public class ExternalIDFilter implements ObjectFilter {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     // Find a labellist column
     boolean done = false;
+    boolean keeplabelcol = false;
     for(int i = 0; i < objects.metaLength(); i++) {
       SimpleTypeInformation<?> meta = objects.meta(i);
       // Skip non-labellist columns - or if we already had a labellist
@@ -63,8 +64,6 @@ public class ExternalIDFilter implements ObjectFilter {
       // We split the label column into two parts
       List<ExternalID> eidcol = new ArrayList<ExternalID>(objects.dataLength());
       List<LabelList> lblcol = new ArrayList<LabelList>(objects.dataLength());
-      bundle.appendColumn(TypeUtil.EXTERNALID, eidcol);
-      bundle.appendColumn(meta, lblcol);
 
       // Split the column
       for(Object obj : objects.getColumn(i)) {
@@ -72,11 +71,20 @@ public class ExternalIDFilter implements ObjectFilter {
           LabelList ll = (LabelList) obj;
           eidcol.add(new ExternalID(ll.remove(externalIdIndex)));
           lblcol.add(ll);
+          if(ll.size() > 0) {
+            keeplabelcol = true;
+          }
         }
         else {
           eidcol.add(null);
           lblcol.add(null);
         }
+      }
+
+      bundle.appendColumn(TypeUtil.EXTERNALID, eidcol);
+      // Only add the label column when it's not empty.
+      if(keeplabelcol) {
+        bundle.appendColumn(meta, lblcol);
       }
     }
     return bundle;
