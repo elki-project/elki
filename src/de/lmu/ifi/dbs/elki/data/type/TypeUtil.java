@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.data.type;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
@@ -74,10 +75,8 @@ public final class TypeUtil {
 
   /**
    * External ID type
-   * 
-   * FIXME: Don't use String here!
    */
-  public static final SimpleTypeInformation<String> EXTERNALID = SimpleTypeInformation.get(String.class);
+  public static final SimpleTypeInformation<ExternalID> EXTERNALID = SimpleTypeInformation.get(ExternalID.class);
 
   /**
    * Type for polygons

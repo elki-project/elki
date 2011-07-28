@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -58,9 +59,9 @@ public class ExternalIDFilter implements ObjectFilter {
         continue;
       }
       done = true;
-      
+
       // We split the label column into two parts
-      List<String> eidcol = new ArrayList<String>(objects.dataLength());
+      List<ExternalID> eidcol = new ArrayList<ExternalID>(objects.dataLength());
       List<LabelList> lblcol = new ArrayList<LabelList>(objects.dataLength());
       bundle.appendColumn(TypeUtil.EXTERNALID, eidcol);
       bundle.appendColumn(meta, lblcol);
@@ -69,7 +70,7 @@ public class ExternalIDFilter implements ObjectFilter {
       for(Object obj : objects.getColumn(i)) {
         if(obj != null) {
           LabelList ll = (LabelList) obj;
-          eidcol.add(ll.remove(externalIdIndex));
+          eidcol.add(new ExternalID(ll.remove(externalIdIndex)));
           lblcol.add(ll);
         }
         else {
