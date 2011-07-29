@@ -2,6 +2,7 @@ package experimentalcode.shared.outlier.ensemble;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -32,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -197,8 +199,43 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
 
     final OutlierResult result;
     if(breadth) {
-      // FIXME: implement!
-      throw new RuntimeException("Breadth-first not yet implemented!");
+      WritableDataStore<Double> breadthscore = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+      DoubleMinMax minmax = new DoubleMinMax();
+      {
+        FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
+        HashMap<IterableIterator<DBID>, Relation<Double>> IDVectorOntoScoreVector = new HashMap<IterableIterator<DBID>, Relation<Double>>();
+        
+        // Mapping score-sorted DBID-Iterators onto their corresponding scores.
+        // We need to initialize them now be able to iterate them "in parallel".
+        for(OutlierResult r : results) {
+          IDVectorOntoScoreVector.put(r.getOrdering().iter(relation.getDBIDs()), r.getScores());
+        }
+        
+        // Iterating over the *lines* of the AS_t(i)-matrix.
+        for(int i = 0; i < relation.size(); i++) {
+          // Iterating over the elements of a line (breadth-first).
+          for(IterableIterator<DBID> iter : IDVectorOntoScoreVector.keySet()) {
+            if(iter.hasNext()) {  // Always true if every algorithm returns a complete result (one score for every DBID).
+              DBID tmpID = iter.next();
+              Double score = IDVectorOntoScoreVector.get(iter).get(tmpID);
+              if(breadthscore.get(tmpID) != null) {
+                breadthscore.put(tmpID, score);
+                minmax.put(score);
+                // Progress does not take the initial mapping into account.
+                if(cprog != null) {
+                  cprog.incrementProcessed(logger);
+                }
+              }
+            }
+          }
+        }
+        if(cprog != null) {
+          cprog.ensureCompleted(logger);
+        }
+        OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
+        Relation<Double> scores = new MaterializedRelation<Double>("Feature bagging", "fb-outlier", TypeUtil.DOUBLE, breadthscore, relation.getDBIDs());
+        result = new OutlierResult(meta, scores);
+      }
     }
     else {
       // Cumulative sum.
