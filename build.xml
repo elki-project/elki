@@ -103,6 +103,7 @@
 		<exclude name="experimentalcode/shared/index/subspace/**" />
 		<exclude name="experimentalcode/shared/kernelbased/**" />
 		<exclude name="experimentalcode/shared/converter/bibtex/**" />
+		<exclude name="experimentalcode/shared/outlier/correlation/ranking/**" />
 		<exclude name="experimentalcode/students/**" />
 		<exclude name="experimentalcode/thomas/**" />
 		<exclude name="experimentalcode/tobias/**" />
@@ -256,6 +257,7 @@
 			deprecation="false"
 			debug="false"
 			optimize="true"
+			includeAntRuntime="false"
 			source="1.6"
 			debuglevel="">
 			<compilerarg value="-Xlint:all" />
@@ -273,6 +275,7 @@
 			deprecation="false"
 			debug="false"
 			optimize="true"
+			includeAntRuntime="false"
 			source="1.6"
 			debuglevel="">
 			<compilerarg value="-Xlint:all" />
@@ -313,6 +316,7 @@
 			deprecation="false"
 			debug="false"
 			optimize="true"
+			includeAntRuntime="false"
 			source="1.6"
 			debuglevel="">
 			<compilerarg value="-Xlint:all" />
