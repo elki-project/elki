@@ -1,7 +1,8 @@
 package experimentalcode.hettab.outlier;
 
-import java.util.Collection;
-
+import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractDistanceBasedSpatialOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractNeighborhoodOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -12,12 +13,15 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -29,51 +33,58 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
-import experimentalcode.hettab.neighborhood.DistanceBasedNeighborSetPredicate;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
+ * Spatial outlier detection based on random walks.
+ * 
+ * Note: this method can only handle one-dimensional data, but could probably be
+ * easily extended to higher dimensional data by using an distance function
+ * instead of the absolute difference.
+ * 
  * <p>
+ * X. Liu and C.-T. Lu and F. Chen, <br>
  * Random Walk on Exhaustive Combination <br>
- * Liu, Xutong and Lu, Chang-Tien and Chen, Feng, <br>
  * Spatial outlier detection: random walk based approaches, <br>
  * in Proceedings of the 18th SIGSPATIAL International Conference on Advances in
  * Geographic Information Systems,2010
+ * </p>
  * 
  * @author Ahmed Hettab
  * 
- * @param <N> Spatial Vector
- * @param<O> non Spatial Vector
+ * @param <N1> Spatial Vector type
+ * @param <N2> Spatial Vector type
  * @param <D> Distance to use
  */
 @Title("Random Walk on Exhaustive Combination")
-@Description("Random Walk on Exhaustive Combination, which detect spatial Outlier")
-@Reference(authors = "Liu, Xutong and Lu, Chang-Tien and Chen, Feng", title = "Spatial outlier detection: random walk based approaches", booktitle = "in Proceedings of the 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems,2010")
-public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedNeighborhoodOutlier<N, D> {
+@Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
+@Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010")
+public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N2, N1, D> {
   /**
    * Logger
    */
   private static final Logging logger = Logging.getLogger(RandomWalkEC.class);
 
   /**
-   * Parameter alpha
+   * Parameter alpha: Attribute difference exponent
    */
   private double alpha;
 
   /**
-   * parameter c
+   * Parameter c: damping factor
    */
   private double c;
 
   /**
    * Constructor
    * 
-   * @param npredf
-   * @param alpha
-   * @param c
+   * @param npredf Neighborhood predicate
+   * @param distanceFunction Distance function
+   * @param alpha Alpha parameter
+   * @param c C parameter
    */
-  public RandomWalkEC(DistanceBasedNeighborSetPredicate.Factory<N, D> npredf, double alpha, double c) {
-    super(npredf);
+  public RandomWalkEC(NeighborSetPredicate.Factory<N2> npredf, DistanceFunction<N1, D> distanceFunction, double alpha, double c) {
+    super(npredf, distanceFunction);
     this.alpha = alpha;
     this.c = c;
   }
@@ -81,46 +92,49 @@ public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends Abstract
   /**
    * Run the algorithm
    * 
-   * @param spatial Spatial neighborhood relation
+   * @param spatial1 Spatial neighborhood relation (for distance function)
+   * @param spatial2 Spatial neighborhood relation (for neighborhood predicate)
    * @param relation Attribute value relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<N> spatial, Relation<? extends NumberVector<?, ?>> relation) {
-    final DistanceBasedNeighborSetPredicate<N, D> npred = getNeighborSetPredicateFactory().instantiate(spatial);
-    PrimitiveDistanceFunction<N, D> distFunc = getNeighborSetPredicateFactory().getSpatialDistanceFunction();
-    WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
+  public OutlierResult run(Relation<N1> spatial1, Relation<N2> spatial2, Relation<? extends NumberVector<?, ?>> relation) {
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial2);
+    DistanceQuery<N1, D> distFunc = getNonSpatialDistanceFunction().instantiate(spatial1);
+    WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial1.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
 
     // Make a static IDs array for matrix column indexing
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+
+    assert distFunc.getDistanceFunction().isSymmetric() : "The current implementation assumes a symmetric distance function!";
     // construct the relation Matrix of the ec-graph
     Matrix E = new Matrix(ids.size(), ids.size());
     for(int i = 0; i < ids.size(); i++) {
       final DBID id = ids.get(i);
       final double val = relation.get(id).doubleValue(1);
-      for(int j = 0; j < ids.size(); j++) {
+      for(int j = i + 1; j < ids.size(); j++) {
         final DBID n = ids.get(j);
         final double e;
-        if(n.equals(id)) {
+        double dist = distFunc.distance(id, n).doubleValue();
+        if(dist == 0) {
+          logger.warning("Zero distances are not supported - skipping: " + id + " " + n);
           e = 0;
         }
         else {
-          double dist = distFunc.distance(spatial.get(id), spatial.get(n)).doubleValue();
-          if(dist == 0) {
-            e = 0;
-          }
-          else {
-            double diff = Math.abs(val - relation.get(n).doubleValue(1));
-            double exp = Math.exp(-Math.pow(diff, alpha));
-            e = exp / dist;
-          }
+          double diff = Math.abs(val - relation.get(n).doubleValue(1));
+          double exp = Math.exp(Math.pow(diff, alpha));
+          // Implementation note: not inverting exp worked a lot better.
+          // Therefore we diverge from the article here.
+          e = exp / dist;
         }
+        // Exploit symmetry
+        E.set(j, i, e);
         E.set(i, j, e);
       }
     }
     // normalize the adjacent Matrix
     // Sum based normalization - don't use E.normalizeColumns()
     // Which normalized to Euclidean length 1.0!
-    // Also do the -c multiplication
+    // Also do the -c multiplication in this process.
     for(int i = 0; i < E.getColumnDimensionality(); i++) {
       double sum = 0.0;
       for(int j = 0; j < E.getRowDimensionality(); j++) {
@@ -151,17 +165,17 @@ public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends Abstract
     E = null;
     // compute the relevance scores between specified Object and its neighbors
     DoubleMinMax minmax = new DoubleMinMax();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(spatial1.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
-      Collection<DoubleObjPair<DBID>> neighbours = npred.getDistanceBasedNeighbors(id);
+      DBIDs neighbours = npred.getNeighborDBIDs(id);
       double gmean = 1.0;
       int cnt = 0;
-      for(DoubleObjPair<DBID> n : neighbours) {
-        if(id.equals(n.second)) {
+      for(DBID n : neighbours) {
+        if(id.equals(n)) {
           continue;
         }
-        double sim = cosineSimilarity(similarityVectors.get(id), similarityVectors.get(n.second));
+        double sim = MathUtil.cosineSimilarity(similarityVectors.get(id), similarityVectors.get(n));
         gmean *= sim;
         cnt++;
       }
@@ -175,16 +189,9 @@ public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends Abstract
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  /**
-   * Computes the cosine similarity for two given feature vectors.
-   */
-  private static final double cosineSimilarity(Vector v1, Vector v2) {
-    return v1.scalarProduct(v2) / (v1.euclideanLength() * v2.euclideanLength());
-  }
-
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), getNonSpatialDistanceFunction().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
   }
 
   @Override
@@ -195,52 +202,72 @@ public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends Abstract
   /**
    * Parameterization class.
    * 
-   * 
-   * 
    * @author Ahmed Hettab
    * 
    * @apiviz.exclude
    * 
-   * @param <V>
-   * @param <D>
+   * @param <N1> Vector type
+   * @param <N2> Vector type
+   * @param <D> Distance type
    */
-  public static class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedNeighborhoodOutlier.Parameterizer<N, D> {
+  public static class Parameterizer<N1, N2, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N2> {
+    /**
+     * Parameter to specify distance function
+     */
+    public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("randomwalkec.distance", "Distance function to use in computing the connectivity graph.");
 
     /**
      * Parameter to specify alpha
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("randomwalkec.alpha", "helps compute more accurate edge value");
+    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("randomwalkec.alpha", "Scaling exponent for value differences.");
 
     /**
      * Parameter to specify the c
      */
-    public static final OptionID C_ID = OptionID.getOrCreateOptionID("randomwalkec.c", "the Parameter c");
+    public static final OptionID C_ID = OptionID.getOrCreateOptionID("randomwalkec.c", "The damping parameter c.");
 
     /**
-     * 
+     * Parameter alpha: scaling
      */
     double alpha = 0.5;
 
     /**
-     * 
+     * Parameter c: damping coefficient
      */
     double c = 0.9;
+
+    /**
+     * Distance function to use
+     */
+    DistanceFunction<N1, D> distFunc;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      configDistance(config);
       configAlpha(config);
       configC(config);
+    }
+
+    /**
+     * Get the distance function parameter
+     * 
+     * @param config Parameterization
+     */
+    protected void configDistance(Parameterization config) {
+      final ObjectParameter<DistanceFunction<N1, D>> param = new ObjectParameter<DistanceFunction<N1, D>>(DISTANCE_ID, DistanceFunction.class);
+      if(config.grab(param)) {
+        distFunc = param.instantiateClass(config);
+      }
     }
 
     /**
      * Get the alpha parameter
      * 
      * @param config Parameterization
-     * @return alpha parameter
      */
     protected void configAlpha(Parameterization config) {
-      final DoubleParameter param = new DoubleParameter(ALPHA_ID);
+      final DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.5);
       if(config.grab(param)) {
         alpha = param.getValue();
       }
@@ -250,7 +277,6 @@ public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends Abstract
      * get the c parameter
      * 
      * @param config
-     * @return
      */
     protected void configC(Parameterization config) {
       final DoubleParameter param = new DoubleParameter(C_ID);
@@ -260,8 +286,8 @@ public class RandomWalkEC<N, O, D extends NumberDistance<D, ?>> extends Abstract
     }
 
     @Override
-    protected RandomWalkEC<N, O, D> makeInstance() {
-      return new RandomWalkEC<N, O, D>(npredf, alpha, c);
+    protected RandomWalkEC<N1, N2, D> makeInstance() {
+      return new RandomWalkEC<N1, N2, D>(npredf, distFunc, alpha, c);
     }
   }
 }

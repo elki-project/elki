@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -21,12 +22,12 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
   /**
    * Parameter to specify the non spatial distance function to use
    */
-  public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("slom.nonspatialdistancefunction", "The distance function to use for non spatial attributes");
+  public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("spatialoutlier.nonspatialdistance", "The distance function to use for non spatial attributes");
 
   /**
-   * Holds the value of {@link #NON_SPATIAL_DISTANCE_FUNCTION_ID}
+   * The distance function to use
    */
-  private PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction;
+  private DistanceFunction<O, D> nonSpatialDistanceFunction;
 
   /**
    * Constructor.
@@ -35,7 +36,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
    * @param nonSpatialDistanceFunction Distance function to use on the
    *        non-spatial attributes.
    */
-  public AbstractDistanceBasedSpatialOutlier(NeighborSetPredicate.Factory<N> npredf, PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction) {
+  public AbstractDistanceBasedSpatialOutlier(NeighborSetPredicate.Factory<N> npredf, DistanceFunction<O, D> nonSpatialDistanceFunction) {
     super(npredf);
     this.nonSpatialDistanceFunction = nonSpatialDistanceFunction;
   }
@@ -45,7 +46,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
    * 
    * @return the distance function to use on the non-spatial attributes
    */
-  protected PrimitiveDistanceFunction<O, D> getNonSpatialDistanceFunction() {
+  protected DistanceFunction<O, D> getNonSpatialDistanceFunction() {
     return nonSpatialDistanceFunction;
   }
 
