@@ -143,7 +143,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> leafEntry = node.getEntry(i);
-        leafEntry.setKnnDistance(knnLists.get(getPageID(leafEntry)).getKNNDistance());
+        leafEntry.setKnnDistance(knnLists.get(leafEntry.getRoutingObjectID()).getKNNDistance());
         knnDist_node = DistanceUtil.max(knnDist_node, leafEntry.getKnnDistance());
       }
     }
