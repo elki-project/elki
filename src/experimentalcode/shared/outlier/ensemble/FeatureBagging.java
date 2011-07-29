@@ -223,6 +223,8 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
                 breadthscore.put(tmpID, score);
                 minmax.put(score);
               }
+            } else {
+              logger.warning("Incomplete result: Iterator does not contain |DB| DBIDs");
             }
           }
           // Progress does not take the initial mapping into account.
