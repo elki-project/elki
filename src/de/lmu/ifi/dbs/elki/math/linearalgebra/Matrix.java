@@ -979,6 +979,41 @@ public class Matrix implements MatrixLike<Matrix>, Serializable {
   }
 
   /**
+   * Linear algebraic matrix multiplication, A^T * B^T. Computed as (B*A)^T
+   * 
+   * @param B another matrix
+   * @return Matrix product, A^T * B^T
+   * @throws IllegalArgumentException Matrix inner dimensions must agree.
+   */
+  public final Matrix transposeTimesTranspose(Matrix B) {
+    // Optimized implementation, exploiting the storage layout
+    if(this.elements.length != B.columndimension) {
+      throw new IllegalArgumentException("Matrix inner dimensions must agree: "+getRowDimensionality()+","+getColumnDimensionality()+" * "+B.getRowDimensionality()+","+B.getColumnDimensionality());
+    }
+    final Matrix X = new Matrix(this.columndimension, B.elements.length);
+    // Optimized ala Jama. jik order.
+    final double[] Acolj = new double[B.columndimension];
+    for(int j = 0; j < X.columndimension; j++) {
+      // Make a linear copy of column j from B
+      // TODO: use column getter from B?
+      for(int k = 0; k < B.columndimension; k++) {
+        Acolj[k] = this.elements[k][j];
+      }
+      final double[] Xrow = X.elements[j];
+      // multiply it with each row from A
+      for(int i = 0; i < B.elements.length; i++) {
+        final double[] Browi = B.elements[i];
+        double s = 0;
+        for(int k = 0; k < B.columndimension; k++) {
+          s += Browi[k] * Acolj[k];
+        }
+        Xrow[i] = s;
+      }
+    }
+    return X;
+  }
+
+  /**
    * Returns the scalar product of the colA column of this and the colB column
    * of B.
    * 
