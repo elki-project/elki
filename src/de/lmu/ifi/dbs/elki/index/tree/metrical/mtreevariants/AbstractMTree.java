@@ -229,6 +229,11 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootID(), null));
     D d_k = knnList.getKNNDistance();
 
+    if (d_k == null) {
+      // Empty tree?
+      return;
+    }
+    
     // search in tree
     while(!pq.isEmpty()) {
       GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
