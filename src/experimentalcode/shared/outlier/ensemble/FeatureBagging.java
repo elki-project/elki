@@ -204,38 +204,40 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
       {
         FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
         HashMap<IterableIterator<DBID>, Relation<Double>> IDVectorOntoScoreVector = new HashMap<IterableIterator<DBID>, Relation<Double>>();
-        
+
         // Mapping score-sorted DBID-Iterators onto their corresponding scores.
         // We need to initialize them now be able to iterate them "in parallel".
         for(OutlierResult r : results) {
           IDVectorOntoScoreVector.put(r.getOrdering().iter(relation.getDBIDs()), r.getScores());
         }
-        
+
         // Iterating over the *lines* of the AS_t(i)-matrix.
         for(int i = 0; i < relation.size(); i++) {
           // Iterating over the elements of a line (breadth-first).
           for(IterableIterator<DBID> iter : IDVectorOntoScoreVector.keySet()) {
-            if(iter.hasNext()) {  // Always true if every algorithm returns a complete result (one score for every DBID).
+            if(iter.hasNext()) { // Always true if every algorithm returns a
+                                 // complete result (one score for every DBID).
               DBID tmpID = iter.next();
               Double score = IDVectorOntoScoreVector.get(iter).get(tmpID);
-              if(breadthscore.get(tmpID) != null) {
+              if(breadthscore.get(tmpID) == null) {
+                System.out.println(tmpID);
                 breadthscore.put(tmpID, score);
                 minmax.put(score);
-                // Progress does not take the initial mapping into account.
-                if(cprog != null) {
-                  cprog.incrementProcessed(logger);
-                }
               }
             }
+          }
+          // Progress does not take the initial mapping into account.
+          if(cprog != null) {
+            cprog.incrementProcessed(logger);
           }
         }
         if(cprog != null) {
           cprog.ensureCompleted(logger);
         }
-        OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-        Relation<Double> scores = new MaterializedRelation<Double>("Feature bagging", "fb-outlier", TypeUtil.DOUBLE, breadthscore, relation.getDBIDs());
-        result = new OutlierResult(meta, scores);
       }
+      OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
+      Relation<Double> scores = new MaterializedRelation<Double>("Feature bagging", "fb-outlier", TypeUtil.DOUBLE, breadthscore, relation.getDBIDs());
+      result = new OutlierResult(meta, scores);
     }
     else {
       // Cumulative sum.
