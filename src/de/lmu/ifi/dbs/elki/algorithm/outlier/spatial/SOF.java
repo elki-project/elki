@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -78,6 +79,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    */
   public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
+    DistanceQuery<O, D> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
 
     WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
     WritableDataStore<Double> lofs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
@@ -88,7 +90,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       double avg = 0;
       for(DBID n : neighbors) {
-        avg += getNonSpatialDistanceFunction().distance(relation.get(id), relation.get(n)).doubleValue();
+        avg += distFunc.distance(id, n).doubleValue();
       }
       lrds.put(id, 1 / (avg / neighbors.size()));
     }

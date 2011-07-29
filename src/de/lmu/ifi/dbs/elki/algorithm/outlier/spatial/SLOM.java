@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -70,6 +71,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
    */
   public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
+    DistanceQuery<O, D> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
 
     WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     // calculate D-Tilde
@@ -83,7 +85,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
         if(id.equals(neighbor)) {
           continue;
         }
-        double dist = getNonSpatialDistanceFunction().distance(relation.get(id), relation.get(neighbor)).doubleValue();
+        double dist = distFunc.distance(id, neighbor).doubleValue();
         sum += dist;
         cnt++;
         maxDist = Math.max(maxDist, dist);

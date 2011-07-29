@@ -629,4 +629,15 @@ public final class MathUtil {
     final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return EARTH_RADIUS * c;
   }
+
+  /**
+   * Compute the cosine similarity for two vectors.
+   * 
+   * @param v1 First vector
+   * @param v2 Second vector
+   * @return Cosine similarity
+   */
+  public static double cosineSimilarity(Vector v1, Vector v2) {
+    return v1.scalarProduct(v2) / (v1.euclideanLength() * v2.euclideanLength());
+  }
 }
