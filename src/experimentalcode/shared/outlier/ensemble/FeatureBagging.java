@@ -220,7 +220,6 @@ public class FeatureBagging<O extends NumberVector<O, ?>, D extends NumberDistan
               DBID tmpID = iter.next();
               Double score = IDVectorOntoScoreVector.get(iter).get(tmpID);
               if(breadthscore.get(tmpID) == null) {
-                System.out.println(tmpID);
                 breadthscore.put(tmpID, score);
                 minmax.put(score);
               }
