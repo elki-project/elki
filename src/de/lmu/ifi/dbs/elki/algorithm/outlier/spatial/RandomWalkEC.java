@@ -1,8 +1,7 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractDistanceBasedSpatialOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractNeighborhoodOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -14,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -27,13 +27,15 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Spatial outlier detection based on random walks.
@@ -52,14 +54,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Ahmed Hettab
  * 
- * @param <N1> Spatial Vector type
- * @param <N2> Spatial Vector type
+ * @param <N> Spatial Vector type
  * @param <D> Distance to use
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
 @Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010")
-public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N2, N1, D> {
+public class RandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<N, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger
    */
@@ -76,17 +77,23 @@ public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends Abstra
   private double c;
 
   /**
+   * Parameter k
+   */
+  private int k;
+
+  /**
    * Constructor
    * 
-   * @param npredf Neighborhood predicate
    * @param distanceFunction Distance function
    * @param alpha Alpha parameter
    * @param c C parameter
+   * @param k Number of neighbors
    */
-  public RandomWalkEC(NeighborSetPredicate.Factory<N2> npredf, DistanceFunction<N1, D> distanceFunction, double alpha, double c) {
-    super(npredf, distanceFunction);
+  public RandomWalkEC(DistanceFunction<N, D> distanceFunction, double alpha, double c, int k) {
+    super(distanceFunction);
     this.alpha = alpha;
     this.c = c;
+    this.k = k;
   }
 
   /**
@@ -97,24 +104,30 @@ public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends Abstra
    * @param relation Attribute value relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<N1> spatial1, Relation<N2> spatial2, Relation<? extends NumberVector<?, ?>> relation) {
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial2);
-    DistanceQuery<N1, D> distFunc = getNonSpatialDistanceFunction().instantiate(spatial1);
-    WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial1.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
+  public OutlierResult run(Relation<N> spatial, Relation<? extends NumberVector<?, ?>> relation) {
+    DistanceQuery<N, D> distFunc = getDistanceFunction().instantiate(spatial);
+    WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
+    WritableDataStore<DBIDs> neighbors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, DBIDs.class);
 
     // Make a static IDs array for matrix column indexing
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
 
-    assert distFunc.getDistanceFunction().isSymmetric() : "The current implementation assumes a symmetric distance function!";
     // construct the relation Matrix of the ec-graph
     Matrix E = new Matrix(ids.size(), ids.size());
+    KNNHeap<D> heap = new KNNHeap<D>(k);
     for(int i = 0; i < ids.size(); i++) {
       final DBID id = ids.get(i);
       final double val = relation.get(id).doubleValue(1);
-      for(int j = i + 1; j < ids.size(); j++) {
+      assert (heap.size() == 0);
+      for(int j = 0; j < ids.size(); j++) {
+        if(i == j) {
+          continue;
+        }
         final DBID n = ids.get(j);
         final double e;
-        double dist = distFunc.distance(id, n).doubleValue();
+        final D distance = distFunc.distance(id, n);
+        heap.add(distance, n);
+        double dist = distance.doubleValue();
         if(dist == 0) {
           logger.warning("Zero distances are not supported - skipping: " + id + " " + n);
           e = 0;
@@ -126,10 +139,14 @@ public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends Abstra
           // Therefore we diverge from the article here.
           e = exp / dist;
         }
-        // Exploit symmetry
         E.set(j, i, e);
-        E.set(i, j, e);
       }
+      // Convert kNN Heap into DBID array
+      ModifiableDBIDs nids = DBIDUtil.newArray(heap.size());
+      while(!heap.isEmpty()) {
+        nids.add(heap.poll().getDBID());
+      }
+      neighbors.put(id, nids);
     }
     // normalize the adjacent Matrix
     // Sum based normalization - don't use E.normalizeColumns()
@@ -165,13 +182,12 @@ public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends Abstra
     E = null;
     // compute the relevance scores between specified Object and its neighbors
     DoubleMinMax minmax = new DoubleMinMax();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(spatial1.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
-      DBIDs neighbours = npred.getNeighborDBIDs(id);
       double gmean = 1.0;
       int cnt = 0;
-      for(DBID n : neighbours) {
+      for(DBID n : neighbors.get(id)) {
         if(id.equals(n)) {
           continue;
         }
@@ -191,7 +207,7 @@ public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends Abstra
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), getNonSpatialDistanceFunction().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
   }
 
   @Override
@@ -206,15 +222,14 @@ public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends Abstra
    * 
    * @apiviz.exclude
    * 
-   * @param <N1> Vector type
-   * @param <N2> Vector type
+   * @param <N> Vector type
    * @param <D> Distance type
    */
-  public static class Parameterizer<N1, N2, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N2> {
+  public static class Parameterizer<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<N, D> {
     /**
-     * Parameter to specify distance function
+     * Parameter to specify the number of neighbors
      */
-    public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("randomwalkec.distance", "Distance function to use in computing the connectivity graph.");
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("randomwalkec.k", "Number of nearest neighbors to use.");
 
     /**
      * Parameter to specify alpha
@@ -237,27 +252,27 @@ public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends Abstra
     double c = 0.9;
 
     /**
-     * Distance function to use
+     * Parameter for kNN
      */
-    DistanceFunction<N1, D> distFunc;
+    int k;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      configDistance(config);
+      configK(config);
       configAlpha(config);
       configC(config);
     }
 
     /**
-     * Get the distance function parameter
+     * Get the kNN parameter
      * 
      * @param config Parameterization
      */
-    protected void configDistance(Parameterization config) {
-      final ObjectParameter<DistanceFunction<N1, D>> param = new ObjectParameter<DistanceFunction<N1, D>>(DISTANCE_ID, DistanceFunction.class);
+    protected void configK(Parameterization config) {
+      final IntParameter param = new IntParameter(K_ID, new GreaterEqualConstraint(1));
       if(config.grab(param)) {
-        distFunc = param.instantiateClass(config);
+        k = param.getValue();
       }
     }
 
@@ -286,8 +301,8 @@ public class RandomWalkEC<N1, N2, D extends NumberDistance<D, ?>> extends Abstra
     }
 
     @Override
-    protected RandomWalkEC<N1, N2, D> makeInstance() {
-      return new RandomWalkEC<N1, N2, D>(npredf, distFunc, alpha, c);
+    protected RandomWalkEC<N, D> makeInstance() {
+      return new RandomWalkEC<N, D>(distanceFunction, alpha, c, k);
     }
   }
 }
