@@ -78,7 +78,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
    * Run the algorithm
    * 
    * @param database Database
-   * @param neighbors Neighborhood relation
+   * @param nrel Neighborhood relation
    * @param relation Data Relation (1 dimensional!)
    * @return Outlier detection result
    */

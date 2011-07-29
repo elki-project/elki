@@ -99,8 +99,7 @@ public class RandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDis
   /**
    * Run the algorithm
    * 
-   * @param spatial1 Spatial neighborhood relation (for distance function)
-   * @param spatial2 Spatial neighborhood relation (for neighborhood predicate)
+   * @param spatial Spatial neighborhood relation
    * @param relation Attribute value relation
    * @return Outlier result
    */
