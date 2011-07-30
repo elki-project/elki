@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -94,23 +93,34 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   public ByLabelClustering() {
     this(false, null);
   }
-  
+
   /**
    * Run the actual clustering algorithm.
    * 
-   * @param database The database to process
    * @param relation The data input we use
    */
-  public Clustering<Model> run(Database database, Relation<?> relation) {
+  public Clustering<Model> run(Relation<?> relation) {
     HashMap<String, ModifiableDBIDs> labelMap = multiple ? multipleAssignment(relation) : singleAssignment(relation);
 
+    ModifiableDBIDs noiseids = DBIDUtil.newArray();
     Clustering<Model> result = new Clustering<Model>("By Label Clustering", "bylabel-clustering");
     for(Entry<String, ModifiableDBIDs> entry : labelMap.entrySet()) {
       ModifiableDBIDs ids = labelMap.get(entry.getKey());
+      if(ids.size() <= 1) {
+        noiseids.addDBIDs(ids);
+        continue;
+      }
+      // Build a cluster
       Cluster<Model> c = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER);
       if(noisepattern != null && noisepattern.matcher(entry.getKey()).find()) {
         c.setNoise(true);
       }
+      result.addCluster(c);
+    }
+    // Collected noise IDs.
+    if(noiseids.size() > 0) {
+      Cluster<Model> c = new Cluster<Model>("Noise", noiseids, ClusterModel.CLUSTER);
+      c.setNoise(true);
       result.addCluster(c);
     }
     return result;
