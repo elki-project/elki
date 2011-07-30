@@ -61,7 +61,8 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
    */
   public Clustering<Model> run(Database database, Relation<?> relation) throws IllegalStateException {
     HashMap<String, ModifiableDBIDs> labelmap = new HashMap<String, ModifiableDBIDs>();
-    
+    ModifiableDBIDs noiseids = DBIDUtil.newArray();
+
     for(DBID id : relation.iterDBIDs()) {
       String label = relation.get(id).toString();
 
@@ -77,7 +78,12 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
 
     ArrayList<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>(labelmap.size());
     for(Entry<String, ModifiableDBIDs> entry : labelmap.entrySet()) {
-      Cluster<Model> clus = new Cluster<Model>(entry.getKey(), entry.getValue(), ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
+      ModifiableDBIDs ids = entry.getValue();
+      if(ids.size() <= 1) {
+        noiseids.addDBIDs(ids);
+        continue;
+      }
+      Cluster<Model> clus = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
       clusters.add(clus);
     }
 
@@ -98,6 +104,12 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
       if(cur.getParents().size() == 0) {
         rootclusters.add(cur);
       }
+    }
+    // Collected noise IDs.
+    if(noiseids.size() > 0) {
+      Cluster<Model> c = new Cluster<Model>("Noise", noiseids, ClusterModel.CLUSTER);
+      c.setNoise(true);
+      rootclusters.add(c);
     }
     assert (rootclusters.size() > 0);
 
