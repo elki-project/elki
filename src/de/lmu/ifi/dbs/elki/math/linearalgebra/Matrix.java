@@ -992,11 +992,10 @@ public class Matrix implements MatrixLike<Matrix>, Serializable {
     }
     final Matrix X = new Matrix(this.columndimension, B.elements.length);
     // Optimized ala Jama. jik order.
-    final double[] Acolj = new double[B.columndimension];
-    for(int j = 0; j < X.columndimension; j++) {
+    final double[] Acolj = new double[this.elements.length];
+    for(int j = 0; j < X.elements.length; j++) {
       // Make a linear copy of column j from B
-      // TODO: use column getter from B?
-      for(int k = 0; k < B.columndimension; k++) {
+      for(int k = 0; k < this.elements.length; k++) {
         Acolj[k] = this.elements[k][j];
       }
       final double[] Xrow = X.elements[j];
