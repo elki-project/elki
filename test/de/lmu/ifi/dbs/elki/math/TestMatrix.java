@@ -13,6 +13,7 @@ public class TestMatrix implements JUnit4Test {
   public void testTransposedOperations() {
     for(int i = 0; i < 100; i++) {
       randomizedTransposedTest();
+      randomizedTestAsymmetric();
     }
   }
 
@@ -36,5 +37,30 @@ public class TestMatrix implements JUnit4Test {
     Matrix AT_BT = A.transpose().times(B.transpose());
     org.junit.Assert.assertTrue("A.transposeTimesTranspose(B) does not equal (B.times(A)).transpose", B.times(A).transpose().almostEquals(AT_BT));
     org.junit.Assert.assertTrue("A.transposeTimesTranspose(B) does not equal A.transpose.times(B.transpose)", A.transposeTimesTranspose(B).almostEquals(AT_BT));
+  }
+  
+  private void randomizedTestAsymmetric() {
+    Random r = new Random();
+    int dim1 = r.nextInt(30) + 10;
+    int dim2 = r.nextInt(30) + 10;
+    int dim3 = r.nextInt(30) + 10;
+    Matrix A = new Matrix(dim1, dim2);
+    Matrix B = new Matrix(dim2, dim3);
+    for(int i = 0; i < dim1; i++) {
+      for(int j = 0; j < dim2; j++) {
+        A.set(i, j, (r.nextDouble() - .5) * 10);
+      }
+    }
+    for(int i = 0; i < dim2; i++) {
+      for(int j = 0; j < dim3; j++) {
+        B.set(i, j, (r.nextDouble() - .5) * 10);
+      }
+    }
+
+    Matrix A_B = A.times(B);
+    Matrix BT_AT = B.transpose().times(A.transpose());
+    Matrix BT_AT2 = B.transposeTimesTranspose(A);
+    org.junit.Assert.assertTrue("B.transposeTimesTranspose(A) does not equal (A.times(B)).transpose", A_B.transpose().almostEquals(BT_AT));
+    org.junit.Assert.assertTrue("B.transposeTimesTranspose(A) does not equal B.transpose.times(A.transpose)", BT_AT2.almostEquals(BT_AT));
   }
 }
