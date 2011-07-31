@@ -155,6 +155,8 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   // TODO test
   private Pair<DBID, Double> getCandidate(Relation<V> relation, Relation<? extends NumberVector<?, ?>> relationy) {
     final int dim = DatabaseUtil.dimensionality(relation);
+    assert(dim == 2);
+    assert(DatabaseUtil.dimensionality(relationy) == 1);
     KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k + 1);
 
     // We need stable indexed DBIDs
@@ -163,7 +165,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     Collections.sort(ids);
 
     // init F,X,Z
-    Matrix X = new Matrix(ids.size(), dim);
+    Matrix X = new Matrix(ids.size(), 6);
     Matrix F = new Matrix(ids.size(), ids.size());
     Matrix Y = new Matrix(ids.size(), 1);
     for(int i = 0; i < ids.size(); i++) {
@@ -172,9 +174,14 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       // Fill the data matrix
       {
         V vec = relation.get(id);
-        for(int j = 0; j < dim; j++) {
-          X.set(i, j, vec.doubleValue(j + 1));
-        }
+        double la = vec.doubleValue(1);
+        double lo = vec.doubleValue(2);
+        X.set(i, 0, 1.0);
+        X.set(i, 1, la);
+        X.set(i, 2, lo);
+        X.set(i, 3, la * lo);
+        X.set(i, 4, la * la);
+        X.set(i, 5, lo * lo);
       }
 
       {
@@ -205,8 +212,8 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
     // Estimate the parameter beta
     // Common term that we can save recomputing.
-    Matrix common = X.transpose().timesTranspose(F).times(F);
-    Matrix b = common.times(X).inverse().times(common).times(Y);
+    Matrix common = X.transposeTimesTranspose(F).times(F);
+    Matrix b = common.times(X).inverse().times(common.times(Y));
     // Estimate sigma_0 and sigma:
     // sigma_sum_square = sigma_0*sigma_0 + sigma*sigma
     Matrix sigmaMat = F.times(X.times(b).minus(F.times(Y)));
