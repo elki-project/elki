@@ -113,6 +113,7 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
       double score = Math.abs((hi.get(id) - mv.getMean()) / mv.getNaiveStddev());
       minmax.put(score);
       scores.put(id, score);
+      System.out.println(score);
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("MOF", "Median-single-attribut-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
