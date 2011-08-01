@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -97,7 +96,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
     if(value <= mean) {
       return 0;
     }
-    return Math.max(0, ErrorFunctions.erf((value - mean) / factor));
+    return Math.max(0, MathUtil.erf((value - mean) / factor));
   }
 
   @Override
