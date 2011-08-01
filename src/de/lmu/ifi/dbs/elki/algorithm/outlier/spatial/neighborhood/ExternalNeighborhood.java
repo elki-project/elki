@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
@@ -135,13 +135,13 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implem
       // TODO: move this into the database layer to share?
       Map<String, DBID> lblmap = new HashMap<String, DBID>(database.size() * 2);
       {
-        Relation<LabelList> olq = database.getDatabase().getRelation(SimpleTypeInformation.get(LabelList.class));
-        Relation<String> eidq = null; // database.getExternalIdQuery();
+        Relation<LabelList> olq = database.getDatabase().getRelation(TypeUtil.LABELLIST);
+        Relation<ExternalID> eidq = database.getDatabase().getRelation(TypeUtil.EXTERNALID);
         for(DBID id : database.iterDBIDs()) {
           if(eidq != null) {
-            String eid = eidq.get(id);
+            ExternalID eid = eidq.get(id);
             if(eid != null) {
-              lblmap.put(eid, id);
+              lblmap.put(eid.toString(), id);
             }
           }
           if(olq != null) {
@@ -162,7 +162,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implem
         InputStream in = new FileInputStream(file);
         in = FileUtil.tryGzipInput(in);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        for(String line; (line = br.readLine()) != null; ) {
+        for(String line; (line = br.readLine()) != null;) {
           ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
           String[] entries = line.split(" ");
           DBID id = lblmap.get(entries[0]);

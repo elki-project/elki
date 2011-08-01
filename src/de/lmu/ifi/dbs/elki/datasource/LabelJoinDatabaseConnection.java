@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -66,6 +67,9 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
         }
         lblcol = lblc; // make static
       }
+      if(lblcol == -1) {
+        throw new AbortException("No label column found in first source, cannot join (do you want to use " + ExternalIDJoinDatabaseConnection.class.getSimpleName() + " instead?)");
+      }
       for(int i = 0; i < first.dataLength(); i++) {
         Object data = first.data(i, lblcol);
         if(data == null) {
@@ -108,6 +112,9 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
           }
         }
         lblcol = lblc; // make static
+      }
+      if(lblcol == -1) {
+        throw new AbortException("No label column found in source " + (c + 1) + ", cannot join (do you want to use " + ExternalIDJoinDatabaseConnection.class.getSimpleName() + " instead?)");
       }
       // Destination columns
       List<ArrayList<Object>> dcol = new ArrayList<ArrayList<Object>>(cur.metaLength());

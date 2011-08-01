@@ -68,7 +68,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
         lblcol = lblc; // make static
       }
       if(lblcol == -1) {
-        throw new AbortException("No external ID column found to join with.");
+        throw new AbortException("No external ID column found in primary source.");
       }
       for(int i = 0; i < first.dataLength(); i++) {
         ExternalID data = (ExternalID) first.data(i, lblcol);
@@ -104,7 +104,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
           }
           buf.append(cur.meta(i));
         }
-        throw new AbortException("No external ID column found to join with. Got: " + buf.toString());
+        throw new AbortException("No external ID column found in source " + (c + 1) + " to join with. Got: " + buf.toString());
       }
       // Destination columns
       List<ArrayList<Object>> dcol = new ArrayList<ArrayList<Object>>(cur.metaLength());
