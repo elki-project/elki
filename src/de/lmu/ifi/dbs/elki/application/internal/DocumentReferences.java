@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,6 +25,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
 /**
@@ -75,8 +79,7 @@ public class DocumentReferences {
   }
 
   private static Document documentParameters() {
-    ArrayList<Class<?>> classes = findAllClassesWithReferences();
-    Collections.sort(classes, new InspectionUtil.ClassSorter());
+    List<Pair<Reference, List<Class<?>>>> refs = sortedReferences();
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
@@ -132,21 +135,28 @@ public class DocumentReferences {
     // Main definition list
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
-    for(Class<?> cls : classes) {
+    for(Pair<Reference, List<Class<?>>> pair : refs) {
       // DT = definition term
       Element classdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
       {
-        Element classan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-        classan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, cls.getName());
-        classdt.appendChild(classan);
-      }
-      // Link back to original class
-      {
-        Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-        classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(cls.getName()));
-        classa.setTextContent(cls.getName());
-        classdt.appendChild(classa);
+        boolean first = true;
+        for(Class<?> cls : pair.second) {
+          if (!first) {
+            classdt.appendChild(htmldoc.createTextNode(", "));
+          }
+          Element classan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+          classan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, cls.getName());
+          classdt.appendChild(classan);
+
+          // Link back to original class
+          Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+          classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(cls.getName()));
+          classa.setTextContent(cls.getName());
+          classdt.appendChild(classa);
+          
+          first = false;
+        }
       }
       maindl.appendChild(classdt);
       // DD = definition description
@@ -154,7 +164,7 @@ public class DocumentReferences {
       maindl.appendChild(classdd);
 
       {
-        Reference ref = DocumentationUtil.getReference(cls);
+        Reference ref = pair.first;
         // Prefix
         if(ref.prefix().length() > 0) {
           Element prediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
@@ -173,7 +183,7 @@ public class DocumentReferences {
         classdd.appendChild(titlediv);
         // Booktitle
         Element booktitlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
-        booktitlediv.setTextContent("In: "+ref.booktitle());
+        booktitlediv.setTextContent("In: " + ref.booktitle());
         classdd.appendChild(booktitlediv);
         // URL
         if(ref.url().length() > 0) {
@@ -187,6 +197,25 @@ public class DocumentReferences {
       }
     }
     return htmldoc;
+  }
+
+  private static List<Pair<Reference, List<Class<?>>>> sortedReferences() {
+    ArrayList<Class<?>> classes = findAllClassesWithReferences();
+    Collections.sort(classes, new InspectionUtil.ClassSorter());
+
+    List<Pair<Reference, List<Class<?>>>> refs = new ArrayList<Pair<Reference, List<Class<?>>>>(classes.size());
+    Map<Reference, List<Class<?>>> map = new HashMap<Reference, List<Class<?>>>(classes.size());
+    for(Class<?> cls : classes) {
+      Reference ref = DocumentationUtil.getReference(cls);
+      List<Class<?>> list = map.get(ref);
+      if(list == null) {
+        list = new ArrayList<Class<?>>(5);
+        map.put(ref, list);
+        refs.add(new Pair<Reference, List<Class<?>>>(ref, list));
+      }
+      list.add(cls);
+    }
+    return refs;
   }
 
   private static String linkForClassName(String name) {
