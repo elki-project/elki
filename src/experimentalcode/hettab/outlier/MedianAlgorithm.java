@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -18,14 +17,15 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.QuickSelect;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
+ * Median Algorithm of C.-T. Lu
+ * 
  * <p>
  * Reference: <br>
  * Chang-Tien Lu <br>
@@ -33,20 +33,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * in Third IEEE International Conference on Data Mining <br>
  * </p>
  * 
- * Description: <br>
  * Median Algorithm uses Median to represent the average non-spatial attribute
  * value of neighbors. <br>
- * The Difference e = non-spatial-Attribut-Value - Median (Neighborhood) is
+ * The Difference e = non-spatial-Attribute-Value - Median (Neighborhood) is
  * computed.<br>
- * The Spatial Objects with the highest standarized e value are Spatial
+ * The Spatial Objects with the highest standardized e value are Spatial
  * Outliers. </p>
  * 
  * @author Ahmed Hettab
  * 
  * @param <N> Neighborhood type
  */
-@Title("Algorithms for Spatial Outlier Detection")
-@Description("Spatial Outlier Detection Algorithm")
+@Title("Median Algorithm for Spatial Outlier Detection")
 @Reference(authors = "Chang-Tien Lu", title = "Algorithms for Spatial Outlier Detection", booktitle = "Proceedings of the Third IEEE International Conference on Data Mining")
 public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
@@ -66,20 +64,16 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Main method
    * 
-   * @param database Database
    * @param nrel Neighborhood relation
    * @param relation Data relation (1d!)
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
+  public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
-    WritableDataStore<Double> gi = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> hi = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    //
+
     MeanVariance mv = new MeanVariance();
     for(DBID id : relation.iterDBIDs()) {
-      //
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       final double median;
       {
@@ -102,22 +96,23 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
           median = relation.get(id).doubleValue(1);
         }
       }
-      gi.put(id, median);
       double h = relation.get(id).doubleValue(1) - median;
-      hi.put(id, h);
+      scores.put(id, h);
       mv.put(h);
     }
 
+    // Normalize scores
+    final double mean = mv.getMean();
+    final double stddev = mv.getNaiveStddev();
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
-      double score = Math.abs((hi.get(id) - mv.getMean()) / mv.getNaiveStddev());
+      double score = Math.abs((scores.get(id) - mean) / stddev);
       minmax.put(score);
       scores.put(id, score);
-      System.out.println(score);
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("MOF", "Median-single-attribut-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("MO", "Median-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
