@@ -155,7 +155,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     // calculate score
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
-      double score = errors.get(id) * 0.6745 / median_dev_from_median;
+      double score = Math.abs(errors.get(id)) * 0.6745 / median_dev_from_median;
       scores.put(id, score);
       minmax.put(score);
     }
