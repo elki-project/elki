@@ -60,11 +60,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
 @Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010")
-public class RandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<N, D, OutlierResult> implements OutlierAlgorithm {
+public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<N, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(RandomWalkEC.class);
+  private static final Logging logger = Logging.getLogger(CTLuRandomWalkEC.class);
 
   /**
    * Parameter alpha: Attribute difference exponent
@@ -89,7 +89,7 @@ public class RandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDis
    * @param c C parameter
    * @param k Number of neighbors
    */
-  public RandomWalkEC(DistanceFunction<N, D> distanceFunction, double alpha, double c, int k) {
+  public CTLuRandomWalkEC(DistanceFunction<N, D> distanceFunction, double alpha, double c, int k) {
     super(distanceFunction);
     this.alpha = alpha;
     this.c = c;
@@ -300,8 +300,8 @@ public class RandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDis
     }
 
     @Override
-    protected RandomWalkEC<N, D> makeInstance() {
-      return new RandomWalkEC<N, D>(distanceFunction, alpha, c, k);
+    protected CTLuRandomWalkEC<N, D> makeInstance() {
+      return new CTLuRandomWalkEC<N, D>(distanceFunction, alpha, c, k);
     }
   }
 }

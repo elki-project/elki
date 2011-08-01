@@ -51,18 +51,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("Z-Test Outlier Detection")
 @Description("Outliers are detected by their z-deviation from the local mean.")
 @Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003")
-public class ZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
+public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ZTestOutlier.class);
+  private static final Logging logger = Logging.getLogger(CTLuZTestOutlier.class);
 
   /**
    * Constructor
    * 
    * @param npredf
    */
-  public ZTestOutlier(NeighborSetPredicate.Factory<N> npredf) {
+  public CTLuZTestOutlier(NeighborSetPredicate.Factory<N> npredf) {
     super(npredf);
   }
 
@@ -137,8 +137,8 @@ public class ZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
-    protected ZTestOutlier<N> makeInstance() {
-      return new ZTestOutlier<N>(npredf);
+    protected CTLuZTestOutlier<N> makeInstance() {
+      return new CTLuZTestOutlier<N>(npredf);
     }
   }
 }

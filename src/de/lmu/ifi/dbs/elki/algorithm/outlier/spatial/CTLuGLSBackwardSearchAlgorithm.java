@@ -63,11 +63,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("GLS-Backward Search")
 @Reference(authors = "F. Chen and C.-T. Lu and A. P. Boedihardjo", title = "GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier Detection", booktitle = "Proc. 16th ACM SIGKDD international conference on Knowledge discovery and data mining")
-public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
+public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(GLSBackwardSearchAlgorithm.class);
+  private static final Logging logger = Logging.getLogger(CTLuGLSBackwardSearchAlgorithm.class);
 
   /**
    * Parameter Alpha - significance niveau
@@ -86,7 +86,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
    * @param k number of nearest neighbors to use
    * @param alpha Significance niveau
    */
-  public GLSBackwardSearchAlgorithm(DistanceFunction<V, D> distanceFunction, int k, double alpha) {
+  public CTLuGLSBackwardSearchAlgorithm(DistanceFunction<V, D> distanceFunction, int k, double alpha) {
     super(distanceFunction);
     this.alpha = alpha;
     this.k = k;
@@ -274,8 +274,8 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
 
     @Override
-    protected GLSBackwardSearchAlgorithm<V, D> makeInstance() {
-      return new GLSBackwardSearchAlgorithm<V, D>(distanceFunction, k, alpha);
+    protected CTLuGLSBackwardSearchAlgorithm<V, D> makeInstance() {
+      return new CTLuGLSBackwardSearchAlgorithm<V, D>(distanceFunction, k, alpha);
     }
 
     /**
