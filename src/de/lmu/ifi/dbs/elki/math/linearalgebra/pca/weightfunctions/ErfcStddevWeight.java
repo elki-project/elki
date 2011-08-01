@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
 
-import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
@@ -20,6 +19,6 @@ public final class ErfcStddevWeight implements WeightFunction {
     if(stddev <= 0) {
       return 1;
     }
-    return ErrorFunctions.erfc(MathUtil.SQRTHALF * distance / stddev);
+    return MathUtil.erfc(MathUtil.SQRTHALF * distance / stddev);
   }
 }
