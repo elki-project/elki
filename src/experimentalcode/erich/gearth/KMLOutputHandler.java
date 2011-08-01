@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -37,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
@@ -69,15 +72,22 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
   OutlierScalingFunction scaling;
 
   /**
+   * Compatibility mode.
+   */
+  private boolean compat;
+
+  /**
    * Constructor.
    * 
    * @param filename Output filename
    * @param scaling Scaling function
+   * @param compat Compatibility mode
    */
-  public KMLOutputHandler(File filename, OutlierScalingFunction scaling) {
+  public KMLOutputHandler(File filename, OutlierScalingFunction scaling, boolean compat) {
     super();
     this.filename = filename;
     this.scaling = scaling;
+    this.compat = compat;
   }
 
   @Override
@@ -162,9 +172,12 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
           // KML uses AABBGGRR format!
           out.writeCharacters(String.format("%02x%02x%02x%02x", col.getAlpha(), col.getBlue(), col.getGreen(), col.getRed()));
           out.writeEndElement(); // color
-          out.writeStartElement("fill");
-          out.writeCharacters("1");
-          out.writeEndElement(); // fill
+          // out.writeStartElement("fill");
+          // out.writeCharacters("1"); // Default 1
+          // out.writeEndElement(); // fill
+          out.writeStartElement("outline");
+          out.writeCharacters("0");
+          out.writeEndElement(); // outline
           out.writeEndElement(); // PolyStyle
         }
         writeNewlineOnDebug(out);
@@ -195,12 +208,18 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         out.writeStartElement("styleUrl");
         int style = (int) (scaling.getScaled(score) * NUMSTYLES);
         style = Math.max(0, Math.min(style, NUMSTYLES - 1));
-        out.writeCharacters("s" + style);
+        out.writeCharacters("#s" + style);
         out.writeEndElement(); // styleUrl
       }
       {
         out.writeStartElement("Polygon");
         writeNewlineOnDebug(out);
+        if(compat) {
+          out.writeStartElement("altitudeMode");
+          out.writeCharacters("relativeToGround");
+          out.writeEndElement(); // close altitude mode
+          writeNewlineOnDebug(out);
+        }
         boolean first = true;
         for(Polygon p : poly.getPolygons()) {
           if(first) {
@@ -211,9 +230,18 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
           }
           out.writeStartElement("LinearRing");
           out.writeStartElement("coordinates");
+          // TODO: don't assume we have the polygons reversed; test!
+          List<Vector> vs = new ArrayList<Vector>();
           for(Vector v : p) {
+            vs.add(v);
+          }
+          Collections.reverse(vs);
+          for(Vector v : vs) {
             out.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
-            out.writeCharacters("\n");
+            if(compat && (v.getDimensionality() == 2)) {
+              out.writeCharacters(",500");
+            }
+            out.writeCharacters(" ");
           }
           out.writeEndElement(); // close coordinates
           out.writeEndElement(); // close LinearRing
@@ -313,6 +341,15 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
     public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("kml.scaling", "Additional scaling function for KML colorization.");
 
     /**
+     * Parameter for compatibility mode.
+     * 
+     * <p>
+     * Key: {@code -kml.compat}
+     * </p>
+     */
+    public static final OptionID COMPAT_ID = OptionID.getOrCreateOptionID("kml.compat", "Use simpler KML objects, compatibility mode.");
+
+    /**
      * Output file name
      */
     File filename;
@@ -321,6 +358,11 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
      * Scaling function
      */
     OutlierScalingFunction scaling;
+
+    /**
+     * Compatibility mode
+     */
+    boolean compat;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -335,11 +377,16 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
+
+      Flag compatF = new Flag(COMPAT_ID);
+      if(config.grab(compatF)) {
+        compat = compatF.getValue();
+      }
     }
 
     @Override
     protected KMLOutputHandler makeInstance() {
-      return new KMLOutputHandler(filename, scaling);
+      return new KMLOutputHandler(filename, scaling, compat);
     }
   }
 }
