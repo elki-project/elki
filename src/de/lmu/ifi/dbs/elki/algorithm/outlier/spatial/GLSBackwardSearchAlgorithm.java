@@ -294,7 +294,6 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
      * Get the k parameter
      * 
      * @param config Parameterization
-     * @return k parameter
      */
     protected void getParameterK(Parameterization config) {
       final IntParameter param = new IntParameter(K_ID);
