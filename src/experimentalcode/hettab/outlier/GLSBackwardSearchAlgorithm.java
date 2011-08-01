@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -108,19 +107,20 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   }
 
   /**
+   * Run the algorithm
    * 
-   * @param database
-   * @param relation
-   * @return
+   * @param relation Neighborhood relation
+   * @param relationy Dataset relation
+   * @return Algorithm result
    */
-  public OutlierResult run(Database database, Relation<V> relation, Relation<? extends NumberVector<?, ?>> relationy) {
+  public OutlierResult run(Relation<V> relation, Relation<? extends NumberVector<?, ?>> relationy) {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     DoubleMinMax mm = new DoubleMinMax(0.0, 0.0);
 
     // Outlier detection loop
     {
       ModifiableDBIDs idview = DBIDUtil.newHashSet(relation.getDBIDs());
-      ProxyView<V> proxy = new ProxyView<V>(database, idview, relation);
+      ProxyView<V> proxy = new ProxyView<V>(relation.getDatabase(), idview, relation);
 
       // Detect up to m outliers
       for(int numout = 0; numout < m; numout++) {
