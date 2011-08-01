@@ -50,18 +50,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("Scatterplot Spatial Outlier")
 @Description("Spatial Outlier Detection Algorithm using linear regression of attributes and the mean of their neighbors.")
 @Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003")
-public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
+public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ScatterplotOutlier.class);
+  private static final Logging logger = Logging.getLogger(CTLuScatterplotOutlier.class);
 
   /**
    * Constructor
    * 
    * @param npredf Neighborhood predicate
    */
-  public ScatterplotOutlier(NeighborSetPredicate.Factory<N> npredf) {
+  public CTLuScatterplotOutlier(NeighborSetPredicate.Factory<N> npredf) {
     super(npredf);
   }
 
@@ -162,8 +162,8 @@ public class ScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
-    protected ScatterplotOutlier<N> makeInstance() {
-      return new ScatterplotOutlier<N>(npredf);
+    protected CTLuScatterplotOutlier<N> makeInstance() {
+      return new CTLuScatterplotOutlier<N>(npredf);
     }
   }
 }

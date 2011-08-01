@@ -1,6 +1,5 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.AbstractNeighborhoodOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -46,18 +45,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Median Algorithm for Spatial Outlier Detection")
 @Reference(authors = "Chang-Tien Lu", title = "Algorithms for Spatial Outlier Detection", booktitle = "Proceedings of the Third IEEE International Conference on Data Mining")
-public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
+public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MedianAlgorithm.class);
+  private static final Logging logger = Logging.getLogger(CTLuMedianAlgorithm.class);
 
   /**
    * Constructor
    * 
    * @param npredf Neighborhood predicate
    */
-  public MedianAlgorithm(NeighborSetPredicate.Factory<N> npredf) {
+  public CTLuMedianAlgorithm(NeighborSetPredicate.Factory<N> npredf) {
     super(npredf);
   }
 
@@ -137,8 +136,8 @@ public class MedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
-    protected MedianAlgorithm<N> makeInstance() {
-      return new MedianAlgorithm<N>(npredf);
+    protected CTLuMedianAlgorithm<N> makeInstance() {
+      return new CTLuMedianAlgorithm<N>(npredf);
     }
   }
 }
