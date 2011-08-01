@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Moran Scatterplot Outlier")
 @Description("Spatial Outlier detection based on the standardized deviation from the local means.")
-@Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003")
+@Reference(authors = "S. Shekhar and C.-T. Lu and P. Zhang", title = "A Unified Approach to Detecting Spatial Outliers", booktitle = "GeoInformatica 7-2, 2003", url="http://dx.doi.org/10.1023/A:1023455925009")
 public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.

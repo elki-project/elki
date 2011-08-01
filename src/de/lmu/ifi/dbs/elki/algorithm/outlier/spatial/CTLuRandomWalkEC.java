@@ -45,11 +45,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * instead of the absolute difference.
  * 
  * <p>
- * X. Liu and C.-T. Lu and F. Chen, <br>
- * Random Walk on Exhaustive Combination <br>
- * Spatial outlier detection: random walk based approaches, <br>
- * in Proceedings of the 18th SIGSPATIAL International Conference on Advances in
- * Geographic Information Systems,2010
+ * X. Liu and C.-T. Lu and F. Chen:<br>
+ * Spatial outlier detection: random walk based approaches,<br>
+ * in Proc. 18th SIGSPATIAL International Conference on Advances in Geographic
+ * Information Systems, 2010
  * </p>
  * 
  * @author Ahmed Hettab
@@ -59,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
-@Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010")
+@Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010", url="http://dx.doi.org/10.1145/1869790.1869841")
 public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<N, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger

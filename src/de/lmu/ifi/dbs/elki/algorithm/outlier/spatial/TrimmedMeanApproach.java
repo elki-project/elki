@@ -34,6 +34,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
+ * A Trimmed Mean Approach to Finding Spatial Outliers.
+ * 
+ * Outliers are defined by their value deviation from a trimmed mean of the neighbors.
+ * 
  * <p>
  * Reference: <br>
  * Tianming Hu and Sam Yuan Sung<br>
@@ -51,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("A Trimmed Mean Approach to Finding Spatial Outliers")
 @Description("A local trimmed mean approach to evaluating the spatial outlier factor which is the degree that a site is outlying compared to its neighbors")
-@Reference(authors = "Tianming Hu and Sam Yuan Sung", title = "A trimmed mean approach to finding spatial outliers", booktitle = "Intelligent Data Analysis, Volume 8, 2004")
+@Reference(authors = "Tianming Hu and Sam Yuan Sung", title = "A trimmed mean approach to finding spatial outliers", booktitle = "Intelligent Data Analysis, Volume 8, 2004", url = "http://iospress.metapress.com/content/PLVLT6431DVNJXNK")
 public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
