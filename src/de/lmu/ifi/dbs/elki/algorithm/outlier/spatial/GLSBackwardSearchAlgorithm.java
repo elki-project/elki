@@ -1,4 +1,4 @@
-package experimentalcode.hettab.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -60,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Vector type to use for distances
  * @param <D> Distance function to use
  */
+@Title("GLS-Backward Search")
 @Reference(authors = "F. Chen and C.-T. Lu and A. P. Boedihardjo", title = "GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier Detection", booktitle = "Proc. 16th ACM SIGKDD international conference on Knowledge discovery and data mining")
 public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
   /**
@@ -93,18 +95,18 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   /**
    * Run the algorithm
    * 
-   * @param relation Neighborhood relation
-   * @param relationy Dataset relation
+   * @param relationx Spatial relation
+   * @param relationy Attribute relation
    * @return Algorithm result
    */
-  public OutlierResult run(Relation<V> relation, Relation<? extends NumberVector<?, ?>> relationy) {
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+  public OutlierResult run(Relation<V> relationx, Relation<? extends NumberVector<?, ?>> relationy) {
+    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relationx.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     DoubleMinMax mm = new DoubleMinMax(0.0, 0.0);
 
     // Outlier detection loop
     {
-      ModifiableDBIDs idview = DBIDUtil.newHashSet(relation.getDBIDs());
-      ProxyView<V> proxy = new ProxyView<V>(relation.getDatabase(), idview, relation);
+      ModifiableDBIDs idview = DBIDUtil.newHashSet(relationx.getDBIDs());
+      ProxyView<V> proxy = new ProxyView<V>(relationx.getDatabase(), idview, relationx);
 
       double phialpha = MathUtil.standardNormalProbit(1.0 - alpha / 2);
       // Detect outliers while significant.
@@ -124,7 +126,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       }
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("GLSSODBackward", "GLSSODbackward-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("GLSSODBackward", "GLSSODbackward-outlier", TypeUtil.DOUBLE, scores, relationx.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
