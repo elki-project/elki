@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -37,16 +38,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * FIXME: Documentation, Reference
+ * GLS-Backward Search is a statistical approach to detecting spatial outliers.
  * 
- * GLSBackwardSearchAlgorithm provides the GLS-SOD Algorithm, an Algorithm to
- * detect Spatial Outlier
+ * <p>
+ * F. Chen and C.-T. Lu and A. P. Boedihardjo: <br>
+ * GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier
+ * Detection <br>
+ * In Proc. 16th ACM SIGKDD international conference on Knowledge discovery and
+ * data mining, 2010
+ * </p>
+ * 
+ * Implementation note: this is just the most basic version of this algorithm.
+ * The spatial relation must be two dimensional, the set of spatial basis
+ * functions is hard-coded (but trivial to enhance) to {1,x,y,x*x,y*y,x*y}, and
+ * we assume the neighborhood is large enough for the simpler formulas to work
+ * that make the optimization problem convex.
  * 
  * @author Ahmed Hettab
  * 
- * @param <V> DatabaseObject to use
+ * @param <V> Vector type to use for distances
  * @param <D> Distance function to use
  */
+@Reference(authors = "F. Chen and C.-T. Lu and A. P. Boedihardjo", title = "GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier Detection", booktitle = "Proc. 16th ACM SIGKDD international conference on Knowledge discovery and data mining")
 public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -54,32 +67,17 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   private static final Logging logger = Logging.getLogger(GLSBackwardSearchAlgorithm.class);
 
   /**
-   * Holds the alpha value
-   */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("glsbs.alpha", "the alpha parameter");
-
-  /**
-   * Parameter Alpha
+   * Parameter Alpha - significance niveau
    */
   private double alpha;
 
   /**
-   * Parameter to specify the k nearest neighbors
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("glsbs.k", "k nearest neighbor");
-
-  /**
-   * The parameter k
+   * Parameter k - neighborhood size
    */
   private int k;
 
   /**
-   * Parameter to specify the k nearest neighbor
-   */
-  public static final OptionID M_ID = OptionID.getOrCreateOptionID("glsbs.m", "the number of outliers to be detected");
-
-  /**
-   * The parameter k
+   * Parameter m - number of outliers to detect
    */
   private int m;
 
@@ -94,16 +92,6 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     this.alpha = alpha;
     this.k = k;
     this.m = m;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return logger;
   }
 
   /**
@@ -124,7 +112,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
 
       // Detect up to m outliers
       for(int numout = 0; numout < m; numout++) {
-        Pair<DBID, Double> candidate = getCandidate(proxy, relationy);
+        Pair<DBID, Double> candidate = singleIteration(proxy, relationy);
         if(candidate.second < alpha) {
           break;
         }
@@ -147,19 +135,20 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   }
 
   /**
+   * Run a single iteration of the GLS-SOD modeling step
    * 
-   * @param database
-   * @param outlier
+   * @param relationx Geo relation
+   * @param relationy Attribute relation
+   * @return Top outlier and associated score
    */
-  // TODO test
-  private Pair<DBID, Double> getCandidate(Relation<V> relation, Relation<? extends NumberVector<?, ?>> relationy) {
-    final int dim = DatabaseUtil.dimensionality(relation);
+  private Pair<DBID, Double> singleIteration(Relation<V> relationx, Relation<? extends NumberVector<?, ?>> relationy) {
+    final int dim = DatabaseUtil.dimensionality(relationx);
     final int dimy = DatabaseUtil.dimensionality(relationy);
     assert (dim == 2);
-    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k + 1);
+    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relationx, getDistanceFunction(), k + 1);
 
     // We need stable indexed DBIDs
-    ArrayDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+    ArrayDBIDs ids = DBIDUtil.newArray(relationx.getDBIDs());
     // Sort, so we can do a binary search below.
     Collections.sort(ids);
 
@@ -172,7 +161,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
 
       // Fill the data matrix
       {
-        V vec = relation.get(id);
+        V vec = relationx.get(id);
         double la = vec.doubleValue(1);
         double lo = vec.doubleValue(2);
         X.set(i, 0, 1.0);
@@ -218,7 +207,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     // Estimate sigma_0 and sigma:
     // sigma_sum_square = sigma_0*sigma_0 + sigma*sigma
     Matrix sigmaMat = F.times(X.times(b).minus(F.times(Y)));
-    final double sigma_sum_square = sigmaMat.normF() / (relation.size() - 6 - 1);
+    final double sigma_sum_square = sigmaMat.normF() / (relationx.size() - 6 - 1);
     final double norm = 1 / Math.sqrt(sigma_sum_square);
 
     // calculate the absolute values of standard residuals
@@ -239,19 +228,55 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     return new Pair<DBID, Double>(worstid, worstscore);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
+
   /**
    * Parameterization class
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.exclude
+   * 
    * @param <V> Input vector type
    * @param <D> Distance type
    */
   public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+    /**
+     * Holds the alpha value - significance niveau
+     */
+    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("glsbs.alpha", "Significance niveau");
+
+    /**
+     * Parameter to specify the k nearest neighbors
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("glsbs.k", "k nearest neighbors to use");
+
+    /**
+     * Parameter to specify the number of outliers to detect
+     */
+    public static final OptionID M_ID = OptionID.getOrCreateOptionID("glsbs.m", "The number of outliers to be detected");
+
+    /**
+     * Parameter Alpha - significance niveau
+     */
     private double alpha;
 
+    /**
+     * Parameter k - neighborhood size
+     */
     private int k;
 
+    /**
+     * Parameter m - number of outliers to detect
+     */
     private int m;
 
     @Override
@@ -263,7 +288,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     }
 
     @Override
-    protected Object makeInstance() {
+    protected GLSBackwardSearchAlgorithm<V, D> makeInstance() {
       return new GLSBackwardSearchAlgorithm<V, D>(distanceFunction, k, alpha, m);
     }
 
