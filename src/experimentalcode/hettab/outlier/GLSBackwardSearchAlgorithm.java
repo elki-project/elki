@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -61,12 +60,12 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("glsbs.alpha", "the alpha parameter");
 
   /**
-   * parameter x2
+   * Parameter Alpha
    */
   private double alpha;
 
   /**
-   * Parameter to specify the k nearest neighbor
+   * Parameter to specify the k nearest neighbors
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("glsbs.k", "k nearest neighbor");
 
@@ -100,7 +99,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?, ?>>(NumberVector.class, 1));
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override
@@ -155,8 +154,8 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   // TODO test
   private Pair<DBID, Double> getCandidate(Relation<V> relation, Relation<? extends NumberVector<?, ?>> relationy) {
     final int dim = DatabaseUtil.dimensionality(relation);
-    assert(dim == 2);
-    assert(DatabaseUtil.dimensionality(relationy) == 1);
+    final int dimy = DatabaseUtil.dimensionality(relationy);
+    assert (dim == 2);
     KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k + 1);
 
     // We need stable indexed DBIDs
@@ -167,7 +166,7 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     // init F,X,Z
     Matrix X = new Matrix(ids.size(), 6);
     Matrix F = new Matrix(ids.size(), ids.size());
-    Matrix Y = new Matrix(ids.size(), 1);
+    Matrix Y = new Matrix(ids.size(), dimy);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
 
@@ -185,8 +184,10 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       }
 
       {
-        double idy = relationy.get(id).doubleValue(1);
-        Y.set(i, 0, idy);
+        for(int d = 0; d < dimy; d++) {
+          double idy = relationy.get(id).doubleValue(d + 1);
+          Y.set(i, d, idy);
+        }
       }
 
       // Fill the neighborhood matrix F:
@@ -227,7 +228,8 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     double worstscore = Double.NEGATIVE_INFINITY;
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
-      double err = Math.abs(E.get(i, 0));
+      double err = E.getRowVector(i).euclideanLength();
+      // double err = Math.abs(E.get(i, 0));
       if(err > worstscore) {
         worstscore = err;
         worstid = id;
