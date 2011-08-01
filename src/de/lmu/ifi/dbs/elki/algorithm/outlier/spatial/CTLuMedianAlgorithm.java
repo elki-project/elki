@@ -27,9 +27,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * <p>
  * Reference: <br>
- * Chang-Tien Lu <br>
+ * C.-T. Lu and D. Chen and Y. Kou<br>
  * Algorithms for Spatial Outlier Detection <br>
- * in Third IEEE International Conference on Data Mining <br>
+ * in Proc. 3rd IEEE International Conference on Data Mining <br>
  * </p>
  * 
  * Median Algorithm uses Median to represent the average non-spatial attribute
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <N> Neighborhood type
  */
 @Title("Median Algorithm for Spatial Outlier Detection")
-@Reference(authors = "Chang-Tien Lu", title = "Algorithms for Spatial Outlier Detection", booktitle = "Proceedings of the Third IEEE International Conference on Data Mining")
+@Reference(authors = "C.-T. Lu and D. Chen and Y. Kou", title = "Algorithms for Spatial Outlier Detection", booktitle = "Proc. 3rd IEEE International Conference on Data Mining", url="http://dx.doi.org/10.1109/ICDM.2003.1250986")
 public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.

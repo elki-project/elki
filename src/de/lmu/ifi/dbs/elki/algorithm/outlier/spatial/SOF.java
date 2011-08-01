@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * <p>
  * Huang, T., Qin, X.<br>
  * Detecting outliers in spatial database.<br>
- * In: Proceedings of the 3rd International Conference on Image and Graphics,
+ * In: Proc. 3rd International Conference on Image and Graphics,
  * Hong Kong, China.
  * </p>
  * 
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <D> Distance type
  */
 @Title("Spatial Outlier Factor")
-@Reference(authors = "Huang, T., Qin, X.", title = "Detecting outliers in spatial database", booktitle = "Proceedings of the 3rd International Conference on Image and Graphics", url = "http://dx.doi.org/10.1109/ICIG.2004.53")
+@Reference(authors = "Huang, T., Qin, X.", title = "Detecting outliers in spatial database", booktitle = "Proc. 3rd International Conference on Image and Graphics", url = "http://dx.doi.org/10.1109/ICIG.2004.53")
 public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, O, D> {
   /**
    * The logger for this class.
