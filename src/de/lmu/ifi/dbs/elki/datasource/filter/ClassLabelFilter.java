@@ -94,7 +94,7 @@ public class ClassLabelFilter implements ObjectFilter {
             clscol.add(lbl);
           }
           catch(Exception e) {
-            throw new AbortException("Cannot initialize class labels.");
+            throw new AbortException("Cannot initialize class labels: "+e.getMessage(), e);
           }
           lblcol.add(ll);
           if(ll.size() > 0) {
