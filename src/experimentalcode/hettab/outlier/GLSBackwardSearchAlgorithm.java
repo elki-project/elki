@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -77,21 +78,16 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
   private int k;
 
   /**
-   * Parameter m - number of outliers to detect
-   */
-  private int m;
-
-  /**
-   * Constructor
+   * Constructor.
    * 
-   * @param alpha
-   * @param k
+   * @param distanceFunction Distance function
+   * @param k number of nearest neighbors to use
+   * @param alpha Significance niveau
    */
-  public GLSBackwardSearchAlgorithm(DistanceFunction<V, D> distanceFunction, int k, double alpha, int m) {
+  public GLSBackwardSearchAlgorithm(DistanceFunction<V, D> distanceFunction, int k, double alpha) {
     super(distanceFunction);
     this.alpha = alpha;
     this.k = k;
-    this.m = m;
   }
 
   /**
@@ -110,17 +106,16 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       ModifiableDBIDs idview = DBIDUtil.newHashSet(relation.getDBIDs());
       ProxyView<V> proxy = new ProxyView<V>(relation.getDatabase(), idview, relation);
 
-      // Detect up to m outliers
-      for(int numout = 0; numout < m; numout++) {
+      double phialpha = MathUtil.standardNormalProbit(1.0 - alpha / 2);
+      // Detect outliers while significant.
+      while(true) {
         Pair<DBID, Double> candidate = singleIteration(proxy, relationy);
-        if(candidate.second < alpha) {
+        if(candidate.second < phialpha) {
           break;
         }
         scores.put(candidate.first, candidate.second);
         mm.put(candidate.second);
         idview.remove(candidate.first);
-        // sanity check, in case proxyview changes behaviour
-        assert (proxy.size() + numout + 1 == relation.size());
       }
 
       // Remaining objects are inliers
@@ -260,11 +255,6 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
     public static final OptionID K_ID = OptionID.getOrCreateOptionID("glsbs.k", "k nearest neighbors to use");
 
     /**
-     * Parameter to specify the number of outliers to detect
-     */
-    public static final OptionID M_ID = OptionID.getOrCreateOptionID("glsbs.m", "The number of outliers to be detected");
-
-    /**
      * Parameter Alpha - significance niveau
      */
     private double alpha;
@@ -274,22 +264,16 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
      */
     private int k;
 
-    /**
-     * Parameter m - number of outliers to detect
-     */
-    private int m;
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       getParameterAlpha(config);
       getParameterK(config);
-      getParameterM(config);
     }
 
     @Override
     protected GLSBackwardSearchAlgorithm<V, D> makeInstance() {
-      return new GLSBackwardSearchAlgorithm<V, D>(distanceFunction, k, alpha, m);
+      return new GLSBackwardSearchAlgorithm<V, D>(distanceFunction, k, alpha);
     }
 
     /**
@@ -314,19 +298,6 @@ public class GLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends 
       final IntParameter param = new IntParameter(K_ID);
       if(config.grab(param)) {
         k = param.getValue();
-      }
-    }
-
-    /**
-     * Get the m parameter
-     * 
-     * @param config Parameterization
-     * @return m parameter
-     */
-    protected void getParameterM(Parameterization config) {
-      final IntParameter param = new IntParameter(M_ID);
-      if(config.grab(param)) {
-        m = param.getValue();
       }
     }
   }
