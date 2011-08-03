@@ -192,4 +192,64 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
       return 0;
     }
   }
+
+  /**
+   * Simple polygon intersection test.
+   * 
+   * FIXME: while this is found in literature and satisfies or needs, it clearly
+   * is not correct: Consider a cross where the two bars are made out of four
+   * vertices each. No vertex is inside the other polygon, yet they intersect.
+   * 
+   * @param p2 Other polygon
+   * @return True when the polygons intersect
+   */
+  public boolean intersects2DSimple(Polygon p2) {
+    assert (getDimensionality() == 2);
+    assert (p2.getDimensionality() == 2);
+    for(Vector v : points) {
+      if(p2.containsPoint2D(v)) {
+        return true;
+      }
+    }
+    for(Vector v : p2.points) {
+      if(this.containsPoint2D(v)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Point in polygon test, based on
+   * 
+   * http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+   * 
+   * by W. Randolph Franklin
+   * 
+   * @param v Point to test
+   * @return True when contained.
+   */
+  public boolean containsPoint2D(Vector v) {
+    assert (v.getDimensionality() == 2);
+    final double testx = v.get(0);
+    final double testy = v.get(1);
+    boolean c = false;
+
+    Iterator<Vector> it = points.iterator();
+    Vector pre = points.get(points.size() - 1);
+    while(it.hasNext()) {
+      final Vector cur = it.next();
+      final double curx = cur.get(0);
+      final double cury = cur.get(1);
+      final double prex = pre.get(0);
+      final double prey = pre.get(1);
+      if(((cury > testy) != (prey > testy))) {
+        if((testx < (prex - curx) * (testy - cury) / (prey - cury) + curx)) {
+          c = !c;
+        }
+      }
+      pre = cur;
+    }
+    return c;
+  }
 }
