@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier.trivial;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -311,7 +311,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     }
 
     @Override
-    protected Object makeInstance() {
+    protected ExternalDoubleOutlierScore makeInstance() {
       return new ExternalDoubleOutlierScore(file, idpattern, scorepattern, inverted, scaling);
     }
   }
