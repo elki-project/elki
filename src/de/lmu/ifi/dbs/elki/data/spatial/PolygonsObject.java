@@ -11,8 +11,7 @@ import java.util.Iterator;
  * 
  * @apiviz.has Polygon
  */
-// TODO: implement SpatialComparable!
-public class PolygonsObject {
+public class PolygonsObject implements SpatialComparable {
   /**
    * Static (empty) prototype
    */
@@ -66,5 +65,29 @@ public class PolygonsObject {
         buf.append(" -- ");
       }
     }
+  }
+
+  @Override
+  public int getDimensionality() {
+    assert (polygons.size() > 0);
+    return polygons.iterator().next().getDimensionality();
+  }
+
+  @Override
+  public double getMin(int dimension) {
+    double min = Double.MAX_VALUE;
+    for(Polygon p : polygons) {
+      min = Math.min(min, p.getMin(dimension));
+    }
+    return min;
+  }
+
+  @Override
+  public double getMax(int dimension) {
+    double max = Double.MIN_VALUE;
+    for(Polygon p : polygons) {
+      max = Math.max(max, p.getMin(dimension));
+    }
+    return max;
   }
 }
