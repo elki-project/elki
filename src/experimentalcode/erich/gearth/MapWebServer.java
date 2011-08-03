@@ -14,6 +14,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
@@ -22,6 +23,8 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -30,6 +33,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 public class MapWebServer {
@@ -90,7 +94,6 @@ public class MapWebServer {
       InetSocketAddress addr = new InetSocketAddress(port);
       server = HttpServer.create(addr, 0);
 
-      server.createContext(PATH_JSONP_OBJECTS, new JSONObjectHandler());
       server.createContext(PATH_JSONP_RESULTS, new JSONResultHandler());
       server.setExecutor(Executors.newCachedThreadPool());
       server.start();
@@ -109,219 +112,234 @@ public class MapWebServer {
     server.stop(0);
   }
 
-  protected void objectToJSON(StringBuffer re, String query) {
-    DBID id = lblmap.get(query);
-    if(id != null) {
-      bundleToJSON(re, id);
-    }
-
-    re.append("\"query\":\"" + jsonEscapeString(query) + "\"");
+  /**
+   * Parse a string into a DBID.
+   * 
+   * @param query Query string
+   * @return DBID
+   */
+  protected DBID stringToDBID(String query) {
+    return DBIDUtil.importInteger(Integer.valueOf(query));
   }
 
-  protected void bundleToJSON(StringBuffer re, DBID id) {
+  protected void bundleToJSON(JSONBuffer re, DBID id) {
     SingleObjectBundle bundle = db.getBundle(id);
-    for(int j = 0; j < bundle.metaLength(); j++) {
-      re.append("\"").append(jsonEscapeString(bundle.meta(j).toString())).append("\":");
-      final Object data = bundle.data(j);
-      // TODO: refactor to JSONFormatters!
-      if(data instanceof NumberVector) {
-        NumberVector<?, ?> v = (NumberVector<?, ?>) data;
-        re.append("[");
-        for(int i = 0; i < v.getDimensionality(); i++) {
-          if(i > 0) {
-            re.append(",");
-          }
-          re.append(v.doubleValue(i + 1));
-        }
-        re.append("]");
-      }
-      else if(data instanceof PolygonsObject) {
-        re.append("[");
-        boolean first = true;
-        for(Polygon p : ((PolygonsObject) data).getPolygons()) {
-          if(first) {
-            first = false;
-          }
-          else {
-            re.append(",");
-          }
-          re.append("[");
-          for(int i = 0; i < p.size(); i++) {
+    if(bundle != null) {
+      for(int j = 0; j < bundle.metaLength(); j++) {
+        re.appendString(bundle.meta(j)).appendRaw(":");
+        final Object data = bundle.data(j);
+        // TODO: refactor to JSONFormatters!
+        if(data instanceof NumberVector) {
+          NumberVector<?, ?> v = (NumberVector<?, ?>) data;
+          re.appendRaw("[");
+          for(int i = 0; i < v.getDimensionality(); i++) {
             if(i > 0) {
-              re.append(",");
+              re.appendRaw(",");
             }
-            Vector point = p.get(i);
-            re.append(point.toStringNoWhitespace());
+            re.appendRaw(FormatUtil.format(v.doubleValue(i + 1)));
           }
-          re.append("]");
+          re.appendRaw("]");
         }
-        re.append("]");
+        else if(data instanceof PolygonsObject) {
+          re.appendRaw("[");
+          boolean first = true;
+          for(Polygon p : ((PolygonsObject) data).getPolygons()) {
+            if(first) {
+              first = false;
+            }
+            else {
+              re.appendRaw(",");
+            }
+            re.appendRaw("[");
+            for(int i = 0; i < p.size(); i++) {
+              if(i > 0) {
+                re.appendRaw(",");
+              }
+              Vector point = p.get(i);
+              re.appendRaw(point.toStringNoWhitespace());
+            }
+            re.appendRaw("]");
+          }
+          re.appendRaw("]");
+        }
+        else {
+          re.appendString(data);
+        }
+        re.appendRaw(",");
+        if(logger.isDebuggingFiner()) {
+          re.appendRaw("\n");
+        }
       }
-      else {
-        re.append("\"");
-        re.append(jsonEscapeString(data.toString()));
-        re.append("\"");
-      }
-      re.append(",");
-      if(logger.isDebuggingFiner()) {
-        re.append("\n");
-      }
+    } else {
+      re.appendKeyValue("error", "Object not found.");
     }
   }
 
-  protected void resultToJSON(StringBuffer re, String name) {
+  protected void resultToJSON(JSONBuffer re, String name) {
     if(result == null) {
-      re.append("\"error\":\"no results available\",");
+      re.appendKeyValue("error", "no results available");
       return;
     }
     // Find requested result
     String[] parts = name.split("/");
     ResultHierarchy hier = result.getHierarchy();
     Result cur = result;
-    for(int i = 0; i < parts.length - 1; i++) {
-      // TODO: handle name collisions. E.g. type_123?
+    int partpos = 0;
+    for(; partpos < parts.length; partpos++) {
+      // FIXME: handle name collisions. E.g. type_123?
       boolean found = false;
       for(Result child : hier.getChildren(cur)) {
-        logger.debug("Testing result: " + child.getShortName() + " <-> " + parts[i]);
-        if(child.getShortName().equals(parts[i])) {
+        // logger.debug("Testing result: " + child.getShortName() + " <-> " + parts[partpos]);
+        if(child.getLongName().equals(parts[partpos]) || child.getShortName().equals(parts[partpos])) {
           cur = child;
           found = true;
           break;
         }
       }
       if(!found) {
-        cur = null;
         break;
       }
     }
     if(cur == null) {
-      re.append("\"error\":\"result not found.\",");
+      re.appendKeyValue("error", "result not found.");
       return;
     }
-    if(parts.length >= 1) {
-      if("children".equals(parts[parts.length - 1])) {
-        re.append("\"children\":[");
+    // logger.debug(FormatUtil.format(parts, ",") + " " + partpos + " " + cur);
+    // Result structure discovery:
+    if(parts.length == partpos + 1) {
+      if("children".equals(parts[partpos])) {
+        re.appendString("children").appendRaw(":[");
         Iterator<Result> iter = hier.getChildren(cur).iterator();
         while(iter.hasNext()) {
           Result child = iter.next();
-          re.append("\"").append(child.getShortName()).append("\"");
+          re.appendString(child.getShortName());
           if(iter.hasNext()) {
-            re.append(",");
+            re.appendRaw(",");
           }
         }
-        re.append("],");
+        re.appendRaw("],");
         return;
       }
-      if(cur instanceof Database) {
-        // TODO: list functions?
-        objectToJSON(re, parts[parts.length - 1]);
-        return;
+    }
+    // Database object access
+    if(cur instanceof Database) {
+      if(parts.length == partpos + 1) {
+        DBID id = stringToDBID(parts[partpos]);
+        if(id != null) {
+          bundleToJSON(re, id);
+          return;
+        }
+        else {
+          re.appendKeyValue("error", "Object not found");
+          return;
+        }
+      }
+    }
+    // Relation object access
+    if(cur instanceof Relation) {
+      if(parts.length == partpos + 1) {
+        Relation<?> rel = (Relation<?>) cur;
+        DBID id = stringToDBID(parts[partpos]);
+        if(id != null) {
+          Object data = rel.get(id);
+          re.appendKeyValue("data", data);
+        }
+        else {
+          re.appendKeyValue("error", "Object not found");
+          return;
+        }
+      }
+    }
+    if(cur instanceof NeighborSetPredicate) {
+      if(parts.length == partpos + 1) {
+        NeighborSetPredicate pred = (NeighborSetPredicate) cur;
+        DBID id = stringToDBID(parts[partpos]);
+        if(id != null) {
+          DBIDs neighbors = pred.getNeighborDBIDs(id);
+          re.appendString("neighbors").appendRaw(":[");
+          for(DBID nid : neighbors) {
+            re.appendRaw(nid.toString()).appendRaw(",");
+          }
+          re.appendRaw("],");
+          return;
+        }
+        else {
+          re.appendKeyValue("error", "Object not found");
+          return;
+        }
       }
     }
     if(cur instanceof OutlierResult) {
-      int offset = 0;
-      int pagesize = 50;
-      re.append("\"scores\":[");
-      OutlierResult or = (OutlierResult) cur;
-      Relation<Double> scores = or.getScores();
-      Iterator<DBID> iter = or.getOrdering().iter(scores.getDBIDs()).iterator();
-      for(int i = 0; i < offset && iter.hasNext(); i++) {
-        iter.next();
-      }
-      for(int i = 0; i < pagesize && iter.hasNext(); i++) {
-        DBID id = iter.next();
-        re.append("{");
-        bundleToJSON(re, id);
-        final Double val = scores.get(id);
-        if(val != null) {
-          re.append("\"score\":\"").append(val).append("\"");
+      if(parts.length == partpos + 1) {
+        if("table".equals(parts[partpos])) {
+          int offset = 0;
+
+          int pagesize = 50;
+          re.appendString("scores").appendRaw(":[");
+          OutlierResult or = (OutlierResult) cur;
+          Relation<Double> scores = or.getScores();
+          Iterator<DBID> iter = or.getOrdering().iter(scores.getDBIDs()).iterator();
+          for(int i = 0; i < offset && iter.hasNext(); i++) {
+            iter.next();
+          }
+          for(int i = 0; i < pagesize && iter.hasNext(); i++) {
+            DBID id = iter.next();
+            re.appendRaw("{");
+            bundleToJSON(re, id);
+            final Double val = scores.get(id);
+            if(val != null) {
+              re.appendKeyValue("score", val);
+            }
+            re.appendRaw("}");
+            if(iter.hasNext()) {
+              re.appendRaw(",");
+            }
+          }
+          re.appendRaw("],");
+          return;
         }
-        re.append("}");
-        if(iter.hasNext()) {
-          re.append(",");
-        }
       }
-      re.append("],");
-      return;
     }
-    re.append("\"error\":\"unknown id\",");
+    re.appendKeyValue("error", "unknown query");
   }
 
-  private static String jsonEscapeString(String orig) {
+  public static String jsonEscapeString(String orig) {
     return orig.replace("\\", "\\\\").replace("\"", "\\\"");
   }
 
-  private class JSONObjectHandler implements HttpHandler {
-    public JSONObjectHandler() {
-      // TODO Auto-generated constructor stub
+  public class JSONBuffer {
+    StringBuffer buffer;
+
+    public JSONBuffer(StringBuffer buffer) {
+      this.buffer = buffer;
     }
 
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-      String requestMethod = exchange.getRequestMethod();
-      if(!requestMethod.equalsIgnoreCase("GET")) {
-        return;
+    public JSONBuffer appendString(Object cont) {
+      final String str;
+      if(cont instanceof String) {
+        str = (String) cont;
       }
-      String path = exchange.getRequestURI().getPath();
-      logger.debug("Request for " + path);
-      if(path.startsWith(PATH_JSONP_OBJECTS)) {
-        path = path.substring(PATH_JSONP_OBJECTS.length());
+      else if(cont == null) {
+        str = "null";
       }
       else {
-        logger.warning("Unexpected path in request handler: " + path);
-        throw new AbortException("Unexpected path: " + path);
+        str = cont.toString();
       }
+      buffer.append("\"").append(jsonEscapeString(str)).append("\"");
+      return this;
+    }
 
-      // Get JSON-with-padding callback name.
-      String callback = null;
-      {
-        String query = exchange.getRequestURI().getQuery();
-        if(query != null) {
-          String[] frags = query.split("&");
-          for(String frag : frags) {
-            if(frag.startsWith("jsonp=")) {
-              callback = URLDecoder.decode(frag.substring("jsonp=".length()), "UTF-8");
-            }
-            if(frag.startsWith("callback=")) {
-              callback = URLDecoder.decode(frag.substring("callback=".length()), "UTF-8");
-            }
-          }
-        }
-        if(logger.isDebuggingFinest() && callback != null) {
-          logger.debugFinest("Callback parameter: " + callback);
-        }
-      }
+    public JSONBuffer appendKeyValue(Object key, Object val) {
+      appendString(key);
+      buffer.append(":");
+      appendString(val);
+      buffer.append(",");
+      return this;
+    }
 
-      // Prepare JSON response.
-      StringBuffer response = new StringBuffer();
-      if(callback != null) {
-        response.append(callback);
-        response.append("({");
-      }
-      else {
-        response.append("{");
-      }
-      try {
-        objectToJSON(response, path);
-      }
-      catch(Exception e) {
-        logger.exception("Exception occurred in embedded web server:", e);
-        throw (new IOException(e));
-      }
-      // wrap up
-      if(callback != null) {
-        response.append("})");
-      }
-      else {
-        response.append("}");
-      }
-      // Send
-      Headers responseHeaders = exchange.getResponseHeaders();
-      responseHeaders.set("Content-Type", "text/javascript");
-      exchange.sendResponseHeaders(200, response.length());
-      OutputStream responseBody = exchange.getResponseBody();
-      responseBody.write(response.toString().getBytes());
-      responseBody.close();
+    public JSONBuffer appendRaw(String chars) {
+      buffer.append(chars);
+      return this;
     }
   }
 
@@ -376,7 +394,7 @@ public class MapWebServer {
         response.append("{");
       }
       try {
-        resultToJSON(response, path);
+        resultToJSON(new JSONBuffer(response), path);
       }
       catch(Exception e) {
         logger.exception("Exception occurred in embedded web server:", e);
