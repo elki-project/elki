@@ -6,9 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -220,6 +219,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
           out.writeEndElement(); // close altitude mode
           writeNewlineOnDebug(out);
         }
+        // First polygon clockwise?
         boolean first = true;
         for(Polygon p : poly.getPolygons()) {
           if(first) {
@@ -230,13 +230,12 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
           }
           out.writeStartElement("LinearRing");
           out.writeStartElement("coordinates");
-          // TODO: don't assume we have the polygons reversed; test!
-          List<Vector> vs = new ArrayList<Vector>();
-          for(Vector v : p) {
-            vs.add(v);
-          }
-          Collections.reverse(vs);
-          for(Vector v : vs) {
+
+          // Reverse anti-clockwise polygons.
+          boolean reverse = (p.testClockwise() >= 0);
+          Iterator<Vector> it = reverse ? p.descendingIterator() : p.iterator();
+          while(it.hasNext()) {
+            Vector v = it.next();
             out.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
             if(compat && (v.getDimensionality() == 2)) {
               out.writeCharacters(",500");
@@ -249,7 +248,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
           first = false;
         }
         writeNewlineOnDebug(out);
-        out.writeEndElement(); // Polygon;
+        out.writeEndElement(); // Polygon
       }
       out.writeEndElement(); // Placemark
       writeNewlineOnDebug(out);

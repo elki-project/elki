@@ -2,9 +2,12 @@ package de.lmu.ifi.dbs.elki.data.spatial;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.iterator.ReverseListIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableListIterator;
 
 /**
  * Class representing a simple polygon.
@@ -66,6 +69,24 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
   }
 
   /**
+   * Get a list iterator.
+   * 
+   * @return List iterator.
+   */
+  public ListIterator<Vector> listIterator() {
+    return new UnmodifiableListIterator<Vector>(points.listIterator());
+  }
+
+  /**
+   * Return an iterator that iterates the list backwards.
+   * 
+   * @return Reversed iterator
+   */
+  public ListIterator<Vector> descendingIterator() {
+    return new UnmodifiableListIterator<Vector>(new ReverseListIterator<Vector>(points));
+  }
+
+  /**
    * Append the polygon to the buffer.
    * 
    * @param buf Buffer to append to
@@ -101,7 +122,7 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
   public int size() {
     return points.size();
   }
-  
+
   /**
    * Get a vector by index.
    * 
@@ -125,5 +146,46 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
   @Override
   public double getMax(int dimension) {
     return max[dimension - 1];
+  }
+
+  /**
+   * Test polygon orientation.
+   * 
+   * @return -1, 0, 1 for counterclockwise, undefined and clockwise.
+   */
+  public int testClockwise() {
+    if(points.size() < 3) {
+      return 0;
+    }
+    final int size = points.size();
+    // Count the number of positive and negative oriented angles
+    int c = 0;
+
+    // TODO: faster when using an iterator?
+    for(int i = 0; i < size; i++) {
+      // Three consecutive points
+      final int j = (i + 1) % size;
+      final int k = (i + 2) % size;
+      final double dxji = points.get(j).get(0) - points.get(i).get(0);
+      final double dykj = points.get(k).get(1) - points.get(j).get(1);
+      final double dyji = points.get(j).get(1) - points.get(i).get(1);
+      final double dxkj = points.get(k).get(0) - points.get(j).get(0);
+      final double z = (dxji * dykj) - (dyji * dxkj);
+      if(z < 0) {
+        c--;
+      }
+      else if(z > 0) {
+        c++;
+      }
+    }
+    if(c > 0) {
+      return -1;
+    }
+    else if(c < 0) {
+      return +1;
+    }
+    else {
+      return 0;
+    }
   }
 }
