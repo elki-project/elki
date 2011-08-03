@@ -202,7 +202,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    * @param alldim Number of total dimensions
    * @param mindim Minimum number to choose
    * @param maxdim Maximum number to choose
-   * @return
+   * @return Subspace as bits.
    */
   private BitSet randomSubspace(final int alldim, final int mindim, final int maxdim) {
     BitSet dimset = new BitSet();
