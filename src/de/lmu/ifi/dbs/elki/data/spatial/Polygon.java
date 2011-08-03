@@ -10,9 +10,13 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableListIterator;
 
 /**
- * Class representing a simple polygon.
+ * Class representing a simple polygon. While you can obviously store non-simple
+ * polygons in this, note that many of the supplied methods will assume that the
+ * polygons are simple.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Vector
  */
 public class Polygon implements Iterable<Vector>, SpatialComparable {
   /**
