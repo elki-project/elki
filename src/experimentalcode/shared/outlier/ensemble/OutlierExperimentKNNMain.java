@@ -183,7 +183,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       @Override
       public void run(int k, String kstr) {
         LOF<O, D> lof = new LOF<O, D>(k, distf, distf);
-        OutlierResult lofresult = lof.run(database, relation);
+        OutlierResult lofresult = lof.run(relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
         scaling.prepare(ids, lofresult);
