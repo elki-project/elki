@@ -97,7 +97,7 @@ public class TopologicalSplitter implements SplitStrategy<SpatialEntry> {
       // comparator used by sort method
 
       for(int i = 1; i <= dim; i++) {
-        double currentPerimeter = 0;
+        double sumOfAllMargins = 0;
         // sort the entries according to their minimal and according to their
         // maximal value
         final SpatialComparator compMin = new SpatialComparator(i, SpatialComparator.MIN);
@@ -116,12 +116,18 @@ public class TopologicalSplitter implements SplitStrategy<SpatialEntry> {
           mbr_max_left = SpatialUtil.union(mbr_max_left, maxSorting.get(k));
           mbr_max_right = SpatialUtil.union(mbr_max_right, maxSorting.get(maxSorting.size() - 1 - k));
           if(k >= minEntries - 1) {
-            currentPerimeter += SpatialUtil.perimeter(mbr_min_left) + SpatialUtil.perimeter(mbr_min_right) + SpatialUtil.perimeter(mbr_max_left) + SpatialUtil.perimeter(mbr_max_right);
+            // Yes, build the sum. This value is solely used for finding the
+            // split axis!
+            // Compare with the original paper, "sum of all margin-values".
+            // Note that mbr_min_left and mbr_max_left do not add up to a
+            // complete split, but when the sum is complete, it will also
+            // include their proper counterpart.
+            sumOfAllMargins += SpatialUtil.perimeter(mbr_min_left) + SpatialUtil.perimeter(mbr_min_right) + SpatialUtil.perimeter(mbr_max_left) + SpatialUtil.perimeter(mbr_max_right);
           }
         }
-        if(currentPerimeter < minSurface) {
+        if(sumOfAllMargins < minSurface) {
           splitAxis = i;
-          minSurface = currentPerimeter;
+          minSurface = sumOfAllMargins;
         }
       }
     }
