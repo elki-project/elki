@@ -93,7 +93,7 @@ public class MultiStepGUI extends JPanel {
     {
       // setup tabbed panels
       JTabbedPane panels = new JTabbedPane();
-      
+
       // Add the output pane to the bottom
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.BOTH;
@@ -102,7 +102,7 @@ public class MultiStepGUI extends JPanel {
       constraints.weightx = 1;
       constraints.weighty = 1;
       add(panels, constraints);
-      
+
       addPanels(panels);
     }
   }
@@ -118,9 +118,10 @@ public class MultiStepGUI extends JPanel {
     panels.addTab("Evaluation", evalTab);
     panels.addTab("Output", outTab);
     panels.addTab("Logging", logTab);
-    
+
     ListParameterization config = new ListParameterization();
-    // Clear errors after each step, so they don't consider themselves failed because of earlier erros.
+    // Clear errors after each step, so they don't consider themselves failed
+    // because of earlier errors.
     logTab.setParameters(config);
     config.clearErrors();
     inputTab.setParameters(config);
