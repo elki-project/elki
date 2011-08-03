@@ -155,7 +155,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     }
 
     @Override
-    protected Object makeInstance() {
+    protected RescaleMetaOutlierAlgorithm makeInstance() {
       return new RescaleMetaOutlierAlgorithm(algorithm, scaling);
     }
   }
