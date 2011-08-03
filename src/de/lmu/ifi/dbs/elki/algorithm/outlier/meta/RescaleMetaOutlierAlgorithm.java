@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier.trivial;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
 
 import java.util.List;
 
