@@ -44,8 +44,8 @@ public class TestPolygon implements JUnit4Test {
     assertTrue("P2 not in p1", p1.containsPoint2D(p22));
     assertFalse("P2 in p2", p2.containsPoint2D(p22));
     assertTrue("P2 not in p3", p3.containsPoint2D(p22));
-    assertFalse("Polygons p1 and p2 must not intersect.", p1.intersects2DSimple(p2));
-    assertTrue("Polygons p1 and p3 must intersect.", p1.intersects2DSimple(p3));
-    assertTrue("Polygons p2 and p3 must intersect.", p2.intersects2DSimple(p3));
+    assertFalse("Polygons p1 and p2 must not intersect.", p1.intersects2DIncomplete(p2));
+    assertTrue("Polygons p1 and p3 must intersect.", p1.intersects2DIncomplete(p3));
+    assertTrue("Polygons p2 and p3 must intersect.", p2.intersects2DIncomplete(p3));
   }
 }

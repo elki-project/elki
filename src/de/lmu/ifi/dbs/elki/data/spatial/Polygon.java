@@ -196,22 +196,31 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
   /**
    * Simple polygon intersection test.
    * 
-   * FIXME: while this is found in literature and satisfies or needs, it clearly
-   * is not correct: Consider a cross where the two bars are made out of four
-   * vertices each. No vertex is inside the other polygon, yet they intersect.
+   * <p>
+   * FIXME: while this is found on some web pages as "solution" and satisfies or
+   * needs, it clearly is not correct; not even for convex polygons: Consider a
+   * cross where the two bars are made out of four vertices each. No vertex is
+   * inside the other polygon, yet they intersect.
    * 
-   * @param p2 Other polygon
+   * I knew this before writing this code, but this O(n) code was the simplest
+   * thing to come up with, and it would work for our current data sets. A way
+   * to fix this is to augment it with the obvious O(n*n) segment intersection
+   * test. (Note that you will still need to test for point containment, since
+   * the whole polygon could be contained in the other!)
+   * </p>
+   * 
+   * @param other Other polygon
    * @return True when the polygons intersect
    */
-  public boolean intersects2DSimple(Polygon p2) {
-    assert (getDimensionality() == 2);
-    assert (p2.getDimensionality() == 2);
-    for(Vector v : points) {
-      if(p2.containsPoint2D(v)) {
+  public boolean intersects2DIncomplete(Polygon other) {
+    assert (this.getDimensionality() == 2);
+    assert (other.getDimensionality() == 2);
+    for(Vector v : this.points) {
+      if(other.containsPoint2D(v)) {
         return true;
       }
     }
-    for(Vector v : p2.points) {
+    for(Vector v : other.points) {
       if(this.containsPoint2D(v)) {
         return true;
       }
