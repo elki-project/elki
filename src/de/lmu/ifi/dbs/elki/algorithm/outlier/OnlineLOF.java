@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -71,7 +70,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
    * the preprocessors.
    */
   @Override
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress("OnlineLOF", 3) : null;
 
     Pair<Pair<KNNQuery<O, D>, KNNQuery<O, D>>, Pair<RKNNQuery<O, D>, RKNNQuery<O, D>>> queries = getKNNAndRkNNQueries(relation, stepprog);
@@ -80,7 +79,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
     RKNNQuery<O, D> rkNNRefer = queries.getSecond().getFirst();
     RKNNQuery<O, D> rkNNReach = queries.getSecond().getSecond();
 
-    LOFResult<O, D> lofResult = super.doRunInTime(database, kNNRefer, kNNReach, stepprog);
+    LOFResult<O, D> lofResult = super.doRunInTime(kNNRefer, kNNReach, stepprog);
     lofResult.setRkNNRefer(rkNNRefer);
     lofResult.setRkNNReach(rkNNReach);
 
@@ -430,7 +429,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
     protected OnlineLOF<O, D> makeInstance() {
       // Default is to re-use the same distance
       DistanceFunction<O, D> rdist = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : distanceFunction;
-      return new OnlineLOF<O, D>(k + (objectIsInKNN ? 0 : 1), distanceFunction, rdist);
+      return new OnlineLOF<O, D>(k, distanceFunction, rdist);
     }
   }
 }

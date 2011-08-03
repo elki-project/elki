@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -21,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -131,7 +130,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * In the official LOF publication, the point itself is not considered to be
    * part of its k nearest neighbors.
    */
-  protected static boolean objectIsInKNN = false;
+  private static boolean objectIsInKNN = false;
 
   /**
    * Constructor.
@@ -142,7 +141,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    */
   public LOF(int k, DistanceFunction<? super O, D> neighborhoodDistanceFunction, DistanceFunction<? super O, D> reachabilityDistanceFunction) {
     super();
-    this.k = k;
+    this.k = k + (objectIsInKNN ? 0 : 1);
     this.neighborhoodDistanceFunction = neighborhoodDistanceFunction;
     this.reachabilityDistanceFunction = reachabilityDistanceFunction;
   }
@@ -150,13 +149,15 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database by
    * calling {@code #doRunInTime(Database)}.
+   * 
+   * @param relation Data to process
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = logger.isVerbose() ? new StepProgress("LOF", 3) : null;
     Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(relation, stepprog);
     KNNQuery<O, D> kNNRefer = pair.getFirst();
     KNNQuery<O, D> kNNReach = pair.getSecond();
-    return doRunInTime(database, kNNRefer, kNNReach, stepprog).getResult();
+    return doRunInTime(kNNRefer, kNNReach, stepprog).getResult();
   }
 
   /**
@@ -203,12 +204,11 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * returns a {@link LOF.LOFResult} encapsulating information that may be
    * needed by an OnlineLOF algorithm.
    * 
-   * @param database the database to process
    * @param kNNRefer the kNN query w.r.t. reference neighborhood distance
    *        function
    * @param kNNReach the kNN query w.r.t. reachability distance function
    */
-  protected LOFResult<O, D> doRunInTime(Database database, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) throws IllegalStateException {
+  protected LOFResult<O, D> doRunInTime(KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) throws IllegalStateException {
     // Assert we got something
     if(kNNRefer == null) {
       throw new AbortException("No kNN queries supported by database for reference neighborhood distance function.");
@@ -241,7 +241,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
-    return new LOFResult<O, D>(database, result, kNNRefer, kNNReach, lrds, lofs);
+    return new LOFResult<O, D>(result, kNNRefer, kNNReach, lrds, lofs);
   }
 
   /**
@@ -349,11 +349,6 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    */
   public static class LOFResult<O, D extends NumberDistance<D, ?>> {
     /**
-     * The database.
-     */
-    private final Database database;
-
-    /**
      * The result of the run of the {@link LOF} algorithm.
      */
     private OutlierResult result;
@@ -398,20 +393,12 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(Database database, OutlierResult result, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
-      this.database = database;
+    public LOFResult(OutlierResult result, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
       this.result = result;
       this.kNNRefer = kNNRefer;
       this.kNNReach = kNNReach;
       this.lrds = lrds;
       this.lofs = lofs;
-    }
-
-    /**
-     * @return the database
-     */
-    public Database getDatabase() {
-      return database;
     }
 
     /**
@@ -524,7 +511,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     protected LOF<O, D> makeInstance() {
       // Default is to re-use the same distance
       DistanceFunction<O, D> rdist = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : distanceFunction;
-      return new LOF<O, D>(k + (objectIsInKNN ? 0 : 1), distanceFunction, rdist);
+      return new LOF<O, D>(k, distanceFunction, rdist);
     }
   }
 }
