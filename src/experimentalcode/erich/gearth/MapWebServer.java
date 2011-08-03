@@ -14,6 +14,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
@@ -60,7 +61,7 @@ public class MapWebServer {
       catch(NoSupportedDataTypeException e) {
         // pass
       }
-      Relation<String> eidq = null;
+      Relation<ExternalID> eidq = null;
       try {
         eidq = db.getRelation(TypeUtil.EXTERNALID);
       }
@@ -77,9 +78,9 @@ public class MapWebServer {
           }
         }
         if(eidq != null) {
-          String eid = eidq.get(id);
+          ExternalID eid = eidq.get(id);
           if(eid != null) {
-            lblmap.put(eid, id);
+            lblmap.put(eid.toString(), id);
           }
         }
       }
