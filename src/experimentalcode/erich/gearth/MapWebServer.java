@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 public class MapWebServer {
@@ -40,7 +41,7 @@ public class MapWebServer {
   private Database db;
 
   private HierarchicalResult result;
-
+  
   public MapWebServer(int port, Database db, HierarchicalResult result) {
     super();
     this.db = db;
@@ -155,7 +156,10 @@ public class MapWebServer {
         Iterator<Result> iter = hier.getChildren(cur).iterator();
         while(iter.hasNext()) {
           Result child = iter.next();
-          re.appendString(child.getShortName());
+          re.startHash();
+          re.appendKeyValue("name", child.getShortName());
+          re.appendKeyValue("type", child.getClass().getSimpleName());
+          re.closeHash();
         }
         re.closeArray();
         return;
@@ -211,6 +215,7 @@ public class MapWebServer {
       }
     }
     if(cur instanceof OutlierResult) {
+      OutlierResult or = (OutlierResult) cur;
       if(parts.length >= partpos + 1) {
         if("table".equals(parts[partpos])) {
           int offset = 0;
@@ -222,9 +227,26 @@ public class MapWebServer {
           if(parts.length >= partpos + 3) {
             pagesize = Integer.valueOf(parts[partpos + 2]);
           }
+          re.appendKeyHash("paging");
+          re.appendKeyValue("offset", offset);
+          re.appendKeyValue("pagesize", pagesize);
+          re.closeHash();
 
+          re.appendKeyHash("meta");
+          OutlierScoreMeta meta = or.getOutlierMeta();
+          re.appendKeyValue("min", meta.getActualMinimum());
+          re.appendKeyValue("max", meta.getActualMaximum());
+          re.appendKeyValue("tmin", meta.getTheoreticalMinimum());
+          re.appendKeyValue("tmax", meta.getTheoreticalMaximum());
+          re.appendKeyValue("base", meta.getTheoreticalBaseline());
+          re.appendKeyValue("type", meta.getClass().getSimpleName());
+          re.closeHash();
+
+          if(logger.isDebuggingFiner()) {
+            re.appendNewline();
+          }
+          
           re.appendKeyArray("scores");
-          OutlierResult or = (OutlierResult) cur;
           Relation<Double> scores = or.getScores();
           Iterator<DBID> iter = or.getOrdering().iter(scores.getDBIDs()).iterator();
           for(int i = 0; i < offset && iter.hasNext(); i++) {
@@ -260,7 +282,7 @@ public class MapWebServer {
         return;
       }
       String path = exchange.getRequestURI().getPath();
-      logger.debug("Request for " + path);
+      //logger.debug("Request for " + path);
       if(path.startsWith(PATH_JSON)) {
         path = path.substring(PATH_JSON.length());
       }
