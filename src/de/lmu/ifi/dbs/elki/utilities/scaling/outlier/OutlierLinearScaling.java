@@ -131,7 +131,9 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
           skippedzeros = true;
           continue;
         }
-        mv.put(val);
+        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+          mv.put(val);
+        }
         if(max == null) {
           mm.put(val);
         }

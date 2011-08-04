@@ -105,7 +105,9 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
       DoubleMinMax mm = new DoubleMinMax();
       for(DBID id : ids) {
         double val = or.getScores().get(id);
-        mm.put(val);
+        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+          mm.put(val);
+        }
       }
       min = mm.getMin();
     }
