@@ -107,9 +107,11 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
         avg += lrds.get(n);
       }
       final double lrd = (avg / neighbors.size()) / lrds.get(id);
-      lofs.put(id, lrd);
       if (!Double.isNaN(lrd)) {
+        lofs.put(id, lrd);
         lofminmax.put(lrd);
+      } else {
+        lofs.put(id, 0.0);
       }
     }
 
