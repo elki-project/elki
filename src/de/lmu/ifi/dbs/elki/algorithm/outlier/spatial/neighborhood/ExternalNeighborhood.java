@@ -173,13 +173,17 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implem
                 neighbours.add(neigh);
               }
               else {
-                logger.warning("No object found for label " + entries[i]);
+                if(logger.isDebugging()) {
+                  logger.debug("No object found for label " + entries[i]);
+                }
               }
             }
             store.put(id, neighbours);
           }
           else {
-            logger.warning("No object found for label " + entries[0]);
+            if(logger.isDebugging()) {
+              logger.warning("No object found for label " + entries[0]);
+            }
           }
         }
         br.close();
