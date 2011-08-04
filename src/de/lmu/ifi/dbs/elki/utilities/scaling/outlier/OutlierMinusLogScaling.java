@@ -57,7 +57,9 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
     DoubleMinMax mm = new DoubleMinMax();
     for(DBID id : ids) {
       double val = or.getScores().get(id);
-      mm.put(val);
+      if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+        mm.put(val);
+      }
     }
     max = mm.getMax();
     mlogmax = -Math.log(mm.getMin() / max);

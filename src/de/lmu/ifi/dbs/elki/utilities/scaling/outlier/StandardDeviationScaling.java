@@ -94,7 +94,9 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
       MeanVariance mv = new MeanVariance();
       for(DBID id : ids) {
         double val = or.getScores().get(id);
-        mv.put(val);
+        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+          mv.put(val);
+        }
       }
       mean = mv.getMean();
       factor = lambda * mv.getSampleStddev() * MathUtil.SQRT2;
@@ -105,8 +107,10 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
       int cnt = 0;
       for(DBID id : ids) {
         double val = or.getScores().get(id);
-        sqsum += (val - mean) * (val - mean);
-        cnt += 1;
+        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+          sqsum += (val - mean) * (val - mean);
+          cnt += 1;
+        }
       }
       factor = lambda * Math.sqrt(sqsum / cnt) * MathUtil.SQRT2;
     }

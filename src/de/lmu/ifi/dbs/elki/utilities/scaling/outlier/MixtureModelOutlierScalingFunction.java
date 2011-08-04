@@ -100,7 +100,9 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
     MeanVariance mv = new MeanVariance();
     for(DBID id : dbids) {
       double val = or.getScores().get(id);
-      mv.put(val);
+      if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+        mv.put(val);
+      }
     }
     double curMu = mv.getMean() * 2;
     if(curMu == 0) {

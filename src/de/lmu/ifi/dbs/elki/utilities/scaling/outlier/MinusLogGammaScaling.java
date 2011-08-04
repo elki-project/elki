@@ -47,7 +47,9 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     DoubleMinMax mm = new DoubleMinMax();
     for(DBID id : ids) {
       double score = or.getScores().get(id);
-      mm.put(score);
+      if(!Double.isNaN(score) && !Double.isInfinite(score)) {
+        mm.put(score);
+      }
     }
     max = mm.getMax();
     mlogmax = -Math.log(mm.getMin() / max);

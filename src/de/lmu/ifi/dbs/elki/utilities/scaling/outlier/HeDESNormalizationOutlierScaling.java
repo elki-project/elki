@@ -41,8 +41,10 @@ public class HeDESNormalizationOutlierScaling implements OutlierScalingFunction 
 
     for(DBID id : ids) {
       double val = or.getScores().get(id);
-      mv.put(val);
-      minmax.put(val);
+      if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+        mv.put(val);
+        minmax.put(val);
+      }
     }
 
     mean = mv.getMean();
