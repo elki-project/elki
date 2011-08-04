@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 public class MapWebServer {
   protected final static Logging logger = Logging.getLogger(MapWebServer.class);
 
-  public final static String PATH_JSONP_RESULTS = "/json/results/";
+  public final static String PATH_JSON = "/json/";
 
   private HttpServer server;
 
@@ -50,7 +50,7 @@ public class MapWebServer {
       InetSocketAddress addr = new InetSocketAddress(port);
       server = HttpServer.create(addr, 0);
 
-      server.createContext(PATH_JSONP_RESULTS, new JSONResultHandler());
+      server.createContext(PATH_JSON, new JSONHttpHandler());
       server.setExecutor(Executors.newCachedThreadPool());
       server.start();
 
@@ -196,6 +196,7 @@ public class MapWebServer {
         DBID id = stringToDBID(parts[partpos]);
         if(id != null) {
           DBIDs neighbors = pred.getNeighborDBIDs(id);
+          re.appendKeyValue("DBID", id);
           re.appendKeyArray("neighbors");
           for(DBID nid : neighbors) {
             re.appendString(nid.toString());
@@ -247,9 +248,9 @@ public class MapWebServer {
     re.appendKeyValue("error", "unknown query");
   }
 
-  private class JSONResultHandler implements HttpHandler {
-    public JSONResultHandler() {
-      // TODO Auto-generated constructor stub
+  private class JSONHttpHandler implements HttpHandler {
+    public JSONHttpHandler() {
+      // Nothing to do.
     }
 
     @Override
@@ -260,8 +261,8 @@ public class MapWebServer {
       }
       String path = exchange.getRequestURI().getPath();
       logger.debug("Request for " + path);
-      if(path.startsWith(PATH_JSONP_RESULTS)) {
-        path = path.substring(PATH_JSONP_RESULTS.length());
+      if(path.startsWith(PATH_JSON)) {
+        path = path.substring(PATH_JSON.length());
       }
       else {
         logger.warning("Unexpected path in request handler: " + path);
@@ -283,9 +284,9 @@ public class MapWebServer {
             }
           }
         }
-        if(logger.isDebuggingFinest() && callback != null) {
-          logger.debugFinest("Callback parameter: " + callback);
-        }
+        // if(logger.isDebuggingFinest() && callback != null) {
+        //  logger.debugFinest("Callback parameter: " + callback);
+        // }
       }
 
       // Prepare JSON response.
@@ -294,8 +295,9 @@ public class MapWebServer {
         response.append(callback);
         response.append("(");
       }
-      JSONBuffer jsonbuf = new JSONBuffer(response).startHash();
+      JSONBuffer jsonbuf = new JSONBuffer(response);
       try {
+        jsonbuf.startHash();
         resultToJSON(jsonbuf, path);
         jsonbuf.closeHash();
       }
