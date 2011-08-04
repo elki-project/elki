@@ -1,7 +1,10 @@
 package de.lmu.ifi.dbs.elki.result.outlier;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
+
 /**
- * Basic outlier score. Straightforward implementation of the {@link OutlierScoreMeta} interface.
+ * Basic outlier score. Straightforward implementation of the
+ * {@link OutlierScoreMeta} interface.
  * 
  * @author Erich Schubert
  */
@@ -10,23 +13,27 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
    * Store the actual minimum
    */
   double actualMinimum = Double.NaN;
+
   /**
    * Store the actual maximum
    */
   double actualMaximum = Double.NaN;
+
   /**
    * Store the theoretical minimum
    */
   double theoreticalMinimum = Double.NaN;
+
   /**
    * Store the theoretical maximum
    */
   double theoreticalMaximum = Double.NaN;
+
   /**
    * Store the theoretical baseline
    */
   double theoreticalBaseline = Double.NaN;
-  
+
   /**
    * Constructor with actual values only.
    * 
@@ -36,7 +43,7 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
   public BasicOutlierScoreMeta(double actualMinimum, double actualMaximum) {
     this(actualMinimum, actualMaximum, Double.NaN, Double.NaN, Double.NaN);
   }
-  
+
   /**
    * Constructor with all range values
    * 
@@ -48,7 +55,7 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
   public BasicOutlierScoreMeta(double actualMinimum, double actualMaximum, double theoreticalMinimum, double theoreticalMaximum) {
     this(actualMinimum, actualMaximum, theoreticalMinimum, theoreticalMaximum, Double.NaN);
   }
-  
+
   /**
    * Full constructor - all values.
    * 
@@ -60,6 +67,9 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
    */
   public BasicOutlierScoreMeta(double actualMinimum, double actualMaximum, double theoreticalMinimum, double theoreticalMaximum, double theoreticalBaseline) {
     super();
+    if(Double.isNaN(actualMinimum) || Double.isNaN(actualMaximum)) {
+      Logging.getLogger(this.getClass()).warning("Warning: Outlier Score meta initalized with NaN values: " + actualMinimum + " - " + actualMaximum);
+    }
     this.actualMinimum = actualMinimum;
     this.actualMaximum = actualMaximum;
     this.theoreticalMinimum = theoreticalMinimum;
@@ -95,29 +105,31 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
   @Override
   public double normalizeScore(double value) {
     double center = 0.0;
-    if (!Double.isNaN(theoreticalBaseline) && !Double.isInfinite(theoreticalBaseline)) {
+    if(!Double.isNaN(theoreticalBaseline) && !Double.isInfinite(theoreticalBaseline)) {
       center = theoreticalBaseline;
-    } else if (!Double.isNaN(theoreticalMinimum) && !Double.isInfinite(theoreticalMinimum)) {
+    }
+    else if(!Double.isNaN(theoreticalMinimum) && !Double.isInfinite(theoreticalMinimum)) {
       center = theoreticalMinimum;
-    } else if (!Double.isNaN(actualMinimum) && !Double.isInfinite(actualMinimum)) {
+    }
+    else if(!Double.isNaN(actualMinimum) && !Double.isInfinite(actualMinimum)) {
       center = actualMinimum;
     }
-    if (value < center) {
+    if(value < center) {
       return 0.0;
     }
     double max = Double.NaN;
-    if (!Double.isNaN(theoreticalMaximum) && !Double.isInfinite(theoreticalMaximum)) {
+    if(!Double.isNaN(theoreticalMaximum) && !Double.isInfinite(theoreticalMaximum)) {
       max = theoreticalMaximum;
     }
-    else if (!Double.isNaN(actualMaximum) && !Double.isInfinite(actualMaximum)) {
+    else if(!Double.isNaN(actualMaximum) && !Double.isInfinite(actualMaximum)) {
       max = actualMaximum;
     }
-    if (!Double.isNaN(max) && !Double.isInfinite(max) && max >= center) {
+    if(!Double.isNaN(max) && !Double.isInfinite(max) && max >= center) {
       return (value - center) / (max - center);
     }
     return value - center;
   }
-  
+
   /**
    * @param actualMinimum the actualMinimum to set
    */
