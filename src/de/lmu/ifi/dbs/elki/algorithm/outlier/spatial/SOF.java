@@ -92,7 +92,11 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       for(DBID n : neighbors) {
         avg += distFunc.distance(id, n).doubleValue();
       }
-      lrds.put(id, 1 / (avg / neighbors.size()));
+      double lrd = 1 / (avg / neighbors.size());
+      if (Double.isNaN(lrd)) {
+        lrd = 0;
+      }
+      lrds.put(id, lrd);
     }
 
     // Compute density quotients
@@ -104,7 +108,9 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       }
       final double lrd = (avg / neighbors.size()) / lrds.get(id);
       lofs.put(id, lrd);
-      lofminmax.put(lrd);
+      if (!Double.isNaN(lrd)) {
+        lofminmax.put(lrd);
+      }
     }
 
     // Build result representation.
