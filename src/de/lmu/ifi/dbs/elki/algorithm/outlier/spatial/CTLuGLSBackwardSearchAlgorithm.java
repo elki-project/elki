@@ -116,7 +116,9 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
           break;
         }
         scores.put(candidate.first, candidate.second);
-        mm.put(candidate.second);
+        if (!Double.isNaN(candidate.second)) {
+          mm.put(candidate.second);
+        }
         idview.remove(candidate.first);
       }
 
