@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.Headers;
@@ -15,12 +13,9 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
-import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
-import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -33,19 +28,14 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 public class MapWebServer {
   protected final static Logging logger = Logging.getLogger(MapWebServer.class);
 
-  public final static String PATH_JSONP_OBJECTS = "/json/objects/";
-
   public final static String PATH_JSONP_RESULTS = "/json/results/";
 
   private HttpServer server;
-
-  private Map<String, DBID> lblmap;
 
   private Database db;
 
@@ -55,40 +45,6 @@ public class MapWebServer {
     super();
     this.db = db;
     this.result = result;
-
-    // Build a map for the main database, using external IDs
-    {
-      Relation<?> olq = null;
-      try {
-        olq = db.getRelation(TypeUtil.GUESSED_LABEL);
-      }
-      catch(NoSupportedDataTypeException e) {
-        // pass
-      }
-      Relation<ExternalID> eidq = null;
-      try {
-        eidq = db.getRelation(TypeUtil.EXTERNALID);
-      }
-      catch(NoSupportedDataTypeException e) {
-        // pass
-      }
-      int size = ((olq != null) ? olq.size() : 0) + ((eidq != null) ? eidq.size() : 0);
-      lblmap = new HashMap<String, DBID>(size);
-      for(DBID id : olq.iterDBIDs()) {
-        if(olq != null) {
-          String label = olq.get(id).toString();
-          if(label != null) {
-            lblmap.put(label, id);
-          }
-        }
-        if(eidq != null) {
-          ExternalID eid = eidq.get(id);
-          if(eid != null) {
-            lblmap.put(eid.toString(), id);
-          }
-        }
-      }
-    }
 
     try {
       InetSocketAddress addr = new InetSocketAddress(port);
@@ -126,51 +82,37 @@ public class MapWebServer {
     SingleObjectBundle bundle = db.getBundle(id);
     if(bundle != null) {
       for(int j = 0; j < bundle.metaLength(); j++) {
-        re.appendString(bundle.meta(j)).appendRaw(":");
         final Object data = bundle.data(j);
         // TODO: refactor to JSONFormatters!
         if(data instanceof NumberVector) {
           NumberVector<?, ?> v = (NumberVector<?, ?>) data;
-          re.appendRaw("[");
+          re.appendKeyArray(bundle.meta(j));
           for(int i = 0; i < v.getDimensionality(); i++) {
-            if(i > 0) {
-              re.appendRaw(",");
-            }
-            re.appendRaw(FormatUtil.format(v.doubleValue(i + 1)));
+            re.append(v.doubleValue(i + 1));
           }
-          re.appendRaw("]");
+          re.closeArray();
         }
         else if(data instanceof PolygonsObject) {
-          re.appendRaw("[");
-          boolean first = true;
+          re.appendKeyArray(bundle.meta(j));
           for(Polygon p : ((PolygonsObject) data).getPolygons()) {
-            if(first) {
-              first = false;
-            }
-            else {
-              re.appendRaw(",");
-            }
-            re.appendRaw("[");
+            re.startArray();
             for(int i = 0; i < p.size(); i++) {
-              if(i > 0) {
-                re.appendRaw(",");
-              }
               Vector point = p.get(i);
-              re.appendRaw(point.toStringNoWhitespace());
+              re.append(point.getArrayRef());
             }
-            re.appendRaw("]");
+            re.closeArray();
           }
-          re.appendRaw("]");
+          re.closeArray();
         }
         else {
-          re.appendString(data);
+          re.appendKeyValue(bundle.meta(j), data);
         }
-        re.appendRaw(",");
         if(logger.isDebuggingFiner()) {
-          re.appendRaw("\n");
+          re.appendNewline();
         }
       }
-    } else {
+    }
+    else {
       re.appendKeyValue("error", "Object not found.");
     }
   }
@@ -189,7 +131,8 @@ public class MapWebServer {
       // FIXME: handle name collisions. E.g. type_123?
       boolean found = false;
       for(Result child : hier.getChildren(cur)) {
-        // logger.debug("Testing result: " + child.getShortName() + " <-> " + parts[partpos]);
+        // logger.debug("Testing result: " + child.getShortName() + " <-> " +
+        // parts[partpos]);
         if(child.getLongName().equals(parts[partpos]) || child.getShortName().equals(parts[partpos])) {
           cur = child;
           found = true;
@@ -208,16 +151,13 @@ public class MapWebServer {
     // Result structure discovery:
     if(parts.length == partpos + 1) {
       if("children".equals(parts[partpos])) {
-        re.appendString("children").appendRaw(":[");
+        re.appendKeyArray("children");
         Iterator<Result> iter = hier.getChildren(cur).iterator();
         while(iter.hasNext()) {
           Result child = iter.next();
           re.appendString(child.getShortName());
-          if(iter.hasNext()) {
-            re.appendRaw(",");
-          }
         }
-        re.appendRaw("],");
+        re.closeArray();
         return;
       }
     }
@@ -256,11 +196,11 @@ public class MapWebServer {
         DBID id = stringToDBID(parts[partpos]);
         if(id != null) {
           DBIDs neighbors = pred.getNeighborDBIDs(id);
-          re.appendString("neighbors").appendRaw(":[");
+          re.appendKeyArray("neighbors");
           for(DBID nid : neighbors) {
-            re.appendRaw(nid.toString()).appendRaw(",");
+            re.appendString(nid.toString());
           }
-          re.appendRaw("],");
+          re.closeArray();
           return;
         }
         else {
@@ -270,12 +210,19 @@ public class MapWebServer {
       }
     }
     if(cur instanceof OutlierResult) {
-      if(parts.length == partpos + 1) {
+      if(parts.length >= partpos + 1) {
         if("table".equals(parts[partpos])) {
           int offset = 0;
+          int pagesize = 100;
 
-          int pagesize = 50;
-          re.appendString("scores").appendRaw(":[");
+          if(parts.length >= partpos + 2) {
+            offset = Integer.valueOf(parts[partpos + 1]);
+          }
+          if(parts.length >= partpos + 3) {
+            pagesize = Integer.valueOf(parts[partpos + 2]);
+          }
+
+          re.appendKeyArray("scores");
           OutlierResult or = (OutlierResult) cur;
           Relation<Double> scores = or.getScores();
           Iterator<DBID> iter = or.getOrdering().iter(scores.getDBIDs()).iterator();
@@ -284,63 +231,20 @@ public class MapWebServer {
           }
           for(int i = 0; i < pagesize && iter.hasNext(); i++) {
             DBID id = iter.next();
-            re.appendRaw("{");
+            re.startHash();
             bundleToJSON(re, id);
             final Double val = scores.get(id);
             if(val != null) {
               re.appendKeyValue("score", val);
             }
-            re.appendRaw("}");
-            if(iter.hasNext()) {
-              re.appendRaw(",");
-            }
+            re.closeHash();
           }
-          re.appendRaw("],");
+          re.closeArray();
           return;
         }
       }
     }
     re.appendKeyValue("error", "unknown query");
-  }
-
-  public static String jsonEscapeString(String orig) {
-    return orig.replace("\\", "\\\\").replace("\"", "\\\"");
-  }
-
-  public class JSONBuffer {
-    StringBuffer buffer;
-
-    public JSONBuffer(StringBuffer buffer) {
-      this.buffer = buffer;
-    }
-
-    public JSONBuffer appendString(Object cont) {
-      final String str;
-      if(cont instanceof String) {
-        str = (String) cont;
-      }
-      else if(cont == null) {
-        str = "null";
-      }
-      else {
-        str = cont.toString();
-      }
-      buffer.append("\"").append(jsonEscapeString(str)).append("\"");
-      return this;
-    }
-
-    public JSONBuffer appendKeyValue(Object key, Object val) {
-      appendString(key);
-      buffer.append(":");
-      appendString(val);
-      buffer.append(",");
-      return this;
-    }
-
-    public JSONBuffer appendRaw(String chars) {
-      buffer.append(chars);
-      return this;
-    }
   }
 
   private class JSONResultHandler implements HttpHandler {
@@ -388,13 +292,12 @@ public class MapWebServer {
       StringBuffer response = new StringBuffer();
       if(callback != null) {
         response.append(callback);
-        response.append("({");
+        response.append("(");
       }
-      else {
-        response.append("{");
-      }
+      JSONBuffer jsonbuf = new JSONBuffer(response).startHash();
       try {
-        resultToJSON(new JSONBuffer(response), path);
+        resultToJSON(jsonbuf, path);
+        jsonbuf.closeHash();
       }
       catch(Exception e) {
         logger.exception("Exception occurred in embedded web server:", e);
@@ -406,10 +309,7 @@ public class MapWebServer {
       }
       // wrap up
       if(callback != null) {
-        response.append("})");
-      }
-      else {
-        response.append("}");
+        response.append(")");
       }
       byte[] rbuf = response.toString().getBytes("UTF-8");
       // Send
