@@ -598,7 +598,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @apiviz.exclude
    */
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
-    protected int minclusters = 0;
+    protected Integer minclusters = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
