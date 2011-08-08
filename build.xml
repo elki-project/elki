@@ -221,6 +221,8 @@
 			     Double-quotes cause issues with windows without 'useexternalfile' and
 			     command line gets too long. -->
 			<header><![CDATA[<table cellspacing="0" cellpadding="0" style="font-weight:bold; font-style:normal; font-size:small"><tr><td align="right"></td><td align="center"><font color="#ff0000">E</font></td><td align="left">nvironment for</td></tr><tr><td align="right">Deve</td><td align="center"><font color="#ff0000">L</font></td><td align="left">oping</td></tr><tr><td align="right"></td><td align=center><font color="#ff0000">K</font></td><td align="left">DD-Applications</td></tr><tr><td align=right>Supported by&nbsp;</td><td align="center"><font color="#ff0000">I</font></td><td align="left">ndex-Structures</td></tr>${javadoc.header.extra}</table>]]></header>
+			<!-- Notice: replace the old header by something like the following (specify dir of the png and put it there to work). -->			
+			<!--<header><![CDATA[<img src="elkilogo.png" width="180">]]></header>-->
 			<footer><![CDATA[<table style="font-size:small;"><tr><td colspan="2" align="left">Release ${release.version} ${release.extraversion}</td></tr>${javadoc.footer.extra}</table>]]></footer>
 		</javadoc>
 	</target>
