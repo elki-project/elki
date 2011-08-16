@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.HashMapList;
@@ -619,6 +620,10 @@ public class DocumentParameters {
           ul.appendChild(li);
         }
         elemdd.appendChild(ul);
+      }
+      // Report when not in properties file.
+      if (Properties.ELKI_PROPERTIES.getProperty(opt.getRestrictionClass().getName()).length == 0) {
+        logger.warning(opt.getRestrictionClass().getName()+" not in properties. No autocompletion available in release GUI.");
       }
     }
   }
