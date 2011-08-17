@@ -1,4 +1,4 @@
-package experimentalcode.erich.gearth;
+package de.lmu.ifi.dbs.elki.application.jsmap;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.Stack;
 
 /**
- * Class to produce JSON output.
+ * Helper class to produce JSON output. Trys hard to ensure validity of the output.
  * 
  * @author Erich Schubert
  */
@@ -33,21 +33,21 @@ public class JSONBuffer {
   /**
    * The actual buffer we serialize to
    */
-  StringBuffer buffer;
+  final StringBuffer buffer;
 
   /**
    * Operations on the stack.
    * 
    * @apiviz.exclude
    */
-  private enum ops {
+  enum ops {
     HASH, ARRAY
   }
 
   /**
    * Operations stack for detecting errors
    */
-  private Stack<ops> stack = new Stack<ops>();
+  final Stack<ops> stack = new Stack<ops>();
 
   /**
    * Constructor.

@@ -1,26 +1,27 @@
-package experimentalcode.erich.gearth;
+package de.lmu.ifi.dbs.elki.application.jsmap;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,31 +50,59 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
-public class MapWebServer {
-  protected final static Logging logger = Logging.getLogger(MapWebServer.class);
+/**
+ * A simple web server to serve data base contents to a JavaScript client.
+ * 
+ * @author Erich Schubert
+ */
+public class JSONWebServer implements HttpHandler {
+  /**
+   * Our logger
+   */
+  protected final static Logging logger = Logging.getLogger(JSONWebServer.class);
 
+  /**
+   * The base path we serve data from
+   */
   public final static String PATH_JSON = "/json/";
 
+  /**
+   * Server instance
+   */
   private HttpServer server;
 
+  /**
+   * The result tree we serve
+   */
+  private HierarchicalResult result;
+
+  /**
+   * The database we use for obtaining object bundles
+   */
   private Database db;
 
-  private HierarchicalResult result;
-  
-  public MapWebServer(int port, Database db, HierarchicalResult result) {
+  /**
+   * Constructor.
+   * 
+   * @param port Port to listen on
+   * @param result Result to serve
+   */
+  public JSONWebServer(int port, HierarchicalResult result) {
     super();
-    this.db = db;
     this.result = result;
+    assert (result != null) : "MapWebServer created with null result.";
+    this.db = ResultUtil.findDatabase(result);
 
     try {
       InetSocketAddress addr = new InetSocketAddress(port);
       server = HttpServer.create(addr, 0);
 
-      server.createContext(PATH_JSON, new JSONHttpHandler());
+      server.createContext(PATH_JSON, this);
       server.setExecutor(Executors.newCachedThreadPool());
       server.start();
 
@@ -97,16 +126,23 @@ public class MapWebServer {
    * @param query Query string
    * @return DBID
    */
-  protected DBID stringToDBID(String query) {
+  private DBID stringToDBID(String query) {
     return DBIDUtil.importInteger(Integer.valueOf(query));
   }
 
+  /**
+   * Serialize an object bundle to JSON.
+   * 
+   * @param re Buffer to serialize to
+   * @param id Object ID
+   */
   protected void bundleToJSON(JSONBuffer re, DBID id) {
     SingleObjectBundle bundle = db.getBundle(id);
     if(bundle != null) {
       for(int j = 0; j < bundle.metaLength(); j++) {
         final Object data = bundle.data(j);
         // TODO: refactor to JSONFormatters!
+        // Format a NumberVector
         if(data instanceof NumberVector) {
           NumberVector<?, ?> v = (NumberVector<?, ?>) data;
           re.appendKeyArray(bundle.meta(j));
@@ -115,6 +151,7 @@ public class MapWebServer {
           }
           re.closeArray();
         }
+        // Format a Polygon
         else if(data instanceof PolygonsObject) {
           re.appendKeyArray(bundle.meta(j));
           for(Polygon p : ((PolygonsObject) data).getPolygons()) {
@@ -127,6 +164,7 @@ public class MapWebServer {
           }
           re.closeArray();
         }
+        // Default serialization as string
         else {
           re.appendKeyValue(bundle.meta(j), data);
         }
@@ -140,38 +178,44 @@ public class MapWebServer {
     }
   }
 
+  /**
+   * Serialize an arbitrary result into JSON.
+   * 
+   * @param re Buffer to serialize to
+   * @param name Result requested
+   */
+  // TODO: refactor
   protected void resultToJSON(JSONBuffer re, String name) {
-    if(result == null) {
-      re.appendKeyValue("error", "no results available");
-      return;
-    }
+    ResultHierarchy hier = result.getHierarchy();
     // Find requested result
     String[] parts = name.split("/");
-    ResultHierarchy hier = result.getHierarchy();
     Result cur = result;
     int partpos = 0;
-    for(; partpos < parts.length; partpos++) {
-      // FIXME: handle name collisions. E.g. type_123?
-      boolean found = false;
-      for(Result child : hier.getChildren(cur)) {
-        // logger.debug("Testing result: " + child.getShortName() + " <-> " +
-        // parts[partpos]);
-        if(child.getLongName().equals(parts[partpos]) || child.getShortName().equals(parts[partpos])) {
-          cur = child;
-          found = true;
+    {
+      for(; partpos < parts.length; partpos++) {
+        // FIXME: handle name collisions. E.g. type_123?
+        boolean found = false;
+        for(Result child : hier.getChildren(cur)) {
+          // logger.debug("Testing result: " + child.getShortName() + " <-> " +
+          // parts[partpos]);
+          if(child.getLongName().equals(parts[partpos]) || child.getShortName().equals(parts[partpos])) {
+            cur = child;
+            found = true;
+            break;
+          }
+        }
+        if(!found) {
           break;
         }
       }
-      if(!found) {
-        break;
+      if(cur == null) {
+        re.appendKeyValue("error", "result not found.");
+        return;
       }
     }
-    if(cur == null) {
-      re.appendKeyValue("error", "result not found.");
-      return;
-    }
     // logger.debug(FormatUtil.format(parts, ",") + " " + partpos + " " + cur);
-    // Result structure discovery:
+
+    // Result structure discovery via "children" parameter.
     if(parts.length == partpos + 1) {
       if("children".equals(parts[partpos])) {
         re.appendKeyArray("children");
@@ -187,6 +231,7 @@ public class MapWebServer {
         return;
       }
     }
+
     // Database object access
     if(cur instanceof Database) {
       if(parts.length == partpos + 1) {
@@ -201,6 +246,7 @@ public class MapWebServer {
         }
       }
     }
+
     // Relation object access
     if(cur instanceof Relation) {
       if(parts.length == partpos + 1) {
@@ -216,6 +262,8 @@ public class MapWebServer {
         }
       }
     }
+
+    // Neighbor access
     if(cur instanceof NeighborSetPredicate) {
       if(parts.length == partpos + 1) {
         NeighborSetPredicate pred = (NeighborSetPredicate) cur;
@@ -236,12 +284,15 @@ public class MapWebServer {
         }
       }
     }
+
+    // Outlier Score access
     if(cur instanceof OutlierResult) {
       OutlierResult or = (OutlierResult) cur;
       if(parts.length >= partpos + 1) {
         if("table".equals(parts[partpos])) {
+          // Handle paging
           int offset = 0;
-          int pagesize = 100;
+          int pagesize = 500;
 
           if(parts.length >= partpos + 2) {
             offset = Integer.valueOf(parts[partpos + 1]);
@@ -253,21 +304,14 @@ public class MapWebServer {
           re.appendKeyValue("offset", offset);
           re.appendKeyValue("pagesize", pagesize);
           re.closeHash();
-
-          re.appendKeyHash("meta");
-          OutlierScoreMeta meta = or.getOutlierMeta();
-          re.appendKeyValue("min", meta.getActualMinimum());
-          re.appendKeyValue("max", meta.getActualMaximum());
-          re.appendKeyValue("tmin", meta.getTheoreticalMinimum());
-          re.appendKeyValue("tmax", meta.getTheoreticalMaximum());
-          re.appendKeyValue("base", meta.getTheoreticalBaseline());
-          re.appendKeyValue("type", meta.getClass().getSimpleName());
-          re.closeHash();
-
           if(logger.isDebuggingFiner()) {
             re.appendNewline();
           }
-          
+
+          // Serialize meta
+          OutlierScoreMeta meta = or.getOutlierMeta();
+          outlierMetaToJSON(re, meta);
+
           re.appendKeyArray("scores");
           Relation<Double> scores = or.getScores();
           Iterator<DBID> iter = or.getOrdering().iter(scores.getDBIDs()).iterator();
@@ -292,62 +336,76 @@ public class MapWebServer {
     re.appendKeyValue("error", "unknown query");
   }
 
-  private class JSONHttpHandler implements HttpHandler {
-    public JSONHttpHandler() {
-      // Nothing to do.
+  /**
+   * Serialize outlier metadata as JSON.
+   * 
+   * @param re Output buffer
+   * @param meta Metadata
+   */
+  private void outlierMetaToJSON(JSONBuffer re, OutlierScoreMeta meta) {
+    re.appendKeyHash("meta");
+    re.appendKeyValue("min", meta.getActualMinimum());
+    re.appendKeyValue("max", meta.getActualMaximum());
+    re.appendKeyValue("tmin", meta.getTheoreticalMinimum());
+    re.appendKeyValue("tmax", meta.getTheoreticalMaximum());
+    re.appendKeyValue("base", meta.getTheoreticalBaseline());
+    re.appendKeyValue("type", meta.getClass().getSimpleName());
+    re.closeHash();
+    if(logger.isDebuggingFiner()) {
+      re.appendNewline();
+    }
+  }
+
+  @Override
+  public void handle(HttpExchange exchange) throws IOException {
+    String requestMethod = exchange.getRequestMethod();
+    if(!requestMethod.equalsIgnoreCase("GET")) {
+      return;
+    }
+    String path = exchange.getRequestURI().getPath();
+    // logger.debug("Request for " + path);
+    if(path.startsWith(PATH_JSON)) {
+      path = path.substring(PATH_JSON.length());
+    }
+    else {
+      logger.warning("Unexpected path in request handler: " + path);
+      throw new AbortException("Unexpected path: " + path);
     }
 
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-      String requestMethod = exchange.getRequestMethod();
-      if(!requestMethod.equalsIgnoreCase("GET")) {
-        return;
-      }
-      String path = exchange.getRequestURI().getPath();
-      //logger.debug("Request for " + path);
-      if(path.startsWith(PATH_JSON)) {
-        path = path.substring(PATH_JSON.length());
-      }
-      else {
-        logger.warning("Unexpected path in request handler: " + path);
-        throw new AbortException("Unexpected path: " + path);
-      }
-
-      // Get JSON-with-padding callback name.
-      String callback = null;
-      {
-        String query = exchange.getRequestURI().getQuery();
-        if(query != null) {
-          String[] frags = query.split("&");
-          for(String frag : frags) {
-            if(frag.startsWith("jsonp=")) {
-              callback = URLDecoder.decode(frag.substring("jsonp=".length()), "UTF-8");
-            }
-            if(frag.startsWith("callback=")) {
-              callback = URLDecoder.decode(frag.substring("callback=".length()), "UTF-8");
-            }
+    // Get JSON-with-padding callback name.
+    String callback = null;
+    {
+      String query = exchange.getRequestURI().getQuery();
+      if(query != null) {
+        String[] frags = query.split("&");
+        for(String frag : frags) {
+          if(frag.startsWith("jsonp=")) {
+            callback = URLDecoder.decode(frag.substring("jsonp=".length()), "UTF-8");
+          }
+          if(frag.startsWith("callback=")) {
+            callback = URLDecoder.decode(frag.substring("callback=".length()), "UTF-8");
           }
         }
-        // if(logger.isDebuggingFinest() && callback != null) {
-        //  logger.debugFinest("Callback parameter: " + callback);
-        // }
       }
+      // if(logger.isDebuggingFinest() && callback != null) {
+      // logger.debugFinest("Callback parameter: " + callback);
+      // }
+    }
 
-      // Prepare JSON response.
-      StringBuffer response = new StringBuffer();
+    // Prepare JSON response.
+    StringBuffer response = new StringBuffer();
+    {
       if(callback != null) {
         response.append(callback);
         response.append("(");
       }
+
+      // JSON serializer
       JSONBuffer jsonbuf = new JSONBuffer(response);
       try {
         jsonbuf.startHash();
         resultToJSON(jsonbuf, path);
         jsonbuf.closeHash();
-      }
-      catch(Exception e) {
-        logger.exception("Exception occurred in embedded web server:", e);
-        throw (new IOException(e));
       }
       catch(Throwable e) {
         logger.exception("Exception occurred in embedded web server:", e);
@@ -357,14 +415,15 @@ public class MapWebServer {
       if(callback != null) {
         response.append(")");
       }
-      byte[] rbuf = response.toString().getBytes("UTF-8");
-      // Send
-      Headers responseHeaders = exchange.getResponseHeaders();
-      responseHeaders.set("Content-Type", "text/javascript");
-      exchange.sendResponseHeaders(200, rbuf.length);
-      OutputStream responseBody = exchange.getResponseBody();
-      responseBody.write(rbuf);
-      responseBody.close();
     }
+
+    byte[] rbuf = response.toString().getBytes("UTF-8");
+    // Send
+    Headers responseHeaders = exchange.getResponseHeaders();
+    responseHeaders.set("Content-Type", "text/javascript");
+    exchange.sendResponseHeaders(200, rbuf.length);
+    OutputStream responseBody = exchange.getResponseBody();
+    responseBody.write(rbuf);
+    responseBody.close();
   }
 }
