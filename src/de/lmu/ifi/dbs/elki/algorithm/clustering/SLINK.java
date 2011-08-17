@@ -172,7 +172,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
 
     result.addChildResult(new MaterializedRelation<DBID>("SLINK pi", "slink-order", TypeUtil.DBID, pi, processedIDs));
     result.addChildResult(new MaterializedRelation<D>("SLINK lambda", "slink-order", new SimpleTypeInformation<D>(distCls), lambda, processedIDs));
-    result.addChildResult(new OrderingFromDataStore<D>("SLINK order", "slink-order", lambda));
+    result.addChildResult(new OrderingFromDataStore<D>("SLINK order", "slink-order", processedIDs, lambda));
     return result;
   }
 

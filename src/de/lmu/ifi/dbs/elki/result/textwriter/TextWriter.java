@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -86,11 +85,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * @apiviz.has NamingScheme
  */
 public class TextWriter {
-  /**
-   * Logger
-   */
-  private static final Logging logger = Logging.getLogger(TextWriter.class);
-
   /**
    * Extension for txt-files.
    */
@@ -266,7 +260,7 @@ public class TextWriter {
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
       for(IterableResult<?> rii : ri) {
-        writeIterableResult(db, streamOpener, rii, rs);
+        writeIterableResult(streamOpener, rii, rs);
       }
     }
     if(rc != null && rc.size() > 0) {
@@ -284,7 +278,7 @@ public class TextWriter {
     }
     if(otherres != null && otherres.size() > 0) {
       for(Result otherr : otherres) {
-        writeOtherResult(db, streamOpener, otherr, rs);
+        writeOtherResult(streamOpener, otherr, rs);
       }
     }
   }
@@ -326,7 +320,7 @@ public class TextWriter {
     out.flush();
   }
 
-  private void writeOtherResult(Database db, StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
+  private void writeOtherResult(StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
     TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
@@ -384,7 +378,7 @@ public class TextWriter {
     out.flush();
   }
 
-  private void writeIterableResult(Database db, StreamFactory streamOpener, IterableResult<?> ri, List<SettingsResult> sr) throws UnableToComplyException, IOException {
+  private void writeIterableResult(StreamFactory streamOpener, IterableResult<?> ri, List<SettingsResult> sr) throws UnableToComplyException, IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(ri, ri.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
     printSettings(out, sr);
@@ -417,7 +411,7 @@ public class TextWriter {
     TextWriterStream out = new TextWriterStream(outStream, writers);
     printSettings(out, sr);
 
-    Iterator<DBID> i = or.iter(db.getDBIDs());
+    Iterator<DBID> i = or.iter(or.getDBIDs());
     while(i.hasNext()) {
       printObject(out, db, i.next(), ra);
     }

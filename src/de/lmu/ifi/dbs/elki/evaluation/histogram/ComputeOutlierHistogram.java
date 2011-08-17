@@ -157,10 +157,10 @@ public class ComputeOutlierHistogram implements Evaluator {
   public HistogramResult<DoubleVector> evaluateOutlierResult(Database database, OutlierResult or) {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
-      oscaling.prepare(database.getDBIDs(), or);
+      oscaling.prepare(or);
     }
 
-    ModifiableDBIDs ids = DBIDUtil.newHashSet(database.getDBIDs());
+    ModifiableDBIDs ids = DBIDUtil.newHashSet(or.getScores().getDBIDs());
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positiveClassName);
     // first value for outliers, second for each object
     final AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> hist;

@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -63,10 +62,10 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   }
 
   @Override
-  public void prepare(DBIDs ids, OutlierResult or) {
+  public void prepare(OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
-      for(DBID id : ids) {
+      for(DBID id : or.getScores().iterDBIDs()) {
         double val = -Math.log(or.getScores().get(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
@@ -79,7 +78,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
       mean = fixedmean;
       double sqsum = 0;
       int cnt = 0;
-      for(DBID id : ids) {
+      for(DBID id : or.getScores().iterDBIDs()) {
         double val = -Math.log(or.getScores().get(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum += (val - mean) * (val - mean);

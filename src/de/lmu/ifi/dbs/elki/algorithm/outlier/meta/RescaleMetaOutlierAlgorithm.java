@@ -98,7 +98,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     OutlierResult or = getOutlierResult(innerresult);
     final Relation<Double> scores = or.getScores();
     if(scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction) scaling).prepare(scores.getDBIDs(), or);
+      ((OutlierScalingFunction) scaling).prepare(or);
     }
 
     WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(scores.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);

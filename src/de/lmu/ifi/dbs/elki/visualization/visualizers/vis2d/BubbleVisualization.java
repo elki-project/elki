@@ -266,7 +266,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
     public Visualization makeVisualization(VisualizationTask task) {
       if(this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
         final OutlierResult outlierResult = task.getResult();
-        ((OutlierScalingFunction) this.scaling).prepare(outlierResult.getScores().getDBIDs(), outlierResult);
+        ((OutlierScalingFunction) this.scaling).prepare(outlierResult);
       }
       return new BubbleVisualization<NV>(task, scaling);
     }
