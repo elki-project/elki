@@ -25,11 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.Stack;
 
 /**
- * Helper class to produce JSON output. Trys hard to ensure validity of the output.
+ * Helper class to produce JSON output. Try hard to ensure validity of the output.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.composedOf StringBuffer
+ * @apiviz.has JSONBuffer.JSONException
  */
 public class JSONBuffer {
   /**
