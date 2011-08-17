@@ -294,7 +294,7 @@ public class JSONWebServer implements HttpHandler {
         if("table".equals(parts[partpos])) {
           // Handle paging
           int offset = 0;
-          int pagesize = 500;
+          int pagesize = 100;
 
           if(parts.length >= partpos + 2) {
             offset = Integer.valueOf(parts[partpos + 1]);
