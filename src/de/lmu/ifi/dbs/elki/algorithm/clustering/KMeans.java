@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -43,23 +42,21 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization;
-import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides the k-means algorithm.
@@ -145,37 +142,24 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
     final Random random = (this.seed != null) ? new Random(this.seed) : new Random();
     if(relation.size() > 0) {
-      // needs normalization to ensure the randomly generated means
-      // are in the same range as the vectors in the database
-      // XXX perhaps this can be done more conveniently?
-      V randomBase = relation.get(relation.iterDBIDs().next());
-      EmptyParameterization parameters = new EmptyParameterization();
-      Class<AttributeWiseMinMaxNormalization<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(AttributeWiseMinMaxNormalization.class);
-      AttributeWiseMinMaxNormalization<V> normalization = parameters.tryInstantiate(cls);
-      for(ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: " + e.getMessage());
-      }
-      List<V> list = new ArrayList<V>(relation.size());
-      for(DBID id : relation.iterDBIDs()) {
-        list.add(relation.get(id));
-      }
-      normalization.normalize(list);
+      final int dim = DatabaseUtil.dimensionality(relation);
+      Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
       List<V> means = new ArrayList<V>(k);
       List<V> oldMeans;
-      List<? extends ModifiableDBIDs> clusters;
       if(logger.isVerbose()) {
         logger.verbose("initializing random vectors");
       }
       for(int i = 0; i < k; i++) {
-        V randomVector = VectorUtil.randomVector(randomBase, random);
-        try {
-          means.add(normalization.restore(randomVector));
+        double[] r = MathUtil.randomDoubleArray(dim, random);
+        // Rescale
+        for (int d = 0; d < dim; d++) {
+          r[d] = minmax.first.doubleValue(d + 1) + (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1)) * r[d];
         }
-        catch(NonNumericFeaturesException e) {
-          logger.warning(e.getMessage());
-          means.add(randomVector);
-        }
+        // Instantiate
+        V randomVector = minmax.first.newInstance(r);
+        means.add(randomVector);
       }
+      List<? extends ModifiableDBIDs> clusters;
       clusters = sort(means, relation);
       boolean changed = true;
       int iteration = 1;
