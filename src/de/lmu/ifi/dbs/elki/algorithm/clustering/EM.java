@@ -358,7 +358,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
    * Creates {@link #k k} random points distributed uniformly within the
    * attribute ranges of the given database.
    * 
-   * @param database the database must contain enough points in order to
+   * @param relation the database must contain enough points in order to
    *        ascertain the range of attribute values. Less than two points would
    *        make no sense. The content of the database is not touched otherwise.
    * @return a list of {@link #k k} random points distributed uniformly within
