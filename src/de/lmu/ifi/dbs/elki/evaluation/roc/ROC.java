@@ -255,7 +255,6 @@ public class ROC {
     /**
      * Constructor.
      * 
-     * @param ids Object IDs
      * @param o Result
      */
     public OutlierScoreAdapter(OutlierResult o) {
