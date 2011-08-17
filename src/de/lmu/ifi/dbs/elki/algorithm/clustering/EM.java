@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -42,27 +41,24 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization;
-import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
@@ -368,7 +364,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
    * @return a list of {@link #k k} random points distributed uniformly within
    *         the attribute ranges of the given database
    */
-  protected List<V> initialMeans(Relation<V> database) {
+  protected List<V> initialMeans(Relation<V> relation) {
     final Random random;
     if(this.seed != null) {
       random = new Random(this.seed);
@@ -376,35 +372,22 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     else {
       random = new Random();
     }
-    if(database.size() > 0) {
-      // needs normalization to ensure the randomly generated means
-      // are in the same range as the vectors in the database
-      // XXX perhaps this can be done more conveniently?
-      V randomBase = database.get(database.iterDBIDs().next());
-      EmptyParameterization parameters = new EmptyParameterization();
-      Class<AttributeWiseMinMaxNormalization<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(AttributeWiseMinMaxNormalization.class);
-      AttributeWiseMinMaxNormalization<V> normalization = parameters.tryInstantiate(cls);
-      for(ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: " + e.getMessage());
-      }
-      List<V> list = new ArrayList<V>(database.size());
-      for(DBID id : database.iterDBIDs()) {
-        list.add(database.get(id));
-      }
-      normalization.normalize(list);
+    if(relation.size() > 0) {
+      final int dim = DatabaseUtil.dimensionality(relation);
+      Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
       List<V> means = new ArrayList<V>(k);
       if(logger.isVerbose()) {
         logger.verbose("initializing random vectors");
       }
       for(int i = 0; i < k; i++) {
-        V randomVector = VectorUtil.randomVector(randomBase, random);
-        try {
-          means.add(normalization.restore(randomVector));
+        double[] r = MathUtil.randomDoubleArray(dim, random);
+        // Rescale
+        for (int d = 0; d < dim; d++) {
+          r[d] = minmax.first.doubleValue(d + 1) + (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1)) * r[d];
         }
-        catch(NonNumericFeaturesException e) {
-          logger.warning(e.getMessage());
-          means.add(randomVector);
-        }
+        // Instantiate
+        V randomVector = minmax.first.newInstance(r);
+        means.add(randomVector);
       }
       return means;
     }
