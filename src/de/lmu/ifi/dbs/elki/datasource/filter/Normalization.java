@@ -22,11 +22,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -52,18 +49,6 @@ public interface Normalization<O> extends ObjectFilter, Parameterizable {
    *                                     suitable to normalization
    */
   MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) throws NonNumericFeaturesException;
-
-  /**
-   * Performs a normalization on a set of feature vectors.
-   *
-   * @param featureVectors a set of feature vectors to be normalized
-   * @return a set of normalized feature vectors corresponding to the given
-   *         feature vectors but being different objects
-   * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
-   *                                     suitable to normalization
-   */
-  @Deprecated
-  List<O> normalize(List<O> featureVectors) throws NonNumericFeaturesException;
 
   /**
    * Transforms a feature vector to the original attribute ranges.
