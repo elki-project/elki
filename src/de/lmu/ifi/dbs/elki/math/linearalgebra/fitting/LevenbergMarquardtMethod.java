@@ -9,11 +9,14 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * Algorithm (GNA) and the method of steepest descent. As such it usually gives
  * more stable results and better convergence.
  * 
- * Implemented mostly based on: <br />
+ * Implemented loosely based on the book: <br />
  * Numerical Recipes In C: The Art Of Scientific Computing <br/>
  * ISBN 0-521-43108-5 <br/>
  * Press, W.H. and Teukolsky, S.A. and Vetterling, W.T. and Flannery, B.P. <br/>
  * Cambridge University Press, Cambridge, Mass, 1992
+ * 
+ * Due to their license, we cannot use their code, but we have to implement the
+ * mathematics ourselves. We hope the loss in precision isn't too big.
  * 
  * TODO: Replace implementation by one based on <br/>
  * M.I.A. Lourakis levmar:<br />

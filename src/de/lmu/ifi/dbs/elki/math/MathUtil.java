@@ -617,7 +617,7 @@ public final class MathUtil {
   /**
    * LANCZOS-Coefficients for Gamma approximation.
    * 
-   * These have slightly higher precision than those in "Numerical Recipes".
+   * These are said to have higher precision than those in "Numerical Recipes".
    * They probably come from
    * 
    * Paul Godfrey: http://my.fit.edu/~gabdo/gamma.txt
@@ -698,8 +698,9 @@ public final class MathUtil {
   /**
    * Returns the regularized gamma function Q(a, x) = 1 - P(a, x).
    * 
-   * Includes the continued fraction way of computing, based loosely on
-   * "Numerical Recipes".
+   * Includes the continued fraction way of computing, based loosely on the book
+   * "Numerical Recipes"; but probably not with the exactly same precision,
+   * since we reimplemented this in our coding style, not literally.
    * 
    * TODO: find "the" most accurate version of this. We seem to agree with
    * others for the first 10+ digits, but diverge a bit later than that.
@@ -743,7 +744,6 @@ public final class MathUtil {
         break;
       }
     }
-    // From Numerical Recipes:
     return fac * Math.exp(-x + a * Math.log(x) - logGamma(a));
   }
 
