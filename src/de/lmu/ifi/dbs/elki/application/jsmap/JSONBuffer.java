@@ -28,6 +28,8 @@ import java.util.Stack;
  * Helper class to produce JSON output. Trys hard to ensure validity of the output.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf StringBuffer
  */
 public class JSONBuffer {
   /**
