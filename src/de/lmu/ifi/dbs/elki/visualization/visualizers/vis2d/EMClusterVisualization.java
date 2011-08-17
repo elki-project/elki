@@ -62,7 +62,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
@@ -414,10 +413,10 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
    * Visualizer for generating SVG-Elements containing ellipses for first,
    * second and third standard deviation
    * 
-   * @author Heidi Kolb
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses EMClusterVisualisation oneway - - «create»
+   * @apiviz.uses EMClusterVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
@@ -430,7 +429,7 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
+    public EMClusterVisualization<NV> makeVisualization(VisualizationTask task) {
       return new EMClusterVisualization<NV>(task);
     }
 

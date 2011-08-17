@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses Result
+ * @apiviz.uses HierarchicalResult
  * @apiviz.has ResultHandler
  */
 public class OutputStep implements WorkflowStep {

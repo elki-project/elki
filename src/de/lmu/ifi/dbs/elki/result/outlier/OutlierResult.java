@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * 
  * @apiviz.composedOf OutlierScoreMeta
  * @apiviz.composedOf Relation oneway - - contains
- * @apiviz.composedOf OrderingFromAnnotationResult
+ * @apiviz.composedOf OrderingFromRelation
  */
 public class OutlierResult extends BasicResult {
   /**
