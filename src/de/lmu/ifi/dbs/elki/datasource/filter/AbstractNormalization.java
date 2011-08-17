@@ -22,14 +22,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
 
 /**
  * Abstract super class for all normalizations.
@@ -44,29 +39,6 @@ public abstract class AbstractNormalization<O> extends AbstractConversionFilter<
    */
   protected AbstractNormalization() {
     super();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public List<O> normalize(List<O> objs) {
-    if(objs.size() == 0) {
-      return Collections.emptyList();
-    }
-
-    if(prepareStart(null)) {
-      for(O obj : objs) {
-        prepareProcessInstance(obj);
-      }
-      prepareComplete();
-    }
-
-    List<O> normalized = new ArrayList<O>(objs.size());
-    for(O obj : objs) {
-      O normalizedObj = filterSingleObject(obj);
-      normalized.add(normalizedObj);
-    }
-    return normalized;
   }
 
   @Override
