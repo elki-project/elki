@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Handle results by serving them via a web server to mapping applications.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf JSONWebServer
  */
 public class JSONResultHandler implements ResultHandler {
   /**

@@ -59,6 +59,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * A simple web server to serve data base contents to a JavaScript client.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses JSONBuffer
  */
 public class JSONWebServer implements HttpHandler {
   /**
