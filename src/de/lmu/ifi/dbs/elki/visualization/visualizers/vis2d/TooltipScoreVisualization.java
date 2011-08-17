@@ -59,8 +59,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * as the cursor lingers on the marker.
  * 
  * @author Remigius Wojdanowski
- * 
- * @apiviz.has AnnotationResult oneway - - visualizes
  */
 public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends TooltipVisualization<NV> {
   /**

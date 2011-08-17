@@ -122,7 +122,7 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.has ExtendedNeighborhood oneway - - «produces»
+   * @apiviz.has LinearWeightedExtendedNeighborhood oneway - - «produces»
    */
   public static class Factory<O> implements WeightedNeighborSetPredicate.Factory<O> {
     /**
