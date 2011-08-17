@@ -72,7 +72,6 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   /**
    * Compute the scaling value in a linear scan over the annotation.
    * 
-   * @param ids Database ids
    * @param or Outlier result
    * @return Scaling value.
    */
