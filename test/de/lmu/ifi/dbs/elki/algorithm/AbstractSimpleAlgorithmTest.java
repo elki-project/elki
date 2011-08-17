@@ -15,10 +15,12 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClust
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
@@ -89,7 +91,8 @@ public abstract class AbstractSimpleAlgorithmTest {
     testParameterizationOk(params);
 
     db.initialize();
-    org.junit.Assert.assertEquals("Database size does not match.", expectedSize, db.size());
+    Relation<?> rel = db.getRelation(TypeUtil.ANY);
+    org.junit.Assert.assertEquals("Database size does not match.", expectedSize, rel.size());
     return db;
   }
 

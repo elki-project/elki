@@ -11,8 +11,10 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -49,7 +51,8 @@ public class TestPairCountingFMeasure implements JUnit4Test {
     db.initialize();
 
     // verify data set size.
-    assertTrue(db.size() == shoulds);
+    Relation<?> rel = db.getRelation(TypeUtil.ANY);
+    assertTrue(rel.size() == shoulds);
 
     // run all-in-one
     TrivialAllInOne allinone = new TrivialAllInOne();
