@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -66,8 +65,8 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   }
 
   @Override
-  public void prepare(DBIDs ids, OutlierResult or) {
-    scaleval = getScaleValue(ids, or);
+  public void prepare(OutlierResult or) {
+    scaleval = getScaleValue(or);
   }
 
   /**
@@ -77,9 +76,9 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
    * @param or Outlier result
    * @return Scaling value.
    */
-  private static double getScaleValue(DBIDs ids, OutlierResult or) {
+  private static double getScaleValue(OutlierResult or) {
     double max = Double.MIN_VALUE;
-    for(DBID id : ids) {
+    for(DBID id : or.getScores().iterDBIDs()) {
       double val = or.getScores().get(id);
       double inv = Math.abs(1.0 / val);
       if(!Double.isInfinite(inv) && !Double.isNaN(inv)) {

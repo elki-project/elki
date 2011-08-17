@@ -22,7 +22,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 
@@ -39,8 +38,7 @@ public interface OutlierScalingFunction extends ScalingFunction {
    * called. This function can be used to extract global parameters such as
    * means, minimums or maximums from the Database, Result or Annotation.
    * 
-   * @param ids Database IDs to process
    * @param or Outlier result to use
    */
-  public void prepare(DBIDs ids, OutlierResult or);
+  public void prepare(OutlierResult or);
 }

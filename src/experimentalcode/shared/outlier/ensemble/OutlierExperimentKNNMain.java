@@ -208,7 +208,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
         OutlierResult lofresult = lof.run(relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
-        scaling.prepare(ids, lofresult);
+        scaling.prepare(lofresult);
         writeResult(fout, ids, lofresult, scaling, "LOF-" + kstr);
         detachResult(database, lofresult);
       }
@@ -233,7 +233,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
         OutlierResult lofresult = ldof.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
-        scaling.prepare(ids, lofresult);
+        scaling.prepare(lofresult);
         writeResult(fout, ids, lofresult, scaling, "LDOF-" + kstr);
         detachResult(database, lofresult);
       }
@@ -247,7 +247,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
         OutlierResult knnresult = knn.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling();
-        scaling.prepare(ids, knnresult);
+        scaling.prepare(knnresult);
         writeResult(fout, ids, knnresult, scaling, "KNN-" + kstr);
         detachResult(database, knnresult);
       }
@@ -261,7 +261,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
         OutlierResult knnresult = knnw.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling();
-        scaling.prepare(ids, knnresult);
+        scaling.prepare(knnresult);
         writeResult(fout, ids, knnresult, scaling, "KNNW-" + kstr);
         detachResult(database, knnresult);
       }
@@ -280,7 +280,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
             OutlierResult abodresult = abod.run(database);
             // Setup scaling
             StandardDeviationScaling scaling = new MinusLogStandardDeviationScaling(null, 1.0);
-            scaling.prepare(ids, abodresult);
+            scaling.prepare(abodresult);
             writeResult(fout, ids, abodresult, scaling, "ABOD-" + kstr);
             detachResult(database, abodresult);
           }

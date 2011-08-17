@@ -148,7 +148,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(scores.getDBIDs());
 
-    scaling.prepare(ids, outlierResult);
+    scaling.prepare(outlierResult);
 
     out.writeStartDocument();
     out.writeCharacters("\n");

@@ -33,6 +33,13 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
  */
 public interface OrderingResult extends Result {
   /**
+   * Get the full set of DBIDs this ordering is defined for.
+   * 
+   * @return DBIDs
+   */
+  public DBIDs getDBIDs();
+  
+  /**
    * Sort the given ids according to this ordering and return an iterator.
    * 
    * @param ids Collection of ids.

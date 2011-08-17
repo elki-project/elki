@@ -258,9 +258,9 @@ public class ROC {
      * @param ids Object IDs
      * @param o Result
      */
-    public OutlierScoreAdapter(DBIDs ids, OutlierResult o) {
+    public OutlierScoreAdapter(OutlierResult o) {
       super();
-      this.iter = o.getOrdering().iter(ids);
+      this.iter = o.getOrdering().iter(o.getScores().getDBIDs());
       this.scores = o.getScores();
     }
 

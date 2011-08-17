@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -63,11 +62,11 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
   }
 
   @Override
-  public void prepare(DBIDs ids, OutlierResult or) {
+  public void prepare(OutlierResult or) {
     meta = or.getOutlierMeta();
     // Determine Minimum and Maximum.
     DoubleMinMax mm = new DoubleMinMax();
-    for(DBID id : ids) {
+    for(DBID id : or.getScores().iterDBIDs()) {
       double score = or.getScores().get(id);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mm.put(score);
@@ -77,7 +76,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     mlogmax = -Math.log(mm.getMin() / max);
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
-    for(DBID id : ids) {
+    for(DBID id : or.getScores().iterDBIDs()) {
       double score = or.getScores().get(id);
       score = preScale(score);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {

@@ -74,6 +74,18 @@ public class OrderingFromRelation implements OrderingResult {
   }
 
   @Override
+  public DBIDs getDBIDs() {
+    return scores.getDBIDs();
+  }
+
+  @Override
+  public IterableIterator<DBID> iter(DBIDs ids) {
+    ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
+    Collections.sort(sorted, new ImpliedComparator());
+    return new IterableIteratorAdapter<DBID>(sorted);
+  }
+
+  @Override
   public String getLongName() {
     return scores.getLongName()+" Order";
   }
@@ -99,12 +111,5 @@ public class OrderingFromRelation implements OrderingResult {
       assert (k2 != null);
       return ascending * k2.compareTo(k1);
     }
-  }
-
-  @Override
-  public IterableIterator<DBID> iter(DBIDs ids) {
-    ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
-    Collections.sort(sorted, new ImpliedComparator());
-    return new IterableIteratorAdapter<DBID>(sorted);
   }
 }

@@ -102,8 +102,8 @@ public class ComputeROCCurve implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
-  private ROCResult computeROCResult(Database database, SetDBIDs positiveids, Iterator<DBID> iter) {
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(database.size());
+  private ROCResult computeROCResult(int size, SetDBIDs positiveids, Iterator<DBID> iter) {
+    ArrayModifiableDBIDs order = DBIDUtil.newArray(size);
     while(iter.hasNext()) {
       Object o = iter.next();
       if(!(o instanceof DBID)) {
@@ -113,10 +113,10 @@ public class ComputeROCCurve implements Evaluator {
         order.add((DBID) o);
       }
     }
-    if(order.size() != database.size()) {
+    if(order.size() != size) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.SimpleAdapter(order.iterator()));
+    List<DoubleDoublePair> roccurve = ROC.materializeROC(size, positiveids, new ROC.SimpleAdapter(order.iterator()));
     double rocauc = ROC.computeAUC(roccurve);
     if(logger.isVerbose()) {
       logger.verbose(ROCAUC_LABEL +": " + rocauc);
@@ -129,8 +129,8 @@ public class ComputeROCCurve implements Evaluator {
     return rocresult;
   }
 
-  private ROCResult computeROCResult(Database database, SetDBIDs positiveids, OutlierResult or) {
-    List<DoubleDoublePair> roccurve = ROC.materializeROC(database.size(), positiveids, new ROC.OutlierScoreAdapter(database.getDBIDs(), or));
+  private ROCResult computeROCResult(int size, SetDBIDs positiveids, OutlierResult or) {
+    List<DoubleDoublePair> roccurve = ROC.materializeROC(size, positiveids, new ROC.OutlierScoreAdapter(or));
     double rocauc = ROC.computeAUC(roccurve);
     if(logger.isVerbose()) {
       logger.verbose(ROCAUC_LABEL+": " + rocauc);
@@ -176,7 +176,7 @@ public class ComputeROCCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      db.getHierarchy().add(o, computeROCResult(db, positiveids, o));
+      db.getHierarchy().add(o, computeROCResult(o.getScores().size(), positiveids, o));
       // Process them only once.
       orderings.remove(o.getOrdering());
       nonefound = false;
@@ -187,15 +187,15 @@ public class ComputeROCCurve implements Evaluator {
     for(IterableResult<?> ir : iterables) {
       Iterator<DBID> iter = getDBIDIterator(ir);
       if(iter != null) {
-        db.getHierarchy().add(ir, computeROCResult(db, positiveids, iter));
+        db.getHierarchy().add(ir, computeROCResult(db.size(), positiveids, iter));
         nonefound = false;
       }
     }
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      Iterator<DBID> iter = or.iter(db.getDBIDs());
-      db.getHierarchy().add(or, computeROCResult(db, positiveids, iter));
+      Iterator<DBID> iter = or.iter(or.getDBIDs());
+      db.getHierarchy().add(or, computeROCResult(or.getDBIDs().size(), positiveids, iter));
       nonefound = false;
     }
 

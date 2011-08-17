@@ -116,15 +116,14 @@ public class JudgeOutlierScores implements Evaluator {
    * 
    * @param ids Inlier IDs
    * @param outlierIds Outlier IDs
-   * @param database Database
    * @param or Outlier Result to evaluate
    * @return Outlier score result
    * @throws IllegalStateException
    */
-  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, Database database, OutlierResult or) throws IllegalStateException {
+  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, OutlierResult or) throws IllegalStateException {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
-      oscaling.prepare(database.getDBIDs(), or);
+      oscaling.prepare(or);
     }
 
     final ScalingFunction innerScaling;
@@ -182,7 +181,7 @@ public class JudgeOutlierScores implements Evaluator {
     ids.removeDBIDs(outlierIds);
 
     for(OutlierResult or : ors) {
-      db.getHierarchy().add(or, computeScore(ids, outlierIds, db, or));
+      db.getHierarchy().add(or, computeScore(ids, outlierIds, or));
     }
   }
 

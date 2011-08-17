@@ -27,7 +27,6 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -58,10 +57,10 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
   double Bfinal;
 
   @Override
-  public void prepare(DBIDs dbids, OutlierResult or) {
+  public void prepare(OutlierResult or) {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
-    for(DBID id : dbids) {
+    for(DBID id : or.getScores().iterDBIDs()) {
       double val = or.getScores().get(id);
       mv.put(val);
     }
@@ -69,7 +68,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
     double b = - mv.getMean();
     int iter = 0;
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(dbids);
+    ArrayDBIDs ids = DBIDUtil.ensureArray(or.getScores().getDBIDs());
     BitSet t = new BitSet(ids.size());
     boolean changing = true;
     while(changing) {

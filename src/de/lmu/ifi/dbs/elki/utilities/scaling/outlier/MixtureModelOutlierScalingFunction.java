@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -117,10 +116,10 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
   }
 
   @Override
-  public void prepare(DBIDs dbids, OutlierResult or) {
+  public void prepare(OutlierResult or) {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
-    for(DBID id : dbids) {
+    for(DBID id : or.getScores().iterDBIDs()) {
       double val = or.getScores().get(id);
       if(!Double.isNaN(val) && !Double.isInfinite(val)) {
         mv.put(val);
@@ -134,7 +133,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
     double curLambda = Math.min(1.0 / curMu, Double.MAX_VALUE);
     double curAlpha = 0.05;
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(dbids);
+    ArrayDBIDs ids = DBIDUtil.ensureArray(or.getScores().getDBIDs());
     // TODO: stop condition!
     int iter = 0;
     // logger.debugFine("iter #-1 mu = " + curMu + " sigma = " + curSigma +

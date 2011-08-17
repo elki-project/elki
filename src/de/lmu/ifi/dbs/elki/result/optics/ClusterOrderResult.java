@@ -74,7 +74,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
   /**
    * The DBIDs we are defined for
    */
-  private ModifiableDBIDs dbids;
+  ModifiableDBIDs dbids;
 
   /**
    * Constructor
@@ -169,6 +169,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
       this.clusterOrder = clusterOrder;
     }
 
+    @Override
+    public DBIDs getDBIDs() {
+      return dbids;
+    }
+    
     /**
      * Use the cluster order to sort the given collection ids.
      * 
