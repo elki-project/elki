@@ -133,7 +133,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
       c.setNoise(true);
       rootclusters.add(c);
     }
-    assert (rootclusters.size() > 0);
+    assert (rootclusters.size() > 0) : "No clusters found by bylabel clustering. Empty database?";
 
     return new Clustering<Model>("By Label Hierarchical Clustering", "bylabel-clustering", rootclusters);
   }
