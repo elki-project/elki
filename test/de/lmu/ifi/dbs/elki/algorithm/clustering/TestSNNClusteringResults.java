@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -39,7 +38,7 @@ public class TestSNNClusteringResults extends AbstractSimpleAlgorithmTest implem
     params.addParameter(SNNClustering.EPSILON_ID, 77);
     params.addParameter(SNNClustering.MINPTS_ID, 28);
     params.addParameter(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 100);
-    SNNClustering<DoubleVector, DoubleDistance> snn = ClassGenericsUtil.parameterizeOrAbort(SNNClustering.class, params);
+    SNNClustering<DoubleVector> snn = ClassGenericsUtil.parameterizeOrAbort(SNNClustering.class, params);
     testParameterizationOk(params);
 
     // run SNN on database

@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -71,14 +70,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @apiviz.uses SharedNearestNeighborSimilarityFunction
  * 
- * @param <O> the type of DatabaseObject the algorithm is applied on
- * @param <D> the type of Distance used for the preprocessing of the shared
- *        nearest neighbors neighborhood lists
+ * @param <O> the type of Object the algorithm is applied on
  */
 @Title("SNN: Shared Nearest Neighbor Clustering")
 @Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters 'minPts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
 @Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", booktitle = "Proc. of SIAM Data Mining (SDM), 2003", url = "http://www.siam.org/meetings/sdm03/proceedings/sdm03_05.pdf")
-public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -124,7 +121,7 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<C
   /**
    * The similarity function for the shared nearest neighbor similarity.
    */
-  private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction;
+  private SharedNearestNeighborSimilarityFunction<O> similarityFunction;
 
   /**
    * Constructor.
@@ -133,7 +130,7 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<C
    * @param epsilon Epsilon
    * @param minpts Minpts
    */
-  public SNNClustering(SharedNearestNeighborSimilarityFunction<O, D> similarityFunction, IntegerDistance epsilon, int minpts) {
+  public SNNClustering(SharedNearestNeighborSimilarityFunction<O> similarityFunction, IntegerDistance epsilon, int minpts) {
     super();
     this.similarityFunction = similarityFunction;
     this.epsilon = epsilon;
@@ -310,18 +307,20 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<C
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> object type
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
+  public static class Parameterizer<O> extends AbstractParameterizer {
     protected IntegerDistance epsilon;
 
     protected int minpts;
 
-    private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction;
+    private SharedNearestNeighborSimilarityFunction<O> similarityFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Class<SharedNearestNeighborSimilarityFunction<O, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
+      Class<SharedNearestNeighborSimilarityFunction<O>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
       similarityFunction = config.tryInstantiate(cls);
 
       DistanceParameter<IntegerDistance> epsilonP = new DistanceParameter<IntegerDistance>(EPSILON_ID, IntegerDistance.FACTORY);
@@ -336,8 +335,8 @@ public class SNNClustering<O, D extends Distance<D>> extends AbstractAlgorithm<C
     }
 
     @Override
-    protected SNNClustering<O, D> makeInstance() {
-      return new SNNClustering<O, D>(similarityFunction, epsilon, minpts);
+    protected SNNClustering<O> makeInstance() {
+      return new SNNClustering<O>(similarityFunction, epsilon, minpts);
     }
   }
 }

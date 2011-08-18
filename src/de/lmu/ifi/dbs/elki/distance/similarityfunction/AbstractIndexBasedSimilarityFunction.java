@@ -81,7 +81,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index, R
   }
 
   @Override
-  public TypeInformation getInputTypeRestriction() {
+  final public TypeInformation getInputTypeRestriction() {
     return indexFactory.getInputTypeRestriction();
   }
 

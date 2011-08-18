@@ -25,8 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -134,11 +132,6 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
   @Override
   public DoubleDistance getDistanceFactory() {
     return DoubleDistance.FACTORY;
-  }
-
-  @Override
-  public SimpleTypeInformation<DBID> getInputTypeRestriction() {
-    return TypeUtil.DBID;
   }
 
   /**
