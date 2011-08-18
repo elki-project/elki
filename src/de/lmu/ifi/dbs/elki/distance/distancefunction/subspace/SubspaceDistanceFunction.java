@@ -23,8 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
@@ -62,11 +60,6 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
   @Override
   public SubspaceDistance getDistanceFactory() {
     return SubspaceDistance.FACTORY;
-  }
-
-  @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

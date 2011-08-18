@@ -38,16 +38,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -77,13 +76,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.has SharedNearestNeighborSimilarityFunction
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
- * @param <D> the type of Distance used by this Algorithm
  */
 // todo arthur comment
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
-public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -115,7 +113,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
   /**
    * The similarity function.
    */
-  private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction;
+  private SharedNearestNeighborSimilarityFunction<V> similarityFunction;
 
   /**
    * Constructor with parameters.
@@ -124,7 +122,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * @param alpha Alpha parameter
    * @param similarityFunction Shared nearest neighbor similarity function
    */
-  public SOD(int knn, double alpha, SharedNearestNeighborSimilarityFunction<V, D> similarityFunction) {
+  public SOD(int knn, double alpha, SharedNearestNeighborSimilarityFunction<V> similarityFunction) {
     super();
     this.knn = knn;
     this.alpha = alpha;
@@ -405,7 +403,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #KNN_ID}.
      */
@@ -419,7 +417,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     /**
      * The similarity function.
      */
-    private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction;
+    private SharedNearestNeighborSimilarityFunction<V> similarityFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -434,13 +432,13 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
         alpha = alphaP.getValue();
       }
 
-      Class<SharedNearestNeighborSimilarityFunction<V, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
+      Class<SharedNearestNeighborSimilarityFunction<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
       similarityFunction = config.tryInstantiate(cls);
     }
 
     @Override
-    protected SOD<V, D> makeInstance() {
-      return new SOD<V, D>(knn, alpha, similarityFunction);
+    protected SOD<V> makeInstance() {
+      return new SOD<V>(knn, alpha, similarityFunction);
     }
   }
 }

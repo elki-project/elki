@@ -25,8 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
@@ -57,11 +55,6 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
    */
   public DiSHDistanceFunction(DiSHPreferenceVectorIndex.Factory<NumberVector<?, ?>> indexFactory, double epsilon) {
     super(indexFactory, epsilon);
-  }
-
-  @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override

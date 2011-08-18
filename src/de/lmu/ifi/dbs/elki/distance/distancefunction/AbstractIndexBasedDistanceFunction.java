@@ -22,6 +22,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -69,6 +70,11 @@ public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index, D e
     return true;
   }
 
+  @Override
+  final public TypeInformation getInputTypeRestriction() {
+    return indexFactory.getInputTypeRestriction();
+  }
+  
   /**
    * The actual instance bound to a particular database.
    * 
