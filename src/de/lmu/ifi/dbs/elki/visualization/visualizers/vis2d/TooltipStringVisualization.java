@@ -29,6 +29,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -199,7 +200,11 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
             task.put(VisualizationTask.META_TOOL, true);
             baseResult.getHierarchy().add(rep, task);
           }
-          // TODO: external IDs separate?
+          if (ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+            final VisualizationTask task = new VisualizationTask(NAME_EID, rep, vrep, this, P2DVisualization.class);
+            task.put(VisualizationTask.META_TOOL, true);
+            baseResult.getHierarchy().add(rep, task);
+          }
         }
       }
     }
