@@ -45,7 +45,7 @@ public class ArffParser implements Parser {
   /**
    * Arff attribute declaration marker
    */
-  public static final Pattern ARFF_HEADER_ATTRIBUTE = Pattern.compile("@attribute\\s+([^ ]+|['\"].*?['\"])\\s+(numeric|real|integer|string|date(\\s.*)|\\{.*\\})\\s*", Pattern.CASE_INSENSITIVE);
+  public static final Pattern ARFF_HEADER_ATTRIBUTE = Pattern.compile("@attribute\\s+([^ ]+|['\"].*?['\"])\\s+(numeric|real|integer|string|double|date(\\s.*)|\\{.*\\})\\s*", Pattern.CASE_INSENSITIVE);
 
   /**
    * Arff data marker
@@ -70,7 +70,7 @@ public class ArffParser implements Parser {
   /**
    * Pattern for numeric columns
    */
-  public static final Pattern ARFF_NUMERIC = Pattern.compile("(numeric|real|integer)", Pattern.CASE_INSENSITIVE);
+  public static final Pattern ARFF_NUMERIC = Pattern.compile("(numeric|real|integer|double)", Pattern.CASE_INSENSITIVE);
 
   /**
    * Empty line pattern.
@@ -211,7 +211,7 @@ public class ArffParser implements Parser {
           throw new AbortException("Unsupported type for column " + in + "->" + out + ": " + ((etyp[out] != null) ? etyp[out].toString() : "null"));
         }
         assert (out == bundle.metaLength() - 1);
-        logger.warning("Added meta: " + bundle.meta(bundle.metaLength() - 1));
+        // logger.warning("Added meta: " + bundle.meta(bundle.metaLength() - 1));
         in = nin;
       }
       // Setup tokenizer
@@ -236,7 +236,7 @@ public class ArffParser implements Parser {
           // ignore empty lines
         }
         else if(tokenizer.ttype != '{') {
-          logger.warning("Regular instance.");
+          // logger.warning("Regular instance.");
           Object[] data = new Object[outdim];
           for(int out = 0; out < outdim; out++) {
             if(etyp[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
@@ -297,6 +297,7 @@ public class ArffParser implements Parser {
               // sparse token
             }
           }
+          throw new AbortException("Sparse ARFF are not (yet) supported.");
         }
         if(tokenizer.ttype != StreamTokenizer.TT_EOF) {
           nextToken(tokenizer);
