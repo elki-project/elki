@@ -73,6 +73,11 @@ public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index, D e
    * The actual instance bound to a particular database.
    * 
    * @author Erich Schubert
+   * 
+   * @param <O> Object type
+   * @param <I> Index type
+   * @param <D> Distance type
+   * @param <F> Distance function type
    */
   abstract public static class Instance<O, I extends Index, D extends Distance<D>, F extends DistanceFunction<? super O, D>> extends AbstractDatabaseDistanceQuery<O, D> implements IndexBasedDistanceFunction.Instance<O, I, D> {
     /**
