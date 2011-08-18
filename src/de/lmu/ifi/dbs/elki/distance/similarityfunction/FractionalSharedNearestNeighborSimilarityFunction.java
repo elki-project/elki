@@ -1,33 +1,33 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
@@ -39,14 +39,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
+ * @apiviz.has 
+ *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
+ *             .Factory
  * @apiviz.uses Instance oneway - - «create»
  * 
  * @param <O> object type
- * @param <D> distance type
  */
 // todo arthur comment class
-public class FractionalSharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
+public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
   /**
    * Constructor.
    * 
@@ -58,9 +59,9 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O, D extends Dist
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends O> Instance<T, D> instantiate(Relation<T> database) {
+  public <T extends O> Instance<T> instantiate(Relation<T> database) {
     SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Relation<O>) database);
-    return (Instance<T, D>) new Instance<O, D>((Relation<O>) database, indexi, indexi.getNumberOfNeighbors());
+    return (Instance<T>) new Instance<O>((Relation<O>) database, indexi);
   }
 
   /**
@@ -71,70 +72,36 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O, D extends Dist
    * @apiviz.uses SharedNearestNeighborIndex
    * 
    * @param <T> Object type
-   * @param <D> Distance type
    */
-  public static class Instance<T, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>, TreeSetDBIDs, DoubleDistance> {
-    /**
-     * Holds the number of nearest neighbors to be used.
-     */
-    private final int numberOfNeighbors;
-
+  public static class Instance<T> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>, TreeSetDBIDs, DoubleDistance> {
     /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
-     * @param numberOfNeighbors Neighborhood size
      */
-    public Instance(Relation<T> database, SharedNearestNeighborIndex<T> preprocessor, int numberOfNeighbors) {
+    public Instance(Relation<T> database, SharedNearestNeighborIndex<T> preprocessor) {
       super(database, preprocessor);
-      this.numberOfNeighbors = numberOfNeighbors;
     }
 
     static protected int countSharedNeighbors(TreeSetDBIDs neighbors1, TreeSetDBIDs neighbors2) {
       int intersection = 0;
       Iterator<DBID> iter1 = neighbors1.iterator();
       Iterator<DBID> iter2 = neighbors2.iterator();
-      DBID neighbors1ID = null;
-      DBID neighbors2ID = null;
-      if(iter1.hasNext()) {
-        neighbors1ID = iter1.next();
-      }
-      if(iter2.hasNext()) {
-        neighbors2ID = iter2.next();
-      }
-      while((iter1.hasNext() || iter2.hasNext()) && neighbors1ID != null && neighbors2ID != null) {
+      DBID neighbors1ID = iter1.hasNext() ? iter1.next() : null;
+      DBID neighbors2ID = iter2.hasNext() ? iter2.next() : null;
+      while(neighbors1ID != null && neighbors2ID != null) {
         if(neighbors1ID.equals(neighbors2ID)) {
           intersection++;
-          if(iter1.hasNext()) {
-            neighbors1ID = iter1.next();
-          }
-          else {
-            neighbors1ID = null;
-          }
-          if(iter2.hasNext()) {
-            neighbors2ID = iter2.next();
-          }
-          else {
-            neighbors2ID = null;
-          }
+          neighbors1ID = iter1.hasNext() ? iter1.next() : null;
+          neighbors2ID = iter2.hasNext() ? iter2.next() : null;
         }
         else if(neighbors2ID.compareTo(neighbors1ID) > 0) {
-          if(iter1.hasNext()) {
-            neighbors1ID = iter1.next();
-          }
-          else {
-            neighbors1ID = null;
-          }
+          neighbors1ID = iter1.hasNext() ? iter1.next() : null;
         }
         else // neighbors1ID > neighbors2ID
         {
-          if(iter2.hasNext()) {
-            neighbors2ID = iter2.next();
-          }
-          else {
-            neighbors2ID = null;
-          }
+          neighbors2ID = iter2.hasNext() ? iter2.next() : null;
         }
       }
       return intersection;
@@ -145,7 +112,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O, D extends Dist
       TreeSetDBIDs neighbors1 = index.getNearestNeighborSet(id1);
       TreeSetDBIDs neighbors2 = index.getNearestNeighborSet(id2);
       int intersection = countSharedNeighbors(neighbors1, neighbors2);
-      return new DoubleDistance((double) intersection / numberOfNeighbors);
+      return new DoubleDistance((double) intersection / index.getNumberOfNeighbors());
     }
 
     @Override
@@ -165,8 +132,10 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O, D extends Dist
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> object type
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+  public static class Parameterizer<O> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -174,8 +143,8 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O, D extends Dist
     }
 
     @Override
-    protected FractionalSharedNearestNeighborSimilarityFunction<O, D> makeInstance() {
-      return new FractionalSharedNearestNeighborSimilarityFunction<O, D>(factory);
+    protected FractionalSharedNearestNeighborSimilarityFunction<O> makeInstance() {
+      return new FractionalSharedNearestNeighborSimilarityFunction<O>(factory);
     }
   }
 }
