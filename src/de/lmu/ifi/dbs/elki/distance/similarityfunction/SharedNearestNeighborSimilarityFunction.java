@@ -27,7 +27,6 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
@@ -43,10 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @apiviz.uses Instance oneway - - «create»
  * 
  * @param <O> object type
- * @param <D> distance type
  */
 // todo arthur comment class
-public class SharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
+public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
   /**
    * Constructor.
    * 
@@ -65,46 +63,20 @@ public class SharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> e
     int intersection = 0;
     Iterator<DBID> iter1 = neighbors1.iterator();
     Iterator<DBID> iter2 = neighbors2.iterator();
-    DBID neighbors1ID = null;
-    DBID neighbors2ID = null;
-    if(iter1.hasNext()) {
-      neighbors1ID = iter1.next();
-    }
-    if(iter2.hasNext()) {
-      neighbors2ID = iter2.next();
-    }
+    DBID neighbors1ID = iter1.hasNext() ? iter1.next() : null;
+    DBID neighbors2ID = iter2.hasNext() ? iter2.next() : null;
     while((iter1.hasNext() || iter2.hasNext()) && neighbors1ID != null && neighbors2ID != null) {
       if(neighbors1ID.equals(neighbors2ID)) {
         intersection++;
-        if(iter1.hasNext()) {
-          neighbors1ID = iter1.next();
-        }
-        else {
-          neighbors1ID = null;
-        }
-        if(iter2.hasNext()) {
-          neighbors2ID = iter2.next();
-        }
-        else {
-          neighbors2ID = null;
-        }
+        neighbors1ID = iter1.hasNext() ? iter1.next() : null;
+        neighbors2ID = iter2.hasNext() ? iter2.next() : null;
       }
       else if(neighbors2ID.compareTo(neighbors1ID) > 0) {
-        if(iter1.hasNext()) {
-          neighbors1ID = iter1.next();
-        }
-        else {
-          neighbors1ID = null;
-        }
+        neighbors1ID = iter1.hasNext() ? iter1.next() : null;
       }
       else // neighbors1ID > neighbors2ID
       {
-        if(iter2.hasNext()) {
-          neighbors2ID = iter2.next();
-        }
-        else {
-          neighbors2ID = null;
-        }
+        neighbors2ID = iter2.hasNext() ? iter2.next() : null;
       }
     }
     return intersection;
@@ -112,9 +84,9 @@ public class SharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> e
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends O> Instance<T, D> instantiate(Relation<T> database) {
+  public <T extends O> Instance<T> instantiate(Relation<T> database) {
     SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Relation<O>) database);
-    return (Instance<T, D>) new Instance<O, D>((Relation<O>) database, indexi);
+    return (Instance<T>) new Instance<O>((Relation<O>) database, indexi);
   }
 
   /**
@@ -126,7 +98,13 @@ public class SharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> e
    * 
    * @param <D>
    */
-  public static class Instance<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
+  public static class Instance<O> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
+    /**
+     * Constructor.
+     *
+     * @param database Database
+     * @param preprocessor Index
+     */
     public Instance(Relation<O> database, SharedNearestNeighborIndex<O> preprocessor) {
       super(database, preprocessor);
     }
@@ -150,8 +128,10 @@ public class SharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> e
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
+  public static class Parameterizer<O> extends AbstractIndexBasedSimilarityFunction.Parameterizer<SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -159,8 +139,8 @@ public class SharedNearestNeighborSimilarityFunction<O, D extends Distance<D>> e
     }
 
     @Override
-    protected SharedNearestNeighborSimilarityFunction<O, D> makeInstance() {
-      return new SharedNearestNeighborSimilarityFunction<O, D>(factory);
+    protected SharedNearestNeighborSimilarityFunction<O> makeInstance() {
+      return new SharedNearestNeighborSimilarityFunction<O>(factory);
     }
   }
 }
