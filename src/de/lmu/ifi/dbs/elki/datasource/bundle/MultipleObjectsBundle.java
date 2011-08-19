@@ -136,10 +136,12 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * 
    * @param type Type information
    * @param data Data to add
+   * @return This object, for chaining.
    */
-  public void appendColumn(SimpleTypeInformation<?> type, List<?> data) {
+  public MultipleObjectsBundle appendColumn(SimpleTypeInformation<?> type, List<?> data) {
     meta.add(type);
     columns.add(data);
+    return this;
   }
 
   /**
@@ -179,6 +181,27 @@ public class MultipleObjectsBundle implements ObjectBundle {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     bundle.appendColumn(type1, data1);
     bundle.appendColumn(type2, data2);
+    return bundle;
+  }
+
+  /**
+   * Helper to add a single column to the bundle.
+   * 
+   * @param <V1> First Object type
+   * @param <V2> Second Object type
+   * @param <V3> Third Object type
+   * @param type1 First type information
+   * @param data1 First data column to add
+   * @param type2 Second type information
+   * @param data2 Second data column to add
+   * @param type3 Third type information
+   * @param data3 Third data column to add
+   */
+  public static <V1, V2, V3> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V1> type1, List<? extends V1> data1, SimpleTypeInformation<? super V2> type2, List<? extends V2> data2, SimpleTypeInformation<? super V3> type3, List<? extends V3> data3) {
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+    bundle.appendColumn(type1, data1);
+    bundle.appendColumn(type2, data2);
+    bundle.appendColumn(type3, data3);
     return bundle;
   }
 
