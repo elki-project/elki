@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
@@ -40,7 +42,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Parser to load polygon data (2D and 3D only) from a simple format. One record
@@ -87,12 +88,14 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
 
     List<PolygonsObject> polys = new ArrayList<PolygonsObject>();
     List<LabelList> labels = new ArrayList<LabelList>();
+    List<ExternalID> eids = new ArrayList<ExternalID>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          Pair<PolygonsObject, LabelList> objectAndLabels = parseLine(line);
-          polys.add(objectAndLabels.first);
-          labels.add(objectAndLabels.second);
+          Object[] objs = parseLine(line);
+          polys.add((PolygonsObject)objs[0]);
+          labels.add((LabelList)objs[1]);
+          eids.add((ExternalID)objs[2]);
         }
       }
     }
@@ -100,7 +103,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.LABELLIST, labels);
+    return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.LABELLIST, labels, TypeUtil.EXTERNALID, eids);
   }
 
   /**
@@ -110,7 +113,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
    * 
    * @return Parsed polygon
    */
-  private Pair<PolygonsObject, LabelList> parseLine(String line) {
+  private Object[] parseLine(String line) {
     List<String> entries = tokenize(line);
     Iterator<String> iter = entries.iterator();
 
@@ -153,7 +156,9 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     if(coords.size() > 0) {
       polys.add(new Polygon(coords));
     }
-    return new Pair<PolygonsObject, LabelList>(new PolygonsObject(polys), labels);
+    // Use first label as eternal ID
+    ExternalID eid = labels.size() > 0 ? new ExternalID(labels.remove(0)) : null;
+    return new Object[] { new PolygonsObject(polys), labels, eid };
   }
 
   @Override
