@@ -1,4 +1,4 @@
-package experimentalcode.erich.arff;
+package de.lmu.ifi.dbs.elki.datasource.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,16 +18,15 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Parser to load WEKA .arff files into ELKI.
  * 
- * Sparse vectors are not yet supported.
- * 
  * This parser is quite hackish, and contains lots of not yet configurable magic.
+ * 
+ * TODO: Sparse vectors are not yet supported.
  * 
  * @author Erich Schubert
  */
