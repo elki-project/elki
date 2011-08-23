@@ -45,8 +45,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -59,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @author Erich Schubert
  */
-public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implements Result {
+public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
   /**
    * Logger
    */
@@ -104,11 +102,6 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implem
    */
   public static class Factory extends AbstractPrecomputedNeighborhood.Factory<Object> {
     /**
-     * Logger
-     */
-    private static final Logging logger = Logging.getLogger(ExternalNeighborhood.class);
-
-    /**
      * The input file.
      */
     private File file;
@@ -127,10 +120,6 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood implem
     public NeighborSetPredicate instantiate(Relation<?> database) {
       DataStore<DBIDs> store = loadNeighbors(database);
       ExternalNeighborhood neighborhood = new ExternalNeighborhood(store);
-      ResultHierarchy hier = database.getHierarchy();
-      if(hier != null) {
-        hier.add(database, neighborhood);
-      }
       return neighborhood;
     }
 

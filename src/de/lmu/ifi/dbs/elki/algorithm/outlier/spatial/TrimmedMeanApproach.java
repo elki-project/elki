@@ -188,7 +188,9 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     //
     Relation<Double> scoreResult = new MaterializedRelation<Double>("TrimmedMean", "Trimmed Mean Score", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
-    return new OutlierResult(scoreMeta, scoreResult);
+    OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
+    or.addChildResult(npred);
+    return or;
   }
 
   @Override

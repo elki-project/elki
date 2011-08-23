@@ -152,7 +152,9 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("Median multiple attributes outlier", "median-outlier", TypeUtil.DOUBLE, scores, attributes.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
-    return new OutlierResult(scoreMeta, scoreResult);
+    OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
+    or.addChildResult(npred);
+    return or;
   }
 
   @Override

@@ -140,8 +140,9 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
     // Build result representation.
     Relation<Double> scoreResult = new MaterializedRelation<Double>("Spatial Outlier Factor", "sof-outlier", TypeUtil.DOUBLE, lofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    return result;
+    OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
+    or.addChildResult(npred);
+    return or;
   }
 
   @Override
