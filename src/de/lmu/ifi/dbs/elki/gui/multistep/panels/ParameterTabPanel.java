@@ -27,8 +27,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.BitSet;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -39,13 +37,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.lmu.ifi.dbs.elki.gui.configurator.ConfiguratorPanel;
-import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observable;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observers;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -183,6 +179,9 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
     ListParameterization config = new ListParameterization();
     parameterTable.appendParameters(config);
     setParameters(config);
+    if(config.getErrors().size() > 0) {
+      reportErrors(config);
+    }
     config.clearErrors();
     parameterTable.setEnabled(true);
   }
@@ -192,14 +191,9 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
    * 
    * @param config Parameterization
    */
-  public void setParameters(ListParameterization config) {
+  public void setParameters(Parameterization config) {
     TrackParameters track = new TrackParameters(config);
     configureStep(track);
-    //config.logUnusedParameters();
-    if(config.getErrors().size() > 0) {
-      reportErrors(config);
-    }
-    List<Pair<OptionID, Object>> remainingParameters = config.getRemainingParameters();
 
     // update parameter table
     {
@@ -210,21 +204,6 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
         parameterTable.addParameter(pair.first, pair.getSecond(), track);
       }
       //parameters.updateFromTrackParameters(track);
-      // Add remaining parameters
-      if(remainingParameters != null && !remainingParameters.isEmpty()) {
-        DynamicParameters.RemainingOptions remo = new DynamicParameters.RemainingOptions();
-        try {
-          remo.setValue("FIXME"); //FormatUtil.format(remainingParameters, " "));
-        }
-        catch(ParameterException e) {
-          logger.exception(e);
-        }
-        BitSet bits = new BitSet();
-        bits.set(DynamicParameters.BIT_INVALID);
-        bits.set(DynamicParameters.BIT_SYNTAX_ERROR);
-        //parameters.addParameter(remo, remo.getValue(), bits, 0);
-        parameterTable.addParameter(null, remo, track);
-      }
 
       parameterTable.revalidate();
       parameterTable.setEnabled(true);
