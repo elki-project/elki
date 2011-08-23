@@ -98,6 +98,7 @@ public class SavedSettingsTabPanel extends JPanel {
           ArrayList<String> settings = store.get(key);
           SerializedParameterization config = new SerializedParameterization(settings);
           gui.setParameters(config);
+          config.logUnusedParameters();
           config.clearErrors();
         }
       });
@@ -109,7 +110,7 @@ public class SavedSettingsTabPanel extends JPanel {
         @Override
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
-          // store.put(key, parameters.serializeParameters());
+          store.put(key, gui.serializeParameters());
           try {
             store.save();
           }
