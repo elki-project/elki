@@ -27,6 +27,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -183,6 +184,21 @@ public class MultiStepGUI extends JPanel {
     //config.clearErrors();
   }
 
+  /**
+   * Get the serialized parameters
+   * 
+   * @return Serialized parameters
+   */
+  public ArrayList<String> serializeParameters() {
+    ListParameterization params = new ListParameterization();
+    logTab.appendParameters(params);
+    inputTab.appendParameters(params);
+    algTab.appendParameters(params);
+    evalTab.appendParameters(params);
+    outTab.appendParameters(params);
+    return params.serialize();
+  }
+  
   /**
    * Create the GUI and show it. For thread safety, this method should be
    * invoked from the event-dispatching thread.

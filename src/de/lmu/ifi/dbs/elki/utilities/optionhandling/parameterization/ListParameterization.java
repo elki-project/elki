@@ -22,6 +22,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -148,5 +149,19 @@ public class ListParameterization extends AbstractParameterization {
       buf.append(pair.getSecond().toString()).append(" ");
     }
     return buf.toString();
+  }
+
+  /**
+   * Serialize parameters.
+   * 
+   * @return Array list of parameters
+   */
+  public ArrayList<String> serialize() {
+    ArrayList<String> params = new ArrayList<String>();
+    for (Pair<OptionID, Object> pair : parameters) {
+      params.add("-" + pair.getFirst().toString());
+      params.add(pair.getSecond().toString());
+    }
+    return params;
   }
 }

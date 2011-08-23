@@ -213,6 +213,15 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
     updateStatus();
     observers.notifyObservers(this);
   }
+  
+  /**
+   * Collect parameters
+   * 
+   * @param params Parameter list to add to
+   */
+  public void appendParameters(ListParameterization params) {
+    parameterTable.appendParameters(params);
+  }
 
   /**
    * Report errors in a single error log record.
