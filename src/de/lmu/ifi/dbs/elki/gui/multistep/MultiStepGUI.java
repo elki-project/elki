@@ -25,9 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -36,15 +36,18 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
+import de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.AlgorithmTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.EvaluationTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.InputTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.LoggingTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.OutputTabPanel;
+import de.lmu.ifi.dbs.elki.gui.multistep.panels.SavedSettingsTabPanel;
 import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
@@ -85,6 +88,8 @@ public class MultiStepGUI extends JPanel {
   private OutputTabPanel outTab;
 
   private LoggingTabPanel logTab;
+
+  private SavedSettingsTabPanel setTab;
 
   /**
    * Constructor
@@ -130,30 +135,52 @@ public class MultiStepGUI extends JPanel {
   }
 
   private void addPanels(JTabbedPane panels) {
+    SavedSettingsFile settings = new SavedSettingsFile(MiniGUI.SAVED_SETTINGS_FILENAME);
+    try {
+      settings.load();
+    }
+    catch(FileNotFoundException e) {
+      logger.warning("Error loading saved settings.");
+    }
+    catch(IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
     inputTab = new InputTabPanel();
     algTab = new AlgorithmTabPanel(inputTab);
     evalTab = new EvaluationTabPanel(inputTab, algTab);
     outTab = new OutputTabPanel(inputTab, evalTab);
     logTab = new LoggingTabPanel();
+    setTab = new SavedSettingsTabPanel(settings, this);
     panels.addTab("Input", inputTab);
     panels.addTab("Algorithm", algTab);
     panels.addTab("Evaluation", evalTab);
     panels.addTab("Output", outTab);
     panels.addTab("Logging", logTab);
+    panels.addTab("Saved Settings", setTab);
 
-    ListParameterization config = new ListParameterization();
+    setParameters(new ListParameterization());
+  }
+
+  /**
+   * Set the parameters.
+   * 
+   * @param config Parameterization
+   */
+  public void setParameters(Parameterization config) {
     // Clear errors after each step, so they don't consider themselves failed
     // because of earlier errors.
     logTab.setParameters(config);
-    config.clearErrors();
+    //config.clearErrors();
     inputTab.setParameters(config);
-    config.clearErrors();
+    //config.clearErrors();
     algTab.setParameters(config);
-    config.clearErrors();
+    //config.clearErrors();
     evalTab.setParameters(config);
-    config.clearErrors();
+    //config.clearErrors();
     outTab.setParameters(config);
-    config.clearErrors();
+    //config.clearErrors();
   }
 
   /**
@@ -200,68 +227,5 @@ public class MultiStepGUI extends JPanel {
         createAndShowGUI();
       }
     });
-  }
-
-  /**
-   * Class to interface between the saved settings list and a JComboBox
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile
-   */
-  class SettingsComboboxModel extends AbstractListModel implements ComboBoxModel {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Settings storage
-     */
-    protected SavedSettingsFile store;
-
-    /**
-     * Selected entry
-     */
-    protected String selected = null;
-
-    /**
-     * Constructor
-     * 
-     * @param store Store to access
-     */
-    public SettingsComboboxModel(SavedSettingsFile store) {
-      super();
-      this.store = store;
-    }
-
-    @Override
-    public String getSelectedItem() {
-      return selected;
-    }
-
-    @Override
-    public void setSelectedItem(Object anItem) {
-      if(anItem instanceof String) {
-        selected = (String) anItem;
-      }
-    }
-
-    @Override
-    public Object getElementAt(int index) {
-      return store.getElementAt(index).first;
-    }
-
-    @Override
-    public int getSize() {
-      return store.size();
-    }
-
-    /**
-     * Force an update
-     */
-    public void update() {
-      fireContentsChanged(this, 0, getSize() + 1);
-    }
   }
 }
