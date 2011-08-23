@@ -34,8 +34,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -49,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  */
-public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood implements Result {
+public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
   /**
    * The logger to use.
    */
@@ -89,11 +87,6 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood implem
    */
   public static class Factory<O> extends AbstractPrecomputedNeighborhood.Factory<O> {
     /**
-     * Logger
-     */
-    private static final Logging logger = Logging.getLogger(ExtendedNeighborhood.class);
-
-    /**
      * Inner neighbor set predicate
      */
     private NeighborSetPredicate.Factory<O> inner;
@@ -119,10 +112,6 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood implem
     public NeighborSetPredicate instantiate(Relation<? extends O> database) {
       DataStore<DBIDs> store = extendNeighborhood(database);
       ExtendedNeighborhood neighborhood = new ExtendedNeighborhood(store);
-      ResultHierarchy hier = database.getHierarchy();
-      if(hier != null) {
-        hier.add(database, neighborhood);
-      }
       return neighborhood;
     }
 

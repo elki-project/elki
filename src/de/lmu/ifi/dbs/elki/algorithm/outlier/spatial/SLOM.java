@@ -187,7 +187,9 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("SLOM", "slom-outlier", TypeUtil.DOUBLE, sloms, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(slomminmax.getMin(), slomminmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    return new OutlierResult(scoreMeta, scoreResult);
+    OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
+    or.addChildResult(npred);
+    return or;
   }
 
   @Override

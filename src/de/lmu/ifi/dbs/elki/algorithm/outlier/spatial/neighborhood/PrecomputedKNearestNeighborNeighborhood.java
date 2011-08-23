@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -54,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <D> Distance to use
  */
-public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> extends AbstractPrecomputedNeighborhood implements Result {
+public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> extends AbstractPrecomputedNeighborhood {
   /**
    * Logger
    */
