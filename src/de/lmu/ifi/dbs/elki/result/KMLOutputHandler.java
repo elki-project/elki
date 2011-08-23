@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.result;
  */
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -105,17 +106,24 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
   private boolean compat;
 
   /**
+   * Automatically open at the end
+   */
+  private boolean autoopen;
+
+  /**
    * Constructor.
    * 
    * @param filename Output filename
    * @param scaling Scaling function
    * @param compat Compatibility mode
+   * @param autoopen Automatically open
    */
-  public KMLOutputHandler(File filename, OutlierScalingFunction scaling, boolean compat) {
+  public KMLOutputHandler(File filename, OutlierScalingFunction scaling, boolean compat, boolean autoopen) {
     super();
     this.filename = filename;
     this.scaling = scaling;
     this.compat = compat;
+    this.autoopen = autoopen;
   }
 
   @Override
@@ -134,6 +142,9 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         out.closeEntry();
         out.flush();
         out.close();
+        if(autoopen) {
+          Desktop.getDesktop().open(filename);
+        }
       }
       catch(XMLStreamException e) {
         logger.exception(e);
@@ -378,6 +389,15 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
     public static final OptionID COMPAT_ID = OptionID.getOrCreateOptionID("kml.compat", "Use simpler KML objects, compatibility mode.");
 
     /**
+     * Parameter for automatically opening the output file.
+     * 
+     * <p>
+     * Key: {@code -kml.autoopen}
+     * </p>
+     */
+    public static final OptionID AUTOOPEN_ID = OptionID.getOrCreateOptionID("kml.autoopen", "Automatically open the result file.");
+
+    /**
      * Output file name
      */
     File filename;
@@ -391,6 +411,11 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
      * Compatibility mode
      */
     boolean compat;
+
+    /**
+     * Automatically open at the end
+     */
+    boolean autoopen = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -410,11 +435,16 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
       if(config.grab(compatF)) {
         compat = compatF.getValue();
       }
+
+      Flag autoopenF = new Flag(AUTOOPEN_ID);
+      if(config.grab(autoopenF)) {
+        autoopen = autoopenF.getValue();
+      }
     }
 
     @Override
     protected KMLOutputHandler makeInstance() {
-      return new KMLOutputHandler(filename, scaling, compat);
+      return new KMLOutputHandler(filename, scaling, compat, autoopen);
     }
   }
 }
