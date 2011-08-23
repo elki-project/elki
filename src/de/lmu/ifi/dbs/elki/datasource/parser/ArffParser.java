@@ -195,7 +195,8 @@ public class ArffParser implements Parser {
           }
         }
         if(etyp[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
-          bundle.appendColumn(VectorFieldTypeInformation.get(DoubleVector.class, dims[out]), new ArrayList<DoubleVector>());
+          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dims[out], new DoubleVector(new double[dims[out]]));
+          bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else if(etyp[out] == TypeUtil.LABELLIST) {
           bundle.appendColumn(TypeUtil.LABELLIST, new ArrayList<LabelList>());
