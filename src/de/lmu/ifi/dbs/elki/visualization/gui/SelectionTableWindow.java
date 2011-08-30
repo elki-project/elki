@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -342,8 +341,9 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
   @Override
   public void contentChanged(DataStoreEvent e) {
-    Set<Type> eventTypes = e.getTypes();
-    if(eventTypes.size() == 1 && eventTypes.iterator().next().equals(Type.UPDATE)) {
+    // Use fully qualified names to avoid JDK7 bug.
+    Set<de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type> eventTypes = e.getTypes();
+    if(eventTypes.size() == 1 && eventTypes.iterator().next().equals(de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type.UPDATE)) {
       dotTableModel.fireTableDataChanged();
     }
     else {
