@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @param <O> object type
  * @param <X> actual tree type
  */
-public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, X extends AbstractRStarTree<?, ?> & Index> extends AbstractRStarTreeFactory<O, X> {
+public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, N extends XNode<E, N>, E extends SpatialEntry, X extends AbstractRStarTree<N, E> & Index> extends AbstractRStarTreeFactory<O, N, E, X> {
   protected double relativeMinEntries;
 
   protected double relativeMinFanout;
