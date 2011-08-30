@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Utility package containing various common types
@@ -98,22 +100,32 @@ public final class TypeUtil {
   /**
    * External ID type
    */
-  public static final SimpleTypeInformation<ExternalID> EXTERNALID = SimpleTypeInformation.get(ExternalID.class);
+  public static final SimpleTypeInformation<ExternalID> EXTERNALID = new SimpleTypeInformation<ExternalID>(ExternalID.class);
 
   /**
    * Type for polygons
    */
-  public static final SimpleTypeInformation<PolygonsObject> POLYGON_TYPE = SimpleTypeInformation.get(PolygonsObject.class);
+  public static final SimpleTypeInformation<PolygonsObject> POLYGON_TYPE = new SimpleTypeInformation<PolygonsObject>(PolygonsObject.class);
 
   /**
    * Double type, outlier scores etc.
    */
-  public static final SimpleTypeInformation<Double> DOUBLE = SimpleTypeInformation.get(Double.class);
+  public static final SimpleTypeInformation<Double> DOUBLE = new SimpleTypeInformation<Double>(Double.class);
 
   /**
    * Integer type.
    */
-  public static final SimpleTypeInformation<Integer> INTEGER = SimpleTypeInformation.get(Integer.class);
+  public static final SimpleTypeInformation<Integer> INTEGER = new SimpleTypeInformation<Integer>(Integer.class);
+
+  /**
+   * Vector type.
+   */
+  public static final SimpleTypeInformation<Vector> VECTOR = new SimpleTypeInformation<Vector>(Vector.class);
+
+  /**
+   * Matrix type.
+   */
+  public static final SimpleTypeInformation<Matrix> MATRIX = new SimpleTypeInformation<Matrix>(Matrix.class);
 
   /**
    * Make a type array easily.

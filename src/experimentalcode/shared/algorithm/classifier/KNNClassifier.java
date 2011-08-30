@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -127,9 +126,8 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
 
       KNNQuery<O, D> knnq = database.getKNNQuery(getDistanceQuery(), k);
       List<DistanceResultPair<D>> query = knnq.getKNNForObject(instance, k);
-      Relation<ClassLabel> crep = database.getRelation(SimpleTypeInformation.get(ClassLabel.class));
+      Relation<ClassLabel> crep = database.getRelation(TypeUtil.CLASSLABEL);
       for(DistanceResultPair<D> neighbor : query) {
-        // noinspection unchecked
         int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(crep.get(neighbor.getDBID()))));
         if(index >= 0) {
           occurences[index]++;

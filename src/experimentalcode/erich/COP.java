@@ -174,8 +174,8 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
     result.addChildResult(new MaterializedRelation<Integer>("Local Dimensionality", "cop-dim", TypeUtil.INTEGER, cop_dim, ids));
-    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", "cop-errorvec", SimpleTypeInformation.get(Vector.class), cop_err_v, ids));
-    result.addChildResult(new MaterializedRelation<Matrix>("Data vectors", "cop-datavec", SimpleTypeInformation.get(Matrix.class), cop_datav, ids));
+    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", "cop-errorvec", TypeUtil.VECTOR, cop_err_v, ids));
+    result.addChildResult(new MaterializedRelation<Matrix>("Data vectors", "cop-datavec", TypeUtil.MATRIX, cop_datav, ids));
     result.addChildResult(new MaterializedRelation<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
     return result;
   }

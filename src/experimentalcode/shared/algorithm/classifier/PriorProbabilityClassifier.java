@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -89,7 +88,7 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
     this.database = database;
     distribution = new double[getLabels().size()];
     int[] occurences = new int[getLabels().size()];
-    Relation<ClassLabel> crep = database.getRelation(SimpleTypeInformation.get(ClassLabel.class));
+    Relation<ClassLabel> crep = database.getRelation(TypeUtil.CLASSLABEL);
     for(Iterator<DBID> iter = crep.iterDBIDs(); iter.hasNext();) {
       ClassLabel label = crep.get(iter.next());
       int index = Collections.binarySearch(getLabels(), label);

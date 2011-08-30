@@ -36,7 +36,7 @@ public class ClusterSimilarityFunction<C extends Cluster<?>> extends AbstractPri
 
   @Override
   public SimpleTypeInformation<? super Cluster<?>> getInputTypeRestriction() {
-    return SimpleTypeInformation.get(Cluster.class);
+    return new SimpleTypeInformation<Cluster<?>>(Cluster.class);
   }
 
   @Override
