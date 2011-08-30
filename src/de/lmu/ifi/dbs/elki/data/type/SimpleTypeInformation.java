@@ -79,18 +79,6 @@ public class SimpleTypeInformation<T> implements TypeInformation {
     return (T) cls.cast(other);
   }
 
-  /**
-   * Pseudo constructor that is often convenient to use when T is not completely
-   * known.
-   * 
-   * @param <T> Type
-   * @param cls Class restriction
-   * @return Type
-   */
-  public static <T> SimpleTypeInformation<T> get(Class<T> cls) {
-    return new SimpleTypeInformation<T>(cls);
-  }
-
   @Override
   public String toString() {
     return getRestrictionClass().getSimpleName();
