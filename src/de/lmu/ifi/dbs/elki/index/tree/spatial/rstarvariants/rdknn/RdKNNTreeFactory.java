@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory<O, RdKNNTree<O, D>> {
+public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory<O, RdKNNNode<D>, RdKNNEntry<D>, RdKNNTree<O, D>> {
   /**
    * Parameter for k
    */

@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.LeastOverlapInsertionStrategy;
@@ -44,9 +45,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.uses AbstractRStarTree oneway - - «create»
  * 
  * @param <O> Object type
+ * @param <N> Node type
+ * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I extends AbstractRStarTree<?, ?> & Index> extends TreeIndexFactory<O, I> {
+public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E> & Index> extends TreeIndexFactory<O, I> {
   /**
    * Fast-insertion parameter. Optional.
    */
@@ -122,6 +125,6 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, I e
     }
 
     @Override
-    protected abstract AbstractRStarTreeFactory<O, ?> makeInstance();
+    protected abstract AbstractRStarTreeFactory<O, ?, ?, ?> makeInstance();
   }
 }

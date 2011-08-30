@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -42,9 +43,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  * @param <D> Distance type
+ * @param <N> Node type
+ * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMTreeFactory<O, D extends Distance<D>, I extends AbstractMTree<O, D, ?, ?> & Index> extends TreeIndexFactory<O, I> {
+public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMTree<O, D, N, E> & Index> extends TreeIndexFactory<O, I> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -92,6 +95,7 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, I extends A
    */
   public static abstract class Parameterizer<O, D extends Distance<D>> extends TreeIndexFactory.Parameterizer<O> {
     protected DistanceFunction<O, D> distanceFunction = null;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -102,6 +106,6 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, I extends A
     }
 
     @Override
-    protected abstract AbstractMTreeFactory<O, D, ?> makeInstance();
+    protected abstract AbstractMTreeFactory<O, D, ?, ?, ?> makeInstance();
   }
 }

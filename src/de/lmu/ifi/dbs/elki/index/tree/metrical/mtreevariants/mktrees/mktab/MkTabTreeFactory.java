@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTreeIndex<O, D>> {
+public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, MkTabTreeIndex<O, D>> {
   /**
    * Constructor.
    * 

@@ -26,6 +26,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -40,9 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @param <O> Object type
  * @param <D> Distance type
+ * @param <N> Node type
+ * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, I extends AbstractMkTree<O, D, ?, ?> & Index> extends AbstractMTreeFactory<O, D, I> {
+public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMkTree<O, D, N, E> & Index> extends AbstractMTreeFactory<O, D, N, E, I> {
   /**
    * Parameter specifying the maximal number k of reverse k nearest neighbors to
    * be supported, must be an integer greater than 0.
@@ -92,6 +96,6 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, I e
     }
 
     @Override
-    protected abstract AbstractMkTreeUnifiedFactory<O, D, ?> makeInstance();
+    protected abstract AbstractMkTreeUnifiedFactory<O, D, ?, ?, ?> makeInstance();
   }
 }
