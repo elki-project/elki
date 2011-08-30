@@ -184,7 +184,7 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
           SVGUtil.addCSSClass(ellipse, EMBORDER + cnum);
           if(opacStyle == 1) {
             CSSClass cls = new CSSClass(null, "temp");
-            double s = (i > 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
+            double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
             cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
             SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
           }
@@ -206,7 +206,7 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
       SVGUtil.addCSSClass(ellipse, EMBORDER + cnum);
       if(opacStyle == 1) {
         CSSClass cls = new CSSClass(null, "temp");
-        double s = (i > 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
+        double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
         cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
         SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
       }
@@ -309,7 +309,7 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
       SVGUtil.addCSSClass(ellipse, EMBORDER + cnum);
       if(opacStyle == 1) {
         CSSClass cls = new CSSClass(null, "temp");
-        double s = (i > 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
+        double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
         cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
         SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
       }
