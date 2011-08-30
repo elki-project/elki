@@ -28,7 +28,6 @@ import java.io.PrintStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import sun.misc.BASE64Encoder;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
@@ -70,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MinusLogStandardDeviationScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.StandardDeviationScaling;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
+import experimentalcode.shared.Base64;
 
 /**
  * Application that runs a series of algorithms on a data set.
@@ -182,7 +182,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
         md.update(" ".getBytes());
         md.update(id.toString().getBytes());
       }
-      fout.append((new BASE64Encoder()).encode(md.digest()));
+      fout.append(Base64.encodeBase64(md.digest()));
       fout.append(FormatUtil.NEWLINE);
     }
 
