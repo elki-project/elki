@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory<O, D, MTreeIndex<O, D>> {
+public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory<O, D, MTreeNode<O, D>, MTreeEntry<D>, MTreeIndex<O, D>> {
   /**
    * Constructor.
    * 
