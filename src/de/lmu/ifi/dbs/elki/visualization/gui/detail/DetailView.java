@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.AttributeModifier;
@@ -99,7 +99,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     this.visi = vis;
     this.ratio = ratio;
 
-    Collections.sort(this.visi);
+    this.visi.sort();
 
     // TODO: only do this when there is an interactive visualizer?
     setDisableInteractions(true);
@@ -131,22 +131,15 @@ public class DetailView extends SVGPlot implements ResultListener {
     getDocument().getRootElement().appendChild(bg);
   }
 
-  // TODO: protected?
   protected void redraw() {
-    // TODO: Clear root children
-    // Warning: do not remove style and similar elements!
-    // while (getRoot().hasChildNodes()) {
-    // getRoot().removeChild(getRoot().getFirstChild());
-    // }
     destroyVisualizations();
 
-    // Collections.sort(layers, new VisualizationInfoComparator());
     width = getRatio();
     height = 1.0;
 
-    ArrayList<Visualization> layers = new ArrayList<Visualization>(visi.size());
+    ArrayList<Visualization> layers = new ArrayList<Visualization>();
     // TODO: center/arrange visualizations?
-    for(VisualizationTask task : visi) {
+    for(VisualizationTask task : IterableUtil.fromIterator(visi.visIterator())) {
       if(VisualizerUtil.isVisible(task)) {
         try {
           Visualization v = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
@@ -261,9 +254,6 @@ public class DetailView extends SVGPlot implements ResultListener {
   public void resultChanged(Result current) {
     // Make sure we are affected:
     if(!(current instanceof VisualizationTask)) {
-      return;
-    }
-    if(!visi.contains(current)) {
       return;
     }
     // Get the layer

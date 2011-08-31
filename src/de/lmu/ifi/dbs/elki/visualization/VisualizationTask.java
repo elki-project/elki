@@ -166,12 +166,12 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   /**
    * Width
    */
-  double width;
+  public double width;
 
   /**
    * Height
    */
-  double height;
+  public double height;
 
   /**
    * Visualization task.

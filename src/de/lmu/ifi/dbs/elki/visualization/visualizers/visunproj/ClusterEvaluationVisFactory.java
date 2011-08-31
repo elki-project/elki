@@ -68,6 +68,8 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
+      task.width = 1.0;
+      task.height = 0.5;
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(sr, task);
     }
@@ -117,5 +119,11 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     return new StaticVisualization(task, layer);
+  }
+
+  @Override
+  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
   }
 }

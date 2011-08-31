@@ -113,7 +113,7 @@ public class ResultVisualizer implements ResultHandler {
       @Override
       public void run() {
         try {
-          ResultWindow window = new ResultWindow(title, db, top, context);
+          ResultWindow window = new ResultWindow(title, top, context);
           window.setVisible(true);
           window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
           window.showOverview();

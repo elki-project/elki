@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 
 /**
  * A projector is responsible for adding projections to the visualization.
@@ -33,16 +34,9 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  */
 public interface Projector extends HierarchicalResult {
   /**
-   * Get the desired size of the projection area.
-   * 
-   * @return Array containing suggested x, y, w, h
-   */
-  public double[] getShape();
-  
-  /**
    * Produce an arrangement of projections.
    * 
    * @return Arrangement.
    */
-  public Collection<LayoutObject> arrange();
+  public Collection<PlotItem> arrange();
 }

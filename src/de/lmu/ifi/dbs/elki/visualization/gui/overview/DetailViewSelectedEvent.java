@@ -44,14 +44,9 @@ public class DetailViewSelectedEvent extends ActionEvent {
   OverviewPlot overview;
 
   /**
-   * X Coordinate
+   * Plot item selected
    */
-  double x;
-
-  /**
-   * X Coordinate
-   */
-  double y;
+  PlotItem it;
 
   /**
    * Constructor. To be called by OverviewPlot only!
@@ -60,14 +55,12 @@ public class DetailViewSelectedEvent extends ActionEvent {
    * @param id ID
    * @param command command that was invoked
    * @param modifiers modifiers
-   * @param x x click
-   * @param y y click
+   * @param it Plot item selected
    */
-  public DetailViewSelectedEvent(OverviewPlot source, int id, String command, int modifiers, double x, double y) {
+  public DetailViewSelectedEvent(OverviewPlot source, int id, String command, int modifiers, PlotItem it) {
     super(source, id, command, modifiers);
     this.overview = source;
-    this.x = x;
-    this.y = y;
+    this.it = it;
   }
 
   /**
@@ -76,6 +69,6 @@ public class DetailViewSelectedEvent extends ActionEvent {
    * @return materialized detail plot
    */
   public DetailView makeDetailView() {
-    return overview.makeDetailView(x, y);
+    return overview.makeDetailView(it);
   }
 }

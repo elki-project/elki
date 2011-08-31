@@ -28,8 +28,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 
 /**
@@ -69,14 +72,14 @@ public class OPTICSProjector<D extends Distance<D>> extends AbstractHierarchical
   }
 
   @Override
-  public double[] getShape() {
-    return new double[] { -4., -1., 4., 1. };
-  }
-
-  @Override
-  public Collection<LayoutObject> arrange() {
-    List<LayoutObject> col = new ArrayList<LayoutObject>(1);
-    col.add(new LayoutObject(0., 0., 4., 1., null));
+  public Collection<PlotItem> arrange() {
+    List<PlotItem> col = new ArrayList<PlotItem>(1);
+    List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
+    if (tasks.size() > 0) {
+      final PlotItem it = new PlotItem(4., 1., null);
+      it.visualizations = tasks;
+      col.add(it);
+    }
     return col;
   }
 

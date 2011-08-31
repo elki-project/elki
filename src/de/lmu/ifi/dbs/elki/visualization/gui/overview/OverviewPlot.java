@@ -28,6 +28,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -37,18 +39,17 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.gui.RectangleArranger;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
-import de.lmu.ifi.dbs.elki.visualization.projector.LayoutObject;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -82,12 +83,12 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Result we work on. Currently unused, but kept for future requirements.
    */
-  private Result result;
+  private HierarchicalResult result;
 
   /**
    * Map of coordinates to plots.
    */
-  protected PlotMap plotmap;
+  protected RectangleArranger<PlotItem> plotmap;
 
   /**
    * Action listeners for this plot.
@@ -100,7 +101,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * @param result Result to visualize
    * @param context Visualizer context
    */
-  public OverviewPlot(Result result, VisualizerContext context) {
+  public OverviewPlot(HierarchicalResult result, VisualizerContext context) {
     super();
     this.result = result;
     this.context = context;
@@ -162,26 +163,35 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * Recompute the layout of visualizations.
    */
   private void arrangeVisualizations() {
-    plotmap = new PlotMap();
+    plotmap = new RectangleArranger<PlotItem>(ratio);
 
-    RectangleArranger<Projector> rect = new RectangleArranger<Projector>(ratio);
-    
     ArrayList<Projector> projectors = ResultUtil.filterResults(result, Projector.class);
+    // Rectangle layout
     for(Projector p : projectors) {
-      double[] shape = p.getShape();
-      rect.put(shape[2], shape[3], p);
+      Collection<PlotItem> projs = p.arrange();
+      for(PlotItem it : projs) {
+        plotmap.put(it.w, it.h, it);
+      }
     }
-      
-    for(Projector p : projectors) {
-      double[] pos = rect.get(p);
-      Collection<LayoutObject> projs = p.arrange();
-      for(LayoutObject l : projs) {
-        final double x = l.reqx + pos[0];
-        final double y = l.reqy + pos[1];
-        final IterableIterator<VisualizationTask> vis = ResultUtil.filteredResults(p, VisualizationTask.class);
-        for(VisualizationTask task : vis) {
-          // VisualizationTask v = task.clone(this, context, l.proj, l.reqw, l.reqh);
-          plotmap.addVis(x, y, l.reqw, l.reqh, l.proj, task);
+
+    ResultHierarchy hier = result.getHierarchy();
+    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(result, VisualizationTask.class);
+    for(VisualizationTask task : tasks) {
+      boolean isprojected = false;
+      for(Result parent : hier.getParents(task)) {
+        if(parent instanceof Projector) {
+          isprojected = true;
+          break;
+        }
+      }
+      if(!isprojected) {
+        if(task.getWidth() <= 0.0 || task.getHeight() <= 0.0) {
+          logger.warning("Task with improper size information: " + task);
+        }
+        else {
+          PlotItem it = new PlotItem(task.getWidth(), task.getHeight(), null);
+          it.visualizations.add(task);
+          plotmap.put(it.w, it.h, it);
         }
       }
     }
@@ -216,32 +226,37 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
 
     // TODO: kill all children in document root except style, defs etc?
-    for(PlotItem it : plotmap.values()) {
-      boolean hasDetails = false;
-      Element g = this.svgElement(SVGConstants.SVG_G_TAG);
-      SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + it.x + " " + it.y + ")");
-      for(VisualizationTask task : it) {
-        Element parent = this.svgElement(SVGConstants.SVG_G_TAG);
-        g.appendChild(parent);
-        makeThumbnail(thumbsize, it, task, parent);
-        vistoelem.put(new Pair<PlotItem, VisualizationTask>(it, task), parent);
+    for(Entry<PlotItem, double[]> e : plotmap.entrySet()) {
+      final double basex = e.getValue()[0];
+      final double basey = e.getValue()[1];
+      for(Iterator<PlotItem> iter = e.getKey().itemIterator(); iter.hasNext();) {
+        PlotItem it = iter.next();
+        boolean hasDetails = false;
+        Element g = this.svgElement(SVGConstants.SVG_G_TAG);
+        SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + (basex + it.x) + " " + (basey + it.y) + ")");
+        for(VisualizationTask task : it.visualizations) {
+          Element parent = this.svgElement(SVGConstants.SVG_G_TAG);
+          g.appendChild(parent);
+          makeThumbnail(thumbsize, it, task, parent);
+          vistoelem.put(new Pair<PlotItem, VisualizationTask>(it, task), parent);
 
-        if(VisualizerUtil.detailsEnabled(task)) {
-          hasDetails = true;
+          if(VisualizerUtil.detailsEnabled(task)) {
+            hasDetails = true;
+          }
         }
-      }
-      plotlayer.appendChild(g);
-      if(hasDetails) {
-        Element hover = this.svgRect(it.x, it.y, it.w, it.h);
-        SVGUtil.addCSSClass(hover, selcss.getName());
-        // link hoverer.
-        EventTarget targ = (EventTarget) hover;
-        targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
-        targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
-        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
-        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(it.x, it.y), false);
+        plotlayer.appendChild(g);
+        if(hasDetails) {
+          Element hover = this.svgRect(basex + it.x, basey + it.y, it.w, it.h);
+          SVGUtil.addCSSClass(hover, selcss.getName());
+          // link hoverer.
+          EventTarget targ = (EventTarget) hover;
+          targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
+          targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
+          targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
+          targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(it), false);
 
-        hoverlayer.appendChild(hover);
+          hoverlayer.appendChild(hover);
+        }
       }
     }
     getRoot().appendChild(plotlayer);
@@ -284,8 +299,10 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     else {
       boolean refreshcss = false;
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
-      for(PlotItem it : plotmap.values()) {
-        for(VisualizationTask task : it) {
+      for(Entry<PlotItem, double[]> ent : plotmap.entrySet()) {
+        PlotItem it = ent.getKey();
+        for(Iterator<VisualizationTask> iter = it.visIterator(); iter.hasNext(); ) {
+          VisualizationTask task = iter.next();
           Element parent = vistoelem.get(new Pair<PlotItem, VisualizationTask>(it, task));
           if(parent == null) {
             LoggingUtil.warning("No container element produced by " + task);
@@ -311,7 +328,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
           }
         }
       }
-      if (refreshcss) {
+      if(refreshcss) {
         updateStyleElement();
       }
     }
@@ -322,7 +339,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    */
   private void recalcViewbox() {
     // Recalculate bounding box.
-    String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotmap.getWidth() + " " + plotmap.getHeight();
+    String vb = "0 0 " + plotmap.getWidth() + " " + plotmap.getHeight();
     // Reset root bounding box.
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / plotmap.getWidth() * plotmap.getHeight()) + "cm");
@@ -350,13 +367,11 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Event triggered when a plot was selected.
    * 
-   * @param x X coordinate
-   * @param y Y coordinate
+   * @param it Plot item selected
    * @return sub plot
    */
-  public DetailView makeDetailView(double x, double y) {
-    PlotItem layers = plotmap.get(x, y);
-    return new DetailView(context, layers, ratio);
+  public DetailView makeDetailView(PlotItem it) {
+    return new DetailView(context, it, ratio);
   }
 
   /**
@@ -371,13 +386,12 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * When a subplot was selected, forward the event to listeners.
    * 
-   * @param x X coordinate
-   * @param y Y coordinate
+   * @param it PlotItem selected
    */
-  protected void triggerSubplotSelectEvent(double x, double y) {
+  protected void triggerSubplotSelectEvent(PlotItem it) {
     // forward event to all listeners.
     for(ActionListener actionListener : actionListeners) {
-      actionListener.actionPerformed(new DetailViewSelectedEvent(this, ActionEvent.ACTION_PERFORMED, null, 0, x, y));
+      actionListener.actionPerformed(new DetailViewSelectedEvent(this, ActionEvent.ACTION_PERFORMED, null, 0, it));
     }
   }
 
@@ -390,30 +404,23 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    */
   public class SelectPlotEvent implements EventListener {
     /**
-     * X coordinate of box.
+     * Plot item clicked
      */
-    double x;
-
-    /**
-     * Y coordinate of box.
-     */
-    double y;
+    PlotItem it;
 
     /**
      * Constructor.
      * 
-     * @param x coordinate
-     * @param y coordinate
+     * @param it Item that was clicked
      */
-    public SelectPlotEvent(double x, double y) {
+    public SelectPlotEvent(PlotItem it) {
       super();
-      this.x = x;
-      this.y = y;
+      this.it = it;
     }
 
     @Override
     public void handleEvent(@SuppressWarnings("unused") Event evt) {
-      triggerSubplotSelectEvent(x, y);
+      triggerSubplotSelectEvent(it);
     }
   }
 
@@ -456,11 +463,11 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     pendingRefresh = pr;
     scheduleUpdate(pr);
   }
-  
+
   @SuppressWarnings("unused")
   @Override
   public void resultAdded(Result child, Result parent) {
-    logger.debug("result added: "+child);
+    logger.debug("result added: " + child);
     if(child instanceof VisualizationTask) {
       reinitOnRefresh = true;
     }
@@ -469,14 +476,14 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
 
   @Override
   public void resultChanged(Result current) {
-    logger.debug("result changed: "+current);
+    logger.debug("result changed: " + current);
     lazyRefresh();
   }
 
   @SuppressWarnings("unused")
   @Override
   public void resultRemoved(Result child, Result parent) {
-    logger.debug("result removed: "+child);
+    logger.debug("result removed: " + child);
     lazyRefresh();
   }
 }

@@ -140,6 +140,8 @@ public class SettingsVisFactory extends AbstractVisFactory {
     final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(newResult, SettingsResult.class);
     for(SettingsResult sr : settingsResults) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
+      task.width = 1.0;
+      task.height = 1.0;
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(sr, task);
     }

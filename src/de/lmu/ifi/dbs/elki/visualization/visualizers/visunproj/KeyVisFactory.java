@@ -106,6 +106,8 @@ public class KeyVisFactory extends AbstractVisFactory {
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
         final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
+        task.width = 1.0;
+        task.height = 1.0;
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         baseResult.getHierarchy().add(c, task);
       }

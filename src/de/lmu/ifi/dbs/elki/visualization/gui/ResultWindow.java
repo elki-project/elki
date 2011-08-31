@@ -40,8 +40,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -131,17 +131,16 @@ public class ResultWindow extends JFrame implements ResultListener {
   /**
    * Result to visualize
    */
-  private Result result;
+  private HierarchicalResult result;
 
   /**
    * Constructor.
    * 
    * @param title Window title
-   * @param db Database
    * @param result Result to visualize
    * @param context Visualizer context
    */
-  public ResultWindow(String title, Database db, Result result, VisualizerContext context) {
+  public ResultWindow(String title, HierarchicalResult result, VisualizerContext context) {
     super(title);
     this.context = context;
     this.result = result;
