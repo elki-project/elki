@@ -32,13 +32,10 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerParameterizer;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
 
 /**
  * Handler to process and visualize a Result.
@@ -69,15 +66,6 @@ public class ResultVisualizer implements ResultHandler {
   public static final OptionID WINDOW_TITLE_ID = OptionID.getOrCreateOptionID("vis.window.title", "Title to use for visualization window.");
 
   /**
-   * Parameter for the maximum number of dimensions,
-   * 
-   * <p>
-   * Code: -vis.maxdim
-   * </p>
-   */
-  public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("vis.maxdim", "Maximum number of dimensions to display.");
-
-  /**
    * Stores the set title.
    */
   String title;
@@ -88,11 +76,6 @@ public class ResultVisualizer implements ResultHandler {
   protected final static String DEFAULT_TITLE = "ELKI Result Visualization";
 
   /**
-   * Stores the maximum number of dimensions to show.
-   */
-  int maxdim = OverviewPlot.MAX_DIMENSIONS_DEFAULT;
-
-  /**
    * Visualization manager.
    */
   VisualizerParameterizer manager;
@@ -101,13 +84,11 @@ public class ResultVisualizer implements ResultHandler {
    * Constructor.
    * 
    * @param title
-   * @param maxdim
    * @param manager
    */
-  public ResultVisualizer(String title, int maxdim, VisualizerParameterizer manager) {
+  public ResultVisualizer(String title, VisualizerParameterizer manager) {
     super();
     this.title = title;
-    this.maxdim = maxdim;
     this.manager = manager;
   }
 
@@ -132,10 +113,9 @@ public class ResultVisualizer implements ResultHandler {
       @Override
       public void run() {
         try {
-          ResultWindow window = new ResultWindow(title, db, top, maxdim, context);
+          ResultWindow window = new ResultWindow(title, db, top, context);
           window.setVisible(true);
           window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-          window.update();
           window.showOverview();
         }
         catch(Throwable e) {
@@ -159,11 +139,6 @@ public class ResultVisualizer implements ResultHandler {
     String title;
 
     /**
-     * Stores the maximum number of dimensions to show.
-     */
-    int maxdim = OverviewPlot.MAX_DIMENSIONS_DEFAULT;
-
-    /**
      * Visualization manager.
      */
     VisualizerParameterizer manager;
@@ -176,16 +151,12 @@ public class ResultVisualizer implements ResultHandler {
         title = titleP.getValue();
       }
 
-      IntParameter maxdimP = new IntParameter(MAXDIM_ID, new GreaterEqualConstraint(1), OverviewPlot.MAX_DIMENSIONS_DEFAULT);
-      if(config.grab(maxdimP)) {
-        maxdim = maxdimP.getValue();
-      }
       manager = config.tryInstantiate(VisualizerParameterizer.class);
     }
 
     @Override
     protected ResultVisualizer makeInstance() {
-      return new ResultVisualizer(title, maxdim, manager);
+      return new ResultVisualizer(title, manager);
     }
   }
 }

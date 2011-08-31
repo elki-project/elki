@@ -1,4 +1,6 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers;
+/**
+ * <p>Projectors are responsible for finding appropriate projections for data relations.</p>
+ */
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -21,35 +23,4 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-import org.w3c.dom.Element;
-
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
-
-/**
- * Static visualization
- * 
- * @author Erich Schubert
- */
-public class StaticVisualization extends AbstractVisualization {
-  /**
-   * Unchanging precomputed visualization.
-   * 
-   * @param task Task to visualize
-   * @param element Element containing the resulting visualization
-   */
-  public StaticVisualization(VisualizationTask task, Element element) {
-    super(task);
-    this.layer = element;
-  }
-
-  @Override
-  protected void incrementalRedraw() {
-    // Do nothing - we keep our static layer
-  }
-
-  @Override
-  protected void redraw() {
-    // Do nothing - we keep our static layer
-  }
-}
+package de.lmu.ifi.dbs.elki.visualization.projector;

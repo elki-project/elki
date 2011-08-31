@@ -1,26 +1,27 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers;
+package de.lmu.ifi.dbs.elki.visualization;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,8 +50,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 
 /**
  * Utility class to determine the visualizers for a result class.
@@ -111,15 +114,22 @@ public class VisualizerParameterizer implements Parameterizable {
   private Pattern hideVisualizers = null;
 
   /**
+   * Projectors to use.
+   */
+  private Collection<ProjectorFactory> projectors;
+
+  /**
    * Constructor.
-   *
+   * 
    * @param stylelib Style library
+   * @param projectors Projectors
    * @param factories Factories to use
    * @param hideVisualizers Visualizer hiding pattern
    */
-  public VisualizerParameterizer(StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerParameterizer(StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories, Pattern hideVisualizers) {
     super();
     this.stylelib = stylelib;
+    this.projectors = projectors;
     this.factories = factories;
     this.hideVisualizers = hideVisualizers;
   }
@@ -131,7 +141,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * @return New context
    */
   public VisualizerContext newContext(HierarchicalResult result) {
-    VisualizerContext context = new VisualizerContext(result, stylelib, factories, hideVisualizers);
+    VisualizerContext context = new VisualizerContext(result, stylelib, projectors, factories, hideVisualizers);
     return context;
   }
 
@@ -210,6 +220,8 @@ public class VisualizerParameterizer implements Parameterizable {
 
     protected Collection<VisFactory> factories = null;
 
+    protected Collection<ProjectorFactory> projectors = null;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -230,32 +242,55 @@ public class VisualizerParameterizer implements Parameterizable {
         }
       }
       MergedParameterization merged = new MergedParameterization(config);
-      factories = collectAlgorithmAdapters(merged);
+      projectors = collectProjectorFactorys(merged);
+      factories = collectVisFactorys(merged);
     }
 
     /**
-     * Collect and instantiate all adapters.
+     * Collect and instantiate all projector factories.
      * 
      * @param config Parameterization
      * @return List of all adapters found.
      */
-    private static <O> Collection<VisFactory> collectAlgorithmAdapters(Parameterization config) {
-      ArrayList<VisFactory> algorithmAdapters = new ArrayList<VisFactory>();
-      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
+    private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config) {
+      ArrayList<ProjectorFactory> factories = new ArrayList<ProjectorFactory>();
+      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(ProjectorFactory.class)) {
         try {
-          VisFactory a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
-          algorithmAdapters.add(a);
+          config.rewind();
+          ProjectorFactory a = ClassGenericsUtil.tryInstantiate(ProjectorFactory.class, c, config);
+          factories.add(a);
         }
         catch(Throwable e) {
           logger.exception("Error instantiating visualization factory " + c.getName(), e);
         }
       }
-      return algorithmAdapters;
+      return factories;
+    }
+
+    /**
+     * Collect and instantiate all visualizer factories.
+     * 
+     * @param config Parameterization
+     * @return List of all adapters found.
+     */
+    private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config) {
+      ArrayList<VisFactory> factories = new ArrayList<VisFactory>();
+      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
+        try {
+          config.rewind();
+          VisFactory a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
+          factories.add(a);
+        }
+        catch(Throwable e) {
+          logger.exception("Error instantiating visualization factory " + c.getName(), e);
+        }
+      }
+      return factories;
     }
 
     @Override
     protected VisualizerParameterizer makeInstance() {
-      return new VisualizerParameterizer(stylelib, factories, hideVisualizers);
+      return new VisualizerParameterizer(stylelib, projectors, factories, hideVisualizers);
     }
   }
 }

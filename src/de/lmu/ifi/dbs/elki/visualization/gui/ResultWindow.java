@@ -46,6 +46,8 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -53,8 +55,6 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
@@ -128,6 +128,9 @@ public class ResultWindow extends JFrame implements ResultListener {
    */
   private DetailView currentSubplot = null;
 
+  /**
+   * Result to visualize
+   */
   private Result result;
 
   /**
@@ -136,10 +139,9 @@ public class ResultWindow extends JFrame implements ResultListener {
    * @param title Window title
    * @param db Database
    * @param result Result to visualize
-   * @param maxdim Maximal dimensionality to show.
    * @param context Visualizer context
    */
-  public ResultWindow(String title, Database db, Result result, int maxdim, VisualizerContext context) {
+  public ResultWindow(String title, Database db, Result result, VisualizerContext context) {
     super(title);
     this.context = context;
     this.result = result;
@@ -194,7 +196,8 @@ public class ResultWindow extends JFrame implements ResultListener {
     filemenu.setMnemonic(KeyEvent.VK_F);
     filemenu.add(overviewItem);
     filemenu.add(exportItem);
-    filemenu.add(editItem);
+    // FIXME: re-add when it is working again.
+    // filemenu.add(editItem);
     filemenu.add(quitItem);
     menubar.add(filemenu);
 
@@ -209,7 +212,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot(db, result, maxdim, context);
+    this.overview = new OverviewPlot(result, context);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override
@@ -339,7 +342,7 @@ public class ResultWindow extends JFrame implements ResultListener {
       // currentSubplot.redraw();
       showPlot(currentSubplot);
     }
-    overview.refresh();
+    overview.lazyRefresh();
   }
 
   /**

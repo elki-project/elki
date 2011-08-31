@@ -25,16 +25,15 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.goldhofa.CCConstants;
 import experimentalcode.students.goldhofa.ClusteringComparison;
@@ -313,7 +312,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
     if (ccr.size() != 1) return;
     
-    final VisualizationTask task = new VisualizationTask(NAME, ccr.get(0), null, this, null);
+    final VisualizationTask task = new VisualizationTask(NAME, ccr.get(0), null, this);
     task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
     baseResult.getHierarchy().add(ccr.get(0), task);
   }
@@ -590,11 +589,6 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     
     return path;
   }*/
-  
-  @Override
-  public Class<? extends Projection> getProjectionType() {
-    return null;
-  }
   
   protected Element getClusteringInfo() {
     

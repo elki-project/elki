@@ -33,14 +33,13 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
@@ -68,7 +67,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluatePairCountingFMeasure.ScoreResult.class);
     for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
-      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(sr, task);
     }
@@ -118,10 +117,5 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     return new StaticVisualization(task, layer);
-  }
-  
-  @Override
-  public Class<? extends Projection> getProjectionType() {
-    return null;
   }
 }

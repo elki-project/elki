@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers;
+package de.lmu.ifi.dbs.elki.visualization;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 
 /**
  * Container class, with ugly casts to reduce generics crazyness.
@@ -173,26 +174,19 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   double height;
 
   /**
-   * Stack to plot to (e.g. 1D, 2D, OPTICS, ...)
-   */
-  Object stack;
-
-  /**
    * Visualization task.
    * 
    * @param name Name
    * @param result Result
    * @param relation Relation to use
    * @param factory Factory
-   * @param stack Stack
    */
-  public VisualizationTask(String name, Result result, Relation<?> relation, VisFactory factory, Object stack) {
+  public VisualizationTask(String name, Result result, Relation<?> relation, VisFactory factory) {
     super();
     this.name = name;
     this.result = result;
     this.relation = relation;
     this.factory = factory;
-    this.stack = stack;
   }
 
   /**
@@ -203,19 +197,17 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * @param result Result
    * @param relation Representation
    * @param factory Factory
-   * @param stack Stack
    * @param proj Projection
    * @param svgp Plot
    * @param width Width
    * @param height Height
    */
-  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory, Object stack, Projection proj, SVGPlot svgp, double width, double height) {
+  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory, Projection proj, SVGPlot svgp, double width, double height) {
     super();
     this.name = name;
     this.context = context;
     this.result = result;
     this.factory = factory;
-    this.stack = stack;
     this.proj = proj;
     this.relation = relation;
     this.svgp = svgp;
@@ -276,7 +268,6 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     obj.result = result;
     obj.proj = proj;
     obj.factory = factory;
-    obj.stack = stack;
     obj.svgp = svgp;
     obj.width = width;
     obj.height = height;
@@ -367,14 +358,5 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   public boolean equals(Object o) {
     // Also don't inherit equals based on list contents!
     return (this == o);
-  }
-
-  /**
-   * Get the stacking object for visualizers.
-   * 
-   * @return Type object, supports identity
-   */
-  public Object getVisualizationStack() {
-    return stack;
   }
 }

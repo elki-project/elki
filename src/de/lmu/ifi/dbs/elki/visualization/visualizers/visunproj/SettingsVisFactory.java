@@ -35,15 +35,14 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Pseudo-Visualizer, that lists the settings of the algorithm-
@@ -140,7 +139,7 @@ public class SettingsVisFactory extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(newResult, SettingsResult.class);
     for(SettingsResult sr : settingsResults) {
-      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(sr, task);
     }
@@ -149,10 +148,5 @@ public class SettingsVisFactory extends AbstractVisFactory {
   @Override
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     return false;
-  }
-
-  @Override
-  public Class<? extends Projection> getProjectionType() {
-    return null;
   }
 }

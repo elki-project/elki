@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -42,8 +43,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Pseudo-Visualizer, that gives the key for a clustering.
@@ -106,7 +105,7 @@ public class KeyVisFactory extends AbstractVisFactory {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
-        final VisualizationTask task = new VisualizationTask(NAME, c, null, this, null);
+        final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         baseResult.getHierarchy().add(c, task);
       }
@@ -116,10 +115,5 @@ public class KeyVisFactory extends AbstractVisFactory {
   @Override
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     return false;
-  }
-
-  @Override
-  public Class<? extends Projection> getProjectionType() {
-    return null;
   }
 }

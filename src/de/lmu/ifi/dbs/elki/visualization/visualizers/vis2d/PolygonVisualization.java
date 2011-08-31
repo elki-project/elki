@@ -41,15 +41,14 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * Renders PolygonsObject in the data set.
@@ -58,6 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * 
  * @apiviz.has PolygonsObject - - visualizes
  */
+// FIXME: currently not operable
 public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisualization<V> implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
@@ -169,16 +169,11 @@ public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisua
       ArrayList<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
       for(Relation<?> rel : results) {
         if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
-          final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P2DVisualization.class);
+          final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           baseResult.getHierarchy().add(rel, task);
         }
       }
-    }
-
-    @Override
-    public Class<? extends Projection> getProjectionType() {
-      return Projection2D.class;
     }
   }
 }

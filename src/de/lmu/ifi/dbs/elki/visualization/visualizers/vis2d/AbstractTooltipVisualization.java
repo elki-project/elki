@@ -34,10 +34,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * General base class for a tooltip visualizer.
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * @param <NV> Number Vector
  */
 // TODO: can we improve performance by not adding as many hovers?
-public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
+public abstract class AbstractTooltipVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -68,7 +68,7 @@ public abstract class TooltipVisualization<NV extends NumberVector<NV, ?>> exten
    */
   public static final String TOOLTIP_AREA = "tooltip_area";
 
-  public TooltipVisualization(VisualizationTask task) {
+  public AbstractTooltipVisualization(VisualizationTask task) {
     super(task);
     context.addDataStoreListener(this);
   }

@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,11 +53,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
+import de.lmu.ifi.dbs.elki.visualization.projector.HistogramProjector;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -65,8 +67,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
@@ -84,17 +84,17 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "Projection Histograms";
+  private static final String NAME = "Histogram";
+
+  /**
+   * Name for this visualizer.
+   */
+  private static final String CNAME = "Cluster Histograms";
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
   public static final String BIN = "bin";
-
-  /**
-   * The clustering we use for colorization
-   */
-  protected static final String KEY_CLUSTERING = "clustering";
 
   /**
    * Internal storage of the curves flag.
@@ -128,7 +128,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     this.curves = curves;
     this.bins = bins;
     this.relation = task.getRelation();
-    this.clustering = task.getGenerics(KEY_CLUSTERING, Clustering.class);
+    this.clustering = task.getResult();
   }
 
   @Override
@@ -377,22 +377,38 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> rels = VisualizerUtil.iterateVectorFieldRepresentations(result);
-      for(Relation<? extends NumberVector<?, ?>> rel : IterableUtil.fromIterator(rels)) {
-        // register self
-        final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P1DHistogramVisualizer.class);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-        baseResult.getHierarchy().add(rel, task);
-      }
+      boolean first = true;
+      // Cluster histograms
       ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
-        Iterator<Relation<? extends NumberVector<?, ?>>> rels2 = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
-        for(Relation<? extends NumberVector<?, ?>> rel2 : IterableUtil.fromIterator(rels2)) {
+        Iterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(baseResult, HistogramProjector.class);
+        for(HistogramProjector<?> p : IterableUtil.fromIterator(ps)) {
           // register self
-          final VisualizationTask task = new VisualizationTask(NAME, rel2, rel2, this, P1DHistogramVisualizer.class);
+          final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          task.put(KEY_CLUSTERING, c);
+          if (first) {
+            first = false;
+          } else {
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          }
           baseResult.getHierarchy().add(c, task);
+          baseResult.getHierarchy().add(p, task);
+        }
+      }
+      // General data distribution
+      {
+        Iterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(result, HistogramProjector.class);
+        for(HistogramProjector<?> p : IterableUtil.fromIterator(ps)) {
+          // register self
+          final VisualizationTask task = new VisualizationTask(NAME, null, p.getRelation(), this);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+          if (first) {
+            first = false;
+          } else {
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          }
+          // baseResult.getHierarchy().add(p.getRelation(), task);
+          baseResult.getHierarchy().add(p, task);
         }
       }
     }
@@ -401,11 +417,6 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
-    }
-
-    @Override
-    public Class<? extends Projection> getProjectionType() {
-      return Projection1D.class;
     }
 
     /**

@@ -1,28 +1,29 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.batik.dom.events.DOMMouseEvent;
@@ -44,18 +45,14 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Handle the marker in an OPTICS plot.
@@ -68,7 +65,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends AbstractVisualization implements DragableArea.DragListener {
+public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends AbstractOPTICSVisualization<D> implements DragableArea.DragListener {
   /**
    * The logger for this class.
    */
@@ -100,16 +97,6 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
   }
 
   /**
-   * Our concerned curve
-   */
-  ClusterOrderResult<D> co;
-
-  /**
-   * The plot
-   */
-  private OPTICSPlot<D> opticsplot;
-
-  /**
    * Element for the events
    */
   private Element etag;
@@ -126,33 +113,20 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    */
   public OPTICSPlotSelectionVisualization(VisualizationTask task) {
     super(task);
-    this.co = task.getResult();
-    this.opticsplot = OPTICSPlot.plotForClusterOrder(this.co, context);
     context.addResultListener(this);
     incrementalRedraw();
   }
 
   @Override
   protected void redraw() {
-    double scale = StyleLibrary.SCALE;
-    final double sizex = scale;
-    final double sizey = scale * task.getHeight() / task.getWidth();
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
-
+    makeLayerElement();
     addCSSClasses();
 
-    this.etag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    this.mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-
-    double heightPlot = scale / opticsplot.getRatio();
-
-    DragableArea drag = new DragableArea(svgp, 0 - scale * 0.1, 0, scale * 1.1, heightPlot, this);
-    etag = drag.getElement();
-
+    mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     addMarker();
+
+    DragableArea drag = new DragableArea(svgp, 0 - plotwidth * 0.1, 0, plotwidth * 1.1, plotheight, this);
+    etag = drag.getElement();
     // mtag first, etag must be the top Element
     layer.appendChild(mtag);
     layer.appendChild(etag);
@@ -162,13 +136,13 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * Add marker for the selected IDs to mtag
    */
   public void addMarker() {
-    List<ClusterOrderEntry<D>> order = co.getClusterOrder();
+    List<ClusterOrderEntry<D>> order = getClusterOrder();
     // TODO: replace mtag!
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
       DBIDs selection = DBIDUtil.ensureSet(selContext.getSelectedIds());
 
-      final double width = StyleLibrary.SCALE / order.size();
+      final double width = plotwidth / order.size();
       int begin = -1;
       for(int j = 0; j < order.size(); j++) {
         DBID id = order.get(j).getID();
@@ -203,16 +177,15 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @return SVG-Element svg-rectangle
    */
   public Element addMarkerRect(double x1, double width) {
-    double heightPlot = StyleLibrary.SCALE / opticsplot.getRatio();
-    return svgp.svgRect(x1, 0, width, heightPlot);
+    return svgp.svgRect(x1, 0, width, plotheight);
   }
 
   @Override
   public boolean startDrag(SVGPoint startPoint, @SuppressWarnings("unused") Event evt) {
-    List<ClusterOrderEntry<D>> order = co.getClusterOrder();
+    List<ClusterOrderEntry<D>> order = getClusterOrder();
     int mouseActIndex = getSelectedIndex(order, startPoint);
     if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
-      double width = StyleLibrary.SCALE / order.size();
+      double width = plotwidth / order.size();
       double x1 = mouseActIndex * width;
       Element marker = addMarkerRect(x1, width);
       SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
@@ -224,12 +197,12 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
 
   @Override
   public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
-    List<ClusterOrderEntry<D>> order = co.getClusterOrder();
+    List<ClusterOrderEntry<D>> order = getClusterOrder();
     int mouseDownIndex = getSelectedIndex(order, startPoint);
     int mouseActIndex = getSelectedIndex(order, dragPoint);
     final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
     final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), order.size());
-    double width = StyleLibrary.SCALE / order.size();
+    double width = plotwidth / order.size();
     double x1 = begin * width;
     double x2 = (end * width) + width;
     mtag.removeChild(mtag.getLastChild());
@@ -241,7 +214,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
 
   @Override
   public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, @SuppressWarnings("unused") boolean inside) {
-    List<ClusterOrderEntry<D>> order = co.getClusterOrder();
+    List<ClusterOrderEntry<D>> order = getClusterOrder();
     int mouseDownIndex = getSelectedIndex(order, startPoint);
     int mouseActIndex = getSelectedIndex(order, dragPoint);
     Mode mode = getInputMode(evt);
@@ -283,7 +256,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @return Index of the object
    */
   private int getSelectedIndex(List<ClusterOrderEntry<D>> order, SVGPoint cPt) {
-    int mouseActIndex = (int) ((cPt.getX() / StyleLibrary.SCALE) * order.size());
+    int mouseActIndex = (int) ((cPt.getX() / plotwidth) * order.size());
     return mouseActIndex;
   }
 
@@ -295,7 +268,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * @param end last index to select
    */
   protected void updateSelection(Mode mode, int begin, int end) {
-    List<ClusterOrderEntry<D>> order = co.getClusterOrder();
+    List<ClusterOrderEntry<D>> order = getClusterOrder();
     if(begin < 0 || begin > end || end >= order.size()) {
       logger.warning("Invalid range in updateSelection: " + begin + " .. " + end);
       return;
@@ -353,7 +326,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
 
   @Override
   public void resultChanged(Result current) {
-    if(current instanceof SelectionResult || current == co || current == opticsplot) {
+    if(current instanceof SelectionResult) {
       synchronizedRedraw();
       return;
     }
@@ -379,12 +352,11 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OPTICSPlot<?>> plots = ResultUtil.filterResults(result, OPTICSPlot.class);
-      for(OPTICSPlot<?> plot : plots) {
-        ClusterOrderResult<?> co = plot.getClusterOrder();
-        final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
+      Iterator<OPTICSProjector<?>> ops = ResultUtil.filteredResults(result, OPTICSProjector.class);
+      for(OPTICSProjector<?> p : IterableUtil.fromIterator(ops)) {
+        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-        baseResult.getHierarchy().add(plot, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
 
@@ -394,13 +366,9 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     }
 
     @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_SELECTION);
-    }
-
-    @Override
-    public Class<? extends Projection> getProjectionType() {
-      return null;
+    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+      // Don't use thumbnails
+      return false;
     }
   }
 }

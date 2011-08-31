@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultProcessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 
 /**
  * Defines the requirements for a visualizer. <br>
@@ -65,11 +65,4 @@ public interface VisFactory extends ResultProcessor, Parameterizable {
    * @return Visualization
    */
   public Visualization makeVisualizationOrThumbnail(VisualizationTask task);
-  
-  /**
-   * Get the projection type.
-   * 
-   * @return projection type
-   */
-  public Class<? extends Projection> getProjectionType();
 }

@@ -1,28 +1,29 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-import java.util.Collection;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVG12Constants;
 import org.apache.batik.util.SVGConstants;
@@ -39,17 +40,16 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCut;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
@@ -62,21 +62,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * 
  * @param <D> distance type
  */
-public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractVisualization implements DragableArea.DragListener {
+public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractOPTICSVisualization<D> implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "OPTICS Cut";
-
-  /**
-   * Our concerned curve
-   */
-  ClusterOrderResult<D> order;
-
-  /**
-   * The actual plot
-   */
-  private OPTICSPlot<D> opticsplot;
 
   /**
    * CSS-Styles
@@ -92,11 +82,6 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    * The current epsilon value.
    */
   private double epsilon = 0.0;
-
-  /**
-   * The height of the plot
-   */
-  private double plotHeight;
 
   /**
    * Sensitive (clickable) area
@@ -125,11 +110,6 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    */
   public OPTICSPlotCutVisualization(VisualizationTask task) {
     super(task);
-    this.order = task.getResult();
-    this.opticsplot = OPTICSPlot.plotForClusterOrder(this.order, context);
-    this.plotHeight = StyleLibrary.SCALE / opticsplot.getRatio();
-
-    synchronizedRedraw();
   }
 
   @Override
@@ -139,24 +119,15 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
 
   @Override
   protected void incrementalRedraw() {
-    addCSSClasses();
-
-    final double scale = StyleLibrary.SCALE;
-
     if(layer == null) {
-      layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-      final double sizex = scale;
-      final double sizey = scale * task.getHeight() / task.getWidth();
-      final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
-      SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
-      SVGUtil.setAtt(layer, SVGConstants.SVG_NAME_ATTRIBUTE, "cut layer");
+      makeLayerElement();
+      addCSSClasses();
     }
 
     // TODO make the number of digits configurable
     final String label = (epsilon != 0.0) ? FormatUtil.format(epsilon, 4) : "";
     // compute absolute y-value of bar
-    final double yAct = plotHeight - getYFromEpsilon(epsilon);
+    final double yAct = plotheight - getYFromEpsilon(epsilon);
 
     if(elemText == null) {
       elemText = svgp.svgText(StyleLibrary.SCALE * 1.05, yAct, label);
@@ -170,7 +141,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
 
     // line and handle
     if(elementLine == null) {
-      elementLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE * 1.05, yAct);
+      elementLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE * 1.04, yAct);
       SVGUtil.addCSSClass(elementLine, CSS_LINE);
       layer.appendChild(elementLine);
     }
@@ -179,7 +150,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
       SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y2_ATTRIBUTE, yAct);
     }
     if(elementPoint == null) {
-      elementPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.05, yAct, StyleLibrary.SCALE * 0.004);
+      elementPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.04, yAct, StyleLibrary.SCALE * 0.004);
       SVGUtil.addCSSClass(elementPoint, CSS_LINE);
       layer.appendChild(elementPoint);
     }
@@ -188,7 +159,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     }
 
     if(eventarea == null) {
-      eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, StyleLibrary.SCALE * 0.1, plotHeight, this);
+      eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, StyleLibrary.SCALE * 0.1, plotheight, this);
       layer.appendChild(eventarea.getElement());
     }
   }
@@ -209,10 +180,10 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     if(y < 0) {
       y = 0;
     }
-    if(y > plotHeight) {
-      y = plotHeight;
+    if(y > plotheight) {
+      y = plotheight;
     }
-    return opticsplot.getScale().getUnscaled(y / plotHeight);
+    return optics.getOPTICSPlot(context).getScale().getUnscaled(y / plotheight);
   }
 
   /**
@@ -222,19 +193,19 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
    * @return y-Value
    */
   protected double getYFromEpsilon(double epsilon) {
-    double y = opticsplot.getScale().getScaled(epsilon) * plotHeight;
+    double y = optics.getOPTICSPlot(context).getScale().getScaled(epsilon) * plotheight;
     if(y < 0) {
       y = 0;
     }
-    if(y > plotHeight) {
-      y = plotHeight;
+    if(y > plotheight) {
+      y = plotheight;
     }
     return y;
   }
 
   @Override
   public boolean startDrag(SVGPoint start, @SuppressWarnings("unused") Event evt) {
-    epsilon = getEpsilonFromY(plotHeight - start.getY());
+    epsilon = getEpsilonFromY(plotheight - start.getY());
     // opvis.unsetEpsilonExcept(this);
     synchronizedRedraw();
     return true;
@@ -243,7 +214,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
   @Override
   public boolean duringDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, boolean inside) {
     if(inside) {
-      epsilon = getEpsilonFromY(plotHeight - end.getY());
+      epsilon = getEpsilonFromY(plotheight - end.getY());
     }
     // opvis.unsetEpsilonExcept(this);
     synchronizedRedraw();
@@ -253,11 +224,12 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
   @Override
   public boolean endDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, boolean inside) {
     if(inside) {
-      epsilon = getEpsilonFromY(plotHeight - end.getY());
+      epsilon = getEpsilonFromY(plotheight - end.getY());
       // opvis.unsetEpsilonExcept(this);
 
       // FIXME: replace an existing optics cut result!
-      Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, opticsplot.getDistanceAdapter(), epsilon);
+      final ClusterOrderResult<D> order = optics.getResult();
+      Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, optics.getOPTICSPlot(context).getDistanceAdapter(), epsilon);
       order.addChildResult(cl);
     }
     context.resultChanged(this.task);
@@ -308,12 +280,11 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OPTICSPlot<?>> plots = ResultUtil.filterResults(result, OPTICSPlot.class);
-      for(OPTICSPlot<?> plot : plots) {
-        ClusterOrderResult<?> co = plot.getClusterOrder();
-        final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
+      Iterator<OPTICSProjector<?>> ops = ResultUtil.filteredResults(result, OPTICSProjector.class);
+      for(OPTICSProjector<?> p : IterableUtil.fromIterator(ops)) {
+        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-        baseResult.getHierarchy().add(plot, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
 
@@ -323,8 +294,9 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractV
     }
 
     @Override
-    public Class<? extends Projection> getProjectionType() {
-      return null;
+    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+      // Don't use thumbnails
+      return false;
     }
   }
 }

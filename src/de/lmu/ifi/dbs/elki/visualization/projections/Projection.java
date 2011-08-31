@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
@@ -41,12 +42,19 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @apiviz.uses NumberVector
  * @apiviz.uses Vector
  */
-public interface Projection {
+public interface Projection extends HierarchicalResult {
   /**
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary#SCALE}.
    */
   public static final double SCALE = StyleLibrary.SCALE;
+  
+  /**
+   * Get the input dimensionality of the projection.
+   * 
+   * @return Input dimensionality
+   */
+  public int getInputDimensionality();
 
   /**
    * Get the scale class for a particular dimension.

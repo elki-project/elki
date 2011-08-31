@@ -1,32 +1,33 @@
 package de.lmu.ifi.dbs.elki.visualization.gui.overview;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -34,33 +35,24 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
-import de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
-import de.lmu.ifi.dbs.elki.visualization.projections.Simple1D;
-import de.lmu.ifi.dbs.elki.visualization.projections.Simple2D;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
+import de.lmu.ifi.dbs.elki.visualization.projector.LayoutObject;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
 
 /**
  * Generate an overview plot for a set of visualizations.
@@ -77,16 +69,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
  */
 public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
-   * Maximum number of dimensions to visualize.
-   * 
-   * TODO: Erich: add scrolling function for higher dimensionality!
+   * Our logging class
    */
-  public static final int MAX_DIMENSIONS_DEFAULT = 10;
-
-  /**
-   * Stores the maximum number of dimensions to show.
-   */
-  private int maxdim = MAX_DIMENSIONS_DEFAULT;
+  private static final Logging logger = Logging.getLogger(OverviewPlot.class);
 
   /**
    * Visualizer context
@@ -94,20 +79,14 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   private VisualizerContext context;
 
   /**
-   * Database we work on.
-   */
-  private Database db;
-
-  /**
    * Result we work on. Currently unused, but kept for future requirements.
    */
-  @SuppressWarnings("unused")
   private Result result;
 
   /**
    * Map of coordinates to plots.
    */
-  protected PlotMap<NumberVector<?, ?>> plotmap;
+  protected PlotMap plotmap;
 
   /**
    * Action listeners for this plot.
@@ -117,15 +96,11 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Constructor.
    * 
-   * @param db Database
    * @param result Result to visualize
-   * @param maxdim Maximum number of dimensions
    * @param context Visualizer context
    */
-  public OverviewPlot(Database db, Result result, int maxdim, VisualizerContext context) {
+  public OverviewPlot(Result result, VisualizerContext context) {
     super();
-    this.maxdim = maxdim;
-    this.db = db;
     this.result = result;
     this.context = context;
     // register context listener
@@ -173,105 +148,33 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   private double ratio = 1.0;
 
   /**
+   * Pending refresh, for lazy refreshing
+   */
+  Runnable pendingRefresh;
+
+  /**
+   * Reinitialize on refresh
+   */
+  private boolean reinitOnRefresh = true;
+
+  /**
    * Recompute the layout of visualizations.
    */
   private void arrangeVisualizations() {
-    // split the visualizers into three sets.
-    // FIXME: THIS IS VERY UGLY, and needs to be refactored.
-    // (This is a remainder of merging adapters and visualizationfactories)
-    List<VisualizationTask> vis = new ArrayList<VisualizationTask>();
-    for(VisualizationTask task : context.iterVisualizers()) {
-      vis.add(task);
-    }
-    // We'll use three regions for now:
-    // 2D projections starting at 0,0 and going right and down.
-    // 1D projections starting at 0, -1 and going right
-    // Other projections starting at -1, min() and going down.
-    plotmap = new PlotMap<NumberVector<?, ?>>();
-    // FIXME: ugly cast used here.
-    Relation<NumberVector<?, ?>> dvdb = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    LinearScale[] scales = null;
-    scales = Scales.calcScales(dvdb);
-    int dmax = Math.min(DatabaseUtil.dimensionality(dvdb), maxdim);
-    for(int d1 = 1; d1 <= dmax; d1++) {
-      for(int d2 = d1 + 1; d2 <= dmax; d2++) {
-        Projection2D proj = new Simple2D(scales, d1, d2);
+    plotmap = new PlotMap();
 
+    ArrayList<Projector> projectors = ResultUtil.filterResults(result, Projector.class);
+    for(Projector p : projectors) {
+      double[] shape = p.getShape();
+      Collection<LayoutObject> projs = p.arrange();
+      for(LayoutObject l : projs) {
+        double x = l.reqx + shape[0];
+        double y = l.reqy + shape[1];
+        final IterableIterator<VisualizationTask> vis = ResultUtil.filteredResults(p, VisualizationTask.class);
         for(VisualizationTask task : vis) {
-          if(task.getFactory().getProjectionType() == Projection2D.class) {
-            plotmap.addVis(d1 - 1, d2 - 2, 1., 1., proj, task);
-          }
+          // VisualizationTask v = task.clone(this, context, l.proj, l.reqw, l.reqh);
+          plotmap.addVis(x, y, l.reqw, l.reqh, l.proj, task);
         }
-      }
-    }
-    if(dmax >= 3) {
-      AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(dvdb), 1, 2);
-      p.addRotation(0, 2, Math.PI / 180 * -10.);
-      p.addRotation(1, 2, Math.PI / 180 * 15.);
-      // Wanna try 4d? go ahead:
-      // p.addRotation(0, 3, Math.PI / 180 * -20.);
-      // p.addRotation(1, 3, Math.PI / 180 * 30.);
-      final double sizeh = Math.ceil((dmax - 1) / 2.0);
-      Projection2D proj = new AffineProjection(scales, p);
-      for(VisualizationTask task : vis) {
-        if(task.getFactory().getProjectionType() == Projection2D.class) {
-          plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, proj, task);
-        }
-      }
-    }
-    // insert column numbers
-    for(int d1 = 1; d1 <= dmax; d1++) {
-      VisualizationTask colvi = new VisualizationTask("", context, null, null, new LabelVisFactory(Integer.toString(d1)), null, null, this, 1, .1);
-      colvi.put(VisualizationTask.META_NODETAIL, true);
-      plotmap.addVis(d1 - 1, -.1, 1., .1, null, colvi);
-    }
-    // insert row numbers
-    for(int d1 = 2; d1 <= dmax; d1++) {
-      VisualizationTask colvi = new VisualizationTask("", context, null, null, new LabelVisFactory(Integer.toString(d1)), null, null, this, .1, 1);
-      colvi.put(VisualizationTask.META_NODETAIL, true);
-      plotmap.addVis(-.1, d1 - 2, .1, 1., null, colvi);
-    }
-    {
-      int dim = dmax;
-      for(int d1 = 1; d1 <= dim; d1++) {
-        Projection1D proj = new Simple1D(scales, d1);
-        double ypos = -.1;
-        for(VisualizationTask task : vis) {
-          if(task.getFactory().getProjectionType() == Projection1D.class) {
-            // TODO: 1d vis might have a different native scaling.
-            double height = 0.5;
-            plotmap.addVis(d1 - 1, ypos - height, 1.0, height, proj, task);
-            //ypos = ypos - height;
-          }
-        }
-      }
-    }
-    {
-      HashMap<Object, double[]> stackmap = new HashMap<Object, double[]>();
-      // find starting position.
-      Double pos = plotmap.minmaxy.getMin();
-      if(pos == null) {
-        pos = 0.0;
-      }
-      // FIXME: use multiple columns!
-      for(VisualizationTask task : vis) {
-        if(task.getFactory().getProjectionType() == Projection1D.class) {
-          continue;
-        }
-        if(task.getFactory().getProjectionType() == Projection2D.class) {
-          continue;
-        }
-        double[] p = null;
-        if(task.getVisualizationStack() != null) {
-          p = stackmap.get(task.getVisualizationStack());
-        }
-        if(p == null) {
-          p = new double[] { -1.1, pos };
-          pos += 1.0;
-          stackmap.put(task.getVisualizationStack(), p);
-        }
-        // TODO: might have different scaling preferences
-        plotmap.addVis(p[0], p[1], 1., 1., null, task);
       }
     }
   }
@@ -279,7 +182,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Refresh the overview plot.
    */
-  public void reinitialize() {
+  private void reinitialize() {
     setupHoverer();
     arrangeVisualizations();
     recalcViewbox();
@@ -364,37 +267,44 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Do a refresh (when visibilities have changed).
    */
-  public void refresh() {
-    if(vistoelem == null || plotlayer == null || hoverlayer == null) {
+  synchronized void refresh() {
+    logger.debug("Refresh");
+    if(vistoelem == null || plotlayer == null || hoverlayer == null || reinitOnRefresh) {
       reinitialize();
+      reinitOnRefresh = false;
     }
     else {
+      boolean refreshcss = false;
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
       for(PlotItem it : plotmap.values()) {
         for(VisualizationTask task : it) {
-          Element gg = vistoelem.get(new Pair<PlotItem, VisualizationTask>(it, task));
-          if(gg == null) {
-            LoggingUtil.warning("No container element found for " + task);
+          Element parent = vistoelem.get(new Pair<PlotItem, VisualizationTask>(it, task));
+          if(parent == null) {
+            LoggingUtil.warning("No container element produced by " + task);
             continue;
           }
           if(VisualizerUtil.thumbnailEnabled(task) && VisualizerUtil.isVisible(task)) {
             // unhide when hidden.
-            if(gg.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
-              gg.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
+            if(parent.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
+              parent.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
             }
             // if not yet rendered, add a thumbnail
-            if(!gg.hasChildNodes()) {
-              makeThumbnail(thumbsize, it, task, gg);
+            if(!parent.hasChildNodes()) {
+              makeThumbnail(thumbsize, it, task, parent);
+              refreshcss = true;
             }
           }
           else {
             // hide if there is anything to hide.
-            if(gg != null && gg.hasChildNodes()) {
-              gg.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+            if(parent != null && parent.hasChildNodes()) {
+              parent.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
             }
             // TODO: unqueue pending thumbnails
           }
         }
+      }
+      if (refreshcss) {
+        updateStyleElement();
       }
     }
   }
@@ -522,27 +432,43 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     this.ratio = ratio;
   }
 
+  /**
+   * Trigger a redraw, but avoid excessive redraws.
+   */
+  public final void lazyRefresh() {
+    Runnable pr = new Runnable() {
+      @Override
+      public void run() {
+        if(OverviewPlot.this.pendingRefresh == this) {
+          OverviewPlot.this.pendingRefresh = null;
+          OverviewPlot.this.refresh();
+        }
+      }
+    };
+    pendingRefresh = pr;
+    scheduleUpdate(pr);
+  }
+  
   @SuppressWarnings("unused")
   @Override
   public void resultAdded(Result child, Result parent) {
-    // TODO: be lazy
-    if (child instanceof VisualizationTask) {
-      reinitialize();
+    logger.debug("result added: "+child);
+    if(child instanceof VisualizationTask) {
+      reinitOnRefresh = true;
     }
-    refresh();
+    lazyRefresh();
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultChanged(Result current) {
-    // TODO: be lazy
-    refresh();
+    logger.debug("result changed: "+current);
+    lazyRefresh();
   }
 
   @SuppressWarnings("unused")
   @Override
   public void resultRemoved(Result child, Result parent) {
-    // TODO: be lazy
-    refresh();
+    logger.debug("result removed: "+child);
+    lazyRefresh();
   }
 }

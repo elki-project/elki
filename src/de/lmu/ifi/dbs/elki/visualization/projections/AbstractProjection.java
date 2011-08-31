@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 /**
@@ -31,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractProjection implements Projection {
+public abstract class AbstractProjection extends AbstractHierarchicalResult implements Projection {
   /**
    * Scales in data set
    */
@@ -45,6 +46,11 @@ public abstract class AbstractProjection implements Projection {
   public AbstractProjection(LinearScale[] scales) {
     super();
     this.scales = scales;
+  }
+  
+  @Override
+  public int getInputDimensionality() {
+    return scales.length;
   }
 
   /**
@@ -248,5 +254,15 @@ public abstract class AbstractProjection implements Projection {
       ds[d] = scales[d].getRelativeUnscaled(ds[d]);
     }
     return prototype.newInstance(vec);
+  }
+
+  @Override
+  public String getLongName() {
+    return "Projection";
+  }
+
+  @Override
+  public String getShortName() {
+    return "projection";
   }
 }

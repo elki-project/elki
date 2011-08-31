@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers;
+package de.lmu.ifi.dbs.elki.visualization.projector;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,34 +22,24 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import org.w3c.dom.Element;
-
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultProcessor;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
- * Static visualization
+ * A projector is responsible for adding projections to the visualization by
+ * detecting appropriate relations in the database.
  * 
  * @author Erich Schubert
  */
-public class StaticVisualization extends AbstractVisualization {
+public interface ProjectorFactory extends ResultProcessor, Parameterizable {
   /**
-   * Unchanging precomputed visualization.
+   * Add projections for the given result (tree) to the result tree.
    * 
-   * @param task Task to visualize
-   * @param element Element containing the resulting visualization
+   * @param baseResult Context to work with
+   * @param newResult Result to process
    */
-  public StaticVisualization(VisualizationTask task, Element element) {
-    super(task);
-    this.layer = element;
-  }
-
   @Override
-  protected void incrementalRedraw() {
-    // Do nothing - we keep our static layer
-  }
-
-  @Override
-  protected void redraw() {
-    // Do nothing - we keep our static layer
-  }
+  public void processNewResult(HierarchicalResult baseResult, Result newResult);
 }
