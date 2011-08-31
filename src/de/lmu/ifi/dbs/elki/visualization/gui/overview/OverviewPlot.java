@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.RectangleArranger;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.projector.LayoutObject;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
@@ -163,13 +164,20 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   private void arrangeVisualizations() {
     plotmap = new PlotMap();
 
+    RectangleArranger<Projector> rect = new RectangleArranger<Projector>(ratio);
+    
     ArrayList<Projector> projectors = ResultUtil.filterResults(result, Projector.class);
     for(Projector p : projectors) {
       double[] shape = p.getShape();
+      rect.put(shape[2], shape[3], p);
+    }
+      
+    for(Projector p : projectors) {
+      double[] pos = rect.get(p);
       Collection<LayoutObject> projs = p.arrange();
       for(LayoutObject l : projs) {
-        double x = l.reqx + shape[0];
-        double y = l.reqy + shape[1];
+        final double x = l.reqx + pos[0];
+        final double y = l.reqy + pos[1];
         final IterableIterator<VisualizationTask> vis = ResultUtil.filteredResults(p, VisualizationTask.class);
         for(VisualizationTask task : vis) {
           // VisualizationTask v = task.clone(this, context, l.proj, l.reqw, l.reqh);
