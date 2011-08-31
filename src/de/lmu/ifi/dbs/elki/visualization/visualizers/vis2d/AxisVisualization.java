@@ -28,23 +28,22 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
+import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Generates a SVG-Element containing axes, including labeling.
@@ -149,11 +148,11 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
-      for(Relation<? extends NumberVector<?, ?>> rel : IterableUtil.fromIterator(reps)) {
-        final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, P2DVisualization.class);
+      Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(result, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+        final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
-        baseResult.getHierarchy().add(rel, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
 
@@ -161,11 +160,6 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
-    }
-
-    @Override
-    public Class<? extends Projection> getProjectionType() {
-      return Projection2D.class;
     }
   }
 }

@@ -111,6 +111,7 @@ public class MergedParameterization implements Parameterization {
       used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getValue()));
       return true;
     }
+    used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getDefaultValue()));
     return false;
   }
 

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.events;
+package de.lmu.ifi.dbs.elki.visualization.projector;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,27 +22,54 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
 /**
- * Event triggered when the contexts view was resized.
+ * Layout object for generating a UI.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.stereotype event
  */
-public class ResizedEvent extends ContextChangedEvent {
+public class LayoutObject {
   /**
-   * Serial version
+   * Requested x (relative)
    */
-  private static final long serialVersionUID = 1L;
+  public final double reqx;
+
+  /**
+   * Requested y (relative)
+   */
+  public final double reqy;
+
+  /**
+   * Requested width
+   */
+  public final double reqw;
+
+  /**
+   * Requested height
+   */
+  public final double reqh;
+
+  /**
+   * Projection to use
+   */
+  public final Projection proj;
 
   /**
    * Constructor.
    * 
-   * @param source Visualization context
+   * @param reqx Requested x (relative)
+   * @param reqy Requested y (relative)
+   * @param reqw Requested width
+   * @param reqh Requested height
+   * @param proj Projection to use
    */
-  public ResizedEvent(VisualizerContext source) {
-    super(source);
+  public LayoutObject(double reqx, double reqy, double reqw, double reqh, Projection proj) {
+    super();
+    this.reqx = reqx;
+    this.reqy = reqy;
+    this.reqw = reqw;
+    this.reqh = reqh;
+    this.proj = proj;
   }
 }

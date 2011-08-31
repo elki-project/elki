@@ -40,9 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -52,8 +53,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
@@ -226,7 +225,7 @@ public class CurveVisFactory extends AbstractVisFactory {
     final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
     final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
-      final VisualizationTask task = new VisualizationTask(NAME, curve, null, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, curve, null, this);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(curve, task);
     }
@@ -236,10 +235,5 @@ public class CurveVisFactory extends AbstractVisFactory {
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     // TODO: depending on the curve complexity?
     return false;
-  }
-
-  @Override
-  public Class<? extends Projection> getProjectionType() {
-    return null;
   }
 }

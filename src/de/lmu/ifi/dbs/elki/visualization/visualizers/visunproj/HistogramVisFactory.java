@@ -34,10 +34,11 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -47,8 +48,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Visualizer to draw histograms.
@@ -168,7 +167,7 @@ public class HistogramVisFactory extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(newResult, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
-      final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this, null);
+      final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this);
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(histogram, task);
     }
@@ -178,10 +177,5 @@ public class HistogramVisFactory extends AbstractVisFactory {
   public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
     // TODO: depending on the histogram complexity?
     return false;
-  }
-
-  @Override
-  public Class<? extends Projection> getProjectionType() {
-    return null;
   }
 }

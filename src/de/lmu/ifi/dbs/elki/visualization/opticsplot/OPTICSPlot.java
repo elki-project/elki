@@ -26,7 +26,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -38,13 +37,12 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
  * Class to produce an OPTICS plot image.
@@ -349,10 +347,10 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    */
   public static <D extends Distance<D>> OPTICSPlot<D> plotForClusterOrder(ClusterOrderResult<D> co, VisualizerContext context) {
     // Check for an existing plot
-    ArrayList<OPTICSPlot<D>> plots = ResultUtil.filterResults(co, OPTICSPlot.class);
-    if (plots.size() > 0) {
-      return plots.get(0);
-    }
+    // ArrayList<OPTICSPlot<D>> plots = ResultUtil.filterResults(co, OPTICSPlot.class);
+    // if (plots.size() > 0) {
+    //   return plots.get(0);
+    // }
     // Supported by this class?
     if (!OPTICSPlot.canPlot(co)) {
       return null;
@@ -362,7 +360,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
     final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
     
     OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor);
-    co.addChildResult(opticsplot);
+    // co.addChildResult(opticsplot);
     return opticsplot;
   }
 

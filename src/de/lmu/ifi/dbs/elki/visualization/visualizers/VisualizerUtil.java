@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
 /**
  * Visualizer utilities.

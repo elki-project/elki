@@ -24,8 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import java.util.LinkedList;
 
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * Item to collect visualization tasks on a specific position on the plot map.

@@ -1,29 +1,29 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers;
+package de.lmu.ifi.dbs.elki.visualization;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -44,9 +44,11 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
+import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
@@ -90,6 +92,11 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   private StyleLibrary stylelib;
 
   /**
+   * Projectors to use
+   */
+  private Collection<ProjectorFactory> projectors;
+
+  /**
    * Factories to use
    */
   private Collection<VisFactory> factories;
@@ -124,14 +131,17 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @param result Result
    * @param stylelib Style library
+   * @param projectors Projectors to use
    * @param factories Visualizer Factories to use
    * @param hideVisualizers Pattern to hide visualizers
    */
-  public VisualizerContext(HierarchicalResult result, StyleLibrary stylelib, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerContext(HierarchicalResult result, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories, Pattern hideVisualizers) {
     super();
     this.result = result;
     this.stylelib = stylelib;
+    this.projectors = projectors;
     this.factories = factories;
+
     this.hideVisualizers = hideVisualizers;
 
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
@@ -149,8 +159,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
     processNewResult(result, result);
 
     // For proxying events.
-    // FIXME: RELEASE4
-    // this.database.addDataStoreListener(this);
+    ResultUtil.findDatabase(result).addDataStoreListener(this);
     // Add ourselves as RL
     addResultListener(this);
   }
@@ -253,7 +262,8 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   public void setVisualizationVisibility(VisualizationTask task, boolean visibility) {
     // Hide other tools
     if(visibility && VisualizerUtil.isTool(task)) {
-      for(VisualizationTask other : iterVisualizers()) {
+      final Iterable<VisualizationTask> visualizers = ResultUtil.filteredResults(getResult(), VisualizationTask.class);
+      for(VisualizationTask other : visualizers) {
         if(other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
           other.put(VisualizationTask.META_VISIBLE, false);
           getHierarchy().resultChanged(other);
@@ -331,6 +341,17 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * @param newResult Newly added Result
    */
   private void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    for(ProjectorFactory p : projectors) {
+      if(hideVisualizers != null && hideVisualizers.matcher(p.getClass().getName()).find()) {
+        continue;
+      }
+      try {
+        p.processNewResult(baseResult, newResult);
+      }
+      catch(Throwable e) {
+        logger.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
+      }
+    }
     // Collect all visualizers.
     for(VisFactory f : factories) {
       if(hideVisualizers != null && hideVisualizers.matcher(f.getClass().getName()).find()) {
@@ -340,7 +361,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
         f.processNewResult(baseResult, newResult);
       }
       catch(Throwable e) {
-        logger.warning("AlgorithmAdapter " + f.getClass().getCanonicalName() + " failed:", e);
+        logger.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);
       }
     }
   }
@@ -349,90 +370,12 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * Get an iterator over all visualizers.
    * 
    * @return Iterator
+   * 
+   * @deprecated Odd semantics: contains duplicates!
    */
+  @Deprecated
   public IterableIterator<VisualizationTask> iterVisualizers() {
-    return new VisualizerIterator();
-  }
-
-  /**
-   * Iterator doing a depth-first traversal of the tree.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private class VisualizerIterator implements IterableIterator<VisualizationTask> {
-    /**
-     * The results iterator.
-     */
-    private Iterator<? extends Result> resultiter = null;
-
-    /**
-     * Current results visualizers
-     */
-    private Iterator<VisualizationTask> resultvisiter = null;
-
-    /**
-     * The current result
-     */
-    private Result curResult = null;
-
-    /**
-     * The next item to return.
-     */
-    private VisualizationTask nextItem = null;
-
-    /**
-     * Constructor.
-     */
-    public VisualizerIterator() {
-      super();
-      this.resultiter = ResultUtil.filteredResults(getResult(), Result.class);
-      updateNext();
-    }
-
-    /**
-     * Update the iterator to point to the next element.
-     */
-    private void updateNext() {
-      nextItem = null;
-      // try within the current result
-      if(resultvisiter != null && resultvisiter.hasNext()) {
-        nextItem = resultvisiter.next();
-        return;
-      }
-      if(resultiter != null && resultiter.hasNext()) {
-        // advance to next result, retry.
-        curResult = resultiter.next();
-        final List<Result> children = getHierarchy().getChildren(curResult);
-        resultvisiter = new TypeFilterIterator<Result, VisualizationTask>(VisualizationTask.class, children);
-        updateNext();
-        return;
-      }
-      // This means we have failed - we'll leave nextItem = null
-    }
-
-    @Override
-    public boolean hasNext() {
-      return (nextItem != null);
-    }
-
-    @Override
-    public VisualizationTask next() {
-      VisualizationTask vis = nextItem;
-      updateNext();
-      return vis;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException("Removals are not supported.");
-    }
-
-    @Override
-    public Iterator<VisualizationTask> iterator() {
-      return this;
-    }
+    return ResultUtil.filteredResults(getResult(), VisualizationTask.class);
   }
 
   /**

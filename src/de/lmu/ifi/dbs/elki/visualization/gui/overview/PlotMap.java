@@ -27,8 +27,8 @@ import java.util.HashMap;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * Manage the Overview plot canvas.
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * 
  * @apiviz.composedOf PlotItem
  */
-class PlotMap<NV> extends HashMap<DoubleDoublePair, PlotItem> {
+class PlotMap extends HashMap<DoubleDoublePair, PlotItem> {
   /**
    * Serial version
    */

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,7 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import java.awt.Color;
-import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -36,17 +37,19 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSDistanceAdapter;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
+import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * Visualize the steep areas found in an OPTICS plot
@@ -56,7 +59,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
  * @apiviz.uses 
  *              de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult
  */
-public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends AbstractVisualization {
+public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -73,19 +76,9 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
   protected static final String CSS_STEEP_DOWN = "opticsSteepDown";
 
   /**
-   * Our cluster order
-   */
-  private ClusterOrderResult<D> co;
-
-  /**
    * Our clustering
    */
   OPTICSXi.SteepAreaResult areas;
-
-  /**
-   * The plot
-   */
-  private OPTICSPlot<D> opticsplot;
 
   /**
    * Constructor.
@@ -94,9 +87,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
    */
   public OPTICSSteepAreaVisualization(VisualizationTask task) {
     super(task);
-    this.co = task.getResult();
-    this.areas = findSteepAreaResult(this.co);
-    this.opticsplot = OPTICSPlot.plotForClusterOrder(this.co, context);
+    this.areas = findSteepAreaResult(this.optics.getResult());
     context.addResultListener(this);
     incrementalRedraw();
   }
@@ -118,30 +109,24 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
 
   @Override
   protected void redraw() {
-    final double scale = StyleLibrary.SCALE;
-    final double sizex = scale;
-    final double sizey = scale * task.getHeight() / task.getWidth();
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
-
+    makeLayerElement();
     addCSSClasses();
-
-    final double plotwidth = scale;
-    final double plotheight = scale / opticsplot.getRatio();
-
-    OPTICSDistanceAdapter<D> adapter = opticsplot.getDistanceAdapter();
+    
+    final OPTICSPlot<D> opticsplot = optics.getOPTICSPlot(context);
+    final List<ClusterOrderEntry<D>> co = getClusterOrder();
+    final OPTICSDistanceAdapter<D> adapter = opticsplot.getDistanceAdapter();
+    final LinearScale scale = opticsplot.getScale();
+    
     for(OPTICSXi.SteepArea area : areas) {
       final int st = area.getStartIndex();
       final int en = area.getEndIndex();
       // Note: make sure we are using doubles!
-      final double x1 = (st + .25) / this.co.getClusterOrder().size();
-      final double x2 = (en + .75) / this.co.getClusterOrder().size();
-      final double d1 = adapter.getDoubleForEntry(this.co.getClusterOrder().get(st));
-      final double d2 = adapter.getDoubleForEntry(this.co.getClusterOrder().get(en));
-      final double y1 = (!Double.isInfinite(d1) && !Double.isNaN(d1)) ? (1. - opticsplot.getScale().getScaled(d1)) : 0.;
-      final double y2 = (!Double.isInfinite(d2) && !Double.isNaN(d2)) ? (1. - opticsplot.getScale().getScaled(d2)) : 0.;
+      final double x1 = (st + .25) / co.size();
+      final double x2 = (en + .75) / co.size();
+      final double d1 = adapter.getDoubleForEntry(co.get(st));
+      final double d2 = adapter.getDoubleForEntry(co.get(en));
+      final double y1 = (!Double.isInfinite(d1) && !Double.isNaN(d1)) ? (1. - scale.getScaled(d1)) : 0.;
+      final double y2 = (!Double.isInfinite(d2) && !Double.isNaN(d2)) ? (1. - scale.getScaled(d2)) : 0.;
       Element e = svgp.svgLine(plotwidth * x1, plotheight * y1, plotwidth * x2, plotheight * y2);
       if(area instanceof OPTICSXi.SteepDownArea) {
         SVGUtil.addCSSClass(e, CSS_STEEP_DOWN);
@@ -184,7 +169,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
 
   @Override
   public void resultChanged(Result current) {
-    if(current instanceof SelectionResult || current == co || current == opticsplot) {
+    if(current instanceof SelectionResult) {
       synchronizedRedraw();
       return;
     }
@@ -210,14 +195,14 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OPTICSPlot<?>> plots = ResultUtil.filterResults(result, OPTICSPlot.class);
-      for(OPTICSPlot<?> plot : plots) {
-        ClusterOrderResult<?> co = plot.getClusterOrder();
-        final SteepAreaResult steep = findSteepAreaResult(co);
+      Iterator<OPTICSProjector<?>> ops = ResultUtil.filteredResults(result, OPTICSProjector.class);
+      for(OPTICSProjector<?> p : IterableUtil.fromIterator(ops)) {
+        final SteepAreaResult steep = findSteepAreaResult(p.getResult());
         if(steep != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, co, null, this, plot);
+          final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          baseResult.getHierarchy().add(p, task);
           baseResult.getHierarchy().add(steep, task);
         }
       }
@@ -232,11 +217,6 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
-    }
-
-    @Override
-    public Class<? extends Projection> getProjectionType() {
-      return null;
     }
   }
 }

@@ -32,13 +32,12 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizationTask;
 
 /**
  * Visualize an arbitrary pixmap result.
@@ -121,7 +120,7 @@ public class PixmapVisualizer extends AbstractVisualization {
       Collection<PixmapResult> prs = ResultUtil.filterResults(result, PixmapResult.class);
       for(PixmapResult pr : prs) {
         // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, pr, null, this, null);
+        final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         baseResult.getHierarchy().add(pr, task);
       }
@@ -136,11 +135,6 @@ public class PixmapVisualizer extends AbstractVisualization {
     public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
       // Don't use thumbnails
       return false;
-    }
-
-    @Override
-    public Class<? extends Projection> getProjectionType() {
-      return null;
     }
   }
 }
