@@ -226,6 +226,8 @@ public class CurveVisFactory extends AbstractVisFactory {
     final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
     for (IterableResult<DoubleDoublePair> curve : curves) {
       final VisualizationTask task = new VisualizationTask(NAME, curve, null, this);
+      task.width = 1.0;
+      task.height = 1.0;
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(curve, task);
     }

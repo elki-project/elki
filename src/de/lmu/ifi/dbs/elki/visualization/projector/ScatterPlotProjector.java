@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.visualization.projector;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projections.Simple2D;
@@ -77,30 +81,36 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
   }
 
   @Override
-  public double[] getShape() {
-    return new double[] { 0, 0, dmax - 1, dmax - 1 };
-  }
-
-  @Override
-  public Collection<LayoutObject> arrange() {
-    List<LayoutObject> layout = new ArrayList<LayoutObject>(dmax - 1 * dmax / 2 + 2 * dmax + 1);
-
-    for(int d1 = 1; d1 <= dmax; d1++) {
-      for(int d2 = d1 + 1; d2 <= dmax; d2++) {
-        Projection2D proj = new Simple2D(scales, d1, d2);
-        layout.add(new LayoutObject(d1 - 1, d2 - 2, 1., 1., proj));
-      }
-    }
-    if(dmax >= 3) {
-      AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(rel), 1, 2);
-      p.addRotation(0, 2, Math.PI / 180 * -10.);
-      p.addRotation(1, 2, Math.PI / 180 * 15.);
-      // Wanna try 4d? go ahead:
-      // p.addRotation(0, 3, Math.PI / 180 * -20.);
-      // p.addRotation(1, 3, Math.PI / 180 * 30.);
+  public Collection<PlotItem> arrange() {
+    List<PlotItem> layout = new ArrayList<PlotItem>(1);
+    List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
+    if (tasks.size() > 0){
       final double sizeh = Math.ceil((dmax - 1) / 2.0);
-      Projection2D proj = new AffineProjection(scales, p);
-      layout.add(new LayoutObject(Math.ceil((dmax - 1) / 2.0), 0.0, sizeh, sizeh, proj));
+      PlotItem master = new PlotItem(sizeh * 2, dmax - 1, null);
+
+      for(int d1 = 1; d1 <= dmax; d1++) {
+        for(int d2 = d1 + 1; d2 <= dmax; d2++) {
+          Projection2D proj = new Simple2D(scales, d1, d2);
+          final PlotItem it = new PlotItem(d1 - 1, d2 - 2, 1., 1., proj);
+          it.visualizations = tasks;
+          master.subitems.add(it);
+        }
+      }
+      if(dmax >= 3) {
+        AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(rel), 1, 2);
+        p.addRotation(0, 2, Math.PI / 180 * -10.);
+        p.addRotation(1, 2, Math.PI / 180 * 15.);
+        // Wanna try 4d? go ahead:
+        // p.addRotation(0, 3, Math.PI / 180 * -20.);
+        // p.addRotation(1, 3, Math.PI / 180 * 30.);
+        Projection2D proj = new AffineProjection(scales, p);
+        final PlotItem it = new PlotItem(sizeh, 0.0, sizeh, sizeh, proj);
+        it.visualizations = tasks;
+        master.subitems.add(it);
+      }
+
+      // TODO: re-add labels?
+      layout.add(master);
     }
     return layout;
   }

@@ -168,6 +168,8 @@ public class HistogramVisFactory extends AbstractVisFactory {
     List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(newResult, HistogramResult.class);
     for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
       final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this);
+      task.width = 2.0;
+      task.height = 1.0;
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(histogram, task);
     }

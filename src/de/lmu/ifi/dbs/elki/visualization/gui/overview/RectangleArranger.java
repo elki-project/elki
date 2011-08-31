@@ -1,30 +1,34 @@
-package de.lmu.ifi.dbs.elki.visualization.gui;
+package de.lmu.ifi.dbs.elki.visualization.gui.overview;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -124,9 +128,23 @@ public class RectangleArranger<T> {
     int bestsy = -1;
     int bestex = cols - 1;
     int bestey = -1;
-    double bestwi = (w / h >= ratio) ? w : 0.0;
-    double besthi = (w / h < ratio) ? 0.0 : h;
-    double bestinc = Double.MAX_VALUE;
+    double bestwi;
+    double besthi;
+    double bestinc;
+    // Baseline: grow by adding to the top or to the right.
+    {
+      double i1 = computeIncreaseArea(w, Math.max(0, h-theight));
+      double i2 = computeIncreaseArea(Math.max(0, w-twidth), h);
+      if (i1 < i2) {
+        bestwi = w;
+        besthi = Math.max(0, h-theight);
+        bestinc = i1;
+      } else {
+        bestwi = Math.max(0, w-twidth);
+        besthi = h;
+        bestinc = i2;
+      }
+    }
     // Find position with minimum increase
     for(int sx = 0; sx < cols; sx++) {
       for(int sy = 0; sy < rows; sy++) {
@@ -139,6 +157,7 @@ public class RectangleArranger<T> {
         int ex = sx;
         int ey = sy;
         while(avw < w || avh < h) {
+          // Grow width first
           if(avw / avh < w / h) {
             if(avw < w && ex + 1 < cols) {
               boolean ok = true;
@@ -169,21 +188,7 @@ public class RectangleArranger<T> {
               }
             }
           }
-          else {
-            if(avw < w && ex + 1 < cols) {
-              boolean ok = true;
-              // All unused?
-              for(int y = sy; y <= ey; y++) {
-                if(usage.get(y).get(ex + 1) != null) {
-                  ok = false;
-                }
-              }
-              if(ok) {
-                ex += 1;
-                avw += widths.get(ex);
-                continue;
-              }
-            }
+          else { // Grow height first
             if(avh < h && ey + 1 < rows) {
               boolean ok = true;
               // All unused?
@@ -195,6 +200,20 @@ public class RectangleArranger<T> {
               if(ok) {
                 ey += 1;
                 avh += heights.get(ey);
+                continue;
+              }
+            }
+            if(avw < w && ex + 1 < cols) {
+              boolean ok = true;
+              // All unused?
+              for(int y = sy; y <= ey; y++) {
+                if(usage.get(y).get(ex + 1) != null) {
+                  ok = false;
+                }
+              }
+              if(ok) {
+                ex += 1;
+                avw += widths.get(ex);
                 continue;
               }
             }
@@ -211,11 +230,9 @@ public class RectangleArranger<T> {
         // Compute increase:
         double winc = Math.max(0.0, w - avw);
         double hinc = Math.max(0.0, h - avh);
-        double inc = Math.max(winc, hinc * ratio);
-        inc = inc * (hinc + inc / ratio + winc / ratio);
+        double inc = computeIncreaseArea(winc, hinc);
 
-        // logger.debugFinest("Candidate: " + sx + "," + sy + " - " + ex + "," +
-        // ey + ": " + avw + "x" + avh + " " + inc);
+        logger.debugFinest("Candidate: " + sx + "," + sy + " - " + ex + "," + ey + ": " + avw + "x" + avh + " " + inc);
         if(inc < bestinc) {
           bestinc = inc;
           bestsx = sx;
@@ -234,31 +251,17 @@ public class RectangleArranger<T> {
       assert assertConsistent();
     }
     logger.debugFinest("Best: " + bestsx + "," + bestsy + " - " + bestex + "," + bestey + " inc: " + bestwi + "x" + besthi + " " + bestinc);
-    assert (bestsx > -1 && bestsy > -1);
     // Need to split a column.
     // TODO: find best column to split. Currently: last
     if(bestwi < 0) {
-      logger.debugFine("Split column " + bestex);
-      // Note: bestwi is negative!
-      widths.add(bestex + 1, -bestwi);
-      widths.set(bestex, widths.get(bestex) + bestwi);
+      splitCol(bestex, -bestwi);
       bestwi = 0.0;
-      // Update used map
-      for(int y = 0; y < rows; y++) {
-        usage.get(y).add(bestex + 1, usage.get(y).get(bestex));
-      }
-      assert assertConsistent();
     }
     // Need to split a row.
     // TODO: find best row to split. Currently: last
     if(besthi < 0) {
-      logger.debugFine("Split row " + bestey);
-      // Note: besthi is negative!
-      heights.add(bestey + 1, -besthi);
-      heights.set(bestey, heights.get(bestey) + besthi);
+      splitRow(bestey, -besthi);
       besthi = 0.0;
-      // Update used map
-      usage.add(bestey + 1, new ArrayList<Object>(usage.get(bestey)));
     }
     // Need to increase the total area
     if(bestinc > 0) {
@@ -289,6 +292,32 @@ public class RectangleArranger<T> {
     if(logger.isDebuggingFinest()) {
       logSizes();
     }
+  }
+
+  protected double computeIncreaseArea(double winc, double hinc) {
+    double inc = Math.max(winc, hinc * ratio);
+    inc = inc * (hinc + inc / ratio + winc / ratio);
+    return inc;
+  }
+
+  protected void splitRow(int bestey, double besthi) {
+    logger.debugFine("Split row " + bestey);
+    heights.add(bestey + 1, besthi);
+    heights.set(bestey, heights.get(bestey) - besthi);
+    // Update used map
+    usage.add(bestey + 1, new ArrayList<Object>(usage.get(bestey)));
+  }
+
+  protected void splitCol(int bestex, double bestwi) {
+    final int rows = heights.size();
+    logger.debugFine("Split column " + bestex);
+    widths.add(bestex + 1, bestwi);
+    widths.set(bestex, widths.get(bestex) - bestwi);
+    // Update used map
+    for(int y = 0; y < rows; y++) {
+      usage.get(y).add(bestex + 1, usage.get(y).get(bestex));
+    }
+    assert assertConsistent();
   }
 
   private void resize(double inc) {
@@ -403,6 +432,33 @@ public class RectangleArranger<T> {
   }
 
   /**
+   * Get the total canvas width
+   * 
+   * @return Width
+   */
+  public double getWidth() {
+    return twidth;
+  }
+
+  /**
+   * Get the total canvas height
+   * 
+   * @return Height
+   */
+  public double getHeight() {
+    return theight;
+  }
+
+  /**
+   * The items contained in the map.
+   * 
+   * @return entry set
+   */
+  public Set<Entry<T, double[]>> entrySet() {
+    return Collections.unmodifiableSet(map.entrySet());
+  }
+
+  /**
    * Test method.
    * 
    * @param args
@@ -421,8 +477,14 @@ public class RectangleArranger<T> {
     r = new RectangleArranger<String>(3., 3.);
     r.put(1., 2., "A");
     r.put(2., 1., "B");
-    r.put(1., 2., "D");
-    r.put(2., 1., "C");
+    r.put(1., 2., "C");
+    r.put(2., 1., "D");
     r.put(2., 2., "E");
+
+    r = new RectangleArranger<String>(4 - 2.6521739130434785);
+    r.put(4., .5, "A");
+    r.put(4., 3., "B");
+    r.put(4., 1., "C");
+    r.put(1., .1, "D");
   }
 }
