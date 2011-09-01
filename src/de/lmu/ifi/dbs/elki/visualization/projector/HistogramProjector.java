@@ -93,7 +93,7 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
       layout.add(master);
       for(int d1 = 1; d1 <= dmax; d1++) {
         PlotItem it = new PlotItem(d1 - 1 + .1, 0, 1., .1, null);
-        final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(Integer.toString(d1)));
+        final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, d1)));
         task.height = .1;
         task.width = 1;
         task.put(VisualizationTask.META_NODETAIL, true); 

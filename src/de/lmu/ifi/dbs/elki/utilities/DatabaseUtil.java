@@ -537,7 +537,7 @@ public final class DatabaseUtil {
    * @param col Column
    * @return Label
    */
-  public <V extends FeatureVector<?, ?>> String getColumnLabel(Relation<? extends V> rel, int col) {
+  public static <V extends FeatureVector<?, ?>> String getColumnLabel(Relation<? extends V> rel, int col) {
     String lbl = assumeVectorField(rel).getLabel(col);
     if(lbl != null) {
       return lbl;
