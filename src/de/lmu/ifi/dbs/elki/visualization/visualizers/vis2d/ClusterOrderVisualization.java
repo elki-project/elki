@@ -97,8 +97,8 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
       if(thisId == null || prevId == null) {
         continue;
       }
-      double[] thisVec = proj.fastProjectDataToRenderSpace(rep.get(thisId));
-      double[] prevVec = proj.fastProjectDataToRenderSpace(rep.get(prevId));
+      double[] thisVec = proj.fastProjectDataToRenderSpace(rel.get(thisId));
+      double[] prevVec = proj.fastProjectDataToRenderSpace(rel.get(prevId));
 
       Element arrow = svgp.svgLine(prevVec[0], prevVec[1], thisVec[0], thisVec[1]);
       SVGUtil.setCSSClass(arrow, cls.getName());

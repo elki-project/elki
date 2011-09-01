@@ -102,7 +102,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
       DBIDs selection = selContext.getSelectedIds();
       for(DBID i : selection) {
         try {
-          double[] v = proj.fastProjectDataToRenderSpace(rep.get(i));
+          double[] v = proj.fastProjectDataToRenderSpace(rel.get(i));
           Element dot = svgp.svgCircle(v[0], v[1], size);
           SVGUtil.addCSSClass(dot, MARKER);
           layer.appendChild(dot);

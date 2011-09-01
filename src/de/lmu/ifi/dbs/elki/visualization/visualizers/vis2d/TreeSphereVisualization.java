@@ -210,7 +210,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
   private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<NV, D, N, E> mtree, E entry, int depth) {
     DBID roid = entry.getRoutingObjectID();
     if(roid != null) {
-      NV ro = rep.get(roid);
+      NV ro = rel.get(roid);
       D rad = entry.getCoveringRadius();
 
       final Element r;

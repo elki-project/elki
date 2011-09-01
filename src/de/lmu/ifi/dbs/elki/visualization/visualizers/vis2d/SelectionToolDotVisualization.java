@@ -216,8 +216,8 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
     else {
       selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
     }
-    for(DBID id : rep.iterDBIDs()) {
-      double[] vec = proj.fastProjectDataToRenderSpace(rep.get(id));
+    for(DBID id : rel.iterDBIDs()) {
+      double[] vec = proj.fastProjectDataToRenderSpace(rel.get(id));
       if(vec[0] >= Math.min(p1.getX(), p2.getX()) && vec[0] <= Math.max(p1.getX(), p2.getX()) && vec[1] >= Math.min(p1.getY(), p2.getY()) && vec[1] <= Math.max(p1.getY(), p2.getY())) {
         if(mode == Mode.INVERT) {
           if(!selection.contains(id)) {

@@ -86,9 +86,9 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
   public void redraw() {
     // draw data
     double dot_size = context.getStyleLibrary().getSize(StyleLibrary.DOTPLOT);
-    for(DBID id : rep.iterDBIDs()) {
+    for(DBID id : rel.iterDBIDs()) {
       try {
-        double[] v = proj.fastProjectDataToRenderSpace(rep.get(id));
+        double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));
         Element dot = svgp.svgCircle(v[0], v[1], dot_size);
         SVGUtil.addCSSClass(dot, MARKER);
         layer.appendChild(dot);

@@ -156,7 +156,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
     DBIDSelection selContext = context.getSelection();
     if(selContext instanceof RangeSelection) {
       DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-      int dim = DatabaseUtil.dimensionality(rep);
+      int dim = DatabaseUtil.dimensionality(rel);
 
       double[] min = new double[dim];
       double[] max = new double[dim];

@@ -130,7 +130,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
       for(DBID objId : clus.getIDs()) {
         final Double radius = getScaledForId(objId);
         if(radius > 0.01) {
-          final NV vec = rep.get(objId);
+          final NV vec = rel.get(objId);
           if(vec != null) {
             double[] v = proj.fastProjectDataToRenderSpace(vec);
             Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
