@@ -186,6 +186,6 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
     if(labels == null) {
       return null;
     }
-    return labels[col];
+    return labels[col - 1];
   }
 }

@@ -195,7 +195,12 @@ public class ArffParser implements Parser {
           }
         }
         if(etyp[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
-          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dims[out], new DoubleVector(new double[dims[out]]));
+          String[] labels = new String[dims[out]];
+          // Collect labels:
+          for (int i = 0; i < dims[out]; i++) {
+            labels[i] = names.get(out + i);
+          }
+          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dims[out], labels, new DoubleVector(new double[dims[out]]));
           bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else if(etyp[out] == TypeUtil.LABELLIST) {
