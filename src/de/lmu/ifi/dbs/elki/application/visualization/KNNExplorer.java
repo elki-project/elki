@@ -33,6 +33,7 @@ import java.util.ListIterator;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -50,6 +51,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
@@ -263,6 +265,14 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+      // ELKI icon
+      try {
+        frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
+      }
+      catch(Exception e) {
+        // Ignore - icon not found is not fatal.
+      }
+      
       // Create a panel and add the button, status label and the SVG canvas.
       final JPanel bigpanel = new JPanel(new BorderLayout());
 

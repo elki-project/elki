@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.Set;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -35,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -131,6 +133,14 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
    */
   public SelectionTableWindow(VisualizerContext context) {
     super(NAME);
+    // ELKI icon
+    try {
+      setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
+    }
+    catch(Exception e) {
+      // Ignore - icon not found is not fatal.
+    }
+    
     this.context = context;
     this.database = ResultUtil.findDatabase(context.getResult());
     // FIXME: re-add labels

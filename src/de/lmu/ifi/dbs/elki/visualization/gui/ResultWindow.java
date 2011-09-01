@@ -31,6 +31,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -40,6 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 
+import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -148,6 +150,14 @@ public class ResultWindow extends JFrame implements ResultListener {
     // close handler
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+    // ELKI icon
+    try {
+      setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
+    }
+    catch(Exception e) {
+      // Ignore - icon not found is not fatal.
+    }
+    
     // setup buttons
     exportItem = new JMenuItem("Export");
     exportItem.setMnemonic(KeyEvent.VK_E);
