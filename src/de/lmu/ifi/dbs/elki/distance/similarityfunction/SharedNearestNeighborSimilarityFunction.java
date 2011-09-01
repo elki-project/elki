@@ -90,13 +90,13 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
   }
 
   /**
-   * TODO: document
+   * Instance for a particular database.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.uses SharedNearestNeighborIndex
    * 
-   * @param <D>
+   * @param <O> Object type
    */
   public static class Instance<O> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
     /**
