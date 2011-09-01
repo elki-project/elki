@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
 import de.lmu.ifi.dbs.elki.visualization.projections.Simple1D;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
 
 /**
  * ScatterPlotProjector is responsible for producing a set of scatterplot
@@ -82,15 +83,23 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
     List<PlotItem> layout = new ArrayList<PlotItem>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0){
-      PlotItem master = new PlotItem(dmax, .5, null);
+      PlotItem master = new PlotItem(dmax + .1, .5 + .1, null);
       for(int d1 = 1; d1 <= dmax; d1++) {
         Projection1D proj = new Simple1D(scales, d1);
-        final PlotItem it = new PlotItem(d1 - 1, 0., 1., .5, proj);
+        final PlotItem it = new PlotItem(d1 - 1 + .1, 0. + .1, 1., .5, proj);
         it.visualizations = tasks;
         master.subitems.add(it);
       }
       layout.add(master);
-      // TODO: add labels?
+      for(int d1 = 1; d1 <= dmax; d1++) {
+        PlotItem it = new PlotItem(d1 - 1 + .1, 0, 1., .1, null);
+        final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(Integer.toString(d1)));
+        task.height = .1;
+        task.width = 1;
+        task.put(VisualizationTask.META_NODETAIL, true); 
+        it.visualizations.add(task);
+        master.subitems.add(it);
+      }
     }
     return layout;
   }
