@@ -113,7 +113,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
   public SelectionToolCubeVisualization(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
-    this.dim = DatabaseUtil.dimensionality(rep);
+    this.dim = DatabaseUtil.dimensionality(rel);
     context.addContextChangeListener(this);
     incrementalRedraw();
   }
@@ -173,7 +173,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
     v2.set(0, x2);
     v2.set(1, y2);
 
-    NV factory = DatabaseUtil.assumeVectorField(rep).getFactory();
+    NV factory = DatabaseUtil.assumeVectorField(rel).getFactory();
 
     NV nv1 = proj.projectRenderToDataSpace(v1, factory);
     NV nv2 = proj.projectRenderToDataSpace(v2, factory);
@@ -245,8 +245,8 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
 
       selection.clear();
       boolean idIn = true;
-      for(DBID id : rep.iterDBIDs()) {
-        NV dbTupel = rep.get(id);
+      for(DBID id : rel.iterDBIDs()) {
+        NV dbTupel = rel.get(id);
         idIn = true;
         for(int i = 0; i < dim; i++) {
           if(ranges != null && ranges[i] != null) {

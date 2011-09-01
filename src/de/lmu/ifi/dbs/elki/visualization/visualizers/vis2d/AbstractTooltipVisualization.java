@@ -92,8 +92,8 @@ public abstract class AbstractTooltipVisualization<NV extends NumberVector<NV, ?
       }
     };
 
-    for(DBID id : rep.iterDBIDs()) {
-      double[] v = proj.fastProjectDataToRenderSpace(rep.get(id));
+    for(DBID id : rel.iterDBIDs()) {
+      double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));
       Element tooltip = makeTooltip(id, v[0], v[1], dotsize);
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 

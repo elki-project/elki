@@ -117,7 +117,7 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
       ConvexHull2D hull = new ConvexHull2D();
 
       for(DBID clpnum : ids) {
-        double[] projP = proj.fastProjectDataToRenderSpace(rep.get(clpnum).getColumnVector());
+        double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum).getColumnVector());
         hull.add(new Vector(projP));
       }
       Polygon chres = hull.getHull();
@@ -128,7 +128,7 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
         // Approximate area (using bounding box)
         double hullarea = SpatialUtil.volume(chres);
         final double relativeArea = (projarea - hullarea) / projarea;
-        final double relativeSize = (double) ids.size() / rep.size();
+        final double relativeSize = (double) ids.size() / rel.size();
         opacity = Math.sqrt(relativeSize * relativeArea);
 
         hulls = path.makeElement(svgp);

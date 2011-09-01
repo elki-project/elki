@@ -374,7 +374,7 @@ public class RectangleArranger<T> {
         assert (widths.get(x) > 0);
         wsum += widths.get(x);
       }
-      assert (wsum == twidth);
+      assert (Math.abs(wsum - twidth) < 1E-10);
     }
     {
       double hsum = 0.0;
@@ -382,7 +382,7 @@ public class RectangleArranger<T> {
         assert (heights.get(y) > 0);
         hsum += heights.get(y);
       }
-      assert (hsum == theight);
+      assert (Math.abs(hsum - theight) < 1E-10);
     }
     {
       assert (usage.size() == rows);
@@ -420,7 +420,7 @@ public class RectangleArranger<T> {
     {
       for(int y = 0; y < rows; y++) {
         for(int x = 0; x < cols; x++) {
-          buf.append(usage.get(y).get(x) != null ? "X" : " ");
+          buf.append(usage.get(y).get(x) != null ? "X" : "_");
         }
         buf.append("|\n");
       }

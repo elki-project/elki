@@ -51,7 +51,7 @@ public abstract class P2DVisualization<NV extends NumberVector<?, ?>> extends Ab
   /**
    * The representation we visualize
    */
-  final protected Relation<NV> rep;
+  final protected Relation<NV> rel;
 
   /**
    * Constructor.
@@ -61,7 +61,7 @@ public abstract class P2DVisualization<NV extends NumberVector<?, ?>> extends Ab
   public P2DVisualization(VisualizationTask task) {
     super(task);
     this.proj = task.getProj();
-    this.rep = task.getRelation();
+    this.rel = task.getRelation();
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
   }

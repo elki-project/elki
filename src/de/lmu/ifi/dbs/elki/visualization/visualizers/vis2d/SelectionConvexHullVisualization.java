@@ -101,7 +101,7 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
       ConvexHull2D hull = new ConvexHull2D();
       for(DBID i : selection) {
         try {
-          hull.add(new Vector(proj.fastProjectDataToRenderSpace(rep.get(i))));
+          hull.add(new Vector(proj.fastProjectDataToRenderSpace(rel.get(i))));
         }
         catch(ObjectNotFoundException e) {
           // ignore

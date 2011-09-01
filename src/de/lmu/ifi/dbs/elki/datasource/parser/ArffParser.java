@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -24,7 +25,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 /**
  * Parser to load WEKA .arff files into ELKI.
  * 
- * This parser is quite hackish, and contains lots of not yet configurable magic.
+ * This parser is quite hackish, and contains lots of not yet configurable
+ * magic.
  * 
  * TODO: Sparse vectors are not yet supported.
  * 
@@ -197,26 +199,31 @@ public class ArffParser implements Parser {
         if(etyp[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
           String[] labels = new String[dims[out]];
           // Collect labels:
-          for (int i = 0; i < dims[out]; i++) {
+          for(int i = 0; i < dims[out]; i++) {
             labels[i] = names.get(out + i);
           }
           VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dims[out], labels, new DoubleVector(new double[dims[out]]));
           bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else if(etyp[out] == TypeUtil.LABELLIST) {
-          bundle.appendColumn(TypeUtil.LABELLIST, new ArrayList<LabelList>());
+          String label = names.get(out);
+          for(int i = 1; i < dims[out]; i++) {
+            label = label + " " + names.get(out + i);
+          }
+          bundle.appendColumn(new SimpleTypeInformation<LabelList>(LabelList.class, label), new ArrayList<LabelList>());
         }
         else if(etyp[out] == TypeUtil.EXTERNALID) {
-          bundle.appendColumn(TypeUtil.EXTERNALID, new ArrayList<ExternalID>());
+          bundle.appendColumn(new SimpleTypeInformation<ExternalID>(ExternalID.class, names.get(out)), new ArrayList<ExternalID>());
         }
         else if(etyp[out] == TypeUtil.CLASSLABEL) {
-          bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<ClassLabel>());
+          bundle.appendColumn(new SimpleTypeInformation<ClassLabel>(ClassLabel.class, names.get(out)), new ArrayList<ClassLabel>());
         }
         else {
           throw new AbortException("Unsupported type for column " + in + "->" + out + ": " + ((etyp[out] != null) ? etyp[out].toString() : "null"));
         }
         assert (out == bundle.metaLength() - 1);
-        // logger.warning("Added meta: " + bundle.meta(bundle.metaLength() - 1));
+        // logger.warning("Added meta: " + bundle.meta(bundle.metaLength() -
+        // 1));
         in = nin;
       }
       // Setup tokenizer

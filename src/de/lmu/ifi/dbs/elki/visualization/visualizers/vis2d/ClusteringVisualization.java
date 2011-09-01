@@ -89,7 +89,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
       Cluster<?> clus = ci.next();
       for(DBID objId : clus.getIDs()) {
         try {
-          final NV vec = rep.get(objId);
+          final NV vec = rel.get(objId);
           double[] v = proj.fastProjectDataToRenderSpace(vec);
           ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
         }

@@ -110,7 +110,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
         drawDistancefunction: for(DistanceResultPair<DoubleDistance> j : result.get(i)) {
           try {
-            double[] v = proj.fastProjectDataToRenderSpace(rep.get(j.getDBID()));
+            double[] v = proj.fastProjectDataToRenderSpace(rel.get(j.getDBID()));
             Element dot = svgp.svgCircle(v[0], v[1], size);
             SVGUtil.addCSSClass(dot, KNNMARKER);
             layer.appendChild(dot);
@@ -122,19 +122,19 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
             if(result.getK() == counter) {
               switch((int) p[0]){
               case 1: {
-                dist = SVGHyperSphere.drawManhattan(svgp, proj, rep.get(i), j.getDistance());
+                dist = SVGHyperSphere.drawManhattan(svgp, proj, rel.get(i), j.getDistance());
                 break;
               }
               case 2: {
-                dist = SVGHyperSphere.drawEuclidean(svgp, proj, rep.get(i), j.getDistance());
+                dist = SVGHyperSphere.drawEuclidean(svgp, proj, rel.get(i), j.getDistance());
                 break;
               }
               case 3: {
-                dist = SVGHyperSphere.drawLp(svgp, proj, rep.get(i), j.getDistance(), p[1]);
+                dist = SVGHyperSphere.drawLp(svgp, proj, rel.get(i), j.getDistance(), p[1]);
                 break;
               }
               case 4: {
-                dist = DistanceFunctionDrawUtils.drawCosine(svgp, proj, rep.get(i), rep.get(j.getDBID()));
+                dist = DistanceFunctionDrawUtils.drawCosine(svgp, proj, rel.get(i), rel.get(j.getDBID()));
                 break;
               }
               default: {
