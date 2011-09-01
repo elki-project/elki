@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -32,13 +31,13 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
@@ -224,7 +223,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 
@@ -275,13 +274,14 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
-      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
-        final ArrayList<MaterializeKNNPreprocessor<NV, D>> kNNIndex = ResultUtil.filterResults(result, MaterializeKNNPreprocessor.class);
-        for(AbstractMaterializeKNNPreprocessor<NV, D> kNN : kNNIndex) {
-          final VisualizationTask task = new VisualizationTask(NAME, kNN, rep, this);
+      final ArrayList<MaterializeKNNPreprocessor<NV, D>> kNNIndex = ResultUtil.filterResults(result, MaterializeKNNPreprocessor.class);
+      for(AbstractMaterializeKNNPreprocessor<NV, D> kNN : kNNIndex) {
+        Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+        for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+          final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
           baseResult.getHierarchy().add(kNN, task);
+          baseResult.getHierarchy().add(p, task);
         }
       }
     }

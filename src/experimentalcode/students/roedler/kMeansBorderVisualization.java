@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -21,12 +20,12 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 import experimentalcode.students.roedler.utils.Voronoi;
 
@@ -148,21 +147,20 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(baseResult);
-      for(Relation<? extends NumberVector<?, ?>> rep : IterableUtil.fromIterator(reps)) {
-        if(DatabaseUtil.dimensionality(rep) > 2) {
-          return;
-        }
-        // Find clusterings we can visualize:
-        Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-        for(Clustering<?> c : clusterings) {
-          if(c.getAllClusters().size() > 0) {
-            // Does the cluster have a model with cluster means?
-            Clustering<MeanModel<NV>> mcls = findMeanModel(c);
-            if(mcls != null) {
-              final VisualizationTask task = new VisualizationTask(NAME, c, rep, this);
-              task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
-              baseResult.getHierarchy().add(c, task);
+      // Find clusterings we can visualize:
+      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+      for(Clustering<?> c : clusterings) {
+        if(c.getAllClusters().size() > 0) {
+          // Does the cluster have a model with cluster means?
+          Clustering<MeanModel<NV>> mcls = findMeanModel(c);
+          if(mcls != null) {
+            Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+            for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+              if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
+                final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
+                task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
+                baseResult.getHierarchy().add(c, task);
+              }
             }
           }
         }
