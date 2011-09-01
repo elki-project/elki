@@ -133,21 +133,22 @@ public class RectangleArranger<T> {
     double bestinc;
     // Baseline: grow by adding to the top or to the right.
     {
-      double i1 = computeIncreaseArea(w, Math.max(0, h-theight));
-      double i2 = computeIncreaseArea(Math.max(0, w-twidth), h);
-      if (i1 < i2) {
+      double i1 = computeIncreaseArea(w, Math.max(0, h - theight));
+      double i2 = computeIncreaseArea(Math.max(0, w - twidth), h);
+      if(i1 < i2) {
         bestwi = w;
-        besthi = Math.max(0, h-theight);
+        besthi = Math.max(0, h - theight);
         bestinc = i1;
-      } else {
-        bestwi = Math.max(0, w-twidth);
+      }
+      else {
+        bestwi = Math.max(0, w - twidth);
         besthi = h;
         bestinc = i2;
       }
     }
     // Find position with minimum increase
-    for(int sx = 0; sx < cols; sx++) {
-      for(int sy = 0; sy < rows; sy++) {
+    for(int sy = 0; sy < rows; sy++) {
+      for(int sx = 0; sx < cols; sx++) {
         if(usage.get(sy).get(sx) != null) {
           continue;
         }

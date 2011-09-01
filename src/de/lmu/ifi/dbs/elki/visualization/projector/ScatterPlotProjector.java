@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projections.Simple2D;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
 
 /**
  * ScatterPlotProjector is responsible for producing a set of scatterplot
@@ -86,12 +87,12 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0){
       final double sizeh = Math.ceil((dmax - 1) / 2.0);
-      PlotItem master = new PlotItem(sizeh * 2, dmax - 1, null);
+      PlotItem master = new PlotItem(sizeh * 2 + .1, dmax - 1 + .1, null);
 
-      for(int d1 = 1; d1 <= dmax; d1++) {
+      for(int d1 = 1; d1 < dmax; d1++) {
         for(int d2 = d1 + 1; d2 <= dmax; d2++) {
           Projection2D proj = new Simple2D(scales, d1, d2);
-          final PlotItem it = new PlotItem(d1 - 1, d2 - 2, 1., 1., proj);
+          PlotItem it = new PlotItem(d1 - 1 + .1, d2 - 2, 1., 1., proj);
           it.visualizations = tasks;
           master.subitems.add(it);
         }
@@ -104,12 +105,31 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
         // p.addRotation(0, 3, Math.PI / 180 * -20.);
         // p.addRotation(1, 3, Math.PI / 180 * 30.);
         Projection2D proj = new AffineProjection(scales, p);
-        final PlotItem it = new PlotItem(sizeh, 0.0, sizeh, sizeh, proj);
+        PlotItem it = new PlotItem(sizeh + .1, 0, sizeh, sizeh, proj);
         it.visualizations = tasks;
         master.subitems.add(it);
       }
-
-      // TODO: re-add labels?
+      // Labels at bottom
+      for(int d1 = 1; d1 < dmax; d1++) {
+        PlotItem it = new PlotItem(d1 - 1 + .1, dmax - 1, 1., .1, null);
+        final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(Integer.toString(d1)));
+        task.height = .1;
+        task.width = 1;
+        task.put(VisualizationTask.META_NODETAIL, true); 
+        it.visualizations.add(task);
+        master.subitems.add(it);
+      }
+      // Labels on left
+      for(int d2 = 2; d2 <= dmax; d2++) {
+        PlotItem it = new PlotItem(0, d2 - 2, .1, 1, null);
+        final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(Integer.toString(d2)));
+        task.height = 1;
+        task.width = .1;
+        task.put(VisualizationTask.META_NODETAIL, true); 
+        it.visualizations.add(task);
+        master.subitems.add(it);
+      }
+      
       layout.add(master);
     }
     return layout;
