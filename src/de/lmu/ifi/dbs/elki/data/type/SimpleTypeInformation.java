@@ -34,6 +34,11 @@ public class SimpleTypeInformation<T> implements TypeInformation {
    * The restriction class we represent.
    */
   private Class<? super T> cls;
+  
+  /**
+   * Type label
+   */
+  private String label = null;
 
   /**
    * Constructor.
@@ -43,6 +48,18 @@ public class SimpleTypeInformation<T> implements TypeInformation {
   public SimpleTypeInformation(Class<? super T> cls) {
     super();
     this.cls = cls;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param cls restriction class
+   * @param label type label
+   */
+  public SimpleTypeInformation(Class<? super T> cls, String label) {
+    super();
+    this.cls = cls;
+    this.label = label;
   }
 
   /**
@@ -82,5 +99,14 @@ public class SimpleTypeInformation<T> implements TypeInformation {
   @Override
   public String toString() {
     return getRestrictionClass().getSimpleName();
+  }
+
+  /**
+   * Get the type label
+   * 
+   * @return Label
+   */
+  public String getLabel() {
+    return label;
   }
 }

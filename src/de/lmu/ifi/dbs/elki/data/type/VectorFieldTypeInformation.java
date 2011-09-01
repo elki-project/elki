@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.data.type;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 
@@ -36,6 +37,11 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
    * Object factory for producing new instances
    */
   private final V factory;
+
+  /**
+   * Labels
+   */
+  private String[] labels = null;
 
   /**
    * Constructor for a request without fixed dimensionality.
@@ -80,6 +86,21 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   public VectorFieldTypeInformation(Class<? super V> cls, int dim, V factory) {
     super(cls, dim, dim);
     this.factory = factory;
+  }
+
+  /**
+   * Constructor with given dimensionality and factory, so usually an instance.
+   * 
+   * @param cls Restriction java class
+   * @param dim Dimensionality
+   * @param labels Labels
+   * @param factory Factory class
+   */
+  public VectorFieldTypeInformation(Class<? super V> cls, int dim, String[] labels, V factory) {
+    super(cls, dim, dim);
+    this.labels = labels;
+    this.factory = factory;
+    assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
   }
 
   @Override
@@ -153,5 +174,18 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
     else {
       return super.toString();
     }
+  }
+
+  /**
+   * Get the column label
+   * 
+   * @param col Column number
+   * @return Label
+   */
+  public String getLabel(int col) {
+    if(labels == null) {
+      return null;
+    }
+    return labels[col];
   }
 }
