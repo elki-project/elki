@@ -123,6 +123,11 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
     return this.seed == ((RandomStableDistanceFunction) obj).seed;
   }
 
+  @Override
+  public int hashCode() {
+    return (int) seed;
+  }
+
   /**
    * Parameterization class.
    * 

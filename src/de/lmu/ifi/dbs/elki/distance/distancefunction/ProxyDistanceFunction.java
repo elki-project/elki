@@ -117,4 +117,9 @@ public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBI
     ProxyDistanceFunction<?, ?> other = (ProxyDistanceFunction<?, ?>) obj;
     return this.inner.equals(other.inner);
   }
+
+  @Override
+  public int hashCode() {
+    return this.inner.hashCode();
+  }
 }
