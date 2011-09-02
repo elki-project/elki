@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -53,11 +54,11 @@ public class TestTopBoundedHeap {
     }
     for(int i = 0; i < asc.length; i++) {
       final Integer gota = hasc.poll();
-      assertEquals("Objects sorted incorrectly at ascending position "+i, asc[i], gota);
+      assertEquals("Objects sorted incorrectly at ascending position " + i, asc[i], gota);
     }
     for(int i = 0; i < desc.length; i++) {
       final Integer gotd = hdesc.poll();
-      assertEquals("Objects sorted incorrectly at descending position "+i, desc[i], gotd);
+      assertEquals("Objects sorted incorrectly at descending position " + i, desc[i], gotd);
     }
   }
 }

@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -98,11 +99,11 @@ public abstract class AbstractSimpleAlgorithmTest {
   protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
     org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
-    
+
     List<Class<?>> filterlist = new ArrayList<Class<?>>();
     filterlist.add(FixedDBIDsFilter.class);
-    if (filters != null) {
-      for (Class<?> filter : filters) {
+    if(filters != null) {
+      for(Class<?> filter : filters) {
         filterlist.add(filter);
       }
     }

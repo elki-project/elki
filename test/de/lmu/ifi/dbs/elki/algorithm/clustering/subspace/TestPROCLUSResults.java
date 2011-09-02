@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -80,7 +81,7 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
   @Test
   public void testPROCLUSSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(PROCLUS.L_ID, 2);
@@ -88,7 +89,7 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
     params.addParameter(PROCLUS.SEED_ID, 2);
     PROCLUS<DoubleVector> proclus = ClassGenericsUtil.parameterizeOrAbort(PROCLUS.class, params);
     testParameterizationOk(params);
-  
+
     // run PROCLUS on database
     Clustering<Model> result = proclus.run(db);
     testFMeasure(db, result, 0.9673718);

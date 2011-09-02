@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -59,7 +60,8 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
     ListParameterization inp = new ListParameterization();
     inp.addParameter(ClassLabelFilter.CLASS_LABEL_INDEX_ID, 1);
     Class<?>[] filters = new Class<?>[] { ClassLabelFilter.class };
-    // FIXME: makeSimpleDatabase currently does also add FILTERS, this doesn't work.
+    // FIXME: makeSimpleDatabase currently does also add FILTERS, this doesn't
+    // work.
     Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp, filters);
 
     ListParameterization params = new ListParameterization();

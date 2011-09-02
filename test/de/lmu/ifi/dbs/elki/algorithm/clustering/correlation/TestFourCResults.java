@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -78,17 +79,17 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
   @Test
   public void testFourCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     // 4C
     params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 1.2);
     params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 5);
     params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 3);
-  
+
     FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);
     testParameterizationOk(params);
-  
+
     // run 4C on database
     Clustering<Model> result = fourc.run(db);
     testFMeasure(db, result, 0.48305405);

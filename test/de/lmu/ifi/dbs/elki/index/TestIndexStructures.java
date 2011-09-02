@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.index;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -150,13 +151,16 @@ public class TestIndexStructures implements JUnit4Test {
    * 
    * @throws ParameterException
    */
-//  @Test
-//  public void testXTree() {
-//    ListParameterization xtreeparams = new ListParameterization();
-//    xtreeparams.addParameter(StaticArrayDatabase.INDEX_ID, experimentalcode.shared.index.xtree.XTreeFactory.class);
-//    xtreeparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
-//    testFileBasedDatabaseConnection(xtreeparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
-//  }
+  // @Test
+  // public void testXTree() {
+  // ListParameterization xtreeparams = new ListParameterization();
+  // xtreeparams.addParameter(StaticArrayDatabase.INDEX_ID,
+  // experimentalcode.shared.index.xtree.XTreeFactory.class);
+  // xtreeparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
+  // testFileBasedDatabaseConnection(xtreeparams,
+  // DoubleDistanceRStarTreeKNNQuery.class,
+  // DoubleDistanceRStarTreeRangeQuery.class);
+  // }
 
   /**
    * Actual test routine.

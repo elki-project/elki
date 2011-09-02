@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.math;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,13 +33,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * JUnit test to test the {@link ReplacingHistogram} class.
+ * 
  * @author Erich Schubert
  */
 public class TestReplacingHistogram implements JUnit4Test {
   ReplacingHistogram<Double> hist;
 
   /**
-   * Test that adds some data to the histogram and compares results. 
+   * Test that adds some data to the histogram and compares results.
    */
   @Test
   public final void testHistogram() {
@@ -61,10 +63,10 @@ public class TestReplacingHistogram implements JUnit4Test {
     hist.replace(-.13, -1.23 + hist.get(-.13));
     hist.replace(1.13, -4.56 + hist.get(1.13));
     assertArrayEquals("Resized histogram doesn't match", resized, hist.getData().toArray(new Double[0]));
-    
+
     // compare results via Iterator.
     int off = 0;
-    for (Pair<Double, Double> pair : hist) {
+    for(Pair<Double, Double> pair : hist) {
       assertEquals("Array iterator bin position", -0.15 + 0.1 * off, pair.getFirst(), 0.00001);
       assertEquals("Array iterator bin contents", resized[off], pair.getSecond(), 0.00001);
       off++;

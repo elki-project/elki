@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.math;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -102,7 +103,6 @@ public class TestQuickSelect implements JUnit4Test {
     // Note: do not change the order, since this modifies the array.
     assertEquals("Full median incorrect.", 0.95, QuickSelect.median(data), Double.MIN_VALUE);
   }
-
 
   @Test
   public void testTies() {

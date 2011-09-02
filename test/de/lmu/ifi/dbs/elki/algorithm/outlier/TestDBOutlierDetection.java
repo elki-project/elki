@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -34,11 +35,11 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the DBOutlierDetection algorithm. 
+ * Tests the DBOutlierDetection algorithm.
  * 
  * @author Lucia Cichella
  */
-public class TestDBOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test{
+public class TestDBOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testDBOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
@@ -48,14 +49,14 @@ public class TestDBOutlierDetection extends AbstractSimpleAlgorithmTest implemen
     params.addParameter(DBOutlierDetection.D_ID, 0.175);
     params.addParameter(DBOutlierDetection.P_ID, 0.98);
 
-    //setup Algorithm
+    // setup Algorithm
     DBOutlierDetection<DoubleVector, DoubleDistance> dbOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(DBOutlierDetection.class, params);
     testParameterizationOk(params);
 
-    //run DBOutlierDetection on database
+    // run DBOutlierDetection on database
     OutlierResult result = dbOutlierDetection.run(db);
 
     testSingleScore(result, 1025, 0.0);
-    testAUC(db, "Noise", result, 0.97487179);   
+    testAUC(db, "Noise", result, 0.97487179);
   }
 }
