@@ -83,7 +83,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
   }
 
   @Override
-  protected boolean prepareStart(@SuppressWarnings("unused") SimpleTypeInformation<V> in) {
+  protected boolean prepareStart(SimpleTypeInformation<V> in) {
     return (minima.length == 0 || maxima.length == 0);
   }
 

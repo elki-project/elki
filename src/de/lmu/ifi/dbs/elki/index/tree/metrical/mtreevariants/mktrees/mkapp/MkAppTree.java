@@ -104,7 +104,6 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * @throws UnsupportedOperationException since this operation is not supported
    */
-  @SuppressWarnings("unused")
   @Override
   public void insert(MkAppEntry<D> id, boolean withPreInsert) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
@@ -113,7 +112,6 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * @throws UnsupportedOperationException since this operation is not supported
    */
-  @SuppressWarnings("unused")
   @Override
   protected void preInsert(MkAppEntry<D> entry) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");

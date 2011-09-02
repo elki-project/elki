@@ -176,7 +176,7 @@ public class JudgeOutlierScores implements Evaluator {
       return;
     }
 
-    ModifiableDBIDs ids = DBIDUtil.newHashSet(db.getDBIDs());
+    ModifiableDBIDs ids = DBIDUtil.newHashSet(ors.iterator().next().getScores().getDBIDs());
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
     ids.removeDBIDs(outlierIds);
 

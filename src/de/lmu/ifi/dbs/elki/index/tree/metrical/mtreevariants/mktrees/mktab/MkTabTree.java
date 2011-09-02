@@ -76,7 +76,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    *         not supported
    */
   @Override
-  protected void preInsert(@SuppressWarnings("unused") MkTabEntry<D> entry) {
+  protected void preInsert(MkTabEntry<D> entry) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -84,7 +84,6 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @throws UnsupportedOperationException since insertion of single objects is
    *         not supported
    */
-  @SuppressWarnings("unused")
   @Override
   public void insert(MkTabEntry<D> entry, boolean withPreInsert) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");

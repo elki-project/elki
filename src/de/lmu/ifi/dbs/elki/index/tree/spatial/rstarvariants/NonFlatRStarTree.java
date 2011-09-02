@@ -110,7 +110,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
   }
 
   @Override
-  protected void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
+  protected void createEmptyRoot(E exampleLeaf) {
     N root = createNewLeafNode();
     writeNode(root);
     setHeight(1);

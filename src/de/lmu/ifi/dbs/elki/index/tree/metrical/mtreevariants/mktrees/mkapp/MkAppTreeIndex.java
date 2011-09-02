@@ -91,7 +91,6 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
     return new MkAppLeafEntry<D>(id, parentDistance, null);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void insert(DBID id) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
@@ -114,7 +113,6 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
-  @SuppressWarnings("unused")
   @Override
   public final boolean delete(DBID id) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
@@ -127,7 +125,6 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
-  @SuppressWarnings("unused")
   @Override
   public void deleteAll(DBIDs ids) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);

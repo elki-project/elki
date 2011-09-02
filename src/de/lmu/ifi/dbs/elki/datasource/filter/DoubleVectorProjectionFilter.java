@@ -57,7 +57,6 @@ public class DoubleVectorProjectionFilter extends AbstractFeatureSelectionFilter
     return TypeUtil.DOUBLE_VECTOR_FIELD;
   }
 
-  @SuppressWarnings("unused")
   @Override
   protected SimpleTypeInformation<? super DoubleVector> convertedType(SimpleTypeInformation<DoubleVector> in) {
     return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, getDimensionality(), new DoubleVector(new double[getDimensionality()]));

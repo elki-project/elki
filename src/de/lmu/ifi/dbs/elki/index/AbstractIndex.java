@@ -64,25 +64,21 @@ public abstract class AbstractIndex<O> implements Index {
     return null;
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void insert(DBID id) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void insertAll(DBIDs ids) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
-  @SuppressWarnings("unused")
   @Override
   public boolean delete(DBID id) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void deleteAll(DBIDs id) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");

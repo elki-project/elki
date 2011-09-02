@@ -72,7 +72,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
    * Does nothing because no operations are necessary before inserting an entry.
    */
   @Override
-  protected void preInsert(@SuppressWarnings("unused") MTreeEntry<D> entry) {
+  protected void preInsert(MTreeEntry<D> entry) {
     // do nothing
   }
 

@@ -96,7 +96,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
   }
 
   @Override
-  protected boolean prepareStart(@SuppressWarnings("unused") SimpleTypeInformation<V> in) {
+  protected boolean prepareStart(SimpleTypeInformation<V> in) {
     return (mean.length == 0 || stddev.length == 0);
   }
 

@@ -115,7 +115,7 @@ public class SavedSettingsTabPanel extends JPanel {
       loadButton.setMnemonic(KeyEvent.VK_L);
       loadButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
           ArrayList<String> settings = store.get(key);
           SerializedParameterization config = new SerializedParameterization(settings);
@@ -130,7 +130,7 @@ public class SavedSettingsTabPanel extends JPanel {
       saveButton.setMnemonic(KeyEvent.VK_S);
       saveButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
           store.put(key, gui.serializeParameters());
           try {
@@ -148,7 +148,7 @@ public class SavedSettingsTabPanel extends JPanel {
       removeButton.setMnemonic(KeyEvent.VK_E);
       removeButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
           store.remove(key);
           try {

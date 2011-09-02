@@ -52,7 +52,6 @@ public abstract class AbstractNormalization<O> extends AbstractConversionFilter<
     return normalizeObjects(objects);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
     // FIXME: implement.

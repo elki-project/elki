@@ -87,7 +87,6 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   }
 
   @Override
-  @SuppressWarnings("unused")
   protected SparseFloatVector createDBObject(List<Double> attributes) {
     throw new UnsupportedOperationException("This method should never be reached.");
   }

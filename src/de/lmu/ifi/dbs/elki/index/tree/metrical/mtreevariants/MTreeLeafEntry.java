@@ -85,7 +85,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    *         assigned a routing object.
    */
   @Override
-  public final void setRoutingObjectID(@SuppressWarnings("unused") DBID objectID) {
+  public final void setRoutingObjectID(DBID objectID) {
     throw new UnsupportedOperationException("Leaf entries should not be assigned a routing object.");
     // super.setEntryID(objectID.getIntegerID());
   }
@@ -131,7 +131,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    *         radius
    */
   @Override
-  public void setCoveringRadius(@SuppressWarnings("unused") D coveringRadius) {
+  public void setCoveringRadius(D coveringRadius) {
     throw new UnsupportedOperationException("This entry is not a directory entry!");
   }
 

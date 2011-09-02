@@ -44,7 +44,6 @@ public class AttributeWiseErfNormalization<O extends NumberVector<O, ?>> extends
     super();
   }
 
-  @SuppressWarnings("unused")
   @Override
   public O restore(O featureVector) throws NonNumericFeaturesException {
     throw new UnsupportedOperationException("Not implemented yet.");

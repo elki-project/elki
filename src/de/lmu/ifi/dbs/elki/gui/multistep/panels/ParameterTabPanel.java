@@ -128,7 +128,7 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
       runButton.setMnemonic(KeyEvent.VK_R);
       runButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           Thread r = new Thread() {
             @Override
             public void run() {

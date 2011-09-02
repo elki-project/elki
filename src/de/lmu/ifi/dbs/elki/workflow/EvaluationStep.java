@@ -117,18 +117,16 @@ public class EvaluationStep implements WorkflowStep {
     }
 
     @Override
-    public void resultAdded(Result child, @SuppressWarnings("unused") Result parent) {
+    public void resultAdded(Result child, Result parent) {
       // Re-run evaluators on result
       update(child);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void resultChanged(Result current) {
       // Ignore for now. TODO: re-evaluate?
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void resultRemoved(Result child, Result parent) {
       // TODO: Implement
