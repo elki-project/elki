@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -86,14 +87,14 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
   @Test
   public void testCLIQUESubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(CLIQUE.TAU_ID, 0.2);
     params.addParameter(CLIQUE.XSI_ID, 6);
     CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
     testParameterizationOk(params);
-  
+
     // run CLIQUE on database
     Clustering<SubspaceModel<DoubleVector>> result = clique.run(db);
     testFMeasure(db, result, 0.433661);

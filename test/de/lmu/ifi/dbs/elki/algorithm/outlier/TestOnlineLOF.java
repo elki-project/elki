@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -120,7 +121,7 @@ public class TestOnlineLOF implements JUnit4Test {
 
     // setup algorithm
     OnlineLOF<DoubleVector, DoubleDistance> lof = new OnlineLOF<DoubleVector, DoubleDistance>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
-    
+
     // run OnlineLOF on database
     OutlierResult result = lof.run(db);
 

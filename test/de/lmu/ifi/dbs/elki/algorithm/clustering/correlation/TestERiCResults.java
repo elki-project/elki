@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -98,7 +99,7 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
   @Test
   public void testERiCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     // ERiC
@@ -117,10 +118,10 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
     params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
     params.addParameter(PercentageEigenPairFilter.ALPHA_ID, 0.6);
-  
+
     ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);
     testParameterizationOk(params);
-  
+
     // run ERiC on database
     Clustering<CorrelationModel<DoubleVector>> result = eric.run(db);
     testFMeasure(db, result, 0.831136946);

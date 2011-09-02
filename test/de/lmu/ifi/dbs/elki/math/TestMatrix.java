@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.math;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -60,7 +61,7 @@ public class TestMatrix implements JUnit4Test {
     org.junit.Assert.assertTrue("A.transposeTimesTranspose(B) does not equal (B.times(A)).transpose", B.times(A).transpose().almostEquals(AT_BT));
     org.junit.Assert.assertTrue("A.transposeTimesTranspose(B) does not equal A.transpose.times(B.transpose)", A.transposeTimesTranspose(B).almostEquals(AT_BT));
   }
-  
+
   private void randomizedTestAsymmetric() {
     Random r = new Random();
     int dim1 = r.nextInt(30) + 10;

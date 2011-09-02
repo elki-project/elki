@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.math;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -109,19 +110,19 @@ public class TestAffineTransformation implements JUnit4Test {
     assertEquals("Vector wasn't translated properly backwards.", v1, v2b);
     Vector v1b = t.applyInverse(v1t);
     assertEquals("Vector wasn't translated properly back and forward.", v1, v1b);
-    
+
     // Translation
     Vector vd = v1.minus(v2b);
     Vector vtd = v1t.minus(v2t);
     assertEquals("Translation changed vector difference.", vd, vtd);
-    
+
     // Translation shouldn't change relative vectors.
     assertEquals("Relative vectors weren't left unchanged by translation!", v1, t.applyRelative(v1));
     assertEquals("Relative vectors weren't left unchanged by translation!", v2t, t.applyRelative(v2t));
     assertEquals("Relative vectors weren't left unchanged by translation!", v1t, t.applyRelative(v1t));
     assertEquals("Relative vectors weren't left unchanged by translation!", v2b, t.applyRelative(v2b));
   }
-  
+
   /**
    * Test direct inclusion of matrices
    */
@@ -176,7 +177,7 @@ public class TestAffineTransformation implements JUnit4Test {
     assertTrue("Forward-Backward didn't work correctly.", v1.minus(v3).euclideanLength() < 0.0001);
     Vector v4 = t.apply(t.apply(t.apply(v1)));
     assertTrue("Triple-Rotation by 120 degree didn't work", v1.minus(v4).euclideanLength() < 0.0001);
-    
+
     // Rotation shouldn't disagree for relative vectors.
     // (they just are not affected by translation!)
     assertEquals("Relative vectors were affected differently by pure rotation!", v2, t.applyRelative(v1));
@@ -202,13 +203,12 @@ public class TestAffineTransformation implements JUnit4Test {
     Vector p5 = new Vector(new double[] { 7, 3, 5 });
     Vector p6 = new Vector(new double[] { 7, 5, 3 });
     Vector[] ps = new Vector[] {
-    // with no arguments.
+        // with no arguments.
     p1,
-    // with just one argument.
+        // with just one argument.
     p1, p3, p5,
-    // with two arguments.
-    p1, p2, p3, p4, p5, p6,
-    };
+        // with two arguments.
+    p1, p2, p3, p4, p5, p6, };
 
     // index in reference array
     int idx = 0;

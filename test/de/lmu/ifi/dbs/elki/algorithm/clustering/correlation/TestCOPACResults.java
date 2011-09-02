@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -89,7 +90,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
   @Test
   public void testCOPACOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
@@ -102,10 +103,10 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
     params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
     params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
     params.addParameter(PercentageEigenPairFilter.ALPHA_ID, 0.8);
-  
+
     COPAC<DoubleVector, DoubleDistance> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
     testParameterizationOk(params);
-  
+
     Clustering<Model> result = copac.run(db);
     testFMeasure(db, result, 0.84687864);
     testClusterSizes(result, new int[] { 1, 22, 22, 29, 34, 158, 182, 202 });

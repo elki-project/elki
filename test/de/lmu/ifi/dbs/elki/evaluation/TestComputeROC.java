@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Test to validate ROC curve computation.
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public class TestComputeROC implements JUnit4Test {
   /**
@@ -55,7 +56,7 @@ public class TestComputeROC implements JUnit4Test {
     positive.add(DBIDUtil.importInteger(3));
     positive.add(DBIDUtil.importInteger(4));
     positive.add(DBIDUtil.importInteger(5));
-    
+
     ArrayList<Pair<Double, DBID>> distances = new ArrayList<Pair<Double, DBID>>();
     distances.add(new Pair<Double, DBID>(0.0, DBIDUtil.importInteger(1)));
     distances.add(new Pair<Double, DBID>(1.0, DBIDUtil.importInteger(2)));
@@ -66,11 +67,11 @@ public class TestComputeROC implements JUnit4Test {
     distances.add(new Pair<Double, DBID>(4.0, DBIDUtil.importInteger(4)));
     distances.add(new Pair<Double, DBID>(5.0, DBIDUtil.importInteger(9)));
     distances.add(new Pair<Double, DBID>(6.0, DBIDUtil.importInteger(5)));
-    
+
     List<DoubleDoublePair> roccurve = ROC.materializeROC(9, positive, distances.iterator());
     // System.out.println(roccurve);
     Assert.assertEquals("ROC curve too complex", 6, roccurve.size());
-    
+
     double auc = ROC.computeAUC(roccurve);
     Assert.assertEquals("ROC AUC not right.", 0.6, auc, 0.0001);
   }

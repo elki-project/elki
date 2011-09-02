@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -46,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   // TODO: add a test for a non-single-link dataset?
-  
+
   /**
    * Run SLINK with fixed parameters and compare the result to a golden
    * standard.

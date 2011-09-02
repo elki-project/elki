@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -77,14 +78,14 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
   @Test
   public void testDiSHSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(DiSH.EPSILON_ID, 0.1);
     params.addParameter(DiSH.MU_ID, 30);
     DiSH<DoubleVector> dish = ClassGenericsUtil.parameterizeOrAbort(DiSH.class, params);
     testParameterizationOk(params);
-  
+
     // run DiSH on database
     Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
     testFMeasure(db, result, 0.6376870);

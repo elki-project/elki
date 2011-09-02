@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -57,7 +58,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
     inp.addParameter(FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class);
     // Input
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600, inp, null);
-    
+
     // CASH parameters
     ListParameterization params = new ListParameterization();
     params.addParameter(CASH.JITTER_ID, 0.7);
@@ -90,17 +91,17 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
     ListParameterization inp = new ListParameterization();
     inp.addParameter(FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class);
     Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600, inp, null);
-  
+
     // CASH parameters
     ListParameterization params = new ListParameterization();
     params.addParameter(CASH.JITTER_ID, 0.7);
     params.addParameter(CASH.MINPTS_ID, 160);
     params.addParameter(CASH.MAXLEVEL_ID, 40);
-  
+
     // setup algorithm
     CASH cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
     testParameterizationOk(params);
-  
+
     // run CASH on database
     Clustering<Model> result = cash.run(db);
     testFMeasure(db, result, 0.443246);

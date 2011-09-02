@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -58,7 +59,7 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
     indexparams.addParameter(StaticArrayDatabase.INDEX_ID, DeLiCluTreeFactory.class);
     indexparams.addParameter(DeLiCluTreeFactory.PAGE_SIZE_ID, 1000);
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710, indexparams, null);
-    
+
     // Setup actual algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(DeLiClu.MINPTS_ID, 18);

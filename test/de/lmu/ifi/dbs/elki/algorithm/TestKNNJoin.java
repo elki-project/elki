@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -121,7 +122,7 @@ public class TestKNNJoin implements JUnit4Test {
       org.junit.Assert.assertEquals("Manhattan variance 2NN", var2nnManhattan, meansize.getSampleVariance(), 0.00001);
     }
   }
-  
+
   /**
    * Test {@link RStarTree} using a file based database connection.
    * 
