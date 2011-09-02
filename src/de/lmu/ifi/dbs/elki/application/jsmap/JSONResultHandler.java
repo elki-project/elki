@@ -61,7 +61,7 @@ public class JSONResultHandler implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, @SuppressWarnings("unused") Result newResult) {
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     if(server == null) {
       server = new JSONWebServer(port, baseResult);
     }

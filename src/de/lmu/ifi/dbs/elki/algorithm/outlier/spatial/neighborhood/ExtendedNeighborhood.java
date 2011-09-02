@@ -51,7 +51,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
   /**
    * The logger to use.
    */
-  private static final Logging logger = Logging.getLogger(ExtendedNeighborhood.class);
+  static final Logging logger = Logging.getLogger(ExtendedNeighborhood.class);
 
   /**
    * Constructor.

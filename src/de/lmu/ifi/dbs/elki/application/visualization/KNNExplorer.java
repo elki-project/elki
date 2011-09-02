@@ -303,7 +303,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       spinner.addChangeListener(new ChangeListener() {
         @Override
-        public void stateChanged(@SuppressWarnings("unused") ChangeEvent e) {
+        public void stateChanged(ChangeEvent e) {
           updateK((Integer) (spinner.getValue()));
           updateSelection();
         }
@@ -320,14 +320,14 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       saveButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
+        public void actionPerformed(ActionEvent ae) {
           SVGSaveDialog.showSaveDialog(plot, 512, 512);
         }
       });
 
       quitButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           frame.setVisible(false);
           frame.dispose();
         }

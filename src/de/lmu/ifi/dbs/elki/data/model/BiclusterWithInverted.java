@@ -63,7 +63,6 @@ public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Biclus
    * 
    * @deprecated Use DBIDs, not integer indexes!
    */
-  @SuppressWarnings("deprecation")
   @Deprecated
   public BiclusterWithInverted(int[] rowIDs, int[] colIDs, Relation<V> database) {
     super(rowIDs, colIDs, database);

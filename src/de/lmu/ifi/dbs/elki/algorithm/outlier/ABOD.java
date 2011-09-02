@@ -360,7 +360,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return result;
   }
 
-  private double[] calcFastNormalization(@SuppressWarnings("unused") DBID x, HashMap<DBID, Double> dists) {
+  private double[] calcFastNormalization(DBID x, HashMap<DBID, Double> dists) {
     double[] result = new double[2];
 
     double sum = 0;

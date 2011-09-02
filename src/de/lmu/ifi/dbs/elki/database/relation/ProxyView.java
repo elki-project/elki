@@ -98,7 +98,7 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
   }
 
   @Override
-  public void delete(@SuppressWarnings("unused") DBID id) {
+  public void delete(DBID id) {
     throw new UnsupportedOperationException("Semantics of 'delete-from-virtual-partition' are not uniquely defined. Delete from IDs or from underlying data, please!");
   }
 

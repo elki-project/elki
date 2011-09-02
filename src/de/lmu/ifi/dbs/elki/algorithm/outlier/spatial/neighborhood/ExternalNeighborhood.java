@@ -61,7 +61,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(ExternalNeighborhood.class);
+  static final Logging logger = Logging.getLogger(ExternalNeighborhood.class);
 
   /**
    * Parameter to specify the neighborhood file

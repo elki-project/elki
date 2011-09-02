@@ -62,13 +62,11 @@ public class ConvertToStringView extends AbstractHierarchicalResult implements R
     return existing.get(id).toString();
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void set(DBID id, String val) {
     throw new UnsupportedOperationException("Covnersion representations are not writable!");
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void delete(DBID id) {
     throw new UnsupportedOperationException("Covnersion representations are not writable!");

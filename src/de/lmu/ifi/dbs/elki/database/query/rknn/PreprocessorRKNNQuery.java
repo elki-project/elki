@@ -81,7 +81,6 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
     return preprocessor.getRKNN(id);
   }
   
-  @SuppressWarnings("unused")
   @Override
   public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");

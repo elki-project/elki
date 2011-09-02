@@ -72,7 +72,6 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
     return id;
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void set(DBID id, DBID val) {
     throw new UnsupportedOperationException("DBIDs cannot be changed.");

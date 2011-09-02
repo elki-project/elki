@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  */
 public class MemoryDataStoreFactory implements DataStoreFactory {
   @Override
-  public <T> WritableDataStore<T> makeStorage(DBIDs ids, @SuppressWarnings("unused") int hints, @SuppressWarnings("unused") Class<? super T> dataclass) {
+  public <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass) {
     if (ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
       Object[] data = new Object[range.size()];
@@ -55,7 +55,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
   }
 
   @Override
-  public WritableRecordStore makeRecordStorage(DBIDs ids, @SuppressWarnings("unused") int hints, Class<?>... dataclasses) {
+  public WritableRecordStore makeRecordStorage(DBIDs ids, int hints, Class<?>... dataclasses) {
     if (ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
       Object[][] data = new Object[range.size()][dataclasses.length];

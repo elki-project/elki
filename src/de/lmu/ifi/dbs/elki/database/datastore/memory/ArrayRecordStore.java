@@ -59,7 +59,7 @@ public class ArrayRecordStore implements WritableRecordStore {
   }
 
   @Override
-  public <T> WritableDataStore<T> getStorage(int col, @SuppressWarnings("unused") Class<? super T> datatype) {
+  public <T> WritableDataStore<T> getStorage(int col, Class<? super T> datatype) {
     // TODO: add type checking safety?
     return new StorageAccessor<T>(col);
   }
@@ -142,7 +142,7 @@ public class ArrayRecordStore implements WritableRecordStore {
     }
 
     @Override
-    public void delete(@SuppressWarnings("unused") DBID id) {
+    public void delete(DBID id) {
       throw new UnsupportedOperationException("ArrayStore record values cannot be deleted.");
     }
 
@@ -158,7 +158,7 @@ public class ArrayRecordStore implements WritableRecordStore {
   }
 
   @Override
-  public boolean remove(@SuppressWarnings("unused") DBID id) {
+  public boolean remove(DBID id) {
     throw new UnsupportedOperationException("ArrayStore records cannot be removed.");
   }
 }

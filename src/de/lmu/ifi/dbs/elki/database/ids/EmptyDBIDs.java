@@ -41,7 +41,7 @@ class EmptyDBIDs extends AbstractList<DBID> implements ArrayStaticDBIDs {
   }
 
   @Override
-  public boolean contains(@SuppressWarnings("unused") Object o) {
+  public boolean contains(Object o) {
     return false;
   }
 
@@ -61,7 +61,7 @@ class EmptyDBIDs extends AbstractList<DBID> implements ArrayStaticDBIDs {
   }
 
   @Override
-  public DBID get(@SuppressWarnings("unused") int i) {
+  public DBID get(int i) {
     throw new ArrayIndexOutOfBoundsException();
   }
 }
