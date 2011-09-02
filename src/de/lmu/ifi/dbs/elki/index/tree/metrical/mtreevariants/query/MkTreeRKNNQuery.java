@@ -59,7 +59,6 @@ public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery
     this.index = index;
   }
 
-  @SuppressWarnings("unused")
   @Override
   public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
@@ -70,7 +69,6 @@ public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery
     return index.reverseKNNQuery(id, k);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public List<List<DistanceResultPair<D>>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // TODO: implement

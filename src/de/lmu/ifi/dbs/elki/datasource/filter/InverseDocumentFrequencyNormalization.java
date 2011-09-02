@@ -57,7 +57,7 @@ public class InverseDocumentFrequencyNormalization extends AbstractNormalization
   }
 
   @Override
-  protected boolean prepareStart(@SuppressWarnings("unused") SimpleTypeInformation<SparseFloatVector> in) {
+  protected boolean prepareStart(SimpleTypeInformation<SparseFloatVector> in) {
     if(idf.size() > 0) {
       throw new UnsupportedOperationException("This normalization may only be used once!");
     }

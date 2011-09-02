@@ -37,7 +37,7 @@ public final class GaussWeight implements WeightFunction {
    * Get Gaussian weight. stddev is not used, scaled using max.
    */
   @Override
-  public double getWeight(double distance, double max, @SuppressWarnings("unused") double stddev) {
+  public double getWeight(double distance, double max, double stddev) {
     if(max <= 0) {
       return 1.0;
     }

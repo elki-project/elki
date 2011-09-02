@@ -58,7 +58,6 @@ public class SparseFloatVectorRandomProjectionFilter extends AbstractRandomFeatu
     return TypeUtil.SPARSE_FLOAT_FIELD;
   }
 
-  @SuppressWarnings("unused")
   @Override
   protected SimpleTypeInformation<? super SparseFloatVector> convertedType(SimpleTypeInformation<SparseFloatVector> in) {
     final Map<Integer, Float> emptyMap = Collections.emptyMap();

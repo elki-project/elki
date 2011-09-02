@@ -36,7 +36,7 @@ public final class InverseProportionalWeight implements WeightFunction {
    * Get inverse proportional weight. stddev is ignored.
    */
   @Override
-  public double getWeight(double distance, double max, @SuppressWarnings("unused") double stddev) {
+  public double getWeight(double distance, double max, double stddev) {
     if(max <= 0) {
       return 1.0;
     }

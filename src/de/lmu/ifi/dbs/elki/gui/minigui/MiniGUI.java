@@ -155,7 +155,7 @@ public class MiniGUI extends JPanel {
       loadButton.setMnemonic(KeyEvent.VK_L);
       loadButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
           ArrayList<String> settings = store.get(key);
           if(settings != null) {
@@ -171,7 +171,7 @@ public class MiniGUI extends JPanel {
       saveButton.setMnemonic(KeyEvent.VK_S);
       saveButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
           // Stop editing the table.
           parameterTable.editCellAt(-1, -1);
@@ -191,7 +191,7 @@ public class MiniGUI extends JPanel {
       removeButton.setMnemonic(KeyEvent.VK_E);
       removeButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
           store.remove(key);
           try {
@@ -211,7 +211,7 @@ public class MiniGUI extends JPanel {
       runButton.setMnemonic(KeyEvent.VK_R);
       runButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           startTask();
         }
       });
@@ -232,7 +232,7 @@ public class MiniGUI extends JPanel {
       ParametersModel parameterModel = new ParametersModel(parameters);
       parameterModel.addTableModelListener(new TableModelListener() {
         @Override
-        public void tableChanged(@SuppressWarnings("unused") TableModelEvent e) {
+        public void tableChanged(TableModelEvent e) {
           // logger.debug("Change event.");
           updateParameterTable();
         }

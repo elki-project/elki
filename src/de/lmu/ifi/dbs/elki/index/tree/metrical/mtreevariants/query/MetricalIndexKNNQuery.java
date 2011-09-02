@@ -159,14 +159,12 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     return getKNNForObject(relation.get(id), k);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // TODO: implement
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
     // TODO: implement

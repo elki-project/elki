@@ -138,8 +138,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
       stddev = Math.sqrt(stddev / ids.size());
     }
 
-    int i = 0;
-    for(Iterator<DBID> it = ids.iterator(); it.hasNext(); i++) {
+    for(Iterator<DBID> it = ids.iterator(); it.hasNext();) {
       V obj = database.get(it.next());
       double distance = weightDistance.distance(centroid, obj).doubleValue();
       double weight = weightfunction.getWeight(distance, maxdist, stddev);

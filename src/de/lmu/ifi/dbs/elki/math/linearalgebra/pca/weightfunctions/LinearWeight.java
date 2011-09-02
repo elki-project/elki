@@ -37,7 +37,7 @@ public final class LinearWeight implements WeightFunction {
    * Linear decreasing weight, from 1.0 to 0.1. Stddev is ignored.
    */
   @Override
-  public double getWeight(double distance, double max, @SuppressWarnings("unused") double stddev) {
+  public double getWeight(double distance, double max, double stddev) {
     if(max <= 0) {
       return 1.0;
     }

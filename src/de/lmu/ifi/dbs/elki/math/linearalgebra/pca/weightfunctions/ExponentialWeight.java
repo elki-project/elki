@@ -42,7 +42,7 @@ public final class ExponentialWeight implements WeightFunction {
    * Exponential Weight function. stddev is not used.
    */
   @Override
-  public double getWeight(double distance, double max, @SuppressWarnings("unused") double stddev) {
+  public double getWeight(double distance, double max, double stddev) {
     if(max <= 0) {
       return 1.0;
     }

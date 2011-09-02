@@ -306,7 +306,7 @@ public class ParameterTable extends JTable {
      * Button callback to show the file selector
      */
     @Override
-    public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
       int returnVal = fc.showOpenDialog(button);
 
       if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -330,7 +330,7 @@ public class ParameterTable extends JTable {
      * Apply the Editor for a selected option.
      */
     @Override
-    public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       if(row < parameters.size()) {
         Parameter<?, ?> option = parameters.getNode(row).param;
         if(option instanceof FileParameter) {
@@ -501,7 +501,7 @@ public class ParameterTable extends JTable {
      * Apply the Editor for a selected option.
      */
     @Override
-    public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       combo.removeAllItems();
       if(row < parameters.size()) {
         Parameter<?, ?> option = parameters.getNode(row).param;

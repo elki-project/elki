@@ -44,13 +44,13 @@ public class LinearRegression {
   public LinearRegression(List<DoubleDoublePair> points) {
     double sumy = 0.0;
     double sumx = 0.0;
-    double sumyy = 0.0;
+    //double sumyy = 0.0;
     double sumxx = 0.0;
     double sumxy = 0.0;
     int gap = 0;
     for(DoubleDoublePair point : points) {
       sumy += point.second;
-      sumyy += point.second * point.second;
+      //sumyy += point.second * point.second;
       gap++;
       sumx += point.first;
       sumxx += point.first * point.first;

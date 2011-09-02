@@ -95,7 +95,6 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   private int dimensionality = -1;
 
   @Override
-  @SuppressWarnings("unused")
   public SparseFloatVector createDBObject(List<Double> attributes) {
     throw new UnsupportedOperationException("This method should never be reached.");
   }

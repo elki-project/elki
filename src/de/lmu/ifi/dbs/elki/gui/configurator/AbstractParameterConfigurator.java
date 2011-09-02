@@ -109,7 +109,7 @@ public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> i
   }
 
   @Override
-  public void addParameter(@SuppressWarnings("unused") Object owner, @SuppressWarnings("unused") Parameter<?, ?> param, @SuppressWarnings("unused") TrackParameters track) {
+  public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
     LoggingUtil.warning(this.getClass() + " does not support sub-parameters!");
   }
 

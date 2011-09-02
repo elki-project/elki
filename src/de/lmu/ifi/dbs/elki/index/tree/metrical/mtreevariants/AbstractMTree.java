@@ -232,7 +232,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   }
 
   @Override
-  protected final void createEmptyRoot(@SuppressWarnings("unused") E exampleLeaf) {
+  protected final void createEmptyRoot(E exampleLeaf) {
     N root = createNewLeafNode();
     writeNode(root);
   }

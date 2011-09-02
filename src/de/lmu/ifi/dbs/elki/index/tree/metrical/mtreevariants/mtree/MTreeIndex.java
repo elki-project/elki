@@ -102,7 +102,6 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
-  @SuppressWarnings("unused")
   @Override
   public final boolean delete(DBID id) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
@@ -115,7 +114,6 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
-  @SuppressWarnings("unused")
   @Override
   public void deleteAll(DBIDs ids) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
