@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -33,9 +34,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -88,7 +89,24 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
     return TypeUtil.array(TypeUtil.GUESSED_LABEL);
   }
 
-  public OutlierResult run(@SuppressWarnings("unused") Database database, Relation<?> relation) throws IllegalStateException {
+  @Override
+  public OutlierResult run(Database database) {
+    // Prefer a true class label
+    Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
+    if(relation != null) {
+      return run(relation);
+    }
+    // Otherwise, try any labellike.
+    return run(database.getRelation(getInputTypeRestriction()[0]));
+  }
+  
+  /**
+   * Run the algorithm
+   * 
+   * @param relation Relation to process.
+   * @return Result
+   */
+  public OutlierResult run(Relation<?> relation) {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, Double.class);
     for(DBID id : relation.iterDBIDs()) {
       String label = relation.get(id).toString();
