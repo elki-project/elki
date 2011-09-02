@@ -85,51 +85,84 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
   public Collection<PlotItem> arrange() {
     List<PlotItem> layout = new ArrayList<PlotItem>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
-    if (tasks.size() > 0){
-      final double sizeh = Math.ceil((dmax - 1) / 2.0);
-      PlotItem master = new PlotItem(sizeh * 2 + .1, dmax - 1 + .1, null);
-
-      for(int d1 = 1; d1 < dmax; d1++) {
-        for(int d2 = d1 + 1; d2 <= dmax; d2++) {
-          Projection2D proj = new Simple2D(scales, d1, d2);
-          PlotItem it = new PlotItem(d1 - 1 + .1, d2 - 2, 1., 1., proj);
+    if(tasks.size() > 0) {
+      final PlotItem master;
+      if(dmax == 2) {
+        // In 2d, make the plot twice as big.
+        master = new PlotItem(2 + .1, 2 + .1, null);
+        {
+          Projection2D proj = new Simple2D(scales, 1, 2);
+          PlotItem it = new PlotItem(.1, 0, 2., 2., proj);
           it.visualizations = tasks;
           master.subitems.add(it);
         }
+        // Label at bottom
+        {
+          PlotItem it = new PlotItem(.1, 2., 2., .1, null);
+          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, 1)));
+          task.height = .1;
+          task.width = 2.;
+          task.put(VisualizationTask.META_NODETAIL, true);
+          it.visualizations.add(task);
+          master.subitems.add(it);
+        }
+        // Label on left
+        {
+          PlotItem it = new PlotItem(0, 0, .1, 2, null);
+          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, 2), true));
+          task.height = 2.;
+          task.width = .1;
+          task.put(VisualizationTask.META_NODETAIL, true);
+          it.visualizations.add(task);
+          master.subitems.add(it);
+        }
       }
-      if(dmax >= 3) {
-        AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(rel), 1, 2);
-        p.addRotation(0, 2, Math.PI / 180 * -10.);
-        p.addRotation(1, 2, Math.PI / 180 * 15.);
-        // Wanna try 4d? go ahead:
-        // p.addRotation(0, 3, Math.PI / 180 * -20.);
-        // p.addRotation(1, 3, Math.PI / 180 * 30.);
-        Projection2D proj = new AffineProjection(scales, p);
-        PlotItem it = new PlotItem(sizeh + .1, 0, sizeh, sizeh, proj);
-        it.visualizations = tasks;
-        master.subitems.add(it);
+      else {
+        final double sizeh = Math.ceil((dmax - 1) / 2.0);
+        master = new PlotItem(sizeh * 2 + .1, dmax - 1 + .1, null);
+
+        for(int d1 = 1; d1 < dmax; d1++) {
+          for(int d2 = d1 + 1; d2 <= dmax; d2++) {
+            Projection2D proj = new Simple2D(scales, d1, d2);
+            PlotItem it = new PlotItem(d1 - 1 + .1, d2 - 2, 1., 1., proj);
+            it.visualizations = tasks;
+            master.subitems.add(it);
+          }
+        }
+        if(dmax >= 3) {
+          AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(rel), 1, 2);
+          p.addRotation(0, 2, Math.PI / 180 * -10.);
+          p.addRotation(1, 2, Math.PI / 180 * 15.);
+          // Wanna try 4d? go ahead:
+          // p.addRotation(0, 3, Math.PI / 180 * -20.);
+          // p.addRotation(1, 3, Math.PI / 180 * 30.);
+          Projection2D proj = new AffineProjection(scales, p);
+          PlotItem it = new PlotItem(sizeh + .1, 0, sizeh, sizeh, proj);
+          it.visualizations = tasks;
+          master.subitems.add(it);
+        }
+        // Labels at bottom
+        for(int d1 = 1; d1 < dmax; d1++) {
+          PlotItem it = new PlotItem(d1 - 1 + .1, dmax - 1, 1., .1, null);
+          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, d1)));
+          task.height = .1;
+          task.width = 1;
+          task.put(VisualizationTask.META_NODETAIL, true);
+          it.visualizations.add(task);
+          master.subitems.add(it);
+        }
+        // Labels on left
+        for(int d2 = 2; d2 <= dmax; d2++) {
+          PlotItem it = new PlotItem(0, d2 - 2, .1, 1, null);
+          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, d2), true));
+          task.height = 1;
+          task.width = .1;
+          task.put(VisualizationTask.META_NODETAIL, true);
+          it.visualizations.add(task);
+          master.subitems.add(it);
+        }
       }
-      // Labels at bottom
-      for(int d1 = 1; d1 < dmax; d1++) {
-        PlotItem it = new PlotItem(d1 - 1 + .1, dmax - 1, 1., .1, null);
-        final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, d1)));
-        task.height = .1;
-        task.width = 1;
-        task.put(VisualizationTask.META_NODETAIL, true); 
-        it.visualizations.add(task);
-        master.subitems.add(it);
-      }
-      // Labels on left
-      for(int d2 = 2; d2 <= dmax; d2++) {
-        PlotItem it = new PlotItem(0, d2 - 2, .1, 1, null);
-        final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, d2), true));
-        task.height = 1;
-        task.width = .1;
-        task.put(VisualizationTask.META_NODETAIL, true); 
-        it.visualizations.add(task);
-        master.subitems.add(it);
-      }
-      
+
       layout.add(master);
     }
     return layout;

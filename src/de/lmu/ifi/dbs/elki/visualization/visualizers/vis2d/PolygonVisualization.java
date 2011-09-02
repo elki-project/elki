@@ -1,28 +1,30 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -40,10 +42,13 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
+import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -57,7 +62,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @apiviz.has PolygonsObject - - visualizes
  */
-// FIXME: currently not operable
 public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisualization<V> implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
@@ -67,7 +71,7 @@ public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisua
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
-  public static final String MARKER = "polys";
+  public static final String POLYS = "polys";
 
   /**
    * The current projection
@@ -87,7 +91,7 @@ public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisua
   public PolygonVisualization(VisualizationTask task) {
     super(task);
     this.proj = task.getProj();
-    this.rep = task.getRelation();
+    this.rep = task.getResult(); // Note: relation was used for projection
     context.addDataStoreListener(this);
     incrementalRedraw();
   }
@@ -100,9 +104,11 @@ public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisua
 
   @Override
   public void redraw() {
-    CSSClass css = new CSSClass(svgp, MARKER);
-    css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-    css.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+    CSSClass css = new CSSClass(svgp, POLYS);
+    // TODO: separate fill and line colors?
+    css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.POLYGONS));
+    css.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.POLYGONS));
+    css.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
     svgp.addCSSClassOrLogError(css);
     svgp.updateStyleElement();
 
@@ -129,7 +135,7 @@ public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisua
           path.drawTo(f[0], f[1]);
         }
         Element e = path.makeElement(svgp);
-        SVGUtil.addCSSClass(e, MARKER);
+        SVGUtil.addCSSClass(e, POLYS);
         layer.appendChild(e);
       }
       catch(ObjectNotFoundException e) {
@@ -139,7 +145,7 @@ public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisua
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 
@@ -169,9 +175,16 @@ public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisua
       ArrayList<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
       for(Relation<?> rel : results) {
         if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
-          final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          baseResult.getHierarchy().add(rel, task);
+          // Assume that a 2d projector is using the same coordinates as the polygons.
+          Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+            if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
+              final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
+              task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 10);
+              baseResult.getHierarchy().add(rel, task);
+              baseResult.getHierarchy().add(p, task);
+            }
+          }
         }
       }
     }

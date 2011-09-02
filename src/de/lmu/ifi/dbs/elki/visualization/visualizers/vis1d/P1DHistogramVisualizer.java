@@ -377,7 +377,6 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      boolean first = true;
       // Cluster histograms
       ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
@@ -386,11 +385,6 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
           // register self
           final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          if (first) {
-            first = false;
-          } else {
-            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          }
           baseResult.getHierarchy().add(c, task);
           baseResult.getHierarchy().add(p, task);
         }
@@ -402,9 +396,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
           // register self
           final VisualizationTask task = new VisualizationTask(NAME, null, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          if (first) {
-            first = false;
-          } else {
+          if(clusterings.size() > 0) {
             task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           }
           // baseResult.getHierarchy().add(p.getRelation(), task);
@@ -414,7 +406,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     }
 
     @Override
-    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
     }
