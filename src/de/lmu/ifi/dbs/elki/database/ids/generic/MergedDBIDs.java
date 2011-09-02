@@ -130,27 +130,27 @@ public class MergedDBIDs implements DBIDs, Collection<DBID> {
   }
 
   @Override
-  public boolean add(@SuppressWarnings("unused") DBID e) {
+  public boolean add(DBID e) {
     throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
   }
 
   @Override
-  public boolean addAll(@SuppressWarnings("unused") Collection<? extends DBID> c) {
+  public boolean addAll(Collection<? extends DBID> c) {
     throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
   }
 
   @Override
-  public boolean remove(@SuppressWarnings("unused") Object o) {
+  public boolean remove(Object o) {
     throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
   }
 
   @Override
-  public boolean removeAll(@SuppressWarnings("unused") Collection<?> c) {
+  public boolean removeAll(Collection<?> c) {
     throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
   }
 
   @Override
-  public boolean retainAll(@SuppressWarnings("unused") Collection<?> c) {
+  public boolean retainAll(Collection<?> c) {
     throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
   }
 }

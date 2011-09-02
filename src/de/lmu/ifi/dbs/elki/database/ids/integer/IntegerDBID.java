@@ -230,7 +230,7 @@ class IntegerDBID extends AbstractList<DBID> implements DBID {
     }
 
     @Override
-    public int getByteSize(@SuppressWarnings("unused") DBID object) throws UnsupportedOperationException {
+    public int getByteSize(DBID object) throws UnsupportedOperationException {
       return getFixedByteSize();
     }
 

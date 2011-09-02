@@ -119,14 +119,12 @@ public class ProxyDatabase extends AbstractDatabase {
     this.relations.add(relation);
   }
 
-  @SuppressWarnings("deprecation")
   @Deprecated
   @Override
   public int size() {
     return ids.size();
   }
 
-  @SuppressWarnings("deprecation")
   @Deprecated
   @Override
   public StaticDBIDs getDBIDs() {

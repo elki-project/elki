@@ -52,7 +52,7 @@ public class NullAlgorithm extends AbstractAlgorithm<Result> {
   }
 
   @Override
-  public Result run(@SuppressWarnings("unused") Database database) throws IllegalStateException {
+  public Result run(Database database) throws IllegalStateException {
     return null;
   }
   

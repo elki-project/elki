@@ -141,7 +141,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     return Collections.unmodifiableCollection(relations);
   }
 
-  @SuppressWarnings({ "unchecked", "unused" })
+  @SuppressWarnings({ "unchecked" })
   @Override
   public <O> Relation<O> getRelation(TypeInformation restriction, Object... hints) throws NoSupportedDataTypeException {
     // Get first match
@@ -153,7 +153,6 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     throw new NoSupportedDataTypeException(restriction);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public <O, D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
     if(distanceFunction == null) {
@@ -162,7 +161,6 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     return distanceFunction.instantiate(objQuery);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public <O, D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(Relation<O> objQuery, SimilarityFunction<? super O, D> similarityFunction, Object... hints) {
     if(similarityFunction == null) {

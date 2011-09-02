@@ -261,14 +261,12 @@ public class StaticArrayDatabase extends AbstractDatabase implements Database, P
     return relation;
   }
 
-  @SuppressWarnings("deprecation")
   @Deprecated
   @Override
   public final int size() {
     return ids.size();
   }
 
-  @SuppressWarnings("deprecation")
   @Deprecated
   @Override
   public StaticDBIDs getDBIDs() {

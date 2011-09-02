@@ -170,12 +170,12 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
   }
 
   @Override
-  public boolean add(@SuppressWarnings("unused") DBID e) {
+  public boolean add(DBID e) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean remove(@SuppressWarnings("unused") Object o) {
+  public boolean remove(Object o) {
     throw new UnsupportedOperationException();
   }
 

@@ -363,13 +363,11 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
       return null; // FIXME
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void set(DBID id, Double val) {
       throw new UnsupportedOperationException();
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void delete(DBID id) {
       throw new UnsupportedOperationException();

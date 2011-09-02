@@ -81,7 +81,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public void deallocateSingleDBID(@SuppressWarnings("unused") DBID id) {
+  public void deallocateSingleDBID(DBID id) {
     // ignore.
   }
 
@@ -96,7 +96,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public void deallocateDBIDRange(@SuppressWarnings("unused") DBIDRange range) {
+  public void deallocateDBIDRange(DBIDRange range) {
     // ignore.
   }
 

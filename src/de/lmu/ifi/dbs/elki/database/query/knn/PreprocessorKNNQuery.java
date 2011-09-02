@@ -154,7 +154,6 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>> extends AbstractData
     }
   }
 
-  @SuppressWarnings("unused")
   @Override
   public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");

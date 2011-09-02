@@ -44,19 +44,16 @@ public abstract class AbstractDBIDSimilarityQuery<O, D extends Distance<D>> exte
     super(relation);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public D similarity(O o1, DBID id2) {
     throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");
   }
 
-  @SuppressWarnings("unused")
   @Override
   public D similarity(DBID id1, O o2) {
     throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");
   }
 
-  @SuppressWarnings("unused")
   @Override
   public D similarity(O o1, O o2) {
     throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");

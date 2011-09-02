@@ -70,7 +70,7 @@ public class MapRecordStore implements WritableRecordStore {
   }
 
   @Override
-  public <T> WritableDataStore<T> getStorage(int col, @SuppressWarnings("unused") Class<? super T> datatype) {
+  public <T> WritableDataStore<T> getStorage(int col, Class<? super T> datatype) {
     // TODO: add type checking?
     return new StorageAccessor<T>(col);
   }
@@ -159,7 +159,7 @@ public class MapRecordStore implements WritableRecordStore {
     }
 
     @Override
-    public void delete(@SuppressWarnings("unused") DBID id) {
+    public void delete(DBID id) {
       throw new UnsupportedOperationException("Record storage values cannot be deleted.");
     }
 
