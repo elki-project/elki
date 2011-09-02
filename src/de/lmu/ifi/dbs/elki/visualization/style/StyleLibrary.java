@@ -109,6 +109,11 @@ public interface StyleLibrary {
   final static String REFERENCE_POINTS = "plot.referencepoints";
 
   /**
+   * Polygons style
+   */
+  final static String POLYGONS = "plot.polygons";
+
+  /**
    * Selection color and opacity
    */
   final static String SELECTION = "plot.selection";
