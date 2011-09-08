@@ -96,12 +96,12 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
       for(int i = 0; i < first.dataLength(); i++) {
         ExternalID data = (ExternalID) first.data(i, lblcol);
         if(data == null) {
-          logger.warning("Object without ID encountered.");
+          logger.debug("Object without ID encountered.");
           continue;
         }
         Integer old = labelmap.put(data, i);
         if(old != null) {
-          logger.warning("Duplicate id encountered: " + data + " in rows " + old + " and " + i);
+          logger.debug("Duplicate id encountered: " + data + " in rows " + old + " and " + i);
         }
       }
     }
@@ -153,7 +153,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
         }
         Integer row = labelmap.get(data);
         if(row == null) {
-          logger.warning("ID not found for join: " + data + " in row " + i);
+          logger.debug("ID not found for join: " + data + " in row " + i);
           continue;
         }
         for(int d = 0; d < cur.metaLength(); d++) {

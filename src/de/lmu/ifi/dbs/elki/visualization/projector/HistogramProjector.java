@@ -83,18 +83,23 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
     List<PlotItem> layout = new ArrayList<PlotItem>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0){
-      PlotItem master = new PlotItem(dmax + .1, .5 + .1, null);
-      for(int d1 = 1; d1 <= dmax; d1++) {
-        Projection1D proj = new Simple1D(scales, d1);
-        final PlotItem it = new PlotItem(d1 - 1 + .1, 0. + .1, 1., .5, proj);
+      final double xoff = (dmax > 1) ? .1 : 0.;
+      final double hheight = .5;
+      final double lheight = .1;
+      PlotItem master = new PlotItem(dmax + xoff, hheight + lheight, null);
+      for(int d1 = 0; d1 < dmax; d1++) {
+        Projection1D proj = new Simple1D(scales, d1 + 1);
+        final PlotItem it = new PlotItem(d1 + xoff, 0, 1., hheight, proj);
         it.visualizations = tasks;
         master.subitems.add(it);
       }
       layout.add(master);
-      for(int d1 = 1; d1 <= dmax; d1++) {
-        PlotItem it = new PlotItem(d1 - 1 + .1, 0, 1., .1, null);
-        final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, d1)));
-        task.height = .1;
+      // Add labels
+      for(int d1 = 0; d1 < dmax; d1++) {
+        PlotItem it = new PlotItem(d1 + xoff, 0, 1., lheight, null);
+        LabelVisFactory lbl = new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, d1 + 1));
+        final VisualizationTask task = new VisualizationTask("", null, null, lbl);
+        task.height = lheight;
         task.width = 1;
         task.put(VisualizationTask.META_NODETAIL, true); 
         it.visualizations.add(task);
