@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +50,10 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Parser to load WEKA .arff files into ELKI.
@@ -88,12 +94,12 @@ public class ArffParser implements Parser {
   /**
    * Pattern to auto-convert columns to external ids.
    */
-  public static final Pattern ARFF_MAGIC_EID = Pattern.compile("(ID|External-?ID)", Pattern.CASE_INSENSITIVE);
+  public static final String DEFAULT_ARFF_MAGIC_EID = "(ID|External-?ID)";
 
   /**
    * Pattern to auto-convert columns to class labels.
    */
-  public static final Pattern ARFF_MAGIC_CLASS = Pattern.compile("(Class|Class-?Label)", Pattern.CASE_INSENSITIVE);
+  public static final String DEFAULT_ARFF_MAGIC_CLASS = "(Class|Class-?Label)";
 
   /**
    * Pattern for numeric columns
@@ -104,6 +110,38 @@ public class ArffParser implements Parser {
    * Empty line pattern.
    */
   public static final Pattern EMPTY = Pattern.compile("^\\s*$");
+
+  /**
+   * Pattern to recognize external ids
+   */
+  Pattern magic_eid;
+
+  /**
+   * Pattern to recognize class label columns
+   */
+  Pattern magic_class;
+
+  /**
+   * Constructor.
+   * 
+   * @param magic_eid Magic to recognize external IDs
+   * @param magic_class Magic to recognize class labels
+   */
+  public ArffParser(Pattern magic_eid, Pattern magic_class) {
+    super();
+    this.magic_eid = magic_eid;
+    this.magic_class = magic_class;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param magic_eid Magic to recognize external IDs
+   * @param magic_class Magic to recognize class labels
+   */
+  public ArffParser(String magic_eid, String magic_class) {
+    this(Pattern.compile(magic_eid, Pattern.CASE_INSENSITIVE), Pattern.compile(magic_class, Pattern.CASE_INSENSITIVE));
+  }
 
   @Override
   public MultipleObjectsBundle parse(InputStream instream) {
@@ -153,7 +191,7 @@ public class ArffParser implements Parser {
           if(state != 2) {
             throw new AbortException("Mixing dense and sparse vectors is currently not allowed.");
           }
-          bundle.appendSimple(loadSparseInstance(tokenizer, dimsize, elkitypes, bundle.metaLength()));
+          bundle.appendSimple(loadSparseInstance(tokenizer, targ, dimsize, elkitypes, bundle.metaLength()));
         }
         if(tokenizer.ttype != StreamTokenizer.TT_EOF) {
           nextToken(tokenizer);
@@ -166,9 +204,9 @@ public class ArffParser implements Parser {
     }
   }
 
-  private Object[] loadSparseInstance(StreamTokenizer tokenizer, int[] dimsize, TypeInformation[] elkitypes, int metaLength) throws IOException {
-    logger.warning("Sparse instance.");
-    Map<Integer, Object> map = new HashMap<Integer, Object>(metaLength);
+  private Object[] loadSparseInstance(StreamTokenizer tokenizer, int[] targ, int[] dimsize, TypeInformation[] elkitypes, int metaLength) throws IOException {
+    // logger.warning("Sparse instance.");
+    Map<Integer, Object> map = new TreeMap<Integer, Object>();
     while(true) {
       nextToken(tokenizer);
       assert (tokenizer.ttype != StreamTokenizer.TT_EOF && tokenizer.ttype != StreamTokenizer.TT_EOL);
@@ -198,7 +236,77 @@ public class ArffParser implements Parser {
         }
       }
     }
-    throw new AbortException("Sparse ARFF are not (yet) supported.");
+    Object[] data = new Object[metaLength];
+    for(int out = 0; out < metaLength; out++) {
+      // Find the first index
+      int s = -1;
+      for(int i = 0; i < targ.length; i++) {
+        if(targ[i] == out && s < 0) {
+          s = i;
+          break;
+        }
+      }
+      assert (s >= 0);
+      if(elkitypes[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
+        Map<Integer, Float> f = new HashMap<Integer, Float>(dimsize[out]);
+        for(Entry<Integer, Object> key : map.entrySet()) {
+          int i = key.getKey();
+          if(i < s) {
+            continue;
+          }
+          if(i >= s + dimsize[out]) {
+            break;
+          }
+          double v = (Double) key.getValue();
+          f.put(i - s + 1, (float) v);
+        }
+        data[out] = new SparseFloatVector(f, dimsize[out]);
+      }
+      else if(elkitypes[out] == TypeUtil.LABELLIST) {
+        // Build a label list out of successive labels
+        LabelList ll = new LabelList();
+        for(Entry<Integer, Object> key : map.entrySet()) {
+          int i = key.getKey();
+          if(i < s) {
+            continue;
+          }
+          if(i >= s + dimsize[out]) {
+            break;
+          }
+          String v = (String) key.getValue();
+          if(ll.size() < i - s) {
+            logger.warning("Sparse consecutive labels are currently not correctly supported.");
+          }
+          ll.add(v);
+        }
+        data[out] = ll;
+      }
+      else if(elkitypes[out] == TypeUtil.EXTERNALID) {
+        String val = (String) map.get(s);
+        if(val != null) {
+          data[out] = new ExternalID(val);
+        }
+        else {
+          throw new AbortException("External ID column not set in sparse instance." + tokenizer.toString());
+        }
+      }
+      else if(elkitypes[out] == TypeUtil.CLASSLABEL) {
+        String val = (String) map.get(s);
+        if(val != null) {
+          // TODO: support other class label types. Find a nicer API, too.
+          ClassLabel lbl = new SimpleClassLabel();
+          lbl.init(val);
+          data[out] = lbl;
+        }
+        else {
+          throw new AbortException("Class label column not set in sparse instance." + tokenizer.toString());
+        }
+      }
+      else {
+        throw new AbortException("Unsupported type for column " + "->" + out + ": " + ((elkitypes[out] != null) ? elkitypes[out].toString() : "null"));
+      }
+    }
+    return data;
   }
 
   private Object[] loadDenseInstance(StreamTokenizer tokenizer, int[] dimsize, TypeInformation[] etyp, int outdim) throws IOException {
@@ -306,7 +414,7 @@ public class ArffParser implements Parser {
         }
         else {
           Map<Integer, Float> empty = Collections.emptyMap();
-          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimsize[out], labels, new SparseFloatVector(empty , dimsize[out]));
+          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimsize[out], labels, new SparseFloatVector(empty, dimsize[out]));
           bundle.appendColumn(type, new ArrayList<SparseFloatVector>());
         }
       }
@@ -327,8 +435,6 @@ public class ArffParser implements Parser {
         throw new AbortException("Unsupported type for column " + in + "->" + out + ": " + ((etyp[out] != null) ? etyp[out].toString() : "null"));
       }
       assert (out == bundle.metaLength() - 1);
-      // logger.warning("Added meta: " + bundle.meta(bundle.metaLength() -
-      // 1));
       in = nin;
     }
   }
@@ -418,7 +524,7 @@ public class ArffParser implements Parser {
   private void processColumnTypes(ArrayList<String> names, ArrayList<String> types, int[] targ, TypeInformation[] etyp, int[] dims) {
     int next = 0;
     for(int i = 0; i < targ.length; i++) {
-      if(ARFF_MAGIC_EID.matcher(names.get(i)).matches()) {
+      if(magic_eid != null && magic_eid.matcher(names.get(i)).matches()) {
         // Turn into an external ID column.
         targ[i] = next;
         etyp[next] = TypeUtil.EXTERNALID;
@@ -426,7 +532,7 @@ public class ArffParser implements Parser {
         next++;
         continue;
       }
-      else if(ARFF_MAGIC_CLASS.matcher(names.get(i)).matches()) {
+      else if(magic_class != null && magic_class.matcher(names.get(i)).matches()) {
         // Type as ClassLabel
         targ[i] = next;
         etyp[next] = TypeUtil.CLASSLABEL;
@@ -495,6 +601,53 @@ public class ArffParser implements Parser {
     }
     else {
       logger.debug("token type: " + tokenizer.ttype);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Pattern for recognizing external ID attributes.
+     */
+    public static final OptionID MAGIC_EID_ID = OptionID.getOrCreateOptionID("arff.externalid", "Pattern to recognize external ID attributes.");
+
+    /**
+     * Pattern for recognizing class label attributes.
+     */
+    public static final OptionID MAGIC_CLASS_ID = OptionID.getOrCreateOptionID("arff.classlabel", "Pattern to recognize class label attributes.");
+
+    /**
+     * Pattern to recognize external ids
+     */
+    Pattern magic_eid;
+
+    /**
+     * Pattern to recognize class label columns
+     */
+    Pattern magic_class;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      PatternParameter eidP = new PatternParameter(MAGIC_EID_ID, DEFAULT_ARFF_MAGIC_EID);
+      if(config.grab(eidP)) {
+        magic_eid = eidP.getValue();
+      }
+      PatternParameter classP = new PatternParameter(MAGIC_CLASS_ID, DEFAULT_ARFF_MAGIC_CLASS);
+      if(config.grab(classP)) {
+        magic_class = classP.getValue();
+      }
+    }
+
+    @Override
+    protected ArffParser makeInstance() {
+      return new ArffParser(magic_eid, magic_class);
     }
   }
 }
