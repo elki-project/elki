@@ -226,12 +226,12 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
      * React to an update manager becoming available.
      */
     @Override
-    public void managerStarted(@SuppressWarnings("unused") UpdateManagerEvent e) {
+    public void managerStarted(UpdateManagerEvent e) {
       makeRunnerIfNeeded();
     }
 
     @Override
-    public void managerStopped(@SuppressWarnings("unused") UpdateManagerEvent e) {
+    public void managerStopped(UpdateManagerEvent e) {
       forgetSynchronizedRunner();
     }
   }

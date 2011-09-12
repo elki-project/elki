@@ -95,7 +95,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
   }
 
   @Override
-  public void contextChanged(@SuppressWarnings("unused") ContextChangedEvent e) {
+  public void contextChanged(ContextChangedEvent e) {
     synchronizedRedraw();
   }
 
@@ -169,19 +169,19 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
   }
 
   @Override
-  public boolean startDrag(@SuppressWarnings("unused") SVGPoint startPoint, @SuppressWarnings("unused") Event evt) {
+  public boolean startDrag(SVGPoint startPoint, Event evt) {
     return true;
   }
 
   @Override
-  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
+  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
     deleteChildren(rtag);
     rtag.appendChild(svgp.svgLine(startPoint.getX(), startPoint.getY(), dragPoint.getX(), dragPoint.getY()));
     return true;
   }
 
   @Override
-  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
+  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
     Vector movingVector = new Vector(2);
     movingVector.set(0, dragPoint.getX() - startPoint.getX());
     movingVector.set(1, dragPoint.getY() - startPoint.getY());

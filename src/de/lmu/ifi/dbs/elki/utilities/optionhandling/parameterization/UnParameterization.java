@@ -51,7 +51,6 @@ public class UnParameterization implements Parameterization {
   }
 
   @Override
-  @SuppressWarnings("unused")
   public boolean checkConstraint(GlobalParameterConstraint constraint) {
     return false;
   }
@@ -67,7 +66,6 @@ public class UnParameterization implements Parameterization {
   }
 
   @Override
-  @SuppressWarnings("unused")
   public boolean grab(Parameter<?, ?> opt) {
     return false;
   }
@@ -78,13 +76,12 @@ public class UnParameterization implements Parameterization {
   }
 
   @Override
-  @SuppressWarnings("unused")
   public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
     return false;
   }
 
   @Override
-  public Parameterization descend(@SuppressWarnings("unused") Object option) {
+  public Parameterization descend(Object option) {
     return this;
   }
   

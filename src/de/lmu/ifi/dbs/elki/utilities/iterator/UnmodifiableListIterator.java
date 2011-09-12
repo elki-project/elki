@@ -87,12 +87,12 @@ public final class UnmodifiableListIterator<T> implements ListIterator<T> {
   }
 
   @Override
-  public void add(@SuppressWarnings("unused") T e) {
+  public void add(T e) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void set(@SuppressWarnings("unused") T e) {
+  public void set(T e) {
     throw new UnsupportedOperationException();
   }
 }

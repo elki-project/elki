@@ -74,14 +74,12 @@ public class ResultHierarchy extends HierarchyHashmapList<Result> {
     fireResultAdded(child, parent);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void remove(Result parent, Result child) {
     // TODO: unlink from hierarchy, fire event
     throw new UnsupportedOperationException();
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void put(Result obj, List<Result> parents, List<Result> children) {
     // TODO: can we support this somehow? Or reduce visibility?

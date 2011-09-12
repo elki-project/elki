@@ -95,18 +95,12 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
   Element etag;
 
   /**
-   * Our result
-   */
-  private SelectionResult result;
-
-  /**
    * Constructor.
    * 
    * @param task Task
    */
   public SelectionToolDotVisualization(VisualizationTask task) {
     super(task);
-    this.result = task.getResult();
     context.addContextChangeListener(this);
     incrementalRedraw();
   }
@@ -118,7 +112,7 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
   }
 
   @Override
-  public void contextChanged(@SuppressWarnings("unused") ContextChangedEvent e) {
+  public void contextChanged(ContextChangedEvent e) {
     synchronizedRedraw();
   }
 
@@ -149,12 +143,12 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
   }
 
   @Override
-  public boolean startDrag(@SuppressWarnings("unused") SVGPoint startPoint, @SuppressWarnings("unused") Event evt) {
+  public boolean startDrag(SVGPoint startPoint, Event evt) {
     return true;
   }
 
   @Override
-  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
+  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
     deleteChildren(rtag);
     double x = Math.min(startPoint.getX(), dragPoint.getX());
     double y = Math.min(startPoint.getY(), dragPoint.getY());
@@ -165,7 +159,7 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
   }
 
   @Override
-  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, @SuppressWarnings("unused") boolean inside) {
+  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
     Mode mode = getInputMode(evt);
     deleteChildren(rtag);
     if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {

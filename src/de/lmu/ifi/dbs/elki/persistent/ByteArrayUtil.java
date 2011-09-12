@@ -275,7 +275,7 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public int getByteSize(@SuppressWarnings("unused") Byte object) {
+    public int getByteSize(Byte object) {
       return getFixedByteSize();
     }
 
@@ -309,7 +309,7 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public int getByteSize(@SuppressWarnings("unused") Short object) {
+    public int getByteSize(Short object) {
       return getFixedByteSize();
     }
 
@@ -343,7 +343,7 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public int getByteSize(@SuppressWarnings("unused") Integer object) {
+    public int getByteSize(Integer object) {
       return getFixedByteSize();
     }
 
@@ -377,7 +377,7 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public int getByteSize(@SuppressWarnings("unused") Long object) {
+    public int getByteSize(Long object) {
       return getFixedByteSize();
     }
 
@@ -411,7 +411,7 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public int getByteSize(@SuppressWarnings("unused") Float object) {
+    public int getByteSize(Float object) {
       return getFixedByteSize();
     }
 
@@ -445,7 +445,7 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public int getByteSize(@SuppressWarnings("unused") Double object) {
+    public int getByteSize(Double object) {
       return getFixedByteSize();
     }
 

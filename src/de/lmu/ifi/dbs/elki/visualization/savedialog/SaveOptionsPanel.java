@@ -171,7 +171,7 @@ public class SaveOptionsPanel extends JPanel {
     spinnerWidth = new JSpinner(modelWidth);
     spinnerWidth.addChangeListener(new ChangeListener() {
       @Override
-      public void stateChanged(@SuppressWarnings("unused") ChangeEvent e) {
+      public void stateChanged(ChangeEvent e) {
         if(aspectRatioLock.isSelected()) {
           int val = modelWidth.getNumber().intValue();
           spinnerHeight.setValue(new Integer((int) Math.round(val / ratio)));
@@ -183,7 +183,7 @@ public class SaveOptionsPanel extends JPanel {
     spinnerHeight = new JSpinner(modelHeight);
     spinnerHeight.addChangeListener(new ChangeListener() {
       @Override
-      public void stateChanged(@SuppressWarnings("unused") ChangeEvent e) {
+      public void stateChanged(ChangeEvent e) {
         if(aspectRatioLock.isSelected()) {
           int val = modelHeight.getNumber().intValue();
           spinnerWidth.setValue(new Integer((int) Math.round(val * ratio)));
@@ -207,7 +207,7 @@ public class SaveOptionsPanel extends JPanel {
       resetSizeButton = new JButton(STR_RESET_IMAGE_SIZE);
       resetSizeButton.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
           modelWidth.setValue(width);
           modelHeight.setValue(height);
           aspectRatioLock.setSelected(true);

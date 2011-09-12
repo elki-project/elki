@@ -137,22 +137,22 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
   /* Make the list unmodifiable! */
 
   @Override
-  public boolean add(@SuppressWarnings("unused") DistanceResultPair<D> e) {
+  public boolean add(DistanceResultPair<D> e) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void add(@SuppressWarnings("unused") int index, @SuppressWarnings("unused") DistanceResultPair<D> element) {
+  public void add(int index, DistanceResultPair<D> element) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean addAll(@SuppressWarnings("unused") Collection<? extends DistanceResultPair<D>> c) {
+  public boolean addAll(Collection<? extends DistanceResultPair<D>> c) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean addAll(@SuppressWarnings("unused") int index, @SuppressWarnings("unused") Collection<? extends DistanceResultPair<D>> c) {
+  public boolean addAll(int index, Collection<? extends DistanceResultPair<D>> c) {
     throw new UnsupportedOperationException();
   }
 
@@ -162,17 +162,17 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
   }
 
   @Override
-  public DistanceResultPair<D> remove(@SuppressWarnings("unused") int index) {
+  public DistanceResultPair<D> remove(int index) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean remove(@SuppressWarnings("unused") Object o) {
+  public boolean remove(Object o) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DistanceResultPair<D> set(@SuppressWarnings("unused") int index, @SuppressWarnings("unused") DistanceResultPair<D> element) {
+  public DistanceResultPair<D> set(int index, DistanceResultPair<D> element) {
     throw new UnsupportedOperationException();
   }
 

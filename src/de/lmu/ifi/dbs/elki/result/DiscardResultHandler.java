@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 /**
  * A dummy result handler that discards the actual result, for use in
  * benchmarks.
@@ -39,7 +37,6 @@ public class DiscardResultHandler implements ResultHandler {
     // empty constructor
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     // always ignore the new result.

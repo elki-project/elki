@@ -179,7 +179,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 

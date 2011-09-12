@@ -108,7 +108,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 

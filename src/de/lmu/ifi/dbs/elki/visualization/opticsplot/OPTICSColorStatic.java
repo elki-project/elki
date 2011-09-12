@@ -47,7 +47,7 @@ public class OPTICSColorStatic implements OPTICSColorAdapter {
   }
 
   @Override
-  public int getColorForEntry(@SuppressWarnings("unused") ClusterOrderEntry<?> coe) {
+  public int getColorForEntry(ClusterOrderEntry<?> coe) {
     return color;
   }
 }

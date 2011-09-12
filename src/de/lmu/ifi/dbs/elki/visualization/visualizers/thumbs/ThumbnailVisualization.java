@@ -152,7 +152,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     refreshThumbnail();
   }
 

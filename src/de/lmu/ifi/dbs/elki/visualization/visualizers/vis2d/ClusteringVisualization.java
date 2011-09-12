@@ -101,7 +101,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 

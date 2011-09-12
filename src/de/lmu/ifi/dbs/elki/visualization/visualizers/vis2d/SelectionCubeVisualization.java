@@ -95,14 +95,8 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
    */
   protected boolean nofill = false;
 
-  /**
-   * The result we process
-   */
-  private SelectionResult result;
-
   public SelectionCubeVisualization(VisualizationTask task, boolean nofill) {
     super(task);
-    this.result = task.getResult();
     this.nofill = nofill;
     addCSSClasses(svgp);
     context.addContextChangeListener(this);
