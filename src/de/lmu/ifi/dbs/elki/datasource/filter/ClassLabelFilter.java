@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses LabelList oneway - - «reads»
  * @apiviz.has ClassLabel
  */
 public class ClassLabelFilter implements ObjectFilter {

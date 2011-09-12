@@ -41,6 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Class that turns a label column into an external ID column.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses LabelList oneway - - «reads»
+ * @apiviz.has ExternalID oneway - - «produces»
  */
 // TODO: use a non-string class for external ids?
 public class ExternalIDFilter implements ObjectFilter {

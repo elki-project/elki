@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.landmark
  */
 public interface Model {
   // currently, there are no requirements on a model.

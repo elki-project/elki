@@ -35,6 +35,8 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @author Erich Schubert
  * 
  * @param <O> Object type
+ * 
+ * @apiviz.uses NumberVector
  */
 public class AttributeWiseErfNormalization<O extends NumberVector<O, ?>> extends AbstractNormalization<O> {
   /**

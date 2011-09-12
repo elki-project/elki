@@ -41,10 +41,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * Dummy Algorithm, which just iterates over all points once, doing a 10NN query
  * each. Useful in testing e.g. index structures and as template for custom
- * algorithms.
+ * algorithms. If you are looking for an algorithm that does <em>nothing</em>,
+ * you must use {@link de.lmu.ifi.dbs.elki.algorithm.NullAlgorithm
+ * NullAlgorithm} instead. While this algorithm doesn't produce a result, it
+ * still performs rather expensive operations.
  * 
  * @author Erich Schubert
  * @param <O> Vector type
+ * 
+ * @apiviz.uses KNNQuery
  */
 @Title("Dummy Algorithm")
 @Description("The algorithm executes a euclidena 10NN query on all data points, and can be used in unit testing")

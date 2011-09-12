@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
  * of classes.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.composedOf Comparable
  */
 public class HierarchicalClassLabel extends ClassLabel {
   /**

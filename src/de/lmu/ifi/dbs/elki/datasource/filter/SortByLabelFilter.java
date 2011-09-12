@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * A filter to sort the data set by some label.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses LabelList oneway - - «reads»
  */
 public class SortByLabelFilter implements ObjectFilter {
   /**

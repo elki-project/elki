@@ -28,6 +28,8 @@ package de.lmu.ifi.dbs.elki.data;
  * A simple class label casting a String as it is as label.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.composedOf String
  */
 public class SimpleClassLabel extends ClassLabel {
   /**

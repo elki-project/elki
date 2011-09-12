@@ -47,6 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Elke Achtert
  * @param <V> vector type
+ * 
+ * @apiviz.uses NumberVector
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
 public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> extends AbstractNormalization<V> {

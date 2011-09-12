@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.uses Clustering
- * @apiviz.uses Model
+ * @apiviz.has Clustering
+ * @apiviz.has Model
  * 
  * @param <C> Clustering type
  */
