@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * onto a selected subset of attributes.</p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.use DoubleVector
  */
 public class DoubleVectorProjectionFilter extends AbstractFeatureSelectionFilter<DoubleVector> {
   /**

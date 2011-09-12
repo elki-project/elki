@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Elke Achtert
  * 
+ * @apiviz.has AbstractDatabaseDistanceFunction.Instance
+ * 
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <D> the type of Distance used
  */

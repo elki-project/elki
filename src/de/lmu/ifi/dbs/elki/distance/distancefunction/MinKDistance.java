@@ -63,6 +63,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses DistanceFunction
+ * @apiviz.has MinKDistance.Instance
+ * 
  * @param <O> Database object type
  * @param <D> Distance type
  */
@@ -121,6 +124,8 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
    * Instance for an actual database.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.use KNNQuery
    */
   public class Instance<T extends O> extends AbstractDatabaseDistanceQuery<T, D> {
     /**

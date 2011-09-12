@@ -38,6 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Elke Achtert
  * 
+ * @apiviz.has AbstractIndexBasedDistanceFunction.Instance
+ * @apiviz.composedOf IndexFactory
+ * 
  * @param <O> the type of object to compute the distances in between
  * @param <I> the type of Index used
  * @param <D> the type of Distance used

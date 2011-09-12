@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
- * @apiviz.uses Instance oneway - - «create»
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
+ * @apiviz.has SharedNearestNeighborJaccardDistanceFunction.Instance oneway - - «create»
  * 
  * @param <O> object type
  */
