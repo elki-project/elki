@@ -75,7 +75,7 @@ public class ClassLabelFilter implements ObjectFilter {
   /**
    * The class label class to use.
    */
-  private final ClassLabel.Factory classLabelFactory;
+  private final ClassLabel.Factory<?> classLabelFactory;
 
   /**
    * Constructor.
@@ -83,7 +83,7 @@ public class ClassLabelFilter implements ObjectFilter {
    * @param classLabelIndex The index to convert
    * @param classLabelFactory The class label factory to use
    */
-  public ClassLabelFilter(int classLabelIndex, ClassLabel.Factory classLabelFactory) {
+  public ClassLabelFilter(int classLabelIndex, ClassLabel.Factory<?> classLabelFactory) {
     super();
     this.classLabelIndex = classLabelIndex;
     this.classLabelFactory = classLabelFactory;
@@ -155,14 +155,14 @@ public class ClassLabelFilter implements ObjectFilter {
     /**
      * The class label factory to use.
      */
-    private ClassLabel.Factory classLabelFactory;
+    private ClassLabel.Factory<?> classLabelFactory;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // parameter class label index
       final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0));
-      final ObjectParameter<ClassLabel.Factory> classlabelClassParam = new ObjectParameter<ClassLabel.Factory>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
+      final ObjectParameter<ClassLabel.Factory<?>> classlabelClassParam = new ObjectParameter<ClassLabel.Factory<?>>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
 
       config.grab(classLabelIndexParam);
       config.grab(classlabelClassParam);

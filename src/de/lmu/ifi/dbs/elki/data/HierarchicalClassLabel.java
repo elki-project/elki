@@ -96,7 +96,6 @@ public class HierarchicalClassLabel extends ClassLabel {
    * separated by '.'.
    * 
    * @param label a String describing a hierarchical class label
-   * @see #init(String, java.util.regex.Pattern, String)
    */
   public HierarchicalClassLabel(String label) {
     this(label, DEFAULT_SEPARATOR, DEFAULT_SEPARATOR_STRING);
@@ -193,7 +192,7 @@ public class HierarchicalClassLabel extends ClassLabel {
    * @apiviz.has HierarchicalClassLabel - - «creates»
    * @apiviz.stereotype factory
    */
-  public static class Factory extends ClassLabel.Factory {
+  public static class Factory extends ClassLabel.Factory<HierarchicalClassLabel> {
     @Override
     public HierarchicalClassLabel makeFromString(String lbl) {
       return new HierarchicalClassLabel(lbl);

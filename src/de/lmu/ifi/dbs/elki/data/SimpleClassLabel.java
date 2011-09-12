@@ -111,7 +111,7 @@ public class SimpleClassLabel extends ClassLabel {
    * @apiviz.has SimpleClassLabel - - «creates»
    * @apiviz.stereotype factory
    */
-  public static class Factory extends ClassLabel.Factory {
+  public static class Factory extends ClassLabel.Factory<SimpleClassLabel> {
     @Override
     public SimpleClassLabel makeFromString(String lbl) {
       return new SimpleClassLabel(lbl);
