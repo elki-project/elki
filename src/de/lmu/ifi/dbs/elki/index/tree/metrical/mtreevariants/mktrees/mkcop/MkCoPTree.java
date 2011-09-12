@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
  * @author Elke Achtert
  * 
  * @apiviz.has MkCoPTreeNode oneway - - contains
+ * @apiviz.uses ConvexHull
  * 
  * @param <O> Object type
  * @param <D> Distance type

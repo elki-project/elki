@@ -32,10 +32,10 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * provided.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf PolynomialApproximation
  */
-
 interface MkAppEntry<D extends NumberDistance<D, ?>> extends MTreeEntry<D> {
-
   /**
    * Returns the approximated value at the specified k.
    * 

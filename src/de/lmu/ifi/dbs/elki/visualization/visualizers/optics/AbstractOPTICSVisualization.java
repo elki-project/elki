@@ -39,7 +39,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * Abstract base class for OPTICS visualizer
  * 
  * @author Erich Schubert
- *
+ * 
+ * @apiviz.uses OPTICSProjector
+ * 
  * @param <D>
  */
 public abstract class AbstractOPTICSVisualization<D extends Distance<D>> extends AbstractVisualization {
@@ -47,12 +49,12 @@ public abstract class AbstractOPTICSVisualization<D extends Distance<D>> extends
    * The plot
    */
   final protected OPTICSProjector<D> optics;
-  
+
   /**
    * Width of plot (in display units)
    */
   protected double plotwidth;
-  
+
   /**
    * Height of plot (in display units)
    */
@@ -60,7 +62,7 @@ public abstract class AbstractOPTICSVisualization<D extends Distance<D>> extends
 
   /**
    * Constructor.
-   *
+   * 
    * @param task Visualization task.
    */
   public AbstractOPTICSVisualization(VisualizationTask task) {
@@ -79,7 +81,7 @@ public abstract class AbstractOPTICSVisualization<D extends Distance<D>> extends
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), plotwidth, plotheight, margin / 2);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
   }
-  
+
   /**
    * Access the raw cluster order
    * 

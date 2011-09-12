@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @apiviz.landmark
  * @apiviz.has VisualizerContext
- * @apiviz.composedOf PlotMap
+ * @apiviz.composedOf RectangleArranger
  * @apiviz.has DetailViewSelectedEvent
  * @apiviz.uses DetailView
  * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.projections.Projection
@@ -419,7 +419,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     }
 
     @Override
-    public void handleEvent(@SuppressWarnings("unused") Event evt) {
+    public void handleEvent(Event evt) {
       triggerSubplotSelectEvent(it);
     }
   }
@@ -464,7 +464,6 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     scheduleUpdate(pr);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultAdded(Result child, Result parent) {
     logger.debug("result added: " + child);
@@ -480,7 +479,6 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     lazyRefresh();
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultRemoved(Result child, Result parent) {
     logger.debug("result removed: " + child);

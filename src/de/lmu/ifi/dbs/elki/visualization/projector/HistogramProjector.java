@@ -46,6 +46,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has LinearScale
+ * 
  * @param <V> Vector type
  */
 public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHierarchicalResult implements Projector {

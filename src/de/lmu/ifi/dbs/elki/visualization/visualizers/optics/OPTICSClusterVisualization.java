@@ -53,8 +53,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ClusterOrderResult
- * @apiviz.uses OPTICSPlot
+ * @apiviz.uses Clustering oneway - - «visualizes»
  * 
  * @param <D> Distance type (actually unused)
  */
@@ -210,7 +209,7 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
     }
 
     @Override
-    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
     }

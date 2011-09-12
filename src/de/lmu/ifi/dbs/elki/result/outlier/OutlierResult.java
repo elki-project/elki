@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
  * @apiviz.composedOf OutlierScoreMeta
  * @apiviz.composedOf Relation oneway - - contains
  * @apiviz.composedOf OrderingFromRelation

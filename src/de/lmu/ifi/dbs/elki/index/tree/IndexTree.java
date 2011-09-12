@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Elke Achtert
  * 
+ * @apiviz.composedOf PageFile
  * @apiviz.has Node oneway - - contains
  * @apiviz.has TreeIndexHeader oneway
  * 

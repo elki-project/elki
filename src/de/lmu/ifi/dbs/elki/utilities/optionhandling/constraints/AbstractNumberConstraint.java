@@ -23,15 +23,16 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Abstract super class for constraints dealing with a certain number value.
  *
  * @author Elke Achtert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter
+ * 
  * @param <P> the type of the parameter to be tested by this constraint (e.g., Number, List<Number>)
  */
 public abstract class AbstractNumberConstraint<P> implements ParameterConstraint<P> {
-
   /**
    * The constraint value.
    */

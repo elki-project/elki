@@ -33,6 +33,7 @@ import java.util.List;
  * @author Elke Achtert
  * 
  * @apiviz.composedOf TreeIndexPathComponent
+ * @apiviz.uses Entry
  * 
  * @param <E> the type of Entry used in the index
  */

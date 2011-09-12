@@ -55,7 +55,7 @@ public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends Pr
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses LocalProjectionIndex oneway - - «create»
+   * @apiviz.has LocalProjectionIndex oneway - - «create»
    * 
    * @param <V> Vector type
    * @param <I> Index type

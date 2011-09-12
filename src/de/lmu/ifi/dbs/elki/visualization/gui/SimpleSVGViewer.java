@@ -84,7 +84,7 @@ public class SimpleSVGViewer extends JFrame {
     exportItem.setMnemonic(KeyEvent.VK_E);
     exportItem.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
+      public void actionPerformed(ActionEvent ae) {
         saveCurrentPlot();
       }
     });
@@ -93,7 +93,7 @@ public class SimpleSVGViewer extends JFrame {
     quitItem.setMnemonic(KeyEvent.VK_Q);
     quitItem.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
         close();
       }
     });

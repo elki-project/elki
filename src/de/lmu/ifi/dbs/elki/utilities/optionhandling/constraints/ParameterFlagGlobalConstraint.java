@@ -36,6 +36,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * the flag the parameter is tested for keeping its constraints or not.
  * 
  * @author Steffi Wanka
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
+ * 
  * @param <C> Constraint type
  * @param <S> Parameter type
  */

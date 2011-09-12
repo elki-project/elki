@@ -163,14 +163,14 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     closeButton = new JButton("close");
     closeButton.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent arg0) {
+      public void actionPerformed(ActionEvent arg0) {
         dispose();
       }
     });
     deleteButton = new JButton("delete");
     deleteButton.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent arg0) {
+      public void actionPerformed(ActionEvent arg0) {
         handleDelete();
       }
     });
@@ -291,7 +291,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     }
 
     @Override
-    public boolean isCellEditable(@SuppressWarnings("unused") int rowIndex, int columnIndex) {
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
       if(columnIndex == 0) {
         return false;
       }
@@ -360,13 +360,11 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     }
   }
   
-  @SuppressWarnings("unused")
   @Override
   public void resultAdded(Result child, Result parent) {
     // TODO Auto-generated method stub
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultRemoved(Result child, Result parent) {
     // TODO Auto-generated method stub

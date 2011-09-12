@@ -48,9 +48,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has LinearScale
+ * 
  * @param <V> Vector type
  */
-// FIXME: re-add column labels
 public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends AbstractHierarchicalResult implements Projector {
   /**
    * Relation we project

@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @author Erich Schubert
  * 
  * @apiviz.has Evaluator
- * @apiviz.has Result
  * @apiviz.uses Result
  */
 public class EvaluationStep implements WorkflowStep {
@@ -77,6 +76,8 @@ public class EvaluationStep implements WorkflowStep {
    * Class to handle running the evaluators on a database instance.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public class Evaluation implements ResultListener {
     /**

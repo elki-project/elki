@@ -58,12 +58,12 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.composedOf SettingsComboboxModel
  * @apiviz.composedOf AlgorithmTabPanel
  * @apiviz.composedOf EvaluationTabPanel
  * @apiviz.composedOf InputTabPanel
  * @apiviz.composedOf LoggingTabPanel
  * @apiviz.composedOf OutputTabPanel
+ * @apiviz.composedOf SavedSettingsTabPanel
  */
 public class MultiStepGUI extends JPanel {
   /**

@@ -28,19 +28,21 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
 /**
- * Defines the requirements for an entry in an MkCop-Tree node.
- * Additionally to an entry in an M-Tree conservative approximation of the
- * knn distances is provided.
- *
- * @author Elke Achtert 
+ * Defines the requirements for an entry in an MkCop-Tree node. Additionally to
+ * an entry in an M-Tree conservative approximation of the knn distances is
+ * provided.
+ * 
+ * @author Elke Achtert
+ * 
+ * @apiviz.composedOf ApproximationLine
  */
 interface MkCoPEntry<D extends NumberDistance<D, ?>> extends MTreeEntry<D> {
 
   /**
    * Returns the conservative approximated knn distance of the entry.
-   *
+   * 
    * @param <O> Object type
-   * @param k                the parameter k of the knn distance
+   * @param k the parameter k of the knn distance
    * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
@@ -48,15 +50,16 @@ interface MkCoPEntry<D extends NumberDistance<D, ?>> extends MTreeEntry<D> {
 
   /**
    * Returns the conservative approximation line.
-   *
+   * 
    * @return the conservative approximation line
    */
   public ApproximationLine getConservativeKnnDistanceApproximation();
 
   /**
    * Sets the conservative approximation line
-   *
-   * @param conservativeApproximation the conservative approximation line to be set
+   * 
+   * @param conservativeApproximation the conservative approximation line to be
+   *        set
    */
   public void setConservativeKnnDistanceApproximation(ApproximationLine conservativeApproximation);
 }

@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
  * Produce OPTICS plot projections
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has OPTICSProjector
  */
 public class OPTICSProjectorFactory implements ProjectorFactory {
   /**

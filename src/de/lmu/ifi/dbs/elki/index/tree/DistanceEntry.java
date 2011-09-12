@@ -30,6 +30,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * belonging to this entry.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf Distance
+ * @apiviz.uses Entry
+ * 
  * @param <E> the type of Entry used in the index
  * @param <D> the type of Distance used
  */

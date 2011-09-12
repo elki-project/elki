@@ -235,7 +235,7 @@ public class CurveVisFactory extends AbstractVisFactory {
   }
 
   @Override
-  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+  public boolean allowThumbnails(VisualizationTask task) {
     // TODO: depending on the curve complexity?
     return false;
   }
