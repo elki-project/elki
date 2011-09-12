@@ -37,6 +37,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
  * frequency.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses SparseFloatVector
  */
 public class InverseDocumentFrequencyNormalization extends AbstractNormalization<SparseFloatVector> {
   /**

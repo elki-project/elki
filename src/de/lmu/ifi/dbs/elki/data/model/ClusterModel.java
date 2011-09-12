@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * 
  * @author Erich Schubert
  *
+ * @apiviz.landmark
  */
 public final class ClusterModel extends BaseModel {
   /**

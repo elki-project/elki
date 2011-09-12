@@ -40,6 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * A filter to sort the data set by some label.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses LabelList oneway - - «reads»
  */
 public class FilterByLabelFilter implements ObjectFilter {
   /**

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ClusterOrderResult
+ * @apiviz.has ClusterOrderResult
  * 
  * @param <D> Distance type
  */

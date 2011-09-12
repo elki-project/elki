@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * A list of string labels
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf String
  */
 public class LabelList extends ArrayList<String> {
   /**
