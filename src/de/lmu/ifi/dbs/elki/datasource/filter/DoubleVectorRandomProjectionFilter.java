@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.use DoubleVector
+ * @apiviz.uses DoubleVector
  */
 public class DoubleVectorRandomProjectionFilter extends AbstractRandomFeatureSelectionFilter<DoubleVector> {
   /**
