@@ -74,18 +74,18 @@ public class ClassLabelFilter implements ObjectFilter {
   /**
    * The class label class to use.
    */
-  private final Class<? extends ClassLabel> classLabelClass;
+  private final ClassLabel.Factory classLabelFactory;
 
   /**
    * Constructor.
    * 
    * @param classLabelIndex The index to convert
-   * @param classLabelClass The class label class to use
+   * @param classLabelFactory The class label factory to use
    */
-  public ClassLabelFilter(int classLabelIndex, Class<? extends ClassLabel> classLabelClass) {
+  public ClassLabelFilter(int classLabelIndex, ClassLabel.Factory classLabelFactory) {
     super();
     this.classLabelIndex = classLabelIndex;
-    this.classLabelClass = classLabelClass;
+    this.classLabelFactory = classLabelFactory;
   }
 
   @Override
@@ -112,8 +112,7 @@ public class ClassLabelFilter implements ObjectFilter {
         if(obj != null) {
           LabelList ll = (LabelList) obj;
           try {
-            ClassLabel lbl = classLabelClass.newInstance();
-            lbl.init(ll.remove(classLabelIndex));
+            ClassLabel lbl = classLabelFactory.makeFromString(ll.remove(classLabelIndex));
             clscol.add(lbl);
           }
           catch(Exception e) {
@@ -153,28 +152,28 @@ public class ClassLabelFilter implements ObjectFilter {
     protected Integer classLabelIndex;
 
     /**
-     * The class label class to use.
+     * The class label factory to use.
      */
-    private Class<? extends ClassLabel> classLabelClass;
+    private ClassLabel.Factory classLabelFactory;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // parameter class label index
       final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0));
-      final ObjectParameter<ClassLabel> classlabelClassParam = new ObjectParameter<ClassLabel>(CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class);
+      final ObjectParameter<ClassLabel.Factory> classlabelClassParam = new ObjectParameter<ClassLabel.Factory>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
 
       config.grab(classLabelIndexParam);
       config.grab(classlabelClassParam);
       if(classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
         classLabelIndex = classLabelIndexParam.getValue();
-        classLabelClass = classlabelClassParam.getValue();
+        classLabelFactory = classlabelClassParam.instantiateClass(config);
       }
     }
 
     @Override
     protected Object makeInstance() {
-      return new ClassLabelFilter(classLabelIndex, classLabelClass);
+      return new ClassLabelFilter(classLabelIndex, classLabelFactory);
     }
   }
 }

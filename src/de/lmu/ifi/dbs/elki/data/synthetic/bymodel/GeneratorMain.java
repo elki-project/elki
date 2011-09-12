@@ -182,8 +182,7 @@ public class GeneratorMain {
     bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
 
     for(GeneratorInterface generator : generators) {
-      ClassLabel l = new SimpleClassLabel();
-      l.init(generator.getName());
+      ClassLabel l = new SimpleClassLabel(generator.getName());
       for(Vector v : generator.getPoints()) {
         DoubleVector dv = new DoubleVector(v);
         bundle.appendSimple(dv, l);

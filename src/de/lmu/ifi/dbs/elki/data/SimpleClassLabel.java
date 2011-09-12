@@ -34,21 +34,14 @@ public class SimpleClassLabel extends ClassLabel {
    * Holds the String designating the label.
    */
   private String label;
-
+  
   /**
-   * @see ClassLabel#ClassLabel()
+   * Constructor.
+   *
+   * @param label Label
    */
-  public SimpleClassLabel() {
+  public SimpleClassLabel(String label) {
     super();
-  }
-
-  /**
-   * Provides a simple class label covering the given String.
-   * 
-   * @param label the String to be cast as label
-   */
-  @Override
-  public void init(String label) {
     this.label = label;
   }
 
@@ -106,5 +99,20 @@ public class SimpleClassLabel extends ClassLabel {
   @Override
   public String toString() {
     return label;
+  }
+
+  /**
+   * Factory class
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.has SimpleClassLabel - - «creates»
+   * @apiviz.stereotype factory
+   */
+  public static class Factory extends ClassLabel.Factory {
+    @Override
+    public SimpleClassLabel makeFromString(String lbl) {
+      return new SimpleClassLabel(lbl);
+    }
   }
 }

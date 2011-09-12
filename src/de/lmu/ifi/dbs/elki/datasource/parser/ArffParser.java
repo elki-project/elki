@@ -293,9 +293,8 @@ public class ArffParser implements Parser {
       else if(elkitypes[out] == TypeUtil.CLASSLABEL) {
         String val = (String) map.get(s);
         if(val != null) {
-          // TODO: support other class label types. Find a nicer API, too.
-          ClassLabel lbl = new SimpleClassLabel();
-          lbl.init(val);
+          // TODO: support other class label types.
+          ClassLabel lbl = new SimpleClassLabel(val);
           data[out] = lbl;
         }
         else {
@@ -348,9 +347,8 @@ public class ArffParser implements Parser {
         if(tokenizer.ttype != StreamTokenizer.TT_WORD) {
           throw new AbortException("Expected word token, got: " + tokenizer.toString());
         }
-        // TODO: support other class label types. Find a nicer API, too.
-        ClassLabel lbl = new SimpleClassLabel();
-        lbl.init(tokenizer.sval);
+        // TODO: support other class label types.
+        ClassLabel lbl = new SimpleClassLabel(tokenizer.sval);
         data[out] = lbl;
         nextToken(tokenizer);
       }
