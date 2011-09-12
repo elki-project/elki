@@ -23,15 +23,19 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import experimentalcode.tobias._index.sstree.DoubleVector;
 
 /**
  * Generate a data set according to a given model.
@@ -63,11 +67,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  */
 public class GeneratorMain {
   /**
-   * Line separator for output
-   */
-  public final static String LINE_SEPARATOR = System.getProperty("line.separator");
-
-  /**
    * List of clusters to generate
    */
   private LinkedList<GeneratorInterface> clusters = new LinkedList<GeneratorInterface>();
@@ -89,10 +88,11 @@ public class GeneratorMain {
   /**
    * Main loop to generate data set.
    * 
+   * @return Generated data set
    * @throws UnableToComplyException when model not satisfiable or no clusters
    *         specified.
    */
-  public void generate() throws UnableToComplyException {
+  public MultipleObjectsBundle generate() throws UnableToComplyException {
     // we actually need some clusters.
     if(clusters.size() < 1) {
       throw new UnableToComplyException("No clusters specified.");
@@ -105,6 +105,10 @@ public class GeneratorMain {
       }
     }
     // generate clusters
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
+    bundle.appendColumn(type, new ArrayList<Object>());
+    bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
     for(GeneratorInterface curclus : clusters) {
       while(curclus.getPoints().size() < curclus.getSize()) {
         // generate the "missing" number of points
@@ -139,67 +143,14 @@ public class GeneratorMain {
           }
         }
       }
-    }
-  }
-
-  /**
-   * Write the resulting clusters to an output stream.
-   * 
-   * @param outStream output stream
-   * @throws IOException thrown on write errors
-   */
-  public void writeClusters(OutputStreamWriter outStream) throws IOException {
-    // compute global discard values
-    int totalsize = 0;
-    int totaldisc = 0;
-    assert (clusters.size() > 0);
-    for(GeneratorInterface curclus : clusters) {
-      totalsize = totalsize + curclus.getSize();
-      if(curclus instanceof GeneratorSingleCluster) {
-        totaldisc = totaldisc + ((GeneratorSingleCluster) curclus).getDiscarded();
+      ClassLabel l = new SimpleClassLabel();
+      l.init(curclus.getName());
+      for(Vector v : curclus.getPoints()) {
+        DoubleVector dv = new DoubleVector(v);
+        bundle.appendSimple(dv, l);
       }
     }
-    double globdens = (double) (totalsize + totaldisc) / totalsize;
-    outStream.write("########################################################" + LINE_SEPARATOR);
-    outStream.write("## Number of clusters: " + clusters.size() + LINE_SEPARATOR);
-    for(GeneratorInterface curclus : clusters) {
-      outStream.write("########################################################" + LINE_SEPARATOR);
-      outStream.write("## Cluster: " + curclus.getName() + LINE_SEPARATOR);
-      outStream.write("########################################################" + LINE_SEPARATOR);
-      outStream.write("## Size: " + curclus.getSize() + LINE_SEPARATOR);
-      if(curclus instanceof GeneratorSingleCluster) {
-        GeneratorSingleCluster cursclus = (GeneratorSingleCluster) curclus;
-        Vector cmin = cursclus.getClipmin();
-        Vector cmax = cursclus.getClipmax();
-        if(cmin != null && cmax != null) {
-          outStream.write("## Clipping: " + cmin.toString() + " - " + cmax.toString() + LINE_SEPARATOR);
-        }
-        outStream.write("## Density correction factor: " + cursclus.getDensityCorrection() + LINE_SEPARATOR);
-        outStream.write("## Generators:" + LINE_SEPARATOR);
-        for(Distribution gen : cursclus.getAxes()) {
-          outStream.write("##   " + gen.toString() + LINE_SEPARATOR);
-        }
-        if(cursclus.getTrans() != null && cursclus.getTrans().getTransformation() != null) {
-          outStream.write("## Affine transformation matrix:" + LINE_SEPARATOR);
-          outStream.write(FormatUtil.format(cursclus.getTrans().getTransformation(), "## ") + LINE_SEPARATOR);
-        }
-      }
-      if(curclus instanceof GeneratorInterfaceDynamic) {
-        GeneratorSingleCluster cursclus = (GeneratorSingleCluster) curclus;
-        outStream.write("## Discards: " + cursclus.getDiscarded() + " Retries left: " + cursclus.getRetries() + LINE_SEPARATOR);
-        double corf = /* cursclus.overweight */(double) (cursclus.getSize() + cursclus.getDiscarded()) / cursclus.getSize() / globdens;
-        outStream.write("## Density correction factor estimation: " + corf + LINE_SEPARATOR);
-
-      }
-      outStream.write("########################################################" + LINE_SEPARATOR);
-      for(Vector p : curclus.getPoints()) {
-        for(int i = 0; i < p.getRowDimensionality(); i++) {
-          outStream.write(p.get(i) + " ");
-        }
-        outStream.write(curclus.getName());
-        outStream.write(LINE_SEPARATOR);
-      }
-    }
+    return bundle;
   }
 
   /**
@@ -218,5 +169,14 @@ public class GeneratorMain {
    */
   public void setTestAgainstModel(boolean testAgainstModel) {
     this.testAgainstModel = testAgainstModel;
+  }
+
+  /**
+   * Access the clusters.
+   * 
+   * @return clusters
+   */
+  public List<GeneratorInterface> getClusters() {
+    return Collections.unmodifiableList(clusters);
   }
 }
