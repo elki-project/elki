@@ -310,8 +310,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
       }
       if(columnIndex == 2 && aValue instanceof String) {
         // FIXME: better class label handling!
-        SimpleClassLabel lbl = new SimpleClassLabel();
-        lbl.init((String) aValue);
+        SimpleClassLabel lbl = new SimpleClassLabel((String) aValue);
         crep.set(id, lbl);
       }
       if(!(aValue instanceof String)) {

@@ -56,15 +56,7 @@ public class HierarchicalClassLabel extends ClassLabel {
   /**
    * Holds the names on the different levels.
    */
-  // TODO: fix generics warnings.
   private Comparable<?>[] levelwiseNames;
-
-  /**
-   * @see ClassLabel#ClassLabel()
-   */
-  public HierarchicalClassLabel() {
-    super();
-  }
 
   /**
    * Constructs a hierarchical class label from the given name, using the given
@@ -78,7 +70,8 @@ public class HierarchicalClassLabel extends ClassLabel {
    * @param separator a separator String to separate different levels in the
    *        String-representation of this HierarchicalClassLabel
    */
-  public void init(String name, Pattern regex, String separator) {
+  public HierarchicalClassLabel(String name, Pattern regex, String separator) {
+    super();
     this.separatorPattern = regex;
     this.separatorString = separator;
     String[] levelwiseStrings = separatorPattern.split(name);
@@ -103,9 +96,8 @@ public class HierarchicalClassLabel extends ClassLabel {
    * @param label a String describing a hierarchical class label
    * @see #init(String, java.util.regex.Pattern, String)
    */
-  @Override
-  public void init(String label) {
-    init(label, DEFAULT_SEPARATOR, DEFAULT_SEPARATOR_STRING);
+  public HierarchicalClassLabel(String label) {
+    this(label, DEFAULT_SEPARATOR, DEFAULT_SEPARATOR_STRING);
   }
 
   /**
@@ -189,5 +181,20 @@ public class HierarchicalClassLabel extends ClassLabel {
       }
     }
     return name.toString();
+  }
+
+  /**
+   * Factory class
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.has HierarchicalClassLabel - - «creates»
+   * @apiviz.stereotype factory
+   */
+  public static class Factory extends ClassLabel.Factory {
+    @Override
+    public HierarchicalClassLabel makeFromString(String lbl) {
+      return new HierarchicalClassLabel(lbl);
+    }
   }
 }

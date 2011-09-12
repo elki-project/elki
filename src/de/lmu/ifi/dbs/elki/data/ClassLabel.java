@@ -31,21 +31,14 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * 
  * @author Arthur Zimek
  */
-public abstract class ClassLabel implements Comparable<ClassLabel>, InspectionUtilFrequentlyScanned {
+public abstract class ClassLabel implements Comparable<ClassLabel> {
   /**
    * ClassLabels need an empty constructor for dynamic access. Subsequently, the
    * init method must be called.
    */
   protected ClassLabel() {
-    // requires subsequent call of init
+    // Initialized from factory
   }
-
-  /**
-   * Initialization of a ClassLabel for the given label.
-   * 
-   * @param label the label to create a ClassLabel
-   */
-  public abstract void init(String label);
 
   /**
    * Any ClassLabel should ensure a natural ordering that is consistent with
@@ -82,5 +75,17 @@ public abstract class ClassLabel implements Comparable<ClassLabel>, InspectionUt
   @Override
   public int hashCode() {
     return toString().hashCode();
+  }
+  
+  /**
+   * Class label factory
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.has ClassLabel - - «creates»
+   * @apiviz.stereotype factory
+   */
+  public static abstract class Factory implements InspectionUtilFrequentlyScanned {
+    public abstract ClassLabel makeFromString(String lbl);
   }
 }
