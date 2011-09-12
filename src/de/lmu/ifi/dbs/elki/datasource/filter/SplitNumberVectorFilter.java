@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.use NumberVector
+ * @apiviz.uses NumberVector
  */
 public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements ObjectFilter {
   /**
