@@ -267,13 +267,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
       return null; // FIXME
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void set(DBID id, D val) {
       throw new UnsupportedOperationException();
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void delete(DBID id) {
       throw new UnsupportedOperationException();
@@ -358,13 +356,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
       return null; // FIXME
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void set(DBID id, DBID val) {
       throw new UnsupportedOperationException();
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void delete(DBID id) {
       throw new UnsupportedOperationException();

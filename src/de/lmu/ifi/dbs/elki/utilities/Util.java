@@ -599,7 +599,7 @@ public final class Util {
     }
 
     @Override
-    public boolean add(@SuppressWarnings("unused") T e) {
+    public boolean add(T e) {
       throw new UnsupportedOperationException();
     }
 

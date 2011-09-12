@@ -75,18 +75,12 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
   public static final String MARKER = "selectionDotMarker";
 
   /**
-   * The selection result we work on
-   */
-  private SelectionResult result;
-
-  /**
    * Constructor.
    * 
    * @param task Task
    */
   public SelectionDotVisualization(VisualizationTask task) {
     super(task);
-    this.result = task.getResult();
     context.addContextChangeListener(this);
     context.addResultListener(this);
     context.addDataStoreListener(this);
@@ -131,7 +125,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 

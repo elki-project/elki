@@ -101,18 +101,12 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
   private Element etag;
 
   /**
-   * Our result
-   */
-  private SelectionResult result;
-
-  /**
    * Constructor.
    * 
    * @param task Task
    */
   public SelectionToolCubeVisualization(VisualizationTask task) {
     super(task);
-    this.result = task.getResult();
     this.dim = DatabaseUtil.dimensionality(rel);
     context.addContextChangeListener(this);
     incrementalRedraw();
@@ -125,7 +119,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
   }
 
   @Override
-  public void contextChanged(@SuppressWarnings("unused") ContextChangedEvent e) {
+  public void contextChanged(ContextChangedEvent e) {
     synchronizedRedraw();
   }
 
@@ -184,12 +178,12 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
   }
 
   @Override
-  public boolean startDrag(@SuppressWarnings("unused") SVGPoint startPoint, @SuppressWarnings("unused") Event evt) {
+  public boolean startDrag(SVGPoint startPoint, Event evt) {
     return true;
   }
 
   @Override
-  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
+  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
     deleteChildren(rtag);
     double x = Math.min(startPoint.getX(), dragPoint.getX());
     double y = Math.min(startPoint.getY(), dragPoint.getY());
@@ -200,7 +194,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
   }
 
   @Override
-  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
+  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
     deleteChildren(rtag);
     if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
       updateSelection(proj, startPoint, dragPoint);

@@ -172,7 +172,7 @@ public abstract class AbstractTooltipVisualization<NV extends NumberVector<NV, ?
   abstract protected void setupCSS(SVGPlot svgp);
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 }

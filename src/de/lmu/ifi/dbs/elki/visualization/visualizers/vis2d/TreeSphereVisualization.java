@@ -248,7 +248,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 

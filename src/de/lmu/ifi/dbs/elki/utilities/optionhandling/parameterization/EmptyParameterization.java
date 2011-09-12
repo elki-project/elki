@@ -37,7 +37,6 @@ public class EmptyParameterization extends AbstractParameterization {
     return false;
   }
 
-  @SuppressWarnings("unused")
   @Override
   public boolean setValueForOption(Parameter<?,?> opt) throws ParameterException {
     // Always return false, we don't have extra parameters,
@@ -49,7 +48,7 @@ public class EmptyParameterization extends AbstractParameterization {
    * Default implementation, for flat parameterizations. 
    */
   @Override
-  public Parameterization descend(@SuppressWarnings("unused") Object option) {
+  public Parameterization descend(Object option) {
     return this;
   }
 }

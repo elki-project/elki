@@ -107,7 +107,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   }
 
   @Override
-  public void contextChanged(@SuppressWarnings("unused") ContextChangedEvent e) {
+  public void contextChanged(ContextChangedEvent e) {
     synchronizedRedraw();
   }
 
@@ -232,7 +232,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     EventTarget targ = (EventTarget) tag;
     targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
       @Override
-      public void handleEvent(@SuppressWarnings("unused") Event evt) {
+      public void handleEvent(Event evt) {
         handleMouseClick(tool);
       }
     }, false);
@@ -252,7 +252,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   }
 
   @Override
-  public void resultAdded(Result child, @SuppressWarnings("unused") Result parent) {
+  public void resultAdded(Result child, Result parent) {
     if(child instanceof VisualizationTask) {
       VisualizationTask task = (VisualizationTask) child;
       if(VisualizerUtil.isTool(task)) {
@@ -262,7 +262,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   }
 
   @Override
-  public void resultRemoved(Result child, @SuppressWarnings("unused") Result parent) {
+  public void resultRemoved(Result child, Result parent) {
     if(child instanceof VisualizationTask) {
       VisualizationTask task = (VisualizationTask) child;
       if(VisualizerUtil.isTool(task)) {

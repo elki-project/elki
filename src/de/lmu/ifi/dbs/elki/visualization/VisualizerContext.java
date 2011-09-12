@@ -397,17 +397,15 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   }
 
   @Override
-  public void resultAdded(Result child, @SuppressWarnings("unused") Result parent) {
+  public void resultAdded(Result child, Result parent) {
     processNewResult(getResult(), child);
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultChanged(Result current) {
     // FIXME: need to do anything?
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultRemoved(Result child, Result parent) {
     // FIXME: implement

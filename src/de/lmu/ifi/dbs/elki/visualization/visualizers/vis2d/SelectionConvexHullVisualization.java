@@ -140,7 +140,7 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
   }
 
   @Override
-  public void contentChanged(@SuppressWarnings("unused") DataStoreEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 

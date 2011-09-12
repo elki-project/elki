@@ -169,7 +169,6 @@ public abstract class AbstractVisualization implements Visualization, ContextCha
    */
   protected abstract void redraw();
 
-  @SuppressWarnings("unused")
   @Override
   public void resultAdded(Result child, Result parent) {
     // Ignore by default
@@ -183,7 +182,6 @@ public abstract class AbstractVisualization implements Visualization, ContextCha
     }
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultRemoved(Result child, Result parent) {
     // Ignore by default.
