@@ -125,7 +125,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.use KNNQuery
+   * @apiviz.uses KNNQuery
    */
   public class Instance<T extends O> extends AbstractDatabaseDistanceQuery<T, D> {
     /**
