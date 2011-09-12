@@ -32,6 +32,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * A collection of math related utility functions.
+ * 
+ * @author Arthur Zimekt
+ * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public final class MathUtil {
   /**

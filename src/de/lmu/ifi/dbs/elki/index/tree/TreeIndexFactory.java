@@ -46,11 +46,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory,interface
- * @apiviz.uses Index oneway - - «create»
+ * @apiviz.has Index oneway - - «create»
  * 
  * @param <O> Object type
  * @param <I> Index type
  */
+// TODO: actually, this class should be called PagedIndexFactory?
 public abstract class TreeIndexFactory<O, I extends Index> implements IndexFactory<O, I> {
   /**
    * Optional parameter that specifies the name of the file storing the index.

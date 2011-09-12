@@ -163,7 +163,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisualization {
     }
 
     @Override
-    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
     }

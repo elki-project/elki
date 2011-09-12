@@ -149,7 +149,7 @@ public class SettingsVisFactory extends AbstractVisFactory {
   }
 
   @Override
-  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+  public boolean allowThumbnails(VisualizationTask task) {
     return false;
   }
 }

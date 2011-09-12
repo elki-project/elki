@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * .
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter
  */
 public class StringLengthConstraint implements ParameterConstraint<String> {
   /**

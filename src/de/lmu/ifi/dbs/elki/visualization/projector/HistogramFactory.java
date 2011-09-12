@@ -40,8 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Produce one-dimensional projections.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.has HistogramProjector
  */
-// TODO: re-add maxdim option
 public class HistogramFactory implements ProjectorFactory {
   /**
    * Maximum dimensionality

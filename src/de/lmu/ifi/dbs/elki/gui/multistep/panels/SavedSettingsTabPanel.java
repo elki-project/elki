@@ -46,6 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedP
  * Tab panel to manage saved settings.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf SavedSettingsTabPanel.SettingsComboboxModel
  */
 public class SavedSettingsTabPanel extends JPanel {
   /**

@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * detecting appropriate relations in the database.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Projector
  */
 public interface ProjectorFactory extends ResultProcessor, Parameterizable {
   /**

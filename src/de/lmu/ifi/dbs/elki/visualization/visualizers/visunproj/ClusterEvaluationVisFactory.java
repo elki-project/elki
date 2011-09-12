@@ -123,7 +123,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   }
 
   @Override
-  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+  public boolean allowThumbnails(VisualizationTask task) {
     // Don't use thumbnails
     return false;
   }

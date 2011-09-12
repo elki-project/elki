@@ -51,9 +51,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has OPTICSPlot oneway - 1 visualizes
- * @apiviz.has ClusterOrderResult oneway - 1 visualizes
- * 
  * @param <D> Distance type
  */
 public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
@@ -138,7 +135,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractOPTICSV
     }
 
     @Override
-    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
     }

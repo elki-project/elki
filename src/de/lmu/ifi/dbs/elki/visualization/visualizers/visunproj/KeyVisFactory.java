@@ -116,7 +116,7 @@ public class KeyVisFactory extends AbstractVisFactory {
   }
 
   @Override
-  public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+  public boolean allowThumbnails(VisualizationTask task) {
     return false;
   }
 }

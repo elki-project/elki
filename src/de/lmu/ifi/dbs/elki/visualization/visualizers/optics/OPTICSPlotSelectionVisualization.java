@@ -59,8 +59,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.uses ClusterOrderResult oneway - 1
- * @apiviz.uses OPTICSPlot oneway - 1
  * @apiviz.uses DBIDSelection oneway - 1 visualizes
  * 
  * @param <D> distance type
@@ -181,7 +179,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
   }
 
   @Override
-  public boolean startDrag(SVGPoint startPoint, @SuppressWarnings("unused") Event evt) {
+  public boolean startDrag(SVGPoint startPoint, Event evt) {
     List<ClusterOrderEntry<D>> order = getClusterOrder();
     int mouseActIndex = getSelectedIndex(order, startPoint);
     if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
@@ -196,7 +194,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
   }
 
   @Override
-  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, @SuppressWarnings("unused") Event evt, @SuppressWarnings("unused") boolean inside) {
+  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
     List<ClusterOrderEntry<D>> order = getClusterOrder();
     int mouseDownIndex = getSelectedIndex(order, startPoint);
     int mouseActIndex = getSelectedIndex(order, dragPoint);
@@ -213,7 +211,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
   }
 
   @Override
-  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, @SuppressWarnings("unused") boolean inside) {
+  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
     List<ClusterOrderEntry<D>> order = getClusterOrder();
     int mouseDownIndex = getSelectedIndex(order, startPoint);
     int mouseActIndex = getSelectedIndex(order, dragPoint);
@@ -366,7 +364,7 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
     }
 
     @Override
-    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
     }

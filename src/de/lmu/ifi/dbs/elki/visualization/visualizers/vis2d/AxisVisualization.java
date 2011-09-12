@@ -158,7 +158,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
     }
 
     @Override
-    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
     }

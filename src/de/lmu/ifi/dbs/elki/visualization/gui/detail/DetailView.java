@@ -52,9 +52,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has VisualizerContext
  * @apiviz.has Visualization
  * @apiviz.has PlotItem
+ * @apiviz.uses VisualizerContext
  * @apiviz.uses VisualizationTask
  */
 public class DetailView extends SVGPlot implements ResultListener {
@@ -245,7 +245,6 @@ public class DetailView extends SVGPlot implements ResultListener {
     }
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultAdded(Result child, Result parent) {
     // Ignore. The PlotItem will need to change.
@@ -285,7 +284,6 @@ public class DetailView extends SVGPlot implements ResultListener {
     }
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultRemoved(Result child, Result parent) {
     // Ignore. The PlotItem will need to change.

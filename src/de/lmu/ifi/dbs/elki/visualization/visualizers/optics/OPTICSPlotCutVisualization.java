@@ -57,9 +57,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.uses ClusterOrderResult oneway - 1 visualizes
- * @apiviz.uses OPTICSPlot oneway - 1 visualizes
- * 
  * @param <D> distance type
  */
 public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractOPTICSVisualization<D> implements DragableArea.DragListener {
@@ -204,7 +201,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractO
   }
 
   @Override
-  public boolean startDrag(SVGPoint start, @SuppressWarnings("unused") Event evt) {
+  public boolean startDrag(SVGPoint start, Event evt) {
     epsilon = getEpsilonFromY(plotheight - start.getY());
     // opvis.unsetEpsilonExcept(this);
     synchronizedRedraw();
@@ -212,7 +209,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractO
   }
 
   @Override
-  public boolean duringDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, boolean inside) {
+  public boolean duringDrag(SVGPoint start, SVGPoint end, Event evt, boolean inside) {
     if(inside) {
       epsilon = getEpsilonFromY(plotheight - end.getY());
     }
@@ -222,7 +219,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractO
   }
 
   @Override
-  public boolean endDrag(@SuppressWarnings("unused") SVGPoint start, SVGPoint end, @SuppressWarnings("unused") Event evt, boolean inside) {
+  public boolean endDrag(SVGPoint start, SVGPoint end, Event evt, boolean inside) {
     if(inside) {
       epsilon = getEpsilonFromY(plotheight - end.getY());
       // opvis.unsetEpsilonExcept(this);
@@ -294,7 +291,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractO
     }
 
     @Override
-    public boolean allowThumbnails(@SuppressWarnings("unused") VisualizationTask task) {
+    public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
     }

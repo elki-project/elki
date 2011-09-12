@@ -30,6 +30,9 @@ package de.lmu.ifi.dbs.elki.index.tree;
  * index of the component in its parent.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.uses Entry oneway - - «references»
+ * 
  * @param <E> the type of Entry used in the index
  */
 public class TreeIndexPathComponent<E extends Entry> {

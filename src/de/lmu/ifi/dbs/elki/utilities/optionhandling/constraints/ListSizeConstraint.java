@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
  * size constraint.
  * 
  * @author Steffi Wanka
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter
+ * 
  * @param <T> Parameter type
  */
 public class ListSizeConstraint<T> implements ParameterConstraint<List<T>> {

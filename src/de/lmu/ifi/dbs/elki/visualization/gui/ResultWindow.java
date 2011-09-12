@@ -165,7 +165,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     exportItem.setEnabled(false);
     exportItem.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
+      public void actionPerformed(ActionEvent ae) {
         saveCurrentPlot();
       }
     });
@@ -174,7 +174,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     quitItem.setMnemonic(KeyEvent.VK_Q);
     quitItem.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
         close();
       }
     });
@@ -184,7 +184,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     overviewItem.setEnabled(false);
     overviewItem.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
+      public void actionPerformed(ActionEvent ae) {
         showOverview();
       }
     });
@@ -193,7 +193,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     editItem.setMnemonic(KeyEvent.VK_T);
     editItem.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
+      public void actionPerformed(ActionEvent ae) {
         showTableView();
       }
     });
@@ -416,7 +416,7 @@ public class ResultWindow extends JFrame implements ResultListener {
         final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
         visItem.addItemListener(new ItemListener() {
           @Override
-          public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+          public void itemStateChanged(ItemEvent e) {
             // We need SwingUtilities to avoid a deadlock!
             SwingUtilities.invokeLater(new Runnable() {
               @Override
@@ -432,7 +432,7 @@ public class ResultWindow extends JFrame implements ResultListener {
         final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
         visItem.addItemListener(new ItemListener() {
           @Override
-          public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+          public void itemStateChanged(ItemEvent e) {
             // We need SwingUtilities to avoid a deadlock!
             SwingUtilities.invokeLater(new Runnable() {
               @Override
@@ -448,19 +448,16 @@ public class ResultWindow extends JFrame implements ResultListener {
     return null;
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultAdded(Result child, Result parent) {
     updateVisualizerMenus();
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultChanged(Result current) {
     updateVisualizerMenus();
   }
 
-  @SuppressWarnings("unused")
   @Override
   public void resultRemoved(Result child, Result parent) {
     updateVisualizerMenus();

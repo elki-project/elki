@@ -41,8 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Produce scatterplot projections.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has ScatterPlotProjector
  */
-// TODO: re-add maxdim option
 public class ScatterPlotFactory implements ProjectorFactory {
   /**
    * Maximum number of dimensions to visualize.
