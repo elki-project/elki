@@ -69,7 +69,7 @@ public class GeneratorMain {
   /**
    * List of clusters to generate
    */
-  private LinkedList<GeneratorInterface> clusters = new LinkedList<GeneratorInterface>();
+  private LinkedList<GeneratorInterface> generators = new LinkedList<GeneratorInterface>();
 
   /**
    * Add a cluster to the cluster list.
@@ -77,7 +77,7 @@ public class GeneratorMain {
    * @param c cluster to add
    */
   public void addCluster(GeneratorInterface c) {
-    clusters.add(c);
+    generators.add(c);
   }
 
   /**
@@ -88,28 +88,23 @@ public class GeneratorMain {
   /**
    * Main loop to generate data set.
    * 
-   * @return Generated data set
    * @throws UnableToComplyException when model not satisfiable or no clusters
    *         specified.
    */
-  public MultipleObjectsBundle generate() throws UnableToComplyException {
+  public void generate() throws UnableToComplyException {
     // we actually need some clusters.
-    if(clusters.size() < 1) {
+    if(generators.size() < 1) {
       throw new UnableToComplyException("No clusters specified.");
     }
     // Assert that cluster dimensions agree.
-    int dim = clusters.get(0).getDim();
-    for(GeneratorInterface c : clusters) {
+    final int dim = generators.get(0).getDim();
+    for(GeneratorInterface c : generators) {
       if(c.getDim() != dim) {
         throw new UnableToComplyException("Cluster dimensions do not agree.");
       }
     }
     // generate clusters
-    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
-    bundle.appendColumn(type, new ArrayList<Object>());
-    bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
-    for(GeneratorInterface curclus : clusters) {
+    for(GeneratorInterface curclus : generators) {
       while(curclus.getPoints().size() < curclus.getSize()) {
         // generate the "missing" number of points
         List<Vector> newp = curclus.generate(curclus.getSize() - curclus.getPoints().size());
@@ -119,7 +114,7 @@ public class GeneratorMain {
             if(testAgainstModel) {
               double max = 0.0;
               double is = 0.0;
-              for(GeneratorInterface other : clusters) {
+              for(GeneratorInterface other : generators) {
                 double d = other.getDensity(p) * other.getSize();
                 if(other == curclus) {
                   is = d;
@@ -143,14 +138,7 @@ public class GeneratorMain {
           }
         }
       }
-      ClassLabel l = new SimpleClassLabel();
-      l.init(curclus.getName());
-      for(Vector v : curclus.getPoints()) {
-        DoubleVector dv = new DoubleVector(v);
-        bundle.appendSimple(dv, l);
-      }
     }
-    return bundle;
   }
 
   /**
@@ -172,11 +160,35 @@ public class GeneratorMain {
   }
 
   /**
-   * Access the clusters.
+   * Access the generators.
    * 
-   * @return clusters
+   * @return generators
    */
-  public List<GeneratorInterface> getClusters() {
-    return Collections.unmodifiableList(clusters);
+  public List<GeneratorInterface> getGenerators() {
+    return Collections.unmodifiableList(generators);
+  }
+
+  /**
+   * Get the objects bundle
+   * 
+   * @return Bundle
+   */
+  public MultipleObjectsBundle getBundle() {
+    final int dim = generators.get(0).getDim();
+    final DoubleVector factory = new DoubleVector(new double[dim]);
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, factory);
+    bundle.appendColumn(type, new ArrayList<Object>());
+    bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
+
+    for(GeneratorInterface generator : generators) {
+      ClassLabel l = new SimpleClassLabel();
+      l.init(generator.getName());
+      for(Vector v : generator.getPoints()) {
+        DoubleVector dv = new DoubleVector(v);
+        bundle.appendSimple(dv, l);
+      }
+    }
+    return bundle;
   }
 }

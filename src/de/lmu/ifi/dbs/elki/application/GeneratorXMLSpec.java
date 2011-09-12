@@ -126,7 +126,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
    * @throws IOException thrown on write errors
    */
   public void writeClusters(OutputStreamWriter outStream, MultipleObjectsBundle data) throws IOException {
-    List<GeneratorInterface> clusters = generator.gen.getClusters();
+    List<GeneratorInterface> clusters = generator.gen.getGenerators();
     // compute global discard values
     int totalsize = 0;
     int totaldisc = 0;

@@ -131,7 +131,8 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     }
     gen.setTestAgainstModel(testAgainstModel);
     try {
-      return gen.generate();
+      gen.generate();
+      return gen.getBundle();
     }
     catch(UnableToComplyException e) {
       throw new AbortException("Data generation failed. ", e);
