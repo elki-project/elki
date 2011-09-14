@@ -3,153 +3,85 @@ package experimentalcode.students.nuecke.optionhandling.parameters;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
-public class EnumParameter<T extends Enum<T>> extends Parameter<Enum<T>, T> {
+/**
+ * Parameter class for a parameter specifying an enum type.
+ * 
+ * <p>
+ * Usage:
+ * <pre>
+ * // Enum declaration.
+ * enum MyEnum { VALUE1, VALUE2 };
+ * // Parameter value holder.
+ * MyEnum myEnumParameter;
+ * 
+ * // ...
+ * 
+ * // Parameterization.
+ * EnumParameter&lt;MyEnum&gt; param = new EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class);
+ * // OR
+ * EnumParameter&lt;MyEnum&gt; param = new EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class, MyEnum.VALUE1);
+ * // OR
+ * EnumParameter&lt;MyEnum&gt; param = new EnumParameter&lt;MyEnum&gt;(ENUM_PROPERTY_ID, MyEnum.class, true);
+ * 
+ * if(config.grab(param)) {
+ *   myEnumParameter = param.getValue();
+ * }
+ * </p>
+ * 
+ * @author Florian Nuecke
+ * 
+ * @param <E> Enum type
+ */
+public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
 
   /**
    * Reference to the actual enum type, for T.valueOf().
    */
-  protected Class<T> enumClass;
+  protected Class<E> enumClass;
 
   /**
    * Constructs a enum parameter with the given optionID, constraints and
    * default value.
-   * 
-   * @param optionID
-   *          the unique id of the parameter
-   * @param constraint
-   *          parameter constraint
-   * @param defaultValue
-   *          the default value of the parameter
-   */
-  public EnumParameter(Class<T> enumClass, OptionID optionID,
-      List<ParameterConstraint<Enum<T>>> constraint, T defaultValue) {
-    super(optionID, constraint, defaultValue);
-    this.enumClass = enumClass;
-  }
-
-  /**
-   * Constructs a enum parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID
-   *          the unique id of the parameter
-   * @param constraints
-   *          parameter constraint
-   * @param optional
-   *          Flag to signal an optional parameter.
-   */
-  public EnumParameter(Class<T> enumClass, OptionID optionID,
-      List<ParameterConstraint<Enum<T>>> constraints, boolean optional) {
-    super(optionID, constraints, optional);
-    this.enumClass = enumClass;
-  }
-
-  /**
-   * Constructs a enum parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID
-   *          the unique id of the parameter
-   * @param constraints
-   *          parameter constraint
-   */
-  public EnumParameter(Class<T> enumClass, OptionID optionID,
-      List<ParameterConstraint<Enum<T>>> constraints) {
-    super(optionID, constraints);
-    this.enumClass = enumClass;
-  }
-
-  /**
-   * Constructs a enum parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID
-   *          the unique id of the parameter
-   * @param constraint
-   *          parameter constraint
-   * @param defaultValue
-   *          the default value of the parameter
-   */
-  public EnumParameter(Class<T> enumClass, OptionID optionID,
-      ParameterConstraint<Enum<T>> constraint, T defaultValue) {
-    super(optionID, constraint, defaultValue);
-    this.enumClass = enumClass;
-  }
-
-  /**
-   * Constructs a enum parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID
-   *          the unique id of the parameter
-   * @param constraint
-   *          parameter constraint
-   * @param optional
-   *          Flag to signal an optional parameter.
-   */
-  public EnumParameter(Class<T> enumClass, OptionID optionID,
-      ParameterConstraint<Enum<T>> constraint, boolean optional) {
-    super(optionID, constraint, optional);
-    this.enumClass = enumClass;
-  }
-
-  /**
-   * Constructs a enum parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID
-   *          the unique id of the parameter
-   * @param constraint
-   *          parameter constraint
-   */
-  public EnumParameter(Class<T> enumClass, OptionID optionID,
-      ParameterConstraint<Enum<T>> constraint) {
-    super(optionID, constraint);
-    this.enumClass = enumClass;
-  }
-
-  /**
-   * Constructs a enum parameter with the given optionID, and default value.
    * 
    * @param optionID
    *          the unique id of the parameter
    * @param defaultValue
    *          the default value of the parameter
    */
-  public EnumParameter(Class<T> enumClass, OptionID optionID, T defaultValue) {
+  public EnumParameter(OptionID optionID, Class<E> enumClass, E defaultValue) {
     super(optionID, defaultValue);
     this.enumClass = enumClass;
   }
 
   /**
-   * Constructs a enum parameter with the given optionID.
+   * Constructs a enum parameter with the given optionID, constraints and
+   * default value.
    * 
    * @param optionID
    *          the unique id of the parameter
    * @param optional
    *          Flag to signal an optional parameter.
    */
-  public EnumParameter(Class<T> enumClass, OptionID optionID, boolean optional) {
+  public EnumParameter(OptionID optionID, Class<E> enumClass, boolean optional) {
     super(optionID, optional);
     this.enumClass = enumClass;
   }
 
   /**
-   * Constructs a enum parameter with the given optionID.
+   * Constructs a enum parameter with the given optionID, constraints and
+   * default value.
    * 
    * @param optionID
    *          the unique id of the parameter
    */
-  public EnumParameter(Class<T> enumClass, OptionID optionID) {
+  public EnumParameter(OptionID optionID, Class<E> enumClass) {
     super(optionID);
     this.enumClass = enumClass;
   }
@@ -160,7 +92,7 @@ public class EnumParameter<T extends Enum<T>> extends Parameter<Enum<T>, T> {
   }
 
   @Override
-  protected T parseValue(Object obj) throws ParameterException {
+  protected E parseValue(Object obj) throws ParameterException {
     if (obj == null) {
       throw new UnspecifiedParameterException("Parameter \"" + getName()
           + "\": Null value given!");
@@ -189,7 +121,7 @@ public class EnumParameter<T extends Enum<T>> extends Parameter<Enum<T>, T> {
    */
   public Collection<String> getPossibleValues() {
     ArrayList<String> values = new ArrayList<String>();
-    for (T t : enumClass.getEnumConstants()) {
+    for (E t : enumClass.getEnumConstants()) {
       values.add(t.name());
     }
     return values;
@@ -205,7 +137,7 @@ public class EnumParameter<T extends Enum<T>> extends Parameter<Enum<T>, T> {
   private String joinEnumNames(String separator) {
     try {
       @SuppressWarnings("unchecked")
-      T[] enumTypes = (T[]) enumClass.getMethod("values").invoke(enumClass);
+      E[] enumTypes = (E[]) enumClass.getMethod("values").invoke(enumClass);
       StringBuilder sb = new StringBuilder();
       for(int i = 0; i < enumTypes.length; ++i) {
         sb.append(enumTypes[i].name());
