@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -301,9 +302,14 @@ public class TextWriter {
       owriter.writeObject(out, lbl, obj);
     }
 
+    Collection<Relation<?>> dbrels = db.getRelations();
     // print the annotations
     if(ra != null) {
       for(Relation<?> a : ra) {
+        // Avoid duplicated output.
+        if (dbrels.contains(a)) {
+          continue;
+        }
         String label = a.getShortName();
         Object value = a.get(objID);
         if(value == null) {
@@ -350,6 +356,11 @@ public class TextWriter {
 
     // Write cluster information
     out.commentPrintLn("Cluster: " + naming.getNameFor(clus));
+    Model model = clus.getModel();
+    if (model != ClusterModel.CLUSTER) {
+      TextWriterWriterInterface<?> mwri = writers.getHandler(model);
+      mwri.writeObject(out, null, model);
+    }
     if(clus.getParents().size() > 0) {
       StringBuffer buf = new StringBuffer();
       buf.append("Parents:");
