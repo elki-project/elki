@@ -39,6 +39,13 @@ import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
+/**
+ * Provide a configuration panel to choose a file with a file selector button.
+ * 
+ * @author Erich Schubert
+ * 
+ * @apiviz.uses FileParameter
+ */
 public class FileParameterConfigurator extends AbstractSingleParameterConfigurator<FileParameter> implements ActionListener {
   /**
    * The panel to store the components

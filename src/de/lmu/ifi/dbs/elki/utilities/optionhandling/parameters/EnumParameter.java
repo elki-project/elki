@@ -1,4 +1,27 @@
-package experimentalcode.students.nuecke.optionhandling.parameters;
+package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,7 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Parameter class for a parameter specifying an enum type.
@@ -48,7 +70,7 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
   protected Class<E> enumClass;
 
   /**
-   * Constructs a enum parameter with the given optionID, constraints and
+   * Constructs an enum parameter with the given optionID, constraints and
    * default value.
    * 
    * @param optionID the unique id of the parameter
@@ -60,7 +82,7 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
   }
 
   /**
-   * Constructs a enum parameter with the given optionID, constraints and
+   * Constructs an enum parameter with the given optionID, constraints and
    * default value.
    * 
    * @param optionID the unique id of the parameter
@@ -72,7 +94,7 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
   }
 
   /**
-   * Constructs a enum parameter with the given optionID, constraints and
+   * Constructs an enum parameter with the given optionID, constraints and
    * default value.
    * 
    * @param optionID the unique id of the parameter
@@ -114,8 +136,10 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
    * @return list of strings representing possible enum values.
    */
   public Collection<String> getPossibleValues() {
-    ArrayList<String> values = new ArrayList<String>();
-    for(E t : enumClass.getEnumConstants()) {
+    // Convert to string array
+    final E[] enums = enumClass.getEnumConstants();
+    ArrayList<String> values = new ArrayList<String>(enums.length);
+    for(E t : enums) {
       values.add(t.name());
     }
     return values;
@@ -132,10 +156,10 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
     E[] enumTypes = enumClass.getEnumConstants();
     StringBuilder sb = new StringBuilder();
     for(int i = 0; i < enumTypes.length; ++i) {
-      sb.append(enumTypes[i].name());
-      if(i < enumTypes.length - 1) {
+      if(i > 0) {
         sb.append(separator);
       }
+      sb.append(enumTypes[i].name());
     }
     return sb.toString();
   }

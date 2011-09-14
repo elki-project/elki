@@ -33,6 +33,13 @@ import javax.swing.JComponent;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
+/**
+ * Provide a configuration panel to modify a boolean via a checkbox.
+ * 
+ * @author Erich Schubert
+ * 
+ * @apiviz.uses Flag
+ */
 public class FlagParameterConfigurator extends AbstractParameterConfigurator<Flag> implements ActionListener {
   final JCheckBox value;
 

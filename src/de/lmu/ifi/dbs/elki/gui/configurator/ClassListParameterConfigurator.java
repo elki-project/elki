@@ -47,6 +47,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParame
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
+/**
+ * Provide a configuration panel to choose classes with the help of a dropdown.
+ * Additionally, the classes can in turn have additional parameters.
+ * 
+ * @author Erich Schubert
+ * 
+ * @apiviz.uses ClassListParameter
+ */
 public class ClassListParameterConfigurator extends AbstractSingleParameterConfigurator<ClassListParameter<?>> implements ActionListener, ChangeListener {
   final ConfiguratorPanel child;
 
