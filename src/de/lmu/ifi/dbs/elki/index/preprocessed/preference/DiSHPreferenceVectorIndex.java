@@ -65,12 +65,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Preprocessor for DiSH preference vector assignment to objects of a certain
@@ -607,19 +606,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         }
 
         // parameter strategy
-        final StringParameter strategyP = new StringParameter(STRATEGY_ID, DEFAULT_STRATEGY.toString());
-        strategyP.addConstraint(new EqualStringConstraint(new String[] { Strategy.APRIORI.toString(), Strategy.MAX_INTERSECTION.toString() }));
+        final EnumParameter<Strategy> strategyP = new EnumParameter<Strategy>(STRATEGY_ID, Strategy.class, DEFAULT_STRATEGY);
         if(config.grab(strategyP)) {
-          String strategyString = strategyP.getValue();
-          if(strategyString.equals(Strategy.APRIORI.toString())) {
-            strategy = Strategy.APRIORI;
-          }
-          else if(strategyString.equals(Strategy.MAX_INTERSECTION.toString())) {
-            strategy = Strategy.MAX_INTERSECTION;
-          }
-          else {
-            config.reportError(new WrongParameterValueException(strategyP, strategyString));
-          }
+          strategy = strategyP.getValue();
         }
       }
 

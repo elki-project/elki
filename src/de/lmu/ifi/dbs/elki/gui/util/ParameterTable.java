@@ -50,6 +50,7 @@ import javax.swing.table.TableColumn;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -253,6 +254,19 @@ public class ParameterTable extends JTable {
           }
           if(!Flag.NOT_SET.equals(val)) {
             comboBox.addItem(Flag.NOT_SET);
+          }
+        }
+        // and for Enum parameters.
+        else if (option instanceof EnumParameter<?>) {
+          EnumParameter<?> ep = (EnumParameter<?>) option;
+          for (String s : ep.getPossibleValues()) {
+            if (ep.hasDefaultValue() && ep.getDefaultValueAsString().equals(s)) {
+              if (!(DynamicParameters.STRING_USE_DEFAULT + " " + ep.getDefaultValueAsString()).equals(val)) {
+                comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + " " + s);
+              }
+            } else if (!s.equals(val)) {
+              comboBox.addItem(s);
+            }
           }
         }
         // No completion for others
@@ -615,6 +629,10 @@ public class ParameterTable extends JTable {
         if(option instanceof FileParameter) {
           activeEditor = fileNameEditor;
           return fileNameEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+        }
+        if(option instanceof EnumParameter<?>) {
+          activeEditor = dropdownEditor;
+          return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
       }
       activeEditor = plaintextEditor;

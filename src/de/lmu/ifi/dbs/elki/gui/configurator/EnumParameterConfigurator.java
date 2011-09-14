@@ -24,36 +24,29 @@ package de.lmu.ifi.dbs.elki.gui.configurator;
  */
 
 import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 
 /**
- * Provide a configuration panel to choose a class with the help of a dropdown.
- * Additionally, the classes can in turn have additional parameters.
+ * Panel to configure EnumParameters by offering a dropdown to choose from.
+ * 
+ * TODO: offer radio buttons when just a few choices are available?
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ClassParameter
+ * @apiviz.uses EnumParameter
  */
-public class ClassParameterConfigurator extends AbstractSingleParameterConfigurator<ClassParameter<?>> implements ActionListener, ChangeListener {
+public class EnumParameterConfigurator extends AbstractSingleParameterConfigurator<EnumParameter<?>> implements ActionListener {
   final JComboBox value;
 
-  final ConfiguratorPanel child;
-
-  public ClassParameterConfigurator(ClassParameter<?> cp, JComponent parent) {
+  public EnumParameterConfigurator(EnumParameter<?> cp, JComponent parent) {
     super(cp, parent);
     // Input field
     {
@@ -62,7 +55,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       constraints.weightx = 1.0;
       value = new JComboBox();
       value.setToolTipText(param.getShortDescription());
-      value.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
+      value.setPrototypeDisplayValue(cp.getPossibleValues().iterator().next());
       parent.add(value, constraints);
       finishGridRow();
     }
@@ -81,26 +74,10 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       value.addItem(DynamicParameters.STRING_OPTIONAL);
     }
     // Offer the shorthand version of class names.
-    for(Class<?> impl : cp.getKnownImplementations()) {
-      value.addItem(ClassParameter.canonicalClassName(impl, cp.getRestrictionClass()));
-    }
-    // Child options
-    {
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.gridwidth = GridBagConstraints.REMAINDER;
-      constraints.fill = GridBagConstraints.HORIZONTAL;
-      constraints.weightx = 1.0;
-      constraints.insets = new Insets(0, 10, 0, 0);
-      child = new ConfiguratorPanel();
-      child.addChangeListener(this);
-      parent.add(child, constraints);
+    for(String s : cp.getPossibleValues()) {
+      value.addItem(s);
     }
     value.addActionListener(this);
-  }
-
-  @Override
-  public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
-    child.addParameter(owner, param, track);
   }
 
   @Override
@@ -114,16 +91,6 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
   }
 
   @Override
-  public void stateChanged(ChangeEvent e) {
-    if(e.getSource() == child) {
-      fireValueChanged();
-    }
-    else {
-      LoggingUtil.warning("stateChanged triggered by unknown source: " + e.getSource());
-    }
-  }
-
-  @Override
   public String getUserInput() {
     String val = (String) value.getSelectedItem();
     if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
@@ -133,11 +100,5 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       return null;
     }
     return val;
-  }
-
-  @Override
-  public void appendParameters(ListParameterization params) {
-    super.appendParameters(params);
-    child.appendParameters(params);
   }
 }

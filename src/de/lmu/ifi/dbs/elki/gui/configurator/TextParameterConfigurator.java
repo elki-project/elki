@@ -34,6 +34,13 @@ import javax.swing.JTextField;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
+/**
+ * Provide a configuration panel to input an arbitrary text parameter.
+ * 
+ * @author Erich Schubert
+ * 
+ * @apiviz.uses ClassParameter
+ */
 // FIXME: update on focus loss?
 // FIXME: restrictions for number input?
 public class TextParameterConfigurator extends AbstractSingleParameterConfigurator<Parameter<?, ?>> implements ActionListener {

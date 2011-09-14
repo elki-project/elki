@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -124,6 +125,9 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
     }
     if(param instanceof FileParameter) {
       return new FileParameterConfigurator((FileParameter) param, this);
+    }
+    if(param instanceof EnumParameter) {
+      return new EnumParameterConfigurator((EnumParameter<?>) param, this);
     }
     return new TextParameterConfigurator(param, this);
   }
