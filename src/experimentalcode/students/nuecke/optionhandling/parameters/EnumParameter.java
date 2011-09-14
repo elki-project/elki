@@ -1,6 +1,8 @@
 package experimentalcode.students.nuecke.optionhandling.parameters;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -180,6 +182,26 @@ public class EnumParameter<T extends Enum<T>> extends Parameter<Enum<T>, T> {
     return getValue().name();
   }
 
+  /**
+   * Get a list of possible values for this enum parameter.
+   * 
+   * @return list of strings representing possible enum values.
+   */
+  public Collection<String> getPossibleValues() {
+    ArrayList<String> values = new ArrayList<String>();
+    for (T t : enumClass.getEnumConstants()) {
+      values.add(t.name());
+    }
+    return values;
+  }
+
+  /**
+   * Utility method for merging possible values into a string for informational
+   * messages.
+   * 
+   * @param separator char sequence to use as a separator for enum values.
+   * @return <code>{VAL1}{separator}{VAL2}{separator}...</code>
+   */
   private String joinEnumNames(String separator) {
     try {
       @SuppressWarnings("unchecked")
