@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -93,12 +94,14 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
   @Override
   public OutlierResult run(Database database) {
     // Prefer a true class label
-    Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
-    if(relation != null) {
+    try {
+      Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
       return run(relation);
     }
-    // Otherwise, try any labellike.
-    return run(database.getRelation(getInputTypeRestriction()[0]));
+    catch(NoSupportedDataTypeException e) {
+      // Otherwise, try any labellike.
+      return run(database.getRelation(getInputTypeRestriction()[0]));
+    }
   }
   
   /**
