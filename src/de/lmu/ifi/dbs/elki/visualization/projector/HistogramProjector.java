@@ -82,7 +82,7 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
 
   @Override
   public Collection<PlotItem> arrange() {
-    List<PlotItem> layout = new ArrayList<PlotItem>(1);
+    List<PlotItem> layout = new ArrayList<PlotItem>(1 + dmax);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0){
       final double xoff = (dmax > 1) ? .1 : 0.;
@@ -91,7 +91,7 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
       PlotItem master = new PlotItem(dmax + xoff, hheight + lheight, null);
       for(int d1 = 0; d1 < dmax; d1++) {
         Projection1D proj = new Simple1D(scales, d1 + 1);
-        final PlotItem it = new PlotItem(d1 + xoff, 0, 1., hheight, proj);
+        final PlotItem it = new PlotItem(d1 + xoff, lheight, 1., hheight, proj);
         it.visualizations = tasks;
         master.subitems.add(it);
       }
