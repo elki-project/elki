@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -80,12 +81,14 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
   @Override
   public Clustering<Model> run(Database database) {
     // Prefer a true class label
-    Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
-    if(relation != null) {
+    try {
+      Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
       return run(relation);
     }
-    // Otherwise, try any labellike.
-    return run(database.getRelation(getInputTypeRestriction()[0]));
+    catch(NoSupportedDataTypeException e) {
+      // Otherwise, try any labellike.
+      return run(database.getRelation(getInputTypeRestriction()[0]));
+    }
   }
 
   /**
