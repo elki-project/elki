@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * <p>
  * Usage:
+ * 
  * <pre>
  * // Enum declaration.
  * enum MyEnum { VALUE1, VALUE2 };
@@ -33,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * if(config.grab(param)) {
  *   myEnumParameter = param.getValue();
  * }
+ * 
  * </p>
  * 
  * @author Florian Nuecke
@@ -50,10 +52,8 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
    * Constructs a enum parameter with the given optionID, constraints and
    * default value.
    * 
-   * @param optionID
-   *          the unique id of the parameter
-   * @param defaultValue
-   *          the default value of the parameter
+   * @param optionID the unique id of the parameter
+   * @param defaultValue the default value of the parameter
    */
   public EnumParameter(OptionID optionID, Class<E> enumClass, E defaultValue) {
     super(optionID, defaultValue);
@@ -64,10 +64,8 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
    * Constructs a enum parameter with the given optionID, constraints and
    * default value.
    * 
-   * @param optionID
-   *          the unique id of the parameter
-   * @param optional
-   *          Flag to signal an optional parameter.
+   * @param optionID the unique id of the parameter
+   * @param optional Flag to signal an optional parameter.
    */
   public EnumParameter(OptionID optionID, Class<E> enumClass, boolean optional) {
     super(optionID, optional);
@@ -78,8 +76,7 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
    * Constructs a enum parameter with the given optionID, constraints and
    * default value.
    * 
-   * @param optionID
-   *          the unique id of the parameter
+   * @param optionID the unique id of the parameter
    */
   public EnumParameter(OptionID optionID, Class<E> enumClass) {
     super(optionID);
@@ -93,20 +90,18 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
 
   @Override
   protected E parseValue(Object obj) throws ParameterException {
-    if (obj == null) {
-      throw new UnspecifiedParameterException("Parameter \"" + getName()
-          + "\": Null value given!");
+    if(obj == null) {
+      throw new UnspecifiedParameterException("Parameter \"" + getName() + "\": Null value given!");
     }
-    if (obj instanceof String) {
+    if(obj instanceof String) {
       try {
         return Enum.valueOf(enumClass, (String) obj);
-      } catch (IllegalArgumentException ex) {
-        throw new WrongParameterValueException("Enum parameter " + getName()
-            + " is invalid (must be one of [" + joinEnumNames(", ") + "].");
+      }
+      catch(IllegalArgumentException ex) {
+        throw new WrongParameterValueException("Enum parameter " + getName() + " is invalid (must be one of [" + joinEnumNames(", ") + "].");
       }
     }
-    throw new WrongParameterValueException("Enum parameter " + getName()
-        + " is not given as a string.");
+    throw new WrongParameterValueException("Enum parameter " + getName() + " is not given as a string.");
   }
 
   @Override
@@ -121,7 +116,7 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
    */
   public Collection<String> getPossibleValues() {
     ArrayList<String> values = new ArrayList<String>();
-    for (E t : enumClass.getEnumConstants()) {
+    for(E t : enumClass.getEnumConstants()) {
       values.add(t.name());
     }
     return values;
@@ -135,34 +130,15 @@ public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
    * @return <code>{VAL1}{separator}{VAL2}{separator}...</code>
    */
   private String joinEnumNames(String separator) {
-    try {
-      @SuppressWarnings("unchecked")
-      E[] enumTypes = (E[]) enumClass.getMethod("values").invoke(enumClass);
-      StringBuilder sb = new StringBuilder();
-      for(int i = 0; i < enumTypes.length; ++i) {
-        sb.append(enumTypes[i].name());
-        if(i < enumTypes.length - 1) {
-          sb.append(separator);
-        }
+    E[] enumTypes = enumClass.getEnumConstants();
+    StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < enumTypes.length; ++i) {
+      sb.append(enumTypes[i].name());
+      if(i < enumTypes.length - 1) {
+        sb.append(separator);
       }
-      return sb.toString();
     }
-    catch(IllegalArgumentException e) {
-      /* eat it */
-    }
-    catch(SecurityException e) {
-      /* eat it */
-    }
-    catch(IllegalAccessException e) {
-      /* eat it */
-    }
-    catch(InvocationTargetException e) {
-      /* eat it */
-    }
-    catch(NoSuchMethodException e) {
-      /* eat it */
-    }
-    return "enum";
+    return sb.toString();
   }
 
 }
