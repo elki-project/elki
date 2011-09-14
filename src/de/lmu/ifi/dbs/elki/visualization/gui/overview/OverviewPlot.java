@@ -300,31 +300,33 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
       boolean refreshcss = false;
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
       for(Entry<PlotItem, double[]> ent : plotmap.entrySet()) {
-        PlotItem it = ent.getKey();
-        for(Iterator<VisualizationTask> iter = it.visIterator(); iter.hasNext(); ) {
-          VisualizationTask task = iter.next();
-          Element parent = vistoelem.get(new Pair<PlotItem, VisualizationTask>(it, task));
-          if(parent == null) {
-            LoggingUtil.warning("No container element produced by " + task);
-            continue;
-          }
-          if(VisualizerUtil.thumbnailEnabled(task) && VisualizerUtil.isVisible(task)) {
-            // unhide when hidden.
-            if(parent.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
-              parent.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
+        for(Iterator<PlotItem> iter = ent.getKey().itemIterator(); iter.hasNext();) {
+          PlotItem it = iter.next();
+
+          for(VisualizationTask task : it.visualizations) {
+            Element parent = vistoelem.get(new Pair<PlotItem, VisualizationTask>(it, task));
+            if(parent == null) {
+              LoggingUtil.warning("No container element found for " + task);
+              continue;
             }
-            // if not yet rendered, add a thumbnail
-            if(!parent.hasChildNodes()) {
-              makeThumbnail(thumbsize, it, task, parent);
-              refreshcss = true;
+            if(VisualizerUtil.thumbnailEnabled(task) && VisualizerUtil.isVisible(task)) {
+              // unhide when hidden.
+              if(parent.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
+                parent.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
+              }
+              // if not yet rendered, add a thumbnail
+              if(!parent.hasChildNodes()) {
+                makeThumbnail(thumbsize, it, task, parent);
+                refreshcss = true;
+              }
             }
-          }
-          else {
-            // hide if there is anything to hide.
-            if(parent != null && parent.hasChildNodes()) {
-              parent.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+            else {
+              // hide if there is anything to hide.
+              if(parent != null && parent.hasChildNodes()) {
+                parent.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+              }
+              // TODO: unqueue pending thumbnails
             }
-            // TODO: unqueue pending thumbnails
           }
         }
       }
