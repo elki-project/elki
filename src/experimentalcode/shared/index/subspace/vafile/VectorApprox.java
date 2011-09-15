@@ -49,9 +49,10 @@ public class VectorApprox {
    */
   private double minDist;
   private double maxDist;
+  
+  private DBID id;
 
-  public VectorApprox(DBID id, int dimensions) {
-    this.setID(id);
+  public VectorApprox(int dimensions) {
 
     approximation = new int[dimensions];
     Arrays.fill(approximation, -1);
@@ -60,10 +61,24 @@ public class VectorApprox {
     maxDist = 0;
   }
 
-  public void calculateApproximation(DoubleVector dv, DAFile[] daFiles) {
+  public VectorApprox(DBID id, int dimensions) {
+
+    this(dimensions);
+    this.id = id;
+  }
+
+/**
+ * @return the id
+ */
+public DBID getId()
+{
+	return id;
+}
+
+public void calculateApproximation(DoubleVector dv, DAFile[] daFiles) {
     for (int i = 0; i< daFiles.length; i++) {
       double val = dv.doubleValue(i + 1);
-      double[] borders = daFiles[i].getBorders();
+      double[] borders = daFiles[i].getSplitPositions();
       assert borders != null : "borders are null";
       int lastBorderIndex = borders.length - 1;
 
@@ -86,7 +101,7 @@ public class VectorApprox {
 
   public void calculateApproximation(DoubleVector dv, double[][] borders) {
     for (int d = 0; d < borders.length; d++) {
-      double val = dv.doubleValue(d);
+      double val = dv.doubleValue(d+1);
       int lastBorderIndex = borders[d].length - 1;
 
       // value is lower outlier
@@ -150,7 +165,7 @@ public class VectorApprox {
 
   public String toString() {
 
-    return "O-" + this.getID() + " (" + Arrays.toString(approximation) + "), squared bounds: [" + this.getPMinDist() + ", " + this.getPMaxDist() + "]";
+    return id + " (" + Arrays.toString(approximation) + "), squared bounds: [" + this.getPMinDist() + ", " + this.getPMaxDist() + "]";
   }
 
   /**

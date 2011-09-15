@@ -43,7 +43,7 @@ public class DAFile
 {
 	private int dimension;
 
-	private double[] borders;
+	private double[] splitPositions;
 	private double[] lookup;
 
 	private int selectivityCoeff;
@@ -64,7 +64,7 @@ public class DAFile
 	{
 		long start = System.currentTimeMillis();
 
-		borders = new double[partitions + 1];
+		splitPositions = new double[partitions + 1];
 		int[] partitionCount = new int[partitions];
 
 		int size = objects.size();
@@ -80,7 +80,7 @@ public class DAFile
 		int i = 0;
 		for (int b = 0; b < partitionCount.length; b++)
 		{
-			borders[b] = tempdata[i];
+			splitPositions[b] = tempdata[i];
 			remaining -= bucketSize;
 			i += bucketSize;
 
@@ -95,29 +95,29 @@ public class DAFile
 
 			partitionCount[b] += bucketSize;
 		}
-		borders[partitions] = tempdata[size - 1] + 0.000001; // make sure that
+		splitPositions[partitions] = tempdata[size - 1] + 0.000001; // make sure that
 															 // last object will
 															 // be included
 
 		System.out.println("dimension " + dimension + " finished! (time: "
 		        + (System.currentTimeMillis() - start) + " ms)");
 		
-		assert borders != null : "borders are null";
+		assert splitPositions != null : "borders are null";
 	}
 
 
 	public void setPartitions(double[] borders)
 	{
-		this.borders = borders;
+		this.splitPositions = borders;
 	}
 
 
 	/**
-	 * @return the borders
+	 * @return the split positions
 	 */
-	public double[] getBorders()
+	public double[] getSplitPositions()
 	{
-		return borders;
+		return splitPositions;
 	}
 
 
@@ -148,22 +148,22 @@ public class DAFile
 
 	public void setLookupTable(DoubleVector query)
 	{
-		int bordercount = borders.length;
+		int bordercount = splitPositions.length;
 		lookup = new double[bordercount];
 		for (int i = 0; i < bordercount; i++)
 		{
-			lookup[i] = Math.pow(borders[i] - query.doubleValue(dimension + 1), p);
+			lookup[i] = Math.pow(splitPositions[i] - query.doubleValue(dimension + 1), p);
 		}
 		
 		int queryCellGlobal = -1;
-		for(int i = 0; i< borders.length;i++){
-		  if(query.doubleValue(dimension+1) < borders[i])
+		for(int i = 0; i< splitPositions.length;i++){
+		  if(query.doubleValue(dimension+1) < splitPositions[i])
 		    break;
 		  else
 		    queryCellGlobal++;
 		}
 		//maxdists
-		maxDists = new double[borders.length - 1];
+		maxDists = new double[splitPositions.length - 1];
     for (int i = 0; i < maxDists.length; i++)
     {
       if (i < queryCellGlobal)
@@ -175,7 +175,7 @@ public class DAFile
     }
     
     //mindists
-    minDists = new double[borders.length - 1];
+    minDists = new double[splitPositions.length - 1];
     for (int i = 0; i < minDists.length; i++)
     {
       if (i < queryCellGlobal)
@@ -224,12 +224,15 @@ public class DAFile
 
 	public int getIOCosts()
 	{
-		return borders.length * 8 + 4;
+		return splitPositions.length * 8 + 4;
 	}
 
 
 	/**
-	 * @param selectivityCoeff the selectivityCoeff to set
+	 * 
+	 * @param daFileList
+	 * @param query
+	 * @param epsilon
 	 */
 	public static void calculateSelectivityCoeffs(List<DAFile> daFileList,
 	        DoubleVector query, double epsilon)
@@ -242,7 +245,7 @@ public class DAFile
 		double[] lowerVals = new double[dimensions];
 		double[] upperVals = new double[dimensions];
 
-		VectorApprox queryApprox = new VectorApprox(query.getID(), dimensions);
+		VectorApprox queryApprox = new VectorApprox(dimensions);
 		queryApprox.calculateApproximation(query, daFiles);
 
 		for (int i = 0; i < dimensions; i++)
@@ -252,11 +255,11 @@ public class DAFile
 		}
 
 		DoubleVector lowerEpsilon = new DoubleVector(lowerVals);
-		VectorApprox lowerEpsilonPartitions = new VectorApprox(null, dimensions);
+		VectorApprox lowerEpsilonPartitions = new VectorApprox(dimensions);
 		lowerEpsilonPartitions.calculateApproximation(lowerEpsilon, daFiles);
 
 		DoubleVector upperEpsilon = new DoubleVector(upperVals);
-		VectorApprox upperEpsilonPartitions = new VectorApprox(null, dimensions);
+		VectorApprox upperEpsilonPartitions = new VectorApprox(dimensions);
 		upperEpsilonPartitions.calculateApproximation(upperEpsilon, daFiles);
 
 		for (int i = 0; i< daFiles.length;i++)

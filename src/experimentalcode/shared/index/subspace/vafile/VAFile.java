@@ -22,17 +22,23 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import experimentalcode.shared.index.subspace.structures.DiskMemory;
-import experimentalcode.thomas.structures.IdDistTuple;
 
 /**
  * VAFile
@@ -47,7 +53,7 @@ public class VAFile extends AbstractVAFile
 	DiskMemory<DoubleVector> data;
 	
 	//temporary, full-dimensional VA representation
-	Vector<VectorApprox> vectorApprox;
+	private List<VectorApprox> vectorApprox;
 	
 	private static final int p = 2;
 	
@@ -63,11 +69,11 @@ public class VAFile extends AbstractVAFile
 	
 	int pageSize;
 	
-	private double[][] borders;
+	private double[][] splitPositions;
 	private double[][] lookup;
 	
 	
-	public VAFile(int pageSize, List<DoubleVector> fullDimensionalData, int partitions)
+	public VAFile(int pageSize, Relation<DoubleVector> fullDimensionalData, int partitions)
 	{	
 		this.pageSize = pageSize;
 		
@@ -76,25 +82,29 @@ public class VAFile extends AbstractVAFile
 		
 		setPartitions(fullDimensionalData, partitions);
 		
-		data = new DiskMemory<DoubleVector>(pageSize/(8*fullDimensionalData.get(0).getDimensionality() + 4),bufferSize);
-		for (DoubleVector dv: fullDimensionalData)
-		{
-			data.add(dv);
-			VectorApprox va = new VectorApprox(dv.getID(), dv.getDimensionality());
-			try { va.calculateApproximation(dv, borders); }
+		DBID sampleID = fullDimensionalData.getDBIDs().iterator().next();
+	    int dimensions = fullDimensionalData.get(sampleID).getDimensionality();
+		data = new DiskMemory<DoubleVector>(pageSize/(8*dimensions + 4),bufferSize);
+		vectorApprox = new ArrayList<VectorApprox>();
+		for (DBID id: fullDimensionalData.getDBIDs()) {
+			DoubleVector dv = fullDimensionalData.get(id);
+			data.add(id, dv);
+			VectorApprox va = new VectorApprox(id, dv.getDimensionality());
+			try { va.calculateApproximation(dv, splitPositions); }
 			catch (Exception e) { e.printStackTrace(); }
 			vectorApprox.add(va);
 		}
 	}
 	
 	
-	public void setPartitions(List<DoubleVector> objects, int partitions) throws IllegalArgumentException
+	public void setPartitions(Relation<DoubleVector> objects, int partitions) throws IllegalArgumentException
 	{
 		if ((Math.log(partitions) / Math.log(2)) != (int)(Math.log(partitions) / Math.log(2)))
 			throw new IllegalArgumentException("Number of partitions must be a power of 2!");
 		
-		int dimensions = objects.get(0).getDimensionality();
-		borders = new double[dimensions][partitions+1];
+		DBID sampleID = objects.getDBIDs().iterator().next();
+	    int dimensions = objects.get(sampleID).getDimensionality();
+		splitPositions = new double[dimensions][partitions+1];
 		int[][] partitionCount = new int[dimensions][partitions];
 		
 		for (int d = 0; d < dimensions; d++)
@@ -103,15 +113,17 @@ public class VAFile extends AbstractVAFile
 			int remaining = size;
 			double[] tempdata = new double[size];
 			int j = 0;
-			for (DoubleVector o: objects)
-				tempdata[j++] = o.doubleValue(d+1);
+			for (DBID id : objects.getDBIDs()) {
+				tempdata[j++] = objects.get(id).doubleValue(d+1);
+			}
 			Arrays.sort(tempdata);
 			
 			int bucketSize = (int)(size / (double)partitions);
 			int i = 0;
-			for (int b = 0; b < partitionCount.length; b++)
+			for (int b = 0; b < partitions; b++)
 			{
-				borders[d][b] = tempdata[i];
+				assert i <= tempdata.length : "i out ouf bounds "+i+" <> "+tempdata.length;
+				splitPositions[d][b] = tempdata[i];
 				remaining -= bucketSize;
 				i += bucketSize;
 				
@@ -125,15 +137,15 @@ public class VAFile extends AbstractVAFile
 				
 				partitionCount[d][b] += bucketSize;
 			}
-			borders[d][partitions] = tempdata[size-1] + 0.000001; // make sure that last object will be included
+			splitPositions[d][partitions] = tempdata[size-1] + 0.000001; // make sure that last object will be included
 			
 			System.out.print("dim " + (d+1) + ": ");
-			for (int b=0; b<borders.length; b++)
+			for (int b=0; b<splitPositions[d].length; b++)
 			{
-				System.out.print(borders[b] + "  ");
-				if (b < borders.length-1)
+				System.out.print(splitPositions[d][b] + "  ");
+				if (b < splitPositions[d].length-1)
 				{
-					System.out.print("(bucket "+(b+1)+"/"+partitionCount.length+", " + partitionCount[b] +")  ");
+					System.out.print("(bucket "+(b+1)+"/"+partitions+", " + partitionCount[d][b] +")  ");
 				}
 			}
 			System.out.println();
@@ -142,16 +154,16 @@ public class VAFile extends AbstractVAFile
 
 
 	/**
-	 * @return the borders
+	 * @return the split positions
 	 */
-	public double[][] getBorders() {
-		return borders;
+	public double[][] getSplitPositions() {
+		return splitPositions;
 	}
 	
 	
 	public double[] getMinDists(int dimension, int queryCell) {
 		
-		double[] result = new double[borders[dimension].length-1];
+		double[] result = new double[splitPositions[dimension].length-1];
 		for (int i = 0; i < result.length; i++)
 		{
 			if (i < queryCell) result[i] = lookup[dimension][i+1];
@@ -164,7 +176,7 @@ public class VAFile extends AbstractVAFile
 	
 	public double[] getMaxDists(int dimension, int queryCell) {
 		
-		double[] result = new double[borders[dimension].length-1];
+		double[] result = new double[splitPositions[dimension].length-1];
 		for (int i = 0; i < result.length; i++)
 		{
 			if (i < queryCell) result[i] = lookup[dimension][i];
@@ -180,14 +192,14 @@ public class VAFile extends AbstractVAFile
 	 */
 	public void setLookupTable(DoubleVector query) {
 		
-		int dimensions = borders.length;
-		int bordercount = borders[0].length;
+		int dimensions = splitPositions.length;
+		int bordercount = splitPositions[0].length;
 		lookup = new double[dimensions][bordercount];
 		for (int d = 0; d < dimensions; d++)
 		{
 			for (int i = 0; i < bordercount; i++)
 			{
-				lookup[d][i] = Math.pow(borders[d][i] - query.doubleValue(d), p);
+				lookup[d][i] = Math.pow(splitPositions[d][i] - query.doubleValue(d+1), p);
 			}
 		}		
 	}
@@ -197,8 +209,8 @@ public class VAFile extends AbstractVAFile
 	{
 		// generate query approximation and lookup table
 		
-		VectorApprox queryApprox = new VectorApprox(query.getID(), query.getDimensionality());
-		try { queryApprox.calculateApproximation(query, borders); }
+		VectorApprox queryApprox = new VectorApprox(query.getDimensionality());
+		try { queryApprox.calculateApproximation(query, splitPositions); }
 		catch (Exception e) { e.printStackTrace(); }
 		setLookupTable(query);
 		
@@ -211,7 +223,7 @@ public class VAFile extends AbstractVAFile
 		
 		// filter step
 		
-		for (int i = 0; i < vectorApprox.size(); i++)
+		for (int i=0; i<vectorApprox.size(); i++)
 		{
 			VectorApprox va = vectorApprox.get(i);
 			double minDist = 0;
@@ -235,41 +247,43 @@ public class VAFile extends AbstractVAFile
 		
 		// refinement step
 		
-		Vector<IdDistTuple> result = new Vector<IdDistTuple>();
+		List<DoubleDistanceResultPair> result = new ArrayList<DoubleDistanceResultPair>();
 		
 		// sort candidates by lower bound (minDist)
 		candidates = VectorApprox.sortByMinDist(candidates);
 		
 		// retrieve accurate distances
-		for (VectorApprox va: candidates)
+		for (int i=0; i<candidates.size(); i++)
 		{
-			if (result.size() < k || va.getPMinDist() < result.lastElement().getPDist())
+			VectorApprox va = candidates.get(i);
+			DoubleDistanceResultPair lastElement = null;
+			if (!result.isEmpty()) lastElement = result.get(result.size()-1);
+			if (result.size() < k || va.getPMinDist() < lastElement.getDoubleDistance())
 			{
-				DoubleVector dv = data.getObject(va.getID());
+				DoubleVector dv = data.getObject(va.getId());
 				double dist = 0;
 				for (int d = 0; d < dv.getDimensionality(); d++)
 				{
-					dist += Math.pow(dv.doubleValue(d) - query.doubleValue(d), p);
+					dist += Math.pow(dv.doubleValue(d+1) - query.doubleValue(d+1), p);
 				}
-				IdDistTuple tup = new IdDistTuple(va.getID());
-				tup.setPDist(dist);
+				DoubleDistanceResultPair dp = new DoubleDistanceResultPair(dist, va.getId());
 				
 				if (result.size() >= k)
-					result.remove(result.lastElement());
+					result.remove(lastElement);
 					
-				result.add(tup);
-				IdDistTuple.sortByDist(result);
+				result.add(dp);
+				Collections.sort(result, new DoubleDistanceResultPairComparator());
 			}
 		}
 		
-		System.out.println("\nquery = " + query);
+		System.out.println("\nquery = (" + query + ")");
 		System.out.println("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
 		
 		ModifiableDBIDs resultIDs = DBIDUtil.newArray(result.size());
-		for (IdDistTuple o: result)
+		for (DoubleDistanceResultPair dp: result)
 		{
-			System.out.println(o);
-			resultIDs.add(o.getID());
+			System.out.println(dp);
+			resultIDs.add(dp.getDBID());
 		}
 		
 		return resultIDs;
