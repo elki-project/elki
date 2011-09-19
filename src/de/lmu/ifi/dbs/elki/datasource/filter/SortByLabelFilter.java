@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses LabelList oneway - - «reads»
+ * @apiviz.uses de.lmu.ifi.dbs.elki.data.LabelList oneway - - «reads»
  */
 public class SortByLabelFilter implements ObjectFilter {
   /**
