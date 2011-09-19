@@ -115,7 +115,7 @@ public class ScatterPlotFactory implements ProjectorFactory {
     }
 
     @Override
-    protected Object makeInstance() {
+    protected ScatterPlotFactory makeInstance() {
       return new ScatterPlotFactory(maxdim);
     }
   }
