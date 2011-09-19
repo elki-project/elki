@@ -47,9 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf GeneratorMain
- * @apiviz.has GeneratorSingleCluster oneway - - creates
- * @apiviz.has GeneratorStatic oneway - - creates
+ * @apiviz.composedOf GeneratorXMLDatabaseConnection
  */
 public class GeneratorXMLSpec extends AbstractApplication {
   /**
