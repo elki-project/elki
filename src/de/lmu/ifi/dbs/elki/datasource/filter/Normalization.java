@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  *
  * @author Arthur Zimek
  * 
+ * @apiviz.landmark
  * @apiviz.has NonNumericFeaturesException
  * 
  * @param <O> object type

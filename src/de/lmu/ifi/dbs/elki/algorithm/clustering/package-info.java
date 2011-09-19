@@ -7,6 +7,8 @@
  * More relaxed clustering algorithms are allowed to provide a result that is a fuzzy clustering, does not
  * partition the database complete or is in any other sense a relaxed clustering result.
  * 
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult
+ * 
  * @see de.lmu.ifi.dbs.elki.algorithm
  */
 /*
