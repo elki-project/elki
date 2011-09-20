@@ -229,8 +229,9 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
           final double nhat_r_alpha = mv_n_r_alpha.getMean();
           final double sigma_nhat_r_alpha = mv_n_r_alpha.getNaiveStddev();
 
-          final double mdef = (nhat_r_alpha - n_alphar) / nhat_r_alpha;
-          final double sigmamdef = sigma_nhat_r_alpha / nhat_r_alpha;
+          // Redundant divisions removed.
+          final double mdef = (nhat_r_alpha - n_alphar); // / nhat_r_alpha;
+          final double sigmamdef = sigma_nhat_r_alpha; // / nhat_r_alpha;
           final double mdefnorm = mdef / sigmamdef;
 
           if(mdefnorm > maxmdefnorm) {
