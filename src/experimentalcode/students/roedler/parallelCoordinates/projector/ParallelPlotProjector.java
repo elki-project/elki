@@ -73,7 +73,7 @@ public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends Abstrac
     List<PlotItem> col = new ArrayList<PlotItem>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0) {
-      final PlotItem it = new PlotItem(4., 1., null);
+      final PlotItem it = new PlotItem(4., 1., /* FIXME: not null! */ null);
       it.visualizations = tasks;
       col.add(it);
     }
