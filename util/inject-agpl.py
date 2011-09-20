@@ -4,30 +4,31 @@ import sys, re
 
 template="""
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 """.strip()
 
 ismarked=re.compile("(General Public License|Copyright \()", re.I)
+iselki=re.compile("This file is part of ELKI:", re.I)
 
 for fn in sys.argv[1:]:
 	fi = open(fn)
@@ -35,7 +36,8 @@ for fn in sys.argv[1:]:
 	fi.close()
 
 	if ismarked.search(c):
-		print fn, "already contained a copyright notice!"
+		if not ismarked.search(c):
+			print fn, "already contained a copyright notice!"
 		continue
 
 	if fn.endswith("package-info.java"):
@@ -47,7 +49,7 @@ for fn in sys.argv[1:]:
 		# Inject copyright notice before the package name, but after the
 		# documentation, this is nicer for eclipse
 		of.write(d)
-		of.write("\n")
+		of.write("\n\n")
 		of.write(template)
 		of.write("\n")
 		of.write(p)
