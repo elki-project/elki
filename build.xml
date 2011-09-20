@@ -12,10 +12,10 @@
 	<property name="ELKI_URL" value="http://elki.dbs.ifi.lmu.de/" />
 
 	<!-- for official builds: -->
-	<property name="release.official" value="true" />
+	<!-- <property name="release.official" value="true" />
 	<property name="release.version" value="0.4.0" />
 	<property name="release.extraversion" value="(${now})" />
-	<property name="doc.srcdir" value="doc/release0.4" />
+	<property name="doc.srcdir" value="doc/release0.4" /> -->
 
 	<!-- defaults -->
 	<property name="release.version" value="INTERNAL-${now}" />
