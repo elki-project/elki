@@ -196,39 +196,40 @@ public class DocumentParameters {
         public void run() {
           // Try a V3 style parameterizer first.
           Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
-          if (par != null) {
+          if(par != null) {
             par.configure(track);
-            return;
           }
-          try {
-            Object instance = ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
-            for(Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
-              if(pair.first == null) {
-                pair.first = instance;
+          else {
+            try {
+              ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
+            }
+            catch(java.lang.NoSuchMethodException e) {
+              logger.warning("Could not instantiate class " + cls.getName() + " - no appropriate constructor or parameterizer found.");
+            }
+            catch(java.lang.reflect.InvocationTargetException e) {
+              if(e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
               }
-              options.add(pair);
+              if(e.getCause() instanceof Error) {
+                throw (Error) e.getCause();
+              }
+              throw new RuntimeException(e.getCause());
+            }
+            catch(RuntimeException e) {
+              throw e;
+            }
+            catch(Exception e) {
+              throw new RuntimeException(e);
+            }
+            catch(java.lang.Error e) {
+              throw new RuntimeException(e);
             }
           }
-          catch(java.lang.NoSuchMethodException e) {
-            logger.warning("Could not instantiate class "+cls.getName()+" - no appropriate constructor or parameterizer found.");
-          }
-          catch(java.lang.reflect.InvocationTargetException e) {
-            if(e.getCause() instanceof RuntimeException) {
-              throw (RuntimeException) e.getCause();
+          for(Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
+            if(pair.first == null) {
+              pair.first = cls;
             }
-            if(e.getCause() instanceof Error) {
-              throw (Error) e.getCause();
-            }
-            throw new RuntimeException(e.getCause());
-          }
-          catch(RuntimeException e) {
-            throw e;
-          }
-          catch(Exception e) {
-            throw new RuntimeException(e);
-          }
-          catch(java.lang.Error e) {
-            throw new RuntimeException(e);
+            options.add(pair);
           }
         }
       }, null);
@@ -296,7 +297,7 @@ public class DocumentParameters {
         boolean inlist = false;
         if(byo != null) {
           for(Pair<Parameter<?, ?>, Class<?>> pair : byo) {
-            if(pair.second == c) {
+            if(pair.second.equals(c)) {
               inlist = true;
               break;
             }
@@ -305,9 +306,6 @@ public class DocumentParameters {
         if(!inlist) {
           byopt.add(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c));
         }
-      }
-      if(!byopt.contains(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c))) {
-        byopt.add(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c));
       }
     }
     es.shutdownNow();
@@ -435,7 +433,7 @@ public class DocumentParameters {
         elemdd.appendChild(elemp);
         // class restriction?
         if(opt instanceof ClassParameter<?>) {
-          appendClassRestriction(htmldoc, (ClassParameter<?>) opt, elemdd);
+          appendClassRestriction(htmldoc, ((ClassParameter<?>) opt).getRestrictionClass(), elemdd);
         }
         // default value? completions?
         appendDefaultValueIfSet(htmldoc, opt, elemdd);
@@ -509,7 +507,7 @@ public class DocumentParameters {
     Collections.sort(opts, new SortByOption());
 
     for(OptionID oid : opts) {
-      Parameter<?, ?> firstopt = byopt.get(oid).get(0).getFirst();
+      final Parameter<?, ?> firstopt = byopt.get(oid).get(0).getFirst();
       // DT = definition term
       Element optdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
@@ -533,8 +531,17 @@ public class DocumentParameters {
         optdd.appendChild(elemp);
       }
       // class restriction?
+      Class<?> superclass = null;
       if(firstopt instanceof ClassParameter<?>) {
-        appendClassRestriction(htmldoc, (ClassParameter<?>) firstopt, optdd);
+        // Find superclass heuristically
+        superclass = ((ClassParameter<?>) firstopt).getRestrictionClass();
+        for (Pair<Parameter<?, ?>, Class<?>> clinst : byopt.get(oid)) {
+          ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
+          if (!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
+            superclass = cls.getRestrictionClass();
+          }
+        }
+        appendClassRestriction(htmldoc, superclass, optdd);
       }
       // default value?
       appendDefaultValueIfSet(htmldoc, firstopt, optdd);
@@ -566,8 +573,8 @@ public class DocumentParameters {
           ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
           if(cls.getRestrictionClass() != null) {
             // TODO: if it is null, it could still be different!
-            if(!cls.getRestrictionClass().equals(((ClassParameter<?>) firstopt).getRestrictionClass())) {
-              appendClassRestriction(htmldoc, cls, classli);
+            if(!cls.getRestrictionClass().equals(superclass)) {
+              appendClassRestriction(htmldoc, cls.getRestrictionClass(), classli);
             }
           }
           else {
@@ -599,22 +606,22 @@ public class DocumentParameters {
     p.appendChild(defa);
   }
 
-  private static void appendClassRestriction(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
-    if(opt.getRestrictionClass() == null) {
-      logger.warning("No restriction class for Parameter " + opt.getName());
+  private static void appendClassRestriction(Document htmldoc, Class<?> restriction, Element elemdd) {
+    if(restriction == null) {
+      logger.warning("No restriction class!");
       return;
     }
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
     p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION));
-    if(opt.getRestrictionClass().isInterface()) {
+    if(restriction.isInterface()) {
       p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION_IMPLEMENTING));
     }
     else {
       p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION_EXTENDING));
     }
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-    defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(opt.getRestrictionClass().getName()));
-    defa.setTextContent(opt.getRestrictionClass().getName());
+    defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(restriction.getName()));
+    defa.setTextContent(restriction.getName());
     p.appendChild(defa);
     elemdd.appendChild(p);
   }
@@ -645,8 +652,8 @@ public class DocumentParameters {
         elemdd.appendChild(ul);
       }
       // Report when not in properties file.
-      if (Properties.ELKI_PROPERTIES.getProperty(opt.getRestrictionClass().getName()).length == 0) {
-        logger.warning(opt.getRestrictionClass().getName()+" not in properties. No autocompletion available in release GUI.");
+      if(Properties.ELKI_PROPERTIES.getProperty(opt.getRestrictionClass().getName()).length == 0) {
+        logger.warning(opt.getRestrictionClass().getName() + " not in properties. No autocompletion available in release GUI.");
       }
     }
   }
