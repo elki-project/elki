@@ -239,6 +239,9 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return prototype.newInstance(vec);
   }
 
-  
-  
+  @Override
+  public double projectDimension(int dim, double value) {
+    double temp = scales[dim].getScaled(value);
+    return (axisHeight + margin[1]) - temp * axisHeight;
+  }
 }

@@ -41,11 +41,13 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
  import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  import de.lmu.ifi.dbs.elki.result.Result;
  import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
  import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
  import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
  import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
  import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
  import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -81,7 +83,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
    /**
     * Fill parameter.
     */
-   protected boolean fill = false;
+   protected boolean fill = true;
 
    /**
     * The tree we visualize
@@ -104,7 +106,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
 
    @Override
    protected void redraw() {
-   
      addCSSClasses(svgp);
      
      if(tree != null) {
@@ -130,13 +131,13 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
          final double relDepth = 1. - (((double) i) / tree.getHeight());
          if(fill) {
            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY,/* relDepth **/ context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
            cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.3);
          }
          else {
            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, /*relDepth **/ context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
          }
          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
@@ -157,22 +158,27 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
     * @param depth Current depth
     */
    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth) {
-     SpatialComparable mbr = entry;
-     
-     System.out.println("T: " + proj.getXpos(depth) + "  " + entry.getMin(depth + 1));
-     Element point = svgp.svgCircle(proj.getXpos(depth), proj.projectDataToRenderSpace(new Vector(entry.getMax(depth + 1))).get(0), 2.);
-     SVGUtil.setCSSClass(point, INDEX + 0);
-     layer.appendChild(point);
-     Element point2 = svgp.svgCircle(proj.getXpos(depth), proj.projectDataToRenderSpace(new Vector(entry.getMin(depth + 1))).get(0), 2.);
-     SVGUtil.setCSSClass(point2, INDEX + 1);
-     layer.appendChild(point2);
-     
-     if(fill) {
+     final int dim = DatabaseUtil.dimensionality(rep);
+     final SpatialComparable mbr = entry;
+
+     SVGPath path = new SVGPath();
+     for (int i = 0; i < dim; i++){
+       if (proj.isVisible(i)){
+         path.drawTo(proj.getXpos(i), proj.projectDimension(i, entry.getMax(i + 1)));
+       }
      }
-     else {
+     for (int i = dim - 1; i >= 0; i--){
+       if (proj.isVisible(i)){
+         path.drawTo(proj.getXpos(i), proj.projectDimension(i, entry.getMin(i + 1)));
+       }
      }
+     path.close();
      
-     System.out.println("TREE test " + depth + "  " + tree.getHeight());
+     Element intervals = path.makeElement(svgp);
+
+     SVGUtil.addCSSClass(intervals, INDEX + depth);
+     layer.appendChild(intervals);
+     
      if(!entry.isLeafEntry()) {
        N node = rtree.getNode(entry);
        for(int i = 0; i < node.getNumEntries(); i++) {

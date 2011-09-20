@@ -22,4 +22,5 @@ public interface ProjectionParallel extends Projection {
   
   public int getFirstVisibleDimension();
   
+  public double projectDimension(int dim, double value);
 }
