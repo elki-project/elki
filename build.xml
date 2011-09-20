@@ -12,10 +12,10 @@
 	<property name="ELKI_URL" value="http://elki.dbs.ifi.lmu.de/" />
 
 	<!-- for official builds: -->
-	<!-- XXX <property name="release.official" value="true" />
-	<property name="release.version" value="0.4~beta2" />
+	<property name="release.official" value="true" />
+	<property name="release.version" value="0.4.0" />
 	<property name="release.extraversion" value="(${now})" />
-	<property name="doc.srcdir" value="doc/release${release.version}" /> -->
+	<property name="doc.srcdir" value="doc/release0.4" />
 
 	<!-- defaults -->
 	<property name="release.version" value="INTERNAL-${now}" />
@@ -231,214 +231,215 @@
 					</td>
 					<td align="left">ndex-Structures</td>
 				</tr>${javadoc.header.extra}</table>]]></header> -->
-		<!-- Notice: replace the old header by something like the following (specify dir of the png and put it there to work). -->
-		<header><![CDATA[<img src="figures/elki-logo-200.png" width="200">]]></header>
-		<footer>
-			<![CDATA[<table style="font-size:small;">
-			<tr>
-				<td colspan="2" align="left">Release ${release.version} ${release.extraversion}</td>
-			</tr>${javadoc.footer.extra}</table>]]></footer>
-</javadoc>
+			<!-- Notice: replace the old header by something like the following (specify dir of the png and put it there to work). -->
+			<header>
+				<![CDATA[<img src="{@docRoot}/figures/elki-logo-200.png" width="200">]]></header>
+			<footer>
+				<![CDATA[<table style="font-size:small;">
+				<tr>
+					<td colspan="2" align="left">Release ${release.version} ${release.extraversion}</td>
+				</tr>${javadoc.footer.extra}</table>]]></footer>
+	</javadoc>
 </target>
 
 <!-- Build the parameter documentation -->
 <target name="doc_params" depends="compile">
-<java dir="${build.output}" classname="${ELKI}.application.internal.DocumentParameters" fork="true">
-	<classpath refid="build.classpath.built" />
-	<arg value="${javadoc.destdir}/parameters-byclass.html" />
-	<arg value="${javadoc.destdir}/parameters-byopt.html" />
-</java>
-<java dir="${build.output}" classname="${ELKI}.application.internal.DocumentReferences" fork="true">
-	<classpath refid="build.classpath.built" />
-	<arg value="${javadoc.destdir}/references.html" />
-</java>
+	<java dir="${build.output}" classname="${ELKI}.application.internal.DocumentParameters" fork="true">
+		<classpath refid="build.classpath.built" />
+		<arg value="${javadoc.destdir}/parameters-byclass.html" />
+		<arg value="${javadoc.destdir}/parameters-byopt.html" />
+	</java>
+	<java dir="${build.output}" classname="${ELKI}.application.internal.DocumentReferences" fork="true">
+		<classpath refid="build.classpath.built" />
+		<arg value="${javadoc.destdir}/references.html" />
+	</java>
 </target>
 
 <!-- Install extra documentation -->
 <target name="doc_extra">
-<copy todir="${javadoc.destdir}">
-	<fileset dir="${doc.srcdir}">
-		<exclude name="overview.html" />
-	</fileset>
-</copy>
+	<copy todir="${javadoc.destdir}">
+		<fileset dir="${doc.srcdir}">
+			<exclude name="overview.html" />
+		</fileset>
+	</copy>
 </target>
 
 <!-- +++++++++++++++++++ COMPILATION TARGETS +++++++++++++++++++ -->
 
 <!-- Compile all java code -->
 <target name="compile_java">
-<mkdir dir="${build.output}" />
-<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
-	<compilerarg value="-Xlint:all" />
-	<classpath refid="build.classpath" />
-	<patternset refid="${build.patternset}" />
-	<src path="${source}" />
-</javac>
+	<mkdir dir="${build.output}" />
+	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
+		<compilerarg value="-Xlint:all" />
+		<classpath refid="build.classpath" />
+		<patternset refid="${build.patternset}" />
+		<src path="${source}" />
+	</javac>
 </target>
 
 <!-- Compile all java tests -->
 <target name="compile_tests">
-<mkdir dir="${build.output}" />
-<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
-	<compilerarg value="-Xlint:all" />
-	<classpath refid="build.classpath" />
-	<patternset refid="${build.patternset}" />
-	<src path="${source.test}" />
-</javac>
+	<mkdir dir="${build.output}" />
+	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
+		<compilerarg value="-Xlint:all" />
+		<classpath refid="build.classpath" />
+		<patternset refid="${build.patternset}" />
+		<src path="${source.test}" />
+	</javac>
 </target>
 
 <!-- Install non-java files -->
 <target name="compile_install">
-<copy todir="${build.output}">
-	<fileset dir="${source}">
-		<include name="**/*.properties" />
-		<include name="**/*.gif" />
-		<include name="**/*.jpg" />
-		<include name="**/*.jpeg" />
-		<include name="**/*.png" />
-		<include name="**/*.xml" />
-		<include name="**/*.xsd" />
-		<include name="**/*.txt" />
-		<patternset refid="${build.patternset}" />
-	</fileset>
-	<mapper>
-		<globmapper from="de/lmu/ifi/dbs/elki/LICENSE.txt" to="legal/ELKI-LICENSE.txt" />
-		<identitymapper />
-	</mapper>
-</copy>
+	<copy todir="${build.output}">
+		<fileset dir="${source}">
+			<include name="**/*.properties" />
+			<include name="**/*.gif" />
+			<include name="**/*.jpg" />
+			<include name="**/*.jpeg" />
+			<include name="**/*.png" />
+			<include name="**/*.xml" />
+			<include name="**/*.xsd" />
+			<include name="**/*.txt" />
+			<patternset refid="${build.patternset}" />
+		</fileset>
+		<mapper>
+			<globmapper from="de/lmu/ifi/dbs/elki/LICENSE.txt" to="legal/ELKI-LICENSE.txt" />
+			<identitymapper />
+		</mapper>
+	</copy>
 </target>
 
 <!-- Validate build -->
 <target name="validate_standalone" description="Validate a to be released source code by trying a build in a sandbox environment" depends="clean">
-<mkdir dir="${build.output}/src" />
-<!-- copy included parts of the source only! -->
-<copy todir="${build.output}/src">
-	<fileset dir="${source}">
-		<patternset refid="${build.patternset}" />
-	</fileset>
-</copy>
-<!-- try a build -->
-<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
-	<compilerarg value="-Xlint:all" />
-	<classpath>
-		<fileset dir="${build.lib}">
-			<include name="**/*.jar" />
+	<mkdir dir="${build.output}/src" />
+	<!-- copy included parts of the source only! -->
+	<copy todir="${build.output}/src">
+		<fileset dir="${source}">
+			<patternset refid="${build.patternset}" />
 		</fileset>
-		<dirset dir="${build.output}/src" />
-	</classpath>
-	<patternset refid="${build.patternset}" />
-	<src path="${build.output}/src" />
-</javac>
+	</copy>
+	<!-- try a build -->
+	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
+		<compilerarg value="-Xlint:all" />
+		<classpath>
+			<fileset dir="${build.lib}">
+				<include name="**/*.jar" />
+			</fileset>
+			<dirset dir="${build.output}/src" />
+		</classpath>
+		<patternset refid="${build.patternset}" />
+		<src path="${build.output}/src" />
+	</javac>
 </target>
 
 <!-- +++++++++++++++++++ JAR GENERATION TARGETS +++++++++++++++++++ -->
 
 <!-- Jar building -->
 <target name="jar_prepare" description="Copies all classes and descriptors together" depends="compile">
-<delete dir="${build.jardir}" />
-<!-- install compiled classes -->
-<copy todir="${build.jardir}">
-	<fileset dir="${build.output}" />
-</copy>
-<!-- Install Apache Batik -->
-<unjar dest="${build.jardir}" src="${build.lib}/batik-all-1.7.jar" overwrite="false">
-	<patternset>
-		<include name="org/apache/batik/**" />
-		<include name="org/w3c/dom/**" />
-		<include name="META-INF/services/**" />
-		<include name="META-INF/LICENSE" />
-		<include name="META-INF/NOTICE" />
-	</patternset>
-	<mapper>
-		<globmapper from="META-INF/LICENSE" to="legal/batik-LICENSE.txt" />
-		<globmapper from="META-INF/NOTICE" to="legal/batik-NOTICE.txt" />
-	</mapper>
-</unjar>
-<!-- Install PDF Transcoder (from Apache Batik / Apache FOP) -->
-<unjar dest="${build.jardir}" src="${build.lib}/pdf-transcoder.jar" overwrite="false">
-	<patternset>
-		<include name="legal/**" />
-		<include name="org/apache/**" />
-		<include name="META-INF/LICENSE" />
-		<include name="META-INF/NOTICE" />
-	</patternset>
-	<mapper>
-		<globmapper from="META-INF/LICENSE" to="legal/pdf-transcoder-LICENSE.txt" />
-		<globmapper from="META-INF/NOTICE" to="legal/pdf-transcoder-NOTICE.txt" />
-	</mapper>
-</unjar>
+	<delete dir="${build.jardir}" />
+	<!-- install compiled classes -->
+	<copy todir="${build.jardir}">
+		<fileset dir="${build.output}" />
+	</copy>
+	<!-- Install Apache Batik -->
+	<unjar dest="${build.jardir}" src="${build.lib}/batik-all-1.7.jar" overwrite="false">
+		<patternset>
+			<include name="org/apache/batik/**" />
+			<include name="org/w3c/dom/**" />
+			<include name="META-INF/services/**" />
+			<include name="META-INF/LICENSE" />
+			<include name="META-INF/NOTICE" />
+		</patternset>
+		<mapper>
+			<globmapper from="META-INF/LICENSE" to="legal/batik-LICENSE.txt" />
+			<globmapper from="META-INF/NOTICE" to="legal/batik-NOTICE.txt" />
+		</mapper>
+	</unjar>
+	<!-- Install PDF Transcoder (from Apache Batik / Apache FOP) -->
+	<unjar dest="${build.jardir}" src="${build.lib}/pdf-transcoder.jar" overwrite="false">
+		<patternset>
+			<include name="legal/**" />
+			<include name="org/apache/**" />
+			<include name="META-INF/LICENSE" />
+			<include name="META-INF/NOTICE" />
+		</patternset>
+		<mapper>
+			<globmapper from="META-INF/LICENSE" to="legal/pdf-transcoder-LICENSE.txt" />
+			<globmapper from="META-INF/NOTICE" to="legal/pdf-transcoder-NOTICE.txt" />
+		</mapper>
+	</unjar>
 
-<!-- Install XML Commons External -->
-<unjar dest="${build.jardir}" src="${build.lib}/xml-commons-external-1.4.01.jar" overwrite="false">
-	<patternset>
-		<include name="org/apache/xmlcommons/**" />
-		<include name="org/w3c/**" />
-		<include name="org/xml.sax/**" />
-		<include name="javax/xml/**" />
-	</patternset>
-</unjar>
-<unjar dest="${build.jardir}" src="${build.lib}/xml-commons-external-1.4.01-ext.jar" overwrite="false">
-	<patternset>
-		<include name="org/w3c/**" />
-	</patternset>
-</unjar>
-<!-- add extra licence file for XML Commons External -->
-<copy file="${build.lib}/xml-commons-external-1.4.01.jar.LICENSE.txt" tofile="${build.jardir}/legal/xml-commons-external-LICENSE.txt" />
+	<!-- Install XML Commons External -->
+	<unjar dest="${build.jardir}" src="${build.lib}/xml-commons-external-1.4.01.jar" overwrite="false">
+		<patternset>
+			<include name="org/apache/xmlcommons/**" />
+			<include name="org/w3c/**" />
+			<include name="org/xml.sax/**" />
+			<include name="javax/xml/**" />
+		</patternset>
+	</unjar>
+	<unjar dest="${build.jardir}" src="${build.lib}/xml-commons-external-1.4.01-ext.jar" overwrite="false">
+		<patternset>
+			<include name="org/w3c/**" />
+		</patternset>
+	</unjar>
+	<!-- add extra licence file for XML Commons External -->
+	<copy file="${build.lib}/xml-commons-external-1.4.01.jar.LICENSE.txt" tofile="${build.jardir}/legal/xml-commons-external-LICENSE.txt" />
 
-<!-- Source code -->
-<mkdir dir="${build.jardir}/src" />
-<copy todir="${build.jardir}/src">
-	<fileset dir="${source}">
-		<patternset refid="${build.patternset}" />
-		<exclude name="*.html" />
-	</fileset>
-</copy>
-<mkdir dir="${build.jardir}/test" />
-<copy todir="${build.jardir}/test">
-	<fileset dir="${source.test}">
-		<patternset refid="${build.patternset}" />
-		<exclude name="*.html" />
-	</fileset>
-</copy>
+	<!-- Source code -->
+	<mkdir dir="${build.jardir}/src" />
+	<copy todir="${build.jardir}/src">
+		<fileset dir="${source}">
+			<patternset refid="${build.patternset}" />
+			<exclude name="*.html" />
+		</fileset>
+	</copy>
+	<mkdir dir="${build.jardir}/test" />
+	<copy todir="${build.jardir}/test">
+		<fileset dir="${source.test}">
+			<patternset refid="${build.patternset}" />
+			<exclude name="*.html" />
+		</fileset>
+	</copy>
 </target>
 
 <!-- create Jar file from jar directory -->
 <target name="jar" description="Creates jar file in base dir" depends="jar_prepare">
-<jar basedir="${build.jardir}/" jarfile="${build.jarfile}" manifest="${source}/META-INF/MANIFEST.MF">
-	<manifest>
-		<attribute name="Main-class" value="${main-class}" />
-		<attribute name="Manifest-Version" value="${release.version}" />
-		<attribute name="Release-Date" value="${now}" />
-		<attribute name="Built-By" value="${user.name}" />
-		<attribute name="Implementation-Title" value="${ELKI_LONG}" />
-		<attribute name="Implementation-Version" value="${release.version}" />
-		<attribute name="Implementation-URL" value="${ELKI_URL}" />
-	</manifest>
-</jar>
+	<jar basedir="${build.jardir}/" jarfile="${build.jarfile}" manifest="${source}/META-INF/MANIFEST.MF">
+		<manifest>
+			<attribute name="Main-class" value="${main-class}" />
+			<attribute name="Manifest-Version" value="${release.version}" />
+			<attribute name="Release-Date" value="${now}" />
+			<attribute name="Built-By" value="${user.name}" />
+			<attribute name="Implementation-Title" value="${ELKI_LONG}" />
+			<attribute name="Implementation-Version" value="${release.version}" />
+			<attribute name="Implementation-URL" value="${ELKI_URL}" />
+		</manifest>
+	</jar>
 </target>
 
 <!-- +++++++++++++++++++ DEPLOYMENT and RELEASE TARGETS +++++++++++++++++++ -->
 
 <!-- Deployment -->
 <target name="deploy" description="Copies the executable jar file to archive and executable directories" depends="jar,doc">
-<mkdir dir="${deploy.output}" />
-<copy todir="${deploy.output}">
-	<fileset file="${build.jarfile}" />
-</copy>
-<copy todir="${deploy.latest}">
-	<fileset file="${build.jarfile}" />
-</copy>
+	<mkdir dir="${deploy.output}" />
+	<copy todir="${deploy.output}">
+		<fileset file="${build.jarfile}" />
+	</copy>
+	<copy todir="${deploy.latest}">
+		<fileset file="${build.jarfile}" />
+	</copy>
 </target>
 
 <!-- Release -->
 <target name="release" description="Publish a new release to the web site">
-<fail unless="release.official" message="Only official builds can be released. Use 'deploy'." />
-<fail unless="release.target" message="No release target folder given." />
-<antcall target="clean" />
-<antcall target="deploy" />
-<mkdir dir="${release.target}" />
-<copy todir="${release.target}">
-	<fileset dir="${deploy.output}" />
-</copy>
+	<fail unless="release.official" message="Only official builds can be released. Use 'deploy'." />
+	<fail unless="release.target" message="No release target folder given." />
+	<antcall target="clean" />
+	<antcall target="deploy" />
+	<mkdir dir="${release.target}" />
+	<copy todir="${release.target}">
+		<fileset dir="${deploy.output}" />
+	</copy>
 </target>
 </project>
