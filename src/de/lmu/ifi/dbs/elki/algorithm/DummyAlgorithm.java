@@ -75,13 +75,15 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
    * @return Null result
    */
   public Result run(Database database, Relation<O> relation) {
+    // Get a distance and knn query for the Euclidean distance
+    // Hardcoded, only use this if you only allow the eucliden distance
     DistanceQuery<O, DoubleDistance> distQuery = database.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
     KNNQuery<O, DoubleDistance> knnQuery = database.getKNNQuery(distQuery, 10);
 
     for(DBID id : relation.iterDBIDs()) {
-      // Get the actual object from the database (but discard)
+      // Get the actual object from the database (but discard the result)
       relation.get(id);
-      // run a 10NN query for each point (but discard)
+      // run a 10NN query for each point (but discard the result)
       knnQuery.getKNNForDBID(id, 10);
     }
     return null;
