@@ -44,6 +44,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -188,77 +190,63 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     WritableRecordStore store = DataStoreUtil.makeRecordStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class, Double.class);
     WritableDataStore<Double> mdef_norm = store.getStorage(0, Double.class);
     WritableDataStore<Double> mdef_radius = store.getStorage(1, Double.class);
+    DoubleMinMax minmax = new DoubleMinMax();
+
     for(DBID id : relation.iterDBIDs()) {
+      final List<DoubleIntPair> cdist = interestingDistances.get(id);
+      final double maxdist = cdist.get(cdist.size() - 1).first;
+      final int maxneig = cdist.get(cdist.size() - 1).second;
+
       double maxmdefnorm = 0.0;
       double maxnormr = 0;
-      List<DoubleIntPair> cdist = interestingDistances.get(id);
-      double maxdist = cdist.get(cdist.size() - 1).first;
-      int maxneig = cdist.get(cdist.size() - 1).second;
       if(maxneig >= nmin) {
         D range = distFunc.getDistanceFactory().fromDouble(maxdist);
         // Compute the largest neighborhood we will need.
         List<DistanceResultPair<D>> maxneighbors = rangeQuery.getRangeForDBID(id, range);
+        // Ensure the set is sorted. Should be a no-op with most indexes.
+        Collections.sort(maxneighbors);
+        // For any critical distance, compute the normalized MDEF score.
         for(DoubleIntPair c : cdist) {
-          double alpha_r = alpha * c.first;
-          // compute n(p_i, \alpha * r) from list
-          int n_alphar = 0;
-          for(DoubleIntPair c2 : cdist) {
-            if(c2.first <= alpha_r) {
-              n_alphar = c2.second;
-            }
-            else {
-              break;
-            }
-          }
-          // compute \hat{n}(p_i, r, \alpha)
-          double nhat_r_alpha = 0.0;
-          double sigma_nhat_r_alpha = 0.0;
-          // Build the sublist from maxneighbors to match the radius c.first
-          List<DistanceResultPair<D>> rneighbors = null;
-          for(int i = nmin; i < maxneighbors.size(); i++) {
-            DistanceResultPair<D> ne = maxneighbors.get(i);
-            if(ne.getDistance().doubleValue() > c.first) {
-              rneighbors = maxneighbors.subList(1, i);
-              break;
-            }
-          }
-          if(rneighbors == null) {
+          // Only start when minimum size is fulfilled
+          if (c.second < nmin) {
             continue;
           }
-          for(DistanceResultPair<D> rn : rneighbors) {
-            List<DoubleIntPair> rncdist = interestingDistances.get(rn.getDBID());
-            int rn_alphar = 0;
-            for(DoubleIntPair c2 : rncdist) {
-              if(c2.first <= alpha_r) {
-                rn_alphar = c2.second;
-              }
-              else {
-                break;
-              }
+          final double r = c.first;
+          final double alpha_r = alpha * r;
+          // compute n(p_i, \alpha * r) from list (note: alpha_r is different from c!)
+          final int n_alphar = elementsAtRadius(cdist, alpha_r);
+          // compute \hat{n}(p_i, r, \alpha) and the corresponding \simga_{MDEF}
+          MeanVariance mv_n_r_alpha = new MeanVariance();
+          for(DistanceResultPair<D> ne : maxneighbors) {
+            // Stop at radius r
+            if(ne.getDistance().doubleValue() > r) {
+              break;
             }
-            nhat_r_alpha = nhat_r_alpha + rn_alphar;
-            sigma_nhat_r_alpha = sigma_nhat_r_alpha + (rn_alphar * rn_alphar);
+            int rn_alphar = elementsAtRadius(interestingDistances.get(ne.getDBID()), alpha_r);
+            mv_n_r_alpha.put(rn_alphar);
           }
-          // finalize average and deviation
-          nhat_r_alpha = nhat_r_alpha / rneighbors.size();
-          sigma_nhat_r_alpha = Math.sqrt(sigma_nhat_r_alpha / rneighbors.size() - nhat_r_alpha * nhat_r_alpha);
-          double mdef = 1.0 - (n_alphar / nhat_r_alpha);
-          double sigmamdef = sigma_nhat_r_alpha / nhat_r_alpha;
-          double mdefnorm = mdef / sigmamdef;
+          // We only use the average and standard deviation
+          final double nhat_r_alpha = mv_n_r_alpha.getMean();
+          final double sigma_nhat_r_alpha = mv_n_r_alpha.getNaiveStddev();
+
+          final double mdef = (nhat_r_alpha - n_alphar) / nhat_r_alpha;
+          final double sigmamdef = sigma_nhat_r_alpha / nhat_r_alpha;
+          final double mdefnorm = mdef / sigmamdef;
 
           if(mdefnorm > maxmdefnorm) {
             maxmdefnorm = mdefnorm;
-            maxnormr = c.first;
+            maxnormr = r;
           }
         }
       }
       else {
-        // FIXME: when nmin was never fulfilled - what is the proper value then?
+        // FIXME: when nmin was not fulfilled - what is the proper value then?
         maxmdefnorm = 1.0;
         maxnormr = maxdist;
       }
       mdef_norm.put(id, maxmdefnorm);
       mdef_radius.put(id, maxnormr);
+      minmax.put(maxmdefnorm);
       if(progressLOCI != null) {
         progressLOCI.incrementProcessed(logger);
       }
@@ -267,11 +255,32 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       progressLOCI.ensureCompleted(logger);
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("LOCI normalized MDEF", "loci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
-    // TODO: actually provide min and max?
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     result.addChildResult(new MaterializedRelation<Double>("LOCI MDEF Radius", "loci-critical-radius", TypeUtil.DOUBLE, mdef_radius, relation.getDBIDs()));
     return result;
+  }
+
+  /**
+   * Get the number of objects for a given radius, from the list of critical
+   * distances, storing (radius, count) pairs.
+   * 
+   * @param criticalDistances
+   * @param radius
+   * @return Number of elements at the given radius
+   */
+  protected int elementsAtRadius(List<DoubleIntPair> criticalDistances, final double radius) {
+    int n_r = 0;
+    for(DoubleIntPair c2 : criticalDistances) {
+      if(c2.first > radius) {
+        break;
+      }
+      if(c2.second != Integer.MIN_VALUE) {
+        // Update
+        n_r = c2.second;
+      }
+    }
+    return n_r;
   }
 
   @Override
