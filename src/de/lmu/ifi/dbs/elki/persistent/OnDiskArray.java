@@ -129,8 +129,8 @@ public class OnDiskArray implements Serializable {
     this.filename = filename;
     this.writable = true;
 
-    // do not allow overwriting.
-    if(filename.exists()) {
+    // do not allow overwriting, unless empty
+    if(filename.exists() && filename.length() > 0) {
       throw new IOException(ExceptionMessages.FILE_EXISTS);
     }
 
