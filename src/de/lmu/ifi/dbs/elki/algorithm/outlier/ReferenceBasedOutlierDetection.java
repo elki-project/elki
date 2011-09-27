@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +46,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -53,6 +55,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -144,30 +147,36 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
 
     DBIDs ids = relation.getDBIDs();
     // storage of distance/score values.
-    WritableDataStore<Double> rbod_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
-    // compute density for one reference point, to initialize the first density
-    // value for each object
+    WritableDataStore<Double> rbod_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_HOT, Double.class);
 
-    double density = 0;
-    V firstRef = refPoints.iterator().next();
-    // compute distance vector for the first reference point
-    List<DistanceResultPair<D>> firstReferenceDists = computeDistanceVector(firstRef, relation, distFunc);
-    // order ascending
-    Collections.sort(firstReferenceDists);
-    for(int l = 0; l < firstReferenceDists.size(); l++) {
-      density = computeDensity(firstReferenceDists, l);
-      rbod_score.put(firstReferenceDists.get(l).getDBID(), density);
-    }
-    // compute density values for all remaining reference points
-    for(V refPoint : refPoints) {
-      List<DistanceResultPair<D>> referenceDists = computeDistanceVector(refPoint, relation, distFunc);
-      // order ascending
-      Collections.sort(referenceDists);
-      // compute density value for each object
-      for(int l = 0; l < referenceDists.size(); l++) {
-        density = computeDensity(referenceDists, l);
-        if(density < rbod_score.get(referenceDists.get(l).getDBID())) {
-          rbod_score.put(referenceDists.get(l).getDBID(), density);
+    // Compute density estimation:
+    {
+      // compute density for one reference point, to initialize the first
+      // density
+      // value for each object, then update
+      final Iterator<V> iter = refPoints.iterator();
+      if(!iter.hasNext()) {
+        throw new AbortException("Cannot compute ROS without reference points!");
+      }
+      V firstRef = iter.next();
+      // compute distance vector for the first reference point
+      List<DistanceResultPair<D>> firstReferenceDists = computeDistanceVector(firstRef, relation, distFunc);
+      for(int l = 0; l < firstReferenceDists.size(); l++) {
+        double density = computeDensity(firstReferenceDists, l);
+        // Initial value
+        rbod_score.put(firstReferenceDists.get(l).getDBID(), density);
+      }
+      // compute density values for all remaining reference points
+      while(iter.hasNext()) {
+        V refPoint = iter.next();
+        List<DistanceResultPair<D>> referenceDists = computeDistanceVector(refPoint, relation, distFunc);
+        // compute density value for each object
+        for(int l = 0; l < referenceDists.size(); l++) {
+          double density = computeDensity(referenceDists, l);
+          // Update minimum
+          if(density < rbod_score.get(referenceDists.get(l).getDBID())) {
+            rbod_score.put(referenceDists.get(l).getDBID(), density);
+          }
         }
       }
     }
@@ -179,7 +188,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
         maxDensity = dens;
       }
     }
-    // compute REFOD_SCORE
+    // compute ROS
     for(DBID id : relation.iterDBIDs()) {
       double score = 1 - (rbod_score.get(id) / maxDensity);
       rbod_score.put(id, score);
@@ -207,13 +216,13 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
    *         database object and the object id
    */
   protected List<DistanceResultPair<D>> computeDistanceVector(V refPoint, Relation<V> database, DistanceQuery<V, D> distFunc) {
+    // TODO: optimize for double distances?
     List<DistanceResultPair<D>> referenceDists = new ArrayList<DistanceResultPair<D>>(database.size());
-    int counter = 0;
-    for(Iterator<DBID> iter = database.iterDBIDs(); iter.hasNext(); counter++) {
-      DBID id = iter.next();
-      DistanceResultPair<D> referenceDist = new GenericDistanceResultPair<D>(distFunc.distance(id, refPoint), id);
-      referenceDists.add(counter, referenceDist);
+    for(DBID id : database.iterDBIDs()) {
+      final D distance = distFunc.distance(id, refPoint);
+      referenceDists.add(new GenericDistanceResultPair<D>(distance, id));
     }
+    Collections.sort(referenceDists);
     return referenceDists;
   }
 
@@ -230,51 +239,53 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
    * @return density for one object and reference point
    */
   protected double computeDensity(List<DistanceResultPair<D>> referenceDists, int index) {
-    double density = 0.0;
-    DistanceResultPair<D> x = referenceDists.get(index);
-    double xDist = x.getDistance().doubleValue();
+    final DistanceResultPair<D> x = referenceDists.get(index);
+    final double xDist = x.getDistance().doubleValue();
 
-    int j = 0;
-    int n = index - 1;
-    int m = index + 1;
-    while(j < k) {
-      double mdist = 0;
-      double ndist = 0;
-      if(n >= 0) {
-        ndist = referenceDists.get(n).getDistance().doubleValue();
-        if(m < referenceDists.size()) {
-          mdist = referenceDists.get(m).getDistance().doubleValue();
-          if(Math.abs(ndist - xDist) < Math.abs(mdist - xDist)) {
-            density += Math.abs(ndist - xDist);
-            n--;
-            j++;
-          }
-          else {
-            density += Math.abs(mdist - xDist);
-            m++;
-            j++;
-          }
+    int lef = index - 1;
+    int rig = index + 1;
+    Mean mean = new Mean();
+    double lef_d = (lef >= 0) ? referenceDists.get(lef).getDistance().doubleValue() : Double.NEGATIVE_INFINITY;
+    double rig_d = (rig < referenceDists.size()) ? referenceDists.get(rig).getDistance().doubleValue() : Double.NEGATIVE_INFINITY;
+    while(mean.getCount() < k) {
+      if(lef >= 0 && rig < referenceDists.size()) {
+        // Prefer n or m?
+        if(Math.abs(lef_d - xDist) < Math.abs(rig_d - xDist)) {
+          mean.put(Math.abs(lef_d - xDist));
+          // Update n
+          lef--;
+          lef_d = (lef >= 0) ? referenceDists.get(lef).getDistance().doubleValue() : Double.NEGATIVE_INFINITY;
         }
         else {
-          density += Math.abs(ndist - xDist);
-          n--;
-          j++;
+          mean.put(Math.abs(rig_d - xDist));
+          // Update right
+          rig++;
+          rig_d = (rig < referenceDists.size()) ? referenceDists.get(rig).getDistance().doubleValue() : Double.NEGATIVE_INFINITY;
         }
       }
-      else if(m < referenceDists.size()) {
-        mdist = referenceDists.get(m).getDistance().doubleValue();
-        density += Math.abs(mdist - xDist);
-        m++;
-        j++;
-      }
       else {
-        throw new IndexOutOfBoundsException();
+        if(lef >= 0) {
+          // Choose left, since right is not available.
+          mean.put(Math.abs(lef_d - xDist));
+          // update left
+          lef--;
+          lef_d = (lef >= 0) ? referenceDists.get(lef).getDistance().doubleValue() : Double.NEGATIVE_INFINITY;
+        }
+        else if(rig < referenceDists.size()) {
+          // Choose right, since left is not available
+          mean.put(Math.abs(rig_d - xDist));
+          // Update right
+          rig++;
+          rig_d = (rig < referenceDists.size()) ? referenceDists.get(rig).getDistance().doubleValue() : Double.NEGATIVE_INFINITY;
+        }
+        else {
+          // Not enough objects in database?
+          throw new IndexOutOfBoundsException();
+        }
       }
     }
 
-    double densityDegree = 1.0 / ((1.0 / k) * density);
-
-    return densityDegree;
+    return 1.0 / mean.getMean();
   }
 
   @Override
