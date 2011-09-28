@@ -4,6 +4,7 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import experimentalcode.erich.utilities.mbr.DoubleRecMBRAdapter;
@@ -106,6 +107,7 @@ public class RTreeLinearSplit implements SplitStrategy {
       area2 = adapter.getArea(w2i);
       mbr1 = DoubleRecMBRAdapter.cloneFrom(w1i, adapter);
       mbr2 = DoubleRecMBRAdapter.cloneFrom(w2i, adapter);
+      LoggingUtil.warning("size:" + num + " minEntries: " + minEntries + " area1: " + area1 + " area2: " + area2 + " w1: " + w1i.toString() + " w2: " + w2i.toString());
     }
     // Second phase, QS2+QS3
     {
@@ -139,7 +141,7 @@ public class RTreeLinearSplit implements SplitStrategy {
             greatestPreference = preference;
             best = pos;
             // Prefer smaller increase
-            preferSecond = (d2 > d1);
+            preferSecond = (d2 < d1);
           }
         }
         // QS3: tie handling
@@ -167,6 +169,7 @@ public class RTreeLinearSplit implements SplitStrategy {
         // Loop from QS2
       }
       // Note: "assigned" and "remaining" likely not updated!
+      LoggingUtil.warning("size:" + num + " minEntries: " + minEntries + " area1: " + area1 + " area2: " + area2);
     }
     return assignment;
   }

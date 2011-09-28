@@ -4,7 +4,6 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import experimentalcode.erich.utilities.mbr.DoubleRecMBRAdapter;
@@ -126,7 +125,6 @@ public class RTreeQuadraticSplit implements SplitStrategy {
         }
         // Loop from QS2
       }
-      LoggingUtil.warning("size:" + num + " minEntries: " + minEntries + " area1: " + area1 + " area2: " + area2);
       // Note: "assigned" and "remaining" likely not updated!
     }
     return assignment;
