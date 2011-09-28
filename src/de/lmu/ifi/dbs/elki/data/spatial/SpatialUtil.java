@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.data.spatial;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * Utility class with spatial functions.
@@ -55,6 +56,28 @@ public final class SpatialUtil {
       max[i] = adapter.getMax(obj, i);
     }
     return new ModifiableHyperBoundingBox(min, max);
+  }
+
+  /**
+   * Compute the volume (area) of the union of two MBRs
+   * 
+   * @param r1 First object
+   * @param a1 Adapter for first object
+   * @param r2 Second object
+   * @param a2 Adapter for second object
+   * @return
+   */
+  public static <E1, E2> double volumeUnion(E1 r1, SpatialAdapter<? super E1> a1, E2 r2, SpatialAdapter<? super E2> a2) {
+    final int dim1 = a1.getDimensionality(r1);
+    final int dim2 = a2.getDimensionality(r2);
+    assert (!LoggingConfiguration.DEBUG && dim1 == dim2);
+    double volume = 1.0;
+    for(int i = 0; i < dim1; i++) {
+      final double min = Math.min(a1.getMin(r1, i), a2.getMin(r2, i));
+      final double max = Math.max(a1.getMax(r1, i), a2.getMax(r2, i));
+      volume *= (max - min);
+    }
+    return volume;
   }
 
   /**
