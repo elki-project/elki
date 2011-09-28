@@ -45,15 +45,17 @@ public interface SpatialAdapter<O> {
    * @param dim Dimension, starting at 0
    * @return Length == max-min
    */
-  // While this is redundant, it saves a computation for point objects, which are common.
+  // While this is somewhat redundant, it saves a computation for point objects,
+  // which are very frequent.
   double getLen(O obj, int dim);
-  
+
   /**
    * Compute the area (volume) of the object.
    * 
    * @param obj Object
    * @return Volume/area
    */
-  // While this is redundant, it saves computations for point objects, which are common.
-  double getArea(O obj);
+  // While this is somewhat redundant, it saves computations for point objects,
+  // which are very frequent.
+  double getVolume(O obj);
 }

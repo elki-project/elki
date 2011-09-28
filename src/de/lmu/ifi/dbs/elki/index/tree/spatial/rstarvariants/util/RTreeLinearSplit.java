@@ -1,15 +1,50 @@
-package experimentalcode.erich.utilities.tree.rtree;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.BitSet;
 
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparableAdapter;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import experimentalcode.erich.utilities.mbr.DoubleRecMBRAdapter;
-import experimentalcode.erich.utilities.mbr.MBRUtil;
 
+/**
+ * Linear-time complexity greedy split as used by the original R-Tree.
+ * 
+ * <p>
+ * Antonin Guttman:<br/>
+ * R-Trees: A Dynamic Index Structure For Spatial Searching<br />
+ * in Proceedings of the 1984 ACM SIGMOD international conference on Management
+ * of data.
+ * </p>
+ * 
+ * @author Erich Schubert
+ */
 @Reference(authors = "Antonin Guttman", title = "R-Trees: A Dynamic Index Structure For Spatial Searching", booktitle = "Proceedings of the 1984 ACM SIGMOD international conference on Management of data", url = "http://dx.doi.org/10.1145/971697.602266")
 public class RTreeLinearSplit implements SplitStrategy {
   /**
@@ -24,7 +59,7 @@ public class RTreeLinearSplit implements SplitStrategy {
     BitSet assignment = new BitSet(num);
     BitSet assigned = new BitSet(num);
     // MBRs and Areas of current assignments
-    double[] mbr1, mbr2;
+    ModifiableHyperBoundingBox mbr1, mbr2;
     double area1 = 0, area2 = 0;
     // LinearPickSeeds - find worst pair
     {
@@ -103,17 +138,18 @@ public class RTreeLinearSplit implements SplitStrategy {
       // Initial mbrs and areas
       final E w1i = getter.get(entries, w1);
       final E w2i = getter.get(entries, w2);
-      area1 = adapter.getArea(w1i);
-      area2 = adapter.getArea(w2i);
-      mbr1 = DoubleRecMBRAdapter.cloneFrom(w1i, adapter);
-      mbr2 = DoubleRecMBRAdapter.cloneFrom(w2i, adapter);
+      area1 = adapter.getVolume(w1i);
+      area2 = adapter.getVolume(w2i);
+      mbr1 = SpatialUtil.copyMBR(w1i, adapter);
+      mbr2 = SpatialUtil.copyMBR(w2i, adapter);
       LoggingUtil.warning("size:" + num + " minEntries: " + minEntries + " area1: " + area1 + " area2: " + area2 + " w1: " + w1i.toString() + " w2: " + w2i.toString());
     }
     // Second phase, QS2+QS3
     {
       int in1 = 1, in2 = 1;
       int remaining = num - 2;
-      while(remaining > 0) {
+      // Choose any element, for example the next.
+      for(int next = assigned.nextClearBit(0); remaining > 0 && next < num; next = assigned.nextClearBit(next + 1)) {
         // Shortcut when minEntries must be fulfilled
         if(in1 + remaining <= minEntries) {
           // No need to updated assigned, no changes to assignment.
@@ -122,30 +158,22 @@ public class RTreeLinearSplit implements SplitStrategy {
         if(in2 + remaining <= minEntries) {
           // Mark unassigned for second.
           // Don't bother to update assigned, though
-          for(int pos = assigned.nextClearBit(0); pos < num; pos = assigned.nextClearBit(pos + 1)) {
-            assignment.set(pos);
+          for(; next < num; next = assigned.nextClearBit(next + 1)) {
+            assignment.set(next);
           }
           break;
         }
         // PickNext
-        double greatestPreference = Double.NEGATIVE_INFINITY;
-        int best = -1;
         boolean preferSecond = false;
-        for(int pos = assigned.nextClearBit(0); pos < num; pos = assigned.nextClearBit(pos + 1)) {
-          // Cost of putting object into both mbrs
-          final double d1 = MBRUtil.areaUnion(mbr1, DoubleRecMBRAdapter.STATIC, getter.get(entries, pos), adapter) - area1;
-          final double d2 = MBRUtil.areaUnion(mbr2, DoubleRecMBRAdapter.STATIC, getter.get(entries, pos), adapter) - area2;
-          // Preference
-          final double preference = Math.abs(d1 - d2);
-          if(preference > greatestPreference) {
-            greatestPreference = preference;
-            best = pos;
-            // Prefer smaller increase
-            preferSecond = (d2 < d1);
-          }
-        }
+
+        // Cost of putting object into both mbrs
+        final E next_i = getter.get(entries, next);
+        final double d1 = SpatialUtil.volumeUnion(mbr1, SpatialComparableAdapter.STATIC, next_i, adapter) - area1;
+        final double d2 = SpatialUtil.volumeUnion(mbr2, SpatialComparableAdapter.STATIC, next_i, adapter) - area2;
+        // Prefer smaller increase
+        preferSecond = (d2 < d1);
         // QS3: tie handling
-        if(greatestPreference == 0) {
+        if(d1 == d2) {
           // Prefer smaller area
           if(area1 != area2) {
             preferSecond = (area2 < area1);
@@ -156,15 +184,19 @@ public class RTreeLinearSplit implements SplitStrategy {
           }
         }
         // Mark as used.
-        assigned.set(best);
+        assigned.set(next);
         remaining--;
         // Assign
         if(!preferSecond) {
           in1++;
+          mbr1.extend(next_i, adapter);
+          area1 = SpatialUtil.volume(mbr1);
         }
         else {
           in2++;
-          assignment.set(best);
+          assignment.set(next);
+          mbr2.extend(next_i, adapter);
+          area2 = SpatialUtil.volume(mbr2);
         }
         // Loop from QS2
       }

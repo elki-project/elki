@@ -33,7 +33,7 @@ public class SpatialComparableAdapter implements SpatialAdapter<SpatialComparabl
   }
 
   @Override
-  public double getArea(SpatialComparable obj) {
+  public double getVolume(SpatialComparable obj) {
     return SpatialUtil.volume(obj);
   }
 }
