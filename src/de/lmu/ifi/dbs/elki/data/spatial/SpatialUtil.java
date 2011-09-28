@@ -51,7 +51,7 @@ public final class SpatialUtil {
     final int dim = adapter.getDimensionality(obj);
     double[] min = new double[dim];
     double[] max = new double[dim];
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       min[i] = adapter.getMin(obj, i);
       max[i] = adapter.getMax(obj, i);
     }
@@ -70,7 +70,7 @@ public final class SpatialUtil {
   public static <E1, E2> double volumeUnion(E1 r1, SpatialAdapter<? super E1> a1, E2 r2, SpatialAdapter<? super E2> a2) {
     final int dim1 = a1.getDimensionality(r1);
     final int dim2 = a2.getDimensionality(r2);
-    assert (!LoggingConfiguration.DEBUG && dim1 == dim2);
+    assert (!LoggingConfiguration.DEBUG || dim1 == dim2);
     double volume = 1.0;
     for(int i = 0; i < dim1; i++) {
       final double min = Math.min(a1.getMin(r1, i), a2.getMin(r2, i));
@@ -131,6 +131,26 @@ public final class SpatialUtil {
   }
 
   /**
+   * Returns true if the two spatial objects intersect (overlap), false otherwise.
+   * 
+   * @param box1 the first object
+   * @param a1 Spatial adapter for first object
+   * @param box2 the second object
+   * @param a2 Spatial adapter for second object
+   * @return true if the spatial objects intersect, false otherwise
+   */
+  public static <E1, E2> boolean intersects(E1 box1, SpatialAdapter<? super E1> a1, E2 box2, SpatialAdapter<? super E2> a2) {
+    final int dim1 = a1.getDimensionality(box1);
+    assert (!LoggingConfiguration.DEBUG || dim1 == a2.getDimensionality(box2));
+    for(int i = 0; i < dim1; i++) {
+      if(a1.getMin(box1, i) > a2.getMax(box2, i) || a1.getMax(box1, i) < a2.getMin(box2, i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Returns true if the first SpatialComparable contains the second
    * SpatialComparable, false otherwise.
    * 
@@ -177,6 +197,29 @@ public final class SpatialUtil {
       }
     }
     return contains;
+  }
+
+  /**
+   * Returns true if the first spatial object contains the second spatial
+   * object, false otherwise.
+   * 
+   * @param box1 the outer object
+   * @param a1 Spatial adapter for first object
+   * @param box2 the inner object
+   * @param a2 Spatial adapter for second object
+   * @return true if the first object contains the second object, false
+   *         otherwise
+   */
+  public static <E1, E2> boolean contains(E1 box1, SpatialAdapter<? super E1> a1, E2 box2, SpatialAdapter<? super E2> a2) {
+    final int dim1 = a1.getDimensionality(box1);
+    assert (!LoggingConfiguration.DEBUG || dim1 == a2.getDimensionality(box2));
+
+    for(int i = 0; i < dim1; i++) {
+      if(a1.getMin(box1, i) > a2.getMin(box2, i) || a1.getMax(box1, i) < a2.getMax(box2, i)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
