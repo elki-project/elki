@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.data.spatial;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 
 /**
  * Utility class with spatial functions.
@@ -131,7 +132,8 @@ public final class SpatialUtil {
   }
 
   /**
-   * Returns true if the two spatial objects intersect (overlap), false otherwise.
+   * Returns true if the two spatial objects intersect (overlap), false
+   * otherwise.
    * 
    * @param box1 the first object
    * @param a1 Spatial adapter for first object
@@ -333,6 +335,104 @@ public final class SpatialUtil {
       return new HyperBoundingBox(mbr1);
     }
     return union(mbr1, mbr2);
+  }
+
+  /**
+   * Compute the union of two objects.
+   * 
+   * @param o1 First object
+   * @param a1 Spatial adapter for first object
+   * @param o2 Second object
+   * @param a2 Spatial adapter for second object
+   * @return Modifiable Hyper Bounding Box
+   */
+  public static <A, B> ModifiableHyperBoundingBox union(A o1, SpatialAdapter<A> a1, B o2, SpatialAdapter<B> a2) {
+    final int dim = a1.getDimensionality(o1);
+    double[] min = new double[dim];
+    double[] max = new double[dim];
+    for(int d = 0; d < dim; d++) {
+      min[d] = Math.min(a1.getMin(o1, d), a2.getMin(o2, d));
+      max[d] = Math.max(a1.getMax(o1, d), a2.getMax(o2, d));
+    }
+    return new ModifiableHyperBoundingBox(min, max);
+  }
+
+  /**
+   * Compute the union of a number of objects.
+   * 
+   * @param data Object
+   * @param getter Array adapter
+   * @param adapter Spatial adapter
+   * @return Modifiable Hyper Bounding Box
+   */
+  public static <E, A> ModifiableHyperBoundingBox union(A data, ArrayAdapter<E, A> getter, SpatialAdapter<E> adapter) {
+    final int num = getter.size(data);
+    assert (num > 0);
+    final E first = getter.get(data, 0);
+    final int dim = adapter.getDimensionality(first);
+    double[] min = new double[dim];
+    double[] max = new double[dim];
+    for(int d = 0; d < dim; d++) {
+      min[d] = adapter.getMin(first, d);
+      max[d] = adapter.getMax(first, d);
+    }
+    for(int i = 1; i < num; i++) {
+      E next = getter.get(data, i);
+      for(int d = 0; d < dim; d++) {
+        min[d] = Math.min(min[d], adapter.getMin(next, d));
+        max[d] = Math.max(max[d], adapter.getMax(next, d));
+      }
+    }
+    return new ModifiableHyperBoundingBox(min, max);
+  }
+
+  /**
+   * Compute the union of two objects as a flat MBR (low-level, for index
+   * structures)
+   * 
+   * @param o1 First object
+   * @param a1 Spatial adapter for first object
+   * @param o2 Second object
+   * @param a2 Spatial adapter for second object
+   * @return Flat MBR
+   */
+  public static <A, B> double[] unionFlatMBR(A o1, SpatialAdapter<A> a1, B o2, SpatialAdapter<B> a2) {
+    final int dim = a1.getDimensionality(o1);
+    double[] mbr = new double[2 * dim];
+    for(int d = 0; d < dim; d++) {
+      mbr[d] = Math.min(a1.getMin(o1, d), a2.getMin(o2, d));
+      mbr[dim + d] = Math.max(a1.getMax(o1, d), a2.getMax(o2, d));
+    }
+    return mbr;
+  }
+
+  /**
+   * Compute the union of a number of objects as a flat MBR (low-level, for
+   * index structures)
+   * 
+   * @param data Object
+   * @param getter Array adapter
+   * @param adapter Spatial adapter
+   * @return Flat MBR
+   */
+  public static <E, A> double[] unionFlatMBR(A data, ArrayAdapter<E, A> getter, SpatialAdapter<E> adapter) {
+    final int num = getter.size(data);
+    assert (num > 0);
+    final E first = getter.get(data, 0);
+    final int dim = adapter.getDimensionality(first);
+    double[] mbr = new double[2 * dim];
+    for(int d = 0; d < dim; d++) {
+      mbr[d] = adapter.getMin(first, d);
+      mbr[dim + d] = adapter.getMax(first, d);
+    }
+    for(int i = 1; i < num; i++) {
+      E next = getter.get(data, i);
+      for(int d = 0; d < dim; d++) {
+        mbr[d] = Math.min(mbr[d], adapter.getMin(next, d));
+        mbr[dim + d] = Math.max(mbr[dim + d], adapter.getMax(next, d));
+      }
+    }
+    return mbr;
   }
 
   /**
