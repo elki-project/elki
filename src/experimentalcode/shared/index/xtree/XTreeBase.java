@@ -150,7 +150,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * @param overlap_type
    */
   public XTreeBase(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(pagefile, bulkSplitter, insertionStrategy);
+    super(pagefile, bulkSplitter, insertionStrategy, null);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;

@@ -72,7 +72,7 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, N extends X
    * @param overlap_type
    */
   public XTreeBaseFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy);
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, null);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;
