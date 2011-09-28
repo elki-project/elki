@@ -143,6 +143,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Database, P
       // TODO: this is an ugly hack
       this.idrep = new DBIDView(this, this.ids);
       relations.add(this.idrep);
+      getHierarchy().add(this, idrep);
 
       // insert into db - note: DBIDs should have been prepared before this!
       Relation<?>[] targets = alignColumns(objpackages);
