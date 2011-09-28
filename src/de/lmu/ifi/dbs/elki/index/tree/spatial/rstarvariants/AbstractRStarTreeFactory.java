@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.LeastOverlapInsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -57,6 +59,11 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
   public static OptionID INSERTION_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.insertionstrategy", "The strategy to use for object insertion.");
 
   /**
+   * Split strategy parameter. Optional.
+   */
+  public static OptionID SPLIT_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.splitstrategy", "The strategy to use for node splitting.");
+
+  /**
    * Parameter for bulk strategy
    */
   public static final OptionID BULK_SPLIT_ID = OptionID.getOrCreateOptionID("spatial.bulkstrategy", "The class to perform the bulk split with.");
@@ -72,6 +79,11 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
   protected BulkSplit bulkSplitter;
 
   /**
+   * The strategy for splitting nodes
+   */
+  protected SplitStrategy nodeSplitter;
+
+  /**
    * Constructor.
    * 
    * @param fileName
@@ -79,11 +91,13 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
    * @param cacheSize
    * @param bulkSplitter the strategy to use for bulk splitting
    * @param insertionStrategy the strategy to find the insertion child
+   * @param nodeSplitter the strategy to use for splitting nodes
    */
-  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
+  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter) {
     super(fileName, pageSize, cacheSize);
     this.insertionStrategy = insertionStrategy;
     this.bulkSplitter = bulkSplitter;
+    this.nodeSplitter = nodeSplitter;
   }
 
   @Override
@@ -99,18 +113,33 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
    * @apiviz.exclude
    */
   public static abstract class Parameterizer<O extends NumberVector<O, ?>> extends TreeIndexFactory.Parameterizer<O> {
-    protected BulkSplit bulkSplitter = null;
-
+    /**
+     * Insertion strategy
+     */
     protected InsertionStrategy insertionStrategy = null;
+
+    /**
+     * The strategy for splitting nodes
+     */
+    protected SplitStrategy nodeSplitter = null;
+    
+    /**
+     * Bulk loading strategy
+     */
+    protected BulkSplit bulkSplitter = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      configBulkLoad(config);
       ClassParameter<InsertionStrategy> insertionStrategyP = new ClassParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, LeastOverlapInsertionStrategy.class);
       if(config.grab(insertionStrategyP)) {
         insertionStrategy = insertionStrategyP.instantiateClass(config);
       }
+      ClassParameter<SplitStrategy> splitStrategyP = new ClassParameter<SplitStrategy>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class);
+      if(config.grab(splitStrategyP)) {
+        nodeSplitter = splitStrategyP.instantiateClass(config);
+      }
+      configBulkLoad(config);
     }
 
     /**

@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -71,9 +72,10 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
    * @param pagefile Page file
    * @param bulkSplitter bulk load strategy
    * @param insertionStrategy the strategy to find the insertion child
+   * @param nodeSplitter the strategy for splitting nodes.
    */
-  public RStarTreeIndex(Relation<O> relation, PageFile<RStarTreeNode> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
-    super(pagefile, bulkSplitter, insertionStrategy);
+  public RStarTreeIndex(Relation<O> relation, PageFile<RStarTreeNode> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter) {
+    super(pagefile, bulkSplitter, insertionStrategy, nodeSplitter);
     this.relation = relation;
     this.initialize();
   }

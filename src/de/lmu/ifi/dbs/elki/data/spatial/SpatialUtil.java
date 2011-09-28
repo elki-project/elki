@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.data.spatial;
  */
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 
 /**
  * Utility class with spatial functions.
@@ -38,6 +39,24 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 // IMPORTANT NOTE: when editing this class, bear in mind that the dimension
 // numbers start at 1 or 0 depending on the context!
 public final class SpatialUtil {
+  /**
+   * Copy the MBR of an instance.
+   * 
+   * @param obj Object to copy
+   * @param adapter Adapter
+   * @return (Modifiable) bounding box
+   */
+  public static <E> ModifiableHyperBoundingBox copyMBR(E obj, SpatialAdapter<? super E> adapter) {
+    final int dim = adapter.getDimensionality(obj);
+    double[] min = new double[dim];
+    double[] max = new double[dim];
+    for (int i = 0; i < dim; i++) {
+      min[i] = adapter.getMin(obj, i);
+      max[i] = adapter.getMax(obj, i);
+    }
+    return new ModifiableHyperBoundingBox(min, max);
+  }
+
   /**
    * Returns a clone of the minimum hyper point.
    * 

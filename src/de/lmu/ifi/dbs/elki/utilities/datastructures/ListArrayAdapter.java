@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 /*
  This file is part of ELKI:
@@ -23,24 +23,39 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import java.util.List;
 
 /**
- * Generic interface for split strategies.
+ * Static adapter class to use a {@link java.util.List} in an array API.
  * 
  * @author Erich Schubert
+ * 
+ * @param <T> Data object type.
  */
-public interface SplitStrategy {
+public class ListArrayAdapter<T> implements ArrayAdapter<T, List<? extends T>> {
   /**
-   * Split a page
-   * 
-   * @param entries Entries to split
-   * @param getter Adapter for the entries array
-   * @param minEntries Minimum number of entries in each part
-   * @return BitSet containing the assignment.
+   * Static instance.
    */
-  public <E, A> BitSet split(A entries, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter, int minEntries);
+  public static ListArrayAdapter<?> STATIC = new ListArrayAdapter<Object>();
+
+  @Override
+  public int size(List<? extends T> array) {
+    return array.size();
+  }
+
+  @Override
+  public T get(List<? extends T> array, int off) throws IndexOutOfBoundsException {
+    return array.get(off);
+  }
+
+  /**
+   * Cast the static instance.
+   * 
+   * @param dummy Dummy variable, for type inference
+   * @return Static instance
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> ListArrayAdapter<T> getStatic(List<T> dummy) {
+    return (ListArrayAdapter<T>) STATIC;
+  }
 }

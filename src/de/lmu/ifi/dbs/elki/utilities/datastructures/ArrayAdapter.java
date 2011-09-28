@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 /*
  This file is part of ELKI:
@@ -23,24 +23,30 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
-
 /**
- * Generic interface for split strategies.
+ * Adapter for array-like things. For example, arrays and lists.
  * 
  * @author Erich Schubert
+ * 
+ * @param <T> Item type
+ * @param <A> Array object type
  */
-public interface SplitStrategy {
+public interface ArrayAdapter<T, A> {
   /**
-   * Split a page
+   * Get the size of the array.
    * 
-   * @param entries Entries to split
-   * @param getter Adapter for the entries array
-   * @param minEntries Minimum number of entries in each part
-   * @return BitSet containing the assignment.
+   * @param array Array-like thing
+   * @return Size
    */
-  public <E, A> BitSet split(A entries, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter, int minEntries);
+  public int size(A array);
+
+  /**
+   * Get the off'th item from the array.
+   * 
+   * @param array Array to get from
+   * @param off Offset
+   * @return Item at offset off
+   * @throws IndexOutOfBoundsException for an invalid index.
+   */
+  public T get(A array, int off) throws IndexOutOfBoundsException;
 }

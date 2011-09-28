@@ -28,6 +28,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -305,7 +306,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
    * @param splitPoint Split point
    */
   public final void splitTo(AbstractNode<E> newNode, List<E> sorting, int splitPoint) {
-    assert(isLeaf() == newNode.isLeaf());
+    assert (isLeaf() == newNode.isLeaf());
     deleteAllEntries();
     StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer("\n") : null;
 
@@ -337,7 +338,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
    * @param assignmentsToSecond the assignment to the new node
    */
   public final void splitTo(AbstractNode<E> newNode, List<E> assignmentsToFirst, List<E> assignmentsToSecond) {
-    assert(isLeaf() == newNode.isLeaf());
+    assert (isLeaf() == newNode.isLeaf());
     deleteAllEntries();
     StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer() : null;
 
@@ -355,6 +356,40 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
         msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
       }
       newNode.addEntry(entry);
+    }
+    if(msg != null) {
+      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+    }
+  }
+
+  /**
+   * Splits the entries of this node into a new node using the given assignments
+   * 
+   * @param newNode Node to split to
+   * @param entries Entries list
+   * @param assignment Assignment mask
+   */
+  public final void splitTo(AbstractNode<E> newNode, List<E> entries, BitSet assignment) {
+    assert (isLeaf() == newNode.isLeaf());
+    deleteAllEntries();
+    StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer() : null;
+
+    for(int i = 0; i < entries.size(); i++) {
+      E entry = entries.get(i);
+      // assignments to this node
+      if(assignment.get(i)) {
+        if(msg != null) {
+          msg.append("n_").append(getPageID()).append(" ").append(entry).append("\n");
+        }
+        addEntry(entry);
+      }
+      else {
+        // assignments to the new node
+        if(msg != null) {
+          msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
+        }
+        newNode.addEntry(entry);
+      }
     }
     if(msg != null) {
       Logger.getLogger(this.getClass().getName()).fine(msg.toString());
