@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * MBR class allowing modifications (as opposed to {@link HyperBoundingBox}).
@@ -114,5 +116,31 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    */
   public double[] getMaxRef() {
     return max;
+  }
+
+  /**
+   * Extend the bounding box by some other spatial object
+   * 
+   * @param obj Spatial object to extend with
+   * @param adapter Adapter
+   * @return true when the MBR changed.
+   */
+  public <E> boolean extend(E obj, SpatialAdapter<? super E> adapter) {
+    final int dim = min.length;
+    assert (!LoggingConfiguration.DEBUG || (adapter.getDimensionality(obj) == dim));
+    boolean extended = false;
+    for(int i = 0; i < dim; i++) {
+      final double omin = adapter.getMin(obj, i);
+      final double omax = adapter.getMax(obj, i);
+      if(omin < min[i]) {
+        min[i] = omin;
+        extended = true;
+      }
+      if(omax > max[i]) {
+        max[i] = omax;
+        extended = true;
+      }
+    }
+    return extended;
   }
 }

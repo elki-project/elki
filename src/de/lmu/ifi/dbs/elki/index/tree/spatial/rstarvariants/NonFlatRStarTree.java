@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -49,9 +50,10 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
    * @param pagefile Page file
    * @param bulkSplitter bulk load strategy
    * @param insertionStrategy the strategy to find the child to insert to
+   * @param nodeSplitter the strategy for splitting nodes.
    */
-  public NonFlatRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
-    super(pagefile, bulkSplitter, insertionStrategy);
+  public NonFlatRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter) {
+    super(pagefile, bulkSplitter, insertionStrategy, nodeSplitter);
   }
 
   /**

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparableAdapter;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -59,8 +61,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ListArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -116,7 +118,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * The split strategy
    */
-  protected SplitStrategy<? super E> nodeSplitter = new TopologicalSplitter();
+  protected SplitStrategy nodeSplitter;
 
   /**
    * The insertion strategy to use
@@ -129,8 +131,9 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param pagefile Page file
    * @param bulkSplitter bulk load strategy
    * @param insertionStrategy the strategy for finding the insertion candidate.
+   * @param nodeSplitter the strategy for splitting nodes.
    */
-  public AbstractRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy) {
+  public AbstractRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter) {
     super(pagefile);
     this.bulkSplitter = bulkSplitter;
     if(insertionStrategy != null) {
@@ -139,6 +142,12 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     else {
       getLogger().warning("No insertion strategy given - falling back to " + LeastOverlapInsertionStrategy.class.getSimpleName());
       this.insertionStrategy = new LeastOverlapInsertionStrategy();
+    }
+    if (nodeSplitter != null) {
+      this.nodeSplitter = nodeSplitter;
+    } else {
+      getLogger().warning("No splitting strategy given - falling back to " + TopologicalSplitter.class.getSimpleName());
+      this.nodeSplitter = new TopologicalSplitter();
     }
   }
 
@@ -682,7 +691,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   private N split(N node) {
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
-    Pair<List<E>, List<E>> split = nodeSplitter.split(node.getEntries(), minimum);
+    final List<E> entries = node.getEntries();
+    BitSet split = nodeSplitter.split(entries, ListArrayAdapter.getStatic(entries), SpatialComparableAdapter.STATIC, minimum);
 
     // New node
     final N newNode;
@@ -694,7 +704,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
     // do the split
     node.deleteAllEntries();
-    node.splitTo(newNode, split.first, split.second);
+    node.splitTo(newNode, entries, split);
 
     // write changes to file
     writeNode(node);
