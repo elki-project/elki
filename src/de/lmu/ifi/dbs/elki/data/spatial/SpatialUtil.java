@@ -417,7 +417,7 @@ public final class SpatialUtil {
    */
   public static <E, A> double[] unionFlatMBR(A data, ArrayAdapter<E, A> getter, SpatialAdapter<E> adapter) {
     final int num = getter.size(data);
-    assert (num > 0);
+    assert (num > 0) : "Cannot compute MBR of empty set.";
     final E first = getter.get(data, 0);
     final int dim = adapter.getDimensionality(first);
     double[] mbr = new double[2 * dim];

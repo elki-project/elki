@@ -58,4 +58,13 @@ public interface SpatialAdapter<O> {
   // While this is somewhat redundant, it saves computations for point objects,
   // which are very frequent.
   double getVolume(O obj);
+
+  /**
+   * Compare two objects (of the exact same type) for equality.
+   * 
+   * @param obj1 First object
+   * @param obj2 Second object
+   * @return Equality result
+   */
+  boolean equal(O obj1, O obj2);
 }

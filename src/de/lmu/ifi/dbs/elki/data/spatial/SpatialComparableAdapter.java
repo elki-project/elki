@@ -36,4 +36,9 @@ public class SpatialComparableAdapter implements SpatialAdapter<SpatialComparabl
   public double getVolume(SpatialComparable obj) {
     return SpatialUtil.volume(obj);
   }
+
+  @Override
+  public boolean equal(SpatialComparable obj1, SpatialComparable obj2) {
+    return SpatialUtil.equals(obj1, obj2);
+  }
 }
