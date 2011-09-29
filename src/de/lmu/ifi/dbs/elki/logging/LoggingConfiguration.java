@@ -95,8 +95,15 @@ public final class LoggingConfiguration {
     if(pkg == null) {
       pkg = "";
     }
-    // Load logging configuration from resources.
-    String cfgfile = pkg.replace('.', File.separatorChar) + File.separatorChar + name;
+    // Load logging configuration from current directory
+    String cfgfile = name;
+    if(new File(name).exists()) {
+      cfgfile = name;
+    }
+    else {
+      // Fall back to full path / resources.
+      cfgfile = pkg.replace('.', File.separatorChar) + File.separatorChar + name;
+    }
     try {
       InputStream cfgdata = FileUtil.openSystemFile(cfgfile);
       logManager.readConfiguration(cfgdata);
