@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -49,7 +50,8 @@ import experimentalcode.shared.index.subspace.structures.DiskMemory;
  */
 public class VAFile extends AbstractVAFile
 {
-	//Full data representation
+  Logger log = Logger.getLogger(VAFile.class.getName());
+  //Full data representation
 	DiskMemory<DoubleVector> data;
 	
 	//temporary, full-dimensional VA representation
@@ -139,16 +141,16 @@ public class VAFile extends AbstractVAFile
 			}
 			splitPositions[d][partitions] = tempdata[size-1] + 0.000001; // make sure that last object will be included
 			
-			System.out.print("dim " + (d+1) + ": ");
+			log.fine("dim " + (d+1) + ": ");
 			for (int b=0; b<splitPositions[d].length; b++)
 			{
-				System.out.print(splitPositions[d][b] + "  ");
+				log.fine(splitPositions[d][b] + "  ");
 				if (b < splitPositions[d].length-1)
 				{
-					System.out.print("(bucket "+(b+1)+"/"+partitions+", " + partitionCount[d][b] +")  ");
+					log.fine("(bucket "+(b+1)+"/"+partitions+", " + partitionCount[d][b] +")  ");
 				}
 			}
-			System.out.println();
+			log.fine(null);
 		}
 	}
 
@@ -276,13 +278,13 @@ public class VAFile extends AbstractVAFile
 			}
 		}
 		
-		System.out.println("\nquery = (" + query + ")");
-		System.out.println("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
+		log.fine("\nquery = (" + query + ")");
+		log.fine("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
 		
 		ModifiableDBIDs resultIDs = DBIDUtil.newArray(result.size());
 		for (DoubleDistanceResultPair dp: result)
 		{
-			System.out.println(dp);
+			log.fine(dp.toString());
 			resultIDs.add(dp.getDBID());
 		}
 		
