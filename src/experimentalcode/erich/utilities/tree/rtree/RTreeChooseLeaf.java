@@ -33,7 +33,7 @@ public class RTreeChooseLeaf implements InsertionStrategy {
   }
 
   @Override
-  public <E, I, A> int choose(A options, ArrayAdapter<E, A> getter, SpatialAdapter<E> a1, I obj, SpatialAdapter<I> a2) {
+  public <E, I, A> int choose(A options, ArrayAdapter<E, A> getter, SpatialAdapter<E> a1, I obj, SpatialAdapter<I> a2, boolean leaf) {
     final int size = getter.size(options);
     assert (size > 0) : "Choose from empty set?";
     double leastEnlargement = Double.POSITIVE_INFINITY;

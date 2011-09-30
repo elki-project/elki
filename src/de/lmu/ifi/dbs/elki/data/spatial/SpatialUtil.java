@@ -292,6 +292,39 @@ public final class SpatialUtil {
   }
 
   /**
+   * Computes the volume of the overlapping box between two SpatialComparables
+   * and return the relation between the volume of the overlapping box and the
+   * volume of both SpatialComparable.
+   * 
+   * @param box1 the first SpatialComparable
+   * @param a1 first spatial adapter
+   * @param box2 the second SpatialComparable
+   * @param a2 second spatial adapter
+   * @return the overlap volume in relation to the singular volumes.
+   */
+  public static <E1, E2> double relativeOverlap(E1 box1, SpatialAdapter<? super E1> a1, E2 box2, SpatialAdapter<? super E2> a2) {
+    final int dim = a1.getDimensionality(box1);
+    assert (!LoggingConfiguration.DEBUG || a2.getDimensionality(box2) == dim) : "Spatial objects do not agree on dimensionality.";
+    double overlap = 1.0;
+
+    for(int i = 1; i <= dim; i++) {
+      // The maximal value of that overlap box in the current
+      // dimension is the minimum of the max values.
+      double omax = Math.min(a1.getMax(box1, i), a2.getMax(box2, i));
+      // The minimal value is the maximum of the min values.
+      double omin = Math.max(a1.getMin(box1, i), a2.getMax(box2, i));
+
+      // if omax <= omin in any dimension, the overlap box has a volume of zero
+      if(omax <= omin) {
+        return 0.0;
+      }
+      overlap *= omax - omin;
+    }
+
+    return overlap / (a1.getVolume(box1) + a2.getVolume(box2));
+  }
+
+  /**
    * Computes the union HyperBoundingBox of two SpatialComparables.
    * 
    * @param box1 the first SpatialComparable
@@ -346,7 +379,7 @@ public final class SpatialUtil {
    * @param a2 Spatial adapter for second object
    * @return Modifiable Hyper Bounding Box
    */
-  public static <A, B> ModifiableHyperBoundingBox union(A o1, SpatialAdapter<A> a1, B o2, SpatialAdapter<B> a2) {
+  public static <A, B> ModifiableHyperBoundingBox union(A o1, SpatialAdapter<? super A> a1, B o2, SpatialAdapter<B> a2) {
     final int dim = a1.getDimensionality(o1);
     double[] min = new double[dim];
     double[] max = new double[dim];
@@ -365,7 +398,7 @@ public final class SpatialUtil {
    * @param adapter Spatial adapter
    * @return Modifiable Hyper Bounding Box
    */
-  public static <E, A> ModifiableHyperBoundingBox union(A data, ArrayAdapter<E, A> getter, SpatialAdapter<E> adapter) {
+  public static <E, A> ModifiableHyperBoundingBox union(A data, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter) {
     final int num = getter.size(data);
     assert (num > 0);
     final E first = getter.get(data, 0);
@@ -396,7 +429,7 @@ public final class SpatialUtil {
    * @param a2 Spatial adapter for second object
    * @return Flat MBR
    */
-  public static <A, B> double[] unionFlatMBR(A o1, SpatialAdapter<A> a1, B o2, SpatialAdapter<B> a2) {
+  public static <E1, E2> double[] unionFlatMBR(E1 o1, SpatialAdapter<? super E1> a1, E2 o2, SpatialAdapter<? super E2> a2) {
     final int dim = a1.getDimensionality(o1);
     double[] mbr = new double[2 * dim];
     for(int d = 0; d < dim; d++) {
@@ -415,7 +448,7 @@ public final class SpatialUtil {
    * @param adapter Spatial adapter
    * @return Flat MBR
    */
-  public static <E, A> double[] unionFlatMBR(A data, ArrayAdapter<E, A> getter, SpatialAdapter<E> adapter) {
+  public static <E, A> double[] unionFlatMBR(A data, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter) {
     final int num = getter.size(data);
     assert (num > 0) : "Cannot compute MBR of empty set.";
     final E first = getter.get(data, 0);
