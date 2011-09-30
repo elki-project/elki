@@ -97,7 +97,11 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
   @Override
   public RdKNNTree<O, D> instantiate(Relation<O> relation) {
     PageFile<RdKNNNode<D>> pagefile = makePageFile(getNodeClass());
-    return new RdKNNTree<O, D>(relation, pagefile, bulkSplitter, insertionStrategy, k_max, distanceFunction, distanceFunction.instantiate(relation), nodeSplitter);
+    RdKNNTree<O, D> index = new RdKNNTree<O, D>(relation, pagefile, k_max, distanceFunction, distanceFunction.instantiate(relation));
+    index.setBulkStrategy(bulkSplitter);
+    index.setInsertionStrategy(insertionStrategy);
+    index.setNodeSplitStrategy(nodeSplitter);
+    return index;
   }
 
   protected Class<RdKNNNode<D>> getNodeClass() {

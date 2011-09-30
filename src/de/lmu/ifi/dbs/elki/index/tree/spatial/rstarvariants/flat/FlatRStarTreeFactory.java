@@ -60,7 +60,11 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
   @Override
   public FlatRStarTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<FlatRStarTreeNode> pagefile = makePageFile(getNodeClass());
-    return new FlatRStarTreeIndex<O>(relation, pagefile, bulkSplitter, insertionStrategy, nodeSplitter);
+    FlatRStarTreeIndex<O> index = new FlatRStarTreeIndex<O>(relation, pagefile);
+    index.setBulkStrategy(bulkSplitter);
+    index.setInsertionStrategy(insertionStrategy);
+    index.setNodeSplitStrategy(nodeSplitter);
+    return index;
   }
 
   protected Class<FlatRStarTreeNode> getNodeClass() {

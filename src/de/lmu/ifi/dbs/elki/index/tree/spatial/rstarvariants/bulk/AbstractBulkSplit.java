@@ -23,14 +23,12 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
 /**
  * Encapsulates the required parameters for a bulk split of a spatial index.
  * 
  * @author Elke Achtert
  */
-public abstract class AbstractBulkSplit implements BulkSplit, Parameterizable {
+public abstract class AbstractBulkSplit implements BulkSplit {
   /**
    * Constructor
    */

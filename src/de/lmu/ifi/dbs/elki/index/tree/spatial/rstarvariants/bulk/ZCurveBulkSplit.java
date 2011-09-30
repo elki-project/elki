@@ -33,6 +33,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Bulk split that orders object by their Z curve position, then splits them
@@ -45,6 +46,11 @@ public class ZCurveBulkSplit extends AbstractBulkSplit {
    * Logger.
    */
   private static final Logging logger = Logging.getLogger(ZCurveBulkSplit.class);
+
+  /**
+   * Static instance
+   */
+  public static final ZCurveBulkSplit STATIC = new ZCurveBulkSplit();
 
   /**
    * Constructor
@@ -180,5 +186,19 @@ public class ZCurveBulkSplit extends AbstractBulkSplit {
       logger.debugFine("partitions " + partitions);
     }
     return partitions;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected ZCurveBulkSplit makeInstance() {
+      return ZCurveBulkSplit.STATIC;
+    }
   }
 }
