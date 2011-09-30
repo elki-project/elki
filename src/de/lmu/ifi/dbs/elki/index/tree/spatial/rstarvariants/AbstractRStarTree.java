@@ -54,11 +54,10 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.LeastOverlapInsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SplitStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.TopologicalSplitter;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastOverlapInsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ListArrayAdapter;
@@ -600,10 +599,12 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     N childNode = getNode(node.getEntry(0));
+    final List<E> entries = node.getEntries();
+    int num = insertionStrategy.choose(entries, ListArrayAdapter.getStatic(entries), SpatialComparableAdapter.STATIC, mbr, SpatialComparableAdapter.STATIC, childNode.isLeaf());
+    TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<E>(entries.get(num), num);
     // children are leafs
     if(childNode.isLeaf()) {
       if(height - subtree.getPathCount() == level) {
-        TreeIndexPathComponent<E> comp = insertionStrategy.findInsertChild(node, mbr);
         return subtree.pathByAddingChild(comp);
       }
       else {
@@ -612,7 +613,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
     // children are directory nodes
     else {
-      IndexTreePath<E> newSubtree = subtree.pathByAddingChild(getLeastEnlargement(node, mbr));
+      IndexTreePath<E> newSubtree = subtree.pathByAddingChild(comp);
       // desired level is reached
       if(height - subtree.getPathCount() == level) {
         return newSubtree;
@@ -621,34 +622,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
         return choosePath(newSubtree, mbr, level);
       }
     }
-  }
-
-  /**
-   * Returns the path information of the entry of the specified node with the
-   * least enlargement if the given mbr would be inserted into.
-   * 
-   * @param node the node which children have to be tested
-   * @param mbr the mbr of the node to be inserted
-   * @return the path information of the entry with the least enlargement if the
-   *         given mbr would be inserted into
-   */
-  private TreeIndexPathComponent<E> getLeastEnlargement(N node, SpatialComparable mbr) {
-    Enlargement<E> min = null;
-
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      E entry = node.getEntry(i);
-      double volume = SpatialUtil.volume(entry);
-      HyperBoundingBox newMBR = SpatialUtil.union(entry, mbr);
-      double inc = SpatialUtil.volume(newMBR) - volume;
-      Enlargement<E> enlargement = new Enlargement<E>(new TreeIndexPathComponent<E>(entry, i), volume, inc, 0);
-
-      if(min == null || min.compareTo(enlargement) > 0) {
-        min = enlargement;
-      }
-    }
-
-    assert min != null;
-    return min.getPathComponent();
   }
 
   /**

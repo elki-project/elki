@@ -307,7 +307,7 @@ public final class SpatialUtil {
     assert (!LoggingConfiguration.DEBUG || a2.getDimensionality(box2) == dim) : "Spatial objects do not agree on dimensionality.";
     double overlap = 1.0;
 
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       // The maximal value of that overlap box in the current
       // dimension is the minimum of the max values.
       double omax = Math.min(a1.getMax(box1, i), a2.getMax(box2, i));
