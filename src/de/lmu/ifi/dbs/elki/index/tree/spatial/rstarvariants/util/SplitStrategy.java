@@ -27,13 +27,14 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Generic interface for split strategies.
  * 
  * @author Erich Schubert
  */
-public interface SplitStrategy {
+public interface SplitStrategy extends Parameterizable {
   /**
    * Split a page
    * 

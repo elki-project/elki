@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Linear-time complexity greedy split as used by the original R-Tree.
@@ -204,5 +205,19 @@ public class RTreeLinearSplit implements SplitStrategy {
       LoggingUtil.warning("size:" + num + " minEntries: " + minEntries + " area1: " + area1 + " area2: " + area2);
     }
     return assignment;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected RTreeLinearSplit makeInstance() {
+      return RTreeLinearSplit.STATIC;
+    }
   }
 }
