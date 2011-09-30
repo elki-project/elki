@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparableAdapter;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Quadratic-time complexity greedy split as used by the original R-Tree.
@@ -165,5 +166,19 @@ public class RTreeQuadraticSplit implements SplitStrategy {
       // Note: "assigned" and "remaining" likely not updated!
     }
     return assignment;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected RTreeQuadraticSplit makeInstance() {
+      return RTreeQuadraticSplit.STATIC;
+    }
   }
 }

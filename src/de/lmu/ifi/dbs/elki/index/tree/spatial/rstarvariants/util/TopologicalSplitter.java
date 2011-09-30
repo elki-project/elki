@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 
 /**
@@ -43,6 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  */
 @Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "http://dx.doi.org/10.1145/93597.98741")
 public class TopologicalSplitter implements SplitStrategy {
+  /**
+   * Static instance.
+   */
+  public static final TopologicalSplitter STATIC = new TopologicalSplitter();
+
   /**
    * constructor.
    */
@@ -298,6 +304,20 @@ public class TopologicalSplitter implements SplitStrategy {
      */
     public DoubleIntPair[] getBestSorting() {
       return bestSorting;
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected TopologicalSplitter makeInstance() {
+      return TopologicalSplitter.STATIC;
     }
   }
 }

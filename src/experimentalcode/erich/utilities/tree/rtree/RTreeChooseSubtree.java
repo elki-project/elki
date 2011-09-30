@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * The default R-Tree insertion strategy: find rectangle with least volume
@@ -19,16 +20,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  */
 @Reference(authors = "Antonin Guttman", title = "R-Trees: A Dynamic Index Structure For Spatial Searching", booktitle = "Proceedings of the 1984 ACM SIGMOD international conference on Management of data", url = "http://dx.doi.org/10.1145/971697.602266")
-public class RTreeChooseLeaf implements InsertionStrategy {
+public class RTreeChooseSubtree implements InsertionStrategy {
   /**
    * Static instance.
    */
-  public static final RTreeChooseLeaf STATIC = new RTreeChooseLeaf();
+  public static final RTreeChooseSubtree STATIC = new RTreeChooseSubtree();
 
   /**
    * Constructor.
    */
-  public RTreeChooseLeaf() {
+  public RTreeChooseSubtree() {
     super();
   }
 
@@ -48,5 +49,19 @@ public class RTreeChooseLeaf implements InsertionStrategy {
     }
     assert (best > -1);
     return best;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected RTreeChooseSubtree makeInstance() {
+      return RTreeChooseSubtree.STATIC;
+    }
   }
 }
