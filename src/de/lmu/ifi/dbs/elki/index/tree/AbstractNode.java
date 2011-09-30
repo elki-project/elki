@@ -279,9 +279,11 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
    * @return a list of the entries
    */
   public final List<E> getEntries() {
-    List<E> result = new ArrayList<E>();
+    List<E> result = new ArrayList<E>(numEntries);
     for(E entry : entries) {
-      result.add(entry);
+      if (entry != null) {
+        result.add(entry);
+      }
     }
     return result;
   }

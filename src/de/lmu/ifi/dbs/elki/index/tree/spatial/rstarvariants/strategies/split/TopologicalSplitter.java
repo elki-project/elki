@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
 
 /*
  This file is part of ELKI:

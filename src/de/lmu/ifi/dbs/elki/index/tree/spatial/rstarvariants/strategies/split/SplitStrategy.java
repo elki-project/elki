@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
 
 /*
  This file is part of ELKI:
@@ -23,27 +23,25 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.index.tree.Node;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import java.util.BitSet;
+
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
- * Interface for implementing insertion strategies, i.e. in which path of the
- * tree to insert the new element.
+ * Generic interface for split strategies.
  * 
  * @author Erich Schubert
  */
-public interface InsertionStrategy extends Parameterizable {
+public interface SplitStrategy extends Parameterizable {
   /**
-   * Find the child to insert into.
+   * Split a page
    * 
-   * @param <N> Node type
-   * @param <E> Entry type
-   * @param node Node to use
-   * @param mbr MBR of entry to insert
-   * @return Entry to insert into
+   * @param entries Entries to split
+   * @param getter Adapter for the entries array
+   * @param minEntries Minimum number of entries in each part
+   * @return BitSet containing the assignment.
    */
-  public <N extends Node<E>, E extends SpatialEntry> TreeIndexPathComponent<E> findInsertChild(N node, SpatialComparable mbr);
+  public <E, A> BitSet split(A entries, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter, int minEntries);
 }

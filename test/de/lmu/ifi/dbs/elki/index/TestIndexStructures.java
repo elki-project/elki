@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistance
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.ApproximateLeastOverlapInsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -140,8 +140,8 @@ public class TestIndexStructures implements JUnit4Test {
   public void testRStarTreeFast() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractRStarTreeFactory.INSERTION_STRATEGY_ID, ApproximateLeastOverlapInsertionStrategy.class);
-    spatparams.addParameter(ApproximateLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
+    spatparams.addParameter(AbstractRStarTreeFactory.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
+    spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
   }

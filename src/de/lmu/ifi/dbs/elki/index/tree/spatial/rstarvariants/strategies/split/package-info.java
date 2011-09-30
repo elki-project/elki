@@ -1,5 +1,6 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
-
+/**
+ * <p>Splitting strategies for R-Trees</p>
+ */
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,26 +23,4 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import java.util.BitSet;
-
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
-/**
- * Generic interface for split strategies.
- * 
- * @author Erich Schubert
- */
-public interface SplitStrategy extends Parameterizable {
-  /**
-   * Split a page
-   * 
-   * @param entries Entries to split
-   * @param getter Adapter for the entries array
-   * @param minEntries Minimum number of entries in each part
-   * @return BitSet containing the assignment.
-   */
-  public <E, A> BitSet split(A entries, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter, int minEntries);
-}
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
