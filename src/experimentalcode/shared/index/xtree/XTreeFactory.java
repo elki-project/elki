@@ -38,7 +38,10 @@ public class XTreeFactory<O extends NumberVector<O, ?>> extends XTreeBaseFactory
   @Override
   public XTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<XTreeNode> pagefile = makePageFile(getNodeClass());
-    return new XTreeIndex<O>(relation, pagefile, bulkSplitter, insertionStrategy, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+    XTreeIndex<O> index = new XTreeIndex<O>(relation, pagefile, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+    index.setBulkStrategy(bulkSplitter);
+    index.setInsertionStrategy(insertionStrategy);
+    return index;
   }
 
   protected Class<XTreeNode> getNodeClass() {

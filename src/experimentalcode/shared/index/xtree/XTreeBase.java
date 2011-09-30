@@ -53,8 +53,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
@@ -141,22 +141,57 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * Constructor.
    * 
    * @param pagefile the page file
-   * @param bulkSplitter bulk loading strategy
-   * @param insertionStrategy
    * @param relativeMinEntries
    * @param relativeMinFanout
    * @param reinsert_fraction
    * @param max_overlap
    * @param overlap_type
    */
-  public XTreeBase(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(pagefile, bulkSplitter, insertionStrategy, null);
+  public XTreeBase(PageFile<N> pagefile, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+    super(pagefile);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;
     this.max_overlap = max_overlap;
     this.overlap_type = overlap_type;
   }
+  
+  @Override
+  public void setNodeSplitStrategy(SplitStrategy nodeSplitter) {
+    throw new UnsupportedOperationException("XTree split strategy cannot be set this way.");
+  }
+
+  @Override
+  protected Logging getLogger() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+
+  @Override
+  protected E createRootEntry() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+
+  @Override
+  protected N createNewLeafNode() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+
+  @Override
+  protected N createNewDirectoryNode() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
 
   /**
    * Returns true if in the specified node an overflow occurred, false
