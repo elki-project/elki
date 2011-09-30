@@ -117,36 +117,56 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * The split strategy
    */
-  protected SplitStrategy nodeSplitter;
+  protected SplitStrategy nodeSplitter = TopologicalSplitter.STATIC;
 
   /**
    * The insertion strategy to use
    */
-  protected final InsertionStrategy insertionStrategy;
+  protected InsertionStrategy insertionStrategy = LeastOverlapInsertionStrategy.STATIC;
 
   /**
    * Constructor
    * 
    * @param pagefile Page file
-   * @param bulkSplitter bulk load strategy
-   * @param insertionStrategy the strategy for finding the insertion candidate.
-   * @param nodeSplitter the strategy for splitting nodes.
    */
-  public AbstractRStarTree(PageFile<N> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter) {
+  public AbstractRStarTree(PageFile<N> pagefile) {
     super(pagefile);
+  }
+
+  /**
+   * Set the bulk loading strategy
+   * 
+   * @param bulkSplitter Bulk loading strategy
+   */
+  public void setBulkStrategy(BulkSplit bulkSplitter) {
     this.bulkSplitter = bulkSplitter;
+  }
+
+  /**
+   * Set the node splitting strategy.
+   * 
+   * @param nodeSplitter the split strategy to set
+   */
+  public void setNodeSplitStrategy(SplitStrategy nodeSplitter) {
+    if(nodeSplitter != null) {
+      this.nodeSplitter = nodeSplitter;
+    }
+    else {
+      getLogger().warning("Ignoring setNodeSplitStrategy(null)");
+    }
+  }
+
+  /**
+   * Set insertion strategy
+   * 
+   * @param insertionStrategy the insertion strategy to set
+   */
+  public void setInsertionStrategy(InsertionStrategy insertionStrategy) {
     if(insertionStrategy != null) {
       this.insertionStrategy = insertionStrategy;
     }
     else {
-      getLogger().warning("No insertion strategy given - falling back to " + LeastOverlapInsertionStrategy.class.getSimpleName());
-      this.insertionStrategy = new LeastOverlapInsertionStrategy();
-    }
-    if (nodeSplitter != null) {
-      this.nodeSplitter = nodeSplitter;
-    } else {
-      getLogger().warning("No splitting strategy given - falling back to " + TopologicalSplitter.class.getSimpleName());
-      this.nodeSplitter = new TopologicalSplitter();
+      getLogger().warning("Ignoring setInsertionStrategy(null)");
     }
   }
 
@@ -387,30 +407,30 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected List<N> createBulkLeafNodes(List<E> objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
-  
+
     ArrayList<N> result = new ArrayList<N>();
     List<List<E>> partitions = bulkSplitter.partition(objects, minEntries, maxEntries);
-  
+
     for(List<E> partition : partitions) {
       // create leaf node
       N leafNode = createNewLeafNode();
       result.add(leafNode);
-  
+
       // insert data
       for(E o : partition) {
         leafNode.addLeafEntry(o);
       }
-  
+
       // write to file
       writeNode(leafNode);
-  
+
       if(getLogger().isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append("pageNo ").append(leafNode.getPageID()).append("\n");
         getLogger().debugFine(msg.toString());
       }
     }
-  
+
     if(getLogger().isDebugging()) {
       getLogger().debugFine("numDataPages = " + result.size());
     }
@@ -494,7 +514,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode) {
     N root = createNewDirectoryNode();
     writeNode(root);
-  
+
     // switch the ids
     oldRoot.setPageID(root.getPageID());
     if(!oldRoot.isLeaf()) {
@@ -503,13 +523,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
         writeNode(node);
       }
     }
-  
+
     root.setPageID(getRootID());
     E oldRootEntry = createNewDirectoryEntry(oldRoot);
     E newNodeEntry = createNewDirectoryEntry(newNode);
     root.addDirectoryEntry(oldRootEntry);
     root.addDirectoryEntry(newNodeEntry);
-  
+
     writeNode(root);
     writeNode(oldRoot);
     writeNode(newNode);
@@ -520,7 +540,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       msg += "\n";
       getLogger().debugFine(msg);
     }
-  
+
     return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
   }
 
@@ -879,12 +899,12 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   @Override
   public final List<E> getLeaves() {
     List<E> result = new ArrayList<E>();
-  
+
     if(height == 1) {
       result.add(getRootEntry());
       return result;
     }
-  
+
     getLeafNodes(getRoot(), result, height);
     return result;
   }
@@ -932,11 +952,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     int leafNodes = 0;
     int objects = 0;
     int levels = 0;
-  
+
     if(initialized) {
       N node = getRoot();
       int dim = node.getDimensionality();
-  
+
       while(!node.isLeaf()) {
         if(node.getNumEntries() > 0) {
           E entry = node.getEntry(0);
@@ -944,7 +964,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
           levels++;
         }
       }
-  
+
       BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
       while(enumeration.hasMoreElements()) {
         IndexTreePath<E> indexPath = enumeration.nextElement();
@@ -971,7 +991,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     else {
       result.append(getClass().getName()).append(" is empty!\n");
     }
-  
+
     return result.toString();
   }
 }

@@ -31,6 +31,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SpatialComparator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Split strategy for bulk-loading a spatial tree where the split axes are the
@@ -45,6 +46,11 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
    * Logger.
    */
   private static final Logging logger = Logging.getLogger(MaxExtensionBulkSplit.class);
+  
+  /**
+   * Static instance
+   */
+  public static final MaxExtensionBulkSplit STATIC = new MaxExtensionBulkSplit();
 
   /**
    * Constructor
@@ -145,5 +151,19 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
       }
     }
     return splitAxis;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected MaxExtensionBulkSplit makeInstance() {
+      return MaxExtensionBulkSplit.STATIC;
+    }
   }
 }

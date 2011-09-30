@@ -31,9 +31,6 @@ import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -62,12 +59,9 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
    * Constructor.
    * 
    * @param pagefile Page file
-   * @param bulkSplitter bulk load strategy
-   * @param insertionStrategy the strategy to find the insertion child
-   * @param nodeSplitter the strategy for splitting nodes.
    */
-  public DeLiCluTree(PageFile<DeLiCluNode> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter) {
-    super(pagefile, bulkSplitter, insertionStrategy, nodeSplitter);
+  public DeLiCluTree(PageFile<DeLiCluNode> pagefile) {
+    super(pagefile);
   }
 
   /**

@@ -59,7 +59,11 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
   @Override
   public DeLiCluTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<DeLiCluNode> pagefile = makePageFile(getNodeClass());
-    return new DeLiCluTreeIndex<O>(relation, pagefile, bulkSplitter, insertionStrategy, nodeSplitter);
+    DeLiCluTreeIndex<O> index = new DeLiCluTreeIndex<O>(relation, pagefile);
+    index.setBulkStrategy(bulkSplitter);
+    index.setInsertionStrategy(insertionStrategy);
+    index.setNodeSplitStrategy(nodeSplitter);
+    return index;
   }
 
   protected Class<DeLiCluNode> getNodeClass() {

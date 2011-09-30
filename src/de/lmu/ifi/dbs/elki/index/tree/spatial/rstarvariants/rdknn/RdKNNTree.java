@@ -56,10 +56,7 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -114,15 +111,12 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
   /**
    * Constructor.
    * 
-   * @param bulkSplitter bulk loading strategy
-   * @param insertionStrategy the strategy to find the insertion child
    * @param k_max max k
    * @param distanceFunction distance function
    * @param distanceQuery distance query
-   * @param nodeSplitter the strategy for splitting nodes.
    */
-  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode<D>> pagefile, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SpatialDistanceQuery<O, D> distanceQuery, SplitStrategy nodeSplitter) {
-    super(pagefile, bulkSplitter, insertionStrategy, nodeSplitter);
+  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode<D>> pagefile, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SpatialDistanceQuery<O, D> distanceQuery) {
+    super(pagefile);
     this.relation = relation;
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
@@ -678,7 +672,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     // FIXME: re-add
     return null;
   }
-  
+
   @Override
   public String getLongName() {
     return "RdKNNTree";
@@ -688,6 +682,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
   public String getShortName() {
     return "rdknntree";
   }
+
   @Override
   protected Logging getLogger() {
     return logger;
