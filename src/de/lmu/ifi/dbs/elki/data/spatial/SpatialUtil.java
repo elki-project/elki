@@ -71,7 +71,7 @@ public final class SpatialUtil {
   public static <E1, E2> double volumeUnion(E1 r1, SpatialAdapter<? super E1> a1, E2 r2, SpatialAdapter<? super E2> a2) {
     final int dim1 = a1.getDimensionality(r1);
     final int dim2 = a2.getDimensionality(r2);
-    assert (!LoggingConfiguration.DEBUG || dim1 == dim2);
+    assert (!LoggingConfiguration.DEBUG || dim1 == dim2) : "Computing union with different dimensionality: " + dim1 + " vs. " + dim2;
     double volume = 1.0;
     for(int i = 0; i < dim1; i++) {
       final double min = Math.min(a1.getMin(r1, i), a2.getMin(r2, i));
