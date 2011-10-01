@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.data.spatial;
  */
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 
@@ -42,40 +41,20 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 // numbers start at 1 or 0 depending on the context!
 public final class SpatialUtil {
   /**
-   * Copy the MBR of an instance.
-   * 
-   * @param obj Object to copy
-   * @param adapter Adapter
-   * @return (Modifiable) bounding box
-   */
-  public static <E> ModifiableHyperBoundingBox copyMBR(E obj, SpatialAdapter<? super E> adapter) {
-    final int dim = adapter.getDimensionality(obj);
-    double[] min = new double[dim];
-    double[] max = new double[dim];
-    for(int i = 0; i < dim; i++) {
-      min[i] = adapter.getMin(obj, i);
-      max[i] = adapter.getMax(obj, i);
-    }
-    return new ModifiableHyperBoundingBox(min, max);
-  }
-
-  /**
    * Compute the volume (area) of the union of two MBRs
    * 
    * @param r1 First object
-   * @param a1 Adapter for first object
    * @param r2 Second object
-   * @param a2 Adapter for second object
    * @return
    */
-  public static <E1, E2> double volumeUnion(E1 r1, SpatialAdapter<? super E1> a1, E2 r2, SpatialAdapter<? super E2> a2) {
-    final int dim1 = a1.getDimensionality(r1);
-    final int dim2 = a2.getDimensionality(r2);
+  public static double volumeUnion(SpatialComparable r1, SpatialComparable r2) {
+    final int dim1 = r1.getDimensionality();
+    final int dim2 = r2.getDimensionality();
     assert (!LoggingConfiguration.DEBUG || dim1 == dim2) : "Computing union with different dimensionality: " + dim1 + " vs. " + dim2;
     double volume = 1.0;
-    for(int i = 0; i < dim1; i++) {
-      final double min = Math.min(a1.getMin(r1, i), a2.getMin(r2, i));
-      final double max = Math.max(a1.getMax(r1, i), a2.getMax(r2, i));
+    for(int i = 1; i <= dim1; i++) {
+      final double min = Math.min(r1.getMin(i), r2.getMin(i));
+      final double max = Math.max(r1.getMax(i), r2.getMax(i));
       volume *= (max - min);
     }
     return volume;
@@ -119,7 +98,7 @@ public final class SpatialUtil {
   public static boolean intersects(SpatialComparable box1, SpatialComparable box2) {
     final int dim = box1.getDimensionality();
     if(dim != box2.getDimensionality()) {
-      throw new IllegalArgumentException("The spatial objects do not have the same dimensionality!");
+      throw new IllegalArgumentException("The spatial objects do not have the same dimensionality: " + box1.getDimensionality() + " " + box2.getDimensionality());
     }
     boolean intersect = true;
     for(int i = 1; i <= dim; i++) {
@@ -129,27 +108,6 @@ public final class SpatialUtil {
       }
     }
     return intersect;
-  }
-
-  /**
-   * Returns true if the two spatial objects intersect (overlap), false
-   * otherwise.
-   * 
-   * @param box1 the first object
-   * @param a1 Spatial adapter for first object
-   * @param box2 the second object
-   * @param a2 Spatial adapter for second object
-   * @return true if the spatial objects intersect, false otherwise
-   */
-  public static <E1, E2> boolean intersects(E1 box1, SpatialAdapter<? super E1> a1, E2 box2, SpatialAdapter<? super E2> a2) {
-    final int dim1 = a1.getDimensionality(box1);
-    assert (!LoggingConfiguration.DEBUG || dim1 == a2.getDimensionality(box2));
-    for(int i = 0; i < dim1; i++) {
-      if(a1.getMin(box1, i) > a2.getMax(box2, i) || a1.getMax(box1, i) < a2.getMin(box2, i)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   /**
@@ -202,29 +160,6 @@ public final class SpatialUtil {
   }
 
   /**
-   * Returns true if the first spatial object contains the second spatial
-   * object, false otherwise.
-   * 
-   * @param box1 the outer object
-   * @param a1 Spatial adapter for first object
-   * @param box2 the inner object
-   * @param a2 Spatial adapter for second object
-   * @return true if the first object contains the second object, false
-   *         otherwise
-   */
-  public static <E1, E2> boolean contains(E1 box1, SpatialAdapter<? super E1> a1, E2 box2, SpatialAdapter<? super E2> a2) {
-    final int dim1 = a1.getDimensionality(box1);
-    assert (!LoggingConfiguration.DEBUG || dim1 == a2.getDimensionality(box2));
-
-    for(int i = 0; i < dim1; i++) {
-      if(a1.getMin(box1, i) > a2.getMin(box2, i) || a1.getMax(box1, i) < a2.getMax(box2, i)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * Computes the volume of this SpatialComparable
    * 
    * @return the volume of this SpatialComparable
@@ -233,7 +168,11 @@ public final class SpatialUtil {
     double vol = 1;
     final int dim = box.getDimensionality();
     for(int i = 1; i <= dim; i++) {
-      vol *= box.getMax(i) - box.getMin(i);
+      double delta = box.getMax(i) - box.getMin(i);
+      if(delta == 0.0) {
+        return 0.0;
+      }
+      vol *= delta;
     }
     return vol;
   }
@@ -292,39 +231,6 @@ public final class SpatialUtil {
   }
 
   /**
-   * Computes the volume of the overlapping box between two SpatialComparables
-   * and return the relation between the volume of the overlapping box and the
-   * volume of both SpatialComparable.
-   * 
-   * @param box1 the first SpatialComparable
-   * @param a1 first spatial adapter
-   * @param box2 the second SpatialComparable
-   * @param a2 second spatial adapter
-   * @return the overlap volume in relation to the singular volumes.
-   */
-  public static <E1, E2> double relativeOverlap(E1 box1, SpatialAdapter<? super E1> a1, E2 box2, SpatialAdapter<? super E2> a2) {
-    final int dim = a1.getDimensionality(box1);
-    assert (!LoggingConfiguration.DEBUG || a2.getDimensionality(box2) == dim) : "Spatial objects do not agree on dimensionality.";
-    double overlap = 1.0;
-
-    for(int i = 0; i < dim; i++) {
-      // The maximal value of that overlap box in the current
-      // dimension is the minimum of the max values.
-      double omax = Math.min(a1.getMax(box1, i), a2.getMax(box2, i));
-      // The minimal value is the maximum of the min values.
-      double omin = Math.max(a1.getMin(box1, i), a2.getMax(box2, i));
-
-      // if omax <= omin in any dimension, the overlap box has a volume of zero
-      if(omax <= omin) {
-        return 0.0;
-      }
-      overlap *= omax - omin;
-    }
-
-    return overlap / (a1.getVolume(box1) + a2.getVolume(box2));
-  }
-
-  /**
    * Computes the union HyperBoundingBox of two SpatialComparables.
    * 
    * @param box1 the first SpatialComparable
@@ -371,98 +277,28 @@ public final class SpatialUtil {
   }
 
   /**
-   * Compute the union of two objects.
-   * 
-   * @param o1 First object
-   * @param a1 Spatial adapter for first object
-   * @param o2 Second object
-   * @param a2 Spatial adapter for second object
-   * @return Modifiable Hyper Bounding Box
-   */
-  public static <A, B> ModifiableHyperBoundingBox union(A o1, SpatialAdapter<? super A> a1, B o2, SpatialAdapter<B> a2) {
-    final int dim = a1.getDimensionality(o1);
-    double[] min = new double[dim];
-    double[] max = new double[dim];
-    for(int d = 0; d < dim; d++) {
-      min[d] = Math.min(a1.getMin(o1, d), a2.getMin(o2, d));
-      max[d] = Math.max(a1.getMax(o1, d), a2.getMax(o2, d));
-    }
-    return new ModifiableHyperBoundingBox(min, max);
-  }
-
-  /**
-   * Compute the union of a number of objects.
-   * 
-   * @param data Object
-   * @param getter Array adapter
-   * @param adapter Spatial adapter
-   * @return Modifiable Hyper Bounding Box
-   */
-  public static <E, A> ModifiableHyperBoundingBox union(A data, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter) {
-    final int num = getter.size(data);
-    assert (num > 0);
-    final E first = getter.get(data, 0);
-    final int dim = adapter.getDimensionality(first);
-    double[] min = new double[dim];
-    double[] max = new double[dim];
-    for(int d = 0; d < dim; d++) {
-      min[d] = adapter.getMin(first, d);
-      max[d] = adapter.getMax(first, d);
-    }
-    for(int i = 1; i < num; i++) {
-      E next = getter.get(data, i);
-      for(int d = 0; d < dim; d++) {
-        min[d] = Math.min(min[d], adapter.getMin(next, d));
-        max[d] = Math.max(max[d], adapter.getMax(next, d));
-      }
-    }
-    return new ModifiableHyperBoundingBox(min, max);
-  }
-
-  /**
-   * Compute the union of two objects as a flat MBR (low-level, for index
-   * structures)
-   * 
-   * @param o1 First object
-   * @param a1 Spatial adapter for first object
-   * @param o2 Second object
-   * @param a2 Spatial adapter for second object
-   * @return Flat MBR
-   */
-  public static <E1, E2> double[] unionFlatMBR(E1 o1, SpatialAdapter<? super E1> a1, E2 o2, SpatialAdapter<? super E2> a2) {
-    final int dim = a1.getDimensionality(o1);
-    double[] mbr = new double[2 * dim];
-    for(int d = 0; d < dim; d++) {
-      mbr[d] = Math.min(a1.getMin(o1, d), a2.getMin(o2, d));
-      mbr[dim + d] = Math.max(a1.getMax(o1, d), a2.getMax(o2, d));
-    }
-    return mbr;
-  }
-
-  /**
    * Compute the union of a number of objects as a flat MBR (low-level, for
    * index structures)
    * 
    * @param data Object
    * @param getter Array adapter
-   * @param adapter Spatial adapter
    * @return Flat MBR
    */
-  public static <E, A> double[] unionFlatMBR(A data, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter) {
+  public static <E extends SpatialComparable, A> double[] unionFlatMBR(A data, ArrayAdapter<E, A> getter) {
     final int num = getter.size(data);
     assert (num > 0) : "Cannot compute MBR of empty set.";
     final E first = getter.get(data, 0);
-    final int dim = adapter.getDimensionality(first);
+    final int dim = first.getDimensionality();
     double[] mbr = new double[2 * dim];
     for(int d = 0; d < dim; d++) {
-      mbr[d] = adapter.getMin(first, d);
-      mbr[dim + d] = adapter.getMax(first, d);
+      mbr[d] = first.getMin(d + 1);
+      mbr[dim + d] = first.getMax(d + 1);
     }
     for(int i = 1; i < num; i++) {
       E next = getter.get(data, i);
       for(int d = 0; d < dim; d++) {
-        mbr[d] = Math.min(mbr[d], adapter.getMin(next, d));
-        mbr[dim + d] = Math.max(mbr[dim + d], adapter.getMax(next, d));
+        mbr[d] = Math.min(mbr[d], next.getMin(d + 1));
+        mbr[dim + d] = Math.max(mbr[dim + d], next.getMax(d + 1));
       }
     }
     return mbr;

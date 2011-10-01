@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparableAdapter;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -35,12 +34,12 @@ public class LeastOverlapInsertionStrategy implements InsertionStrategy {
   }
 
   @Override
-  public <E, I, A> int choose(A options, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> a1, I obj, SpatialAdapter<? super I> a2, boolean leaf) {
+  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, boolean leaf) {
     if(leaf) {
-      return chooseLeastOverlap(options, getter, a1, obj, a2);
+      return chooseLeastOverlap(options, getter, obj);
     }
     else {
-      return chooseLeastEnlargement(options, getter, a1, obj, a2);
+      return chooseLeastEnlargement(options, getter, obj);
     }
   }
 
@@ -50,12 +49,10 @@ public class LeastOverlapInsertionStrategy implements InsertionStrategy {
    * 
    * @param options Options to choose from
    * @param getter Array adapter for options
-   * @param a1 Spatial adapter for options
    * @param obj Insertion object
-   * @param a2 Spatial adapter for insertion object
    * @return Subtree index in array.
    */
-  protected <I, E, A> int chooseLeastOverlap(A options, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> a1, I obj, SpatialAdapter<? super I> a2) {
+  protected <A> int chooseLeastOverlap(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj) {
     final int size = getter.size(options);
     assert (size > 0) : "Choose from empty set?";
     // R*-Tree: overlap increase for leaves.
@@ -66,21 +63,21 @@ public class LeastOverlapInsertionStrategy implements InsertionStrategy {
     // least overlap increase, on reduced candidate set:
     for(int i = 0; i < size; i++) {
       // Existing object and extended rectangle:
-      E entry = getter.get(options, i);
-      HyperBoundingBox mbr = SpatialUtil.union(entry, a1, obj, a2);
+      SpatialComparable entry = getter.get(options, i);
+      HyperBoundingBox mbr = SpatialUtil.union(entry, obj);
       // Compute relative overlap increase.
       double overlap_wout = 0.0;
       double overlap_with = 0.0;
       for(int k = 0; k < size; k++) {
         if(i != k) {
-          E other = getter.get(options, k);
-          overlap_wout += SpatialUtil.relativeOverlap(entry, a1, other, a1);
-          overlap_with += SpatialUtil.relativeOverlap(mbr, SpatialComparableAdapter.STATIC, other, a1);
+          SpatialComparable other = getter.get(options, k);
+          overlap_wout += SpatialUtil.relativeOverlap(entry, other);
+          overlap_with += SpatialUtil.relativeOverlap(mbr, other);
         }
       }
       double inc_overlap = overlap_with - overlap_wout;
       if(inc_overlap < least_overlap) {
-        final double area = a1.getVolume(entry);
+        final double area = SpatialUtil.volume(entry);
         final double inc_area = SpatialUtil.volume(mbr) - area;
         // Volume increase and overlap increase:
         least_overlap = inc_overlap;
@@ -89,7 +86,7 @@ public class LeastOverlapInsertionStrategy implements InsertionStrategy {
         best = i;
       }
       else if(inc_overlap == least_overlap) {
-        final double area = a1.getVolume(entry);
+        final double area = SpatialUtil.volume(entry);
         final double inc_area = SpatialUtil.volume(mbr) - area;
         if(inc_area < least_areainc || (inc_area == least_areainc && area < least_area)) {
           least_overlap = inc_overlap;
@@ -109,12 +106,10 @@ public class LeastOverlapInsertionStrategy implements InsertionStrategy {
    * 
    * @param options Options to choose from
    * @param getter Array adapter for options
-   * @param a1 Spatial adapter for options
    * @param obj Insertion object
-   * @param a2 Spatial adapter for insertion object
    * @return Subtree index in array.
    */
-  protected <E, I, A> int chooseLeastEnlargement(A options, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> a1, I obj, SpatialAdapter<? super I> a2) {
+  protected <A> int chooseLeastEnlargement(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj) {
     final int size = getter.size(options);
     assert (size > 0) : "Choose from empty set?";
     // As in R-Tree, with a slight modification for ties
@@ -122,9 +117,9 @@ public class LeastOverlapInsertionStrategy implements InsertionStrategy {
     double minArea = -1;
     int best = -1;
     for(int i = 0; i < size; i++) {
-      E entry = getter.get(options, i);
-      final double area = a1.getVolume(entry);
-      double enlargement = SpatialUtil.volumeUnion(entry, a1, obj, a2) - area;
+      SpatialComparable entry = getter.get(options, i);
+      final double area = SpatialUtil.volume(entry);
+      double enlargement = SpatialUtil.volumeUnion(entry, obj) - area;
       if(enlargement < leastEnlargement) {
         leastEnlargement = enlargement;
         best = i;

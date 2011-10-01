@@ -3,8 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert;
 import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparableAdapter;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
@@ -47,12 +46,12 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
   }
 
   @Override
-  public <E, I, A> int choose(A options, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> a1, I obj, SpatialAdapter<? super I> a2, boolean leaf) {
+  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, boolean leaf) {
     if(leaf) {
-      return chooseLeastOverlapApproximately(options, getter, a1, obj, a2);
+      return chooseLeastOverlapApproximately(options, getter, obj);
     }
     else {
-      return chooseLeastEnlargement(options, getter, a1, obj, a2);
+      return chooseLeastEnlargement(options, getter, obj);
     }
   }
 
@@ -62,27 +61,25 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
    * 
    * @param options Options to choose from
    * @param getter Array adapter for options
-   * @param a1 Spatial adapter for options
    * @param obj Insertion object
-   * @param a2 Spatial adapter for insertion object
    * @return Subtree index in array.
    */
-  protected <I, E, A> int chooseLeastOverlapApproximately(A options, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> a1, I obj, SpatialAdapter<? super I> a2) {
+  protected <A> int chooseLeastOverlapApproximately(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj) {
     final int size = getter.size(options);
     assert (size > 0) : "Choose from empty set?";
     if(size <= numCandidates) {
       // Skip building the heap.
-      return chooseLeastOverlap(options, getter, a1, obj, a2);
+      return chooseLeastOverlap(options, getter, obj);
     }
 
     // Heap of candidates
     TopBoundedHeap<DoubleIntPair> candidates = new TopBoundedHeap<DoubleIntPair>(numCandidates, Collections.reverseOrder());
     for(int i = 0; i < size; i++) {
       // Existing object and extended rectangle:
-      E entry = getter.get(options, i);
-      HyperBoundingBox mbr = SpatialUtil.union(entry, a1, obj, a2);
+      SpatialComparable entry = getter.get(options, i);
+      HyperBoundingBox mbr = SpatialUtil.union(entry, obj);
       // Area increase
-      final double inc_area = SpatialUtil.volume(mbr) - a1.getVolume(entry);
+      final double inc_area = SpatialUtil.volume(mbr) - SpatialUtil.volume(entry);
       candidates.add(new DoubleIntPair(inc_area, i));
     }
 
@@ -97,21 +94,21 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
       final double inc_area = pair.first;
 
       // Existing object and extended rectangle:
-      E entry = getter.get(options, pair.second);
-      HyperBoundingBox mbr = SpatialUtil.union(entry, a1, obj, a2);
+      SpatialComparable entry = getter.get(options, pair.second);
+      HyperBoundingBox mbr = SpatialUtil.union(entry, obj);
       // Compute relative overlap increase.
       double overlap_wout = 0.0;
       double overlap_with = 0.0;
       for(int k = 0; k < size; k++) {
         if(pair.second != k) {
-          E other = getter.get(options, k);
-          overlap_wout += SpatialUtil.relativeOverlap(entry, a1, other, a1);
-          overlap_with += SpatialUtil.relativeOverlap(mbr, SpatialComparableAdapter.STATIC, other, a1);
+          SpatialComparable other = getter.get(options, k);
+          overlap_wout += SpatialUtil.relativeOverlap(entry, other);
+          overlap_with += SpatialUtil.relativeOverlap(mbr, other);
         }
       }
       double inc_overlap = overlap_with - overlap_wout;
       if(inc_overlap < least_overlap) {
-        final double area = a1.getVolume(entry);
+        final double area = SpatialUtil.volume(entry);
         // Volume increase and overlap increase:
         least_overlap = inc_overlap;
         least_areainc = inc_area;
@@ -119,7 +116,7 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
         best = pair.second;
       }
       else if(inc_overlap == least_overlap) {
-        final double area = a1.getVolume(entry);
+        final double area = SpatialUtil.volume(entry);
         if(inc_area < least_areainc || (inc_area == least_areainc && area < least_area)) {
           least_overlap = inc_overlap;
           least_areainc = inc_area;

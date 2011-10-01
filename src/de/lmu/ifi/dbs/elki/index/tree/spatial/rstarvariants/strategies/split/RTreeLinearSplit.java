@@ -26,8 +26,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparableAdapter;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
@@ -54,7 +53,7 @@ public class RTreeLinearSplit implements SplitStrategy {
   public static final RTreeLinearSplit STATIC = new RTreeLinearSplit();
 
   @Override
-  public <E, A> BitSet split(A entries, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter, int minEntries) {
+  public <E extends SpatialComparable, A> BitSet split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
     final int num = getter.size(entries);
     // Object assignment, and processed objects
     BitSet assignment = new BitSet(num);
@@ -64,7 +63,7 @@ public class RTreeLinearSplit implements SplitStrategy {
     double area1 = 0, area2 = 0;
     // LinearPickSeeds - find worst pair
     {
-      final int dim = adapter.getDimensionality(getter.get(entries, 0));
+      final int dim = getter.get(entries, 0).getDimensionality();
       // Best candidates
       double bestsep = Double.NEGATIVE_INFINITY;
       int w1 = -1, w2 = -1;
@@ -79,8 +78,8 @@ public class RTreeLinearSplit implements SplitStrategy {
         int eh = -1, eh2 = -1;
         for(int i = 0; i < num; i++) {
           E ei = getter.get(entries, i);
-          final double low = adapter.getMin(ei, d);
-          final double hig = adapter.getMax(ei, d);
+          final double low = ei.getMin(d);
+          final double hig = ei.getMax(d);
           minlow = Math.min(minlow, low);
           maxhig = Math.max(maxhig, hig);
           if(low >= maxlow) {
@@ -139,10 +138,10 @@ public class RTreeLinearSplit implements SplitStrategy {
       // Initial mbrs and areas
       final E w1i = getter.get(entries, w1);
       final E w2i = getter.get(entries, w2);
-      area1 = adapter.getVolume(w1i);
-      area2 = adapter.getVolume(w2i);
-      mbr1 = SpatialUtil.copyMBR(w1i, adapter);
-      mbr2 = SpatialUtil.copyMBR(w2i, adapter);
+      area1 = SpatialUtil.volume(w1i);
+      area2 = SpatialUtil.volume(w2i);
+      mbr1 = new ModifiableHyperBoundingBox(w1i);
+      mbr2 = new ModifiableHyperBoundingBox(w2i);
       LoggingUtil.warning("size:" + num + " minEntries: " + minEntries + " area1: " + area1 + " area2: " + area2 + " w1: " + w1i.toString() + " w2: " + w2i.toString());
     }
     // Second phase, QS2+QS3
@@ -169,8 +168,8 @@ public class RTreeLinearSplit implements SplitStrategy {
 
         // Cost of putting object into both mbrs
         final E next_i = getter.get(entries, next);
-        final double d1 = SpatialUtil.volumeUnion(mbr1, SpatialComparableAdapter.STATIC, next_i, adapter) - area1;
-        final double d2 = SpatialUtil.volumeUnion(mbr2, SpatialComparableAdapter.STATIC, next_i, adapter) - area2;
+        final double d1 = SpatialUtil.volumeUnion(mbr1, next_i) - area1;
+        final double d2 = SpatialUtil.volumeUnion(mbr2, next_i) - area2;
         // Prefer smaller increase
         preferSecond = (d2 < d1);
         // QS3: tie handling
@@ -190,13 +189,13 @@ public class RTreeLinearSplit implements SplitStrategy {
         // Assign
         if(!preferSecond) {
           in1++;
-          mbr1.extend(next_i, adapter);
+          mbr1.extend(next_i);
           area1 = SpatialUtil.volume(mbr1);
         }
         else {
           in2++;
           assignment.set(next);
-          mbr2.extend(next_i, adapter);
+          mbr2.extend(next_i);
           area2 = SpatialUtil.volume(mbr2);
         }
         // Loop from QS2
