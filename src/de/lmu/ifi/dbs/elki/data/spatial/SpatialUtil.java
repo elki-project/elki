@@ -284,7 +284,7 @@ public final class SpatialUtil {
    * @param getter Array adapter
    * @return Flat MBR
    */
-  public static <E extends SpatialComparable, A> double[] unionFlatMBR(A data, ArrayAdapter<E, A> getter) {
+  public static <E extends SpatialComparable, A> double[] unionFlatMBR(A data, ArrayAdapter<E, ? super A> getter) {
     final int num = getter.size(data);
     assert (num > 0) : "Cannot compute MBR of empty set.";
     final E first = getter.get(data, 0);
