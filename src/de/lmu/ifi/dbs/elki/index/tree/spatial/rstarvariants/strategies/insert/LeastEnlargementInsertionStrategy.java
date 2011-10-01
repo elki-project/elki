@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert;
 
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -34,14 +34,14 @@ public class LeastEnlargementInsertionStrategy implements InsertionStrategy {
   }
 
   @Override
-  public <E, I, A> int choose(A options, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> a1, I obj, SpatialAdapter<? super I> a2, boolean leaf) {
+  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, boolean leaf) {
     final int size = getter.size(options);
     assert (size > 0) : "Choose from empty set?";
     double leastEnlargement = Double.POSITIVE_INFINITY;
     int best = -1;
     for(int i = 0; i < size; i++) {
-      E entry = getter.get(options, i);
-      double enlargement = SpatialUtil.volumeUnion(entry, a1, obj, a2) - a1.getVolume(entry);
+      SpatialComparable entry = getter.get(options, i);
+      double enlargement = SpatialUtil.volumeUnion(entry, obj) - SpatialUtil.volume(entry);
       if(enlargement < leastEnlargement) {
         leastEnlargement = enlargement;
         best = i;

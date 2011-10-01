@@ -28,7 +28,7 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -57,8 +57,8 @@ public class TopologicalSplitter implements SplitStrategy {
   }
 
   @Override
-  public <E, A> BitSet split(A entries, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter, int minEntries) {
-    Split<A, E> split = new Split<A, E>(entries, getter, adapter);
+  public <E extends SpatialComparable, A> BitSet split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
+    Split<A, E> split = new Split<A, E>(entries, getter);
     split.chooseSplitAxis(minEntries);
     split.chooseSplitPoint(minEntries);
     int splitpoint = split.getSplitPoint();
@@ -78,7 +78,7 @@ public class TopologicalSplitter implements SplitStrategy {
    * 
    * @param <E> Actual entry type
    */
-  private class Split<A, E> {
+  private class Split<A, E extends SpatialComparable> {
     /**
      * The index of the split point.
      */
@@ -121,19 +121,13 @@ public class TopologicalSplitter implements SplitStrategy {
     private int dimensionality;
 
     /**
-     * Spatial adapter
-     */
-    private SpatialAdapter<? super E> adapter;
-
-    /**
      * Constructor.
      */
-    public Split(A entries, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter) {
+    public Split(A entries, ArrayAdapter<E, A> getter) {
       this.entries = entries;
       this.getter = getter;
-      this.adapter = adapter;
       this.size = getter.size(entries);
-      this.dimensionality = adapter.getDimensionality(getter.get(entries, 0));
+      this.dimensionality = getter.get(entries, 0).getDimensionality();
       initMinMaxArrays();
     }
 
@@ -147,7 +141,7 @@ public class TopologicalSplitter implements SplitStrategy {
       double minSurface = Double.MAX_VALUE;
       int splitAxis = -1;
 
-      for(int d = 0; d < dimensionality; d++) {
+      for(int d = 1; d <= dimensionality; d++) {
         double sumOfAllMargins = 0;
         fillAndSort(d);
 
@@ -157,16 +151,16 @@ public class TopologicalSplitter implements SplitStrategy {
         // Except that we don't match them as you would do in a split, but
         // Iterate over all possible splits from both sides (as well as min and
         // max) in parallel, since union can be computed incrementally.
-        ModifiableHyperBoundingBox mbr_min_left = SpatialUtil.copyMBR(get(minSorting[0]), adapter);
-        ModifiableHyperBoundingBox mbr_min_right = SpatialUtil.copyMBR(get(minSorting[size - 1]), adapter);
-        ModifiableHyperBoundingBox mbr_max_left = SpatialUtil.copyMBR(get(maxSorting[0]), adapter);
-        ModifiableHyperBoundingBox mbr_max_right = SpatialUtil.copyMBR(get(maxSorting[size - 1]), adapter);
+        ModifiableHyperBoundingBox mbr_min_left = new ModifiableHyperBoundingBox(get(minSorting[0]));
+        ModifiableHyperBoundingBox mbr_min_right = new ModifiableHyperBoundingBox(get(minSorting[size - 1]));
+        ModifiableHyperBoundingBox mbr_max_left = new ModifiableHyperBoundingBox(get(maxSorting[0]));
+        ModifiableHyperBoundingBox mbr_max_right = new ModifiableHyperBoundingBox(get(maxSorting[size - 1]));
 
         for(int k = 1; k < size - minEntries; k++) {
-          mbr_min_left.extend(get(minSorting[k]), adapter);
-          mbr_min_right.extend(get(minSorting[size - 1 - k]), adapter);
-          mbr_max_left.extend(get(maxSorting[k]), adapter);
-          mbr_max_right.extend(get(maxSorting[size - 1 - k]), adapter);
+          mbr_min_left.extend(get(minSorting[k]));
+          mbr_min_right.extend(get(minSorting[size - 1 - k]));
+          mbr_max_left.extend(get(maxSorting[k]));
+          mbr_max_right.extend(get(maxSorting[size - 1 - k]));
           if(k >= minEntries - 1) {
             // Yes, build the sum. This value is solely used for finding the
             // preferred split axis!
@@ -181,7 +175,7 @@ public class TopologicalSplitter implements SplitStrategy {
           minSurface = sumOfAllMargins;
         }
       }
-      if(splitAxis != dimensionality - 1) {
+      if(splitAxis != dimensionality) {
         fillAndSort(splitAxis);
       }
     }
@@ -208,9 +202,9 @@ public class TopologicalSplitter implements SplitStrategy {
       // maximal value in the current dimension.
       for(int j = 0; j < size; j++) {
         E e = get(j);
-        minSorting[j].first = adapter.getMin(e, dim);
+        minSorting[j].first = e.getMin(dim);
         minSorting[j].second = j;
-        maxSorting[j].first = adapter.getMax(e, dim);
+        maxSorting[j].first = e.getMax(dim);
         maxSorting[j].second = j;
       }
       Arrays.sort(minSorting);
@@ -280,9 +274,9 @@ public class TopologicalSplitter implements SplitStrategy {
      * @return the mbr of the specified nodes
      */
     private HyperBoundingBox mbr(final DoubleIntPair[] sorting, final int from, final int to) {
-      ModifiableHyperBoundingBox mbr = SpatialUtil.copyMBR(get(sorting[from]), adapter);
+      ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(get(sorting[from]));
       for(int i = from + 1; i < to; i++) {
-        mbr.extend(get(sorting[i]), adapter);
+        mbr.extend(get(sorting[i]));
       }
       return mbr;
     }

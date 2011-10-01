@@ -37,7 +37,6 @@ import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparableAdapter;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -620,7 +619,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     N childNode = getNode(node.getEntry(0));
     final List<E> entries = node.getEntries();
-    int num = insertionStrategy.choose(entries, ListArrayAdapter.getStatic(entries), SpatialComparableAdapter.STATIC, mbr, SpatialComparableAdapter.STATIC, childNode.isLeaf());
+    int num = insertionStrategy.choose(entries, ListArrayAdapter.getStatic(entries), mbr, childNode.isLeaf());
     TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<E>(entries.get(num), num);
     // children are leafs
     if(childNode.isLeaf()) {
@@ -685,7 +684,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
     final List<E> entries = node.getEntries();
-    BitSet split = nodeSplitter.split(entries, ListArrayAdapter.getStatic(entries), SpatialComparableAdapter.STATIC, minimum);
+    BitSet split = nodeSplitter.split(entries, ListArrayAdapter.getStatic(entries), minimum);
 
     // New node
     final N newNode;

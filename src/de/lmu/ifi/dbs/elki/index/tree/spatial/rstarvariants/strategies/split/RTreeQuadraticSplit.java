@@ -26,8 +26,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialAdapter;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparableAdapter;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -53,7 +52,7 @@ public class RTreeQuadraticSplit implements SplitStrategy {
   public static final RTreeQuadraticSplit STATIC = new RTreeQuadraticSplit();
 
   @Override
-  public <E, A> BitSet split(A entries, ArrayAdapter<E, A> getter, SpatialAdapter<? super E> adapter, int minEntries) {
+  public <E extends SpatialComparable, A> BitSet split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
     final int num = getter.size(entries);
     // Object assignment, and processed objects
     BitSet assignment = new BitSet(num);
@@ -70,14 +69,14 @@ public class RTreeQuadraticSplit implements SplitStrategy {
       double[] areas = new double[num];
       for(int e1 = 0; e1 < num - 1; e1++) {
         final E e1i = getter.get(entries, e1);
-        areas[e1] = adapter.getVolume(e1i);
+        areas[e1] = SpatialUtil.volume(e1i);
       }
       // Compute area increase
       for(int e1 = 0; e1 < num - 1; e1++) {
         final E e1i = getter.get(entries, e1);
         for(int e2 = e1 + 1; e2 < num; e2++) {
           final E e2i = getter.get(entries, e2);
-          final double areaJ = SpatialUtil.volumeUnion(e1i, adapter, e2i, adapter);
+          final double areaJ = SpatialUtil.volumeUnion(e1i, e2i);
           final double d = areaJ - areas[e1] - areas[e2];
           if(d > worst) {
             worst = d;
@@ -95,8 +94,8 @@ public class RTreeQuadraticSplit implements SplitStrategy {
       // Initial mbrs and areas
       area1 = areas[w1];
       area2 = areas[w2];
-      mbr1 = SpatialUtil.copyMBR(getter.get(entries, w1), adapter);
-      mbr2 = SpatialUtil.copyMBR(getter.get(entries, w2), adapter);
+      mbr1 = new ModifiableHyperBoundingBox(getter.get(entries, w1));
+      mbr2 = new ModifiableHyperBoundingBox(getter.get(entries, w2));
     }
     // Second phase, QS2+QS3
     {
@@ -124,8 +123,8 @@ public class RTreeQuadraticSplit implements SplitStrategy {
         for(int pos = assigned.nextClearBit(0); pos < num; pos = assigned.nextClearBit(pos + 1)) {
           // Cost of putting object into both mbrs
           final E pos_i = getter.get(entries, pos);
-          final double d1 = SpatialUtil.volumeUnion(mbr1, SpatialComparableAdapter.STATIC, pos_i, adapter) - area1;
-          final double d2 = SpatialUtil.volumeUnion(mbr2, SpatialComparableAdapter.STATIC, pos_i, adapter) - area2;
+          final double d1 = SpatialUtil.volumeUnion(mbr1, pos_i) - area1;
+          final double d2 = SpatialUtil.volumeUnion(mbr2, pos_i) - area2;
           // Preference
           final double preference = Math.abs(d1 - d2);
           if(preference > greatestPreference) {
@@ -152,13 +151,13 @@ public class RTreeQuadraticSplit implements SplitStrategy {
         remaining--;
         if(!preferSecond) {
           in1++;
-          mbr1.extend(best_i, adapter);
+          mbr1.extend(best_i);
           area1 = SpatialUtil.volume(mbr1);
         }
         else {
           in2++;
           assignment.set(best);
-          mbr2.extend(best_i, adapter);
+          mbr2.extend(best_i);
           area2 = SpatialUtil.volume(mbr2);
         }
         // Loop from QS2
