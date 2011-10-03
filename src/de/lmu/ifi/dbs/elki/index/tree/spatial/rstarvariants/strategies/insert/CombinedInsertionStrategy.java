@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -49,11 +48,9 @@ public class CombinedInsertionStrategy implements InsertionStrategy {
   @Override
   public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, int height, int depth) {
     if(depth + 1 >= height) {
-      LoggingUtil.warning("leaf");
       return leafStrategy.choose(options, getter, obj, height, depth);
     }
     else {
-      LoggingUtil.warning("dir");
       return dirStrategy.choose(options, getter, obj, height, depth);
     }
   }
