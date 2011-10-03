@@ -28,7 +28,6 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -68,7 +67,7 @@ public class RTreeLinearSplit implements SplitStrategy {
       double bestsep = Double.NEGATIVE_INFINITY;
       int w1 = -1, w2 = -1;
       // LPS1: find extreme rectangles
-      for(int d = 0; d < dim; d++) {
+      for(int d = 1; d <= dim; d++) {
         // We need to find two candidates each, in case of el==eh!
         double minlow = Double.POSITIVE_INFINITY;
         double maxlow = Double.NEGATIVE_INFINITY, maxlow2 = Double.NEGATIVE_INFINITY;
@@ -142,7 +141,6 @@ public class RTreeLinearSplit implements SplitStrategy {
       area2 = SpatialUtil.volume(w2i);
       mbr1 = new ModifiableHyperBoundingBox(w1i);
       mbr2 = new ModifiableHyperBoundingBox(w2i);
-      LoggingUtil.warning("size:" + num + " minEntries: " + minEntries + " area1: " + area1 + " area2: " + area2 + " w1: " + w1i.toString() + " w2: " + w2i.toString());
     }
     // Second phase, QS2+QS3
     {
@@ -201,7 +199,6 @@ public class RTreeLinearSplit implements SplitStrategy {
         // Loop from QS2
       }
       // Note: "assigned" and "remaining" likely not updated!
-      LoggingUtil.warning("size:" + num + " minEntries: " + minEntries + " area1: " + area1 + " area2: " + area2);
     }
     return assignment;
   }
