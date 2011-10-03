@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.Spl
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ListArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -619,7 +619,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     N childNode = getNode(node.getEntry(0));
     final List<E> entries = node.getEntries();
-    int num = insertionStrategy.choose(entries, ListArrayAdapter.getStatic(entries), mbr, childNode.isLeaf());
+    int num = insertionStrategy.choose(entries, ArrayUtil.listAdapter(entries), mbr, childNode.isLeaf());
     TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<E>(entries.get(num), num);
     // children are leafs
     if(childNode.isLeaf()) {
@@ -684,7 +684,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
     final List<E> entries = node.getEntries();
-    BitSet split = nodeSplitter.split(entries, ListArrayAdapter.getStatic(entries), minimum);
+    BitSet split = nodeSplitter.split(entries, ArrayUtil.listAdapter(entries), minimum);
 
     // New node
     final N newNode;
