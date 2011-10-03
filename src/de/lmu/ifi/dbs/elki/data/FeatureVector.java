@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 
 /**
  * Generic FeatureVector class that can contain any type of data (i.e. numerical
@@ -65,16 +65,10 @@ public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> {
   /**
    * Returns a new FeatureVector of V for the given values.
    * 
-   * @param values the values of the featureVector
+   * @param array the values of the featureVector
+   * @param adapter adapter class
+   * @param <A> Array type
    * @return a new FeatureVector of V for the given values
    */
-  V newInstance(D[] values);
-
-  /**
-   * Returns a new FeatureVector of V for the given values.
-   * 
-   * @param values the values of the featureVector
-   * @return a new FeatureVector of V for the given values
-   */
-  V newInstance(List<D> values);
+  <A> V newInstance(A array, ArrayAdapter<D, A> adapter);
 }

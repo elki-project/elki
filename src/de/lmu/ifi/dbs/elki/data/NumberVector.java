@@ -207,14 +207,6 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
   V newInstance(double[] values);
 
   /**
-   * Returns a new NumberVector of N for the given values.
-   * 
-   * @param values the values of the NumberVector
-   * @return a new NumberVector of N for the given values
-   */
-  V newInstance(Vector values);
-  
-  /**
    * Instantiate from any number-array like object.
    * 
    * @param <A> Array type

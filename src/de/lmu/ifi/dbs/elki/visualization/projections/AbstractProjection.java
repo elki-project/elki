@@ -193,7 +193,7 @@ public abstract class AbstractProjection extends AbstractHierarchicalResult impl
     for(int d = 0; d < dim; d++) {
       ds[d] = scales[d].getUnscaled(ds[d]);
     }
-    return factory.newInstance(vec);
+    return factory.newInstance(vec.getArrayRef());
   }
 
   /**
@@ -214,7 +214,7 @@ public abstract class AbstractProjection extends AbstractHierarchicalResult impl
     for(int d = 0; d < dim; d++) {
       ds[d] = scales[d].getUnscaled(ds[d]);
     }
-    return prototype.newInstance(vec);
+    return prototype.newInstance(vec.getArrayRef());
   }
 
   /**
@@ -233,7 +233,7 @@ public abstract class AbstractProjection extends AbstractHierarchicalResult impl
     for(int d = 0; d < dim; d++) {
       ds[d] = scales[d].getRelativeUnscaled(ds[d]);
     }
-    return prototype.newInstance(vec);
+    return prototype.newInstance(vec.getArrayRef());
   }
 
   /**
@@ -254,7 +254,7 @@ public abstract class AbstractProjection extends AbstractHierarchicalResult impl
     for(int d = 0; d < dim; d++) {
       ds[d] = scales[d].getRelativeUnscaled(ds[d]);
     }
-    return prototype.newInstance(vec);
+    return prototype.newInstance(vec.getArrayRef());
   }
 
   @Override

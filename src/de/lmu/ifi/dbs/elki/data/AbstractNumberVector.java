@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayUtil;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -100,5 +102,10 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
   @Override
   public short shortValue(int dimension) {
     return (short) longValue(dimension);
+  }
+
+  @Override
+  public V newInstance(double[] values) {
+    return newInstance(values, ArrayUtil.DOUBLE_ARRAY_ADAPTER);
   }
 }

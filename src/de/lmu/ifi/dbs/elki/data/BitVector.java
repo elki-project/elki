@@ -26,12 +26,12 @@ package de.lmu.ifi.dbs.elki.data;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -84,21 +84,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
       this.bits.set(i, bits[i].bitValue());
     }
     this.dimensionality = bits.length;
-  }
-
-  /**
-   * Provides a new BitVector corresponding to the bits in the given list.
-   * 
-   * @param bits an array of bits specifying the bits in this bit vector
-   */
-  public BitVector(List<Bit> bits) {
-    this.bits = new BitSet(bits.size());
-    int i = 0;
-    for(Bit bit : bits) {
-      this.bits.set(i, bit.bitValue());
-      i++;
-    }
-    this.dimensionality = bits.size();
   }
 
   /**
@@ -377,25 +362,12 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   }
 
   @Override
-  public BitVector newInstance(double[] values) {
-    int dim = values.length;
+  public <A> BitVector newInstance(A array, ArrayAdapter<Bit, A> adapter) {
+    int dim = adapter.size(array);
     BitSet bits = new BitSet(dim);
     for(int i = 0; i < dim; i++) {
-      if(values[i] >= 0.5) {
-        bits.set(i);
-      }
-    }
-    return new BitVector(bits, dim);
-  }
-
-  @Override
-  public BitVector newInstance(Vector values) {
-    int dim = values.getDimensionality();
-    BitSet bits = new BitSet(dim);
-    for(int i = 0; i < dim; i++) {
-      if(values.get(i) >= 0.5) {
-        bits.set(i);
-      }
+      bits.set(i, adapter.get(array, i).bitValue());
+      i++;
     }
     return new BitVector(bits, dim);
   }
@@ -410,28 +382,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
       }
     }
     return new BitVector(bits, dim);
-  }
-
-  /**
-   * Creates and returns a new BitVector based on the passed values.
-   * 
-   * @return a new instance of this BitVector with the specified values
-   * 
-   */
-  @Override
-  public BitVector newInstance(Bit[] values) {
-    return new BitVector(values);
-  }
-
-  /**
-   * Creates and returns a new BitVector based on the passed values.
-   * 
-   * @return a new instance of this BitVector with the specified values
-   * 
-   */
-  @Override
-  public BitVector newInstance(List<Bit> values) {
-    return new BitVector(values);
   }
 
   @Override
@@ -490,7 +440,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   public int getByteSize(BitVector vec) {
     return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
   }
-
 
   /**
    * Parameterization class

@@ -21,6 +21,11 @@ public final class ArrayUtil {
   private static final NumberListArrayAdapter<Number> NUMBERLISTADAPTER = new NumberListArrayAdapter<Number>();
 
   /**
+   * Use a double array in the array API.
+   */
+  public static final NumberArrayAdapter<Double, double[]> DOUBLE_ARRAY_ADAPTER = new DoubleArrayAdapter();
+
+  /**
    * Cast the static instance.
    * 
    * @param dummy Dummy variable, for type inference
@@ -109,5 +114,54 @@ public final class ArrayUtil {
     public byte getByte(List<? extends T> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).byteValue();
     }
+  }
+  
+  /**
+   * Use a double array as, well, double array in the ArrayAdapter API.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  private static class DoubleArrayAdapter implements NumberArrayAdapter<Double, double[]> {
+    @Override
+    public int size(double[] array) {
+      return array.length;
+    }
+
+    @Override
+    public Double get(double[] array, int off) throws IndexOutOfBoundsException {
+      return array[off];
+    }
+
+    @Override
+    public double getDouble(double[] array, int off) throws IndexOutOfBoundsException {
+      return array[off];
+    }
+
+    @Override
+    public float getFloat(double[] array, int off) throws IndexOutOfBoundsException {
+      return (float) array[off];
+    }
+
+    @Override
+    public int getInteger(double[] array, int off) throws IndexOutOfBoundsException {
+      return (int) array[off];
+    }
+
+    @Override
+    public short getShort(double[] array, int off) throws IndexOutOfBoundsException {
+      return (short) array[off];
+    }
+
+    @Override
+    public long getLong(double[] array, int off) throws IndexOutOfBoundsException {
+      return (long) array[off];
+    }
+
+    @Override
+    public byte getByte(double[] array, int off) throws IndexOutOfBoundsException {
+      return (byte) array[off];
+    }    
   }
 }
