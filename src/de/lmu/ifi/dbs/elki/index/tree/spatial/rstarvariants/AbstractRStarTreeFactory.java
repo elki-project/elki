@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.CombinedInsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastOverlapInsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -131,7 +131,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ClassParameter<InsertionStrategy> insertionStrategyP = new ClassParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, LeastOverlapInsertionStrategy.class);
+      ClassParameter<InsertionStrategy> insertionStrategyP = new ClassParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class);
       if(config.grab(insertionStrategyP)) {
         insertionStrategy = insertionStrategyP.instantiateClass(config);
       }

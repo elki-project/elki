@@ -16,8 +16,9 @@ public interface InsertionStrategy extends Parameterizable {
    * @param options Options to choose from
    * @param getter Array adapter for options
    * @param obj Insertion object
-   * @param leaf Choose at leaf height.
+   * @param height Tree height
+   * @param depth Insertion depth (depth == height - 1 indicates leaf level)
    * @return Subtree index in array.
    */
-  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, boolean leaf);
+  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, int height, int depth);
 }

@@ -34,7 +34,7 @@ public class LeastEnlargementInsertionStrategy implements InsertionStrategy {
   }
 
   @Override
-  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, boolean leaf) {
+  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, int height, int depth) {
     final int size = getter.size(options);
     assert (size > 0) : "Choose from empty set?";
     double leastEnlargement = Double.POSITIVE_INFINITY;

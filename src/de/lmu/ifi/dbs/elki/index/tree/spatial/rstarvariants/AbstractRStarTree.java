@@ -619,7 +619,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     N childNode = getNode(node.getEntry(0));
     final List<E> entries = node.getEntries();
-    int num = insertionStrategy.choose(entries, ArrayUtil.listAdapter(entries), mbr, childNode.isLeaf());
+    int num = insertionStrategy.choose(entries, ArrayUtil.listAdapter(entries), mbr, height, subtree.getPathCount());
     TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<E>(entries.get(num), num);
     // children are leafs
     if(childNode.isLeaf()) {
