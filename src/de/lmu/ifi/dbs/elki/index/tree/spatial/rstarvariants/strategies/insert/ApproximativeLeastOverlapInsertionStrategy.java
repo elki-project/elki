@@ -46,30 +46,12 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
   }
 
   @Override
-  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, boolean leaf) {
-    if(leaf) {
-      return chooseLeastOverlapApproximately(options, getter, obj);
-    }
-    else {
-      return chooseLeastEnlargement(options, getter, obj);
-    }
-  }
-
-  /**
-   * Choose subtree by least overlap, then area increase, then area. See the
-   * R*-Tree publication for details and experiments.
-   * 
-   * @param options Options to choose from
-   * @param getter Array adapter for options
-   * @param obj Insertion object
-   * @return Subtree index in array.
-   */
-  protected <A> int chooseLeastOverlapApproximately(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj) {
+  public <A> int choose(A options, ArrayAdapter<? extends SpatialComparable, A> getter, SpatialComparable obj, int height, int depth) {
     final int size = getter.size(options);
     assert (size > 0) : "Choose from empty set?";
     if(size <= numCandidates) {
       // Skip building the heap.
-      return chooseLeastOverlap(options, getter, obj);
+      return super.choose(options, getter, obj, height, depth);
     }
 
     // Heap of candidates
