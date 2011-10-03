@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -292,23 +293,18 @@ public class UnsafeDoubleVector extends AbstractNumberVector<UnsafeDoubleVector,
   }
 
   @Override
-  public UnsafeDoubleVector newInstance(Vector values) {
-    return new UnsafeDoubleVector(values.getArrayRef());
-  }
-
-  @Override
-  public UnsafeDoubleVector newInstance(Double[] values) {
-    return new UnsafeDoubleVector(values);
-  }
-
-  @Override
   public UnsafeDoubleVector newInstance(double[] values) {
     return new UnsafeDoubleVector(values);
   }
 
   @Override
-  public UnsafeDoubleVector newInstance(List<Double> values) {
-    return new UnsafeDoubleVector(values);
+  public <A> UnsafeDoubleVector newInstance(A array, ArrayAdapter<Double, A> adapter) {
+    int dim = adapter.size(array);
+    double[] values = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.get(array, i);
+    }
+    return new UnsafeDoubleVector(values, true);
   }
 
   @Override

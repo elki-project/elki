@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -233,30 +234,14 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
     return featureLine.toString();
   }
 
-  /**
-   * @return a new FloatVector with the specified values
-   */
   @Override
-  public FloatVector newInstance(Vector values) {
-    return new FloatVector(values);
-  }
-
-  /**
-   * @return a new FloatVector with the specified values
-   */
-  @Override
-  public FloatVector newInstance(double[] values) {
-    return new FloatVector(Util.convertToFloat(values));
-  }
-
-  @Override
-  public FloatVector newInstance(Float[] values) {
-    return new FloatVector(values);
-  }
-
-  @Override
-  public FloatVector newInstance(List<Float> values) {
-    return new FloatVector(values);
+  public <A> FloatVector newInstance(A array, ArrayAdapter<Float, A> adapter) {
+    int dim = adapter.size(array);
+    float[] values = new float[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.get(array, i);
+    }
+    return new FloatVector(values, true);
   }
 
   @Override

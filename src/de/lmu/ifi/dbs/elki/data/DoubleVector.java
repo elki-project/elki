@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -275,23 +276,18 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   }
 
   @Override
-  public DoubleVector newInstance(Vector values) {
-    return new DoubleVector(values);
-  }
-
-  @Override
-  public DoubleVector newInstance(Double[] values) {
-    return new DoubleVector(values);
-  }
-
-  @Override
   public DoubleVector newInstance(double[] values) {
     return new DoubleVector(values);
   }
 
   @Override
-  public DoubleVector newInstance(List<Double> values) {
-    return new DoubleVector(values);
+  public <A> DoubleVector newInstance(A array, ArrayAdapter<Double, A> adapter) {
+    int dim = adapter.size(array);
+    double[] values = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.get(array, i);
+    }
+    return new DoubleVector(values, true);
   }
 
   @Override

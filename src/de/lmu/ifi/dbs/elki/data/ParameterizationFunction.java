@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 
 /**
  * A parameterization function describes all lines in a d-dimensional feature
@@ -549,22 +551,27 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
   }
 
   @Override
-  public DoubleVector newInstance(double[] values) {
+  public ParameterizationFunction newInstance(double[] values) {
     return new ParameterizationFunction(values);
   }
 
   @Override
-  public DoubleVector newInstance(Vector values) {
+  public <A> DoubleVector newInstance(A array, ArrayAdapter<Double, A> adapter) {
+    final int dim = adapter.size(array);
+    double[] values = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.get(array, i);
+    }
     return new ParameterizationFunction(values);
   }
 
   @Override
-  public DoubleVector newInstance(Double[] values) {
-    return new ParameterizationFunction(values);
-  }
-
-  @Override
-  public DoubleVector newInstance(List<Double> values) {
+  public <A> DoubleVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+    final int dim = adapter.size(array);
+    double[] values = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.getDouble(array, i);
+    }
     return new ParameterizationFunction(values);
   }
 }

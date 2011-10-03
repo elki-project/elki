@@ -25,13 +25,12 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -65,20 +64,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   }
 
   /**
-   * Provides a feature vector consisting of int values according to the
-   * given Integer values.
-   * 
-   * @param values the values to be set as values of the integer vector
-   */
-  public IntegerVector(List<Integer> values) {
-    int i = 0;
-    this.values = new int[values.size()];
-    for(Iterator<Integer> iter = values.iterator(); iter.hasNext(); i++) {
-      this.values[i] = (iter.next());
-    }
-  }
-
-  /**
    * Provides an IntegerVector consisting of the given integer values.
    * 
    * @param values the values to be set as values of the IntegerVector
@@ -86,39 +71,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   public IntegerVector(int[] values) {
     this.values = new int[values.length];
     System.arraycopy(values, 0, this.values, 0, values.length);
-  }
-
-  /**
-   * Provides an IntegerVector consisting of the given integer values.
-   * 
-   * @param values the values to be set as values of the IntegerVector
-   */
-  public IntegerVector(Integer[] values) {
-    this.values = new int[values.length];
-    for(int i = 0; i < values.length; i++) {
-      this.values[i] = values[i];
-    }
-  }
-
-  /**
-   * Provides an IntegerVector consisting of the given double values.
-   * 
-   * @param values the values to be set as values of the IntegerVector
-   */
-  public IntegerVector(double[] values) {
-    this.values = new int[values.length];
-    for(int i = 0; i < this.values.length; i++) {
-      this.values[i] = (int) values[i];
-    }
-  }
-
-  /**
-   * Provides an IntegerVector consisting of the given double vectors values.
-   * 
-   * @param values the values to be set as values of the IntegerVector
-   */
-  public IntegerVector(Vector values) {
-    this(values.getArrayRef());
   }
 
   @Override
@@ -288,23 +240,13 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   }
 
   @Override
-  public IntegerVector newInstance(Vector values) {
-    return new IntegerVector(values);
-  }
-
-  @Override
-  public IntegerVector newInstance(Integer[] values) {
-    return new IntegerVector(values);
-  }
-
-  @Override
-  public IntegerVector newInstance(double[] values) {
-    return new IntegerVector(values);
-  }
-
-  @Override
-  public IntegerVector newInstance(List<Integer> values) {
-    return new IntegerVector(values);
+  public <A> IntegerVector newInstance(A array, ArrayAdapter<Integer, A> adapter) {
+    int dim = adapter.size(array);
+    int[] values = new int[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.get(array, i);
+    }
+    return new IntegerVector(values, true);
   }
 
   @Override

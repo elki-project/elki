@@ -23,10 +23,9 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -121,29 +120,9 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
   }
 
   @Override
-  public OneDimensionalDoubleVector newInstance(double[] values) {
-    assert (values.length == 1) : "Incorrect dimensionality for 1-dimensional vector.";
-    return new OneDimensionalDoubleVector(values[0]);
-  }
-
-  @Override
-  public OneDimensionalDoubleVector newInstance(Vector values) {
-    assert (values.getDimensionality() == 1) : "Incorrect dimensionality for 1-dimensional vector.";
-    return new OneDimensionalDoubleVector(values.get(0));
-  }
-
-  @Override
-  public OneDimensionalDoubleVector newInstance(Double[] values) {
-    assert (values != null) : "newInstace(null) is not allowed.";
-    assert (values.length == 1) : "Incorrect dimensionality for 1-dimensional vector.";
-    return new OneDimensionalDoubleVector(values[0]);
-  }
-
-  @Override
-  public OneDimensionalDoubleVector newInstance(List<Double> values) {
-    assert (values != null) : "newInstace(null) is not allowed.";
-    assert (values.size() == 1) : "Incorrect dimensionality for 1-dimensional vector.";
-    return new OneDimensionalDoubleVector(values.get(0));
+  public <A> OneDimensionalDoubleVector newInstance(A array, ArrayAdapter<Double, A> adapter) {
+    assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
+    return new OneDimensionalDoubleVector(adapter.get(array, 0));
   }
 
   @Override

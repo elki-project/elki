@@ -25,14 +25,12 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.datasource.parser.SparseFloatVectorLabelParser;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -483,24 +481,14 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   @Override
-  public SparseFloatVector newInstance(Vector values) {
-    return newInstance(values.getArrayRef());
-  }
-
-  @Override
-  public SparseFloatVector newInstance(double[] values) {
-    // FIXME: inefficient
-    return new SparseFloatVector(Util.convertToFloat(values));
-  }
-
-  @Override
-  public SparseFloatVector newInstance(List<Float> values) {
-    return new SparseFloatVector(Util.unboxToFloat(ClassGenericsUtil.toArray(values, Float.class)));
-  }
-
-  @Override
-  public SparseFloatVector newInstance(Float[] values) {
-    return new SparseFloatVector(Util.unboxToFloat(values));
+  public <A> SparseFloatVector newInstance(A array, ArrayAdapter<Float, A> adapter) {
+    int dim = adapter.size(array);
+    float[] values = new float[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.get(array, i);
+    }
+    // TODO: inefficient
+    return new SparseFloatVector(values);
   }
 
   @Override
