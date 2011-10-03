@@ -28,7 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
-import de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -116,7 +116,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      configParser(config, Parser.class, DoubleVectorLabelParser.class);
+      configParser(config, Parser.class, NumberVectorLabelParser.class);
       configFilters(config);
     }
 

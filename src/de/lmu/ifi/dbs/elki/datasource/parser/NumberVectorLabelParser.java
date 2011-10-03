@@ -33,15 +33,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -61,7 +66,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector used
  */
-public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> extends AbstractParser implements LinebasedParser, Parser {
+public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends AbstractParser implements LinebasedParser, Parser {
+  /**
+   * Logging class.
+   */
+  private static final Logging logger = Logging.getLogger(NumberVectorLabelParser.class);
+  
   /**
    * A comma separated list of the indices of labels (may be numeric), counting
    * whitespace separated entries in a line starting with 0. The corresponding
@@ -73,9 +83,23 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   public static final OptionID LABEL_INDICES_ID = OptionID.getOrCreateOptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
 
   /**
+   * Parameter to specify the type of vectors to produce.
+   * <p>
+   * Key: {@code -parser.vector-type}<br />
+   * Default: DoubleVector
+   * </p>
+   */
+  public static final OptionID VECTOR_TYPE_ID = OptionID.getOrCreateOptionID("parser.vector-type", "The type of vectors to create for numerical attributes.");
+
+  /**
    * Keeps the indices of the attributes to be treated as a string label.
    */
   protected BitSet labelIndices;
+
+  /**
+   * Vector factory class
+   */
+  protected V factory;
 
   /**
    * Constructor
@@ -83,10 +107,12 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * @param colSep
    * @param quoteChar
    * @param labelIndices
+   * @param factory Vector factory
    */
-  public NumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
+  public NumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices, V factory) {
     super(colSep, quoteChar);
     this.labelIndices = labelIndices;
+    this.factory = factory;
   }
 
   @Override
@@ -159,7 +185,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     }
 
     Pair<V, LabelList> objectAndLabels;
-    V vec = createDBObject(attributes);
+    V vec = createDBObject(attributes, ArrayUtil.numberListAdapter(attributes));
     objectAndLabels = new Pair<V, LabelList>(vec, labels);
     return objectAndLabels;
   }
@@ -172,7 +198,9 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * @param attributes the attributes of the vector to create.
    * @return a RalVector of type V containing the given attribute values
    */
-  protected abstract V createDBObject(List<Double> attributes);
+  protected <A> V createDBObject(A attributes, NumberArrayAdapter<?, A> adapter) {
+    return factory.newInstance(attributes, adapter);
+  }
 
   /**
    * Get a prototype object for the given dimensionality.
@@ -180,7 +208,16 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * @param dimensionality Dimensionality
    * @return Prototype object
    */
-  abstract protected VectorFieldTypeInformation<V> getTypeInformation(int dimensionality);
+  VectorFieldTypeInformation<V> getTypeInformation(int dimensionality) {
+    @SuppressWarnings("unchecked")
+    Class<V> cls = (Class<V>) factory.getClass();
+    return new VectorFieldTypeInformation<V>(cls, dimensionality, factory);
+  }
+  
+  @Override
+  protected Logging getLogger() {
+    return logger;
+  }
 
   /**
    * Parameterization class.
@@ -189,15 +226,32 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<V extends NumberVector<?, ?>> extends AbstractParser.Parameterizer {
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParser.Parameterizer {
     /**
      * Keeps the indices of the attributes to be treated as a string label.
      */
     protected BitSet labelIndices = null;
 
+    /**
+     * Factory
+     */
+    protected V factory;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      getLabelIndices(config);
+      getFactory(config);
+    }
+
+    protected void getFactory(Parameterization config) {
+      ObjectParameter<V> factoryP = new ObjectParameter<V>(VECTOR_TYPE_ID, NumberVector.class, DoubleVector.class);
+      if(config.grab(factoryP)) {
+        factory = factoryP.instantiateClass(config);
+      }
+    }
+
+    protected void getLabelIndices(Parameterization config) {
       IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID, true);
 
       labelIndices = new BitSet();
@@ -210,6 +264,8 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     }
 
     @Override
-    protected abstract NumberVectorLabelParser<V> makeInstance();
+    protected NumberVectorLabelParser<V> makeInstance() {
+      return new NumberVectorLabelParser<V>(colSep, quoteChar, labelIndices, factory);
+    }
   }
 }

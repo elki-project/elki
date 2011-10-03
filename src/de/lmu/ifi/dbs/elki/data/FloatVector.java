@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * A FloatVector is to store real values approximately as float values.
@@ -40,6 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * @author Elke Achtert
  */
 public class FloatVector extends AbstractNumberVector<FloatVector, Float> implements ByteBufferSerializer<FloatVector> {
+  /**
+   * Static factory instance
+   */
+  public static final FloatVector STATIC = new FloatVector(new float[0], true);
+
   /**
    * Keeps the values of the float vector
    */
@@ -253,6 +260,16 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
   }
 
   @Override
+  public <A> FloatVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+    int dim = adapter.size(array);
+    float[] values = new float[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.getFloat(array, i);
+    }
+    return new FloatVector(values, true);
+  }
+
+  @Override
   public FloatVector fromByteBuffer(ByteBuffer buffer) throws IOException {
     final short dimensionality = buffer.getShort();
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * dimensionality;
@@ -280,5 +297,19 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
   @Override
   public int getByteSize(FloatVector vec) {
     return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * vec.getDimensionality();
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected FloatVector makeInstance() {
+      return STATIC;
+    }
   }
 }

@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * An IntegerVector is to store integer values.
@@ -39,6 +41,11 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * @author Erich Schubert
  */
 public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> implements ByteBufferSerializer<IntegerVector> {
+  /**
+   * Static instance (object factory)
+   */
+  public static final IntegerVector STATIC = new IntegerVector(new int[0], true);
+
   /**
    * Keeps the values of the real vector
    */
@@ -301,6 +308,16 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   }
 
   @Override
+  public <A> IntegerVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+    int dim = adapter.size(array);
+    int[] values = new int[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.getInteger(array, i);
+    }
+    return new IntegerVector(values, true);
+  }
+
+  @Override
   public IntegerVector fromByteBuffer(ByteBuffer buffer) throws IOException {
     final short dimensionality = buffer.getShort();
     final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
@@ -326,5 +343,20 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   @Override
   public int getByteSize(IntegerVector vec) {
     return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
+  }
+
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected IntegerVector makeInstance() {
+      return STATIC;
+    }
   }
 }

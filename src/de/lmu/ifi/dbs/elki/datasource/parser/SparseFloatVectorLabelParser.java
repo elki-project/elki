@@ -85,7 +85,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    * @param labelIndices
    */
   public SparseFloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices);
+    super(colSep, quoteChar, labelIndices, SparseFloatVector.STATIC);
   }
 
   /**
@@ -93,11 +93,6 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    * index of any attribute.
    */
   private int dimensionality = -1;
-
-  @Override
-  public SparseFloatVector createDBObject(List<Double> attributes) {
-    throw new UnsupportedOperationException("This method should never be reached.");
-  }
 
   @Override
   public Pair<SparseFloatVector, LabelList> parseLineInternal(String line) {

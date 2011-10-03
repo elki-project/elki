@@ -32,34 +32,38 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayUtil;
 
 /**
  * Parser reads points transposed. Line n gives the n-th attribute for all
  * points.
  * 
  * @author Arthur Zimek
+ * 
+ * @param <V> Vector type
  */
-public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser {
+public class NumberVectorLabelTransposingParser<V extends NumberVector<V, ?>> extends NumberVectorLabelParser<V> {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(DoubleVectorLabelTransposingParser.class);
+  private static final Logging logger = Logging.getLogger(NumberVectorLabelTransposingParser.class);
 
   /**
    * Constructor.
    * 
-   * @param colSep
-   * @param quoteChar
-   * @param labelIndices
+   * @param colSep Column separator pattern
+   * @param quoteChar Quote character
+   * @param labelIndices Indices of columns to use as labels
+   * @param factory Factory class
    */
-  public DoubleVectorLabelTransposingParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices);
+  public NumberVectorLabelTransposingParser(Pattern colSep, char quoteChar, BitSet labelIndices, V factory) {
+    super(colSep, quoteChar, labelIndices, factory);
   }
 
   @Override
@@ -110,10 +114,10 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<DoubleVector> vectors = new ArrayList<DoubleVector>();
+    List<V> vectors = new ArrayList<V>();
     List<LabelList> lblc = new ArrayList<LabelList>();
     for(int i = 0; i < data.length; i++) {
-      DoubleVector featureVector = new DoubleVector(data[i]);
+      V featureVector = createDBObject(data[i], ArrayUtil.numberListAdapter(data[i]));
       vectors.add(featureVector);
       lblc.add(labels[i]);
     }
@@ -132,10 +136,10 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<DoubleVector> {
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override
-    protected DoubleVectorLabelTransposingParser makeInstance() {
-      return new DoubleVectorLabelTransposingParser(colSep, quoteChar, labelIndices);
+    protected NumberVectorLabelTransposingParser<V> makeInstance() {
+      return new NumberVectorLabelTransposingParser<V>(colSep, quoteChar, labelIndices, factory);
     }
   }
 }

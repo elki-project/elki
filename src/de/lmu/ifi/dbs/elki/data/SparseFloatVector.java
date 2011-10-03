@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * <p>
@@ -46,6 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  */
 // TODO: implement ByteArraySerializer<SparseFloatVector>
 public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> implements SparseNumberVector<SparseFloatVector, Float> {
+  /**
+   * Static instance
+   */
+  public static final SparseFloatVector STATIC = new SparseFloatVector(new int[0], new float[0], -1);
+
   /**
    * Indexes of values
    */
@@ -497,11 +504,36 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   @Override
+  public <A> SparseFloatVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+    int dim = adapter.size(array);
+    float[] values = new float[dim];
+    for(int i = 0; i < dim; i++) {
+      values[i] = adapter.getFloat(array, i);
+    }
+    // TODO: inefficient
+    return new SparseFloatVector(values);
+  }
+
+  @Override
   public BitSet getNotNullMask() {
     BitSet b = new BitSet();
     for(int key : indexes) {
       b.set(key);
     }
     return b;
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected SparseFloatVector makeInstance() {
+      return STATIC;
+    }
   }
 }
