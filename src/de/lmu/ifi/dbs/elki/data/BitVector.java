@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Provides a BitVector wrapping a BitSet.
@@ -39,6 +41,11 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * @author Arthur Zimek
  */
 public class BitVector extends AbstractNumberVector<BitVector, Bit> implements ByteBufferSerializer<BitVector> {
+  /**
+   * Static instance.
+   */
+  public static final BitVector STATIC = new BitVector(new BitSet(0), 0);
+
   /**
    * Storing the bits.
    */
@@ -393,6 +400,18 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
     return new BitVector(bits, dim);
   }
 
+  @Override
+  public <A> BitVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+    int dim = adapter.size(array);
+    BitSet bits = new BitSet(dim);
+    for(int i = 0; i < dim; i++) {
+      if(adapter.getDouble(array, i) >= 0.5) {
+        bits.set(i);
+      }
+    }
+    return new BitVector(bits, dim);
+  }
+
   /**
    * Creates and returns a new BitVector based on the passed values.
    * 
@@ -425,9 +444,9 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
     // read values
     BitSet values = new BitSet(dimensionality);
     byte b = 0;
-    for(int i = 0; i < dimensionality; i ++) {
+    for(int i = 0; i < dimensionality; i++) {
       // read the next byte when needed.
-      if ((i & 7) == 0) {
+      if((i & 7) == 0) {
         b = buffer.get();
       }
       final byte bit = (byte) (1 << (i & 7));
@@ -441,7 +460,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   @Override
   public void toByteBuffer(ByteBuffer buffer, BitVector vec) throws IOException {
     final int len = getByteSize(vec);
-    assert(vec.getDimensionality() <= Short.MAX_VALUE);
+    assert (vec.getDimensionality() <= Short.MAX_VALUE);
     final short dim = (short) vec.getDimensionality();
     if(buffer.remaining() < len) {
       throw new IOException("Not enough space for the bit vector!");
@@ -460,15 +479,30 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
         b &= ~mask;
       }
       // Write when appropriate
-      if ((i & 7) == 7 || i == dim - 1) {
+      if((i & 7) == 7 || i == dim - 1) {
         buffer.put(b);
         b = 0;
       }
     }
   }
-  
+
   @Override
   public int getByteSize(BitVector vec) {
     return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
+  }
+
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected BitVector makeInstance() {
+      return STATIC;
+    }
   }
 }

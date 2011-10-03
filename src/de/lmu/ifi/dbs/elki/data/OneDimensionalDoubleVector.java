@@ -27,15 +27,22 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Specialized class implementing a one-dimensional double vector without using
- * an array. Saves a little bit of memory, albeit we cannot avoid boxing as long as
- * we want to implement the interface.
+ * an array. Saves a little bit of memory, albeit we cannot avoid boxing as long
+ * as we want to implement the interface.
  * 
  * @author Erich Schubert
  */
 public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensionalDoubleVector, Double> {
+  /**
+   * Static factory instance
+   */
+  public static final OneDimensionalDoubleVector STATIC = new OneDimensionalDoubleVector(Double.NaN);
+
   /**
    * The actual data value
    */
@@ -137,5 +144,25 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
     assert (values != null) : "newInstace(null) is not allowed.";
     assert (values.size() == 1) : "Incorrect dimensionality for 1-dimensional vector.";
     return new OneDimensionalDoubleVector(values.get(0));
+  }
+
+  @Override
+  public <A> OneDimensionalDoubleVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+    assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
+    return new OneDimensionalDoubleVector(adapter.getDouble(array, 0));
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected OneDimensionalDoubleVector makeInstance() {
+      return STATIC;
+    }
   }
 }

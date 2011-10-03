@@ -26,6 +26,8 @@ package de.lmu.ifi.dbs.elki.data;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface NumberVector defines the methods that should be implemented by any
@@ -40,7 +42,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @apiviz.has Matrix
  * @apiviz.has Vector
  */
-public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V, N>, SpatialComparable {
+public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V, N>, SpatialComparable, Parameterizable {
   /**
    * Returns the value in the specified dimension as double.
    * 
@@ -211,4 +213,14 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
    * @return a new NumberVector of N for the given values
    */
   V newInstance(Vector values);
+  
+  /**
+   * Instantiate from any number-array like object.
+   * 
+   * @param <A> Array type
+   * @param array Array
+   * @param adapter Adapter
+   * @return a new NumberVector of N for the given values.
+   */
+  <A> V newInstance(A array, NumberArrayAdapter<?, A> adapter);
 }

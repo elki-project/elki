@@ -81,14 +81,9 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
    * @param labelIndices
    */
   public TermFrequencyParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices);
+    super(colSep, quoteChar, labelIndices, SparseFloatVector.STATIC);
     this.maxdim = 0;
     this.keymap = new HashMap<String, Integer>();
-  }
-
-  @Override
-  protected SparseFloatVector createDBObject(List<Double> attributes) {
-    throw new UnsupportedOperationException("This method should never be reached.");
   }
 
   @Override

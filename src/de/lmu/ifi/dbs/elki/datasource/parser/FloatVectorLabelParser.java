@@ -23,13 +23,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import java.util.BitSet;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.FloatVector;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * <p>
@@ -68,22 +66,7 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
    * @param labelIndices
    */
   public FloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices);
-  }
-
-  /**
-   * Creates a FloatVector out of the given attribute values.
-   * 
-   * @see de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser#createDBObject(java.util.List)
-   */
-  @Override
-  public FloatVector createDBObject(List<Double> attributes) {
-    return new FloatVector(Util.convertToFloat(attributes));
-  }
-
-  @Override
-  protected VectorFieldTypeInformation<FloatVector> getTypeInformation(int dimensionality) {
-    return new VectorFieldTypeInformation<FloatVector>(FloatVector.class, dimensionality, new FloatVector(new float[dimensionality]));
+    super(colSep, quoteChar, labelIndices, FloatVector.STATIC);
   }
 
   @Override
@@ -99,6 +82,11 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
    * @apiviz.exclude
    */
   public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<FloatVector> {
+    @Override
+    protected void getFactory(Parameterization config) {
+      // Do nothing: not used
+    }
+
     @Override
     protected FloatVectorLabelParser makeInstance() {
       return new FloatVectorLabelParser(colSep, quoteChar, labelIndices);
