@@ -129,7 +129,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           parseLineInternal(line, vectors, labels);
-          V newvec = vectors.get(vectors.size());
+          V newvec = vectors.get(vectors.size() - 1);
           if(dimensionality < 0) {
             dimensionality = newvec.getDimensionality();
           }
