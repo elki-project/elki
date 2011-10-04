@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 
@@ -41,7 +43,7 @@ public class GeneratorModel implements Model {
   /**
    * Individual distributions
    */
-  Distribution[] distributions;
+  List<Distribution> distributions;
 
   /**
    * Constructor.
@@ -49,15 +51,15 @@ public class GeneratorModel implements Model {
    * @param transform Transformation
    * @param distributions Distributions
    */
-  public GeneratorModel(AffineTransformation transform, Distribution[] distributions) {
+  public GeneratorModel(AffineTransformation transform, List<Distribution> distributions) {
     super();
-    assert(transform.getDimensionality() == distributions.length);
+    assert(transform == null || transform.getDimensionality() == distributions.size());
     this.transform = transform;
     this.distributions = distributions;
   }
 
   /**
-   * @return the transform
+   * @return the transform. May be null!
    */
   protected AffineTransformation getTransform() {
     return transform;
@@ -69,6 +71,6 @@ public class GeneratorModel implements Model {
    * @return the nth distribution (starting at 1)
    */
   protected Distribution getDistribution(int dim) {
-    return distributions[dim - 1];
+    return distributions.get(dim - 1);
   }
 }

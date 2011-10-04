@@ -23,22 +23,22 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
- * Generic cluster model. Does not supply additional meta information except that it is a cluster.
- * Since there is no meta information, you should use the static {@link #CLUSTER} object.
+ * Generic cluster model. Does not supply additional meta information except
+ * that it is a cluster. Since there is no meta information, you should use the
+ * static {@link #CLUSTER} object.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.landmark
  */
 public final class ClusterModel extends BaseModel {
   /**
-   * Static cluster model that can be shared for all clusters (since the object doesn't include meta information.
+   * Static cluster model that can be shared for all clusters (since the object
+   * doesn't include meta information.
    */
   public final static ClusterModel CLUSTER = new ClusterModel();
 
-  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "ClusterModel";

@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
 import java.util.LinkedList;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.data.model.GeneratorModel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
@@ -121,7 +122,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * so far!
    * 
    * @param gen Distribution generator
-   * @throws UnableToComplyException thrown when no new generators may be added anymore
+   * @throws UnableToComplyException thrown when no new generators may be added
+   *         anymore
    */
   public void addGenerator(Distribution gen) throws UnableToComplyException {
     if(trans != null) {
@@ -412,5 +414,14 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    */
   public Random getNewRandomGenerator() {
     return new Random(random.nextLong());
+  }
+
+  /**
+   * Make a cluster model for this cluster.
+   * 
+   * @return Model
+   */
+  public GeneratorModel makeModel() {
+    return new GeneratorModel(trans, axes);
   }
 }
