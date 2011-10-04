@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -118,7 +119,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
     if(value <= mean) {
       return 0;
     }
-    return Math.max(0, MathUtil.erf((value - mean) / factor));
+    return Math.max(0, NormalDistribution.erf((value - mean) / factor));
   }
 
   @Override

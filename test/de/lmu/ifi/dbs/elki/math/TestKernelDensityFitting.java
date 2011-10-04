@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
 import de.lmu.ifi.dbs.elki.math.statistics.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -138,8 +139,8 @@ public class TestKernelDensityFitting implements JUnit4Test {
     params[0] = mv.getMean();
     params[1] = mv.getSampleStddev();
     // guess initial amplitude for an gaussian distribution.
-    double c1 = MathUtil.erf(Math.abs(data[0] - params[0]) / (params[1] * Math.sqrt(2)));
-    double c2 = MathUtil.erf(Math.abs(data[data.length - 1] - params[0]) / (params[1] * Math.sqrt(2)));
+    double c1 = NormalDistribution.erf(Math.abs(data[0] - params[0]) / (params[1] * Math.sqrt(2)));
+    double c2 = NormalDistribution.erf(Math.abs(data[data.length - 1] - params[0]) / (params[1] * Math.sqrt(2)));
     params[2] = 1.0 / Math.min(c1, c2);
     // System.out.println("Mean: " + params[0] + " Stddev: " + params[1] +
     // " Amp: " + params[2]);

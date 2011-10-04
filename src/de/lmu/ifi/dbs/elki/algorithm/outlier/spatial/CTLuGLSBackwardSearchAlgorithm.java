@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -131,7 +131,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
       ModifiableDBIDs idview = DBIDUtil.newHashSet(relationx.getDBIDs());
       ProxyView<V> proxy = new ProxyView<V>(relationx.getDatabase(), idview, relationx);
 
-      double phialpha = MathUtil.standardNormalProbit(1.0 - alpha / 2);
+      double phialpha = NormalDistribution.standardNormalProbit(1.0 - alpha / 2);
       // Detect outliers while significant.
       while(true) {
         Pair<DBID, Double> candidate = singleIteration(proxy, relationy);

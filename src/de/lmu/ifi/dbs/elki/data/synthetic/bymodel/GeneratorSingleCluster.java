@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
 import java.util.LinkedList;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
@@ -238,7 +238,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
       double[] d = new double[dim];
       int i = 0;
       for(Distribution axis : axes) {
-        d[i] = axis.generate();
+        d[i] = axis.nextRandom();
         i++;
       }
       Vector p = new Vector(d);
@@ -272,7 +272,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
     double density = 1.0;
     int i = 0;
     for(Distribution axis : axes) {
-      density = density * axis.explain(o.get(i));
+      density = density * axis.pdf(o.get(i));
       i++;
     }
     return density * densitycorrection;

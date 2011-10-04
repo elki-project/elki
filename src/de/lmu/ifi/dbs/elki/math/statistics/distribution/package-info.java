@@ -1,5 +1,6 @@
-package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
-
+/**
+ * <p>Standard distributions, with random generation functionalities.</p>
+ */
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,27 +23,4 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-
-/**
- * Gaussian Error Function Weight function, scaled using stddev. This probably
- * is the most statistically sound weight.
- * 
- * erfc(1 / sqrt(2) * distance / stddev)
- * 
- * @author Erich Schubert
- */
-public final class ErfcStddevWeight implements WeightFunction {
-  /**
-   * Return Erfc weight, scaled by standard deviation. max is ignored.
-   */
-  @Override
-  public double getWeight(double distance, double max, double stddev) {
-    if(stddev <= 0) {
-      return 1;
-    }
-    return NormalDistribution.erfc(MathUtil.SQRTHALF * distance / stddev);
-  }
-}
+package de.lmu.ifi.dbs.elki.math.statistics.distribution;

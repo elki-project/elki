@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 
 /**
  * Attribute-wise Normalization using the error function. This mostly makes
@@ -55,7 +55,7 @@ public class AttributeWiseErfNormalization<O extends NumberVector<O, ?>> extends
   protected O filterSingleObject(O obj) {
     double[] val = new double[obj.getDimensionality()];
     for(int i = 0; i < val.length; i++) {
-      val[i] = MathUtil.erf(obj.doubleValue(i + 1));
+      val[i] = NormalDistribution.erf(obj.doubleValue(i + 1));
     }
     return obj.newInstance(val);
   }

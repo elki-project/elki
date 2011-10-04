@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -59,7 +60,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
     if(mlogv < mean || Double.isNaN(mlogv)) {
       return 0.0;
     }
-    return Math.max(0.0, MathUtil.erf((mlogv - mean) / factor));
+    return Math.max(0.0, NormalDistribution.erf((mlogv - mean) / factor));
   }
 
   @Override

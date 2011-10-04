@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 
 /**
  * Gaussian Error Function Weight function, scaled such that the result it 0.1
@@ -48,6 +48,6 @@ public final class ErfcWeight implements WeightFunction {
     double relativedistance = distance / max;
     // the scaling was picked such that getWeight(a,a,0) is 0.1
     // since erfc(1.1630871536766736) == 1.0
-    return MathUtil.erfc(1.1630871536766736 * relativedistance);
+    return NormalDistribution.erfc(1.1630871536766736 * relativedistance);
   }
 }
