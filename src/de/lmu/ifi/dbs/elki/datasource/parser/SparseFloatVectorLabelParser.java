@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * <p>
@@ -95,7 +94,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   private int dimensionality = -1;
 
   @Override
-  public Pair<SparseFloatVector, LabelList> parseLineInternal(String line) {
+  protected void parseLineInternal(String line, List<SparseFloatVector> vectors, List<LabelList> labellist) {
     List<String> entries = tokenize(line);
     int cardinality = Integer.parseInt(entries.get(0));
 
@@ -124,7 +123,8 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
         labels.add(entries.get(i));
       }
     }
-    return new Pair<SparseFloatVector, LabelList>(new SparseFloatVector(values, dimensionality), labels);
+    vectors.add(new SparseFloatVector(values, dimensionality));
+    labellist.add(labels);
   }
 
   /**
@@ -141,9 +141,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          Pair<SparseFloatVector, LabelList> pair = parseLineInternal(line);
-          vectors.add(pair.first);
-          lblc.add(pair.second);
+          parseLineInternal(line, vectors, lblc);
         }
       }
     }

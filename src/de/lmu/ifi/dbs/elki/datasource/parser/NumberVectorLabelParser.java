@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * <p>
@@ -64,6 +63,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.landmark
+ * @apiviz.has NumberVector
+ * 
  * @param <V> the type of NumberVector used
  */
 public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends AbstractParser implements LinebasedParser, Parser {
@@ -71,7 +74,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * Logging class.
    */
   private static final Logging logger = Logging.getLogger(NumberVectorLabelParser.class);
-  
+
   /**
    * A comma separated list of the indices of labels (may be numeric), counting
    * whitespace separated entries in a line starting with 0. The corresponding
@@ -125,15 +128,16 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          Pair<V, LabelList> objectAndLabels = parseLineInternal(line);
+          parseLineInternal(line, vectors, labels);
+          V newvec = vectors.get(vectors.size());
           if(dimensionality < 0) {
-            dimensionality = objectAndLabels.getFirst().getDimensionality();
+            dimensionality = newvec.getDimensionality();
           }
-          else if(dimensionality != objectAndLabels.getFirst().getDimensionality()) {
-            throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + objectAndLabels.getFirst().getDimensionality() + " != " + dimensionality);
+          else {
+            if(dimensionality != newvec.getDimensionality()) {
+              throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + newvec.getDimensionality() + " != " + dimensionality);
+            }
           }
-          vectors.add(objectAndLabels.first);
-          labels.add(objectAndLabels.second);
         }
       }
     }
@@ -145,24 +149,8 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
 
   @Override
   public SingleObjectBundle parseLine(String line) {
-    Pair<V, LabelList> objectAndLabels = parseLineInternal(line);
-    SingleObjectBundle pkg = new SingleObjectBundle();
-    pkg.append(getTypeInformation(objectAndLabels.first.getDimensionality()), objectAndLabels.first);
-    pkg.append(TypeUtil.LABELLIST, objectAndLabels.second);
-    return pkg;
-  }
-
-  /**
-   * Internal method for parsing a single line. Used by both line based parsig
-   * as well as block parsing. This saves the building of meta data for each
-   * line.
-   * 
-   * @param line Line to process
-   * @return parsing result
-   */
-  protected Pair<V, LabelList> parseLineInternal(String line) {
+    // TODO: code duplication with parseLineInternal below.
     List<String> entries = tokenize(line);
-
     // Split into numerical attributes and labels
     List<Double> attributes = new ArrayList<Double>(entries.size());
     LabelList labels = new LabelList();
@@ -174,20 +162,54 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
         try {
           Double attribute = Double.valueOf(ent);
           attributes.add(attribute);
+          continue;
         }
         catch(NumberFormatException e) {
-          labels.add(ent);
+          // Ignore attempt, add to labels below.
         }
       }
-      else {
-        labels.add(ent);
+      labels.add(ent);
+    }
+    V vec = createDBObject(attributes, ArrayUtil.numberListAdapter(attributes));
+    SingleObjectBundle pkg = new SingleObjectBundle();
+    pkg.append(getTypeInformation(vec.getDimensionality()), vec);
+    pkg.append(TypeUtil.LABELLIST, labels);
+    return pkg;
+  }
+
+  /**
+   * Internal method for parsing a single line. Used by both line based parsig
+   * as well as block parsing. This saves the building of meta data for each
+   * line.
+   * 
+   * @param line Line to process
+   * @param vectors Vectors
+   * @param labellist Labels
+   */
+  protected void parseLineInternal(String line, List<V> vectors, List<LabelList> labellist) {
+    List<String> entries = tokenize(line);
+    // Split into numerical attributes and labels
+    List<Double> attributes = new ArrayList<Double>(entries.size());
+    LabelList labels = new LabelList();
+
+    Iterator<String> itr = entries.iterator();
+    for(int i = 0; itr.hasNext(); i++) {
+      String ent = itr.next();
+      if(!labelIndices.get(i)) {
+        try {
+          Double attribute = Double.valueOf(ent);
+          attributes.add(attribute);
+          continue;
+        }
+        catch(NumberFormatException e) {
+          // Ignore attempt, add to labels below.
+        }
       }
+      labels.add(ent);
     }
 
-    Pair<V, LabelList> objectAndLabels;
-    V vec = createDBObject(attributes, ArrayUtil.numberListAdapter(attributes));
-    objectAndLabels = new Pair<V, LabelList>(vec, labels);
-    return objectAndLabels;
+    vectors.add(createDBObject(attributes, ArrayUtil.numberListAdapter(attributes)));
+    labellist.add(labels);
   }
 
   /**
@@ -213,7 +235,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     Class<V> cls = (Class<V>) factory.getClass();
     return new VectorFieldTypeInformation<V>(cls, dimensionality, factory);
   }
-  
+
   @Override
   protected Logging getLogger() {
     return logger;

@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A parser to load term frequency data, which essentially are sparse vectors
@@ -87,7 +86,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   }
 
   @Override
-  public Pair<SparseFloatVector, LabelList> parseLineInternal(String line) {
+  protected void parseLineInternal(String line, List<SparseFloatVector> vectors, List<LabelList> labellist) {
     List<String> entries = tokenize(line);
 
     Map<Integer, Float> values = new TreeMap<Integer, Float>();
@@ -122,7 +121,8 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
       labels.add(curterm);
     }
 
-    return new Pair<SparseFloatVector, LabelList>(new SparseFloatVector(values, maxdim), labels);
+    vectors.add(new SparseFloatVector(values, maxdim));
+    labellist.add(labels);
   }
 
   @Override
@@ -134,9 +134,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          Pair<SparseFloatVector, LabelList> pair = parseLineInternal(line);
-          vectors.add(pair.first);
-          lblc.add(pair.second);
+          parseLineInternal(line, vectors, lblc);
         }
       }
     }
