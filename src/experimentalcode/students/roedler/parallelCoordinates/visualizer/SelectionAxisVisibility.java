@@ -28,7 +28,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
 
 
 /**
- * Generates a SVG-Element containing axes, including labeling.
+ * interactive SVG-Element for selecting visible axis.
  * 
  * @author Robert Rödler
  * 
@@ -59,6 +59,10 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
    */
   public static final String SAV_CROSS = "SAVbuttoncross";
   
+  private Element border;
+  private Element[] rect;
+  private int c;
+  
   /**
    * Constructor.
    * 
@@ -67,6 +71,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
   public SelectionAxisVisibility(VisualizationTask task) {
     super(task);
     incrementalRedraw();
+    context.addContextChangeListener(this);
   }
   
   @Override
@@ -75,33 +80,27 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     int dim = DatabaseUtil.dimensionality(rep);
 
     
-    Element back = svgp.svgRect(proj.getXpos(0) - 5.0, 115.0, (proj.getXpos(dim - 1) - proj.getMarginX()) + 10.0, 4.0);
+    Element back = svgp.svgRect(proj.getXpos(0) - 8.0, 115.0, (proj.getXpos(proj.getLastVisibleDimension()) - proj.getMarginX()) + 16.0, 4.0);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
     layer.appendChild(back);
     
-    Element border;
-    Element[] rect = new Element[dim];
+    
     
     int notvis = 0;
     int lastvis = 0;
-    int c = 0;
+    boolean ls = true;
+    c = 0;
+    rect = new Element[dim];
     
-    for (int i = 0; i < dim; i++){
-      if (proj.isVisible(i)){
+    for (int i = 0; i <= dim; i++){
+
+      if (i == dim || proj.isVisible(i)) {
         if (notvis != 0){
-          double dist = (proj.getXpos(i) - proj.getXpos(lastvis)) / ((double)notvis + 1.0);
-          for (int j = 0; j < notvis; j++){
-            border = svgp.svgRect(proj.getXpos(lastvis) + (1 + j) * dist - 1.5, 115.5, 3.0, 3.0);
-            SVGUtil.addCSSClass(border, SAV_BORDER);
-            layer.appendChild(border);
-            
-            rect[c] = svgp.svgRect(proj.getXpos(lastvis) + (1 + j) * dist - 1.5, 115.5, 3.0, 3.0);
-            SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
-            addEventListener(rect[c], c);
-            layer.appendChild(rect[c]);
-            c++;
-          }
+          addEmptyButton(lastvis, i, notvis, dim, ls);
         }
+
+        if (i == dim) { break; }
+        
         double xpos = proj.getXpos(i) - 1.5;
         
         border = svgp.svgRect(xpos, 115.5, 3.0, 3.0);
@@ -123,13 +122,66 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
         
         lastvis = i;
         notvis = 0;
+        ls = false;
         c++;
       }
       else {
         notvis++;
       }
     }
+  }
   
+  private void addEmptyButton(int last, int vis, int notvis, int dim, boolean ls){
+    double dist;
+    
+    if (notvis > 2 && ((last == 0 && ls) || vis == dim)){
+
+      dist = 5.0;
+      
+      if (vis == dim){
+      
+        for (int j = 0; j < notvis; j++){
+          border = svgp.svgRect(proj.getXpos(last) +  dist - 1.5, 115.5 - j * 5.0, 3.0, 3.0);
+          SVGUtil.addCSSClass(border, SAV_BORDER);
+          layer.appendChild(border);
+          
+          rect[c] = svgp.svgRect(proj.getXpos(last) + dist - 1.5, 115.5 - j * 5.0, 3.0, 3.0);
+          SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
+          addEventListener(rect[c], c);
+          layer.appendChild(rect[c]);
+          c++;
+        }
+      }
+      else {
+        for (int j = 0; j < notvis; j++){
+          border = svgp.svgRect(proj.getXpos(last) +  dist - 1.5, (115.5 - (notvis - 1) * 5.0) + j * 5.0, 3.0, 3.0);
+          SVGUtil.addCSSClass(border, SAV_BORDER);
+          layer.appendChild(border);
+          
+          rect[c] = svgp.svgRect(proj.getXpos(last) + dist - 1.5, (115.5 - (notvis - 1) * 5.0) + j * 5.0, 3.0, 3.0);
+          SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
+          addEventListener(rect[c], c);
+          layer.appendChild(rect[c]);
+          c++;
+        }
+      }
+    }
+    else {
+      if (vis == dim) { dist = 10.0 / (notvis + 1); }
+      else { dist = (proj.getXpos(vis) - proj.getXpos(last)) / ((double)notvis + 1.0); }
+  
+      for (int j = 0; j < notvis; j++){
+        border = svgp.svgRect(proj.getXpos(last) + (1 + j) * dist - 1.5, 115.5, 3.0, 3.0);
+        SVGUtil.addCSSClass(border, SAV_BORDER);
+        layer.appendChild(border);
+        
+        rect[c] = svgp.svgRect(proj.getXpos(last) + (1 + j) * dist - 1.5, 115.5, 3.0, 3.0);
+        SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
+        addEventListener(rect[c], c);
+        layer.appendChild(rect[c]);
+        c++;
+      }
+    }
   }
   
   /**
@@ -143,7 +195,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
       @Override
       public void handleEvent(Event evt) {
-        if (proj.getVisibleDimensions() > 2){
+        if (proj.getVisibleDimensions() > 2 || !proj.isVisible(i)){
           proj.setVisible(!proj.isVisible(i), i);
           incrementalRedraw();
           context.fireContextChange(null);
@@ -209,7 +261,6 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
 
     /**
      * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
     public Factory() {
       super();
@@ -230,18 +281,6 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
         baseResult.getHierarchy().add(p, task);
       }
     }
-    
-/*    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<Relation<? extends NumberVector<?, ?>>> reps = VisualizerUtil.iterateVectorFieldRepresentations(result);
-      for(Relation<? extends NumberVector<?, ?>> rel : IterableUtil.fromIterator(reps)) {
-     //   final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this, ParallelVisualization.class);
-        final VisualizationTask task = new VisualizationTask(NAME, rel, rel, this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-        task.put(VisualizationTask.META_NOEXPORT, true);
-        baseResult.getHierarchy().add(rel, task);
-      }
-    }*/
 
     @Override
     public boolean allowThumbnails(VisualizationTask task) {

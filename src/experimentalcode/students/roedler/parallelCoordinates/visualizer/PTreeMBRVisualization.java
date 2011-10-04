@@ -29,33 +29,32 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
  import org.w3c.dom.Element;
 
  import de.lmu.ifi.dbs.elki.data.NumberVector;
- import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
- import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
  import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
  import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
  import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
  import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
- import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  import de.lmu.ifi.dbs.elki.result.Result;
  import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
  import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
  import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
  import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
  import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
+ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
  import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
  import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
+ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+ import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
+ import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
  import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
+ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
  /**
   * Visualize the  of an R-Tree based index.
@@ -69,7 +68,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
   * @param <E> Tree entry type
   */
  // TODO: listen for tree changes instead of data changes?
- public class PTreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NV> implements ContextChangeListener, DataStoreListener {
+ public class PTreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NV> implements MenuOwner, ContextChangeListener, DataStoreListener {
    /**
     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
     */
@@ -84,6 +83,11 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
     * Fill parameter.
     */
    protected boolean fill = true;
+   
+   /**
+    * visible parameter.
+    */
+   protected boolean visible = false;
 
    /**
     * The tree we visualize
@@ -107,8 +111,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
    @Override
    protected void redraw() {
      addCSSClasses(svgp);
-     
-     if(tree != null) {
+     if(tree != null && visible) {
        E root = tree.getRootEntry();
        visualizeRTreeEntry(svgp, layer, proj, tree, root, 0);
      }
@@ -145,6 +148,21 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
          svgp.addCSSClassOrLogError(cls);
        }
      }
+     svgp.updateStyleElement();
+   }
+   /**
+    * removes the required CSS-Classes
+    * in order to add others
+    * 
+    * @param svgp SVG-Plot
+    */
+   private void removeCSSClasses(SVGPlot svgp){
+     for (int i = 0; i < tree.getHeight(); i++){
+       if (svgp.getCSSClassManager().contains(INDEX + i)){
+          svgp.getCSSClassManager().removeClass(svgp.getCSSClassManager().getClass(INDEX + i));
+       }
+     }
+     svgp.updateStyleElement();
    }
 
    /**
@@ -159,7 +177,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
     */
    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth) {
      final int dim = DatabaseUtil.dimensionality(rep);
-     final SpatialComparable mbr = entry;
 
      SVGPath path = new SVGPath();
      for (int i = 0; i < dim; i++){
@@ -190,6 +207,25 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
      }
    }
 
+   @Override
+   public SubMenu getMenu() {
+   SubMenu myMenu = new SubMenu(this, NAME);
+   myMenu.addCheckBoxItem("visible", "vis", false);
+   myMenu.addCheckBoxItem("fill", "fill", true);
+   
+   return myMenu;
+   }
+
+   @Override
+   public void menuPressed(String id, boolean checked) {
+     if (id == "vis") { visible = checked; }
+     if (id == "fill") { 
+       fill = checked;
+       removeCSSClasses(svgp);
+     }
+     incrementalRedraw();
+   }
+   
    @Override
    public void destroy() {
      super.destroy();

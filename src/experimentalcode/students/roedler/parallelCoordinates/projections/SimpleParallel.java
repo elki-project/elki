@@ -43,6 +43,11 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   boolean[] isVisible;
   
   /**
+   * dimension order
+   */
+  int[] dimOrder;
+  
+  /**
    * Constructor.
    * 
    * @param scales Scales to use
@@ -60,11 +65,15 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     for (int i = 0; i < isVisible.length; i++){
       isVisible[i] = true;
     }
+    dimOrder = new int[dims];
+    for (int i = 0; i < dimOrder.length; i++){
+      dimOrder[i] = i;
+    }
   }
   
   public int getFirstVisibleDimension(){
     for (int i = 0; i < dims; i++){
-      if (isVisible(i)){
+      if (isVisible(dimOrder[i])){
         return i;
       }
     }
@@ -94,9 +103,9 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   
   public double getXpos(int dim){
     int notvis = 0;
-    if (isVisible[dim] == false){ return -1.0; }
+    if (isVisible[dimOrder[dim]] == false){ return -1.0; }
     for(int i = 0; i < dim; i++){
-      if(isVisible[i] == false){
+      if(isVisible[dimOrder[i]] == false){
         notvis++;
       }
     }
@@ -104,7 +113,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
   
   public boolean isVisible(int dim){
-    return isVisible[dim];
+    return isVisible[dimOrder[dim]];
   }
   
   public double getMarginX(){
@@ -116,7 +125,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
   
   public void setVisible(boolean vis, int dim){
-    isVisible[dim] = vis;
+    isVisible[dimOrder[dim]] = vis;
     if (vis == false) {
       visDims--;
     }
@@ -133,7 +142,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     for (int i = 0; i < v.getDimensionality(); i++) {
       ret.set(i, (axisHeight + margin[1]) - v.get(i) * axisHeight);
     }
-    return ret;
+    return sortDims(ret);
   }
 
   @Override
@@ -142,7 +151,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     for (int i = 0; i < v.getDimensionality(); i++){
       ret.set(i, ((v.get(i) - margin[1]) + axisHeight) / axisHeight);
     }
-    return ret;
+    return sortDims(ret);
   }
 
   @Override
@@ -151,7 +160,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     for (int i = 0; i < v.getDimensionality(); i++){
       ret.set(i, -v.get(i) * axisHeight);
     }
-    return ret;
+    return sortDims(ret);
   }
 
   @Override
@@ -160,7 +169,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     for (int i = 0; i < v.getDimensionality(); i++){
       ret.set(i, v.get(i) / axisHeight);
     }
-    return null;
+    return sortDims(ret);
   }
 
 /*  @Override
@@ -241,7 +250,75 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
 
   @Override
   public double projectDimension(int dim, double value) {
-    double temp = scales[dim].getScaled(value);
+    double temp = scales[dimOrder[dim]].getScaled(value);
     return (axisHeight + margin[1]) - temp * axisHeight;
   }
+
+  @Override
+  public int getLastVisibleDimension() {
+    for (int i = (isVisible.length - 1); i >= 0; i--){
+      if (isVisible[dimOrder[i]] == true){ return i; }
+    }
+    return -1;
+  }
+  
+  @Override
+  public int getLastVisibleDimension(int dim) {
+    for (int i = dim - 1; i >= 0; i--){
+      if (isVisible[dimOrder[i]] == true){ return i; }
+    }
+    return -1;
+  }
+
+  @Override
+  public void swapDimensions(int a, int b) {
+    int temp = dimOrder[a];
+    dimOrder[a] = dimOrder[b];
+    dimOrder[b] = temp;
+    
+  }
+
+  @Override
+  public void shiftDimension(int dim, int rn) {
+    if (dim > rn){
+      int temp = dimOrder[dim];
+      
+      for (int i = dim; i > rn; i--){
+        dimOrder[i] = dimOrder[i - 1];
+      }
+      dimOrder[rn] = temp;
+    }
+    else {
+      int temp = dimOrder[dim];
+     
+      for (int i = dim; i < rn - 1; i++){
+        dimOrder[i] = dimOrder[i + 1];
+      }
+      dimOrder[rn - 1] = temp;
+    }
+  }
+
+  @Override
+  public int getDimensionNumber(int pos) {
+    return dimOrder[pos];
+  } 
+  
+  public Vector sortDims(Vector s){
+    Vector ret = new Vector(s.getDimensionality());
+    for (int i = 0; i < s.getDimensionality(); i++){
+      ret.set(i, s.get(dimOrder[i]));
+    }
+    return ret;
+  }
+
+  @Override
+  public int getNextVisibleDimension(int dim) {
+    for (int i = dim + 1; i < dims; i++){
+      if (isVisible[dimOrder[i]] == true){
+        return i;
+      }
+    }
+    return dim;
+  }
+  
 }
