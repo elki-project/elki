@@ -31,6 +31,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -180,12 +182,14 @@ public class GeneratorMain {
     VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, factory);
     bundle.appendColumn(type, new ArrayList<Object>());
     bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
+    bundle.appendColumn(new SimpleTypeInformation<Model>(Model.class), new ArrayList<Model>());
 
     for(GeneratorInterface generator : generators) {
       ClassLabel l = new SimpleClassLabel(generator.getName());
+      Model model = generator.makeModel();
       for(Vector v : generator.getPoints()) {
         DoubleVector dv = new DoubleVector(v);
-        bundle.appendSimple(dv, l);
+        bundle.appendSimple(dv, l, model);
       }
     }
     return bundle;

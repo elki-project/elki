@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
@@ -81,4 +82,11 @@ public interface GeneratorInterface {
    * @return cluster name
    */
   public String getName();
+
+  /**
+   * Make a cluster model for this cluster.
+   * 
+   * @return Cluster model
+   */
+  public Model makeModel();
 }

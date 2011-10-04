@@ -27,8 +27,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
  * Class for static clusters, that is an implementation of GeneratorInterface
@@ -70,9 +71,6 @@ public class GeneratorStatic implements GeneratorInterface {
     return new ArrayList<Vector>(points);
   }
 
-  /**
-   * Get density at a given coordinate.
-   */
   @Override
   public double getDensity(Vector p) {
     for(Vector my : points) {
@@ -83,54 +81,28 @@ public class GeneratorStatic implements GeneratorInterface {
     return 0.0;
   }
 
-  /**
-   * Get cluster dimensionality
-   */
   @Override
   public int getDim() {
     return points.getFirst().getDimensionality();
   }
 
-  /**
-   * Get number of discarded points
-   * 
-   * @return number of discarded points
-   */
-  public int getDiscarded() {
-    return 0;
-  }
-
-  /**
-   * Get cluster name
-   */
   @Override
   public String getName() {
     return name;
   }
 
-  /**
-   * Get cluster points
-   */
   @Override
   public List<Vector> getPoints() {
     return points;
   }
 
-  /**
-   * Get cluster size
-   */
   @Override
   public int getSize() {
     return points.size();
   }
 
-  /**
-   * Notify cluster of discarded points. Not supported for static generators.
-   * 
-   * @param discarded parameter not supported.
-   * @throws UnableToComplyException always thrown, since the static generator doesn't supprot discards.
-   */
-  public void setDiscarded(int discarded) throws UnableToComplyException {
-    throw new UnableToComplyException("Points in static clusters may never be discarded.");
+  @Override
+  public Model makeModel() {
+    return ClusterModel.CLUSTER;
   }
 }
