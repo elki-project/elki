@@ -63,6 +63,10 @@ public class UnsafeDoubleVector extends AbstractNumberVector<UnsafeDoubleVector,
    */
   private double[] values;
 
+  private static int ARRAY_DOUBLE_BASE_OFFSET;
+
+  private static long ARRAY_DOUBLE_INDEX_SCALE;
+
   /**
    * Private constructor. NOT for public use.
    */
@@ -93,6 +97,8 @@ public class UnsafeDoubleVector extends AbstractNumberVector<UnsafeDoubleVector,
           break;
         }
       }
+      ARRAY_DOUBLE_BASE_OFFSET = unsafe.arrayBaseOffset(double[].class);
+      ARRAY_DOUBLE_INDEX_SCALE = unsafe.arrayIndexScale(double[].class);
     }
     catch(Exception ignore) {
     }
@@ -161,7 +167,7 @@ public class UnsafeDoubleVector extends AbstractNumberVector<UnsafeDoubleVector,
   @Override
   public Double getValue(int dimension) {
     long dim = dimension - 1;
-    return UNSAFE.getDouble(values, Unsafe.ARRAY_DOUBLE_BASE_OFFSET + dim * Unsafe.ARRAY_DOUBLE_INDEX_SCALE);
+    return UNSAFE.getDouble(values, ARRAY_DOUBLE_BASE_OFFSET + dim * ARRAY_DOUBLE_INDEX_SCALE);
   }
 
   /**
@@ -176,7 +182,7 @@ public class UnsafeDoubleVector extends AbstractNumberVector<UnsafeDoubleVector,
   @Override
   public double doubleValue(int dimension) {
     long dim = dimension - 1;
-    return UNSAFE.getDouble(values, Unsafe.ARRAY_DOUBLE_BASE_OFFSET + dim * Unsafe.ARRAY_DOUBLE_INDEX_SCALE);
+    return UNSAFE.getDouble(values, ARRAY_DOUBLE_BASE_OFFSET + dim * ARRAY_DOUBLE_INDEX_SCALE);
   }
 
   /**
@@ -191,7 +197,7 @@ public class UnsafeDoubleVector extends AbstractNumberVector<UnsafeDoubleVector,
   @Override
   public long longValue(int dimension) {
     long dim = dimension - 1;
-    return (long) UNSAFE.getDouble(values, Unsafe.ARRAY_DOUBLE_BASE_OFFSET + dim * Unsafe.ARRAY_DOUBLE_INDEX_SCALE);
+    return (long) UNSAFE.getDouble(values, ARRAY_DOUBLE_BASE_OFFSET + dim * ARRAY_DOUBLE_INDEX_SCALE);
   }
 
   /**
