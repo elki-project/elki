@@ -131,12 +131,6 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
         
         
     }
-    Vector s = new Vector(10);
-    String t = "";
-    for (int i = 0; i < s.getDimensionality(); i++){
-      s.set(i, (double) i);
-      t = t + Integer.toString(proj.getDimensionNumber(i)) + "  ";
-    }
   }
   
   
