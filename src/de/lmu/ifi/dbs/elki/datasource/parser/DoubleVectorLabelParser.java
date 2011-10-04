@@ -47,8 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.landmark
- * 
  * @apiviz.has DoubleVector
  */
 public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
