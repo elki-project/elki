@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution;
+package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 /*
  This file is part of ELKI:
@@ -28,11 +28,26 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
- * Simple generator for a Gamma Distribution
+ * Gamma Distribution, with random generation and density functions.
  * 
  * @author Erich Schubert
  */
 public final class GammaDistribution implements Distribution {
+  /**
+   * LANCZOS-Coefficients for Gamma approximation.
+   * 
+   * These are said to have higher precision than those in "Numerical Recipes".
+   * They probably come from
+   * 
+   * Paul Godfrey: http://my.fit.edu/~gabdo/gamma.txt
+   */
+  static final double[] LANCZOS = { 0.99999999999999709182, 57.156235665862923517, -59.597960355475491248, 14.136097974741747174, -0.49191381609762019978, .33994649984811888699e-4, .46523628927048575665e-4, -.98374475304879564677e-4, .15808870322491248884e-3, -.21026444172410488319e-3, .21743961811521264320e-3, -.16431810653676389022e-3, .84418223983852743293e-4, -.26190838401581408670e-4, .36899182659531622704e-5, };
+
+  /**
+   * Numerical precision to use
+   */
+  static final double NUM_PRECISION = 1E-15;
+
   /**
    * Alpha == k
    */
@@ -49,7 +64,7 @@ public final class GammaDistribution implements Distribution {
   private Random random;
 
   /**
-   * Constructor for Gamma distribution generator
+   * Constructor for Gamma distribution.
    * 
    * @param k k, alpha aka. "shape" parameter
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
@@ -67,38 +82,23 @@ public final class GammaDistribution implements Distribution {
   }
 
   /**
-   * Gamma distribution PDF (with 0.0 for x &lt; 0)
+   * Constructor for Gamma distribution.
    * 
-   * @param x query value
-   * @param k Alpha
-   * @param theta Thetha = 1 / Beta
-   * @return probability density
+   * @param k k, alpha aka. "shape" parameter
+   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    */
-  public static double pdf(double x, double k, double theta) {
-    if(x < 0) {
-      return 0.0;
-    }
-    if(x == 0) {
-      if(k == 1.0) {
-        return theta;
-      }
-      else {
-        return 0.0;
-      }
-    }
-    if(k == 1.0) {
-      return Math.exp(-x * theta) * theta;
-    }
-
-    return Math.exp((k - 1.0) * Math.log(x * theta) - x * theta - MathUtil.logGamma(k)) * theta;
+  public GammaDistribution(double k, double theta) {
+    this(k, theta, new Random());
   }
 
-  /**
-   * Return the PDF of the generators distribution
-   */
   @Override
-  public double explain(double val) {
+  public double pdf(double val) {
     return pdf(val, k, theta);
+  }
+
+  @Override
+  public double cdf(double val) {
+    return cdf(val, k, theta);
   }
 
   /**
@@ -113,7 +113,7 @@ public final class GammaDistribution implements Distribution {
    * rejection technique, Communications of the ACM 25, 47-54.
    */
   @Override
-  public double generate() {
+  public double nextRandom() {
     /* Constants */
     final double q1 = 0.0416666664, q2 = 0.0208333723, q3 = 0.0079849875;
     final double q4 = 0.0015746717, q5 = -0.0003349403, q6 = 0.0003340332;
@@ -301,5 +301,162 @@ public final class GammaDistribution implements Distribution {
    */
   public double getTheta() {
     return theta;
+  }
+
+  /**
+   * The CDF, static version.
+   * 
+   * @param val Value
+   * @param k Shape k
+   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @return cdf value
+   */
+  public static double cdf(double val, double k, double theta) {
+    return regularizedGammaP(k, val / theta);
+  }
+
+  /**
+   * Gamma distribution PDF (with 0.0 for x &lt; 0)
+   * 
+   * @param x query value
+   * @param k Alpha
+   * @param theta Thetha = 1 / Beta
+   * @return probability density
+   */
+  public static double pdf(double x, double k, double theta) {
+    if(x < 0) {
+      return 0.0;
+    }
+    if(x == 0) {
+      if(k == 1.0) {
+        return theta;
+      }
+      else {
+        return 0.0;
+      }
+    }
+    if(k == 1.0) {
+      return Math.exp(-x * theta) * theta;
+    }
+
+    return Math.exp((k - 1.0) * Math.log(x * theta) - x * theta - logGamma(k)) * theta;
+  }
+
+  /**
+   * Compute logGamma.
+   * 
+   * Based loosely on "Numerical Recpies" and the work of Paul Godfrey at
+   * http://my.fit.edu/~gabdo/gamma.txt
+   * 
+   * TODO: find out which approximation really is the best...
+   * 
+   * @param x Parameter x
+   * @return @return log(&#915;(x))
+   */
+  public static double logGamma(final double x) {
+    if(Double.isNaN(x) || (x <= 0.0)) {
+      return Double.NaN;
+    }
+    double g = 607.0 / 128.0;
+    double tmp = x + g + .5;
+    tmp = (x + 0.5) * Math.log(tmp) - tmp;
+    double ser = LANCZOS[0];
+    for(int i = LANCZOS.length - 1; i > 0; --i) {
+      ser += LANCZOS[i] / (x + i);
+    }
+    return tmp + Math.log(MathUtil.SQRTTWOPI * ser / x);
+  }
+
+  /**
+   * Returns the regularized gamma function P(a, x).
+   * 
+   * Includes the quadrature way of computing.
+   * 
+   * TODO: find "the" most accurate version of this. We seem to agree with
+   * others for the first 10+ digits, but diverge a bit later than that.
+   * 
+   * @param a Parameter a
+   * @param x Parameter x
+   * @return Gamma value
+   */
+  public static double regularizedGammaP(final double a, final double x) {
+    // Special cases
+    if(Double.isNaN(a) || Double.isNaN(x) || (a <= 0.0) || (x < 0.0)) {
+      return Double.NaN;
+    }
+    if(x == 0.0) {
+      return 0.0;
+    }
+    if(x >= a + 1) {
+      // Expected to converge faster
+      return 1.0 - regularizedGammaQ(a, x);
+    }
+    // Loosely following "Numerical Recipes"
+    double del = 1.0 / a;
+    double sum = del;
+    for(int n = 1; n < Integer.MAX_VALUE; n++) {
+      // compute next element in the series
+      del *= x / (a + n);
+      sum = sum + del;
+      if(Math.abs(del / sum) < NUM_PRECISION || sum >= Double.POSITIVE_INFINITY) {
+        break;
+      }
+    }
+    if(Double.isInfinite(sum)) {
+      return 1.0;
+    }
+    return Math.exp(-x + (a * Math.log(x)) - logGamma(a)) * sum;
+  }
+
+  /**
+   * Returns the regularized gamma function Q(a, x) = 1 - P(a, x).
+   * 
+   * Includes the continued fraction way of computing, based loosely on the book
+   * "Numerical Recipes"; but probably not with the exactly same precision,
+   * since we reimplemented this in our coding style, not literally.
+   * 
+   * TODO: find "the" most accurate version of this. We seem to agree with
+   * others for the first 10+ digits, but diverge a bit later than that.
+   * 
+   * @param a parameter a
+   * @param x parameter x
+   * @return Result
+   */
+  public static double regularizedGammaQ(final double a, final double x) {
+    if(Double.isNaN(a) || Double.isNaN(x) || (a <= 0.0) || (x < 0.0)) {
+      return Double.NaN;
+    }
+    if(x == 0.0) {
+      return 1.0;
+    }
+    if(x < a + 1.0) {
+      // Expected to converge faster
+      return 1.0 - regularizedGammaP(a, x);
+    }
+    // Compute using continued fraction approach.
+    final double FPMIN = Double.MIN_VALUE / NUM_PRECISION;
+    double b = x + 1 - a;
+    double c = 1.0 / FPMIN;
+    double d = 1.0 / b;
+    double fac = d;
+    for(int i = 1; i < Integer.MAX_VALUE; i++) {
+      double an = i * (a - i);
+      b += 2;
+      d = an * d + b;
+      if(Math.abs(d) < FPMIN) {
+        d = FPMIN;
+      }
+      c = b + an / c;
+      if(Math.abs(c) < FPMIN) {
+        c = FPMIN;
+      }
+      d = 1 / d;
+      double del = d * c;
+      fac *= del;
+      if(Math.abs(del - 1.0) <= NUM_PRECISION) {
+        break;
+      }
+    }
+    return fac * Math.exp(-x + a * Math.log(x) - logGamma(a));
   }
 }

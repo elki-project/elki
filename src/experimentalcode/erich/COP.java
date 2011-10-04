@@ -48,9 +48,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -121,7 +121,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     WritableDataStore<Integer> cop_dim = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Integer.class);
     WritableDataStore<CorrelationAnalysisSolution<?>> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
     {// compute neighbors of each db object
-      FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", database.size(), logger) : null;
+      FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
       for(DBID id : data.iterDBIDs()) {
         List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k + 1);
@@ -146,7 +146,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
          */
         double stddev = depsol.getStandardDeviation();
         double distance = depsol.distance(data.get(id));
-        double prob = MathUtil.erf(distance / (stddev * sqrt2));
+        double prob = NormalDistribution.erf(distance / (stddev * sqrt2));
 
         cop_score.put(id, prob);
 

@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -304,7 +304,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
 
       FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), logger) : null;
       for(DBID id : relation.iterDBIDs()) {
-        loops.put(id, MathUtil.erf((plofs.get(id) - 1) / (nplof * sqrt2)));
+        loops.put(id, NormalDistribution.erf((plofs.get(id) - 1) / (nplof * sqrt2)));
 
         if(progressLOOPs != null) {
           progressLOOPs.incrementProcessed(logger);

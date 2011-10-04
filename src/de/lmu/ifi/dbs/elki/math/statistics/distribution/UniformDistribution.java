@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution;
+package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 /*
  This file is part of ELKI:
@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution;
 import java.util.Random;
 
 /**
- * Simple uniform distribution class
+ * Uniform distribution.
  * 
  * @author Erich Schubert
  */
@@ -59,6 +59,7 @@ public final class UniformDistribution implements Distribution {
    * @param random Random generator
    */
   public UniformDistribution(double min, double max, Random random) {
+    super();
     // Swap parameters if they were given incorrectly.
     if(min > max) {
       double tmp = min;
@@ -72,21 +73,36 @@ public final class UniformDistribution implements Distribution {
   }
 
   /**
-   * Return the PDF of the generators distribution
+   * Constructor for a uniform distribution on the interval [min, max[
+   * 
+   * @param min Minimum value
+   * @param max Maximum value
    */
+  public UniformDistribution(double min, double max) {
+    this(min, max, new Random());
+  }
+
   @Override
-  public double explain(double val) {
+  public double pdf(double val) {
     if(val < min || val >= max) {
       return 0.0;
     }
     return 1.0 / len;
   }
 
-  /**
-   * Generate a random value with the generators parameters
-   */
   @Override
-  public double generate() {
+  public double cdf(double val) {
+    if(val < min) {
+      return 0.0;
+    }
+    if(val > max) {
+      return 1.0;
+    }
+    return (val - min) / len;
+  }
+
+  @Override
+  public double nextRandom() {
     return min + random.nextDouble() * len;
   }
 

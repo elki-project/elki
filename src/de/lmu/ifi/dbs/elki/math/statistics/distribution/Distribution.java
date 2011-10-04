@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution;
+package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 /*
  This file is part of ELKI:
@@ -23,28 +23,39 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
- * Interface for a simple distribution generator
- * with a PDF, i.e. it can also compute a density
+ * Interface for a simple distribution generator with a PDF, i.e. it can also
+ * compute a density
  * 
  * @author Erich Schubert
  */
 public interface Distribution {
   /**
    * Generate a new random value
-   * @return new generated value
+   * 
+   * @return new random value
    */
-  public double generate();
+  public double nextRandom();
+
   /**
    * Return the density of an existing value
+   * 
    * @param val existing value
    * @return distribution density
    */
-  public double explain(double val);
-  
+  public double pdf(double val);
+
   /**
-   * Describe the generator
+   * Return the cumulative density function at the given value.
+   * 
+   * @param val existing value
+   * @return cumulative density
+   */
+  public double cdf(double val);
+
+  /**
+   * Describe the distribution
+   * 
    * @return description
    */
   @Override
