@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @author Erich Schubert
  */
-public final class GammaDistribution implements Distribution {
+public class GammaDistribution implements Distribution {
   /**
    * LANCZOS-Coefficients for Gamma approximation.
    * 
@@ -320,7 +320,7 @@ public final class GammaDistribution implements Distribution {
    * 
    * @param x query value
    * @param k Alpha
-   * @param theta Thetha = 1 / Beta
+   * @param theta Theta = 1 / Beta
    * @return probability density
    */
   public static double pdf(double x, double k, double theta) {
