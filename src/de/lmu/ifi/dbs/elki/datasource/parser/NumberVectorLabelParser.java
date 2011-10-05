@@ -233,7 +233,8 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   VectorFieldTypeInformation<V> getTypeInformation(int dimensionality) {
     @SuppressWarnings("unchecked")
     Class<V> cls = (Class<V>) factory.getClass();
-    return new VectorFieldTypeInformation<V>(cls, dimensionality, factory);
+    V f = factory.newInstance(new double[dimensionality]);
+    return new VectorFieldTypeInformation<V>(cls, dimensionality, f);
   }
 
   @Override
