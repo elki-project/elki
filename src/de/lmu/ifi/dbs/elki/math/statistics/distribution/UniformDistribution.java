@@ -30,7 +30,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public final class UniformDistribution implements Distribution {
+public class UniformDistribution implements Distribution {
   /**
    * Minimum
    */
