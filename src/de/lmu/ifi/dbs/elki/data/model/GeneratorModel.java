@@ -61,16 +61,16 @@ public class GeneratorModel implements Model {
   /**
    * @return the transform. May be null!
    */
-  protected AffineTransformation getTransform() {
+  public AffineTransformation getTransform() {
     return transform;
   }
 
   /**
    * Get the individual distributions
    * 
-   * @return the nth distribution (starting at 1)
+   * @return the nth distribution (starting at 0)
    */
-  protected Distribution getDistribution(int dim) {
-    return distributions.get(dim - 1);
+  public Distribution getDistribution(int dim) {
+    return distributions.get(dim);
   }
 }
