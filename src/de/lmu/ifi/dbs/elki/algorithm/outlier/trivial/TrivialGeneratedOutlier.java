@@ -103,6 +103,9 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
   public OutlierResult run(Relation<Model> models, Relation<NumberVector<?, ?>> vecs, Relation<?> labels) {
     WritableDataStore<Double> scores = DataStoreUtil.makeStorage(models.getDBIDs(), DataStoreFactory.HINT_HOT, Double.class);
 
+    // Adjustment constant
+    final double minscore = expect / (expect + 1);
+    
     HashSet<GeneratorModel> generators = new HashSet<GeneratorModel>();
     for(DBID id : models.iterDBIDs()) {
       Model model = models.get(id);
@@ -143,6 +146,8 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       }
       // score inversion.
       score = expect / (expect + score);
+      // adjust to 0 to 1 range:
+      score = (score - minscore) / (1 - minscore);
       scores.put(id, score);
     }
     Relation<Double> scoreres = new MaterializedRelation<Double>("Model outlier scores", "model-outlier", TypeUtil.DOUBLE, scores, models.getDBIDs());
