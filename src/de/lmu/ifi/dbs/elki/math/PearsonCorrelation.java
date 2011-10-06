@@ -128,6 +128,33 @@ public class PearsonCorrelation {
   }
 
   /**
+   * Get the number of points the average is based on.
+   * 
+   * @return number of data points
+   */
+  public double getCount() {
+    return sumWe;
+  }
+
+  /**
+   * Return mean of X
+   * 
+   * @return mean
+   */
+  public double getMeanX() {
+    return meanX;
+  }
+  
+  /**
+   * Return mean of Y
+   * 
+   * @return mean
+   */
+  public double getMeanY() {
+    return meanY;
+  }
+  
+  /**
    * Get the covariance of X and Y (not taking sampling into account)
    * 
    * @return Covariance
