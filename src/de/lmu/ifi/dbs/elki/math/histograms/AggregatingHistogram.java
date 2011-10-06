@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math;
+package de.lmu.ifi.dbs.elki.math.histograms;
 
 /*
  This file is part of ELKI:
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
