@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math;
+package de.lmu.ifi.dbs.elki.math.histograms;
 
 /*
  This file is part of ELKI:

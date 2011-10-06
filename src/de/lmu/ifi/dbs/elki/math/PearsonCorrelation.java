@@ -25,6 +25,11 @@ package de.lmu.ifi.dbs.elki.math;
 /**
  * Class to incrementally compute pearson correlation.
  * 
+ * In fact, this actually computes Var(X), Var(Y) and Cov(X, Y), all of which
+ * can be obtained from this class. If you need more than two variables, use
+ * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix} which uses
+ * slightly more memory (by using arrays) but essentially does the same.
+ * 
  * @author Erich Schubert
  */
 public class PearsonCorrelation {
@@ -46,12 +51,12 @@ public class PearsonCorrelation {
   /**
    * Current mean for X
    */
-  private double meanX;
+  private double meanX = 0;
 
   /**
    * Current mean for Y
    */
-  private double meanY;
+  private double meanY = 0;
 
   /**
    * Weight sum
@@ -113,12 +118,113 @@ public class PearsonCorrelation {
    * @return Correlation value
    */
   public double getCorrelation() {
-    final double popSdX = Math.sqrt(sumXX / sumWe);
-    final double popSdY = Math.sqrt(sumYY / sumWe);
-    final double covXY = sumXY / sumWe;
+    final double popSdX = getNaiveStddevX();
+    final double popSdY = getNaiveStddevY();
+    final double covXY = getNaiveCovariance();
     if(popSdX == 0 || popSdY == 0) {
       return 0;
     }
     return covXY / (popSdX * popSdY);
+  }
+
+  /**
+   * Get the covariance of X and Y (not taking sampling into account)
+   * 
+   * @return Covariance
+   */
+  public double getNaiveCovariance() {
+    return sumXY / sumWe;
+  }
+
+  /**
+   * Get the covariance of X and Y (with sampling correction)
+   * 
+   * @return Covariance
+   */
+  public double getSampleCovariance() {
+    assert (sumWe > 1);
+    return sumXY / (sumWe - 1);
+  }
+
+  /**
+   * Return the naive variance (not taking sampling into account)
+   * 
+   * Note: usually, you should be using {@link #getSampleVariance} instead!
+   * 
+   * @return variance
+   */
+  public double getNaiveVarianceX() {
+    return sumXX / sumWe;
+  }
+
+  /**
+   * Return sample variance.
+   * 
+   * @return sample variance
+   */
+  public double getSampleVarianceX() {
+    assert (sumWe > 1);
+    return sumXX / (sumWe - 1);
+  }
+
+  /**
+   * Return standard deviation using the non-sample variance
+   * 
+   * Note: usually, you should be using {@link #getSampleStddev} instead!
+   * 
+   * @return stddev
+   */
+  public double getNaiveStddevX() {
+    return Math.sqrt(getNaiveVarianceX());
+  }
+
+  /**
+   * Return standard deviation
+   * 
+   * @return stddev
+   */
+  public double getSampleStddevX() {
+    return Math.sqrt(getSampleVarianceX());
+  }
+
+  /**
+   * Return the naive variance (not taking sampling into account)
+   * 
+   * Note: usually, you should be using {@link #getSampleVariance} instead!
+   * 
+   * @return variance
+   */
+  public double getNaiveVarianceY() {
+    return sumYY / sumWe;
+  }
+
+  /**
+   * Return sample variance.
+   * 
+   * @return sample variance
+   */
+  public double getSampleVarianceY() {
+    assert (sumWe > 1);
+    return sumYY / (sumWe - 1);
+  }
+
+  /**
+   * Return standard deviation using the non-sample variance
+   * 
+   * Note: usually, you should be using {@link #getSampleStddev} instead!
+   * 
+   * @return stddev
+   */
+  public double getNaiveStddevY() {
+    return Math.sqrt(getNaiveVarianceY());
+  }
+
+  /**
+   * Return standard deviation
+   * 
+   * @return stddev
+   */
+  public double getSampleStddevY() {
+    return Math.sqrt(getSampleVarianceY());
   }
 }
