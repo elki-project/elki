@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.persistent;
 
+import java.io.Externalizable;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,37 +26,11 @@ package de.lmu.ifi.dbs.elki.persistent;
  */
 
 /**
- * Defines the requirements for objects that can be stored in a cache and can be
- * persistently saved.
+ * Base interface for externalizable pages.
  * 
- * @author Elke Achtert
+ * @author Erich Schubert
  */
-public interface Page {
-  /**
-   * Returns the unique id of this Page.
-   * 
-   * @return the unique id of this Page. Return -1 for unassigned page numbers.
-   */
-  int getPageID();
-
-  /**
-   * Sets the unique id of this Page.
-   * 
-   * @param id the id to be set
-   */
-  void setPageID(int id);
-
-  /**
-   * Returns true if this page is dirty, false otherwise.
-   * 
-   * @return true if this page is dirty, false otherwise
-   */
-  boolean isDirty();
-
-  /**
-   * Sets the dirty flag of this page.
-   * 
-   * @param dirty the dirty flag to be set
-   */
-  void setDirty(boolean dirty);
+// TODO: replace with the newer ByteSerializers
+public interface ExternalizablePage extends Page, Externalizable {
+  // Empty
 }

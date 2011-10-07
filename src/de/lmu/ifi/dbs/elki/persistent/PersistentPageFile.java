@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @param <P> Page type
  */
-public class PersistentPageFile<P extends Page> extends AbstractStoringPageFile<P> {
+public class PersistentPageFile<P extends ExternalizablePage> extends AbstractStoringPageFile<P> {
   /**
    * Our logger
    */

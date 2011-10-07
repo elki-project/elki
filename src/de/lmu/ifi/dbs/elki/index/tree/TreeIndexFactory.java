@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.index.tree;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.persistent.ExternalizablePage;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
-import de.lmu.ifi.dbs.elki.persistent.Page;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -124,7 +124,7 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
    * @return Page file
    */
   // FIXME: make this single-shot when filename is set!
-  protected <N extends Page> PageFile<N> makePageFile(Class<N> cls) {
+  protected <N extends ExternalizablePage> PageFile<N> makePageFile(Class<N> cls) {
     final PageFile<N> inner;
     if(fileName == null) {
       inner = new MemoryPageFile<N>(pageSize);

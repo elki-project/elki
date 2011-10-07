@@ -31,11 +31,9 @@ import java.io.ObjectOutput;
  * Abstract superclass for pages.
  * 
  * @author Elke Achtert
- * 
- * @apiviz.uses PageFile
  */
 // todo elke revise comments
-public abstract class AbstractPage implements Page {
+public abstract class AbstractExternalizablePage implements ExternalizablePage {
   /**
    * Serial version
    */
@@ -44,7 +42,7 @@ public abstract class AbstractPage implements Page {
   /**
    * The unique id if this page.
    */
-  private Integer id;
+  private int id;
 
   /**
    * The dirty flag of this page.
@@ -54,8 +52,9 @@ public abstract class AbstractPage implements Page {
   /**
    * Empty constructor for Externalizable interface.
    */
-  public AbstractPage() {
+  public AbstractExternalizablePage() {
     super();
+    this.id = -1;
   }
 
   /**
@@ -64,7 +63,7 @@ public abstract class AbstractPage implements Page {
    * @return the unique id of this Page
    */
   @Override
-  public final Integer getPageID() {
+  public final int getPageID() {
     return id;
   }
 
@@ -140,12 +139,7 @@ public abstract class AbstractPage implements Page {
    */
   @Override
   public String toString() {
-    if(id != null) {
-      return Integer.toString(id);
-    }
-    else {
-      return "null";
-    }
+    return Integer.toString(id);
   }
 
   /**
@@ -164,9 +158,9 @@ public abstract class AbstractPage implements Page {
       return false;
     }
 
-    final AbstractPage that = (AbstractPage) o;
+    final AbstractExternalizablePage that = (AbstractExternalizablePage) o;
 
-    return id.equals(that.getPageID());
+    return id == that.getPageID();
   }
 
   /**
@@ -176,6 +170,6 @@ public abstract class AbstractPage implements Page {
    */
   @Override
   public int hashCode() {
-    return id.hashCode();
+    return id;
   }
 }
