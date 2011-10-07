@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
+import de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @author Elke Achtert
  * @param <E> the type of Entry used in the index
  */
-public abstract class AbstractNode<E extends Entry> extends AbstractPage implements Node<E> {
+public abstract class AbstractNode<E extends Entry> extends AbstractExternalizablePage implements Node<E> {
   /**
    * The number of entries in this node.
    */
@@ -156,7 +156,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractPage impleme
    * both nodes are of the same type (leaf node or directory node) and have
    * contain the same entries, <code>false</code> otherwise.
    * 
-   * @see de.lmu.ifi.dbs.elki.persistent.AbstractPage#equals(Object)
+   * @see de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage#equals(Object)
    */
   @Override
   public boolean equals(Object o) {

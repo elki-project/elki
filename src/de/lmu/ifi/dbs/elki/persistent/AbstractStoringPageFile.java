@@ -67,11 +67,11 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
    * @param page the page to set the id
    */
   @Override
-  public Integer setPageID(P page) {
-    Integer pageID = page.getPageID();
-    if(pageID == null) {
+  public int setPageID(P page) {
+    int pageID = page.getPageID();
+    if(pageID == -1) {
       pageID = getNextEmptyPageID();
-      if(pageID == null) {
+      if(pageID == -1) {
         pageID = nextPageID++;
       }
       page.setPageID(pageID);
@@ -95,12 +95,12 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
    * 
    * @return the next empty page id
    */
-  private Integer getNextEmptyPageID() {
+  private int getNextEmptyPageID() {
     if(!emptyPages.empty()) {
       return emptyPages.pop();
     }
     else {
-      return null;
+      return -1;
     }
   }
 

@@ -38,7 +38,7 @@ public interface PageFile<P extends Page> extends PageFileStatistics {
    * @param page the page to set the id
    * @return the page id
    */
-  public Integer setPageID(P page);
+  public int setPageID(P page);
 
   /**
    * Writes a page into this file. The method tests if the page has already an

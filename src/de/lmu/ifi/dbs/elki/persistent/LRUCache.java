@@ -142,8 +142,8 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
   }
 
   @Override
-  public Integer setPageID(P page) {
-    Integer pageID = file.setPageID(page);
+  public int setPageID(P page) {
+    int pageID = file.setPageID(page);
     return pageID;
   }
 
