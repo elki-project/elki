@@ -192,6 +192,43 @@ public final class SpatialUtil {
   }
 
   /**
+   * Computes the volume of the overlapping box between two SpatialComparables.
+   * 
+   * @param box1 the first SpatialComparable
+   * @param box2 the second SpatialComparable
+   * @return the overlap volume.
+   */
+  public static double overlap(SpatialComparable box1, SpatialComparable box2) {
+    final int dim = box1.getDimensionality();
+    if(dim != box2.getDimensionality()) {
+      throw new IllegalArgumentException("This HyperBoundingBox and the given HyperBoundingBox need same dimensionality");
+    }
+
+    // the maximal and minimal value of the overlap box.
+    double omax, omin;
+
+    // the overlap volume
+    double overlap = 1.0;
+
+    for(int i = 1; i <= dim; i++) {
+      // The maximal value of that overlap box in the current
+      // dimension is the minimum of the max values.
+      omax = Math.min(box1.getMax(i), box2.getMax(i));
+      // The minimal value is the maximum of the min values.
+      omin = Math.max(box1.getMin(i), box2.getMin(i));
+
+      // if omax <= omin in any dimension, the overlap box has a volume of zero
+      if(omax <= omin) {
+        return 0.0;
+      }
+
+      overlap *= omax - omin;
+    }
+
+    return overlap;
+  }
+
+  /**
    * Computes the volume of the overlapping box between two SpatialComparables
    * and return the relation between the volume of the overlapping box and the
    * volume of both SpatialComparable.
