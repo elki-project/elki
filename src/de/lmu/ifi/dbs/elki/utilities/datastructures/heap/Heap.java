@@ -32,6 +32,8 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import de.lmu.ifi.dbs.elki.utilities.Util;
+
 /**
  * Basic in-memory heap structure. Closely related to a {@link java.util.PriorityQueue},
  * but here we can override methods to obtain e.g. a {@link TopBoundedHeap}
@@ -110,7 +112,11 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     super();
     this.size = 0;
     this.queue = new Object[size];
-    this.comparator = comparator;
+    if (comparator == null) {
+      this.comparator = Util.forwardOrder();
+    } else {
+      this.comparator = comparator;
+    }
   }
 
   @Override
@@ -286,42 +292,48 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     modCount++;
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Compare two objects, by their position.
+   * 
+   * @param pos1 First object position
+   * @param pos2 Second object position
+   * @return Comparison result
+   */
   protected int compare(int pos1, int pos2) {
-    if(comparator != null) {
+    try {
       return comparator.compare(castQueueElement(pos1), castQueueElement(pos2));
     }
-    try {
-      Comparable<E> c = (Comparable<E>) castQueueElement(pos1);
-      return c.compareTo(castQueueElement(pos2));
-    }
     catch(ClassCastException e) {
       throw e;
     }
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Compare an external object with the one at a certain position.
+   * 
+   * @param o1 First object
+   * @param pos2 Second object position
+   * @return Comparison result
+   */
   protected int compareExternal(E o1, int pos2) {
-    if(comparator != null) {
+    try {
       return comparator.compare(o1, castQueueElement(pos2));
     }
-    try {
-      Comparable<E> c = (Comparable<E>) o1;
-      return c.compareTo(castQueueElement(pos2));
-    }
     catch(ClassCastException e) {
       throw e;
     }
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Compare two objects outside of the heap
+   * 
+   * @param o1 First object
+   * @param o2 Second object
+   * @return Comparison result
+   */
   protected int compareExternalExternal(E o1, E o2) {
-    if(comparator != null) {
-      return comparator.compare(o1, o2);
-    }
     try {
-      Comparable<E> c = (Comparable<E>) o1;
-      return c.compareTo(o2);
+      return comparator.compare(o1, o2);
     }
     catch(ClassCastException e) {
       throw e;
