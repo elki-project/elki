@@ -67,6 +67,22 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
     }
     return max;
   }
+  
+  //TODO: define method in interface
+  /**
+   * Returns the max norm of the given vector.
+   * 
+   * @param v the vector to compute the norm of
+   * @return the max norm of the given vector
+   */
+  public double norm(NumberVector<?,?> v){
+    final int dim = v.getDimensionality();
+    double max = 0;
+    for(int i = 1; i <= dim; i++) {
+      max = Math.max(v.doubleValue(i),max);
+    }
+    return max;
+  }
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
