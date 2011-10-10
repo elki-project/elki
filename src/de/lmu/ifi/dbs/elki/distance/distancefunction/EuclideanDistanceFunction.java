@@ -71,6 +71,23 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     }
     return Math.sqrt(sqrDist);
   }
+  
+  // TODO: define method in interface
+  /**
+   * Returns the Euclidean norm of the given vector.
+   * 
+   * @param v the vector to compute the norm of
+   * @return the Euclidean norm of the given vector
+   */
+  public double norm(NumberVector<?,?> v){
+    final int dim = v.getDimensionality();
+    double sqrDist = 0;
+    for(int i = 1; i <= dim; i++) {
+      final double delta = v.doubleValue(i);
+      sqrDist += delta * delta;
+    }
+    return Math.sqrt(sqrDist);
+  }
 
   protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
     final int dim = mbr.getDimensionality();
