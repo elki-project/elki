@@ -28,6 +28,7 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -550,7 +551,7 @@ public final class Util {
       return 0;
     }
     long result = hash[0];
-    for (int i = 1; i < hash.length; i++) {
+    for(int i = 1; i < hash.length; i++) {
       result = result * prime + hash[i];
     }
     return (int) result;
@@ -698,5 +699,36 @@ public final class Util {
         throw new UnsupportedOperationException();
       }
     }
+  }
+
+  /**
+   * Static instance
+   */
+  private static final Comparator<?> FORWARD = new ForwardComparator();
+
+  /**
+   * Regular comparator. See {@link java.util.Collections#reverseOrder()} for a
+   * reverse comparator.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private static final class ForwardComparator implements Comparator<Comparable<Object>> {
+    @Override
+    public int compare(Comparable<Object> o1, Comparable<Object> o2) {
+      return o1.compareTo(o2);
+    }
+  }
+
+  /**
+   * Compare two objects, forward. See
+   * {@link java.util.Collections#reverseOrder()} for a reverse comparator.
+   * 
+   * @return Forward comparator
+   */
+  @SuppressWarnings("unchecked")
+  public static final <T> Comparator<T> forwardOrder() {
+    return (Comparator<T>) FORWARD;
   }
 }
