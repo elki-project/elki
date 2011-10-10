@@ -159,7 +159,8 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       }
       for(int i = 0; i < this.sampleSize; i++) {
         for(int d = 0; d < dim; d++) {
-          vec[d] = minima[d] + (new Random(masterRandom.nextLong()).nextDouble()) % (maxima[d] - minima[d] + 1.0);
+          // TODO: das ist noch etwas unguenstig - erzeuge d Random Objekte in einer eigenen Schleife und verwende die für die jeweilige Dimension in dieser Schleife
+          vec[d] = minima[d] + (new Random(masterRandom.nextLong()).nextDouble()) % (maxima[d] - minima[d] + 1.0); // TODO ist Modulo hier richtig?
         }
         V newp = factory.newInstance(vec);
         result.add(newp);
@@ -208,6 +209,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
+  // TODO: update comments and author information after copy&paste ;-)
   /**
    * Result object for ROC curves.
    * 
