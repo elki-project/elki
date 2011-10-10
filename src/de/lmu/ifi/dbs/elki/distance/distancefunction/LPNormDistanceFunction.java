@@ -83,6 +83,23 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceFunction
     }
     return Math.pow(sqrDist, 1.0 / p);
   }
+  
+  //TODO: define method in interface
+  /**
+   * Returns the LP norm of the given vector.
+   * 
+   * @param v the vector to compute the norm of
+   * @return the LP norm of the given vector
+   */
+  public double norm(NumberVector<?,?> v){
+    final int dim = v.getDimensionality();
+    double sqrDist = 0;
+    for(int i = 1; i <= dim; i++) {
+      final double delta = v.doubleValue(i);
+      sqrDist += Math.pow(delta,p);
+    }
+    return Math.pow(sqrDist, 1.0 / p);
+  }
 
   /**
    * Get the functions p parameter.
