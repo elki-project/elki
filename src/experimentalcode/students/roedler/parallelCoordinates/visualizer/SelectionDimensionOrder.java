@@ -133,7 +133,6 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
             }
           }
           else{
-            if (i == selecteddim) { continue; }
             arrow = getArrow(3, proj.getXpos(i), 122.0);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
@@ -143,7 +142,6 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
             layer.appendChild(button);
             
             if (last > 0.){
-              if (selecteddim == proj.getNextVisibleDimension(proj.getNextVisibleDimension(i))) { continue; }
               arrow = getArrow(3, last + ((proj.getXpos(i)) - last) / 2., 122.0);
               SVGUtil.addCSSClass(arrow, SDO_ARROW);
               layer.appendChild(arrow);
@@ -184,7 +182,9 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
             proj.swapDimensions(selecteddim, i);
           }
           else {
-            proj.shiftDimension(selecteddim, i);
+            if (selecteddim != i) {
+              proj.shiftDimension(selecteddim, i);
+            }
           }
           selected = false;
           selecteddim = -1;
@@ -274,7 +274,7 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     }
     if(!svgp.getCSSClassManager().contains(SDO_ARROW)) {
       CSSClass cls = new CSSClass(this, SDO_ARROW);
-      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
+      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_DARKGREY_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
       svgp.addCSSClassOrLogError(cls);
