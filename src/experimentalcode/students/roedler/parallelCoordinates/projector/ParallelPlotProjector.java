@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
+import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
+import experimentalcode.students.roedler.parallelCoordinates.projections.SimpleParallel;
 
 /**
  * ParallelPlotProjector is responsible for producing a parallelplot
@@ -73,7 +75,8 @@ public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends Abstrac
     List<PlotItem> col = new ArrayList<PlotItem>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0) {
-      final PlotItem it = new PlotItem(4., 1., /* FIXME: not null! */ null);
+      ProjectionParallel proj = new SimpleParallel(scales, scales.length, new double[]{10.0, 10.0}, new double[]{280., 140.}, 100.0);
+      final PlotItem it = new PlotItem(2., 1., /* FIXME: not null! */ proj);
       it.visualizations = tasks;
       col.add(it);
     }

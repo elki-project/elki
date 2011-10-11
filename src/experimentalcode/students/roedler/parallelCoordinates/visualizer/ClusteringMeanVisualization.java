@@ -3,6 +3,8 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.swing.JCheckBoxMenuItem;
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -57,6 +59,11 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
    * selected cluster
    */
   private boolean[] clustervis;
+  
+  /**
+   * menu items
+   */
+  JCheckBoxMenuItem items[];
   
   /**
    * Constructor.
@@ -175,41 +182,48 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
   public SubMenu getMenu() {
     SubMenu myMenu = new SubMenu(this, CLUSTERMEAN);
     
-    for(int num = 0; num < clustering.getAllClusters().size(); num++) {
-      myMenu.addCheckBoxItem("Cluster " + num, Integer.toString(num), false);
+    int clus = clustering.getAllClusters().size();
+    
+    items = new JCheckBoxMenuItem[clus]; 
+    
+    for(int num = 0; num < clus; num++) {
+      items[num] = myMenu.addCheckBoxItem("Cluster " + num, Integer.toString(num), false);
     }
-   /* 
+    
     myMenu.addSeparator();
     
     myMenu.addItem("Select all", "-1");
     myMenu.addItem("Unselect all", "-2");
     myMenu.addItem("Invert all", "-3");
-    */
+    
     return myMenu;
   }
 
   @Override
   public void menuPressed(String id, boolean checked) {
     int iid = Integer.parseInt(id);
-   /* if (iid < 0){
+    if (iid < 0){
       if (iid == -1){
         for(int i = 0; i < clustervis.length; i++){
+          items[i].setSelected(true);
           clustervis[i] = true;
         }
       }
       if (iid == -2){
         for(int i = 0; i < clustervis.length; i++){
+          items[i].setSelected(false);
           clustervis[i] = false;
         }
       }
       if (iid == -3){
         for(int i = 0; i < clustervis.length; i++){
+          items[i].setSelected(!clustervis[i]);
           clustervis[i] = !clustervis[i];
         }
       }
       incrementalRedraw();
       return;
-    }*/
+    }
     
     clustervis[iid] = checked;
     incrementalRedraw(); 
