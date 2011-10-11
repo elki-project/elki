@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -104,30 +105,34 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
   public HopkinsResult run(Database database, Relation<V> relation) {
     final DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final Random masterRandom = (this.seed != null) ? new Random(this.seed) : new Random();
+    KNNQuery<V, D> knnQuery = database.getKNNQuery(distanceQuery,2);
 
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(distanceQuery, 1);
-
-    Collection<V> uniformObjs = getUniformObjs(relation, masterRandom);
-    // wenn seed nicht initialisiert??? geht das so??? oder bei DBIDUtil noch
-    // methode ohne seed
-    if(this.seed == null)
-      seed = System.currentTimeMillis();
+  //compute NN distances for random objects within the database
+    if(this.seed == null) seed = System.currentTimeMillis();
     ModifiableDBIDs dataSampleIds = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, this.seed);
-
-    // Compute Hopkins Statistic
+    Iterator<DBID> iter2 = dataSampleIds.iterator();
+    //k= 2 und dann natürlich 2. element aus liste holen sonst nächster nachbar von q immer q
+    double b = knnQuery.getKNNForDBID(iter2.next(), 2).get(1).getDistance().doubleValue();
+    while(iter2.hasNext()) {
+      b += knnQuery.getKNNForDBID(iter2.next(), 2).get(1).getDistance().doubleValue();
+    }
+    
+  //compute NN distances for uniform objects
+    Collection<V> uniformObjs = getUniformObjs(relation, masterRandom);
     Iterator<V> iter = uniformObjs.iterator();
-    double a = knnQuery.getKNNForObject(iter.next(), 1).get(0).getDistance().doubleValue();
+    double a = knnQuery.getKNNForObject(iter.next(),1).get(0).getDistance().doubleValue();
     while(iter.hasNext()) {
       a += knnQuery.getKNNForObject(iter.next(), 1).get(0).getDistance().doubleValue();
     }
-
-    Iterator<DBID> iter2 = dataSampleIds.iterator();
-    double b = knnQuery.getKNNForDBID(iter2.next(), 1).get(0).getDistance().doubleValue();
-    while(iter.hasNext()) {
-      b += knnQuery.getKNNForDBID(iter2.next(), 1).get(0).getDistance().doubleValue();
-    }
+    
+    //compute hopkins statistik
     double result = a / (a + b);
-    return new HopkinsResult(result);
+    System.out.println("uniform: " + a + "   dataset: "+ b + "   result: " + result);
+    //turn into result object
+    DoubleDoublePair pair = new DoubleDoublePair(result, 0);
+    ArrayList<DoubleDoublePair> coll = new ArrayList<DoubleDoublePair>();
+    coll.add( pair);
+    return new HopkinsResult(coll);
   }
 
   public <T extends V> Collection<V> getUniformObjs(Relation<V> relation, Random masterRandom) {
@@ -165,39 +170,12 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
         V newp = factory.newInstance(vec);
         result.add(newp);
       }
-
     }
+    
     return result;
   }
 
-  // public double[][] computeMinMax(Collection<DoubleVector> data){
-  // double[] maxValues = {};
-  // double[] minValues = {};
-  // Iterator<DoubleVector> iter = data.iterator();
-  // // initialize minvalues maxvalues
-  // if(iter.hasNext()) {
-  // DoubleVector object = iter.next();
-  // for(int i = 0; i < object.getDimensionality(); i++) {
-  // minValues[i] = object.doubleValue(i);
-  // maxValues[i] = object.doubleValue(i);
-  // }
-  // }
-  // while(iter.hasNext()) {
-  // DoubleVector object = iter.next();
-  // for(int i = 0; i < object.getDimensionality(); i++) {
-  // if(object.doubleValue(i) < minValues[i]) {
-  // minValues[i] = object.doubleValue(i);
-  // }
-  // if(object.doubleValue(i) > maxValues[i]) {
-  // maxValues[i] = object.doubleValue(i);
-  // }
-  // }
-  // }
-  // double[][] result= {{},{}};
-  // result[0] = maxValues;
-  // result[1] = minValues;
-  // return result;
-  // }
+
 
   @Override
   protected Logging getLogger() {
@@ -210,33 +188,21 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
   }
 
   // TODO: update comments and author information after copy&paste ;-)
-  /**
-   * Result object for ROC curves.
-   * 
-   * @author Erich Schubert
-   */
-  public static class HopkinsResult extends BasicResult {
-    /**
-     * hopkins value
-     */
-    private double hopkins;
+  //TODO: :) Only Guttenberg changes author information after copy&paste 
+ 
+  public static class HopkinsResult extends CollectionResult<DoubleDoublePair> {
+   
 
     /**
      * Constructor.
      * 
      * @param hokins result value Hopkinsstatistic
      */
-    public HopkinsResult(double hopkins) {
-      super("Hopkinsstatistic", "hopkins");
-      this.hopkins = hopkins;
+    public HopkinsResult(Collection<DoubleDoublePair> hopkinsResult) {
+      super("Hopkinsstatistic", "hopkins", hopkinsResult);
     }
 
-    /**
-     * @return the area under curve
-     */
-    public double getHopkins() {
-      return hopkins;
-    }
+    
   }
 
   /**
