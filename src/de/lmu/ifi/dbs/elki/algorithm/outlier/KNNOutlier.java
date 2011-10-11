@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -113,7 +114,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
     }
     FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), logger) : null;
 
-    double maxodegree = 0;
+    DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
     for(DBID id : distanceQuery.getRelation().iterDBIDs()) {
@@ -124,7 +125,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
       double dkn = knns.get(last).getDistance().doubleValue();
       knno_score.put(id, dkn);
 
-      maxodegree = Math.max(maxodegree, dkn);
+      minmax.put(dkn);
 
       if(progressKNNDistance != null) {
         progressKNNDistance.incrementProcessed(logger);
@@ -134,7 +135,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
       progressKNNDistance.ensureCompleted(logger);
     }
     Relation<Double> scoreres = new MaterializedRelation<Double>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, knno_score, relation.getDBIDs());
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxodegree, 0.0, Double.POSITIVE_INFINITY);
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
   }
 
