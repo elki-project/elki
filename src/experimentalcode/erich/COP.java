@@ -1,26 +1,27 @@
 package experimentalcode.erich;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.List;
 
@@ -50,17 +51,19 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Algorithm to compute local correlation outlier probability.
@@ -87,6 +90,8 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    */
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
 
+  public static final OptionID PCARUNNER_ID = OptionID.getOrCreateOptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
+
   /**
    * Number of neighbors to be considered.
    */
@@ -102,12 +107,12 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * 
    * @param distanceFunction
    * @param k
-   * @param dependencyDerivator
+   * @param pca
    */
-  public COP(DistanceFunction<? super V, D> distanceFunction, int k, DependencyDerivator<V, D> dependencyDerivator) {
+  public COP(DistanceFunction<? super V, D> distanceFunction, int k, PCAFilteredRunner<V> pca) {
     super(distanceFunction);
     this.k = k;
-    this.dependencyDerivator = dependencyDerivator;
+    this.dependencyDerivator = new DependencyDerivator<V, D>(null, FormatUtil.NF8, pca, 0, false);
   }
 
   public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {
@@ -206,7 +211,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     /**
      * Holds the object performing the dependency derivation
      */
-    protected DependencyDerivator<V, D> dependencyDerivator;
+    protected PCAFilteredRunner<V> pca;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -215,13 +220,15 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      Class<DependencyDerivator<V, D>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-      dependencyDerivator = config.tryInstantiate(cls);
+      ObjectParameter<PCAFilteredRunner<V>> pcaP = new ObjectParameter<PCAFilteredRunner<V>>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
+      if(config.grab(pcaP)) {
+        pca = pcaP.instantiateClass(config);
+      }
     }
 
     @Override
     protected COP<V, D> makeInstance() {
-      return new COP<V, D>(distanceFunction, k, dependencyDerivator);
+      return new COP<V, D>(distanceFunction, k, pca);
     }
   }
 }

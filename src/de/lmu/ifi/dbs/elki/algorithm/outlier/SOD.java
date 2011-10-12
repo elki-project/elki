@@ -93,7 +93,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
    * considered for learning the subspace properties., must be an integer
    * greater than 0.
    */
-  public static final OptionID KNN_ID = OptionID.getOrCreateOptionID("sod.knn", "The number of shared nearest neighbors to be considered for learning the subspace properties.");
+  public static final OptionID KNN_ID = OptionID.getOrCreateOptionID("sod.knn", "The number of most snn-similar objects to use as reference set for learning the subspace properties.");
 
   /**
    * Parameter to indicate the multiplier for the discriminance value for
@@ -421,6 +421,9 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      Class<SharedNearestNeighborSimilarityFunction<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
+      similarityFunction = config.tryInstantiate(cls);
+      
       final IntParameter knnP = new IntParameter(KNN_ID, new GreaterConstraint(0), 1);
       if(config.grab(knnP)) {
         knn = knnP.getValue();
@@ -430,9 +433,6 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
       if(config.grab(alphaP)) {
         alpha = alphaP.getValue();
       }
-
-      Class<SharedNearestNeighborSimilarityFunction<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
-      similarityFunction = config.tryInstantiate(cls);
     }
 
     @Override
