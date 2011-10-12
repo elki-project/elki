@@ -97,7 +97,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   public static final OptionID OUTPUT_ACCURACY_ID = OptionID.getOrCreateOptionID("derivator.accuracy", "Threshold for output accuracy fraction digits.");
 
   /**
-   * Optional parameter to specify the treshold for the size of the random
+   * Optional parameter to specify the threshold for the size of the random
    * sample to use, must be an integer greater than 0.
    * <p/>
    * Default value: the size of the complete dataset
