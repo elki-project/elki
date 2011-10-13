@@ -52,7 +52,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KNNOutlier.class);
+  private static final Logging logger = Logging.getLogger(HopkinsStatistic.class);
 
   public static final OptionID SAMPLESIZE_ID = OptionID.getOrCreateOptionID("hopkins.samplesize", "Size of the datasample.");
 
@@ -107,9 +107,8 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     final Random masterRandom = (this.seed != null) ? new Random(this.seed) : new Random();
     KNNQuery<V, D> knnQuery = database.getKNNQuery(distanceQuery,2);
 
-  //compute NN distances for random objects within the database
-    if(this.seed == null) seed = System.currentTimeMillis();
-    ModifiableDBIDs dataSampleIds = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, this.seed);
+   //compute NN distances for random objects within the database
+    ModifiableDBIDs dataSampleIds = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, masterRandom.nextLong());
     Iterator<DBID> iter2 = dataSampleIds.iterator();
     //k= 2 und dann natürlich 2. element aus liste holen sonst nächster nachbar von q immer q
     double b = knnQuery.getKNNForDBID(iter2.next(), 2).get(1).getDistance().doubleValue();
@@ -127,7 +126,9 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     
     //compute hopkins statistik
     double result = a / (a + b);
-    System.out.println("uniform: " + a + "   dataset: "+ b + "   result: " + result);
+    if(logger.isVerbose()){
+      logger.verbose("uniform: " + a + "   dataset: "+ b + "   result: " + result);
+    }
     //turn into result object
     DoubleDoublePair pair = new DoubleDoublePair(result, 0);
     ArrayList<DoubleDoublePair> coll = new ArrayList<DoubleDoublePair>();
@@ -139,13 +140,18 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     int dim = DatabaseUtil.dimensionality(relation);
     ArrayList<V> result = new ArrayList<V>(this.sampleSize);
     double[] vec = new double[dim];
+    Random[] randoms = new Random[dim];
+    for(int i = 0; i < randoms.length; i++) {
+      randoms[i] = new Random(masterRandom.nextLong());
+    }
+    
     V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
     // if no parameter for min max compute from dataset
     if(this.minima == null || this.maxima == null || this.minima.length == 0 || this.maxima.length == 0) {
       Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
       for(int i = 0; i < this.sampleSize; i++) {
         for(int d = 0; d < dim; d++) {
-          vec[d] = minmax.first.doubleValue(d + 1) + (new Random(masterRandom.nextLong()).nextDouble()) % (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1) + 1.0);
+          vec[d] = minmax.first.doubleValue(d + 1) + (randoms[d].nextDouble()) % (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1) + 1.0);
         }
         V newp = factory.newInstance(vec);
         result.add(newp);
@@ -196,7 +202,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     /**
      * Constructor.
      * 
-     * @param hokins result value Hopkinsstatistic
+     * @param hopkins result value Hopkinsstatistic
      */
     public HopkinsResult(Collection<DoubleDoublePair> hopkinsResult) {
       super("Hopkinsstatistic", "hopkins", hopkinsResult);
