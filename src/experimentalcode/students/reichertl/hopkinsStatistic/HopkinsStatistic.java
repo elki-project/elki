@@ -74,12 +74,12 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
   /**
    * Parameter for minimum.
    */
-  public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("normalize.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
+  public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("dimension.min", "a comma separated concatenation of the minimum values in each dimension. If no value is specified, the minimum value of the attribute range in this dimension will be taken. If only one value is specified, this value will be taken for all dimensions.");
 
   /**
    * Parameter for maximum.
    */
-  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
+  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension. If no value is specified, the maximum value of the attribute range in this dimension will be taken.  If only one value is specified, this value will be taken for all dimensions.");
 
   /**
    * Stores the maximum in each dimension.
@@ -105,34 +105,35 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
   public HopkinsResult run(Database database, Relation<V> relation) {
     final DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final Random masterRandom = (this.seed != null) ? new Random(this.seed) : new Random();
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(distanceQuery,2);
+    KNNQuery<V, D> knnQuery = database.getKNNQuery(distanceQuery, 2);
 
-   //compute NN distances for random objects within the database
+    // compute NN distances for random objects within the database
     ModifiableDBIDs dataSampleIds = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, masterRandom.nextLong());
     Iterator<DBID> iter2 = dataSampleIds.iterator();
-    //k= 2 und dann natürlich 2. element aus liste holen sonst nächster nachbar von q immer q
+    // k= 2 und dann natürlich 2. element aus liste holen sonst nächster nachbar
+    // von q immer q
     double b = knnQuery.getKNNForDBID(iter2.next(), 2).get(1).getDistance().doubleValue();
     while(iter2.hasNext()) {
       b += knnQuery.getKNNForDBID(iter2.next(), 2).get(1).getDistance().doubleValue();
     }
-    
-  //compute NN distances for uniform objects
+
+    // compute NN distances for uniform objects
     Collection<V> uniformObjs = getUniformObjs(relation, masterRandom);
     Iterator<V> iter = uniformObjs.iterator();
-    double a = knnQuery.getKNNForObject(iter.next(),1).get(0).getDistance().doubleValue();
+    double a = knnQuery.getKNNForObject(iter.next(), 1).get(0).getDistance().doubleValue();
     while(iter.hasNext()) {
       a += knnQuery.getKNNForObject(iter.next(), 1).get(0).getDistance().doubleValue();
     }
-    
-    //compute hopkins statistik
+
+    // compute hopkins statistik
     double result = a / (a + b);
-    if(logger.isVerbose()){
-      logger.verbose("uniform: " + a + "   dataset: "+ b + "   result: " + result);
+    if(logger.isVerbose()) {
+      logger.verbose("uniform: " + a + "   dataset: " + b + "   result: " + result);
     }
-    //turn into result object
+    // turn into result object
     DoubleDoublePair pair = new DoubleDoublePair(result, 0);
     ArrayList<DoubleDoublePair> coll = new ArrayList<DoubleDoublePair>();
-    coll.add( pair);
+    coll.add(pair);
     return new HopkinsResult(coll);
   }
 
@@ -144,44 +145,41 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     for(int i = 0; i < randoms.length; i++) {
       randoms[i] = new Random(masterRandom.nextLong());
     }
-    
+
     V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
-    // if no parameter for min max compute from dataset
+    // if no parameter for min max compute min max values for each dimension
+    // from dataset
     if(this.minima == null || this.maxima == null || this.minima.length == 0 || this.maxima.length == 0) {
       Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
-      for(int i = 0; i < this.sampleSize; i++) {
-        for(int d = 0; d < dim; d++) {
-          vec[d] = minmax.first.doubleValue(d + 1) + (randoms[d].nextDouble()) % (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1) + 1.0);
-        }
-        V newp = factory.newInstance(vec);
-        result.add(newp);
+      this.minima = new double[dim];
+      this.maxima = new double[dim];
+      for(int d = 0; d < dim; d++) {
+        minima[d] = minmax.first.doubleValue(d);
+        maxima[d] = minmax.second.doubleValue(d);
       }
     }
-    else {
-      if(this.minima.length == 1 || this.maxima.length == 1) {
-        double val = minima[0];
-        for(int i = 0; i < dim; i++) {
-          minima[i] = val;
-        }
-        val = maxima[0];
-        for(int i = 0; i < dim; i++) {
-          maxima[i] = val;
-        }
+    // if only one value for all dimensions set this value for each dimension
+    if(this.minima.length == 1 || this.maxima.length == 1) {
+      double val = minima[0];
+      for(int i = 0; i < dim; i++) {
+        minima[i] = val;
       }
-      for(int i = 0; i < this.sampleSize; i++) {
-        for(int d = 0; d < dim; d++) {
-          // TODO: das ist noch etwas unguenstig - erzeuge d Random Objekte in einer eigenen Schleife und verwende die für die jeweilige Dimension in dieser Schleife
-          vec[d] = minima[d] + (new Random(masterRandom.nextLong()).nextDouble()) % (maxima[d] - minima[d] + 1.0); // TODO ist Modulo hier richtig?
-        }
-        V newp = factory.newInstance(vec);
-        result.add(newp);
+      val = maxima[0];
+      for(int i = 0; i < dim; i++) {
+        maxima[i] = val;
       }
     }
-    
+    // compute uniform objects
+    for(int i = 0; i < this.sampleSize; i++) {
+      for(int d = 0; d < dim; d++) {
+        vec[d] = minima[d] + (randoms[d].nextDouble() * (maxima[d] - minima[d]));
+      }
+      V newp = factory.newInstance(vec);
+      result.add(newp);
+    }
+
     return result;
   }
-
-
 
   @Override
   protected Logging getLogger() {
@@ -193,11 +191,8 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
-  // TODO: update comments and author information after copy&paste ;-)
-  //TODO: :) Only Guttenberg changes author information after copy&paste 
- 
+
   public static class HopkinsResult extends CollectionResult<DoubleDoublePair> {
-   
 
     /**
      * Constructor.
@@ -208,13 +203,12 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       super("Hopkinsstatistic", "hopkins", hopkinsResult);
     }
 
-    
   }
 
   /**
    * Parameterization class.
    * 
-   * @author Erich Schubert
+   * @author Lisa Reichert
    * 
    * @apiviz.exclude
    */
