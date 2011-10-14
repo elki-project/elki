@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math;
+package de.lmu.ifi.dbs.elki.math.geometry;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
