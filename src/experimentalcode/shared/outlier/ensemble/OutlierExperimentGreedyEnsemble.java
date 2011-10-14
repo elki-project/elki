@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -71,6 +70,8 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
    * The data input part.
    */
   private InputStep inputstep;
+
+  boolean refine_truth = false;
 
   /**
    * Constructor.
@@ -108,7 +109,7 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
 
     final int estimated_outliers = (int) (0.005 * dim);
     int union_outliers = 0;
-    final double[] estimated_score = new double[dim];
+    final int[] outliers_seen = new int[dim];
     // Find the top-k for each ensemble member
     {
       for(DBID id : relation.iterDBIDs()) {
@@ -125,9 +126,12 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
           logger.warning("Too many ties. Expected: " + estimated_outliers + " got: " + heap.size());
         }
         for(DoubleIntPair pair : heap) {
-          if(estimated_score[pair.second] == 0) {
-            estimated_score[pair.second] = 1.0;
+          if(outliers_seen[pair.second] == 0) {
+            outliers_seen[pair.second] = 1;
             union_outliers += 1;
+          }
+          else {
+            outliers_seen[pair.second] += 1;
           }
         }
       }
@@ -135,23 +139,12 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
     logger.verbose("Merged top " + estimated_outliers + " outliers to: " + union_outliers + " outliers");
     // Build the final weight vector.
     final double[] estimated_weights = new double[dim];
-    {
-      for(int i = 0; i < dim; i++) {
-        if(estimated_score[i] > 0) {
-          estimated_weights[i] = 0.5 / union_outliers;
-        }
-        else {
-          estimated_weights[i] = 0.5 / (dim - union_outliers);
-        }
-      }
-    }
-    NumberVector<?, ?> targvec = refvec.newInstance(estimated_score);
-    PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> wdist, tdist;
-    // wdist = new WeightedSquaredEuclideanDistanceFunction(estimated_weights);
-    // wdist = new WeightedLPNormDistanceFunction(1.0, estimated_weights);
-    wdist = new WeightedPearsonCorrelationDistanceFunction(estimated_weights);
-    tdist = wdist; // new WeightedLPNormDistanceFunction(1.0,
-                   // estimated_weights);
+    final double[] estimated_truth = new double[dim];
+    updateEstimations(outliers_seen, union_outliers, estimated_weights, estimated_truth);
+    NumberVector<?, ?> estimated_truth_vec = refvec.newInstance(estimated_truth);
+
+    PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> wdist = getDistanceFunction(estimated_weights);
+    PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> tdist = wdist;
 
     // Build the naive ensemble:
     final double[] naiveensemble = new double[dim];
@@ -188,7 +181,7 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
         // fout.append(labels.get(id));
         final NumberVector<?, ?> vec = relation.get(id);
         double auc = computeROCAUC(vec, positive, dim);
-        double estimated = wdist.doubleDistance(vec, targvec);
+        double estimated = wdist.doubleDistance(vec, estimated_truth_vec);
         double cost = tdist.doubleDistance(vec, refvec);
         logger.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(id));
         if(auc > bestauc) {
@@ -207,6 +200,8 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
     }
 
     // Initialize ensemble with "best" method
+    logger.verbose("Distance function: " + wdist);
+    logger.verbose("Initial estimation of outliers: " + union_outliers);
     logger.verbose("Initializing ensemble with: " + labels.get(bestid));
     ModifiableDBIDs ensemble = DBIDUtil.newArray(bestid);
     ModifiableDBIDs enscands = DBIDUtil.newHashSet(relation.getDBIDs());
@@ -228,7 +223,8 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
       double s1 = ensemble.size() / (ensemble.size() + 1.);
       double s2 = 1. / (ensemble.size() + 1.);
 
-      TopBoundedHeap<DoubleObjPair<DBID>> heap = new TopBoundedHeap<DoubleObjPair<DBID>>(enscands.size(), Collections.reverseOrder());
+      final int heapsize = enscands.size();
+      TopBoundedHeap<DoubleObjPair<DBID>> heap = new TopBoundedHeap<DoubleObjPair<DBID>>(heapsize, Collections.reverseOrder());
       for(DBID id : enscands) {
         final NumberVector<?, ?> vec = relation.get(id);
         double diversity = wdist.doubleDistance(vec, greedyvec);
@@ -243,8 +239,8 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
           testensemble[i] = greedyensemble[i] * s1 + vec.doubleValue(i + 1) * s2;
         }
         NumberVector<?, ?> testvec = refvec.newInstance(testensemble);
-        double oldd = wdist.doubleDistance(targvec, greedyvec);
-        double newd = wdist.doubleDistance(targvec, testvec);
+        double oldd = wdist.doubleDistance(estimated_truth_vec, greedyvec);
+        double newd = wdist.doubleDistance(estimated_truth_vec, testvec);
         // logger.verbose("Distances: " + oldd + " vs. " + newd);
         if(newd < oldd) {
           System.arraycopy(testensemble, 0, greedyensemble, 0, dim);
@@ -254,6 +250,26 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
         }
         else {
           // logger.verbose("Discarding: " + labels.get(bestadd));
+          if(refine_truth) {
+            boolean refresh = false;
+            // Update target vectors and weights
+            TiedTopBoundedHeap<DoubleIntPair> oheap = new TiedTopBoundedHeap<DoubleIntPair>(estimated_outliers, Collections.reverseOrder());
+            for(int i = 0; i < dim; i++) {
+              oheap.add(new DoubleIntPair(vec.doubleValue(i + 1), i));
+            }
+            for(DoubleIntPair pair : oheap) {
+              assert (outliers_seen[pair.second] > 0);
+              outliers_seen[pair.second] -= 1;
+              if(outliers_seen[pair.second] == 0) {
+                union_outliers -= 1;
+                refresh = true;
+              }
+            }
+            if(refresh) {
+              updateEstimations(outliers_seen, union_outliers, estimated_weights, estimated_truth);
+              estimated_truth_vec = refvec.newInstance(estimated_truth);
+            }
+          }
         }
       }
     }
@@ -268,23 +284,26 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
       }
     }
     NumberVector<?, ?> greedyvec = refvec.newInstance(greedyensemble);
+    logger.verbose("Estimated outliers remaining: " + union_outliers);
     logger.verbose("Greedy ensemble: " + greedylbl.toString());
 
     logger.verbose("Best single ROC AUC: " + bestauc + " (" + bestaucstr + ")");
     logger.verbose("Best single cost:    " + bestcost + " (" + bestcoststr + ")");
     // Evaluate the naive ensemble and the "shrunk" ensemble
+    double naiveauc, naivecost;
     {
-      double auc = computeROCAUC(naivevec, positive, dim);
-      double cost = tdist.doubleDistance(naivevec, refvec);
-      logger.verbose("Naive ensemble AUC:   " + auc + " cost: " + cost);
-      logger.verbose("Naive ensemble Gain:  " + (auc - bestauc) / (1 - bestauc) + " cost gain: " + (bestcost - cost) / bestcost);
+      naiveauc = computeROCAUC(naivevec, positive, dim);
+      naivecost = tdist.doubleDistance(naivevec, refvec);
+      logger.verbose("Naive ensemble AUC:   " + naiveauc + " cost: " + naivecost);
+      logger.verbose("Naive ensemble Gain:  " + gain(naiveauc, bestauc, 1) + " cost gain: " + gain(naivecost, bestcost, 0));
     }
     double greedyauc, greedycost;
     {
       greedyauc = computeROCAUC(greedyvec, positive, dim);
       greedycost = tdist.doubleDistance(greedyvec, refvec);
       logger.verbose("Greedy ensemble AUC:  " + greedyauc + " cost: " + greedycost);
-      logger.verbose("Greedy ensemble Gain: " + (greedyauc - bestauc) / (1 - bestauc) + " cost gain: " + (bestcost - greedycost) / bestcost);
+      logger.verbose("Greedy ensemble Gain to best:  " + gain(greedyauc, bestauc, 1) + " cost gain: " + gain(greedycost, bestcost, 0));
+      logger.verbose("Greedy ensemble Gain to naive: " + gain(greedyauc, naiveauc, 1) + " cost gain: " + gain(greedycost, naivecost, 0));
     }
     {
       MeanVariance meanauc = new MeanVariance();
@@ -315,12 +334,34 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
         meancost.put(cost);
       }
       logger.verbose("Random ensemble AUC:  " + meanauc.getMean() + " + stddev: " + meanauc.getSampleStddev() + " = " + (meanauc.getMean() + meanauc.getSampleStddev()));
-      logger.verbose("Random ensemble Gain: " + (meanauc.getMean() - bestauc) / (1 - bestauc));
+      logger.verbose("Random ensemble Gain: " + gain(meanauc.getMean(), bestauc, 1));
       logger.verbose("Greedy improvement:   " + (greedyauc - meanauc.getMean()) / meanauc.getSampleStddev() + " standard deviations.");
       logger.verbose("Random ensemble Cost: " + meancost.getMean() + " + stddev: " + meancost.getSampleStddev() + " = " + (meancost.getMean() + meanauc.getSampleStddev()));
-      logger.verbose("Random ensemble Gain: " + (bestcost - meancost.getMean()) / bestcost);
+      logger.verbose("Random ensemble Gain: " + gain(meancost.getMean(), bestcost, 0));
       logger.verbose("Greedy improvement:   " + (meancost.getMean() - greedycost) / meancost.getSampleStddev() + " standard deviations.");
+      logger.verbose("Naive ensemble Gain to random: " + gain(naiveauc, meanauc.getMean(), 1) + " cost gain: " + gain(naivecost, meancost.getMean(), 0));
+      logger.verbose("Random ensemble Gain to naive: " + gain(meanauc.getMean(), naiveauc, 1) + " cost gain: " + gain(meancost.getMean(), naivecost, 0));
+      logger.verbose("Greedy ensemble Gain to random: " + gain(greedyauc, meanauc.getMean(), 1) + " cost gain: " + gain(greedycost, meancost.getMean(), 0));
     }
+  }
+
+  protected void updateEstimations(final int[] outliers_seen, int union_outliers, final double[] estimated_weights, final double[] estimated_truth) {
+    for(int i = 0; i < outliers_seen.length; i++) {
+      if(outliers_seen[i] > 0) {
+        estimated_weights[i] = 0.5 / union_outliers;
+        estimated_truth[i] = 1.0;
+      }
+      else {
+        estimated_weights[i] = 0.5 / (outliers_seen.length - union_outliers);
+        estimated_truth[i] = 0.0;
+      }
+    }
+  }
+
+  private PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> getDistanceFunction(double[] estimated_weights) {
+    // return new WeightedSquaredEuclideanDistanceFunction(estimated_weights);
+    // return new WeightedLPNormDistanceFunction(1.0, estimated_weights);
+    return new WeightedPearsonCorrelationDistanceFunction(estimated_weights);
   }
 
   private double computeROCAUC(NumberVector<?, ?> vec, Set<Integer> positive, int dim) {
@@ -340,6 +381,10 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
       }
     }
     return combined;
+  }
+
+  double gain(double score, double ref, double optimal) {
+    return 1 - ((optimal - score) / (optimal - ref));
   }
 
   /**

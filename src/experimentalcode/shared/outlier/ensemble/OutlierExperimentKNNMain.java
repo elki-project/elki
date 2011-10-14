@@ -1,26 +1,27 @@
 package experimentalcode.shared.outlier.ensemble;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,11 +84,6 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
   private static final Logging logger = Logging.getLogger(OutlierExperimentKNNMain.class);
 
   /**
-   * Disable ABOD for now, it takes pretty long.
-   */
-  private static final boolean runabod = false;
-
-  /**
    * Input step
    */
   final InputStep inputstep;
@@ -121,6 +117,11 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * By label outlier detection - reference
    */
   ByLabelOutlier bylabel;
+  
+  /**
+   * Include ABOD
+   */
+  boolean runabod = false;
 
   /**
    * Constructor.
@@ -150,7 +151,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
     final Database database = inputstep.getDatabase();
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
     logger.verbose("Running preprocessor ...");
-    MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, distf, maxk);
+    MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, distf, maxk + 2);
     database.addIndex(preproc);
 
     // Test that we did get a proper index query
@@ -199,6 +200,34 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       writeResult(fout, ids, allresult, new IdentityScaling(), "all-outliers");
     }
 
+    // KNN
+    logger.verbose("Running KNN");
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
+        KNNOutlier<O, D> knn = new KNNOutlier<O, D>(distf, k);
+        OutlierResult knnresult = knn.run(database, relation);
+        // Setup scaling
+        StandardDeviationScaling scaling = new StandardDeviationScaling();
+        scaling.prepare(knnresult);
+        writeResult(fout, ids, knnresult, scaling, "KNN-" + kstr);
+        detachResult(database, knnresult);
+      }
+    });
+    // KNN Weight
+    logger.verbose("Running KNNweight");
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
+        KNNWeightOutlier<O, D> knnw = new KNNWeightOutlier<O, D>(distf, k);
+        OutlierResult knnresult = knnw.run(database, relation);
+        // Setup scaling
+        StandardDeviationScaling scaling = new StandardDeviationScaling();
+        scaling.prepare(knnresult);
+        writeResult(fout, ids, knnresult, scaling, "KNNW-" + kstr);
+        detachResult(database, knnresult);
+      }
+    });
     // Run LOF
     logger.verbose("Running LOF");
     runForEachK(new AlgRunner() {
@@ -230,44 +259,16 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
       @Override
       public void run(int k, String kstr) {
         LDOF<O, D> ldof = new LDOF<O, D>(distf, k);
-        OutlierResult lofresult = ldof.run(database, relation);
+        OutlierResult ldofresult = ldof.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
-        scaling.prepare(lofresult);
-        writeResult(fout, ids, lofresult, scaling, "LDOF-" + kstr);
-        detachResult(database, lofresult);
-      }
-    });
-    // KNN
-    logger.verbose("Running KNN");
-    runForEachK(new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        KNNOutlier<O, D> knn = new KNNOutlier<O, D>(distf, k);
-        OutlierResult knnresult = knn.run(database, relation);
-        // Setup scaling
-        StandardDeviationScaling scaling = new StandardDeviationScaling();
-        scaling.prepare(knnresult);
-        writeResult(fout, ids, knnresult, scaling, "KNN-" + kstr);
-        detachResult(database, knnresult);
-      }
-    });
-    // KNN Weight
-    logger.verbose("Running KNNweight");
-    runForEachK(new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        KNNWeightOutlier<O, D> knnw = new KNNWeightOutlier<O, D>(distf, k);
-        OutlierResult knnresult = knnw.run(database, relation);
-        // Setup scaling
-        StandardDeviationScaling scaling = new StandardDeviationScaling();
-        scaling.prepare(knnresult);
-        writeResult(fout, ids, knnresult, scaling, "KNNW-" + kstr);
-        detachResult(database, knnresult);
+        scaling.prepare(ldofresult);
+        writeResult(fout, ids, ldofresult, scaling, "LDOF-" + kstr);
+        detachResult(database, ldofresult);
       }
     });
     // ABOD
-    if(runabod) {
+    if(runabod && relation.size() < 10000) {
       try {
         final PolynomialKernelFunction poly = new PolynomialKernelFunction(PolynomialKernelFunction.DEFAULT_DEGREE);
         @SuppressWarnings("unchecked")
