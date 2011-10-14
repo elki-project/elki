@@ -154,17 +154,19 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       this.minima = new double[dim];
       this.maxima = new double[dim];
       for(int d = 0; d < dim; d++) {
-        minima[d] = minmax.first.doubleValue(d);
-        maxima[d] = minmax.second.doubleValue(d);
+        minima[d] = minmax.first.doubleValue(d+1);
+        maxima[d] = minmax.second.doubleValue(d+1);
       }
     }
     // if only one value for all dimensions set this value for each dimension
     if(this.minima.length == 1 || this.maxima.length == 1) {
       double val = minima[0];
+      this.minima = new double[dim];
       for(int i = 0; i < dim; i++) {
         minima[i] = val;
       }
       val = maxima[0];
+      this.maxima = new double[dim];
       for(int i = 0; i < dim; i++) {
         maxima[i] = val;
       }
