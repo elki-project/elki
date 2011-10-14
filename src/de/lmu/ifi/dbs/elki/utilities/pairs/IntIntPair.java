@@ -154,6 +154,11 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
     this.second = second;
   }
   
+  @Override
+  public String toString() {
+    return "(" + first + ", " + second + ")";
+  }
+
   /**
    * Comparator to compare by second component only 
    */
