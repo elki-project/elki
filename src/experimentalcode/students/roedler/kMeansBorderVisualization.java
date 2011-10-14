@@ -159,6 +159,7 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
               if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
                 final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
                 task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
+                baseResult.getHierarchy().add(p, task);
                 baseResult.getHierarchy().add(c, task);
               }
             }
