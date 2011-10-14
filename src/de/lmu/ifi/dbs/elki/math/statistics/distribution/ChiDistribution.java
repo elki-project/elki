@@ -65,7 +65,7 @@ public class ChiDistribution implements Distribution {
    * 
    * @param val Value
    * @param dof Degrees of freedom
-   * @return
+   * @return Pdf value
    */
   public static double pdf(double val, double dof) {
     if(val < 0) {

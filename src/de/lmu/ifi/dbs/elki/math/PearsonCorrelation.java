@@ -176,7 +176,7 @@ public class PearsonCorrelation {
   /**
    * Return the naive variance (not taking sampling into account)
    * 
-   * Note: usually, you should be using {@link #getSampleVariance} instead!
+   * Note: usually, you should be using {@link #getSampleVarianceX} instead!
    * 
    * @return variance
    */
@@ -197,7 +197,7 @@ public class PearsonCorrelation {
   /**
    * Return standard deviation using the non-sample variance
    * 
-   * Note: usually, you should be using {@link #getSampleStddev} instead!
+   * Note: usually, you should be using {@link #getSampleStddevX} instead!
    * 
    * @return stddev
    */
@@ -217,7 +217,7 @@ public class PearsonCorrelation {
   /**
    * Return the naive variance (not taking sampling into account)
    * 
-   * Note: usually, you should be using {@link #getSampleVariance} instead!
+   * Note: usually, you should be using {@link #getSampleVarianceY} instead!
    * 
    * @return variance
    */
@@ -238,7 +238,7 @@ public class PearsonCorrelation {
   /**
    * Return standard deviation using the non-sample variance
    * 
-   * Note: usually, you should be using {@link #getSampleStddev} instead!
+   * Note: usually, you should be using {@link #getSampleStddevY} instead!
    * 
    * @return stddev
    */

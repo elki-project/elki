@@ -45,7 +45,7 @@ public final class SpatialUtil {
    * 
    * @param r1 First object
    * @param r2 Second object
-   * @return
+   * @return Volume of union
    */
   public static double volumeUnion(SpatialComparable r1, SpatialComparable r2) {
     final int dim1 = r1.getDimensionality();

@@ -121,7 +121,6 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    * Extend the bounding box by some other spatial object
    * 
    * @param obj Spatial object to extend with
-   * @param adapter Adapter
    * @return true when the MBR changed.
    */
   public <E extends SpatialComparable> boolean extend(E obj) {

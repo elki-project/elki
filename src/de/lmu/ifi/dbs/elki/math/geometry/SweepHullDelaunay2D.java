@@ -652,9 +652,9 @@ public class SweepHullDelaunay2D {
    * @param a Starting point
    * @param b Reference point
    * @param d Test point
-   * @return
+   * @return true when on the left side 
    */
-  public boolean leftOf(Vector a, Vector b, Vector d) {
+  boolean leftOf(Vector a, Vector b, Vector d) {
     final double bax = b.get(0) - a.get(0);
     final double bay = b.get(1) - a.get(1);
     final double dax = d.get(0) - a.get(0);
