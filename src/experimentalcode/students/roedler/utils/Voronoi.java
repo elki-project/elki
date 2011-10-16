@@ -3,13 +3,16 @@ package experimentalcode.students.roedler.utils;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -46,9 +49,11 @@ public class Voronoi {
 
     final List<Vector> points = Arrays.asList(meansproj);
     final List<SweepHullDelaunay2D.Triangle> delaunay;
-    {
+    if(meansproj.length > 2) {
       SweepHullDelaunay2D dt = new SweepHullDelaunay2D(points);
       delaunay = dt.getDelaunay();
+    } else {
+      delaunay = Collections.emptyList();
     }
 
     int max = 4 + (means.length - 3) * 2;
@@ -56,10 +61,11 @@ public class Voronoi {
 
     // graphsize for checkGraphsize method
     double[] graphSize = new double[4];
-    graphSize[0] = proj.estimateViewport().first.getMax() * linesLonger;
-    graphSize[1] = proj.estimateViewport().second.getMax() * linesLonger;
-    graphSize[2] = proj.estimateViewport().first.getMin() * linesLonger;
-    graphSize[3] = proj.estimateViewport().second.getMin() * linesLonger;
+    Pair<DoubleMinMax, DoubleMinMax> vp = proj.estimateViewport();
+    graphSize[0] = vp.first.getMax() * linesLonger;
+    graphSize[1] = vp.second.getMax() * linesLonger;
+    graphSize[2] = vp.first.getMin() * linesLonger;
+    graphSize[3] = vp.second.getMin() * linesLonger;
 
     double width, angle;
 
