@@ -252,18 +252,6 @@ public class RectangleArranger<T> {
       assert assertConsistent();
     }
     logger.debugFinest("Best: " + bestsx + "," + bestsy + " - " + bestex + "," + bestey + " inc: " + bestwi + "x" + besthi + " " + bestinc);
-    // Need to split a column.
-    // TODO: find best column to split. Currently: last
-    if(bestwi < 0) {
-      splitCol(bestex, -bestwi);
-      bestwi = 0.0;
-    }
-    // Need to split a row.
-    // TODO: find best row to split. Currently: last
-    if(besthi < 0) {
-      splitRow(bestey, -besthi);
-      besthi = 0.0;
-    }
     // Need to increase the total area
     if(bestinc > 0) {
       assert (bestex == cols - 1 || bestey == rows - 1);
@@ -273,6 +261,18 @@ public class RectangleArranger<T> {
       // Resubmit
       put(w, h, data);
       return;
+    }
+    // Need to split a column.
+    // TODO: find best column to split. Currently: last
+    if(bestwi < 0.0) {
+      splitCol(bestex, -bestwi);
+      bestwi = 0.0;
+    }
+    // Need to split a row.
+    // TODO: find best row to split. Currently: last
+    if(besthi < 0.0) {
+      splitRow(bestey, -besthi);
+      besthi = 0.0;
     }
     for(int x = bestsx; x <= bestex; x++) {
       for(int y = bestsy; y <= bestey; y++) {
@@ -371,7 +371,7 @@ public class RectangleArranger<T> {
     {
       double wsum = 0.0;
       for(int x = 0; x < cols; x++) {
-        assert (widths.get(x) > 0);
+        assert (widths.get(x) > 0) : "Negative width: "+widths.get(x);
         wsum += widths.get(x);
       }
       assert (Math.abs(wsum - twidth) < 1E-10);
@@ -379,7 +379,7 @@ public class RectangleArranger<T> {
     {
       double hsum = 0.0;
       for(int y = 0; y < rows; y++) {
-        assert (heights.get(y) > 0);
+        assert (heights.get(y) > 0) : "Negative height: "+heights.get(y);
         hsum += heights.get(y);
       }
       assert (Math.abs(hsum - theight) < 1E-10);
