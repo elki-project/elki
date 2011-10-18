@@ -153,7 +153,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     clusterOrder.add(startID, null, distFunction.getDistanceFactory().infiniteDistance());
     int numHandled = 1;
     index.setHandled(startID, relation.get(startID));
-    SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry)index.getRootEntry();
+    SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry) index.getRootEntry();
     SpatialObjectPair spatialObjectPair = new SpatialObjectPair(distFunction.getDistanceFactory().nullDistance(), rootEntry, rootEntry, true);
     heap.add(spatialObjectPair);
 
@@ -217,8 +217,8 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param knns the knn list
    */
   private void expandNodes(DeLiCluTree index, SpatialPrimitiveDistanceFunction<NV, D> distFunction, SpatialObjectPair nodePair, DataStore<KNNList<D>> knns) {
-    DeLiCluNode node1 = index.getNode(((SpatialDirectoryEntry)nodePair.entry1).getPageID());
-    DeLiCluNode node2 = index.getNode(((SpatialDirectoryEntry)nodePair.entry2).getPageID());
+    DeLiCluNode node1 = index.getNode(((SpatialDirectoryEntry) nodePair.entry1).getPageID());
+    DeLiCluNode node2 = index.getNode(((SpatialDirectoryEntry) nodePair.entry2).getPageID());
 
     if(node1.isLeaf()) {
       expandLeafNodes(distFunction, node1, node2, knns);
@@ -238,6 +238,9 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param node2 the second node
    */
   private void expandDirNodes(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluNode node1, DeLiCluNode node2) {
+    if(logger.isDebuggingFinest()) {
+      logger.debugFinest("ExpandDirNodes: " + node1.getPageID() + " + " + node2.getPageID());
+    }
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
@@ -271,6 +274,9 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param knns the knn list
    */
   private void expandLeafNodes(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNList<D>> knns) {
+    if(logger.isDebuggingFinest()) {
+      logger.debugFinest("ExpandLeafNodes: " + node1.getPageID() + " + " + node2.getPageID());
+    }
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
@@ -304,7 +310,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param knns the knn list
    */
   private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, DataStore<KNNList<D>> knns) {
-    SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry)path.remove(0).getEntry();
+    SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry) path.remove(0).getEntry();
     reinsertExpanded(distFunction, index, path, 0, rootEntry, knns);
   }
 
