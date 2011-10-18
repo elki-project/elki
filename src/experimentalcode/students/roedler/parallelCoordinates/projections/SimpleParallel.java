@@ -80,6 +80,14 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return 0;
   }
   
+  public double getSizeX(){
+    return size[0];
+  }
+  
+  public double getSizeY(){
+    return size[1];
+  }
+  
   public int getVisibleDimensions(){
     return visDims;
   }

@@ -38,4 +38,8 @@ public interface ProjectionParallel extends Projection {
   public int getDimensionNumber(int pos);
   
   public Vector sortDims(Vector s);
+  
+  public double getSizeX();
+  
+  public double getSizeY();
 }
