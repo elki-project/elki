@@ -85,32 +85,40 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     Element button;
     double last = -1.;
     
+    double as = proj.getSizeY() / 70.;
+    double bs = as * 1.5;
+    double hbs = bs / 2.;
+    double qas = as / 4.;
+    double ypos = proj.getMarginY() * 2. + proj.getAxisHeight();
+    double dist = 2.5 * as; 
     
     double xpos = proj.getMarginX() / 2.;
     if (hide){
       
-      Element back = svgp.svgRect(xpos - 3.0, 120.0, 6., 4.0);
+     // Element back = svgp.svgRect(xpos - 3.0, 120.0, 6., 4.0);
+      Element back = svgp.svgRect(0.0, ypos, proj.getMarginX(), proj.getSizeY() / 35.);
       SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
       layer.appendChild(back);
-      arrow = getArrow(2, xpos, 122.);
+      arrow = getArrow(2, xpos, ypos + as, as);
       SVGUtil.addCSSClass(arrow, SDO_ARROW);
       layer.appendChild(arrow);
-      Element rect = svgp.svgRect(xpos - 1.5, 120.5, 3.0, 3.0);
+      Element rect = svgp.svgRect(xpos - hbs, ypos + qas, bs, bs);
       SVGUtil.addCSSClass(rect, SDO_BUTTON);
       addEventListener(rect, -1, -1);
       layer.appendChild(rect);
     }
     else {
-      Element back = svgp.svgRect(proj.getXpos(0) - 8.0, 120.0, (proj.getXpos(proj.getLastVisibleDimension()) - proj.getMarginX()) + 16.0, 4.0);
+     // Element back = svgp.svgRect(proj.getXpos(0) - 8.0, 120.0, (proj.getXpos(proj.getLastVisibleDimension()) - proj.getMarginX()) + 16.0, 4.0);
+      Element back = svgp.svgRect(0.0, (proj.getMarginY() * 2. + proj.getAxisHeight()), proj.getSizeX(), proj.getSizeY() / 35.);
       SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
       layer.appendChild(back);
-      Element line = svgp.svgLine(xpos + xpos / 3., 120.0, xpos + xpos / 3., 124.0);
+      Element line = svgp.svgLine(xpos + xpos / 3., ypos, xpos + xpos / 3., ypos + as * 2.);
       SVGUtil.addCSSClass(line, SDO_ARROW);
       layer.appendChild(line);
-      arrow = getArrow(0, xpos -1., 122.);
+      arrow = getArrow(0, xpos -1., ypos + as, as);
       SVGUtil.addCSSClass(arrow, SDO_ARROW);
       layer.appendChild(arrow);
-      Element rect = svgp.svgRect(xpos - 1.5, 120.5, 3.0, 3.0);
+      Element rect = svgp.svgRect(xpos - hbs, ypos + qas, bs, bs);
       SVGUtil.addCSSClass(rect, SDO_BUTTON);
       addEventListener(rect, -1, -1);
       layer.appendChild(rect);
@@ -123,29 +131,29 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
             if(i == 0){j = 1; }
             if (i == proj.getLastVisibleDimension()){end = 2; }
             for (; j < end; j++){
-              arrow = getArrow(j, (proj.getXpos(i) - 5.0) + j * 5.0, 122.0);
+              arrow = getArrow(j, (proj.getXpos(i) - dist) + j * dist, ypos + as, as);
               SVGUtil.addCSSClass(arrow, SDO_ARROW);
               layer.appendChild(arrow);
-              button = svgp.svgRect((proj.getXpos(i) - 6.5) + j * 5.0, 120.5, 3., 3.);
+              button = svgp.svgRect((proj.getXpos(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
               SVGUtil.addCSSClass(button, SDO_BUTTON);
               addEventListener(button, i, j);
               layer.appendChild(button);
             }
           }
           else{
-            arrow = getArrow(3, proj.getXpos(i), 122.0);
+            arrow = getArrow(3, proj.getXpos(i), ypos + as, as);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            button = svgp.svgRect((proj.getXpos(i) - 1.5) , 120.5, 3., 3.);
+            button = svgp.svgRect((proj.getXpos(i) - hbs) , ypos + qas, bs, bs);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, 3);
             layer.appendChild(button);
             
             if (last > 0.){
-              arrow = getArrow(3, last + ((proj.getXpos(i)) - last) / 2., 122.0);
+              arrow = getArrow(3, last + ((proj.getXpos(i)) - last) / 2., ypos + as, as);
               SVGUtil.addCSSClass(arrow, SDO_ARROW);
               layer.appendChild(arrow);
-              button = svgp.svgRect(last + (((proj.getXpos(i)) - last) / 2.) - 1.5, 120.5, 3., 3.);
+              button = svgp.svgRect(last + (((proj.getXpos(i)) - last) / 2.) - hbs, ypos + qas, bs, bs);
               SVGUtil.addCSSClass(button, SDO_BUTTON);
               addEventListener(button, i, 4);
               layer.appendChild(button);
@@ -204,37 +212,38 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     }, false);
   }
   
-  private Element getArrow(int dir, double x, double y){
+  private Element getArrow(int dir, double x, double y, double size){
     SVGPath path = new SVGPath();
+    double hs = size / 2.;
     
     switch (dir) {
       case 0: {
-        path.drawTo(x + 1., y + 1.);
-        path.drawTo(x - 1., y);
-        path.drawTo(x + 1., y - 1.);
-        path.drawTo(x + 1., y + 1.);
+        path.drawTo(x + hs, y + hs);
+        path.drawTo(x - hs, y);
+        path.drawTo(x + hs, y - hs);
+        path.drawTo(x + hs, y + hs);
         break;
       }
       case 1: {
-        path.drawTo(x - 1., y - 1.);
-        path.drawTo(x + 1., y - 1.);
-        path.drawTo(x, y + 1.);
-        path.drawTo(x - 1., y - 1.);
+        path.drawTo(x - hs, y - hs);
+        path.drawTo(x + hs, y - hs);
+        path.drawTo(x, y + hs);
+        path.drawTo(x - hs, y - hs);
         break;
       }
       case 2: {
-        path.drawTo(x - 1., y - 1.);
-        path.drawTo(x + 1., y);
-        path.drawTo(x - 1., y + 1.);
-        path.drawTo(x - 1., y - 1.);
+        path.drawTo(x - hs, y - hs);
+        path.drawTo(x + hs, y);
+        path.drawTo(x - hs, y + hs);
+        path.drawTo(x - hs, y - hs);
         break;
       }
       case 3: {
         
-        path.drawTo(x - 1., y + 1.);
-        path.drawTo(x, y - 1.);
-        path.drawTo(x + 1., y + 1.);
-        path.drawTo(x - 1., y + 1.);
+        path.drawTo(x - hs, y + hs);
+        path.drawTo(x, y - hs);
+        path.drawTo(x + hs, y + hs);
+        path.drawTo(x - hs, y + hs);
       }
     }
     
