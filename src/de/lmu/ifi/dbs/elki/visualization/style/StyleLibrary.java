@@ -126,8 +126,7 @@ public interface StyleLibrary {
 
   /**
    * Scaling constant. Keep in sync with
-   * {@link de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection#SCALE}
-   * .
+   * {@link de.lmu.ifi.dbs.elki.visualization.projections.Projection#SCALE}
    */
   public static final double SCALE = 100.0;
 
