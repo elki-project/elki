@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -60,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A simple ensemble method called "Feature bagging" for outlier detection.
@@ -163,22 +163,28 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     DoubleMinMax minmax = new DoubleMinMax();
     if(breadth) {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
-      HashMap<IterableIterator<DBID>, Relation<Double>> IDVectorOntoScoreVector = new HashMap<IterableIterator<DBID>, Relation<Double>>();
+      Pair<IterableIterator<DBID>, Relation<Double>>[] IDVectorOntoScoreVector = Pair.newPairArray(results.size());
 
       // Mapping score-sorted DBID-Iterators onto their corresponding scores.
       // We need to initialize them now be able to iterate them "in parallel".
-      for(OutlierResult r : results) {
-        IDVectorOntoScoreVector.put(r.getOrdering().iter(relation.getDBIDs()), r.getScores());
+      {
+        int i = 0;
+        for(OutlierResult r : results) {
+          IDVectorOntoScoreVector[i] = new Pair<IterableIterator<DBID>, Relation<Double>>(r.getOrdering().iter(relation.getDBIDs()), r.getScores());
+          i++;
+        }
       }
 
       // Iterating over the *lines* of the AS_t(i)-matrix.
       for(int i = 0; i < relation.size(); i++) {
         // Iterating over the elements of a line (breadth-first).
-        for(IterableIterator<DBID> iter : IDVectorOntoScoreVector.keySet()) {
-          if(iter.hasNext()) { // Always true if every algorithm returns a
-                               // complete result (one score for every DBID).
+        for(Pair<IterableIterator<DBID>, Relation<Double>> pair : IDVectorOntoScoreVector) {
+          IterableIterator<DBID> iter = pair.first;
+          // Always true if every algorithm returns a complete result (one score
+          // for every DBID).
+          if(iter.hasNext()) {
             DBID tmpID = iter.next();
-            double score = IDVectorOntoScoreVector.get(iter).get(tmpID);
+            double score = pair.second.get(tmpID);
             if(scores.get(tmpID) == null) {
               scores.put(tmpID, score);
               minmax.put(score);
