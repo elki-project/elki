@@ -23,16 +23,16 @@ package de.lmu.ifi.dbs.elki.evaluation.paircounting;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorMerge;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorNoise;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorSingleCluster;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGeneratorInterface;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Compare two clustering results using a pair-counting F-Measure.
@@ -48,176 +48,133 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * itself are useful, however their combination -- the F-Measure -- is useful.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGeneratorInterface
- * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorNoise
- * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorSingleCluster
- * @apiviz.uses de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorMerge
  */
 public class PairCountingFMeasure {
   /**
-   * Get a pair generator for the given Clustering
+   * Compare two clustering results.
    * 
-   * @param <R> Clustering result class
-   * @param <M> Model type
-   * @param clusters Clustering result
-   * @param noiseSpecial Special handling for "noise clusters"
-   * @param hierarchicalSpecial Special handling for hierarchical clusters
-   * @return Sorted pair generator
+   * @param result1 first result
+   * @param result2 second result
+   * @param noiseSpecial Noise receives special treatment
+   * @return Pair counts
    */
-  public static <R extends Clustering<M>, M extends Model> PairSortedGeneratorInterface getPairGenerator(R clusters, boolean noiseSpecial, boolean hierarchicalSpecial) {
-    // collect all clusters into a flat list.
-    Collection<Cluster<M>> allclusters = clusters.getAllClusters();
-
-    // Make generators for each cluster
-    PairSortedGeneratorInterface[] gens = new PairSortedGeneratorInterface[allclusters.size()];
-    int i = 0;
-    for(Cluster<?> c : allclusters) {
-      if(noiseSpecial && c.isNoise()) {
-        gens[i] = new PairGeneratorNoise(c);
+  public static int[] countPairs(Clustering<?> result1, Clustering<?> result2, boolean noiseSpecial) {
+    final int self = 0;
+    final List<? extends Cluster<?>> cs1 = result1.getAllClusters();
+    final List<? extends Cluster<?>> cs2 = result2.getAllClusters();
+    // Fill overlap matrix
+    final int[][] overlapmat = new int[cs1.size()][cs2.size()];
+    final BitSet noise1 = new BitSet(cs1.size());
+    final BitSet noise2 = new BitSet(cs2.size());
+    {
+      final Iterator<? extends Cluster<?>> it1 = cs1.iterator();
+      for(int i1 = 0; it1.hasNext(); i1++) {
+        final Cluster<?> c1 = it1.next();
+        if(noiseSpecial && c1.isNoise()) {
+          noise1.set(i1);
+        }
+        final DBIDs ids = DBIDUtil.ensureSet(c1.getIDs());
+        final Iterator<? extends Cluster<?>> it2 = cs2.iterator();
+        for(int i2 = 0; it2.hasNext(); i2++) {
+          final Cluster<?> c2 = it2.next();
+          if(noiseSpecial && i1 == 0 && c2.isNoise()) {
+            noise2.set(i2);
+          }
+          int count = 0;
+          for(DBID id : c2.getIDs()) {
+            if(ids.contains(id)) {
+              count++;
+            }
+          }
+          overlapmat[i1][i2] = count;
+        }
+      }
+    }
+    // Pair counting
+    int sum1 = 0, sum2 = 0;
+    int in1 = 0, in2 = 0, inboth = 0;
+    for(Cluster<?> c1 : cs1) {
+      if(noiseSpecial && c1.isNoise()) {
+        in1 += c1.size() * (1 - self);
       }
       else {
-        gens[i] = new PairGeneratorSingleCluster(c, hierarchicalSpecial);
+        in1 += c1.size() * (c1.size() - self);
       }
-      i++;
+      sum1 += c1.size();
     }
-    return new PairGeneratorMerge(gens);
+    for(Cluster<?> c2 : cs2) {
+      if(noiseSpecial && c2.isNoise()) {
+        in2 += c2.size() * (1 - self);
+      }
+      else {
+        in2 += c2.size() * (c2.size() - self);
+      }
+      sum2 += c2.size();
+    }
+    for(int i1 = 0; i1 < cs1.size(); i1++) {
+      for(int i2 = 0; i2 < cs2.size(); i2++) {
+        final int s = overlapmat[i1][i2];
+        if(noiseSpecial && (noise1.get(i1) || noise2.get(i2))) {
+          inboth += s * (1 - self);
+        }
+        else {
+          inboth += s * (s - self);
+        }
+      }
+    }
+    if(sum1 != sum2) {
+      LoggingUtil.warning("PairCounting F-Measure is not well defined for overlapping and incomplete clusterings.");
+    }
+    return new int[] { inboth, in1 - inboth, in2 - inboth };
   }
 
   /**
    * Compare two clustering results.
    * 
-   * @param <R> Result type
-   * @param <M> Model type
-   * @param <S> Result type
-   * @param <N> Model type
    * @param result1 first result
    * @param result2 second result
    * @param beta Beta value for the F-Measure
    * @param noiseSpecial Noise receives special treatment
-   * @param hierarchicalSpecial Special handling for hierarchical clusters
    * @return Pair counting F-Measure result.
    */
-  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2, double beta, boolean noiseSpecial, boolean hierarchicalSpecial) {
-    PairSortedGeneratorInterface first = getPairGenerator(result1, noiseSpecial, hierarchicalSpecial);
-    PairSortedGeneratorInterface second = getPairGenerator(result2, noiseSpecial, hierarchicalSpecial);
-    Triple<Integer, Integer, Integer> countedPairs = countPairs(first, second);
-    return fMeasure(countedPairs.first, countedPairs.second, countedPairs.third, beta);
+  public static double compareClusterings(Clustering<?> result1, Clustering<?> result2, double beta, boolean noiseSpecial) {
+    int[] counts = countPairs(result1, result2, noiseSpecial);
+    return fMeasure(counts[0], counts[1], counts[2], beta);
   }
 
   /**
    * Compare two clustering results.
    * 
-   * @param <R> Result type
-   * @param <M> Model type
-   * @param <S> Result type
-   * @param <N> Model type
    * @param result1 first result
    * @param result2 second result
    * @param beta Beta value for the F-Measure
    * @return Pair counting F-Measure result.
    */
-  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2, double beta) {
-    return compareClusterings(result1, result2, beta, false, false);
+  public static double compareClusterings(Clustering<?> result1, Clustering<?> result2, double beta) {
+    return compareClusterings(result1, result2, beta, false);
   }
 
   /**
    * Compare two clustering results.
    * 
-   * @param <R> Result type
-   * @param <M> Model type
-   * @param <S> Result type
-   * @param <N> Model type
    * @param result1 first result
    * @param result2 second result
    * @param noiseSpecial Noise receives special treatment
    * @return Pair counting F-1-Measure result.
    */
-  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2, boolean noiseSpecial, boolean hierarchicalSpecial) {
-    return compareClusterings(result1, result2, 1.0, noiseSpecial, hierarchicalSpecial);
+  public static double compareClusterings(Clustering<?> result1, Clustering<?> result2, boolean noiseSpecial) {
+    return compareClusterings(result1, result2, 1.0, noiseSpecial);
   }
 
   /**
    * Compare two clustering results.
    * 
-   * @param <R> Result type
-   * @param <M> Model type
-   * @param <S> Result type
-   * @param <N> Model type
    * @param result1 first result
    * @param result2 second result
    * @return Pair counting F-1-Measure result.
    */
-  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2) {
-    return compareClusterings(result1, result2, 1.0, false, false);
-  }
-
-  /**
-   * Compare two sets of generated pairs. It determines how many objects of the
-   * first set are in both sets, just in the first set or just in the second
-   * set.</p>
-   * 
-   * 
-   * @param <R> Result type
-   * @param <M> Model type
-   * @param <S> Result type
-   * @param <N> Model type
-   * @param result1 first result
-   * @param result2 second result
-   * @return Returns a {@link Triple} that contains the number of objects that
-   *         are in both sets (FIRST), the number of objects that are just in
-   *         the first set (SECOND) and the number of object that are just in
-   *         the second set (THIRD).
-   * 
-   */
-  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> Triple<Integer, Integer, Integer> countPairs(R result1, S result2) {
-    PairSortedGeneratorInterface first = getPairGenerator(result1, false, false);
-    PairSortedGeneratorInterface second = getPairGenerator(result2, false, false);
-    return countPairs(first, second);
-  }
-
-  /**
-   * Compare two sets of generated pairs. It determines how many objects of the
-   * first set are in both sets, just in the first set or just in the second
-   * set.</p>
-   * 
-   * @param first first set
-   * @param second second set
-   * @return Returns a {@link Triple} that contains the number of objects that
-   *         are in both sets (FIRST), the number of objects that are just in
-   *         the first set (SECOND) and the number of object that are just in
-   *         the second set (THIRD).
-   */
-  public static Triple<Integer, Integer, Integer> countPairs(PairSortedGeneratorInterface first, PairSortedGeneratorInterface second) {
-    int inboth = 0;
-    int infirst = 0;
-    int insecond = 0;
-
-    while(first.current() != null && second.current() != null) {
-      int cmp = first.current().compareTo(second.current());
-      if(cmp == 0) {
-        inboth++;
-        first.next();
-        second.next();
-      }
-      else if(cmp < 0) {
-        infirst++;
-        first.next();
-      }
-      else {
-        insecond++;
-        second.next();
-      }
-    }
-    while(first.current() != null) {
-      infirst++;
-      first.next();
-    }
-    while(second.current() != null) {
-      insecond++;
-      second.next();
-    }
-    return new Triple<Integer, Integer, Integer>(inboth, infirst, insecond);
+  public static double compareClusterings(Clustering<?> result1, Clustering<?> result2) {
+    return compareClusterings(result1, result2, 1.0, false);
   }
 
   /**
@@ -235,7 +192,8 @@ public class PairCountingFMeasure {
    */
   public static double fMeasure(int inBoth, int inFirst, int inSecond, double beta) {
     // System.out.println("Both: "+inboth+" First: "+infirst+" Second: "+insecond);
-    double fmeasure = ((1 + beta * beta) * inBoth) / ((1 + beta * beta) * inBoth + (beta * beta) * inFirst + inSecond);
+    final double beta2 = beta * beta;
+    double fmeasure = ((1 + beta2) * inBoth) / ((1 + beta2) * inBoth + beta2 * inFirst + inSecond);
     return fmeasure;
   }
 }

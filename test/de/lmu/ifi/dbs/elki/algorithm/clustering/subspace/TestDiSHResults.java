@@ -66,7 +66,7 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
     // run DiSH on database
     Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
 
-    testFMeasureHierarchical(db, result, 0.9991258);
+    testFMeasure(db, result, 0.996976); // Hierarchical pairs scored: 0.9991258
     testClusterSizes(result, new int[] { 51, 199, 200 });
   }
 

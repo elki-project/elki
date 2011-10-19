@@ -79,6 +79,6 @@ public class TestFeatureBagging extends AbstractSimpleAlgorithmTest implements J
     OutlierResult result = fb.run(db);
 
     testSingleScore(result, 1293, 1.321709879);
-    testAUC(db, "Noise", result, 0.88466106);
+    testAUC(db, "Noise", result, 0.88448179);
   }
 }
