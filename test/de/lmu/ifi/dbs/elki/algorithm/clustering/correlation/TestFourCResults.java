@@ -67,7 +67,7 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
     // run 4C on database
     Clustering<Model> result = fourc.run(db);
 
-    testFMeasureHierarchical(db, result, 0.79467);
+    testFMeasure(db, result, 0.498048); // Hierarchical pairs scored: 0.79467
     testClusterSizes(result, new int[] { 5, 595 });
   }
 

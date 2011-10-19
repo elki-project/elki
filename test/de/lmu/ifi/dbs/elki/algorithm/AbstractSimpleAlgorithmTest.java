@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -156,25 +155,6 @@ public abstract class AbstractSimpleAlgorithmTest {
     Clustering<Model> rbl = bylabel.run(database);
 
     double score = PairCountingFMeasure.compareClusterings(clustering, rbl, 1.0);
-    if(logger.isVerbose()) {
-      logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
-    }
-    org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match.", expected, score, 0.0001);
-  }
-
-  /**
-   * Test the clustering result by comparing the score with an expected value.
-   * 
-   * @param database Database to test
-   * @param clustering Clustering result
-   * @param expected Expected score
-   */
-  protected <O> void testFMeasureHierarchical(Database database, Clustering<?> clustering, double expected) {
-    // Run by-label as reference
-    ByLabelHierarchicalClustering bylabel = new ByLabelHierarchicalClustering();
-    Clustering<Model> rbl = bylabel.run(database);
-
-    double score = PairCountingFMeasure.compareClusterings(clustering, rbl, 1.0, false, true);
     if(logger.isVerbose()) {
       logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
     }

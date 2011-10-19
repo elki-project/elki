@@ -87,7 +87,7 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     // run ERiC on database
     Clustering<CorrelationModel<DoubleVector>> result = eric.run(db);
 
-    testFMeasureHierarchical(db, result, 0.9204825);
+    testFMeasure(db, result, 0.714207); // Hierarchical pairs scored: 0.9204825
     testClusterSizes(result, new int[] { 109, 184, 307 });
   }
 

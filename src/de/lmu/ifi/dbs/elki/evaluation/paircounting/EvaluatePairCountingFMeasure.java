@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGeneratorInterface;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
@@ -45,7 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
  * Evaluate a clustering result by comparing it to an existing cluster label.
@@ -115,15 +113,13 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
     }
     Clustering<?> refc = refcrs.get(0);
     for(Clustering<?> c : crs) {
-      PairSortedGeneratorInterface first = PairCountingFMeasure.getPairGenerator(c, noiseSpecialHandling, false);
-      PairSortedGeneratorInterface second = PairCountingFMeasure.getPairGenerator(refc, noiseSpecialHandling, false);
-      Triple<Integer, Integer, Integer> countedPairs = PairCountingFMeasure.countPairs(first, second);
+      int[] countedPairs = PairCountingFMeasure.countPairs(c, refc, noiseSpecialHandling);
       // Use double, since we want double results at the end!
-      double sum = countedPairs.first + countedPairs.second + countedPairs.third;
-      double inboth = countedPairs.first / sum;
-      double infirst = countedPairs.second / sum;
-      double insecond = countedPairs.third / sum;
-      double fmeasure = PairCountingFMeasure.fMeasure(countedPairs.first, countedPairs.second, countedPairs.third, 1.0);
+      double sum = countedPairs[0] + countedPairs[1] + countedPairs[2];
+      double inboth = countedPairs[0] / sum;
+      double infirst = countedPairs[1] / sum;
+      double insecond = countedPairs[2] / sum;
+      double fmeasure = PairCountingFMeasure.fMeasure(countedPairs[0], countedPairs[1], countedPairs[2], 1.0);
       ArrayList<Vector> s = new ArrayList<Vector>(4);
       s.add(new Vector(new double[] { fmeasure, inboth, infirst, insecond }));
       db.getHierarchy().add(c, new ScoreResult(s));

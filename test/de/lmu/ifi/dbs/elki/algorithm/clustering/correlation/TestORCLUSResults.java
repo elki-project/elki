@@ -68,7 +68,7 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
 
-    testFMeasureHierarchical(db, result, 0.789113);
+    testFMeasure(db, result, 0.640306); // Hierarchical pairs scored: 0.789113
     testClusterSizes(result, new int[] { 22, 27, 401 });
   }
 
