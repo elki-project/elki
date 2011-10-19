@@ -27,13 +27,10 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -69,12 +66,9 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
 
     // run CLIQUE on database
     Clustering<SubspaceModel<DoubleVector>> result = clique.run(db);
-    // Run by-label as reference
-    ByLabelClustering bylabel = new ByLabelClustering(true, null);
-    Clustering<Model> rbl = bylabel.run(db);
 
-    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match.", 0.9882, score, 0.0001);
+    // PairCounting is not appropriate here: overlapping clusterings!
+    // testFMeasure(db, result, 0.9882);
     testClusterSizes(result, new int[] { 200, 200, 216, 400 });
   }
 
@@ -97,7 +91,8 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
 
     // run CLIQUE on database
     Clustering<SubspaceModel<DoubleVector>> result = clique.run(db);
-    testFMeasure(db, result, 0.433661);
+    // PairCounting is not appropriate here: overlapping clusterings!
+    // testFMeasure(db, result, 0.433661);
     testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
   }
 }

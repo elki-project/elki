@@ -67,7 +67,8 @@ public class TestSUBCLUResults extends AbstractSimpleAlgorithmTest implements JU
     // run SUBCLU on database
     Clustering<SubspaceModel<DoubleVector>> result = subclu.run(db);
 
-    testFMeasure(db, result, 0.9090);
+    // PairCounting is not appropriate here: overlapping clusterings!
+    // testFMeasure(db, result, 0.9090);
     testClusterSizes(result, new int[] { 191, 194, 395 });
   }
 
@@ -90,7 +91,8 @@ public class TestSUBCLUResults extends AbstractSimpleAlgorithmTest implements JU
 
     // run SUBCLU on database
     Clustering<SubspaceModel<DoubleVector>> result = subclu.run(db);
-    testFMeasure(db, result, 0.49279033);
+    // PairCounting is not appropriate here: overlapping clusterings!
+    // testFMeasure(db, result, 0.49279033);
     testClusterSizes(result, new int[] { 99, 247, 303, 323, 437, 459 });
   }
 }
