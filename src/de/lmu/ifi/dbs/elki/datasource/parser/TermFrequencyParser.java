@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -44,6 +45,9 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * A parser to load term frequency data, which essentially are sparse vectors
@@ -73,14 +77,21 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   HashMap<String, Integer> keymap;
 
   /**
+   * Normalize
+   */
+  boolean normalize;
+
+  /**
    * Constructor.
    * 
+   * @param normalize Normalize
    * @param colSep
    * @param quoteChar
    * @param labelIndices
    */
-  public TermFrequencyParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
+  public TermFrequencyParser(boolean normalize, Pattern colSep, char quoteChar, BitSet labelIndices) {
     super(colSep, quoteChar, labelIndices, SparseFloatVector.STATIC);
+    this.normalize = normalize;
     this.maxdim = 0;
     this.keymap = new HashMap<String, Integer>();
   }
@@ -89,6 +100,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   protected void parseLineInternal(String line, List<SparseFloatVector> vectors, List<LabelList> labellist) {
     List<String> entries = tokenize(line);
 
+    double len = 0;
     Map<Integer, Float> values = new TreeMap<Integer, Float>();
     LabelList labels = new LabelList();
 
@@ -99,7 +111,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
       }
       else {
         try {
-          Float attribute = Float.valueOf(entries.get(i));
+          float attribute = Float.valueOf(entries.get(i));
           Integer curdim = keymap.get(curterm);
           if(curdim == null) {
             curdim = maxdim + 1;
@@ -107,6 +119,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
             maxdim += 1;
           }
           values.put(curdim, attribute);
+          len += attribute;
           curterm = null;
         }
         catch(NumberFormatException e) {
@@ -119,6 +132,13 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
     }
     if(curterm != null) {
       labels.add(curterm);
+    }
+    if(normalize) {
+      if(Math.abs(len - 1.0) > 1E-10 && len > 1E-10) {
+        for(Entry<Integer, Float> ent : values.entrySet()) {
+          ent.setValue((float) (ent.getValue() / len));
+        }
+      }
     }
 
     vectors.add(new SparseFloatVector(values, maxdim));
@@ -142,7 +162,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
     // Set maximum dimensionality
-    for(int i = 0; i < vectors.size(); i ++) {
+    for(int i = 0; i < vectors.size(); i++) {
       vectors.get(i).setDimensionality(maxdim);
     }
     return MultipleObjectsBundle.makeSimple(getTypeInformation(maxdim), vectors, TypeUtil.LABELLIST, lblc);
@@ -167,9 +187,28 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
    * @apiviz.exclude
    */
   public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<SparseFloatVector> {
+    /**
+     * Option ID for normalization
+     */
+    public static final OptionID NORMALIZE_FLAG = OptionID.getOrCreateOptionID("tf.normalize", "Normalize vectors to manhattan length 1 (convert term counts to term frequencies)");
+
+    /**
+     * Normalization flag
+     */
+    boolean normalize = false;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Flag normF = new Flag(NORMALIZE_FLAG);
+      if(config.grab(normF)) {
+        normalize = normF.getValue();
+      }
+    }
+
     @Override
     protected TermFrequencyParser makeInstance() {
-      return new TermFrequencyParser(colSep, quoteChar, labelIndices);
+      return new TermFrequencyParser(normalize, colSep, quoteChar, labelIndices);
     }
   }
 }
