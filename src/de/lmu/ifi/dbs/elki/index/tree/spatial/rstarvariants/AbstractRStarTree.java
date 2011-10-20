@@ -30,9 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -91,7 +89,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * was already a reinsert operation in this level during the current insert /
    * delete operation.
    */
-  protected final Map<Integer, Boolean> reinsertions = new HashMap<Integer, Boolean>();
+  protected final BitSet reinsertions = new BitSet();
 
   /**
    * The height of this R*-Tree.
@@ -468,13 +466,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   abstract protected int computeHeight();
 
   /**
-   * Clears the reinsertions.
-   */
-  protected void clearReinsertions() {
-    reinsertions.clear();
-  }
-
-  /**
    * Returns true if in the specified node an overflow occurred, false
    * otherwise.
    * 
@@ -656,11 +647,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   private N overflowTreatment(N node, IndexTreePath<E> path) {
     int level = height - path.getPathCount() + 1;
-    Boolean reInsert = reinsertions.get(level);
+    boolean reInsert = reinsertions.get(level);
 
     // there was still no reinsert operation at this level
-    if(node.getPageID() != 0 && (reInsert == null || !reInsert)) {
-      reinsertions.put(level, true);
+    if(node.getPageID() != 0 && !reInsert) {
+      reinsertions.set(level);
       if(getLogger().isDebugging()) {
         getLogger().debugFine("REINSERT " + reinsertions + "\n");
       }
