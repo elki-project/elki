@@ -15,7 +15,7 @@ public interface ReinsertStrategy {
    * @param entries Entries in overflowing node
    * @param getter Adapter for the entries array
    * @param page Spatial extend of the page 
-   * @return true when a reinsert was performed.
+   * @return index of pages to reinsert.
    */
   public <E extends SpatialComparable, A> int[] computeReinserts(A entries, ArrayAdapter<E, A> getter, SpatialComparable page);
 }
