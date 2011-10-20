@@ -27,9 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -38,10 +36,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
@@ -53,6 +48,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastOverlapInsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -85,13 +83,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected final static boolean extraIntegrityChecks = false;
 
   /**
-   * Contains a boolean for each level of this R*-Tree that indicates if there
-   * was already a reinsert operation in this level during the current insert /
-   * delete operation.
-   */
-  protected final BitSet reinsertions = new BitSet();
-
-  /**
    * The height of this R*-Tree.
    */
   protected int height;
@@ -120,6 +111,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * The insertion strategy to use
    */
   protected InsertionStrategy insertionStrategy = LeastOverlapInsertionStrategy.STATIC;
+
+  /**
+   * Overflow treatment
+   */
+  protected OverflowTreatment overflowTreatment = new LimitedReinsertOverflowTreatment(new CloseReinsert());
 
   /**
    * Constructor
@@ -168,6 +164,15 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   }
 
   /**
+   * Set the overflow treatment strategy.
+   * 
+   * @param overflowTreatment overflow treatment strategy
+   */
+  public void setOverflowTreatment(OverflowTreatment overflowTreatment) {
+    this.overflowTreatment = overflowTreatment;
+  }
+
+  /**
    * Returns the path to the leaf entry in the specified subtree that represents
    * the data object with the specified mbr and id.
    * 
@@ -206,7 +211,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     if(!initialized) {
       initialize(leaf);
     }
-    reinsertions.clear();
+    overflowTreatment.reinitialize();
 
     preInsert(leaf);
     insertLeafEntry(leaf);
@@ -225,7 +230,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     IndexTreePath<E> subtree = choosePath(getRootPath(), entry, 1);
 
     if(getLogger().isDebugging()) {
-      getLogger().debugFine("insertion-subtree " + subtree + "\n");
+      getLogger().debugFine("insertion-subtree " + subtree);
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -282,7 +287,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       N node = stack.pop();
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
-          reinsertions.clear();
+          overflowTreatment.reinitialize(); // Intended?
           this.insertLeafEntry(node.getEntry(i));
         }
       }
@@ -646,23 +651,10 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    *         reinsertion
    */
   private N overflowTreatment(N node, IndexTreePath<E> path) {
-    int level = height - path.getPathCount() + 1;
-    boolean reInsert = reinsertions.get(level);
-
-    // there was still no reinsert operation at this level
-    if(node.getPageID() != 0 && !reInsert) {
-      reinsertions.set(level);
-      if(getLogger().isDebugging()) {
-        getLogger().debugFine("REINSERT " + reinsertions + "\n");
-      }
-      reInsert(node, level, path);
+    if(overflowTreatment.handleOverflow(this, node, path)) {
       return null;
     }
-
-    // there was already a reinsert operation at this level
-    else {
-      return split(node);
-    }
+    return split(node);
   }
 
   /**
@@ -709,29 +701,21 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * Reinserts the specified node at the specified level.
    * 
    * @param node the node to be reinserted
-   * @param level the level of the node
    * @param path the path to the node
+   * @param offs the nodes indexes to reinsert
    */
-  @SuppressWarnings("unchecked")
-  protected void reInsert(N node, int level, IndexTreePath<E> path) {
-    EuclideanDistanceFunction distFunction = EuclideanDistanceFunction.STATIC;
-    DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
+  public void reInsert(N node, IndexTreePath<E> path, int[] offs) {
+    final int level = height - (path.getPathCount() - 1);
 
-    // compute the center distances of entries to the node and sort it
-    // in decreasing order to their distances
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      E entry = node.getEntry(i);
-      DoubleDistance dist = distFunction.centerDistance(node, entry);
-      reInsertEntries[i] = new DistanceEntry<DoubleDistance, E>(entry, dist, i);
+    BitSet remove = new BitSet();
+    List<E> entries = node.getEntries();
+    List<E> reInsertEntries = new ArrayList<E>(offs.length);
+    for (int i = 0; i < offs.length; i++) {
+      reInsertEntries.add(entries.get(offs[i]));
+      remove.set(offs[i]);
     }
-    Arrays.sort(reInsertEntries, Collections.reverseOrder());
-
-    // define, how many entries will be reinserted
-    int start = (int) (0.3 * node.getNumEntries());
-
-    // initialize the reinsertion operation: move the remaining entries
-    // forward
-    node.initReInsert(start, reInsertEntries);
+    // Remove the entries we reinsert
+    node.removeMask(remove);
     writeNode(node);
 
     // and adapt the mbrs
@@ -744,22 +728,22 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       writeNode(parent);
       childPath = childPath.getParentPath();
       child = parent;
+      // TODO: stop writing when MBR didn't change!
     }
 
     // reinsert the first entries
-    for(int i = 0; i < start; i++) {
-      DistanceEntry<DoubleDistance, E> re = reInsertEntries[i];
+    for(E entry : reInsertEntries) {
       if(node.isLeaf()) {
         if(getLogger().isDebugging()) {
-          getLogger().debugFine("reinsert " + re.getEntry());
+          getLogger().debug("reinsert " + entry);
         }
-        insertLeafEntry(re.getEntry());
+        insertLeafEntry(entry);
       }
       else {
         if(getLogger().isDebugging()) {
-          getLogger().debugFine("reinsert " + re.getEntry() + " at " + level);
+          getLogger().debug("reinsert " + entry + " at " + level);
         }
-        insertDirectoryEntry(re.getEntry(), level);
+        insertDirectoryEntry(entry, level);
       }
     }
   }
@@ -771,7 +755,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   protected void adjustTree(IndexTreePath<E> subtree) {
     if(getLogger().isDebugging()) {
-      getLogger().debugFine("Adjust tree " + subtree + "\n");
+      getLogger().debugFine("Adjust tree " + subtree);
     }
 
     // get the root of the subtree
