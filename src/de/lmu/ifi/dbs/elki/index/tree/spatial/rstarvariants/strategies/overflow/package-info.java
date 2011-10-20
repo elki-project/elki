@@ -1,8 +1,6 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert;
-
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
-
+/**
+ * <p>Overflow treatment strategies for R-Trees</p>
+ */
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,15 +23,4 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/**
- * Original (Guttman) R-Tree didn't have reinsertions.
- * 
- * @author Erich Schubert
- */
-public class NoReinsert implements ReinsertStrategy {
-  @Override
-  public <E extends SpatialComparable, A> int[] computeReinserts(A entries, ArrayAdapter<E, A> getter, SpatialComparable page) {
-    return new int[] {};
-  }
-}
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow;

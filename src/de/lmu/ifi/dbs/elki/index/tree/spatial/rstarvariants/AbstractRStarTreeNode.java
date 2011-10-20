@@ -26,14 +26,13 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.BitSet;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
@@ -125,7 +124,32 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param entry the entry representing this node
    */
   public void adjustEntry(E entry) {
-    ((SpatialDirectoryEntry)entry).setMBR(computeMBR());
+    ((SpatialDirectoryEntry) entry).setMBR(computeMBR());
+  }
+
+  /**
+   * Remove entries according to the given mask.
+   * 
+   * @param mask Mask to remove
+   */
+  public void removeMask(BitSet mask) {
+    int dest = mask.nextSetBit(0);
+    if(dest < 0) {
+      return;
+    }
+    int src = mask.nextClearBit(dest);
+    while(src < numEntries) {
+      entries[dest] = entries[src];
+      if(!mask.get(src)) {
+        dest++;
+      }
+      src++;
+    }
+    while(src < numEntries) {
+      entries[src] = null;
+      src++;
+    }
+    numEntries -= (src-dest);
   }
 
   /**
@@ -138,30 +162,8 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @return the MBR of the new Node
    */
   public E adjustEntryIncremental(E entry, SpatialComparable responsibleMBR) {
-    ((SpatialDirectoryEntry)entry).setMBR(SpatialUtil.union(entry, responsibleMBR));
+    ((SpatialDirectoryEntry) entry).setMBR(SpatialUtil.union(entry, responsibleMBR));
     return entry;
-  }
-
-  /**
-   * * Initializes a reinsert operation. Deletes all entries in this node and
-   * adds all entries from start index on to this node's children.
-   * 
-   * @param start the start index of the entries that will be reinserted
-   * @param reInsertEntries the array of entries to be reinserted
-   */
-  protected <D extends Distance<D>> void initReInsert(int start, DistanceEntry<D, E>[] reInsertEntries) {
-    deleteAllEntries();
-
-    if(isLeaf()) {
-      for(int i = start; i < reInsertEntries.length; i++) {
-        addLeafEntry(reInsertEntries[i].getEntry());
-      }
-    }
-    else {
-      for(int i = start; i < reInsertEntries.length; i++) {
-        addDirectoryEntry(reInsertEntries[i].getEntry());
-      }
-    }
   }
 
   /**
