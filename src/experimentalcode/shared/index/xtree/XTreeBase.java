@@ -930,11 +930,11 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       return null;
     }
     int level = height - path.getPathCount() + 1;
-    Boolean reInsert = reinsertions.get(level);
+    boolean reInsert = reinsertions.get(level);
 
     // there was still no reinsert operation at this level
-    if(node.getPageID() != 0 && (reInsert == null || !reInsert) && reinsert_fraction != 0) {
-      reinsertions.put(level, true);
+    if(node.getPageID() != 0 && !reInsert && reinsert_fraction != 0) {
+      reinsertions.set(level);
       if(getLogger().isDebugging()) {
         getLogger().debugFine("REINSERT " + reinsertions);
       }
