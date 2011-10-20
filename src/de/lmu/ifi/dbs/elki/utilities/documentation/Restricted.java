@@ -44,5 +44,5 @@ public @interface Restricted {
    * 
    * @return reason why this class must not be published
    */
-  String reason();
+  String value();
 }
