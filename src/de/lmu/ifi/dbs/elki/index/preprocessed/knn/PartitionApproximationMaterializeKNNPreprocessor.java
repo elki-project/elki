@@ -85,8 +85,6 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
   public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, int partitions) {
     super(relation, distanceFunction, k);
     this.partitions = partitions;
-    // preprocess now
-    preprocess();
   }
 
   @Override

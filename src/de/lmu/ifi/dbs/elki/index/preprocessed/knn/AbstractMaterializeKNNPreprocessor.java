@@ -25,9 +25,9 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 import java.util.List;
 
-import javax.swing.event.EventListenerList;
-
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -69,11 +69,6 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
    * The distance query we used.
    */
   protected final DistanceQuery<O, D> distanceQuery;
-
-  /**
-   * Holds the listener.
-   */
-  protected final EventListenerList listenerList = new EventListenerList();
 
   /**
    * Constructor.
@@ -121,6 +116,31 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
    */
   protected abstract void preprocess();
 
+  /**
+   * Get the k nearest neighbors.
+   * 
+   * @param objid Object ID
+   * @return Neighbors
+   */
+  public List<DistanceResultPair<D>> get(DBID objid) {
+    if (storage == null) {
+      preprocess();
+    }
+    return storage.get(objid);
+  }
+
+  @Override
+  public void insertAll(DBIDs ids) {
+    if(storage == null) {
+      if(ids.size() > 0) {
+        preprocess();
+      }
+    }
+    else {
+      throw new UnsupportedOperationException("Preprocessor already ran.");
+    }
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
@@ -136,7 +156,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
         break;
       }
     }
-    return new PreprocessorKNNQuery<O, S>(relation, (MaterializeKNNPreprocessor<O, S>) this);
+    return new PreprocessorKNNQuery<O, S>(relation, (AbstractMaterializeKNNPreprocessor<O, S>) this);
   }
 
   /**
@@ -217,7 +237,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
     public D getDistanceFactory() {
       return distanceFunction.getDistanceFactory();
     }
-    
+
     @Override
     public TypeInformation getInputTypeRestriction() {
       return distanceFunction.getInputTypeRestriction();

@@ -26,6 +26,8 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.event.EventListenerList;
+
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -83,6 +85,11 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   protected final KNNQuery<O, D> knnQuery;
 
   /**
+   * Holds the listener.
+   */
+  protected final EventListenerList listenerList = new EventListenerList();
+
+  /**
    * Constructor with preprocessing step.
    * 
    * @param relation Relation to preprocess
@@ -90,23 +97,8 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    * @param k query k
    */
   public MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
-    this(relation, distanceFunction, k, true);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param relation Relation to preprocess
-   * @param distanceFunction the distance function to use
-   * @param k query k
-   */
-  protected MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, boolean preprocess) {
     super(relation, distanceFunction, k);
     this.knnQuery = relation.getDatabase().getKNNQuery(distanceQuery, k, DatabaseQuery.HINT_BULK, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_NO_CACHE);
-
-    if(preprocess) {
-      preprocess();
-    }
   }
 
   /**
@@ -148,16 +140,6 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     }
   }
 
-  /**
-   * Get the k nearest neighbors.
-   * 
-   * @param objid Object ID
-   * @return Neighbors
-   */
-  public List<DistanceResultPair<D>> get(DBID objid) {
-    return storage.get(objid);
-  }
-
   @Override
   public final void insert(DBID id) {
     objectsInserted(id);
@@ -165,6 +147,9 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
 
   @Override
   public void insertAll(DBIDs ids) {
+    if (storage == null && ids.size() > 0) {
+      preprocess();
+    }
     objectsInserted(ids);
   }
 

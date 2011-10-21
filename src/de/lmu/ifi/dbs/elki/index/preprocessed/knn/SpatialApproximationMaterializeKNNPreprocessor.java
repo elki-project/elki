@@ -83,7 +83,6 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    */
   public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
     super(relation, distanceFunction, k);
-    preprocess();
   }
 
   @Override
