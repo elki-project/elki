@@ -43,7 +43,7 @@ public abstract class AbstractPreprocessorIndex<O, R> extends AbstractIndex<O> {
   /**
    * The data store
    */
-  protected WritableDataStore<R> storage;
+  protected WritableDataStore<R> storage = null;
 
   /**
    * Constructor.
