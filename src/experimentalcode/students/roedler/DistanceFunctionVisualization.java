@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -72,7 +71,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
   /**
    * The selection result we work on
    */
-  private MaterializeKNNPreprocessor<NV, DoubleDistance> result;
+  private AbstractMaterializeKNNPreprocessor<NV, DoubleDistance> result;
 
   /**
    * p[0] type of a Norm p[1] value of a Lp Norm
@@ -274,7 +273,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final ArrayList<MaterializeKNNPreprocessor<NV, D>> kNNIndex = ResultUtil.filterResults(result, MaterializeKNNPreprocessor.class);
+      final ArrayList<AbstractMaterializeKNNPreprocessor<NV, D>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
       for(AbstractMaterializeKNNPreprocessor<NV, D> kNN : kNNIndex) {
         Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
