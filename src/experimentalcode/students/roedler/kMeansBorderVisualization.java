@@ -1,5 +1,7 @@
 package experimentalcode.students.roedler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -12,12 +14,16 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
+import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -44,12 +50,12 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "kMeans Border Visualization";
+  private static final String NAME = "k-means Voronoi cells";
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
-  public static final String KMEANSBORDER = "kMeansSeparator";
+  private static final String KMEANSBORDER = "kmeans-border";
 
   /**
    * The result we work on
@@ -60,6 +66,11 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
    * The voronoi diagram
    */
   Element voronoi;
+
+  /**
+   * Draw this factor beyond the viewport.
+   */
+  double linesLonger = 1.2;
 
   /**
    * Constructor
@@ -75,24 +86,37 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
 
   @Override
   protected void redraw() {
-
     addCSSClasses(svgp);
 
+    // Viewing area size
+    double[] graphSize = new double[4];
+    Pair<DoubleMinMax, DoubleMinMax> vp = proj.estimateViewport();
+    graphSize[0] = vp.first.getMax() * linesLonger;
+    graphSize[1] = vp.second.getMax() * linesLonger;
+    graphSize[2] = vp.first.getMin() * linesLonger;
+    graphSize[3] = vp.second.getMin() * linesLonger;
+
+    // Project the means
     Vector[] means = new Vector[clustering.getAllClusters().size()];
-    Vector[] meansproj = new Vector[clustering.getAllClusters().size()];
-
-    Iterator<Cluster<MeanModel<NV>>> ci = clustering.getAllClusters().iterator();
-
-    for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-      Cluster<MeanModel<NV>> clus = ci.next();
-      double[] mean = proj.fastProjectDataToRenderSpace(clus.getModel().getMean());
-      meansproj[cnum] = new Vector(mean);
-      means[cnum] = clus.getModel().getMean().getColumnVector();
+    {
+      int cnum = 0;
+      for(Cluster<MeanModel<NV>> clus : clustering.getAllClusters()) {
+        double[] mean = proj.fastProjectDataToRenderSpace(clus.getModel().getMean());
+        means[cnum] = new Vector(mean);
+        cnum++;
+      }
     }
-    Voronoi vrni = new Voronoi(svgp, proj);
-    voronoi = vrni.createVoronoi(means, meansproj);
-    SVGUtil.addCSSClass(voronoi, KMEANSBORDER);
-    layer.appendChild(voronoi);
+    final Element path;
+    if (means.length == 2) {
+      path = Voronoi.drawFakeVoronoi(graphSize, means).makeElement(svgp);
+    } else if (means.length > 2) {
+      ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(Arrays.asList(means)).getDelaunay();
+      path = Voronoi.drawVoronoi(graphSize, delaunay, means).makeElement(svgp);
+    } else {
+      return;
+    }
+    SVGUtil.addCSSClass(path, KMEANSBORDER);
+    layer.appendChild(path);
   }
 
   /**
@@ -106,7 +130,7 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
       CSSClass cls = new CSSClass(this, KMEANSBORDER);
       cls = new CSSClass(this, KMEANSBORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) * .5);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
@@ -114,24 +138,17 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
     }
   }
 
-  /*
-   * @Override public void resultChanged(Result current) { if (current
-   * instanceof SelectionResult) { synchronizedRedraw(); return; }
-   * super.resultChanged(current); }
-   */
-
   /**
    * Factory for visualizers to generate an SVG-Element containing the lines
    * between kMeans clusters
    * 
-   * @author Heidi Kolb
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses kMeansVisualisation oneway - - «create»
+   * @apiviz.uses kMeansBorderVisualisation oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
-
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
      * Constructor
