@@ -49,7 +49,7 @@ public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements R
   private Relation<O> relation;
 
   public XTreeIndex(Relation<O> relation, PageFile<XTreeNode> pagefile, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(pagefile, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+    super(pagefile, relativeMinEntries, relativeMinFanout, max_overlap, overlap_type);
     this.relation = relation;
     this.initialize();
   }

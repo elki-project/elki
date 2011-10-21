@@ -49,9 +49,6 @@ public class XTreeHeader extends TreeIndexHeader {
    */
   private int min_fanout;
 
-  /** Fraction of pages to be re-inserted instead of trying a split. */
-  private float reinsert_fraction = (float) .3;
-
   /** Maximally allowed overlap. */
   private float max_overlap = (float) .2;
 
@@ -72,12 +69,11 @@ public class XTreeHeader extends TreeIndexHeader {
     super();
   }
 
-  public XTreeHeader(int pageSize, int dirCapacity, int leafCapacity, int dirMinimum, int leafMinimum, int min_fanout, long num_elements, int dimensionality, float reinsert_fraction, float max_overlap) {
+  public XTreeHeader(int pageSize, int dirCapacity, int leafCapacity, int dirMinimum, int leafMinimum, int min_fanout, long num_elements, int dimensionality, float max_overlap) {
     super(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum);
     this.min_fanout = min_fanout;
     this.num_elements = num_elements;
     this.dimensionality = dimensionality;
-    this.reinsert_fraction = reinsert_fraction;
     this.max_overlap = max_overlap;
   }
 
@@ -97,7 +93,6 @@ public class XTreeHeader extends TreeIndexHeader {
     this.min_fanout = file.readInt();
     this.num_elements = file.readLong();
     this.dimensionality = file.readInt();
-    this.reinsert_fraction = file.readFloat();
     this.max_overlap = file.readFloat();
     this.supernode_offset = file.readLong();
   }
@@ -116,7 +111,6 @@ public class XTreeHeader extends TreeIndexHeader {
     file.writeInt(min_fanout);
     file.writeLong(num_elements);
     file.writeInt(dimensionality);
-    file.writeFloat(reinsert_fraction);
     file.writeFloat(max_overlap);
     file.writeLong(supernode_offset);
   }
@@ -127,13 +121,6 @@ public class XTreeHeader extends TreeIndexHeader {
    */
   public int getMin_fanout() {
     return min_fanout;
-  }
-
-  /**
-   * @return the fraction of pages to be re-inserted before splitting
-   */
-  public float getReinsert_fraction() {
-    return reinsert_fraction;
   }
 
   /**

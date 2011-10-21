@@ -29,8 +29,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -42,10 +40,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
@@ -104,9 +99,6 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    */
   protected int min_fanout;
 
-  /** Fraction of pages to be re-inserted instead of trying a split. */
-  protected float reinsert_fraction = .3f;
-
   /** Maximum overlap for a split partition. */
   protected float max_overlap = .2f;
 
@@ -143,15 +135,13 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * @param pagefile the page file
    * @param relativeMinEntries
    * @param relativeMinFanout
-   * @param reinsert_fraction
    * @param max_overlap
    * @param overlap_type
    */
-  public XTreeBase(PageFile<N> pagefile, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+  public XTreeBase(PageFile<N> pagefile, double relativeMinEntries, double relativeMinFanout, float max_overlap, int overlap_type) {
     super(pagefile);
     this.relativeMinEntries = relativeMinEntries;
     this.relativeMinFanout = relativeMinFanout;
-    this.reinsert_fraction = reinsert_fraction;
     this.max_overlap = max_overlap;
     this.overlap_type = overlap_type;
   }
@@ -428,7 +418,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
 
   @Override
   protected TreeIndexHeader createHeader() {
-    return new XTreeHeader(getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafMinimum, min_fanout, num_elements, dimensionality, reinsert_fraction, max_overlap);
+    return new XTreeHeader(getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafMinimum, min_fanout, num_elements, dimensionality, max_overlap);
   }
 
   /**
@@ -453,7 +443,6 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     this.min_fanout = header.getMin_fanout();
     this.num_elements = header.getNumberOfElements();
     this.dimensionality = header.getDimensionality();
-    this.reinsert_fraction = header.getReinsert_fraction();
     this.max_overlap = header.getMaxOverlap();
     long superNodeOffset = header.getSupernode_offset();
 
@@ -929,24 +918,11 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       node.growSuperNode();
       return null;
     }
-    int level = height - path.getPathCount() + 1;
-    boolean reInsert = reinsertions.get(level);
-
-    // there was still no reinsert operation at this level
-    if(node.getPageID() != 0 && !reInsert && reinsert_fraction != 0) {
-      reinsertions.set(level);
-      if(getLogger().isDebugging()) {
-        getLogger().debugFine("REINSERT " + reinsertions);
-      }
-
-      reInsert(node, level, path);
+    // Handled by reinsertion?
+    if (overflowTreatment.handleOverflow(this, node, path)) {
       return null;
     }
-
-    // there was already a reinsert operation at this level
-    else {
-      return split(node, splitAxis);
-    }
+    return split(node, splitAxis);
   }
 
   // /**
@@ -988,83 +964,6 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
   // // FIXME: make generic (or just hope DoubleVector is fine)
   // return (O) new DoubleVector(d);
   // }
-
-  /**
-   * Reinserts the specified node at the specified level.
-   * 
-   * @param node the node to be reinserted
-   * @param level the level of the node
-   * @param path the path to the node
-   */
-  @Override
-  @SuppressWarnings("unchecked")
-  protected void reInsert(N node, int level, IndexTreePath<E> path) {
-    SquaredEuclideanDistanceFunction distFunction = SquaredEuclideanDistanceFunction.STATIC;
-    DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
-
-    // O centroid = compute_centroid(node);
-
-    // compute the center distances of entries to the node and sort it
-    // in decreasing order to their distances
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      E entry = node.getEntry(i);
-      DoubleDistance dist = distFunction.centerDistance(node, entry);
-      // DoubleDistance dist = distFunction.maxDist(entry.getMBR(), centroid);
-      // DoubleDistance dist = distFunction.centerDistance(entry.getMBR(),
-      // centroid);
-      reInsertEntries[i] = new DistanceEntry<DoubleDistance, E>(entry, dist, i);
-    }
-    Arrays.sort(reInsertEntries, Collections.reverseOrder());
-
-    // define how many entries will be reinserted
-    int start = (int) (reinsert_fraction * node.getNumEntries());
-
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("reinserting " + node.getPageID() + " ; from 0 to " + (start - 1));
-    }
-
-    // initialize the reinsertion operation: move the remaining entries
-    // forward
-    node.initReInsert(start, reInsertEntries);
-    writeNode(node);
-
-    // and adapt the mbrs
-    IndexTreePath<E> childPath = path;
-    N child = node;
-    while(childPath.getParentPath() != null) {
-      N parent = getNode(childPath.getParentPath().getLastPathComponent().getEntry());
-      int indexOfChild = childPath.getLastPathComponent().getIndex();
-      child.adjustEntry(parent.getEntry(indexOfChild));
-      writeNode(parent);
-      childPath = childPath.getParentPath();
-      child = parent;
-    }
-
-    // reinsert the first entries
-    for(int i = 0; i < start; i++) {
-      DistanceEntry<DoubleDistance, E> re = reInsertEntries[i];
-      if(getLogger().isDebugging()) {
-        getLogger().debugFine("reinsert " + re.getEntry() + (node.isLeaf() ? "" : " at " + level));
-      }
-      insertEntry(re.getEntry(), level);
-    }
-  }
-
-  /**
-   * Inserts the specified entry at the specified level into this R*-Tree.
-   * 
-   * @param entry the entry to be inserted
-   * @param level the level at which the entry is to be inserted; automatically
-   *        set to <code>1</code> for leaf entries
-   */
-  private void insertEntry(E entry, int level) {
-    if(entry.isLeafEntry()) {
-      insertLeafEntry(entry);
-    }
-    else {
-      insertDirectoryEntry(entry, level);
-    }
-  }
 
   /**
    * Inserts the specified leaf entry into this R*-Tree.
@@ -1369,7 +1268,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     result.append(superNodes).append(" Supernodes (max = ").append(maxSuperCapacity - 1).append(", min = ").append(minSuperCapacity - 1).append(")\n");
     result.append(leafNodes).append(" Data Nodes (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
     result.append(objects).append(" ").append(dimensionality).append("-dim. points in the tree \n");
-    result.append("min_fanout = ").append(min_fanout).append(", max_overlap = ").append(max_overlap).append((this.overlap_type == DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", re_inserts = ").append(reinsert_fraction + "\n");
+    result.append("min_fanout = ").append(min_fanout).append(", max_overlap = ").append(max_overlap).append((this.overlap_type == DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", \n");
     PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     result.append("Storage Quota ").append(BigInteger.valueOf(objects + dirNodes + superNodes + leafNodes).multiply(BigInteger.valueOf(100)).divide(totalCapacity).toString()).append("%\n");
 

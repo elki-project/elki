@@ -312,22 +312,6 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
   }
 
   /**
-   * Initializes a reinsert operation. Deletes all entries in this node and adds
-   * all entries from start index on to this node's children.
-   * 
-   * @param start the start index of the entries that will be reinserted
-   * @param reInsertEntries the array of entries to be reinserted
-   */
-  @Override
-  protected <D extends de.lmu.ifi.dbs.elki.distance.distancevalue.Distance<D>> void initReInsert(int start, de.lmu.ifi.dbs.elki.index.tree.DistanceEntry<D, E>[] reInsertEntries) {
-    deleteAllEntries();
-    numEntries = 0;
-    for(int i = start; i < reInsertEntries.length; i++) {
-      entries[numEntries++] = reInsertEntries[i].getEntry();
-    }
-  }
-
-  /**
    * Tests, if the parameters of the entry representing this node, are correctly
    * set. Subclasses may need to overwrite this method.
    * 
