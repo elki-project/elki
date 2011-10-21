@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
@@ -43,25 +41,45 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @author Erich Schubert
  */
 @Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "http://dx.doi.org/10.1145/93597.98741")
-public class FarReinsert implements ReinsertStrategy {
-  SpatialPrimitiveDistanceFunction<?, ? extends NumberDistance<?, ?>> distFunction = EuclideanDistanceFunction.STATIC;
-
-  double share = 0.3;
+public class FarReinsert extends AbstractPartialReinsert {
+  /**
+   * Constructor.
+   *
+   * @param reinsertAmount Amount to reinsert
+   * @param distanceFunction Distance function
+   */
+  public FarReinsert(double reinsertAmount, SpatialPrimitiveDoubleDistanceFunction<?> distanceFunction) {
+    super(reinsertAmount, distanceFunction);
+  }
 
   @Override
   public <E extends SpatialComparable, A> int[] computeReinserts(A entries, ArrayAdapter<E, A> getter, SpatialComparable page) {
     DoubleIntPair[] order = new DoubleIntPair[getter.size(entries)];
     for(int i = 0; i < order.length; i++) {
-      double distance = distFunction.centerDistance(getter.get(entries, i), page).doubleValue();
+      double distance = distanceFunction.doubleCenterDistance(getter.get(entries, i), page);
       order[i] = new DoubleIntPair(distance, i);
     }
     Arrays.sort(order, Collections.reverseOrder());
 
-    int num = (int) (share * order.length);
+    int num = (int) (reinsertAmount * order.length);
     int[] re = new int[num];
     for(int i = 0; i < num; i++) {
       re[i] = order[i].second;
     }
     return re;
+  }
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractPartialReinsert.Parameterizer {
+    @Override
+    protected Object makeInstance() {
+      return new CloseReinsert(reinsertAmount, distanceFunction);
+    }
   }
 }
