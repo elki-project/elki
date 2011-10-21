@@ -1,8 +1,32 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.util.BitSet;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -25,6 +49,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "http://dx.doi.org/10.1145/93597.98741")
 public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
   /**
+   * Default insert strategy used by R*-tree
+   */
+  public static final LimitedReinsertOverflowTreatment RSTAR_OVERFLOW = new LimitedReinsertOverflowTreatment(new CloseReinsert(0.3, SquaredEuclideanDistanceFunction.STATIC));
+
+  /**
    * Bitset to keep track of levels a reinsert has been performed at.
    */
   private BitSet reinsertions = new BitSet();
@@ -32,7 +61,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
   /**
    * Strategy for the actual reinsertions
    */
-  private ReinsertStrategy reinsertStrategy = new CloseReinsert();
+  private final ReinsertStrategy reinsertStrategy;
 
   /**
    * Constructor.

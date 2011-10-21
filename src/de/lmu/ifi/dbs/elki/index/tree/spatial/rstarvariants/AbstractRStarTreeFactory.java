@@ -32,11 +32,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.CombinedInsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -69,6 +70,11 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
   public static final OptionID BULK_SPLIT_ID = OptionID.getOrCreateOptionID("spatial.bulkstrategy", "The class to perform the bulk split with.");
 
   /**
+   * Overflow treatment.
+   */
+  public static OptionID OVERFLOW_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.overflowtreatment", "The strategy to use for handling overflows.");
+  
+  /**
    * Strategy to find the insertion node with.
    */
   protected InsertionStrategy insertionStrategy;
@@ -82,6 +88,11 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
    * The strategy for splitting nodes
    */
   protected SplitStrategy nodeSplitter;
+  
+  /**
+   * Overflow treatment strategy
+   */
+  protected OverflowTreatment overflowTreatment; 
 
   /**
    * Constructor.
@@ -92,12 +103,14 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
    * @param bulkSplitter the strategy to use for bulk splitting
    * @param insertionStrategy the strategy to find the insertion child
    * @param nodeSplitter the strategy to use for splitting nodes
+   * @param overflowTreatment the strategy to use for overflow treatment
    */
-  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter) {
+  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment) {
     super(fileName, pageSize, cacheSize);
     this.insertionStrategy = insertionStrategy;
     this.bulkSplitter = bulkSplitter;
     this.nodeSplitter = nodeSplitter;
+    this.overflowTreatment = overflowTreatment;
   }
 
   @Override
@@ -127,17 +140,26 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
      * Bulk loading strategy
      */
     protected BulkSplit bulkSplitter = null;
+    
+    /**
+     * Overflow treatment strategy
+     */
+    protected OverflowTreatment overflowTreatment = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ClassParameter<InsertionStrategy> insertionStrategyP = new ClassParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class);
+      ObjectParameter<InsertionStrategy> insertionStrategyP = new ObjectParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class);
       if(config.grab(insertionStrategyP)) {
         insertionStrategy = insertionStrategyP.instantiateClass(config);
       }
-      ClassParameter<SplitStrategy> splitStrategyP = new ClassParameter<SplitStrategy>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class);
+      ObjectParameter<SplitStrategy> splitStrategyP = new ObjectParameter<SplitStrategy>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class);
       if(config.grab(splitStrategyP)) {
         nodeSplitter = splitStrategyP.instantiateClass(config);
+      }
+      ObjectParameter<OverflowTreatment> overflowP = new ObjectParameter<OverflowTreatment>(OVERFLOW_STRATEGY_ID, OverflowTreatment.class, LimitedReinsertOverflowTreatment.class);
+      if (config.grab(overflowP)) {
+        overflowTreatment = overflowP.instantiateClass(config);
       }
       configBulkLoad(config);
     }

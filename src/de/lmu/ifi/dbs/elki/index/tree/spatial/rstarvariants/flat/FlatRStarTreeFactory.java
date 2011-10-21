@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -52,9 +53,10 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
    * @param bulkSplitter Bulk loading strategy
    * @param insertionStrategy the strategy to find the insertion child
    * @param nodeSplitter the strategy for splitting nodes.
+   * @param overflowTreatment the strategy to use for overflow treatment
    */
-  public FlatRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter);
+  public FlatRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment);
   }
 
   @Override
@@ -64,6 +66,7 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
     index.setBulkStrategy(bulkSplitter);
     index.setInsertionStrategy(insertionStrategy);
     index.setNodeSplitStrategy(nodeSplitter);
+    index.setOverflowTreatment(overflowTreatment);
     return index;
   }
 
@@ -81,7 +84,7 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
   public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected FlatRStarTreeFactory<O> makeInstance() {
-      return new FlatRStarTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter);
+      return new FlatRStarTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment);
     }
   }
 }
