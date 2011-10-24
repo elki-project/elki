@@ -234,7 +234,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
       }
     }
     // Ensure we have a valid range
-    if(range.isValid()) {
+    if(!range.isValid()) {
       range.put(0.0);
       range.put(1.0);
     }
