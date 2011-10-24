@@ -1,0 +1,57 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="1" test-model="1">
+  <cluster name="Cluster_1" size="100">
+    <normal mean="0.3" stddev="0.1" />
+    <normal mean="0.5" stddev="0.1" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.7" stddev="0.05" />
+    <normal mean="0.5" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.67" stddev="0.05" />
+    <normal mean="0.58" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.67" stddev="0.05" />
+    <normal mean="0.42" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.6" stddev="0.05" />
+    <normal mean="0.65" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.6" stddev="0.05" />
+    <normal mean="0.35" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.55" stddev="0.05" />
+    <normal mean="0.75" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.55" stddev="0.05" />
+    <normal mean="0.25" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.45" stddev="0.05" />
+    <normal mean="0.8" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="30">
+    <normal mean="0.45" stddev="0.05" />
+    <normal mean="0.2" stddev="0.05" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Noise" size="20" density-correction="20">
+    <uniform min="0" max="1" />
+    <uniform min="0" max="1" />
+  </cluster>
+</dataset>
