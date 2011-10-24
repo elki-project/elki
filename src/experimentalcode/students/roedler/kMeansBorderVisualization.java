@@ -94,19 +94,24 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
         means.add(clus.getModel().getMean().getColumnVector());
       }
     }
-    final Element path;
     if (clusters.size() < 2) {
       return;
     }
     else if(clusters.size() == 2) {
-      path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
+      Element path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
+      SVGUtil.addCSSClass(path, KMEANSBORDER);
+      layer.appendChild(path);
     }
     else {
       ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
-      path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
+      Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
+      SVGUtil.addCSSClass(path, KMEANSBORDER);
+      layer.appendChild(path);
+      
+      Element p2 = VoronoiDraw.drawDelaunay(delaunay, means).makeElement(svgp);
+      SVGUtil.addCSSClass(p2, KMEANSBORDER);
+      layer.appendChild(p2);
     }
-    SVGUtil.addCSSClass(path, KMEANSBORDER);
-    layer.appendChild(path);
   }
 
   /**
