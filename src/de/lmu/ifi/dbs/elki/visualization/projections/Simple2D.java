@@ -26,11 +26,8 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Dimension-selecting 2D projection.
@@ -113,22 +110,8 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public Pair<DoubleMinMax, DoubleMinMax> estimateViewport() {
-    DoubleMinMax minmaxx = new DoubleMinMax();
-    DoubleMinMax minmaxy = new DoubleMinMax();
-    minmaxx.put(SCALE * .5);
-    minmaxx.put(-SCALE * .5);
-    minmaxy.put(SCALE * .5);
-    minmaxy.put(-SCALE * .5);
-    return new Pair<DoubleMinMax, DoubleMinMax>(minmaxx, minmaxy);
-  }
-
-  @Override
-  public String estimateTransformString(double margin, double width, double height) {
-    Pair<DoubleMinMax, DoubleMinMax> minmax = estimateViewport();
-    double sizex = (minmax.first.getMax() - minmax.first.getMin());
-    double sizey = (minmax.second.getMax() - minmax.second.getMin());
-    return SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";
+  public CanvasSize estimateViewport() {
+    return new CanvasSize(-SCALE * .5, SCALE * .5, -SCALE * .5, SCALE * .5);
   }
 
   @Override
@@ -142,7 +125,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
     if(ldim > 0) {
       System.arraycopy(s, 0, r, 2, ldim);
     }
-    if (hdim - ldim > 1) {
+    if(hdim - ldim > 1) {
       System.arraycopy(s, ldim + 1, r, ldim + 2, hdim - (ldim + 1));
     }
     if(hdim + 1 < s.length) {
@@ -164,7 +147,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
       System.arraycopy(s, 2, r, 0, ldim);
     }
     // ldim = s[0 or 1]
-    if (hdim - ldim > 1) {
+    if(hdim - ldim > 1) {
       System.arraycopy(s, ldim + 2, r, ldim + 1, hdim - (ldim + 1));
     }
     // hdim = s[0 or 1]

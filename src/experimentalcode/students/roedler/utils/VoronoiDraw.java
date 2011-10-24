@@ -1,0 +1,156 @@
+package experimentalcode.students.roedler.utils;
+
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
+import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
+
+/**
+ * Draw the Voronoi cells
+ * 
+ * @author Robert Rödler
+ * @author Erich Schubert
+ */
+public class VoronoiDraw {
+  /**
+   * Draw the Delaunay triangulation.
+   * 
+   * @param delaunay Triangulation
+   * @param projmeans Projected means
+   * @return Path
+   */
+  public static SVGPath drawDelaunay(List<SweepHullDelaunay2D.Triangle> delaunay, List<Vector> projmeans) {
+    final SVGPath path = new SVGPath();
+    for(SweepHullDelaunay2D.Triangle del : delaunay) {
+      path.moveTo(projmeans.get(del.a));
+      path.drawTo(projmeans.get(del.b));
+      path.moveTo(projmeans.get(del.a));
+      path.drawTo(projmeans.get(del.c));
+      path.moveTo(projmeans.get(del.b));
+      path.drawTo(projmeans.get(del.c));
+    }
+    return path;
+  }
+
+  /**
+   * Draw a Voronoi diagram
+   * 
+   * @param proj Projection
+   * @param delaunay Delaunay triangulation
+   * @param means Cluster means
+   * @return SVG path
+   */
+  // TODO: remove Vector() wrapping.
+  public static SVGPath drawVoronoi(Projection2D proj, List<SweepHullDelaunay2D.Triangle> delaunay, List<Vector> means) {
+    final SVGPath path = new SVGPath();
+    CanvasSize viewport = proj.estimateViewport();
+    for(int i = 0; i < delaunay.size(); i++) {
+      SweepHullDelaunay2D.Triangle del = delaunay.get(i);
+      final double[] projcx = proj.fastProjectDataToRenderSpace(new Vector(del.cx, del.cy));
+      if(del.ab > i) {
+        Triangle oth = delaunay.get(del.ab);
+        path.moveTo(projcx);
+        path.drawTo(proj.fastProjectDataToRenderSpace(new Vector(oth.cx, oth.cy)));
+      }
+      else if(del.ab < 0) {
+        Vector dirv = means.get(del.a).minus(means.get(del.b)).rotate90Equals();
+        double[] dir = proj.fastProjectRelativeDataToRenderSpace(dirv);
+        final double factor = continueToMargin(projcx, dir, viewport);
+        if(factor > 0) {
+          path.moveTo(projcx);
+          path.relativeLineTo(factor * dir[0], factor * dir[1]);
+        }
+      }
+
+      if(del.bc > i) {
+        Triangle oth = delaunay.get(del.bc);
+        path.moveTo(projcx);
+        path.drawTo(proj.fastProjectDataToRenderSpace(new Vector(oth.cx, oth.cy)));
+      }
+      else if(del.bc < 0) {
+        Vector dirv = means.get(del.b).minus(means.get(del.c)).rotate90Equals();
+        double[] dir = proj.fastProjectRelativeDataToRenderSpace(dirv);
+        final double factor = continueToMargin(projcx, dir, viewport);
+        if(factor > 0) {
+          path.moveTo(projcx);
+          path.relativeLineTo(factor * dir[0], factor * dir[1]);
+        }
+      }
+
+      if(del.ca > i) {
+        Triangle oth = delaunay.get(del.ca);
+        path.moveTo(projcx);
+        path.drawTo(proj.fastProjectDataToRenderSpace(new Vector(oth.cx, oth.cy)));
+      }
+      else if(del.ca < 0) {
+        Vector dirv = means.get(del.c).minus(means.get(del.a)).rotate90Equals();
+        double[] dir = proj.fastProjectRelativeDataToRenderSpace(dirv);
+        final double factor = continueToMargin(projcx, dir, viewport);
+        if(factor > 0) {
+          path.moveTo(projcx);
+          path.relativeLineTo(factor * dir[0], factor * dir[1]);
+        }
+      }
+    }
+    return path;
+  }
+
+  /**
+   * Continue a line along a given direction to the margin.
+   * 
+   * @param origin Origin point
+   * @param delta Direction vector
+   * @param viewport Viewport
+   * @return scaling factor
+   */
+  private static double continueToMargin(double[] origin, double[] delta, CanvasSize viewport) {
+    assert (delta.length == 2 && origin.length == 2);
+    double factor = Double.POSITIVE_INFINITY;
+    if(delta[0] > 0) {
+      factor = Math.min(factor, (viewport.maxx - origin[0]) / delta[0]);
+    }
+    else if(delta[0] < 0) {
+      factor = Math.min(factor, (origin[0] - viewport.minx) / -delta[0]);
+    }
+    if(delta[1] > 0) {
+      factor = Math.min(factor, (viewport.maxy - origin[1]) / delta[1]);
+    }
+    else if(delta[1] < 0) {
+      factor = Math.min(factor, (origin[1] - viewport.miny) / -delta[1]);
+    }
+    return factor;
+  }
+
+  /**
+   * Fake voronoi. For two means only
+   * 
+   * @param proj Projection
+   * @param meansproj Projected means.
+   * @return SVG path
+   */
+  public static SVGPath drawFakeVoronoi(Projection2D proj, List<Vector> meansproj) {
+    CanvasSize viewport = proj.estimateViewport();
+    final SVGPath path = new SVGPath();
+    // Difference
+    final double dx = meansproj.get(1).get(0) - meansproj.get(0).get(0);
+    final double dy = meansproj.get(1).get(1) - meansproj.get(0).get(1);
+    // Mean
+    final double mx = (meansproj.get(0).get(0) + meansproj.get(1).get(0)) / 2;
+    final double my = (meansproj.get(0).get(1) + meansproj.get(1).get(1)) / 2;
+    // As double[]
+    final double[] p = { mx, my };
+
+    final double angle = Math.atan2(dy, dx);
+    double len = DistanceFunctionDrawUtils.checkGraphSize(viewport, angle + Math.PI / 2, p);
+    path.moveTo(mx, my);
+    path.relativeLineTo(len * Math.cos(angle + Math.PI / 2), len * Math.sin(angle + Math.PI / 2));
+    len = DistanceFunctionDrawUtils.checkGraphSize(viewport, angle - Math.PI / 2, p);
+    path.moveTo(mx, my);
+    path.relativeLineTo(len * Math.cos(angle - Math.PI / 2), len * Math.sin(angle - Math.PI / 2));
+    return path;
+  }
+}

@@ -35,15 +35,14 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -146,12 +145,12 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
     }
 
     // calculate the position of the first tool
-    Pair<DoubleMinMax, DoubleMinMax> pt = proj.estimateViewport();
-    double x = pt.getFirst().getMin() - 0.17 * scale;
+    CanvasSize viewport = proj.estimateViewport();
+    double x = viewport.getMinX() - 0.17 * scale;
     double width = 0.07 * scale;
     double height = 0.06 * scale;
-    double miny = pt.getSecond().getMin();
-    double maxy = pt.getSecond().getMax();
+    double miny = viewport.getMinY();
+    double maxy = viewport.getMaxY();
     double y = (miny + maxy) / 2 - (vis.size() * height * 1.4) / 2;
     if(y < miny) {
       logger.warning("Too many Tools");
