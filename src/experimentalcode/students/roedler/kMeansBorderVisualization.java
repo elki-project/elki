@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -96,24 +97,30 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
     graphSize[2] = vp.first.getMin() * linesLonger;
     graphSize[3] = vp.second.getMin() * linesLonger;
 
+    final List<Cluster<MeanModel<NV>>> clusters = clustering.getAllClusters();
+    
     // Project the means
-    Vector[] means = new Vector[clustering.getAllClusters().size()];
+    // Unprojected means: for correct border computations in asymmetrically scaled situations
+    // Projected means: for accurate drawing.
+    ArrayList<Vector> means = new ArrayList<Vector>(clusters.size());
+    ArrayList<Vector> meansproj = new ArrayList<Vector>(clusters.size());
     {
-      int cnum = 0;
-      for(Cluster<MeanModel<NV>> clus : clustering.getAllClusters()) {
-        double[] mean = proj.fastProjectDataToRenderSpace(clus.getModel().getMean());
-        means[cnum] = new Vector(mean);
-        cnum++;
+      for(Cluster<MeanModel<NV>> clus : clusters) {
+        Vector curmean = clus.getModel().getMean().getColumnVector();
+        means.add(curmean);
+        meansproj.add(new Vector(proj.fastProjectDataToRenderSpace(curmean)));
       }
     }
     final Element path;
-    if (means.length == 2) {
-      path = Voronoi.drawFakeVoronoi(graphSize, means).makeElement(svgp);
-    } else if (means.length > 2) {
-      ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(Arrays.asList(means)).getDelaunay();
-      path = Voronoi.drawVoronoi(graphSize, delaunay, means).makeElement(svgp);
-    } else {
+    if (clusters.size() < 2) {
       return;
+    }
+    else if(clusters.size() == 2) {
+      path = Voronoi.drawFakeVoronoi(graphSize, means).makeElement(svgp);
+    }
+    else {
+      ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
+      path = Voronoi.drawVoronoi(graphSize, delaunay, means).makeElement(svgp);
     }
     SVGUtil.addCSSClass(path, KMEANSBORDER);
     layer.appendChild(path);

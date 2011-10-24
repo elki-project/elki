@@ -421,4 +421,15 @@ public final class MathUtil {
   public static double cosineSimilarity(Vector v1, Vector v2) {
     return v1.scalarProduct(v2) / (v1.euclideanLength() * v2.euclideanLength());
   }
+
+  /**
+   * Compute the angle between two vectors.
+   * 
+   * @param v1 first vector
+   * @param v2 second vector
+   * @return Angle
+   */
+  public static double angle(Vector v1, Vector v2) {
+    return v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
+  }
 }

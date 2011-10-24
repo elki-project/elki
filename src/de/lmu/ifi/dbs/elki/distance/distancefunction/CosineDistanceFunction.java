@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -34,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class CosineDistanceFunction extends AbstractCosineDistanceFunction {
+public class CosineDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Static instance
    */
@@ -62,7 +63,7 @@ public class CosineDistanceFunction extends AbstractCosineDistanceFunction {
    */
   @Override
   public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    double d = 1 - angle(v1, v2);
+    double d = 1 - VectorUtil.angle(v1, v2);
     if(d < 0) {
       d = 0;
     }

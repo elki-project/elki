@@ -15,20 +15,27 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
  * @author Erich Schubert
  */
 public class Voronoi {
-  public static SVGPath drawDelaunay(double[] graphSize, List<SweepHullDelaunay2D.Triangle> delaunay, Vector[] means) {
+  /**
+   * Draw the Delaunay triangulation.
+   * 
+   * @param delaunay Triangulation
+   * @param projmeans Projected means
+   * @return Path
+   */
+  public static SVGPath drawDelaunay(List<SweepHullDelaunay2D.Triangle> delaunay, List<Vector> projmeans) {
     final SVGPath path = new SVGPath();
     for(SweepHullDelaunay2D.Triangle del : delaunay) {
-      path.moveTo(means[del.a].get(0), means[del.a].get(1));
-      path.drawTo(means[del.b].get(0), means[del.b].get(1));
-      path.moveTo(means[del.a].get(0), means[del.a].get(1));
-      path.drawTo(means[del.c].get(0), means[del.c].get(1));
-      path.moveTo(means[del.b].get(0), means[del.b].get(1));
-      path.drawTo(means[del.c].get(0), means[del.c].get(1));
+      path.moveTo(projmeans.get(del.a));
+      path.drawTo(projmeans.get(del.b));
+      path.moveTo(projmeans.get(del.a));
+      path.drawTo(projmeans.get(del.c));
+      path.moveTo(projmeans.get(del.b));
+      path.drawTo(projmeans.get(del.c));
     }
     return path;
   }
 
-  public static SVGPath drawVoronoi(double[] graphSize, List<SweepHullDelaunay2D.Triangle> delaunay, Vector[] means) {
+  public static SVGPath drawVoronoi(double[] graphSize, List<SweepHullDelaunay2D.Triangle> delaunay, List<Vector> means) {
     final SVGPath path = new SVGPath();
     for(int i = 0; i < delaunay.size(); i++) {
       SweepHullDelaunay2D.Triangle del = delaunay.get(i);
@@ -38,7 +45,7 @@ public class Voronoi {
         path.drawTo(oth.cx, oth.cy);
       }
       else if(del.ab < 0) {
-        double angle = lineDirection(means[del.a], means[del.b], means[del.c], new Vector(del.cx, del.cy));
+        double angle = lineDirection(means.get(del.a), means.get(del.b), means.get(del.c), new Vector(del.cx, del.cy));
         double len = DistanceFunctionDrawUtils.checkGraphSize(graphSize, angle, new double[] { del.cx, del.cy });
         path.moveTo(del.cx, del.cy);
         path.drawTo(del.cx + len * Math.cos(angle), del.cy + len * Math.sin(angle));
@@ -50,7 +57,7 @@ public class Voronoi {
         path.drawTo(oth.cx, oth.cy);
       }
       else if(del.bc < 0) {
-        double angle = lineDirection(means[del.b], means[del.c], means[del.a], new Vector(del.cx, del.cy));
+        double angle = lineDirection(means.get(del.b), means.get(del.c), means.get(del.a), new Vector(del.cx, del.cy));
         double len = DistanceFunctionDrawUtils.checkGraphSize(graphSize, angle, new double[] { del.cx, del.cy });
         path.moveTo(del.cx, del.cy);
         path.drawTo(del.cx + len * Math.cos(angle), del.cy + len * Math.sin(angle));
@@ -62,7 +69,7 @@ public class Voronoi {
         path.drawTo(oth.cx, oth.cy);
       }
       else if(del.ca < 0) {
-        double angle = lineDirection(means[del.c], means[del.a], means[del.b], new Vector(del.cx, del.cy));
+        double angle = lineDirection(means.get(del.c), means.get(del.a), means.get(del.b), new Vector(del.cx, del.cy));
         double len = DistanceFunctionDrawUtils.checkGraphSize(graphSize, angle, new double[] { del.cx, del.cy });
         path.moveTo(del.cx, del.cy);
         path.drawTo(del.cx + len * Math.cos(angle), del.cy + len * Math.sin(angle));
@@ -78,14 +85,14 @@ public class Voronoi {
    * @param meansproj Projected means.
    * @return SVG path
    */
-  public static SVGPath drawFakeVoronoi(double[] graphSize, Vector[] meansproj) {
+  public static SVGPath drawFakeVoronoi(double[] graphSize, List<Vector> meansproj) {
     final SVGPath path = new SVGPath();
     // Difference
-    final double dx = meansproj[1].get(0) - meansproj[0].get(0);
-    final double dy = meansproj[1].get(1) - meansproj[0].get(1);
+    final double dx = meansproj.get(1).get(0) - meansproj.get(0).get(0);
+    final double dy = meansproj.get(1).get(1) - meansproj.get(0).get(1);
     // Mean
-    final double mx = (meansproj[0].get(0) + meansproj[1].get(0)) / 2;
-    final double my = (meansproj[0].get(1) + meansproj[1].get(1)) / 2;
+    final double mx = (meansproj.get(0).get(0) + meansproj.get(1).get(0)) / 2;
+    final double my = (meansproj.get(0).get(1) + meansproj.get(1).get(1)) / 2;
     // As double[]
     final double[] p = { mx, my };
 
@@ -103,10 +110,7 @@ public class Voronoi {
     final double midx = (a.get(0) + b.get(0)) / 2;
     final double midy = (a.get(1) + b.get(1)) / 2;
 
-    Line2D.Double testLine = new Line2D.Double(a.get(0), a.get(1), b.get(0), b.get(1));
-    Line2D.Double testSide = new Line2D.Double(p.get(0), p.get(1), c.get(0), c.get(1));
-
-    if(testSide.intersectsLine(testLine)) {
+    if(Line2D.linesIntersect(p.get(0), p.get(1), c.get(0), c.get(1), a.get(0), a.get(1), b.get(0), b.get(1))) {
       return Math.atan2(p.get(1) - midy, p.get(0) - midx);
     }
     else {
