@@ -159,6 +159,25 @@ public class SVGPath {
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
+  public SVGPath drawTo(double[] xy) {
+    if(!isStarted()) {
+      moveTo(xy);
+    }
+    else {
+      lineTo(xy);
+    }
+    return this;
+  }
+
+  /**
+   * Draw a line given a series of coordinates.
+   * 
+   * Helper function that will use "move" for the first point, "lineto" for the
+   * remaining.
+   * 
+   * @param xy new coordinates
+   * @return path object, for compact syntax.
+   */
   public SVGPath drawTo(Vector xy) {
     if(!isStarted()) {
       moveTo(xy);
@@ -196,6 +215,17 @@ public class SVGPath {
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
+  public SVGPath lineTo(double[] xy) {
+    append(SVGConstants.PATH_LINE_TO, xy[0], xy[1]);
+    return this;
+  }
+
+  /**
+   * Draw a line to the given coordinates.
+   * 
+   * @param xy new coordinates
+   * @return path object, for compact syntax.
+   */
   public SVGPath lineTo(Vector xy) {
     append(SVGConstants.PATH_LINE_TO, xy.get(0), xy.get(1));
     return this;
@@ -210,6 +240,17 @@ public class SVGPath {
    */
   public SVGPath relativeLineTo(double x, double y) {
     append(PATH_LINE_TO_RELATIVE, x, y);
+    return this;
+  }
+
+  /**
+   * Draw a line to the given relative coordinates.
+   * 
+   * @param xy new coordinates
+   * @return path object, for compact syntax.
+   */
+  public SVGPath relativeLineTo(double[] xy) {
+    append(PATH_LINE_TO_RELATIVE, xy[0], xy[1]);
     return this;
   }
 
@@ -286,6 +327,17 @@ public class SVGPath {
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
+  public SVGPath moveTo(double[] xy) {
+    append(SVGConstants.PATH_MOVE, xy[0], xy[1]);
+    return this;
+  }
+
+  /**
+   * Move to the given coordinates.
+   * 
+   * @param xy new coordinates
+   * @return path object, for compact syntax.
+   */
   public SVGPath moveTo(Vector xy) {
     append(SVGConstants.PATH_MOVE, xy.get(0), xy.get(1));
     return this;
@@ -300,6 +352,17 @@ public class SVGPath {
    */
   public SVGPath relativeMoveTo(double x, double y) {
     append(PATH_MOVE_RELATIVE, x, y);
+    return this;
+  }
+
+  /**
+   * Move to the given relative coordinates.
+   * 
+   * @param xy new coordinates
+   * @return path object, for compact syntax.
+   */
+  public SVGPath relativeMoveTo(double[] xy) {
+    append(PATH_MOVE_RELATIVE, xy[0], xy[1]);
     return this;
   }
 

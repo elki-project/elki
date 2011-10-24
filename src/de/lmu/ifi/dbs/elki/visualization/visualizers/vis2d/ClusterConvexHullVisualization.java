@@ -37,17 +37,16 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.geometry.ConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -103,8 +102,8 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
   @Override
   protected void redraw() {
     // Viewport size, for "relative size" computations
-    final Pair<DoubleMinMax, DoubleMinMax> viewp = proj.estimateViewport();
-    double projarea = (viewp.getFirst().getDiff()) * (viewp.getSecond().getDiff());
+    final CanvasSize viewp = proj.estimateViewport();
+    double projarea = viewp.getDiffX() * viewp.getDiffY();
 
     double opacity = 0.25;
 

@@ -1,7 +1,6 @@
 package experimentalcode.students.roedler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +14,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -24,7 +22,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -34,7 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
-import experimentalcode.students.roedler.utils.Voronoi;
+import experimentalcode.students.roedler.utils.VoronoiDraw;
 
 /**
  * Visualizer for generating an SVG-Element containing lines that separates the
@@ -88,27 +85,13 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-
-    // Viewing area size
-    double[] graphSize = new double[4];
-    Pair<DoubleMinMax, DoubleMinMax> vp = proj.estimateViewport();
-    graphSize[0] = vp.first.getMax() * linesLonger;
-    graphSize[1] = vp.second.getMax() * linesLonger;
-    graphSize[2] = vp.first.getMin() * linesLonger;
-    graphSize[3] = vp.second.getMin() * linesLonger;
-
     final List<Cluster<MeanModel<NV>>> clusters = clustering.getAllClusters();
     
-    // Project the means
-    // Unprojected means: for correct border computations in asymmetrically scaled situations
-    // Projected means: for accurate drawing.
+    // Collect cluster means
     ArrayList<Vector> means = new ArrayList<Vector>(clusters.size());
-    ArrayList<Vector> meansproj = new ArrayList<Vector>(clusters.size());
     {
       for(Cluster<MeanModel<NV>> clus : clusters) {
-        Vector curmean = clus.getModel().getMean().getColumnVector();
-        means.add(curmean);
-        meansproj.add(new Vector(proj.fastProjectDataToRenderSpace(curmean)));
+        means.add(clus.getModel().getMean().getColumnVector());
       }
     }
     final Element path;
@@ -116,11 +99,11 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
       return;
     }
     else if(clusters.size() == 2) {
-      path = Voronoi.drawFakeVoronoi(graphSize, means).makeElement(svgp);
+      path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
     }
     else {
       ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
-      path = Voronoi.drawVoronoi(graphSize, delaunay, means).makeElement(svgp);
+      path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
     }
     SVGUtil.addCSSClass(path, KMEANSBORDER);
     layer.appendChild(path);

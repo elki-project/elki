@@ -545,7 +545,7 @@ public class Vector implements MatrixLike<Vector>, Serializable {
     }
     return f;
   }
-  
+
   /**
    * Normalizes this vector to the length of 1.0.
    */
@@ -649,5 +649,18 @@ public class Vector implements MatrixLike<Vector>, Serializable {
    */
   public void setZero() {
     Arrays.fill(elements, 0.0);
+  }
+
+  /**
+   * Rotate vector by 90 degrees.
+   * 
+   * @return self, for operation chaining.
+   */
+  public Vector rotate90Equals() {
+    assert (elements.length == 2);
+    double temp = elements[0];
+    elements[0] = elements[1];
+    elements[1] = -temp;
+    return this;
   }
 }

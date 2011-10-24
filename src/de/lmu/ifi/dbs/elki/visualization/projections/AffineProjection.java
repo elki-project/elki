@@ -29,9 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Affine projections are the most general class. They are initialized by an
@@ -47,6 +45,11 @@ public class AffineProjection extends AbstractProjection implements Projection2D
    * Affine transformation used in projection
    */
   private AffineTransformation proj;
+
+  /**
+   * Viewport (cache)
+   */
+  private CanvasSize viewport = null;
 
   /**
    * Constructor with a given database and axes.
@@ -104,41 +107,36 @@ public class AffineProjection extends AbstractProjection implements Projection2D
   }
 
   @Override
-  public Pair<DoubleMinMax, DoubleMinMax> estimateViewport() {
-    final int dim = proj.getDimensionality();
-    DoubleMinMax minmaxx = new DoubleMinMax();
-    DoubleMinMax minmaxy = new DoubleMinMax();
+  public CanvasSize estimateViewport() {
+    if(viewport == null) {
+      final int dim = proj.getDimensionality();
+      DoubleMinMax minmaxx = new DoubleMinMax();
+      DoubleMinMax minmaxy = new DoubleMinMax();
 
-    // Origin
-    Vector orig = new Vector(dim);
-    orig = projectScaledToRender(orig);
-    minmaxx.put(orig.get(0));
-    minmaxy.put(orig.get(1));
-    // Diagonal point
-    Vector diag = new Vector(dim);
-    for(int d2 = 0; d2 < dim; d2++) {
-      diag.set(d2, 1);
+      // Origin
+      Vector orig = new Vector(dim);
+      orig = projectScaledToRender(orig);
+      minmaxx.put(orig.get(0));
+      minmaxy.put(orig.get(1));
+      // Diagonal point
+      Vector diag = new Vector(dim);
+      for(int d2 = 0; d2 < dim; d2++) {
+        diag.set(d2, 1);
+      }
+      diag = projectScaledToRender(diag);
+      minmaxx.put(diag.get(0));
+      minmaxy.put(diag.get(1));
+      // Axis end points
+      for(int d = 0; d < dim; d++) {
+        Vector v = new Vector(dim);
+        v.set(d, 1);
+        Vector ax = projectScaledToRender(v);
+        minmaxx.put(ax.get(0));
+        minmaxy.put(ax.get(1));
+      }
+      viewport = new CanvasSize(minmaxx.getMin(), minmaxx.getMax(), minmaxy.getMin(), minmaxy.getMax());
     }
-    diag = projectScaledToRender(diag);
-    minmaxx.put(diag.get(0));
-    minmaxy.put(diag.get(1));
-    // Axis end points
-    for(int d = 0; d < dim; d++) {
-      Vector v = new Vector(dim);
-      v.set(d, 1);
-      Vector ax = projectScaledToRender(v);
-      minmaxx.put(ax.get(0));
-      minmaxy.put(ax.get(1));
-    }
-    return new Pair<DoubleMinMax, DoubleMinMax>(minmaxx, minmaxy);
-  }
-
-  @Override
-  public String estimateTransformString(double margin, double width, double height) {
-    Pair<DoubleMinMax, DoubleMinMax> minmax = estimateViewport();
-    double sizex = (minmax.first.getMax() - minmax.first.getMin());
-    double sizey = (minmax.second.getMax() - minmax.second.getMin());
-    return SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";
+    return viewport;
   }
 
   /**
