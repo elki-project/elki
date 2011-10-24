@@ -129,28 +129,26 @@ public class VoronoiDraw {
    * Fake voronoi. For two means only
    * 
    * @param proj Projection
-   * @param meansproj Projected means.
+   * @param means Mean vectors
    * @return SVG path
    */
-  public static SVGPath drawFakeVoronoi(Projection2D proj, List<Vector> meansproj) {
+  public static SVGPath drawFakeVoronoi(Projection2D proj, List<Vector> means) {
     CanvasSize viewport = proj.estimateViewport();
     final SVGPath path = new SVGPath();
     // Difference
-    final double dx = meansproj.get(1).get(0) - meansproj.get(0).get(0);
-    final double dy = meansproj.get(1).get(1) - meansproj.get(0).get(1);
+    final Vector dirv = (means.get(1).minus(means.get(0))).rotate90Equals();
+    double[] dir = proj.fastProjectRelativeDataToRenderSpace(dirv);
     // Mean
-    final double mx = (meansproj.get(0).get(0) + meansproj.get(1).get(0)) / 2;
-    final double my = (meansproj.get(0).get(1) + meansproj.get(1).get(1)) / 2;
-    // As double[]
-    final double[] p = { mx, my };
+    final Vector mean = (means.get(0).plus(means.get(1))).timesEquals(0.5);
+    double[] projmean = proj.fastProjectDataToRenderSpace(mean);
 
-    final double angle = Math.atan2(dy, dx);
-    double len = DistanceFunctionDrawUtils.checkGraphSize(viewport, angle + Math.PI / 2, p);
-    path.moveTo(mx, my);
-    path.relativeLineTo(len * Math.cos(angle + Math.PI / 2), len * Math.sin(angle + Math.PI / 2));
-    len = DistanceFunctionDrawUtils.checkGraphSize(viewport, angle - Math.PI / 2, p);
-    path.moveTo(mx, my);
-    path.relativeLineTo(len * Math.cos(angle - Math.PI / 2), len * Math.sin(angle - Math.PI / 2));
+    double factor = continueToMargin(projmean, dir, viewport);
+    path.moveTo(projmean[0] + factor * dir[0], projmean[1] + factor * dir[1]);
+    // Inverse direction:
+    dir[0] *= -1;
+    dir[1] *= -1;
+    factor = continueToMargin(projmean, dir, viewport);
+    path.drawTo(projmean[0] + factor * dir[0], projmean[1] + factor * dir[1]);
     return path;
   }
 }
