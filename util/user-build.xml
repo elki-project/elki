@@ -1,0 +1,65 @@
+<project name="ELKI-Custom" default="jar" basedir="..">
+	<property name="src" location="src" />
+	<property name="build" location="build" />
+	<property name="dist" location="." />
+	<property name="elki" value="de.lmu.ifi.dbs.elki" />
+	<property name="title" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures" />
+	<property name="url" value="http://elki.dbs.ifi.lmu.de/" />
+	<property name="version" value="custom" />
+
+	<target name="init">
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" includes="" includeantruntime="false" deprecation="false" debug="false" optimize="true" source="1.6" target="1.6" debuglevel="">
+			<compilerarg value="-Xlint:all" />
+			<classpath>
+				<pathelement path="${src}" />
+				<pathelement path="lib/batik-all-1.7.jar" />
+				<pathelement path="lib/xml-commons-external-1.4.01.jar" />
+				<pathelement path="lib/xml-commons-external-1.4.01-ext.jar" />
+				<pathelement path="lib/pdf-transcoder.jar" />
+			</classpath>
+			<include name="de/lmu/ifi/dbs/elki/**/*.java" />
+			<include name="tutorial/**/*.java" />
+			<!-- CUSTOMIZE THIS TO INCLUDE YOUR PACKAGE(S) ! -->
+			<include name="experimentalcode/students/USERNAME/**/*.java" />
+			<!-- <include name="experimentalcode/shared/**/*.java" /> -->
+
+			<exclude name="experimentalcode/shared/index/subspace/**" />
+			<exclude name="experimentalcode/shared/converter/bibtex/**" />
+			<exclude name="experimentalcode/shared/outlier/correlation/ranking/**" />
+		</javac>
+	</target>
+
+	<target name="install" depends="init">
+		<copy todir="${build}">
+			<fileset dir="${src}">
+				<include name="de/**/*" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" depends="compile, install">
+		<!-- build precompiled jar -->
+		<jar jarfile="${dist}/elki-custom.jar" basedir="${build}">
+			<manifest>
+				<attribute name="Main-class" value="${elki}.gui.minigui.MiniGUI" />
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Implementation-Title" value="${title}" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Implementation-URL" value="${url}" />
+				<attribute name="Class-Path" value="lib/batik-all-1.7.jar lib/xml-commons-external-1.4.01.jar lib/xml-commons-external-1.4.01-ext.jar lib/pdf-transcoder.jar" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}" />
+		<delete dir="${dist}/elki-custom.jar" />
+	</target>
+</project>
