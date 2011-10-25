@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -106,7 +107,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   }
 
   @Override
-  public Collection<Index> getIndexes() {
+  public List<Index> getIndexes() {
     return Collections.unmodifiableList(this.indexes);
   }
 
@@ -175,8 +176,13 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
-    for(Index idx : getIndexes()) {
+    ListIterator<Index> iter = indexes.listIterator(indexes.size());
+    while(iter.hasPrevious()) {
+      Index idx = iter.previous();
       if(idx instanceof KNNIndex) {
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest("Considering index for kNN Query: " + idx);
+        }
         @SuppressWarnings("unchecked")
         final KNNIndex<O> knnIndex = (KNNIndex<O>) idx;
         KNNQuery<O, D> q = knnIndex.getKNNQuery(distanceQuery, hints);
@@ -200,8 +206,13 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    for(Index idx : getIndexes()) {
+    ListIterator<Index> iter = indexes.listIterator(indexes.size());
+    while(iter.hasPrevious()) {
+      Index idx = iter.previous();
       if(idx instanceof RangeIndex) {
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest("Considering index for range query: " + idx);
+        }
         @SuppressWarnings("unchecked")
         final RangeIndex<O> rangeIndex = (RangeIndex<O>) idx;
         RangeQuery<O, D> q = rangeIndex.getRangeQuery(distanceQuery, hints);
@@ -225,8 +236,13 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
-    for(Index idx : getIndexes()) {
+    ListIterator<Index> iter = indexes.listIterator(indexes.size());
+    while(iter.hasPrevious()) {
+      Index idx = iter.previous();
       if(idx instanceof RKNNIndex) {
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest("Considering index for RkNN Query: " + idx);
+        }
         @SuppressWarnings("unchecked")
         final RKNNIndex<O> rknnIndex = (RKNNIndex<O>) idx;
         RKNNQuery<O, D> q = rknnIndex.getRKNNQuery(distanceQuery, hints);

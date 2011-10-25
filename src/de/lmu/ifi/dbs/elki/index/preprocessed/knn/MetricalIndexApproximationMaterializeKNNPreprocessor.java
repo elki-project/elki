@@ -28,11 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -69,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor<O, D> {
+public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor<O, D, List<DistanceResultPair<D>>> {
   /**
    * Logger to use
    */
@@ -92,7 +91,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
     MetricalIndexTree<O, D, N, E> index = getMetricalIndex(relation);
 
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    createStorage();
     MeanVariance pagesize = new MeanVariance();
     MeanVariance ksize = new MeanVariance();
     if(getLogger().isVerbose()) {
@@ -203,7 +202,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Factory<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D> {
+  public static class Factory<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, List<DistanceResultPair<D>>> {
     /**
      * Constructor.
      * 

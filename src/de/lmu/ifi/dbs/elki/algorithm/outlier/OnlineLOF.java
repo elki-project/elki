@@ -107,8 +107,8 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
     // add listener
     KNNListener l = new LOFKNNListener(lofResult);
-    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
-    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, List<DistanceResultPair<D>>>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, List<DistanceResultPair<D>>>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
 
     return lofResult.getResult();
   }
@@ -194,8 +194,8 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
     @Override
     public void kNNsChanged(KNNChangeEvent e) {
-      AbstractMaterializeKNNPreprocessor<O, D> p1 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNRefer()).getPreprocessor();
-      AbstractMaterializeKNNPreprocessor<O, D> p2 = ((PreprocessorKNNQuery<O, D>) lofResult.getKNNReach()).getPreprocessor();
+      AbstractMaterializeKNNPreprocessor<O, D, ?> p1 = ((PreprocessorKNNQuery<O, D, ?>) lofResult.getKNNRefer()).getPreprocessor();
+      AbstractMaterializeKNNPreprocessor<O, D, ?> p2 = ((PreprocessorKNNQuery<O, D, ?>) lofResult.getKNNReach()).getPreprocessor();
 
       if(firstEventReceived == null) {
         if(e.getSource().equals(p1) && e.getSource().equals(p2)) {

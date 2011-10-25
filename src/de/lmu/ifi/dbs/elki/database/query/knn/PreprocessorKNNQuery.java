@@ -45,11 +45,11 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-public class PreprocessorKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements KNNQuery<O, D> {
+public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<DistanceResultPair<D>>> extends AbstractDataBasedQuery<O> implements KNNQuery<O, D> {
   /**
    * The last preprocessor result
    */
-  final private AbstractMaterializeKNNPreprocessor<O, D> preprocessor;
+  final private AbstractMaterializeKNNPreprocessor<O, D, T> preprocessor;
 
   /**
    * Warn only once.
@@ -62,7 +62,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>> extends AbstractData
    * @param database Database to query
    * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorKNNQuery(Relation<O> database, AbstractMaterializeKNNPreprocessor<O, D> preprocessor) {
+  public PreprocessorKNNQuery(Relation<O> database, AbstractMaterializeKNNPreprocessor<O, D, T> preprocessor) {
     super(database);
     this.preprocessor = preprocessor;
   }
@@ -73,7 +73,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>> extends AbstractData
    * @param database Database to query
    * @param preprocessor Preprocessor to use
    */
-  public PreprocessorKNNQuery(Relation<O> database, AbstractMaterializeKNNPreprocessor.Factory<O, D> preprocessor) {
+  public PreprocessorKNNQuery(Relation<O> database, AbstractMaterializeKNNPreprocessor.Factory<O, D, T> preprocessor) {
     this(database, preprocessor.instantiate(database));
   }
 
@@ -164,7 +164,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>> extends AbstractData
    * 
    * @return preprocessor instance
    */
-  public AbstractMaterializeKNNPreprocessor<O, D> getPreprocessor() {
+  public AbstractMaterializeKNNPreprocessor<O, D, T> getPreprocessor() {
     return preprocessor;
   }
 

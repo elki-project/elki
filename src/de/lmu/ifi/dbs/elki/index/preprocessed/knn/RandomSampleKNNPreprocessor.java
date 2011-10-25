@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -55,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D> {
+public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, List<DistanceResultPair<D>>> {
   /**
    * Logger
    */
@@ -145,7 +146,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D> {
+  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, List<DistanceResultPair<D>>> {
     /**
      * Relative share of objects to get
      */
@@ -171,7 +172,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
     }
 
     @Override
-    public AbstractMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
+    public RandomSampleKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
       return new RandomSampleKNNPreprocessor<O, D>(relation, distanceFunction, k, share, seed);
     }
 
