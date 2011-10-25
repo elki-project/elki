@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database;
 
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -185,14 +184,12 @@ public class StaticArrayDatabase extends AbstractDatabase implements Database, P
 
   @Override
   public void addIndex(Index index) {
+    if(logger.isDebuggingFiner()) {
+      logger.debugFine("Adding index: " + index);
+    }
     this.indexes.add(index);
     // TODO: actually add index to the representation used?
     this.addChildResult(index);
-  }
-
-  @Override
-  public Collection<Index> getIndexes() {
-    return Collections.unmodifiableList(this.indexes);
   }
 
   @Override

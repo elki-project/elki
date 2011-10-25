@@ -88,7 +88,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
 
   @Override
   protected void preprocess() {
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, List.class);
+    createStorage();
     materialized_RkNN = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, Set.class);
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors and reverse k nearest neighbors (k=" + k + ")", relation.size(), getLogger()) : null;
     materializeKNNAndRKNNs(DBIDUtil.ensureArray(relation.getDBIDs()), progress);
@@ -333,7 +333,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
   public String getShortName() {
     return "knn and rknn preprocessor";
   }
-  
+
   @Override
   protected Logging getLogger() {
     return logger;
@@ -373,8 +373,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
      */
     public static class Parameterizer<O, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
-      protected Factory<O,D> makeInstance() {
-        return new Factory<O,D>(k, distanceFunction);
+      protected Factory<O, D> makeInstance() {
+        return new Factory<O, D>(k, distanceFunction);
       }
     }
   }

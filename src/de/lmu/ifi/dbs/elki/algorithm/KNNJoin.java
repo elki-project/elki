@@ -110,7 +110,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    *         {@link SpatialPrimitiveDistanceFunction}.
    */
   @SuppressWarnings("unchecked")
-  public DataStore<KNNList<D>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public WritableDataStore<KNNList<D>> run(Database database, Relation<V> relation) throws IllegalStateException {
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }

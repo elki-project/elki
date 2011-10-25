@@ -28,8 +28,6 @@ import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -66,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D> {
+public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, List<DistanceResultPair<D>>> {
   /**
    * Logger to use.
    */
@@ -106,7 +104,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    */
   @Override
   protected void preprocess() {
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    createStorage();
 
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
@@ -408,7 +406,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D> {
+  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, List<DistanceResultPair<D>>> {
     /**
      * Index factory.
      * 

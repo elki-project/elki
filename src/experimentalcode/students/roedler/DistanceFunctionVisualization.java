@@ -71,7 +71,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
   /**
    * The selection result we work on
    */
-  private AbstractMaterializeKNNPreprocessor<NV, DoubleDistance> result;
+  private AbstractMaterializeKNNPreprocessor<NV, DoubleDistance, ?> result;
 
   /**
    * p[0] type of a Norm p[1] value of a Lp Norm
@@ -197,7 +197,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
    *         Cosine =-1 -> visualization not implemented so far p[1] the p value
    *         itself
    */
-  public static <NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> double[] getLPNormP(AbstractMaterializeKNNPreprocessor<NV, D> kNN) {
+  public static <NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> double[] getLPNormP(AbstractMaterializeKNNPreprocessor<NV, D, ?> kNN) {
     double[] p = new double[2];
     // Note: we deliberately lose generics here, so the compilers complain less
     // on the next typecheck and cast!
@@ -273,8 +273,8 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final ArrayList<AbstractMaterializeKNNPreprocessor<NV, D>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
-      for(AbstractMaterializeKNNPreprocessor<NV, D> kNN : kNNIndex) {
+      final ArrayList<AbstractMaterializeKNNPreprocessor<NV, D, ?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
+      for(AbstractMaterializeKNNPreprocessor<NV, D, ?> kNN : kNNIndex) {
         Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
           final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), this);

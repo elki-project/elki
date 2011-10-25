@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -61,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
-public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D> {
+public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, List<DistanceResultPair<D>>> {
   // TODO: randomize/shuffle?
 
   /**
@@ -174,7 +175,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D> {
+  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, List<DistanceResultPair<D>>> {
     /**
      * Parameter to specify the number of partitions to use for materializing
      * the kNN. Must be an integer greater than 1.
