@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @created 16.09.2009
  * @date 16.09.2009
  */
-public class VectorApprox {
+public class VectorApprox<V extends NumberVector<V,?>> {
 
   /**
    * approximation (va cell ids)
@@ -75,7 +75,7 @@ public DBID getId()
 	return id;
 }
 
-public void calculateApproximation(DoubleVector dv, DAFile[] daFiles) {
+public void calculateApproximation(V dv, DAFile[] daFiles) {
     for (int i = 0; i< daFiles.length; i++) {
       double val = dv.doubleValue(i + 1);
       double[] borders = daFiles[i].getSplitPositions();
@@ -99,7 +99,7 @@ public void calculateApproximation(DoubleVector dv, DAFile[] daFiles) {
     }
   }
 
-  public void calculateApproximation(DoubleVector dv, double[][] borders) {
+  public void calculateApproximation(V dv, double[][] borders) {
     for (int d = 0; d < borders.length; d++) {
       double val = dv.doubleValue(d+1);
       int lastBorderIndex = borders[d].length - 1;
