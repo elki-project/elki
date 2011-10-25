@@ -33,6 +33,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -48,11 +49,11 @@ import experimentalcode.shared.index.subspace.structures.DiskMemory;
  * @created 15.09.2009
  * @date 15.09.2009
  */
-public class VAFile extends AbstractVAFile
+public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 {
   Logger log = Logger.getLogger(VAFile.class.getName());
   //Full data representation
-	DiskMemory<DoubleVector> data;
+	DiskMemory<V> data;
 	
 	//temporary, full-dimensional VA representation
 	private List<VectorApprox> vectorApprox;
@@ -75,21 +76,21 @@ public class VAFile extends AbstractVAFile
 	private double[][] lookup;
 	
 	
-	public VAFile(int pageSize, Relation<DoubleVector> fullDimensionalData, int partitions)
+	public VAFile(int pageSize, Relation<V> relation, int partitions)
 	{	
 		this.pageSize = pageSize;
 		
 		scannedBytes = 0;
 		issuedQueries = 0;
 		
-		setPartitions(fullDimensionalData, partitions);
+		setPartitions(relation, partitions);
 		
-		DBID sampleID = fullDimensionalData.getDBIDs().iterator().next();
-	    int dimensions = fullDimensionalData.get(sampleID).getDimensionality();
-		data = new DiskMemory<DoubleVector>(pageSize/(8*dimensions + 4),bufferSize);
+		DBID sampleID = relation.getDBIDs().iterator().next();
+	    int dimensions = relation.get(sampleID).getDimensionality();
+		data = new DiskMemory<V>(pageSize/(8*dimensions + 4),bufferSize);
 		vectorApprox = new ArrayList<VectorApprox>();
-		for (DBID id: fullDimensionalData.getDBIDs()) {
-			DoubleVector dv = fullDimensionalData.get(id);
+		for (DBID id: relation.getDBIDs()) {
+			V dv = relation.get(id);
 			data.add(id, dv);
 			VectorApprox va = new VectorApprox(id, dv.getDimensionality());
 			try { va.calculateApproximation(dv, splitPositions); }
@@ -98,8 +99,11 @@ public class VAFile extends AbstractVAFile
 		}
 	}
 	
+	public int getPageAccess(){
+	  return data.pageAccessesL;
+	}
 	
-	public void setPartitions(Relation<DoubleVector> objects, int partitions) throws IllegalArgumentException
+	public void setPartitions(Relation<V> objects, int partitions) throws IllegalArgumentException
 	{
 		if ((Math.log(partitions) / Math.log(2)) != (int)(Math.log(partitions) / Math.log(2)))
 			throw new IllegalArgumentException("Number of partitions must be a power of 2!");
@@ -192,7 +196,7 @@ public class VAFile extends AbstractVAFile
 	/**
 	 * @param query
 	 */
-	public void setLookupTable(DoubleVector query) {
+	public void setLookupTable(V query) {
 		
 		int dimensions = splitPositions.length;
 		int bordercount = splitPositions[0].length;
@@ -207,7 +211,7 @@ public class VAFile extends AbstractVAFile
 	}
 	
 	
-	public DBIDs knnQuery(DoubleVector query, int k)
+	public DBIDs knnQuery(V query, int k)
 	{
 		// generate query approximation and lookup table
 		
@@ -262,7 +266,7 @@ public class VAFile extends AbstractVAFile
 			if (!result.isEmpty()) lastElement = result.get(result.size()-1);
 			if (result.size() < k || va.getPMinDist() < lastElement.getDoubleDistance())
 			{
-				DoubleVector dv = data.getObject(va.getId());
+				V dv = data.getObject(va.getId());
 				double dist = 0;
 				for (int d = 0; d < dv.getDimensionality(); d++)
 				{
@@ -290,4 +294,11 @@ public class VAFile extends AbstractVAFile
 		
 		return resultIDs;
 	}
+
+
+  @Override
+  public void setLookupTable(DoubleVector dv) {
+    // TODO Auto-generated method stub
+    
+  }
 }
