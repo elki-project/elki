@@ -49,14 +49,14 @@ import experimentalcode.shared.index.subspace.structures.DiskMemory;
  * @created 15.09.2009
  * @date 15.09.2009
  */
-public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
+public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V>
 {
   Logger log = Logger.getLogger(VAFile.class.getName());
   //Full data representation
 	DiskMemory<V> data;
 	
 	//temporary, full-dimensional VA representation
-	private List<VectorApprox> vectorApprox;
+	private List<VectorApprox<V>> vectorApprox;
 	
 	private static final int p = 2;
 	
@@ -74,6 +74,8 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 	
 	private double[][] splitPositions;
 	private double[][] lookup;
+  private int partitions;
+  private int scanPageAccesses;
 	
 	
 	public VAFile(int pageSize, Relation<V> relation, int partitions)
@@ -82,17 +84,18 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 		
 		scannedBytes = 0;
 		issuedQueries = 0;
+		scanPageAccesses = 0;
 		
 		setPartitions(relation, partitions);
 		
 		DBID sampleID = relation.getDBIDs().iterator().next();
 	    int dimensions = relation.get(sampleID).getDimensionality();
 		data = new DiskMemory<V>(pageSize/(8*dimensions + 4),bufferSize);
-		vectorApprox = new ArrayList<VectorApprox>();
+		vectorApprox = new ArrayList<VectorApprox<V>>();
 		for (DBID id: relation.getDBIDs()) {
 			V dv = relation.get(id);
 			data.add(id, dv);
-			VectorApprox va = new VectorApprox(id, dv.getDimensionality());
+			VectorApprox<V> va = new VectorApprox<V>(id, dv.getDimensionality());
 			try { va.calculateApproximation(dv, splitPositions); }
 			catch (Exception e) { e.printStackTrace(); }
 			vectorApprox.add(va);
@@ -100,7 +103,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 	}
 	
 	public int getPageAccess(){
-	  return data.pageAccessesL;
+	  return data.pageAccessesL + scanPageAccesses;
 	}
 	
 	public void setPartitions(Relation<V> objects, int partitions) throws IllegalArgumentException
@@ -112,6 +115,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 	    int dimensions = objects.get(sampleID).getDimensionality();
 		splitPositions = new double[dimensions][partitions+1];
 		int[][] partitionCount = new int[dimensions][partitions];
+		this.partitions = partitions;
 		
 		for (int d = 0; d < dimensions; d++)
 		{
@@ -197,7 +201,6 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 	 * @param query
 	 */
 	public void setLookupTable(V query) {
-		
 		int dimensions = splitPositions.length;
 		int bordercount = splitPositions[0].length;
 		lookup = new double[dimensions][bordercount];
@@ -215,23 +218,27 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 	{
 		// generate query approximation and lookup table
 		
-		VectorApprox queryApprox = new VectorApprox(query.getDimensionality());
+		VectorApprox<V> queryApprox = new VectorApprox<V>(query.getDimensionality());
 		try { queryApprox.calculateApproximation(query, splitPositions); }
 		catch (Exception e) { e.printStackTrace(); }
 		setLookupTable(query);
 		
 		
+		
 		// perform multi-step NN-query
 		
-		Vector<VectorApprox> candidates = new Vector<VectorApprox>();
+		Vector<VectorApprox<V>> candidates = new Vector<VectorApprox<V>>();
 		double minMaxDist = Double.POSITIVE_INFINITY;
 		
 		
 		// filter step
+    final int newBytesScanned = vectorApprox.size() * VectorApprox.byteOnDisk(query.getDimensionality(), partitions);
+    scanPageAccesses += (int) Math.ceil(((double)newBytesScanned) / pageSize);
+    scannedBytes += newBytesScanned;
 		
 		for (int i=0; i<vectorApprox.size(); i++)
 		{
-			VectorApprox va = vectorApprox.get(i);
+			VectorApprox<V> va = vectorApprox.get(i);
 			double minDist = 0;
 			double maxDist = 0;
 			for (int d = 0; d < va.getApproximationSize(); d++)
@@ -261,10 +268,10 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 		// retrieve accurate distances
 		for (int i=0; i<candidates.size(); i++)
 		{
-			VectorApprox va = candidates.get(i);
+			VectorApprox<V> va = candidates.get(i);
 			DoubleDistanceResultPair lastElement = null;
 			if (!result.isEmpty()) lastElement = result.get(result.size()-1);
-			if (result.size() < k || va.getPMinDist() < lastElement.getDoubleDistance())
+			if (/* result.size() < k || */ va.getPMinDist() < lastElement.getDoubleDistance())
 			{
 				V dv = data.getObject(va.getId());
 				double dist = 0;
@@ -294,11 +301,4 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile
 		
 		return resultIDs;
 	}
-
-
-  @Override
-  public void setLookupTable(DoubleVector dv) {
-    // TODO Auto-generated method stub
-    
-  }
 }
