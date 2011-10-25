@@ -75,7 +75,7 @@ public DBID getId()
 	return id;
 }
 
-public void calculateApproximation(V dv, DAFile[] daFiles) {
+public void calculateApproximation(V dv, DAFile<V>[] daFiles) {
     for (int i = 0; i< daFiles.length; i++) {
       double val = dv.doubleValue(i + 1);
       double[] borders = daFiles[i].getSplitPositions();
@@ -179,19 +179,19 @@ public void calculateApproximation(V dv, DAFile[] daFiles) {
     return numberOfDimensions * (int)(Math.ceil((Math.log(numberOfPartitions) / Math.log(2)) / 8));
   }
 
-  public static Vector<VectorApprox> sortByMinDist(Vector<VectorApprox> vectorApprox) {
-    Collections.sort(vectorApprox, new MinDistComparator());
+  public static <V extends NumberVector<V, ?>> Vector<VectorApprox<V>> sortByMinDist(Vector<VectorApprox<V>> vectorApprox) {
+    Collections.sort(vectorApprox, new MinDistComparator<V>());
     return vectorApprox;
   }
 }
 
-class MinDistComparator implements Comparator<VectorApprox> {
+class MinDistComparator<V extends NumberVector<V, ?>> implements Comparator<VectorApprox<V>> {
 
   /* (non-Javadoc)
    * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
    */
   @Override
-  public int compare(VectorApprox a, VectorApprox b) {
+  public int compare(VectorApprox<V> a, VectorApprox<V> b) {
     return Double.compare(a.getPMinDist(), b.getPMinDist());
   }
 }

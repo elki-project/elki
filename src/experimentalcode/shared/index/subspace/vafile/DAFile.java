@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import experimentalcode.franz.utils.ArrayUtils;
 
 
@@ -39,7 +39,7 @@ import experimentalcode.franz.utils.ArrayUtils;
  * @created 22.09.2009
  * @date 22.09.2009
  */
-public class DAFile
+public class DAFile<V extends NumberVector<V, ?>>
 {
 	private int dimension;
 
@@ -60,7 +60,7 @@ public class DAFile
 	}
 
 
-	public void setPartitions(Collection<DoubleVector> objects, int partitions)
+	public void setPartitions(Collection<V> objects, int partitions)
 	{
 		long start = System.currentTimeMillis();
 
@@ -71,7 +71,7 @@ public class DAFile
 		int remaining = size;
 		double[] tempdata = new double[size];
 		int j = 0;
-		for (DoubleVector dv : objects)
+		for (V dv : objects)
 			tempdata[j++] = dv.doubleValue(dimension + 1);
 		Arrays.sort(tempdata);
 		tempdata = ArrayUtils.unique(tempdata, 1 / (100 * partitions));
@@ -146,7 +146,7 @@ public class DAFile
 	}
 
 
-	public void setLookupTable(DoubleVector query)
+	public void setLookupTable(V query)
 	{
 		int bordercount = splitPositions.length;
 		lookup = new double[bordercount];
@@ -234,18 +234,19 @@ public class DAFile
 	 * @param query
 	 * @param epsilon
 	 */
-	public static void calculateSelectivityCoeffs(List<DAFile> daFileList,
-	        DoubleVector query, double epsilon)
+	public static <V extends NumberVector<V, ?>> void calculateSelectivityCoeffs(List<DAFile<V>> daFileList,
+	        V query, double epsilon)
 	{
-		DAFile[] daFiles = new DAFile[daFileList.size()];
-		for (DAFile da : daFileList)
+		@SuppressWarnings("unchecked")
+    DAFile<V>[] daFiles = new DAFile[daFileList.size()];
+		for (DAFile<V> da : daFileList)
 			daFiles[da.getDimension()] = da;
 
 		int dimensions = query.getDimensionality();
 		double[] lowerVals = new double[dimensions];
 		double[] upperVals = new double[dimensions];
 
-		VectorApprox queryApprox = new VectorApprox(dimensions);
+		VectorApprox<V> queryApprox = new VectorApprox<V>(dimensions);
 		queryApprox.calculateApproximation(query, daFiles);
 
 		for (int i = 0; i < dimensions; i++)
@@ -254,12 +255,12 @@ public class DAFile
 			upperVals[i] = query.doubleValue(i + 1) + epsilon;
 		}
 
-		DoubleVector lowerEpsilon = new DoubleVector(lowerVals);
-		VectorApprox lowerEpsilonPartitions = new VectorApprox(dimensions);
+		V lowerEpsilon = query.newInstance(lowerVals);
+		VectorApprox<V> lowerEpsilonPartitions = new VectorApprox<V>(dimensions);
 		lowerEpsilonPartitions.calculateApproximation(lowerEpsilon, daFiles);
 
-		DoubleVector upperEpsilon = new DoubleVector(upperVals);
-		VectorApprox upperEpsilonPartitions = new VectorApprox(dimensions);
+		V upperEpsilon = query.newInstance(upperVals);
+		VectorApprox<V> upperEpsilonPartitions = new VectorApprox<V>(dimensions);
 		upperEpsilonPartitions.calculateApproximation(upperEpsilon, daFiles);
 
 		for (int i = 0; i< daFiles.length;i++)
@@ -273,16 +274,16 @@ public class DAFile
 	}
 
 
-	public static List<DAFile> sortBySelectivity(List<DAFile> daFiles)
+	public static <V extends NumberVector<V, ?>> List<DAFile<V>> sortBySelectivity(List<DAFile<V>> daFiles)
 	{
-		Collections.sort(daFiles, new DAFileSelectivityComparator());
+		Collections.sort(daFiles, new DAFileSelectivityComparator<V>());
 		return daFiles;
 	}
 
 }
 
 
-class DAFileSelectivityComparator implements Comparator<DAFile>
+class DAFileSelectivityComparator<V extends NumberVector<V, ?>> implements Comparator<DAFile<V>>
 {
 
 	/*
@@ -290,7 +291,7 @@ class DAFileSelectivityComparator implements Comparator<DAFile>
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public int compare(DAFile a, DAFile b)
+	public int compare(DAFile<V> a, DAFile<V> b)
 	{
 		return Double.compare(a.getSelectivityCoeff(), b.getSelectivityCoeff());
 	}
