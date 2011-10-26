@@ -48,7 +48,7 @@ public final class LoggingConfiguration {
   /**
    * Configuration file name
    */
-  private static final String CLIConffile = "logging-cli.properties";
+  private static final String LOGGING_PROPERTIES_FILE = "logging.properties";
 
   /**
    * Top level ELKI package (for setting 'verbose')
@@ -63,7 +63,7 @@ public final class LoggingConfiguration {
   /**
    * Static instance of the configuration
    */
-  protected static LoggingConfiguration config = new LoggingConfiguration(confbase, CLIConffile);
+  protected static LoggingConfiguration config = new LoggingConfiguration(confbase, LOGGING_PROPERTIES_FILE);
 
   /**
    * Configure Java Logging API: {@link java.util.logging.LogManager}
