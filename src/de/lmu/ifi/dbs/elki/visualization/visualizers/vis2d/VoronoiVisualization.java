@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,28 +22,35 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.svg.VoronoiDraw;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
-import experimentalcode.students.roedler.utils.VoronoiDraw;
 
 /**
- * Visualizer for generating an SVG-Element containing lines that separates the
- * means
+ * Visualizer drawing Voronoi cells for k-means clusterings.
+ * 
+ * See also: {@link de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans KMeans
+ * clustering}
  * 
  * @author Robert Rödler
+ * @author Erich Schubert
  * 
  * @apiviz.has MeanModel oneway - - visualizes
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
 
   /**
    * A short name characterizing this Visualizer.
@@ -56,28 +63,39 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
   private static final String KMEANSBORDER = "kmeans-border";
 
   /**
+   * Visualization mode.
+   * 
+   * @author Erich Schubert
+   */
+  public static enum Mode {
+    VORONOI, DELAUNAY, V_AND_D
+  }
+
+  /**
    * The result we work on
    */
   Clustering<MeanModel<NV>> clustering;
 
   /**
-   * The voronoi diagram
+   * The Voronoi diagram
    */
   Element voronoi;
 
   /**
-   * Draw this factor beyond the viewport.
+   * Active drawing mode.
    */
-  double linesLonger = 1.2;
+  private Mode mode;
 
   /**
    * Constructor
    * 
    * @param task VisualizationTask
+   * @param mode Drawing mode
    */
-  public kMeansBorderVisualization(VisualizationTask task) {
+  public VoronoiVisualization(VisualizationTask task, Mode mode) {
     super(task);
     this.clustering = task.getResult();
+    this.mode = mode;
     context.addContextChangeListener(this);
     incrementalRedraw();
   }
@@ -86,7 +104,11 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
   protected void redraw() {
     addCSSClasses(svgp);
     final List<Cluster<MeanModel<NV>>> clusters = clustering.getAllClusters();
-    
+
+    if(clusters.size() < 2) {
+      return;
+    }
+
     // Collect cluster means
     ArrayList<Vector> means = new ArrayList<Vector>(clusters.size());
     {
@@ -94,23 +116,31 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
         means.add(clus.getModel().getMean().getColumnVector());
       }
     }
-    if (clusters.size() < 2) {
-      return;
-    }
-    else if(clusters.size() == 2) {
-      Element path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
-      SVGUtil.addCSSClass(path, KMEANSBORDER);
-      layer.appendChild(path);
+    if(clusters.size() == 2) {
+      if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
+        Element path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
+        SVGUtil.addCSSClass(path, KMEANSBORDER);
+        layer.appendChild(path);
+      }
+      if(mode == Mode.DELAUNAY || mode == Mode.V_AND_D) {
+        Element path = new SVGPath(proj.fastProjectDataToRenderSpace(means.get(0))).drawTo(proj.fastProjectDataToRenderSpace(means.get(1))).makeElement(svgp);
+        SVGUtil.addCSSClass(path, KMEANSBORDER);
+        layer.appendChild(path);
+      }
     }
     else {
+      // Compute Delaunay Triangulation
       ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
-      Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
-      SVGUtil.addCSSClass(path, KMEANSBORDER);
-      layer.appendChild(path);
-      
-      Element p2 = VoronoiDraw.drawDelaunay(delaunay, means).makeElement(svgp);
-      SVGUtil.addCSSClass(p2, KMEANSBORDER);
-      layer.appendChild(p2);
+      if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
+        Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
+        SVGUtil.addCSSClass(path, KMEANSBORDER);
+        layer.appendChild(path);
+      }
+      if(mode == Mode.DELAUNAY || mode == Mode.V_AND_D) {
+        Element path = VoronoiDraw.drawDelaunay(proj, delaunay, means).makeElement(svgp);
+        SVGUtil.addCSSClass(path, KMEANSBORDER);
+        layer.appendChild(path);
+      }
     }
   }
 
@@ -138,23 +168,41 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
    * between kMeans clusters
    * 
    * @author Robert Rödler
+   * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses kMeansBorderVisualisation oneway - - «create»
+   * @apiviz.uses VoronoiVisualisation oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
-     * Constructor
+     * Mode for drawing: Voronoi, Delaunay, both
+     * 
+     * <p>
+     * Key: {@code -voronoi.mode}
+     * </p>
      */
-    public Factory() {
+    public static final OptionID MODE_ID = OptionID.getOrCreateOptionID("voronoi.mode", "Mode for drawing the voronoi cells (and/or delaunay triangulation)");
+
+    /**
+     * Drawing mode
+     */
+    private Mode mode;
+
+    /**
+     * Constructor
+     * 
+     * @param mode Drawing mode
+     */
+    public Factory(Mode mode) {
       super();
+      this.mode = mode;
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new kMeansBorderVisualization<NV>(task);
+      return new VoronoiVisualization<NV>(task, mode);
     }
 
     @Override
@@ -194,6 +242,31 @@ public class kMeansBorderVisualization<NV extends NumberVector<NV, ?>> extends P
         return (Clustering<MeanModel<NV>>) c;
       }
       return null;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      protected Mode mode;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        EnumParameter<Mode> modeP = new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.VORONOI);
+        if(config.grab(modeP)) {
+          mode = modeP.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(mode);
+      }
     }
   }
 }
