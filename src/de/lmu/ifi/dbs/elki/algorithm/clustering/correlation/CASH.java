@@ -472,7 +472,9 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
     }
 
     if(logger.isDebuggingFiner()) {
-      logger.debugFiner("heap.size %d", heap.size());
+      StringBuffer msg = new StringBuffer();
+      msg.append("heap.size ").append(heap.size());
+      logger.debugFiner(msg.toString());
     }
   }
 
@@ -494,7 +496,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
     VectorFieldTypeInformation<ParameterizationFunction> type = VectorFieldTypeInformation.get(ParameterizationFunction.class, basis.getColumnDimensionality());
     MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<ParameterizationFunction>(proxy, type, ids);
     proxy.addRelation(prep);
-
+    
     // Project
     for(DBID id : ids) {
       ParameterizationFunction f = project(basis, relation.get(id));
@@ -596,7 +598,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
       }
 
       if(heap.size() % 10000 == 0 && logger.isVerbose()) {
-        logger.verbose("heap size %d", heap.size());
+        logger.verbose("heap size " + heap.size());
       }
 
       if(heap.size() >= 40000) {
@@ -606,7 +608,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
       }
 
       if(logger.isDebuggingFiner()) {
-        logger.debugFiner("split %s %d-%d", interval.toString(), interval.getLevel(), interval.getMaxSplitDimension());
+        logger.debugFiner("split " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
       }
       interval.split();
 
