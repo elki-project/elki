@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.utils;
+package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import java.util.List;
 
@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 
 /**
  * Draw the Voronoi cells
@@ -19,19 +18,18 @@ public class VoronoiDraw {
   /**
    * Draw the Delaunay triangulation.
    * 
+   * @param proj Projection
    * @param delaunay Triangulation
-   * @param projmeans Projected means
+   * @param means Means
    * @return Path
    */
-  public static SVGPath drawDelaunay(List<SweepHullDelaunay2D.Triangle> delaunay, List<Vector> projmeans) {
+  public static SVGPath drawDelaunay(Projection2D proj, List<SweepHullDelaunay2D.Triangle> delaunay, List<Vector> means) {
     final SVGPath path = new SVGPath();
     for(SweepHullDelaunay2D.Triangle del : delaunay) {
-      path.moveTo(projmeans.get(del.a));
-      path.drawTo(projmeans.get(del.b));
-      path.moveTo(projmeans.get(del.a));
-      path.drawTo(projmeans.get(del.c));
-      path.moveTo(projmeans.get(del.b));
-      path.drawTo(projmeans.get(del.c));
+      path.moveTo(proj.fastProjectDataToRenderSpace(means.get(del.a)));
+      path.drawTo(proj.fastProjectDataToRenderSpace(means.get(del.b)));
+      path.drawTo(proj.fastProjectDataToRenderSpace(means.get(del.c)));
+      path.close();
     }
     return path;
   }
@@ -44,17 +42,16 @@ public class VoronoiDraw {
    * @param means Cluster means
    * @return SVG path
    */
-  // TODO: remove Vector() wrapping.
   public static SVGPath drawVoronoi(Projection2D proj, List<SweepHullDelaunay2D.Triangle> delaunay, List<Vector> means) {
     final SVGPath path = new SVGPath();
     CanvasSize viewport = proj.estimateViewport();
     for(int i = 0; i < delaunay.size(); i++) {
       SweepHullDelaunay2D.Triangle del = delaunay.get(i);
-      final double[] projcx = proj.fastProjectDataToRenderSpace(new Vector(del.cx, del.cy));
+      final double[] projcx = proj.fastProjectDataToRenderSpace(del.m);
       if(del.ab > i) {
         Triangle oth = delaunay.get(del.ab);
         path.moveTo(projcx);
-        path.drawTo(proj.fastProjectDataToRenderSpace(new Vector(oth.cx, oth.cy)));
+        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m));
       }
       else if(del.ab < 0) {
         Vector dirv = means.get(del.a).minus(means.get(del.b)).rotate90Equals();
@@ -69,7 +66,7 @@ public class VoronoiDraw {
       if(del.bc > i) {
         Triangle oth = delaunay.get(del.bc);
         path.moveTo(projcx);
-        path.drawTo(proj.fastProjectDataToRenderSpace(new Vector(oth.cx, oth.cy)));
+        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m));
       }
       else if(del.bc < 0) {
         Vector dirv = means.get(del.b).minus(means.get(del.c)).rotate90Equals();
@@ -84,7 +81,7 @@ public class VoronoiDraw {
       if(del.ca > i) {
         Triangle oth = delaunay.get(del.ca);
         path.moveTo(projcx);
-        path.drawTo(proj.fastProjectDataToRenderSpace(new Vector(oth.cx, oth.cy)));
+        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m));
       }
       else if(del.ca < 0) {
         Vector dirv = means.get(del.c).minus(means.get(del.a)).rotate90Equals();
@@ -100,7 +97,7 @@ public class VoronoiDraw {
   }
 
   /**
-   * Fake voronoi. For two means only
+   * Fake Voronoi diagram. For two means only
    * 
    * @param proj Projection
    * @param means Mean vectors

@@ -181,7 +181,7 @@ public class SweepHullDelaunay2D {
     }
 
     // Resort from triangle center
-    Vector center = new Vector(besttri.cx, besttri.cy);
+    Vector center = besttri.m;
     for(int i = start; i < len; i++) {
       sort[i].first = quadraticEuclidean(center, points.get(sort[i].second));
     }
@@ -694,7 +694,12 @@ public class SweepHullDelaunay2D {
     /**
      * Circumcircle parameters
      */
-    public double r2 = -1, cx = 0, cy = 0;
+    public double r2 = -1;
+    
+    /**
+     * Center vector
+     */
+    public Vector m = new Vector(2);
 
     /**
      * Constructor.
@@ -761,8 +766,8 @@ public class SweepHullDelaunay2D {
      * @return true when contained
      */
     public boolean inCircle(Vector opp) {
-      double dx = opp.get(0) - cx;
-      double dy = opp.get(1) - cy;
+      double dx = opp.get(0) - m.get(0);
+      double dy = opp.get(1) - m.get(1);
       return (dx * dx + dy * dy) <= r2;
     }
 
@@ -856,8 +861,8 @@ public class SweepHullDelaunay2D {
       this.b = o.b;
       this.c = o.c;
       this.r2 = o.r2;
-      this.cx = o.cx;
-      this.cy = o.cy;
+      this.m.set(0, o.m.get(0));
+      this.m.set(1, o.m.get(1));
     }
 
     /**
@@ -897,8 +902,8 @@ public class SweepHullDelaunay2D {
         return false;
       }
 
-      cx = pa.get(0) + offx;
-      cy = pa.get(1) + offy;
+      m.set(0, pa.get(0) + offx);
+      m.set(1, pa.get(1) + offy);
       return true;
     }
 

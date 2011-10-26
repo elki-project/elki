@@ -116,7 +116,7 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
       ConvexHull2D hull = new ConvexHull2D();
 
       for(DBID clpnum : ids) {
-        double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum).getColumnVector());
+        double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum));
         hull.add(new Vector(projP));
       }
       Polygon chres = hull.getHull();
