@@ -33,17 +33,19 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
 
 /**
  * This class is a wrapper around {@link java.util.logging.Logger} and
- * {@link java.util.logging.LogManager} offering additional convenience functions.
+ * {@link java.util.logging.LogManager} offering additional convenience
+ * functions.
  * 
- * If a class keeps a static reference to the appropriate {@link Logging} object,
- * performance penalty compared to standard logging should be minimal.
+ * If a class keeps a static reference to the appropriate {@link Logging}
+ * object, performance penalty compared to standard logging should be minimal.
  * 
- * However when using {@link java.util.logging.LogRecord} directly instead of 
- * {@link ELKILogRecord}, the use of the {@link #log(LogRecord)} method will result in
- * incorrectly logged cause location. Therefore, use {@link ELKILogRecord}!
+ * However when using {@link java.util.logging.LogRecord} directly instead of
+ * {@link ELKILogRecord}, the use of the {@link #log(LogRecord)} method will
+ * result in incorrectly logged cause location. Therefore, use
+ * {@link ELKILogRecord}!
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.uses LoggingConfiguration
  * @apiviz.uses ELKILogRecord oneway - - «create»
  */
@@ -87,7 +89,7 @@ public class Logging {
   /**
    * Retrieve logging utility for a particular class.
    * 
-   * @param name Class name 
+   * @param name Class name
    * @return Logger
    */
   public synchronized static Logging getLogger(final String name) {
@@ -108,7 +110,7 @@ public class Logging {
   public boolean isLoggable(Level lev) {
     return logger.isLoggable(lev);
   }
-  
+
   /**
    * Test whether to log 'verbose'.
    * 
@@ -116,6 +118,17 @@ public class Logging {
    */
   public boolean isVerbose() {
     return logger.isLoggable(Level.INFO);
+  }
+
+  /**
+   * Test whether to log 'debug' at 'FINE' level.
+   * 
+   * This is the same as {@link #isDebuggingFine}
+   * 
+   * @return true if debug logging enabled
+   */
+  public boolean isDebug() {
+    return logger.isLoggable(Level.FINE);
   }
 
   /**
@@ -133,7 +146,18 @@ public class Logging {
    * Test whether to log 'debug' at 'FINE' level
    * 
    * This is the same as {@link #isDebugging}
-   *  
+   * 
+   * @return true if debug logging enabled
+   */
+  public boolean isDebugFine() {
+    return logger.isLoggable(Level.FINE);
+  }
+
+  /**
+   * Test whether to log 'debug' at 'FINE' level
+   * 
+   * This is the same as {@link #isDebugging}
+   * 
    * @return true if debug logging enabled
    */
   public boolean isDebuggingFine() {
@@ -145,8 +169,26 @@ public class Logging {
    * 
    * @return true if debug logging enabled
    */
+  public boolean isDebugFiner() {
+    return logger.isLoggable(Level.FINER);
+  }
+
+  /**
+   * Test whether to log 'debug' at 'FINER' level
+   * 
+   * @return true if debug logging enabled
+   */
   public boolean isDebuggingFiner() {
     return logger.isLoggable(Level.FINER);
+  }
+
+  /**
+   * Test whether to log 'debug' at 'FINEST' level
+   * 
+   * @return true if debug logging enabled
+   */
+  public boolean isDebugFinest() {
+    return logger.isLoggable(Level.FINEST);
   }
 
   /**
@@ -211,6 +253,19 @@ public class Logging {
   }
 
   /**
+   * Log a message at the 'severe' level.
+   * 
+   * @param message Warning log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void error(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
+    log(Level.SEVERE, message);
+  }
+
+  /**
    * Log a message at the 'warning' level.
    * 
    * @param message Warning log message.
@@ -226,6 +281,19 @@ public class Logging {
    * @param message Warning log message.
    */
   public void warning(CharSequence message) {
+    log(Level.WARNING, message);
+  }
+
+  /**
+   * Log a message at the 'warning' level.
+   * 
+   * @param message Warning log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void warning(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
     log(Level.WARNING, message);
   }
 
@@ -249,6 +317,21 @@ public class Logging {
    * @param message Informational log message.
    */
   public void verbose(CharSequence message) {
+    log(Level.INFO, message);
+  }
+
+  /**
+   * Log a message at the 'info' ('verbose') level.
+   * 
+   * You should check isVerbose() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void verbose(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
     log(Level.INFO, message);
   }
 
@@ -281,6 +364,21 @@ public class Logging {
    * You should check isDebugging() before building the message.
    * 
    * @param message Informational log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void debug(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
+    log(Level.FINE, message);
+  }
+
+  /**
+   * Log a message at the 'fine' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
    * @param e Exception
    */
   public void debugFine(CharSequence message, Throwable e) {
@@ -304,6 +402,21 @@ public class Logging {
    * You should check isDebugging() before building the message.
    * 
    * @param message Informational log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void debugFine(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
+    log(Level.FINE, message);
+  }
+
+  /**
+   * Log a message at the 'fine' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
    * @param e Exception
    */
   public void fine(CharSequence message, Throwable e) {
@@ -318,6 +431,21 @@ public class Logging {
    * @param message Informational log message.
    */
   public void fine(CharSequence message) {
+    log(Level.FINE, message);
+  }
+
+  /**
+   * Log a message at the 'fine' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void fine(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
     log(Level.FINE, message);
   }
 
@@ -350,6 +478,21 @@ public class Logging {
    * You should check isDebugging() before building the message.
    * 
    * @param message Informational log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void debugFiner(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
+    log(Level.FINER, message);
+  }
+
+  /**
+   * Log a message at the 'finer' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
    * @param e Exception
    */
   public void finer(CharSequence message, Throwable e) {
@@ -364,6 +507,21 @@ public class Logging {
    * @param message Informational log message.
    */
   public void finer(CharSequence message) {
+    log(Level.FINER, message);
+  }
+
+  /**
+   * Log a message at the 'finer' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void finer(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
     log(Level.FINER, message);
   }
 
@@ -396,6 +554,21 @@ public class Logging {
    * You should check isDebugging() before building the message.
    * 
    * @param message Informational log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void debugFinest(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
+    log(Level.FINEST, message);
+  }
+
+  /**
+   * Log a message at the 'finest' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
    * @param e Exception
    */
   public void finest(CharSequence message, Throwable e) {
@@ -410,6 +583,21 @@ public class Logging {
    * @param message Informational log message.
    */
   public void finest(CharSequence message) {
+    log(Level.FINEST, message);
+  }
+
+  /**
+   * Log a message at the 'finest' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param args Extra arguments ({@link String#format} style)
+   */
+  public void finest(String message, Object... args) {
+    if(args.length > 0) {
+      message = String.format(message, args);
+    }
     log(Level.FINEST, message);
   }
 
@@ -433,7 +621,7 @@ public class Logging {
   }
 
   /**
-   * Log a Progress object. 
+   * Log a Progress object.
    * 
    * @param pgr Progress to log.
    */
