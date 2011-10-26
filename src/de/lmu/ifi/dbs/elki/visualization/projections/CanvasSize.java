@@ -106,4 +106,29 @@ public class CanvasSize {
   public double getDiffY() {
     return maxy - miny;
   }
+
+  /**
+   * Continue a line along a given direction to the margin.
+   * 
+   * @param origin Origin point
+   * @param delta Direction vector
+   * @return scaling factor for delta vector
+   */
+  public double continueToMargin(double[] origin, double[] delta) {
+    assert (delta.length == 2 && origin.length == 2);
+    double factor = Double.POSITIVE_INFINITY;
+    if(delta[0] > 0) {
+      factor = Math.min(factor, (maxx - origin[0]) / delta[0]);
+    }
+    else if(delta[0] < 0) {
+      factor = Math.min(factor, (origin[0] - minx) / -delta[0]);
+    }
+    if(delta[1] > 0) {
+      factor = Math.min(factor, (maxy - origin[1]) / delta[1]);
+    }
+    else if(delta[1] < 0) {
+      factor = Math.min(factor, (origin[1] - miny) / -delta[1]);
+    }
+    return factor;
+  }
 }

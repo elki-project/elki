@@ -59,7 +59,7 @@ public class VoronoiDraw {
       else if(del.ab < 0) {
         Vector dirv = means.get(del.a).minus(means.get(del.b)).rotate90Equals();
         double[] dir = proj.fastProjectRelativeDataToRenderSpace(dirv);
-        final double factor = continueToMargin(projcx, dir, viewport);
+        final double factor = viewport.continueToMargin(projcx, dir);
         if(factor > 0) {
           path.moveTo(projcx);
           path.relativeLineTo(factor * dir[0], factor * dir[1]);
@@ -74,7 +74,7 @@ public class VoronoiDraw {
       else if(del.bc < 0) {
         Vector dirv = means.get(del.b).minus(means.get(del.c)).rotate90Equals();
         double[] dir = proj.fastProjectRelativeDataToRenderSpace(dirv);
-        final double factor = continueToMargin(projcx, dir, viewport);
+        final double factor = viewport.continueToMargin(projcx, dir);
         if(factor > 0) {
           path.moveTo(projcx);
           path.relativeLineTo(factor * dir[0], factor * dir[1]);
@@ -89,7 +89,7 @@ public class VoronoiDraw {
       else if(del.ca < 0) {
         Vector dirv = means.get(del.c).minus(means.get(del.a)).rotate90Equals();
         double[] dir = proj.fastProjectRelativeDataToRenderSpace(dirv);
-        final double factor = continueToMargin(projcx, dir, viewport);
+        final double factor = viewport.continueToMargin(projcx, dir);
         if(factor > 0) {
           path.moveTo(projcx);
           path.relativeLineTo(factor * dir[0], factor * dir[1]);
@@ -97,32 +97,6 @@ public class VoronoiDraw {
       }
     }
     return path;
-  }
-
-  /**
-   * Continue a line along a given direction to the margin.
-   * 
-   * @param origin Origin point
-   * @param delta Direction vector
-   * @param viewport Viewport
-   * @return scaling factor
-   */
-  private static double continueToMargin(double[] origin, double[] delta, CanvasSize viewport) {
-    assert (delta.length == 2 && origin.length == 2);
-    double factor = Double.POSITIVE_INFINITY;
-    if(delta[0] > 0) {
-      factor = Math.min(factor, (viewport.maxx - origin[0]) / delta[0]);
-    }
-    else if(delta[0] < 0) {
-      factor = Math.min(factor, (origin[0] - viewport.minx) / -delta[0]);
-    }
-    if(delta[1] > 0) {
-      factor = Math.min(factor, (viewport.maxy - origin[1]) / delta[1]);
-    }
-    else if(delta[1] < 0) {
-      factor = Math.min(factor, (origin[1] - viewport.miny) / -delta[1]);
-    }
-    return factor;
   }
 
   /**
@@ -142,12 +116,12 @@ public class VoronoiDraw {
     final Vector mean = (means.get(0).plus(means.get(1))).timesEquals(0.5);
     double[] projmean = proj.fastProjectDataToRenderSpace(mean);
 
-    double factor = continueToMargin(projmean, dir, viewport);
+    double factor = viewport.continueToMargin(projmean, dir);
     path.moveTo(projmean[0] + factor * dir[0], projmean[1] + factor * dir[1]);
     // Inverse direction:
     dir[0] *= -1;
     dir[1] *= -1;
-    factor = continueToMargin(projmean, dir, viewport);
+    factor = viewport.continueToMargin(projmean, dir);
     path.drawTo(projmean[0] + factor * dir[0], projmean[1] + factor * dir[1]);
     return path;
   }
