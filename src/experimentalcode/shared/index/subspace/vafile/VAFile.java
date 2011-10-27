@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -49,7 +50,6 @@ import experimentalcode.shared.index.subspace.structures.DiskMemory;
  */
 public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
   Logger log = Logger.getLogger(VAFile.class.getName());
-
   // Full data representation
   DiskMemory<V> data;
 
@@ -79,6 +79,8 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
   private int scanPageAccesses;
 
   public VAFile(int pageSize, Relation<V> relation, int partitions) {
+   
+    
     this.pageSize = pageSize;
 
     scannedBytes = 0;
@@ -103,6 +105,8 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
       }
       vectorApprox.add(va);
     }
+    
+   
   }
 
   public int getPageAccess() {
@@ -155,14 +159,14 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
                                                                      // will be
                                                                      // included
 
-      log.fine("dim " + (d + 1) + ": ");
+      log.finest("dim " + (d + 1) + ": ");
       for(int b = 0; b < splitPositions[d].length; b++) {
-        log.fine(splitPositions[d][b] + "  ");
+        log.finest(splitPositions[d][b] + "  ");
         if(b < splitPositions[d].length - 1) {
-          log.fine("(bucket " + (b + 1) + "/" + partitions + ", " + partitionCount[d][b] + ")  ");
+          log.finest("(bucket " + (b + 1) + "/" + partitions + ", " + partitionCount[d][b] + ")  ");
         }
       }
-      log.fine(null);
+      log.finest(null);
     }
   }
 
@@ -233,6 +237,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
     double minMaxDist = Double.POSITIVE_INFINITY;
 
     // filter step
+
     final int newBytesScanned = vectorApprox.size() * VectorApprox.byteOnDisk(query.getDimensionality(), partitions);
     scanPageAccesses += (int) Math.ceil(((double) newBytesScanned) / pageSize);
     scannedBytes += newBytesScanned;
@@ -254,22 +259,26 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
         candidates.add(va);
       }
       minMaxDist = Math.min(minMaxDist, maxDist);
+      
     }
 
     // refinement step
+
 
     List<DoubleDistanceResultPair> result = new ArrayList<DoubleDistanceResultPair>();
 
     // sort candidates by lower bound (minDist)
     candidates = VectorApprox.sortByMinDist(candidates);
-
+    log.fine("candidates size " + candidates.size());
     // retrieve accurate distances
-    for(int i = 0; i < candidates.size(); i++) {
+   for(int i = 0; i < candidates.size(); i++) {
+      
       VectorApprox<V> va = candidates.get(i);
       DoubleDistanceResultPair lastElement = null;
       if(!result.isEmpty())
         lastElement = result.get(result.size() - 1);
-      if(/* result.size() < k || */va.getPMinDist() < lastElement.getDoubleDistance()) {
+     
+      if(result.size() < k || va.getPMinDist() < lastElement.getDoubleDistance()) {
         V dv = data.getObject(va.getId());
         double dist = 0;
         for(int d = 0; d < dv.getDimensionality(); d++) {
@@ -284,13 +293,12 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
         Collections.sort(result, new DoubleDistanceResultPairComparator());
       }
     }
-
-    log.fine("\nquery = (" + query + ")");
-    log.fine("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
+    log.finest("\nquery = (" + query + ")");
+    log.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
 
     ModifiableDBIDs resultIDs = DBIDUtil.newArray(result.size());
     for(DoubleDistanceResultPair dp : result) {
-      log.fine(dp.toString());
+      log.finest(dp.toString());
       resultIDs.add(dp.getDBID());
     }
 
