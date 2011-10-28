@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalC
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
@@ -54,13 +55,20 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
    */
   private static final Logging logger = Logging.getLogger(HopkinsStatistic.class);
 
-  public static final OptionID SAMPLESIZE_ID = OptionID.getOrCreateOptionID("hopkins.samplesize", "Size of the datasample.");
+  public static final OptionID SAMPLESIZE_ID = OptionID.getOrCreateOptionID("hopkins.samplesizes", "List of the size of datasamples");
 
   /**
-   * The parameter sampleSize
+   * The parameter sampleSizes
    */
-  private int sampleSize;
+  private List<Integer> sampleSizes = new ArrayList<Integer>();
+  
+  /**
+   * Parameter to specify the number of repetitions of computing the hopkins value.
+   */
+  public static final OptionID REP_ID = OptionID.getOrCreateOptionID("hopkins.rep", "The number of repetitions.");
 
+  private int rep; 
+  
   /**
    * Parameter to specify the random generator seed.
    */
@@ -91,10 +99,11 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
    */
   private double[] minima = new double[0];
 
-  public HopkinsStatistic(PrimitiveDistanceFunction<? super V, D> distanceFunction, int sampleSize, Long seed, double[] minima, double[] maxima) {
+  public HopkinsStatistic(PrimitiveDistanceFunction<? super V, D> distanceFunction, List<Integer> sampleSizes, Long seed, int rep, double[] minima, double[] maxima) {
     super(distanceFunction);
-    this.sampleSize = sampleSize;
+    this.sampleSizes = sampleSizes;
     this.seed = seed;
+    this.rep = rep;
     this.minima = minima;
     this.maxima = maxima;
   }
@@ -106,8 +115,28 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     final DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final Random masterRandom = (this.seed != null) ? new Random(this.seed) : new Random();
     KNNQuery<V, D> knnQuery = database.getKNNQuery(distanceQuery, 2);
+    double hopkins;
+    DoubleDoublePair pair;
+    ArrayList<DoubleDoublePair> result = new ArrayList<DoubleDoublePair>();
 
-    // compute NN distances for random objects within the database
+    for(int i = 0; i < sampleSizes.size(); i++) {
+      int sampleSize = sampleSizes.get(i);
+      double h = 0;
+      logger.fine("rep" + rep);
+      //compute the hopkins value several times an use the average value for a more stable result
+      for(int j=0; j < this.rep; j++){
+        h += computeHopkinsValue(knnQuery, relation, masterRandom, sampleSize);
+      }
+      hopkins = h/this.rep;
+      // turn into result object
+      pair = new DoubleDoublePair(hopkins, sampleSize);
+      result.add(pair);
+    }
+    return new HopkinsResult(result);
+  }
+
+  private double computeHopkinsValue(KNNQuery<V, D> knnQuery, Relation<V> relation, Random masterRandom, int sampleSize) {
+    // compute NN distances for random objects from within the database
     ModifiableDBIDs dataSampleIds = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, masterRandom.nextLong());
     Iterator<DBID> iter2 = dataSampleIds.iterator();
     // k= 2 und dann natürlich 2. element aus liste holen sonst nächster nachbar
@@ -117,8 +146,8 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       b += knnQuery.getKNNForDBID(iter2.next(), 2).get(1).getDistance().doubleValue();
     }
 
-    // compute NN distances for uniform objects
-    Collection<V> uniformObjs = getUniformObjs(relation, masterRandom);
+    // compute NN distances for randomly created new uniform objects
+    Collection<V> uniformObjs = getUniformObjs(relation, masterRandom, sampleSize);
     Iterator<V> iter = uniformObjs.iterator();
     double a = knnQuery.getKNNForObject(iter.next(), 1).get(0).getDistance().doubleValue();
     while(iter.hasNext()) {
@@ -126,20 +155,13 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     }
 
     // compute hopkins statistik
-    double result = a / (a + b);
-    if(logger.isVerbose()) {
-      logger.verbose("uniform: " + a + "   dataset: " + b + "   result: " + result);
-    }
-    // turn into result object
-    DoubleDoublePair pair = new DoubleDoublePair(result, 0);
-    ArrayList<DoubleDoublePair> coll = new ArrayList<DoubleDoublePair>();
-    coll.add(pair);
-    return new HopkinsResult(coll);
+    double result = b / (a + b);
+    return result;
   }
 
-  public <T extends V> Collection<V> getUniformObjs(Relation<V> relation, Random masterRandom) {
+  public <T extends V> Collection<V> getUniformObjs(Relation<V> relation, Random masterRandom, int sampleSize) {
     int dim = DatabaseUtil.dimensionality(relation);
-    ArrayList<V> result = new ArrayList<V>(this.sampleSize);
+    ArrayList<V> result = new ArrayList<V>(sampleSize);
     double[] vec = new double[dim];
     Random[] randoms = new Random[dim];
     for(int i = 0; i < randoms.length; i++) {
@@ -154,8 +176,8 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       this.minima = new double[dim];
       this.maxima = new double[dim];
       for(int d = 0; d < dim; d++) {
-        minima[d] = minmax.first.doubleValue(d+1);
-        maxima[d] = minmax.second.doubleValue(d+1);
+        minima[d] = minmax.first.doubleValue(d + 1);
+        maxima[d] = minmax.second.doubleValue(d + 1);
       }
     }
     // if only one value for all dimensions set this value for each dimension
@@ -172,7 +194,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       }
     }
     // compute uniform objects
-    for(int i = 0; i < this.sampleSize; i++) {
+    for(int i = 0; i < sampleSize; i++) {
       for(int d = 0; d < dim; d++) {
         vec[d] = minima[d] + (randoms[d].nextDouble() * (maxima[d] - minima[d]));
       }
@@ -192,7 +214,6 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
-
 
   public static class HopkinsResult extends CollectionResult<DoubleDoublePair> {
 
@@ -216,8 +237,10 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
    */
   public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
 
-    protected Integer sampleSize;
-
+    protected List<Integer> sampleSizes;
+    
+    protected int rep;
+    
     protected Long seed;
 
     /**
@@ -233,10 +256,17 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter sample = new IntParameter(SAMPLESIZE_ID, new GreaterConstraint(0));
+      IntParameter r = new IntParameter(REP_ID, 1);
+      if(config.grab(r)) {
+        rep = r.getValue();
+      }
+      else{
+        rep = r.getDefaultValue();
+      }
+        
+      IntListParameter sample = new IntListParameter(SAMPLESIZE_ID);
       if(config.grab(sample)) {
-        sampleSize = sample.getValue();
+        sampleSizes = sample.getValue();
       }
       LongParameter seedP = new LongParameter(SEED_ID, true);
       if(config.grab(seedP)) {
@@ -267,7 +297,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
 
     @Override
     protected HopkinsStatistic<V, D> makeInstance() {
-      return new HopkinsStatistic<V, D>(distanceFunction, sampleSize, seed, minima, maxima);
+      return new HopkinsStatistic<V, D>(distanceFunction, sampleSizes, seed,rep, minima, maxima);
     }
   }
 }
