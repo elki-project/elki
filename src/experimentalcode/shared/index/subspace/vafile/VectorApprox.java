@@ -134,6 +134,12 @@ public class VectorApprox<V extends NumberVector<V, ?>> {
   private boolean approximationIsSet(int dim) {
     return approximation[dim] != -1;
   }
+  
+  public void resetPDists()
+  {
+	  minDist = 0;
+	  maxDist = 0;
+  }
 
   public void resetPMinDist() {
     minDist = 0;

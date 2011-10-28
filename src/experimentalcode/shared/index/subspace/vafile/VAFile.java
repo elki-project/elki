@@ -186,7 +186,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
       else if(i > queryCell)
         result[i] = lookup[dimension][i];
       else
-        result[i] = Math.min(lookup[dimension][i], lookup[dimension][i + 1]);
+        result[i] = 0;
     }
     return result;
   }
@@ -225,6 +225,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
     VectorApprox<V> queryApprox = new VectorApprox<V>(query.getDimensionality());
     try {
       queryApprox.calculateApproximation(query, splitPositions);
+      //System.out.println("*** query: "+query + " " +queryApprox);
     }
     catch(Exception e) {
       e.printStackTrace();
@@ -244,6 +245,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
 
     for(int i = 0; i < vectorApprox.size(); i++) {
       VectorApprox<V> va = vectorApprox.get(i);
+      va.resetPDists();
       double minDist = 0;
       double maxDist = 0;
       for(int d = 0; d < va.getApproximationSize(); d++) {
@@ -252,6 +254,9 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
         minDist += getMinDists(d, queryApproxDim)[vectorApproxDim];
         maxDist += getMaxDists(d, queryApproxDim)[vectorApproxDim];
       }
+      minDist = Math.pow(minDist, 1.0 / p);
+      maxDist = Math.pow(maxDist, 1.0 / p);
+      
       if(minDist < minMaxDist) // object has to be refined
       {
         va.increasePMinDist(minDist);
@@ -272,32 +277,36 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
     log.fine("candidates size " + candidates.size());
     // retrieve accurate distances
    for(int i = 0; i < candidates.size(); i++) {
-      
       VectorApprox<V> va = candidates.get(i);
       DoubleDistanceResultPair lastElement = null;
+      double lastDist = Double.POSITIVE_INFINITY;
+      
       if(!result.isEmpty())
-        lastElement = result.get(result.size() - 1);
+        {
+    	  lastElement = result.get(result.size() - 1);
+    	  lastDist = lastElement.getDoubleDistance();
+        }
      
-      if(result.size() < k || va.getPMinDist() < lastElement.getDoubleDistance()) {
+      // retrieve at least k elements while the min distances are smaller than the greatest accurate distance
+      if(result.size() < k || va.getPMinDist() < lastDist) {
         V dv = data.getObject(va.getId());
         double dist = 0;
         for(int d = 0; d < dv.getDimensionality(); d++) {
           dist += Math.pow(dv.doubleValue(d + 1) - query.doubleValue(d + 1), p);
         }
+        dist = Math.pow(dist, 1.0 / p);
         DoubleDistanceResultPair dp = new DoubleDistanceResultPair(dist, va.getId());
 
-        if(result.size() >= k)
-          result.remove(lastElement);
-
         result.add(dp);
-        Collections.sort(result, new DoubleDistanceResultPairComparator());
+    	Collections.sort(result, new DoubleDistanceResultPairComparator());
       }
     }
     log.finest("\nquery = (" + query + ")");
     log.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
 
     ModifiableDBIDs resultIDs = DBIDUtil.newArray(result.size());
-    for(DoubleDistanceResultPair dp : result) {
+    for(int i=0; i<k; i++) {
+    	DoubleDistanceResultPair dp = result.get(i);
       log.finest(dp.toString());
       resultIDs.add(dp.getDBID());
     }
