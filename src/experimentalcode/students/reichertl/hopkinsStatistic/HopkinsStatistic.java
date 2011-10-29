@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -118,18 +119,16 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     double hopkins;
     DoubleDoublePair pair;
     ArrayList<DoubleDoublePair> result = new ArrayList<DoubleDoublePair>();
-
+    MeanVariance mv = new MeanVariance();
     for(int i = 0; i < sampleSizes.size(); i++) {
       int sampleSize = sampleSizes.get(i);
-      double h = 0;
-      logger.fine("rep" + rep);
-      //compute the hopkins value several times an use the average value for a more stable result
+      //compute the hopkins value several times and use the average value for a more stable result
       for(int j=0; j < this.rep; j++){
-        h += computeHopkinsValue(knnQuery, relation, masterRandom, sampleSize);
+        mv.put(computeHopkinsValue(knnQuery, relation, masterRandom, sampleSize));
       }
-      hopkins = h/this.rep;
+      logger.fine("hopkins " + mv.getMean() + " samplesize " + sampleSize);
       // turn into result object
-      pair = new DoubleDoublePair(hopkins, sampleSize);
+      pair = new DoubleDoublePair(mv.getMean(), mv.getSampleVariance());
       result.add(pair);
     }
     return new HopkinsResult(result);
@@ -139,6 +138,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     // compute NN distances for random objects from within the database
     ModifiableDBIDs dataSampleIds = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, masterRandom.nextLong());
     Iterator<DBID> iter2 = dataSampleIds.iterator();
+    
     // k= 2 und dann natürlich 2. element aus liste holen sonst nächster nachbar
     // von q immer q
     double b = knnQuery.getKNNForDBID(iter2.next(), 2).get(1).getDistance().doubleValue();
