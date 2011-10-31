@@ -33,15 +33,22 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -74,18 +81,30 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
   private final static String CSS_MEAN = "mean-marker";
 
   /**
+   * CSS class name for center of the means
+   */
+  private final static String CSS_MEAN_STAR = "mean-star";
+
+  /**
    * Clustering to visualize.
    */
   Clustering<MeanModel<NV>> clustering;
 
   /**
-   * Constructor.
-   *
-   * @param task Visualization task
+   * Draw stars
    */
-  public ClusterMeanVisualization(VisualizationTask task) {
+  boolean stars;
+
+  /**
+   * Constructor.
+   * 
+   * @param task Visualization task
+   * @param stars Draw stars
+   */
+  public ClusterMeanVisualization(VisualizationTask task, boolean stars) {
     super(task);
     this.clustering = task.getResult();
+    this.stars = stars;
     context.addContextChangeListener(this);
     incrementalRedraw();
   }
@@ -98,7 +117,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
     double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
 
     Iterator<Cluster<MeanModel<NV>>> ci = clustering.getAllClusters().iterator();
-    for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
+    for(int cnum = 0; ci.hasNext(); cnum++) {
       Cluster<MeanModel<NV>> clus = ci.next();
       double[] mean = proj.fastProjectDataToRenderSpace(clus.getModel().getMean());
 
@@ -114,6 +133,18 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
 
       layer.appendChild(meanMarkerCenter);
       layer.appendChild(meanMarkerCenter2);
+
+      if(stars) {
+        SVGPath star = new SVGPath();
+        for(DBID id : clus.getIDs()) {
+          double[] obj = proj.fastProjectDataToRenderSpace(rel.get(id));
+          star.moveTo(mean);
+          star.drawTo(obj);
+        }
+        Element stare = star.makeElement(svgp);
+        SVGUtil.setCSSClass(stare, CSS_MEAN_STAR + "_" + cnum);
+        layer.appendChild(stare);
+      }
     }
   }
 
@@ -124,15 +155,30 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
    */
   private void addCSSClasses(SVGPlot svgp) {
     if(!svgp.getCSSClassManager().contains(CSS_MEAN_CENTER)) {
-      CSSClass center = new CSSClass(svgp, CSS_MEAN_CENTER);
+      CSSClass center = new CSSClass(this, CSS_MEAN_CENTER);
       center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.DEFAULT));
       center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.AXIS_TICK) / 2);
       svgp.addCSSClassOrLogError(center);
     }
     if(!svgp.getCSSClassManager().contains(CSS_MEAN)) {
-      CSSClass center = new CSSClass(svgp, CSS_MEAN);
+      CSSClass center = new CSSClass(this, CSS_MEAN);
       center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.7");
       svgp.addCSSClassOrLogError(center);
+    }
+    if(stars) {
+      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+
+      Iterator<Cluster<MeanModel<NV>>> ci = clustering.getAllClusters().iterator();
+      for(int cnum = 0; ci.hasNext(); cnum++) {
+        ci.next();
+        if(!svgp.getCSSClassManager().contains(CSS_MEAN_STAR + "_" + cnum)) {
+          CSSClass center = new CSSClass(this, CSS_MEAN_STAR + "_" + cnum);
+          center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(cnum));
+          center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+          center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.7");
+          svgp.addCSSClassOrLogError(center);
+        }
+      }
     }
   }
 
@@ -149,15 +195,32 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
-     * Constructor
+     * Option ID for visualization of cluster means.
+     * 
+     * <pre>
+     * -cluster.stars
+     * </pre>
      */
-    public Factory() {
+    public static final OptionID STARS_ID = OptionID.getOrCreateOptionID("cluster.stars", "Visualize mean-based clusters using stars.");
+
+    /**
+     * Draw stars
+     */
+    private boolean stars;
+
+    /**
+     * Constructor.
+     * 
+     * @param stars Draw stars
+     */
+    public Factory(boolean stars) {
       super();
+      this.stars = stars;
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusterMeanVisualization<NV>(task);
+      return new ClusterMeanVisualization<NV>(task, stars);
     }
 
     @Override
@@ -194,6 +257,31 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
         return (Clustering<MeanModel<NV>>) c;
       }
       return null;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      protected boolean stars = false;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        Flag starsF = new Flag(STARS_ID);
+        if(config.grab(starsF)) {
+          stars = starsF.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(stars);
+      }
     }
   }
 }
