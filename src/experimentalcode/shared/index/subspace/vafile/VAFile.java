@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import experimentalcode.shared.index.subspace.structures.DiskMemory;
 
 /**
@@ -89,8 +90,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
 
     setPartitions(relation, partitions);
 
-    DBID sampleID = relation.getDBIDs().iterator().next();
-    int dimensions = relation.get(sampleID).getDimensionality();
+    int dimensions = DatabaseUtil.dimensionality(relation);
     data = new DiskMemory<V>(pageSize / (8 * dimensions + 4), bufferSize);
     vectorApprox = new ArrayList<VectorApprox<V>>();
     for(DBID id : relation.getDBIDs()) {
@@ -117,8 +117,8 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
     if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2)))
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
 
-    DBID sampleID = objects.getDBIDs().iterator().next();
-    int dimensions = objects.get(sampleID).getDimensionality();
+    
+    int dimensions = DatabaseUtil.dimensionality(objects);
     splitPositions = new double[dimensions][partitions + 1];
     int[][] partitionCount = new int[dimensions][partitions];
     this.partitions = partitions;
@@ -274,7 +274,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
 
     // sort candidates by lower bound (minDist)
     candidates = VectorApprox.sortByMinDist(candidates);
-    log.fine("candidates size " + candidates.size());
+//    log.fine("candidates size " + candidates.size());
     // retrieve accurate distances
    for(int i = 0; i < candidates.size(); i++) {
       VectorApprox<V> va = candidates.get(i);
