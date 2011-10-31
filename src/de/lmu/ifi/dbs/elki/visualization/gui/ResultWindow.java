@@ -112,11 +112,6 @@ public class ResultWindow extends JFrame implements ResultListener {
   private JMenu visualizersMenu;
 
   /**
-   * The "Visualizers options" button, to configure visualizers
-   */
-  private JMenu visualizersOptionsMenu;
-
-  /**
    * The SVG canvas.
    */
   private JSVGSynchronizedCanvas svgCanvas;
@@ -219,9 +214,6 @@ public class ResultWindow extends JFrame implements ResultListener {
     visualizersMenu = new JMenu("Visualizers");
     visualizersMenu.setMnemonic(KeyEvent.VK_V);
     menubar.add(visualizersMenu);
-
-    visualizersOptionsMenu = new JMenu("Visualizers Options");
-    menubar.add(visualizersOptionsMenu);
 
     panel.add("North", menubar);
 
@@ -367,7 +359,6 @@ public class ResultWindow extends JFrame implements ResultListener {
    * Update the visualizer menus.
    */
   private void updateVisualizerMenus() {
-    visualizersOptionsMenu.removeAll();
     visualizersMenu.removeAll();
     ResultHierarchy hier = context.getHierarchy();
     for(Result child : hier.getChildren(result)) {
