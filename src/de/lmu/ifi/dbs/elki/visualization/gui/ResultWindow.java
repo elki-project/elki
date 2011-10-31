@@ -112,6 +112,11 @@ public class ResultWindow extends JFrame implements ResultListener {
   private JMenu visualizersMenu;
 
   /**
+   * The "Visualizers options" button, to configure visualizers
+   */
+  private JMenu visualizersOptionsMenu;
+
+  /**
    * The SVG canvas.
    */
   private JSVGSynchronizedCanvas svgCanvas;
@@ -158,7 +163,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     catch(Exception e) {
       // Ignore - icon not found is not fatal.
     }
-    
+
     // setup buttons
     exportItem = new JMenuItem("Export");
     exportItem.setMnemonic(KeyEvent.VK_E);
@@ -214,6 +219,9 @@ public class ResultWindow extends JFrame implements ResultListener {
     visualizersMenu = new JMenu("Visualizers");
     visualizersMenu.setMnemonic(KeyEvent.VK_V);
     menubar.add(visualizersMenu);
+
+    visualizersOptionsMenu = new JMenu("Visualizers Options");
+    menubar.add(visualizersOptionsMenu);
 
     panel.add("North", menubar);
 
@@ -359,6 +367,7 @@ public class ResultWindow extends JFrame implements ResultListener {
    * Update the visualizer menus.
    */
   private void updateVisualizerMenus() {
+    visualizersOptionsMenu.removeAll();
     visualizersMenu.removeAll();
     ResultHierarchy hier = context.getHierarchy();
     for(Result child : hier.getChildren(result)) {
@@ -384,7 +393,8 @@ public class ResultWindow extends JFrame implements ResultListener {
         nochildren = false;
       }
     }
-    // Item for a visualizer
+
+    // Item for the visualizer
     JMenuItem item = makeMenuItemForVisualizer(r);
     if(nochildren) {
       if(item != null) {
@@ -402,12 +412,15 @@ public class ResultWindow extends JFrame implements ResultListener {
       }
       parent.add(submenu);
     }
+
     return true;
   }
 
   public JMenuItem makeMenuItemForVisualizer(Result r) {
     if(VisualizationTask.class.isInstance(r)) {
       final VisualizationTask v = (VisualizationTask) r;
+      JMenuItem item;
+
       // Currently enabled?
       final String name = v.getLongName();
       boolean enabled = VisualizerUtil.isVisible(v);
@@ -426,7 +439,7 @@ public class ResultWindow extends JFrame implements ResultListener {
             });
           }
         });
-        return visItem;
+        item = visItem;
       }
       else {
         final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
@@ -442,7 +455,17 @@ public class ResultWindow extends JFrame implements ResultListener {
             });
           }
         });
-        return visItem;
+        item = visItem;
+      }
+      boolean hasoptions = VisualizerUtil.hasOptions(v);
+      if(hasoptions) {
+        final JMenu menu = new JMenu(name);
+        menu.add(item);
+        // TODO: build a menu for the visualizer!
+        return menu;
+      }
+      else {
+        return item;
       }
     }
     return null;
