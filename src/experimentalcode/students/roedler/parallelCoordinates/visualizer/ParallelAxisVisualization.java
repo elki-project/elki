@@ -48,7 +48,7 @@ public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends P
     try {
       for(int i = 0; i < dim; i++){
         if (proj.isVisible(i)){
-          SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(i), proj.getXpos(i), proj.getMarginY(), proj.getXpos(i), proj.getMarginY() + proj.getAxisHeight(), true, context.getStyleLibrary());
+          SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(i), proj.getXpos(i), proj.getMarginY(), proj.getXpos(i), proj.getMarginY() + proj.getAxisHeight(), true, context.getStyleLibrary(), proj.isInverted(i), proj.getScale());
         }
       }
       
@@ -103,7 +103,7 @@ public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends P
     @Override
     public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
-      return false;
+      return true;
     }
 
   }

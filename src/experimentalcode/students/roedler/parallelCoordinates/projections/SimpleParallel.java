@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.AbstractProjection;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 public class SimpleParallel extends AbstractProjection implements ProjectionParallel {
-  
+
   /**
    * Number of dimensions
    */
@@ -38,6 +38,11 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   int visDims;
   
   /**
+   * Scale
+   */
+  final double Scale;
+  
+  /**
    * which dimensions are visible
    */
   boolean[] isVisible;
@@ -48,12 +53,20 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   int[] dimOrder;
   
   /**
+   * dimension inverted?
+   */
+  boolean[] inverted;
+  
+  /**
    * Constructor.
    * 
    * @param scales Scales to use
    */
-  
   public SimpleParallel(LinearScale[] scales, int dims, double[] margin, double[] size, double axisHeight){
+    this(scales, dims, margin, size, axisHeight, 100.0);
+  }
+  
+  public SimpleParallel(LinearScale[] scales, int dims, double[] margin, double[] size, double axisHeight, double Scale){
     super(scales);
     this.dims = dims;
     dist = (size[0] - 2 * margin[0]) / (double)(dims - 1);
@@ -61,6 +74,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     this.size = size;
     this.axisHeight = axisHeight;
     this.visDims = dims;
+    this.Scale = Scale;
     isVisible = new boolean[dims];
     for (int i = 0; i < isVisible.length; i++){
       isVisible[i] = true;
@@ -69,6 +83,11 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     for (int i = 0; i < dimOrder.length; i++){
       dimOrder[i] = i;
     }
+    inverted = new boolean[dims];
+    for (int i = 0; i < inverted.length; i++){
+      inverted[i] = false;
+    }
+    
   }
   
   public int getFirstVisibleDimension(){
@@ -93,7 +112,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
   
   private void calcAxisPositions(){
-    dist = (size[0] - 2 * margin[0]) / (double)(dims -(dims - (visDims - 1)));
+    dist = ((size[0] - 2 * margin[0]) / (double)(dims -(dims - (visDims - 1))));
   }
   
   @Override
@@ -117,7 +136,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
         notvis++;
       }
     }
-    return margin[0] + (dim - notvis) * dist;
+    return (margin[0] + (dim - notvis) * dist);
   }
   
   public boolean isVisible(int dim){
@@ -148,7 +167,12 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     Vector ret = new Vector(v.getDimensionality());
     //ret.set(1, v.get(1));
     for (int i = 0; i < v.getDimensionality(); i++) {
-      ret.set(i, (axisHeight + margin[1]) - v.get(i) * axisHeight);
+      if (inverted[i]){
+        ret.set(i, margin[1] + v.get(i) * axisHeight);
+      }
+      else {
+        ret.set(i, (axisHeight + margin[1]) - v.get(i) * axisHeight);
+      }
     }
     return sortDims(ret);
   }
@@ -157,7 +181,12 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   public Vector projectRenderToScaled(Vector v) {
     Vector ret = new Vector(v.getDimensionality());
     for (int i = 0; i < v.getDimensionality(); i++){
-      ret.set(i, ((v.get(i) - margin[1]) + axisHeight) / axisHeight);
+      if (inverted[i]){
+        ret.set(i, (v.get(i) - margin[1]) / axisHeight);
+      }
+      else{
+        ret.set(i, (Math.abs(v.get(i) - margin[1]) - axisHeight) / axisHeight);
+      }
     }
     return sortDims(ret);
   }
@@ -259,7 +288,10 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   @Override
   public double projectDimension(int dim, double value) {
     double temp = scales[dimOrder[dim]].getScaled(value);
-    return (axisHeight + margin[1]) - temp * axisHeight;
+    if (inverted[dimOrder[dim]]){
+      return margin[1] + temp * axisHeight;
+    }
+    return ((axisHeight + margin[1]) - temp * axisHeight);
   }
 
   @Override
@@ -328,5 +360,29 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     }
     return dim;
   }
+
+  @Override
+  public void setInverted(int dim) {
+    inverted[dimOrder[dim]] = !inverted[dimOrder[dim]];
+    
+  }
+
+  @Override
+  public void setInverted(int dim, boolean bool) {
+    inverted[dimOrder[dim]] = bool;
+    
+  }
+
+  @Override
+  public boolean isInverted(int dim) {
+    return inverted[dimOrder[dim]];
+  }
+
+  @Override
+  public double getScale() {
+    return Scale;
+  }
+  
+  
   
 }

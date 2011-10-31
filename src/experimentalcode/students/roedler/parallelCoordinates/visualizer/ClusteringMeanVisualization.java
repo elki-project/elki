@@ -156,7 +156,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
       for(@SuppressWarnings("unused")
       Cluster<?> cluster : clustering.getAllClusters()) {
         CSSClass cls = new CSSClass(this, CLUSTERMEAN + clusterID);
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) * 2.0);
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / (proj.getScale() / 2.));
 
         if(clustering.getAllClusters().size() == 1) {
           color = "black";
@@ -268,7 +268,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
           Iterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
           for(ParallelPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
             final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 4);
+            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 5);
             baseResult.getHierarchy().add(c, task);
             baseResult.getHierarchy().add(p, task);
           }
