@@ -42,4 +42,12 @@ public interface ProjectionParallel extends Projection {
   public double getSizeX();
   
   public double getSizeY();
+  
+  public void setInverted(int dim);
+  
+  public void setInverted(int dim, boolean bool);
+  
+  public boolean isInverted(int dim);
+  
+  public double getScale();
 }

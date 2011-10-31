@@ -112,22 +112,18 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
         double xpos = proj.getXpos(i) - bhs / 2.;        
         
         border = svgp.svgRect(xpos, ypos, bhs, bhs);
-    //    border = svgp.svgRect(xpos, 115.5, 3.0, 3.0);
         SVGUtil.addCSSClass(border, SAV_BORDER);
         layer.appendChild(border);
       
         Element cross = svgp.svgLine(xpos + cs, ypos + cs, xpos + cs + qs, ypos + cs + qs);
-    //    Element cross = svgp.svgLine(xpos + 0.5, 116.0, xpos + 2.5, 118.0);
         SVGUtil.addCSSClass(cross, SAV_CROSS);
         layer.appendChild(cross);
         
         Element cross2 = svgp.svgLine(xpos + cs + qs, ypos + cs, xpos + cs, ypos + cs + qs);
-    //    Element cross2 = svgp.svgLine(xpos + 2.5, 116.0, xpos + 0.5, 118.0);
         SVGUtil.addCSSClass(cross2, SAV_CROSS);
         layer.appendChild(cross2);
       
         rect[c] = svgp.svgRect(xpos, ypos, bhs, bhs);
-    //    rect[c] = svgp.svgRect(xpos, 115.5, 3.0, 3.0);
         SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
         addEventListener(rect[c], c);
         layer.appendChild(rect[c]);
@@ -149,18 +145,15 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     if (notvis > 2 && ((last == 0 && ls) || vis == dim)){
 
       dist = (cs + qs) * 2.;
-      // dist = 5.0;
       
       if (vis == dim){
       
         for (int j = 0; j < notvis; j++){
           border = svgp.svgRect(proj.getXpos(last) + dist - hbs, ypos - j * dist, bhs, bhs);
-          //border = svgp.svgRect(proj.getXpos(last) +  dist - 1.5, 115.5 - j * 5.0, 3.0, 3.0);
           SVGUtil.addCSSClass(border, SAV_BORDER);
           layer.appendChild(border);
           
           rect[c] = svgp.svgRect(proj.getXpos(last) + dist - hbs, ypos - j * dist, bhs, bhs);
-          //rect[c] = svgp.svgRect(proj.getXpos(last) + dist - 1.5, 115.5 - j * 5.0, 3.0, 3.0);
           SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
           addEventListener(rect[c], c);
           layer.appendChild(rect[c]);
@@ -168,14 +161,13 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
         }
       }
       else {
+        double xpos = 0.;
         for (int j = 0; j < notvis; j++){
-          border = svgp.svgRect(proj.getXpos(last) + dist - hbs, (ypos - (notvis - 1) * dist) + j * dist, bhs, bhs);
-         // border = svgp.svgRect(proj.getXpos(last) +  dist - 1.5, (115.5 - (notvis - 1) * 5.0) + j * 5.0, 3.0, 3.0);
+          border = svgp.svgRect(xpos + dist - hbs, (ypos - (notvis - 1) * dist) + j * dist, bhs, bhs);
           SVGUtil.addCSSClass(border, SAV_BORDER);
           layer.appendChild(border);
           
-          rect[c] = svgp.svgRect(proj.getXpos(last) + dist - hbs, (ypos - (notvis - 1) * dist) + j * dist, bhs, bhs);
-          //rect[c] = svgp.svgRect(proj.getXpos(last) + dist - 1.5, (115.5 - (notvis - 1) * 5.0) + j * 5.0, 3.0, 3.0);
+          rect[c] = svgp.svgRect(xpos + dist - hbs, (ypos - (notvis - 1) * dist) + j * dist, bhs, bhs);
           SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
           addEventListener(rect[c], c);
           layer.appendChild(rect[c]);
@@ -184,16 +176,18 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
       }
     }
     else {
+      double xpos = proj.getXpos(last);
+      if (xpos < 0.){xpos = 0.;}
       if (vis == dim) { dist = proj.getMarginX() / (notvis + 1.); } //dist = 10.0 / (notvis + 1); }
-      else { dist = (proj.getXpos(vis) - proj.getXpos(last)) / ((double)notvis + 1.0); }
-  
+      else { dist = (proj.getXpos(vis) - xpos) / ((double)notvis + 1.0); }
+      
       for (int j = 0; j < notvis; j++){
-        border = svgp.svgRect(proj.getXpos(last) + (1 + j) * dist - hbs, ypos, bhs, bhs);
+        border = svgp.svgRect(xpos + (1 + j) * dist - hbs, ypos, bhs, bhs);
         //border = svgp.svgRect(proj.getXpos(last) + (1 + j) * dist - 1.5, 115.5, 3.0, 3.0);
         SVGUtil.addCSSClass(border, SAV_BORDER);
         layer.appendChild(border);
         
-        rect[c] = svgp.svgRect(proj.getXpos(last) + (1 + j) * dist - hbs, ypos, bhs, bhs);
+        rect[c] = svgp.svgRect(xpos + (1 + j) * dist - hbs, ypos, bhs, bhs);
         //rect[c] = svgp.svgRect(proj.getXpos(last) + (1 + j) * dist - 1.5, 115.5, 3.0, 3.0);
         SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
         addEventListener(rect[c], c);
@@ -243,7 +237,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     if(!svgp.getCSSClassManager().contains(SAV_BORDER)) {
       CSSClass cls = new CSSClass(this, SAV_BORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 2.0);
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() * 2.));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
@@ -256,7 +250,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     if(!svgp.getCSSClassManager().contains(SAV_CROSS)) {
       CSSClass cls = new CSSClass(this, SAV_CROSS);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() * 1.5));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }

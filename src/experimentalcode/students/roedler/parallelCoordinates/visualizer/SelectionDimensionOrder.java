@@ -58,12 +58,8 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
    */
   public static final String SDO_ARROW = "SDOarrow";
   
-  private Element border;
-  private Element[] rect;
-  private int c;
   private int selecteddim = -1;
   private boolean selected = false;
-  private boolean hide = true;
   
   /**
    * Constructor.
@@ -91,79 +87,50 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     double qas = as / 4.;
     double ypos = proj.getMarginY() * 2. + proj.getAxisHeight();
     double dist = 2.5 * as; 
-    
-    double xpos = proj.getMarginX() / 2.;
-    if (hide){
-      
-     // Element back = svgp.svgRect(xpos - 3.0, 120.0, 6., 4.0);
-      Element back = svgp.svgRect(0.0, ypos, proj.getMarginX(), proj.getSizeY() / 35.);
-      SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
-      layer.appendChild(back);
-      arrow = getArrow(2, xpos, ypos + as, as);
-      SVGUtil.addCSSClass(arrow, SDO_ARROW);
-      layer.appendChild(arrow);
-      Element rect = svgp.svgRect(xpos - hbs, ypos + qas, bs, bs);
-      SVGUtil.addCSSClass(rect, SDO_BUTTON);
-      addEventListener(rect, -1, -1);
-      layer.appendChild(rect);
-    }
-    else {
-     // Element back = svgp.svgRect(proj.getXpos(0) - 8.0, 120.0, (proj.getXpos(proj.getLastVisibleDimension()) - proj.getMarginX()) + 16.0, 4.0);
+
       Element back = svgp.svgRect(0.0, (proj.getMarginY() * 2. + proj.getAxisHeight()), proj.getSizeX(), proj.getSizeY() / 35.);
       SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
       layer.appendChild(back);
-      Element line = svgp.svgLine(xpos + xpos / 3., ypos, xpos + xpos / 3., ypos + as * 2.);
-      SVGUtil.addCSSClass(line, SDO_ARROW);
-      layer.appendChild(line);
-      arrow = getArrow(0, xpos -1., ypos + as, as);
-      SVGUtil.addCSSClass(arrow, SDO_ARROW);
-      layer.appendChild(arrow);
-      Element rect = svgp.svgRect(xpos - hbs, ypos + qas, bs, bs);
-      SVGUtil.addCSSClass(rect, SDO_BUTTON);
-      addEventListener(rect, -1, -1);
-      layer.appendChild(rect);
       
-      for (int i = 0; i < dim; i++){
-        if (proj.isVisible(i)){
-          if (!selected){
-            int j = 0;
-            int end = 3;
-            if(i == 0){j = 1; }
-            if (i == proj.getLastVisibleDimension()){end = 2; }
-            for (; j < end; j++){
-              arrow = getArrow(j, (proj.getXpos(i) - dist) + j * dist, ypos + as, as);
-              SVGUtil.addCSSClass(arrow, SDO_ARROW);
-              layer.appendChild(arrow);
-              button = svgp.svgRect((proj.getXpos(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
-              SVGUtil.addCSSClass(button, SDO_BUTTON);
-              addEventListener(button, i, j);
-              layer.appendChild(button);
-            }
-          }
-          else{
-            arrow = getArrow(3, proj.getXpos(i), ypos + as, as);
+    for (int i = 0; i < dim; i++){
+      if (proj.isVisible(i)){
+        if (!selected){
+          int j = 0;
+          int end = 3;
+          if(i == 0 || i == proj.getFirstVisibleDimension()){j = 1; }
+          if (i == proj.getLastVisibleDimension()){end = 2; }
+          for (; j < end; j++){
+            arrow = getArrow(j, (proj.getXpos(i) - dist) + j * dist, ypos + as, as);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            button = svgp.svgRect((proj.getXpos(i) - hbs) , ypos + qas, bs, bs);
+            button = svgp.svgRect((proj.getXpos(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
-            addEventListener(button, i, 3);
+            addEventListener(button, i, j);
             layer.appendChild(button);
-            
-            if (last > 0.){
-              arrow = getArrow(3, last + ((proj.getXpos(i)) - last) / 2., ypos + as, as);
-              SVGUtil.addCSSClass(arrow, SDO_ARROW);
-              layer.appendChild(arrow);
-              button = svgp.svgRect(last + (((proj.getXpos(i)) - last) / 2.) - hbs, ypos + qas, bs, bs);
-              SVGUtil.addCSSClass(button, SDO_BUTTON);
-              addEventListener(button, i, 4);
-              layer.appendChild(button);
-            }
-            last = proj.getXpos(i);
           }
+        }
+        else{
+          arrow = getArrow(3, proj.getXpos(i), ypos + as, as);
+          SVGUtil.addCSSClass(arrow, SDO_ARROW);
+          layer.appendChild(arrow);
+          button = svgp.svgRect((proj.getXpos(i) - hbs) , ypos + qas, bs, bs);
+          SVGUtil.addCSSClass(button, SDO_BUTTON);
+          addEventListener(button, i, 3);
+          layer.appendChild(button);
+          
+          if (last > 0.){
+            arrow = getArrow(3, last + ((proj.getXpos(i)) - last) / 2., ypos + as, as);
+            SVGUtil.addCSSClass(arrow, SDO_ARROW);
+            layer.appendChild(arrow);
+            button = svgp.svgRect(last + (((proj.getXpos(i)) - last) / 2.) - hbs, ypos + qas, bs, bs);
+            SVGUtil.addCSSClass(button, SDO_BUTTON);
+            addEventListener(button, i, 4);
+            layer.appendChild(button);
+          }
+          last = proj.getXpos(i);
         }
       }
     }
-    
   }
   
   /**
@@ -178,9 +145,9 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
       @Override
       public void handleEvent(Event evt) {
    
-        if (i == -1){
+ /*       if (i == -1){
           hide = !hide;
-        }
+        }*/
         if (j == 1){
           selected = true;
           selecteddim = i;
@@ -271,7 +238,7 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     if(!svgp.getCSSClassManager().contains(SDO_BORDER)) {
       CSSClass cls = new CSSClass(this, SDO_BORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 2.0);
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() *2.0));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
@@ -284,7 +251,7 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     if(!svgp.getCSSClassManager().contains(SDO_ARROW)) {
       CSSClass cls = new CSSClass(this, SDO_ARROW);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_DARKGREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() * 1.5));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
