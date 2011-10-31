@@ -91,6 +91,18 @@ public final class VisualizerUtil {
   }
 
   /**
+   * Utility function to test for a visualizer having options.
+   * 
+   * @param vis Visualizer to test
+   * @return true when it has options
+   */
+  public static boolean hasOptions(VisualizationTask vis) {
+    // Currently enabled?
+    Boolean hasoptions = vis.getGenerics(VisualizationTask.META_HAS_OPTIONS, Boolean.class);
+    return (hasoptions != null) && hasoptions;
+  }
+
+  /**
    * Filter for number vector field representations
    * 
    * @param result Result to filter

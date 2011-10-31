@@ -105,6 +105,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   public static final String META_TOOL = "tool";
 
   /**
+   * Indicate whether this task has options.
+   */
+  public static final String META_HAS_OPTIONS = "has-options";
+
+  /**
    * Background layer
    */
   public final static int LEVEL_BACKGROUND = 0;
