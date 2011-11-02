@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**

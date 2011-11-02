@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /*
  This file is part of ELKI:
@@ -106,6 +106,6 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
 
   @Override
   public V newInstance(double[] values) {
-    return newInstance(values, ArrayUtil.DOUBLE_ARRAY_ADAPTER);
+    return newInstance(values, ArrayLikeUtil.doubleArrayAdapter());
   }
 }

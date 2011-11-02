@@ -4,8 +4,8 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.FeatureVectorAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.SubsetArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter;
 
 /**
  * Projection class for number vectors.
@@ -38,7 +38,7 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> extends Abstract
    * @param factory Object factory
    */
   public FeatureSelection(int[] dims, V factory) {
-    super(new SubsetArrayAdapter<F, V>(FeatureVectorAdapter.getStatic((V) null), dims));
+    super(new SubsetArrayAdapter<F, V>(ArrayLikeUtil.featureVectorAdapter((V) null), dims));
     this.factory = factory;
     this.dimensionality = dims.length;
 

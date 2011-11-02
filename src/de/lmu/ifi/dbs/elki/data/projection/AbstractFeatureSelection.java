@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
  */
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.SubsetArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter;
 
 /**
  * Abstract feature selection projection

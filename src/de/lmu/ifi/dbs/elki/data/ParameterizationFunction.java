@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * A parameterization function describes all lines in a d-dimensional feature
