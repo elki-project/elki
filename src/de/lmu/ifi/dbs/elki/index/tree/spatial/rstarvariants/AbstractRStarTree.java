@@ -677,21 +677,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       newNode = createNewDirectoryNode();
     }
     // do the split
-    node.deleteAllEntries();
     node.splitTo(newNode, entries, split);
 
     // write changes to file
     writeNode(node);
     writeNode(newNode);
-
-    // if(getLogger().isDebugging()) {
-    // StringBuffer msg = new StringBuffer();
-    // msg.append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
-    // msg.append("      splitAxis ").append(split.getSplitAxis()).append("\n");
-    // msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
-    // msg.append("      newNode ").append(newNode.getPageID()).append("\n");
-    // getLogger().debugFine(msg.toString());
-    // }
 
     return newNode;
   }
