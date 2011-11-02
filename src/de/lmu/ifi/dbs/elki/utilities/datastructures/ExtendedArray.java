@@ -23,14 +23,12 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Class to extend an array with a single element virtually.
  * 
  * @author Erich Schubert
  * 
  * @param <T> Object type
- * @param <A> Array-like type
  */
 public class ExtendedArray<T> implements ArrayAdapter<T, ExtendedArray<T>> {
   /**
