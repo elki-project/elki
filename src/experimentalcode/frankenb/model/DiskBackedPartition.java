@@ -185,7 +185,7 @@ public class DiskBackedPartition<V extends NumberVector<V, ?>> implements IParti
     for(int k = 0; k < dimensionality; ++k) {
       data[k] = file.readDouble();
     }
-    final V vec = prototype.newInstance(data);
+    final V vec = prototype.newNumberVector(data);
     return new Pair<DBID, V>(id, vec);
   }
 

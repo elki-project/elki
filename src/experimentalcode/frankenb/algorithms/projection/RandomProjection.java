@@ -88,7 +88,7 @@ public class RandomProjection<V extends NumberVector<V, ?>> implements IProjecti
 
     V factory = DatabaseUtil.assumeVectorField(dataSet).getFactory();
     for(DBID id : dataSet.iterDBIDs()) {
-      V result = factory.newInstance(projectionMatrix.times(dataSet.get(id).getColumnVector()).getArrayRef());
+      V result = factory.newNumberVector(projectionMatrix.times(dataSet.get(id).getColumnVector()).getArrayRef());
       projectedDataSet.set(id, result);
     }
 

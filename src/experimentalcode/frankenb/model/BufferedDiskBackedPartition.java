@@ -104,7 +104,7 @@ public class BufferedDiskBackedPartition<V extends NumberVector<V, ?>> implement
     for(int k = 0; k < dimensionality; ++k) {
       data[k] = file.readDouble();
     }
-    V vec = prototype.newInstance(data);
+    V vec = prototype.newNumberVector(data);
     return new Pair<DBID, V>(id, vec);
   }
 
