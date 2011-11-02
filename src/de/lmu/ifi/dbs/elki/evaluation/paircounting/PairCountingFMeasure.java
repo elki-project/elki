@@ -58,7 +58,7 @@ public class PairCountingFMeasure {
    * @param noiseSpecial Noise receives special treatment
    * @return Pair counts
    */
-  public static int[] countPairs(Clustering<?> result1, Clustering<?> result2, boolean noiseSpecial) {
+  public static long[] countPairs(Clustering<?> result1, Clustering<?> result2, boolean noiseSpecial) {
     final int self = 0;
     final List<? extends Cluster<?>> cs1 = result1.getAllClusters();
     final List<? extends Cluster<?>> cs2 = result2.getAllClusters();
@@ -92,7 +92,7 @@ public class PairCountingFMeasure {
     }
     // Pair counting
     int sum1 = 0, sum2 = 0;
-    int in1 = 0, in2 = 0, inboth = 0;
+    long in1 = 0, in2 = 0, inboth = 0;
     for(Cluster<?> c1 : cs1) {
       if(noiseSpecial && c1.isNoise()) {
         in1 += c1.size() * (1 - self);
@@ -125,7 +125,10 @@ public class PairCountingFMeasure {
     if(sum1 != sum2) {
       LoggingUtil.warning("PairCounting F-Measure is not well defined for overlapping and incomplete clusterings.");
     }
-    return new int[] { inboth, in1 - inboth, in2 - inboth };
+    if(sum1 >= Math.sqrt(Long.MAX_VALUE)) {
+      LoggingUtil.warning("Your data set size probably is too big for this implementation, which uses only long precision.");
+    }
+    return new long[] { inboth, in1 - inboth, in2 - inboth };
   }
 
   /**
@@ -138,7 +141,7 @@ public class PairCountingFMeasure {
    * @return Pair counting F-Measure result.
    */
   public static double compareClusterings(Clustering<?> result1, Clustering<?> result2, double beta, boolean noiseSpecial) {
-    int[] counts = countPairs(result1, result2, noiseSpecial);
+    long[] counts = countPairs(result1, result2, noiseSpecial);
     return fMeasure(counts[0], counts[1], counts[2], beta);
   }
 
@@ -190,7 +193,7 @@ public class PairCountingFMeasure {
    * @param beta The beta values for the f-measure.
    * @return The F-measure.
    */
-  public static double fMeasure(int inBoth, int inFirst, int inSecond, double beta) {
+  public static double fMeasure(long inBoth, long inFirst, long inSecond, double beta) {
     // System.out.println("Both: "+inboth+" First: "+infirst+" Second: "+insecond);
     final double beta2 = beta * beta;
     double fmeasure = ((1 + beta2) * inBoth) / ((1 + beta2) * inBoth + beta2 * inFirst + inSecond);
