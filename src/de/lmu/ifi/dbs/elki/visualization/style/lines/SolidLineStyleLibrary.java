@@ -31,17 +31,18 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
- * Line style library featuring solid lines for default styles only
- * (combine with a color library to obtain enough classes!)
+ * Line style library featuring solid lines for default styles only (combine
+ * with a color library to obtain enough classes!)
  * 
  * {@link LineStyleLibrary#FLAG_STRONG} will result in thicker lines.
  * 
- * {@link LineStyleLibrary#FLAG_WEAK} will result in thinner and semi-transparent lines.
+ * {@link LineStyleLibrary#FLAG_WEAK} will result in thinner and
+ * semi-transparent lines.
  * 
  * {@link LineStyleLibrary#FLAG_INTERPOLATED} will result in dashed lines.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.composedOf ColorLibrary
  */
 public class SolidLineStyleLibrary implements LineStyleLibrary {
@@ -49,7 +50,7 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
    * Reference to the color library.
    */
   private ColorLibrary colors;
-  
+
   /**
    * Constructor.
    * 
@@ -79,7 +80,7 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
     }
     cls.setStatement(CSSConstants.CSS_STROKE_WIDTH_PROPERTY, SVGUtil.fmt(width));
     if(interpolated) {
-      cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, ""+SVGUtil.fmt(width/StyleLibrary.SCALE*2)+","+SVGUtil.fmt(width/StyleLibrary.SCALE*2));
+      cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, "" + SVGUtil.fmt(width / StyleLibrary.SCALE * 2) + "," + SVGUtil.fmt(width / StyleLibrary.SCALE * 2));
     }
   }
 }

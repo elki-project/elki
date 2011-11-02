@@ -37,12 +37,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * {@link LineStyleLibrary#FLAG_STRONG} will result in thicker lines.
  * 
- * {@link LineStyleLibrary#FLAG_WEAK} will result in thinner and semi-transparent lines.
+ * {@link LineStyleLibrary#FLAG_WEAK} will result in thinner and
+ * semi-transparent lines.
  * 
- * {@link LineStyleLibrary#FLAG_INTERPOLATED} will result in shorter dashing patterns.
+ * {@link LineStyleLibrary#FLAG_INTERPOLATED} will result in shorter dashing
+ * patterns.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.composedOf ColorLibrary
  */
 public class DashedLineStyleLibrary implements LineStyleLibrary {
@@ -53,21 +55,22 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
 
   /** Dash patterns to regularly use */
   private double[][] dashpatterns = {
-  // solid, no dashing
+      // solid, no dashing
   {},
-  // half-half
+      // half-half
   { .5, .5 },
-  // quarters
+      // quarters
   { .25, .25, .25, .25 },
-  // alternating long-quart
+      // alternating long-quart
   { .75, .25 },
-  // dash-dot
+      // dash-dot
   { .7, .1, .1, .1 }, };
+
   /** Replacement for the solid pattern in 'interpolated' mode */
   private double[] solidreplacement = { .1, .1 };
 
   private int dashnum = dashpatterns.length;
-  
+
   /**
    * Constructor
    * 
@@ -109,13 +112,14 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
             pattern.append(",");
           }
           pattern.append(SVGUtil.fmt(pat[i] * width * 30));
-          //pattern.append("%");
+          // pattern.append("%");
         }
         cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, pattern.toString());
       }
-    } else {
+    }
+    else {
       double[] pat = dashpatterns[styleflav];
-      if (styleflav == 0) {
+      if(styleflav == 0) {
         pat = solidreplacement;
       }
       assert (pat.length % 2 == 0);
@@ -127,10 +131,10 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
             pattern.append(",");
           }
           pattern.append(SVGUtil.fmt(pat[i] * width));
-          //pattern.append("%");
+          // pattern.append("%");
         }
         cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, pattern.toString());
-      }      
+      }
     }
   }
 }
