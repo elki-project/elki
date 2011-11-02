@@ -32,10 +32,11 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
- * Simple marker library that just draws colored crosses at the given coordinates.
+ * Simple marker library that just draws colored rectangles at the given
+ * coordinates.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.composedOf ColorLibrary
  */
 public class MinimalMarkers implements MarkerLibrary {
@@ -43,11 +44,11 @@ public class MinimalMarkers implements MarkerLibrary {
    * Color library
    */
   private ColorLibrary colors;
-  
+
   /**
    * Constructor
    * 
-   * @param style Style library to use 
+   * @param style Style library to use
    */
   public MinimalMarkers(StyleLibrary style) {
     super();
@@ -60,7 +61,7 @@ public class MinimalMarkers implements MarkerLibrary {
   @Override
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
     Element marker = plot.svgRect(x - size / 2, y - size / 2, size, size);
-    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY+":" + colors.getColor(stylenr));
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + colors.getColor(stylenr));
     parent.appendChild(marker);
     return marker;
   }

@@ -23,34 +23,46 @@ package de.lmu.ifi.dbs.elki.visualization.style.marker;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
- * A marker library is a class that can generate and draw various styles of
- * markers. Different uses might require different marker libraries (e.g. full
- * screen, thumbnail, print)
+ * Simple marker library that just draws colored circles at the given
+ * coordinates.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses Element oneway - - «create»
+ * @apiviz.composedOf ColorLibrary
  */
-public interface MarkerLibrary {
+public class CircleMarkers implements MarkerLibrary {
   /**
-   * Insert a marker at the given coordinates. Markers will be defined in the
-   * defs part of the document, and then SVG-"use"d at the given coordinates.
-   * This supposedly is more efficient and significantly reduces file size.
-   * Symbols will be named "s0", "s1" etc.; these names must not be used by
-   * other elements in the SVG document!
-   * 
-   * @param plot Plot to draw on
-   * @param parent parent node
-   * @param x coordinate
-   * @param y coordinate
-   * @param style style (enumerated)
-   * @param size size
-   * @return Element node generated.
+   * Color library
    */
-  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
+  private ColorLibrary colors;
+
+  /**
+   * Constructor
+   * 
+   * @param style Style library to use
+   */
+  public CircleMarkers(StyleLibrary style) {
+    super();
+    this.colors = style.getColorSet(StyleLibrary.PLOT);
+  }
+
+  /**
+   * Use a given marker on the document.
+   */
+  @Override
+  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
+    Element marker = plot.svgCircle(x, y, size / 2);
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + colors.getColor(stylenr));
+    parent.appendChild(marker);
+    return marker;
+  }
 }
