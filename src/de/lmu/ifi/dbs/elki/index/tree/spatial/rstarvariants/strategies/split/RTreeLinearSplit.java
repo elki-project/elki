@@ -28,7 +28,7 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 

@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
  * Parser reads points transposed. Line n gives the n-th attribute for all
@@ -117,7 +117,7 @@ public class NumberVectorLabelTransposingParser<V extends NumberVector<V, ?>> ex
     List<V> vectors = new ArrayList<V>();
     List<LabelList> lblc = new ArrayList<LabelList>();
     for(int i = 0; i < data.length; i++) {
-      V featureVector = createDBObject(data[i], ArrayUtil.numberListAdapter(data[i]));
+      V featureVector = createDBObject(data[i], ArrayLikeUtil.numberListAdapter(data[i]));
       vectors.add(featureVector);
       lblc.add(labels[i]);
     }

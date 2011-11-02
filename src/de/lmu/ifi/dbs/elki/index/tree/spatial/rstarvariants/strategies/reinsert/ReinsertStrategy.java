@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert
  */
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 
 /**
  * Reinsertion strategy to resolve overflows in the RStarTree.

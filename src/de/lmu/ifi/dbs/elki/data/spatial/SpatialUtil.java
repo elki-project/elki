@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.data.spatial;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 
 /**
  * Utility class with spatial functions.

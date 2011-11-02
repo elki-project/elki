@@ -27,7 +27,7 @@ import java.util.Collections;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;

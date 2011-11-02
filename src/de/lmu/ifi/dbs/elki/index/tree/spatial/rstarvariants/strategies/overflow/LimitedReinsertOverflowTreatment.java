@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.ReinsertStrategy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -87,7 +87,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
 
     reinsertions.set(level);
     List<E> entries = node.getEntries();
-    int[] cands = reinsertStrategy.computeReinserts(entries, ArrayUtil.listAdapter(entries), node);
+    int[] cands = reinsertStrategy.computeReinserts(entries, ArrayLikeUtil.listAdapter(entries), node);
     if(cands == null || cands.length == 0) {
       return false;
     }

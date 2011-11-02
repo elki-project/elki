@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 
 /**
  * Generic FeatureVector class that can contain any type of data (i.e. numerical

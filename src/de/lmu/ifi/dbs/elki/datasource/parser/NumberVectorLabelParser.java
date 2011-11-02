@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.ArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
@@ -170,7 +170,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       }
       labels.add(ent);
     }
-    V vec = createDBObject(attributes, ArrayUtil.numberListAdapter(attributes));
+    V vec = createDBObject(attributes, ArrayLikeUtil.numberListAdapter(attributes));
     SingleObjectBundle pkg = new SingleObjectBundle();
     pkg.append(getTypeInformation(vec.getDimensionality()), vec);
     pkg.append(TypeUtil.LABELLIST, labels);
@@ -208,7 +208,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       labels.add(ent);
     }
 
-    vectors.add(createDBObject(attributes, ArrayUtil.numberListAdapter(attributes)));
+    vectors.add(createDBObject(attributes, ArrayLikeUtil.numberListAdapter(attributes)));
     labellist.add(labels);
   }
 
