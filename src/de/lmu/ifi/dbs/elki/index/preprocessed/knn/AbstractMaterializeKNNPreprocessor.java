@@ -171,7 +171,9 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
         break;
       }
     }
-    return new PreprocessorKNNQuery<O, S, List<DistanceResultPair<S>>>(relation, (AbstractMaterializeKNNPreprocessor<O, S, List<DistanceResultPair<S>>>) this);
+    // To make compilers happy:
+    AbstractMaterializeKNNPreprocessor<?, ?, ?> tmp = this;
+    return new PreprocessorKNNQuery<O, S, List<DistanceResultPair<S>>>(relation, (AbstractMaterializeKNNPreprocessor<O, S, List<DistanceResultPair<S>>>) tmp);
   }
 
   /**
