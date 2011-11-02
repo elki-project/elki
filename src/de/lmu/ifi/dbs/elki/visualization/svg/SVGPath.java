@@ -715,8 +715,7 @@ public class SVGPath {
    * @param ar x-axis-rotation
    * @param la large arc flag, if angle >= 180¬∞
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
-   * @param x new coordinates
-   * @param y new coordinates
+   * @param xy new coordinates
    */
   public SVGPath ellipticalArc(double rx, double ry, double ar, double la, double sp, double[] xy) {
     append(SVGConstants.PATH_ARC, rx, ry, ar, la, sp, xy[0], xy[1]);
