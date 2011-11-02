@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.ListBasedColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.lines.DashedLineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.lines.LineStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.lines.SolidLineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.PrettyMarkers;
 
@@ -75,6 +75,16 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
    * Separator for lists.
    */
   public static final String LIST_SEPARATOR = ",";
+
+  /**
+   * Property string for the line style library
+   */
+  public static final String PROP_LINES_LIBRARY = "lines-library";
+
+  /**
+   * Property string for the marker style library
+   */
+  public static final String PROP_MARKER_LIBRARY = "marker-library";
 
   /**
    * Properties file to use.
@@ -301,8 +311,21 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   @Override
   public LineStyleLibrary lines() {
     if(linelib == null) {
-      // FIXME: make configurable
-      linelib = new DashedLineStyleLibrary(this);
+      String libname = properties.getProperty(PROP_LINES_LIBRARY, SolidLineStyleLibrary.class.getName());
+      try {
+        Class<?> cls;
+        try {
+          cls = Class.forName(libname);
+        }
+        catch(ClassNotFoundException e) {
+          cls = Class.forName(LineStyleLibrary.class.getPackage().getName() + "." + libname);
+        }
+        linelib = (LineStyleLibrary) cls.getConstructor(StyleLibrary.class).newInstance(this);
+      }
+      catch(Exception e) {
+        logger.exception(e);
+        linelib = new SolidLineStyleLibrary(this);
+      }
     }
     return linelib;
   }
@@ -310,8 +333,21 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   @Override
   public MarkerLibrary markers() {
     if(markerlib == null) {
-      // FIXME: make configurable
-      markerlib = new PrettyMarkers(this);
+      String libname = properties.getProperty(PROP_MARKER_LIBRARY, PrettyMarkers.class.getName());
+      try {
+        Class<?> cls;
+        try {
+          cls = Class.forName(libname);
+        }
+        catch(ClassNotFoundException e) {
+          cls = Class.forName(MarkerLibrary.class.getPackage().getName() + "." + libname);
+        }
+        markerlib = (MarkerLibrary) cls.getConstructor(StyleLibrary.class).newInstance(this);
+      }
+      catch(Exception e) {
+        logger.exception(e);
+        markerlib = new PrettyMarkers(this);
+      }
     }
     return markerlib;
   }
