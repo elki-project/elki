@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -37,16 +39,22 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.math.geometry.AlphaShape;
 import de.lmu.ifi.dbs.elki.math.geometry.ConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -57,26 +65,28 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
 /**
- * Visualizer for generating an SVG-Element containing the convex hull of each
- * cluster.
+ * Visualizer for generating an SVG-Element containing the convex hull / alpha
+ * shape of each cluster.
  * 
  * @author Robert Rödler
+ * @author Erich Schubert
  * 
  * @apiviz.has Clustering oneway - - visualizes
  * @apiviz.uses ConvexHull2D
+ * @apiviz.uses AlphaShape
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class ClusterHullVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Cluster Convex Hull Visualization";
+  private static final String NAME = "Cluster Hull Visualization";
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
-  public static final String CONVEXHULL = "convexHull";
+  public static final String CLUSTERHULL = "cluster-hull";
 
   /**
    * The result we work on
@@ -84,18 +94,20 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
   Clustering<Model> clustering;
 
   /**
-   * The hulls
+   * Alpha value
    */
-  Element hulls;
+  double alpha = Double.POSITIVE_INFINITY;
 
   /**
    * Constructor
    * 
    * @param task VisualizationTask
+   * @param alpha Alpha value
    */
-  public ClusterConvexHullVisualization(VisualizationTask task) {
+  public ClusterHullVisualization(VisualizationTask task, double alpha) {
     super(task);
     this.clustering = task.getResult();
+    this.alpha = alpha;
     context.addContextChangeListener(this);
     incrementalRedraw();
   }
@@ -112,29 +124,46 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
 
     for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
       Cluster<?> clus = ci.next();
-
       final DBIDs ids = clus.getIDs();
-      ConvexHull2D hull = new ConvexHull2D();
 
-      for(DBID clpnum : ids) {
-        double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum));
-        hull.add(new Vector(projP));
+      if(alpha >= Double.POSITIVE_INFINITY) {
+        ConvexHull2D hull = new ConvexHull2D();
+
+        for(DBID clpnum : ids) {
+          double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum));
+          hull.add(new Vector(projP));
+        }
+        Polygon chres = hull.getHull();
+
+        // Plot the convex hull:
+        if(chres != null) {
+          SVGPath path = new SVGPath(chres);
+          // Approximate area (using bounding box)
+          double hullarea = SpatialUtil.volume(chres);
+          final double relativeArea = (projarea - hullarea) / projarea;
+          final double relativeSize = (double) ids.size() / rel.size();
+          opacity = Math.sqrt(relativeSize * relativeArea);
+
+          Element hulls = path.makeElement(svgp);
+          addCSSClasses(svgp, cnum, opacity);
+          SVGUtil.addCSSClass(hulls, CLUSTERHULL + cnum);
+          layer.appendChild(hulls);
+        }
       }
-      Polygon chres = hull.getHull();
-
-      // Plot the convex hull:
-      if(chres != null) {
-        SVGPath path = new SVGPath(chres);
-        // Approximate area (using bounding box)
-        double hullarea = SpatialUtil.volume(chres);
-        final double relativeArea = (projarea - hullarea) / projarea;
-        final double relativeSize = (double) ids.size() / rel.size();
-        opacity = Math.sqrt(relativeSize * relativeArea);
-
-        hulls = path.makeElement(svgp);
-        addCSSClasses(svgp, cnum, opacity);
-        SVGUtil.addCSSClass(hulls, CONVEXHULL + cnum);
-        layer.appendChild(hulls);
+      else {
+        ArrayList<Vector> ps = new ArrayList<Vector>(ids.size());
+        for(DBID clpnum : ids) {
+          double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum));
+          ps.add(new Vector(projP));
+        }
+        List<Polygon> polys = (new AlphaShape(ps, alpha * Projection.SCALE)).compute();
+        for(Polygon p : polys) {
+          SVGPath path = new SVGPath(p);
+          Element hulls = path.makeElement(svgp);
+          addCSSClasses(svgp, cnum, 0.5);
+          SVGUtil.addCSSClass(hulls, CLUSTERHULL + cnum);
+          layer.appendChild(hulls);
+        }
       }
     }
   }
@@ -147,7 +176,7 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
   private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-    CSSClass cls = new CSSClass(this, CONVEXHULL + clusterID);
+    CSSClass cls = new CSSClass(this, CLUSTERHULL + clusterID);
     cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
 
     final String color;
@@ -166,26 +195,35 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
 
   /**
    * Factory for visualizers to generate an SVG-Element containing the convex
-   * hull of a cluster.
+   * hull or alpha shape of a cluster.
    * 
    * @author Robert Rödler
+   * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses ClusterConvexHullVisualization oneway - - «create»
+   * @apiviz.uses ClusterHullVisualization oneway - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
     /**
-     * Constructor
+     * Alpha value
      */
-    public Factory() {
+    double alpha = Double.POSITIVE_INFINITY;
+
+    /**
+     * Constructor.
+     * 
+     * @param alpha Alpha value
+     */
+    public Factory(double alpha) {
       super();
+      this.alpha = alpha;
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusterConvexHullVisualization<NV>(task);
+      return new ClusterHullVisualization<NV>(task, alpha);
     }
 
     @Override
@@ -201,6 +239,43 @@ public class ClusterConvexHullVisualization<NV extends NumberVector<NV, ?>> exte
           baseResult.getHierarchy().add(c, task);
           baseResult.getHierarchy().add(p, task);
         }
+      }
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      /**
+       * Alpha-Value for alpha-shapes
+       * 
+       * <p>
+       * Key: {@code -hull.alpha}
+       * </p>
+       */
+      public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hull.alpha", "Alpha value for hull drawing (in projected space!).");
+
+      /**
+       * Alpha value
+       */
+      double alpha = Double.POSITIVE_INFINITY;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY);
+        if(config.grab(alphaP)) {
+          alpha = alphaP.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(alpha);
       }
     }
   }
