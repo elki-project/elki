@@ -57,7 +57,7 @@ public class AttributeWiseErfNormalization<O extends NumberVector<O, ?>> extends
     for(int i = 0; i < val.length; i++) {
       val[i] = NormalDistribution.erf(obj.doubleValue(i + 1));
     }
-    return obj.newInstance(val);
+    return obj.newNumberVector(val);
   }
 
   @Override

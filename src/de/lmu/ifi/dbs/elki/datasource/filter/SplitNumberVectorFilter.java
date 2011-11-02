@@ -122,8 +122,8 @@ public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements Ob
         for(int d = 0; d < odims.length; d++) {
           part2[d] = obj.doubleValue(odims[d]);
         }
-        col1.add(obj.newInstance(part1));
-        col2.add(obj.newInstance(part2));
+        col1.add(obj.newNumberVector(part1));
+        col2.add(obj.newNumberVector(part2));
       }
     }
     return bundle;

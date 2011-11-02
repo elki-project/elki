@@ -362,7 +362,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   }
 
   @Override
-  public <A> BitVector newInstance(A array, ArrayAdapter<Bit, A> adapter) {
+  public <A> BitVector newFeatureVector(A array, ArrayAdapter<Bit, A> adapter) {
     int dim = adapter.size(array);
     BitSet bits = new BitSet(dim);
     for(int i = 0; i < dim; i++) {
@@ -373,7 +373,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   }
 
   @Override
-  public <A> BitVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> BitVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     int dim = adapter.size(array);
     BitSet bits = new BitSet(dim);
     for(int i = 0; i < dim; i++) {

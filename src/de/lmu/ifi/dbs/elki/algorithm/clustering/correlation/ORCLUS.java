@@ -462,7 +462,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   private V projection(ORCLUSCluster c, V o, V factory) {
     Matrix o_proj = o.getRowVector().times(c.basis);
     double[] values = o_proj.getColumnPackedCopy();
-    return factory.newInstance(values);
+    return factory.newNumberVector(values);
   }
 
   @Override
@@ -523,7 +523,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
       for(int d = 1; d <= o.getDimensionality(); d++) {
         values[d - 1] = o.doubleValue(d);
       }
-      this.centroid = factory.newInstance(values);
+      this.centroid = factory.newNumberVector(values);
     }
   }
 

@@ -107,7 +107,7 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
       for(int d = 0; d < dim; d++) {
         vec[d] = mean[d] + (Math.random() - 0.5) * scale * delta[d];
       }
-      V newp = factory.newInstance(vec);
+      V newp = factory.newNumberVector(vec);
       // logger.debug("New reference point: " + FormatUtil.format(vec));
       result.add(newp);
     }

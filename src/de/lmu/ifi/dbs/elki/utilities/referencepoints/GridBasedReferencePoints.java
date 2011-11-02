@@ -117,13 +117,13 @@ public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements R
           acc = acc / (gridres + 1);
           vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
         }
-        V newp = factory.newInstance(vec);
+        V newp = factory.newNumberVector(vec);
         // logger.debug("New reference point: " + FormatUtil.format(vec));
         result.add(newp);
       }
     }
     else {
-      result.add(factory.newInstance(mean));
+      result.add(factory.newNumberVector(mean));
       // logger.debug("New reference point: " + FormatUtil.format(mean));
     }
 

@@ -120,13 +120,13 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
   }
 
   @Override
-  public <A> OneDimensionalDoubleVector newInstance(A array, ArrayAdapter<Double, A> adapter) {
+  public <A> OneDimensionalDoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
     assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
     return new OneDimensionalDoubleVector(adapter.get(array, 0));
   }
 
   @Override
-  public <A> OneDimensionalDoubleVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> OneDimensionalDoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
     return new OneDimensionalDoubleVector(adapter.getDouble(array, 0));
   }

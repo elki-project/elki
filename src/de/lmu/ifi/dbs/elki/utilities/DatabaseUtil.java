@@ -256,8 +256,8 @@ public final class DatabaseUtil {
       }
     }
     NV factory = assumeVectorField(database).getFactory();
-    NV min = factory.newInstance(mins);
-    NV max = factory.newInstance(maxs);
+    NV min = factory.newNumberVector(mins);
+    NV max = factory.newNumberVector(maxs);
     return new Pair<NV, NV>(min, max);
   }
 

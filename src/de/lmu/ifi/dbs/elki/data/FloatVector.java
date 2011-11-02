@@ -235,7 +235,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
   }
 
   @Override
-  public <A> FloatVector newInstance(A array, ArrayAdapter<Float, A> adapter) {
+  public <A> FloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
     int dim = adapter.size(array);
     float[] values = new float[dim];
     for(int i = 0; i < dim; i++) {
@@ -245,7 +245,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
   }
 
   @Override
-  public <A> FloatVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> FloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     int dim = adapter.size(array);
     float[] values = new float[dim];
     for(int i = 0; i < dim; i++) {

@@ -70,5 +70,5 @@ public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> {
    * @param <A> Array type
    * @return a new FeatureVector of V for the given values
    */
-  <A> V newInstance(A array, ArrayAdapter<D, A> adapter);
+  <A> V newFeatureVector(A array, ArrayAdapter<D, A> adapter);
 }

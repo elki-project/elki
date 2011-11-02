@@ -204,7 +204,7 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
    * @param values the values of the NumberVector
    * @return a new NumberVector of N for the given values
    */
-  V newInstance(double[] values);
+  V newNumberVector(double[] values);
 
   /**
    * Instantiate from any number-array like object.
@@ -214,5 +214,5 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
    * @param adapter Adapter
    * @return a new NumberVector of N for the given values.
    */
-  <A> V newInstance(A array, NumberArrayAdapter<?, A> adapter);
+  <A> V newNumberVector(A array, NumberArrayAdapter<?, A> adapter);
 }
