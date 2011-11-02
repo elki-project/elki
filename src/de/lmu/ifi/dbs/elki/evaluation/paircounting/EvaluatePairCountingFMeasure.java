@@ -113,7 +113,7 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
     }
     Clustering<?> refc = refcrs.get(0);
     for(Clustering<?> c : crs) {
-      int[] countedPairs = PairCountingFMeasure.countPairs(c, refc, noiseSpecialHandling);
+      long[] countedPairs = PairCountingFMeasure.countPairs(c, refc, noiseSpecialHandling);
       // Use double, since we want double results at the end!
       double sum = countedPairs[0] + countedPairs[1] + countedPairs[2];
       double inboth = countedPairs[0] / sum;
