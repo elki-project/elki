@@ -259,7 +259,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
           weightVector.set(d, true);
         }
       }
-      center = DatabaseUtil.assumeVectorField(database).getFactory().newInstance(centerValues);
+      center = DatabaseUtil.assumeVectorField(database).getFactory().newNumberVector(centerValues);
       sod = subspaceOutlierDegree(queryObject, center, weightVector);
     }
 

@@ -94,11 +94,11 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
     for(int d = 0; d < dim; d++) {
       vec[d] = mean[d] - delta[d];
     }
-    result.add(factory.newInstance(vec));
+    result.add(factory.newNumberVector(vec));
     for(int d = 0; d < dim; d++) {
       vec[d] = mean[d] + delta[d];
     }
-    result.add(factory.newInstance(vec));
+    result.add(factory.newNumberVector(vec));
 
     // Plus axis end points:
     for(int i = 0; i < dim; i++) {
@@ -110,7 +110,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
           vec[d] = mean[d] + delta[d];
         }
       }
-      result.add(factory.newInstance(vec));
+      result.add(factory.newNumberVector(vec));
     }
 
     return result;

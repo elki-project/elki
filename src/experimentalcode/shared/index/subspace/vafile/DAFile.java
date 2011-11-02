@@ -220,11 +220,11 @@ public class DAFile<V extends NumberVector<V, ?>> {
       upperVals[i] = query.doubleValue(i + 1) + epsilon;
     }
 
-    V lowerEpsilon = query.newInstance(lowerVals);
+    V lowerEpsilon = query.newNumberVector(lowerVals);
     VectorApprox<V> lowerEpsilonPartitions = new VectorApprox<V>(dimensions);
     lowerEpsilonPartitions.calculateApproximation(lowerEpsilon, daFiles);
 
-    V upperEpsilon = query.newInstance(upperVals);
+    V upperEpsilon = query.newNumberVector(upperVals);
     VectorApprox<V> upperEpsilonPartitions = new VectorApprox<V>(dimensions);
     upperEpsilonPartitions.calculateApproximation(upperEpsilon, daFiles);
 

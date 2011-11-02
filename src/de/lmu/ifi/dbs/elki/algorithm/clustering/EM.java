@@ -387,7 +387,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
           r[d] = minmax.first.doubleValue(d + 1) + (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1)) * r[d];
         }
         // Instantiate
-        V randomVector = minmax.first.newInstance(r);
+        V randomVector = minmax.first.newNumberVector(r);
         means.add(randomVector);
       }
       return means;

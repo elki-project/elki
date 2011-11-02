@@ -145,7 +145,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
       values[d - 1] = normalize(d - 1, featureVector.doubleValue(d));
     }
-    return featureVector.newInstance(values);
+    return featureVector.newNumberVector(values);
   }
 
   @Override
@@ -155,7 +155,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
         values[d - 1] = restore(d - 1, featureVector.doubleValue(d));
       }
-      return featureVector.newInstance(values);
+      return featureVector.newNumberVector(values);
     }
     else {
       throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + mean.length);

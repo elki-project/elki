@@ -245,7 +245,7 @@ public class CovarianceMatrix {
    * @return Mean vector
    */
   public <F extends NumberVector<? extends F, ?>> F getMeanVector(Relation<? extends F> relation) {
-    return DatabaseUtil.assumeVectorField(relation).getFactory().newInstance(mean);
+    return DatabaseUtil.assumeVectorField(relation).getFactory().newNumberVector(mean);
   }
 
   /**

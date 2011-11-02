@@ -481,7 +481,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   @Override
-  public <A> SparseFloatVector newInstance(A array, ArrayAdapter<Float, A> adapter) {
+  public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
     int dim = adapter.size(array);
     float[] values = new float[dim];
     for(int i = 0; i < dim; i++) {
@@ -492,7 +492,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   @Override
-  public <A> SparseFloatVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> SparseFloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     int dim = adapter.size(array);
     float[] values = new float[dim];
     for(int i = 0; i < dim; i++) {

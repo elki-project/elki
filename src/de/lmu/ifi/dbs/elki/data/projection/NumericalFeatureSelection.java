@@ -1,12 +1,11 @@
 package de.lmu.ifi.dbs.elki.data.projection;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter;
 
 /**
@@ -15,9 +14,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <F> Feature type
+ * @param <N> Number type
  */
-public class FeatureSelection<V extends FeatureVector<V, F>, F> extends AbstractFeatureSelection<V, F> {
+public class NumericalFeatureSelection<V extends NumberVector<V, N>, N extends Number> extends AbstractFeatureSelection<V, N> {
   /**
    * Minimum dimensionality required for projection
    */
@@ -39,8 +38,8 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> extends Abstract
    * @param dim Dimensions
    * @param factory Object factory
    */
-  public FeatureSelection(int[] dims, V factory) {
-    super(new SubsetArrayAdapter<F, V>(getAdapter(factory), dims));
+  public NumericalFeatureSelection(int[] dims, V factory) {
+    super(new SubsetArrayAdapter<N, V>(getAdapter(factory), dims));
     this.factory = factory;
     this.dimensionality = dims.length;
 
@@ -57,13 +56,14 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> extends Abstract
    * @param factory Object factory, for type inference
    * @return Adapter
    */
+  private static <V extends NumberVector<V, N>, N extends Number> NumberArrayAdapter<N, ? super V> getAdapter(V factory) {
+    return ArrayLikeUtil.numberVectorAdapter(factory);
+  }
+
   @SuppressWarnings("unchecked")
-  private static <V extends FeatureVector<V, F>, F> ArrayAdapter<F, ? super V> getAdapter(V factory) {
-    if(factory instanceof NumberVector) {
-      ArrayAdapter<?, ?> ret = ArrayLikeUtil.numberVectorAdapter((NumberVector<?, ?>) factory);
-      return (ArrayAdapter<F, ? super V>) ret;
-    }
-    return ArrayLikeUtil.featureVectorAdapter(factory);
+  @Override
+  public V project(V data) {
+    return factory.newNumberVector(data, (NumberArrayAdapter<N, ? super V>) adapter);
   }
 
   @Override

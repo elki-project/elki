@@ -147,7 +147,7 @@ public class Centroid extends Vector {
    * @return the data
    */
   public <F extends NumberVector<? extends F, ?>> F toVector(Relation<? extends F> relation) {
-    return DatabaseUtil.assumeVectorField(relation).getFactory().newInstance(elements);
+    return DatabaseUtil.assumeVectorField(relation).getFactory().newNumberVector(elements);
   }
 
   /**

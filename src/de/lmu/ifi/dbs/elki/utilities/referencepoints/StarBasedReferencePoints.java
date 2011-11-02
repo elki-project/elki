@@ -118,7 +118,7 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
 
     ArrayList<V> result = new ArrayList<V>(2 * dim + 1);
     if(!nocenter) {
-      result.add(factory.newInstance(centroid));
+      result.add(factory.newNumberVector(centroid));
     }
     // Plus axis end points through centroid
     double[] vec = new double[dim];
@@ -129,9 +129,9 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
         }
       }
       vec[i] = min[i];
-      result.add(factory.newInstance(vec));
+      result.add(factory.newNumberVector(vec));
       vec[i] = max[i];
-      result.add(factory.newInstance(vec));
+      result.add(factory.newNumberVector(vec));
     }
 
     return result;

@@ -39,7 +39,7 @@ public abstract class AbstractFeatureSelection<V extends FeatureVector<V, F>, F>
   /**
    * Array adapter
    */
-  SubsetArrayAdapter<F, V> adapter;
+  protected SubsetArrayAdapter<F, V> adapter;
 
   /**
    * Constructor.
@@ -53,7 +53,7 @@ public abstract class AbstractFeatureSelection<V extends FeatureVector<V, F>, F>
 
   @Override
   public V project(V data) {
-    return data.newInstance(data, adapter);
+    return data.newFeatureVector(data, adapter);
   }
 
   @Override

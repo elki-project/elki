@@ -196,7 +196,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       for(int d = 0; d < dim; d++) {
         vec[d] = minima[d] + (randoms[d].nextDouble() * (maxima[d] - minima[d]));
       }
-      V newp = factory.newInstance(vec);
+      V newp = factory.newNumberVector(vec);
       result.add(newp);
     }
 

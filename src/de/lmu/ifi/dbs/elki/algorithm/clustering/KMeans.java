@@ -157,7 +157,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
           r[d] = minmax.first.doubleValue(d + 1) + (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1)) * r[d];
         }
         // Instantiate
-        V randomVector = minmax.first.newInstance(r);
+        V randomVector = minmax.first.newNumberVector(r);
         means.add(randomVector);
       }
       List<? extends ModifiableDBIDs> clusters;

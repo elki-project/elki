@@ -276,12 +276,12 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   }
 
   @Override
-  public DoubleVector newInstance(double[] values) {
+  public DoubleVector newNumberVector(double[] values) {
     return new DoubleVector(values);
   }
 
   @Override
-  public <A> DoubleVector newInstance(A array, ArrayAdapter<Double, A> adapter) {
+  public <A> DoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
     int dim = adapter.size(array);
     double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {
@@ -291,7 +291,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   }
 
   @Override
-  public <A> DoubleVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     int dim = adapter.size(array);
     double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {

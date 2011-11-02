@@ -551,12 +551,12 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
   }
 
   @Override
-  public ParameterizationFunction newInstance(double[] values) {
+  public ParameterizationFunction newNumberVector(double[] values) {
     return new ParameterizationFunction(values);
   }
 
   @Override
-  public <A> DoubleVector newInstance(A array, ArrayAdapter<Double, A> adapter) {
+  public <A> DoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
     final int dim = adapter.size(array);
     double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {
@@ -566,7 +566,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
   }
 
   @Override
-  public <A> DoubleVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     final int dim = adapter.size(array);
     double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {

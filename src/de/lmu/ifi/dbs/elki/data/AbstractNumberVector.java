@@ -105,7 +105,7 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
   }
 
   @Override
-  public V newInstance(double[] values) {
-    return newInstance(values, ArrayLikeUtil.doubleArrayAdapter());
+  public V newNumberVector(double[] values) {
+    return newNumberVector(values, ArrayLikeUtil.doubleArrayAdapter());
   }
 }

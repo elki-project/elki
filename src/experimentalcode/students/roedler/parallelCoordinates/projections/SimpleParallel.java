@@ -254,7 +254,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     for(int d = 0; d < dim; d++) {
       ds[d] = scales[d].getUnscaled(ds[d]);
     }
-    return prototype.newInstance(vec.getArrayRef());
+    return prototype.newNumberVector(vec.getArrayRef());
   }
 
   @Override
@@ -282,7 +282,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     for(int d = 0; d < dim; d++) {
       ds[d] = scales[d].getRelativeUnscaled(ds[d]);
     }
-    return prototype.newInstance(vec.getArrayRef());
+    return prototype.newNumberVector(vec.getArrayRef());
   }
 
   @Override

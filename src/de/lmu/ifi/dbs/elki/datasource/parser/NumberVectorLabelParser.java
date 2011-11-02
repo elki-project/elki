@@ -221,7 +221,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * @return a RalVector of type V containing the given attribute values
    */
   protected <A> V createDBObject(A attributes, NumberArrayAdapter<?, A> adapter) {
-    return factory.newInstance(attributes, adapter);
+    return factory.newNumberVector(attributes, adapter);
   }
 
   /**
@@ -233,7 +233,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   VectorFieldTypeInformation<V> getTypeInformation(int dimensionality) {
     @SuppressWarnings("unchecked")
     Class<V> cls = (Class<V>) factory.getClass();
-    V f = factory.newInstance(new double[dimensionality]);
+    V f = factory.newNumberVector(new double[dimensionality]);
     return new VectorFieldTypeInformation<V>(cls, dimensionality, f);
   }
 

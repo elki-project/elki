@@ -65,7 +65,7 @@ public final class VectorUtil {
    * @return new instance
    */
   public static <V extends NumberVector<V, ?>> V randomVector(V template, Random r) {
-    return template.newInstance(MathUtil.randomDoubleArray(template.getDimensionality(), r));
+    return template.newNumberVector(MathUtil.randomDoubleArray(template.getDimensionality(), r));
   }
 
   /**

@@ -240,7 +240,7 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   }
 
   @Override
-  public <A> IntegerVector newInstance(A array, ArrayAdapter<Integer, A> adapter) {
+  public <A> IntegerVector newFeatureVector(A array, ArrayAdapter<Integer, A> adapter) {
     int dim = adapter.size(array);
     int[] values = new int[dim];
     for(int i = 0; i < dim; i++) {
@@ -250,7 +250,7 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   }
 
   @Override
-  public <A> IntegerVector newInstance(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> IntegerVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     int dim = adapter.size(array);
     int[] values = new int[dim];
     for(int i = 0; i < dim; i++) {
