@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.SubsetArrayAdapter;
  * @param <V> Vector type
  * @param <F> Feature type
  */
-public class FeatureSelection<V extends FeatureVector<V, F>, F> extends AbstractFeatureSelectionProjection<V, F> {
+public class FeatureSelection<V extends FeatureVector<V, F>, F> extends AbstractFeatureSelection<V, F> {
   /**
    * Minimum dimensionality required for projection
    */
