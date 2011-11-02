@@ -67,6 +67,8 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
    * Visualization mode.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static enum Mode {
     VORONOI, DELAUNAY, V_AND_D
