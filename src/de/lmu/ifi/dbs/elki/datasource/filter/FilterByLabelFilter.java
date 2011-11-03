@@ -23,12 +23,11 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -43,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * 
  * @apiviz.uses LabelList oneway - - «reads»
  */
-public class FilterByLabelFilter implements ObjectFilter {
+public class FilterByLabelFilter extends AbstractStreamFilter {
   /**
    * Class logger
    */
@@ -53,11 +52,16 @@ public class FilterByLabelFilter implements ObjectFilter {
    * The filter pattern
    */
   private final Pattern pattern;
-  
+
   /**
    * Inversion flag
    */
   private final boolean inverted;
+
+  /**
+   * Label column
+   */
+  private int lblcol = -1;
 
   /**
    * Constructor.
@@ -72,50 +76,69 @@ public class FilterByLabelFilter implements ObjectFilter {
   }
 
   @Override
-  public MultipleObjectsBundle filter(final MultipleObjectsBundle objects) {
-    if(logger.isDebugging()) {
-      logger.debug("Filtering the data set");
-    }
+  public BundleMeta getMeta() {
+    return source.getMeta();
+  }
 
-    // Identify a label column
-    final int lblcol;
-    {
-      int lblc = -1;
-      for(int i = 0; i < objects.metaLength(); i++) {
-        if(TypeUtil.GUESSED_LABEL.isAssignableFromType(objects.meta(i))) {
-          lblc = i;
-          break;
+  @Override
+  public Object data(int rnum) {
+    return source.data(rnum);
+  }
+
+  @Override
+  public Event nextEvent() {
+    while(true) {
+      Event ev = source.nextEvent();
+      switch(ev){
+      case END_OF_STREAM:
+        if (lblcol < 0) {
+          logger.warning("By label filter was used, but never saw a label relation!");
         }
-      }
-      lblcol = lblc; // make static
-    }
-
-    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    for(int j = 0; j < objects.metaLength(); j++) {
-      bundle.appendColumn(objects.meta(j), new ArrayList<Object>());
-    }
-    for(int i = 0; i < objects.dataLength(); i++) {
-      Object l = objects.data(i, lblcol);
-      if(l instanceof LabelList) {
-        boolean good = false;
-        for(String label : (LabelList) l) {
-          if(pattern.matcher(label).matches()) {
-            good = true;
-            break;
+        return Event.END_OF_STREAM;
+      case META_ADDED:
+        // Search for the first label column
+        if(lblcol < 0) {
+          BundleMeta meta = source.getMeta();
+          for(int i = 0; i < meta.size(); i++) {
+            if(TypeUtil.GUESSED_LABEL.isAssignableFromType(meta.get(i))) {
+              lblcol = i;
+              break;
+            }
           }
         }
-        if(good == inverted) {
-          continue;
+        return Event.META_ADDED;
+      case NEXT_OBJECT:
+        if(lblcol > 0) {
+          Object l = source.data(lblcol);
+          if(l instanceof LabelList) {
+            boolean good = false;
+            for(String label : (LabelList) l) {
+              if(pattern.matcher(label).matches()) {
+                good = true;
+                break;
+              }
+            }
+            if(good == inverted) {
+              continue;
+            }
+          }
+          else {
+            if(!pattern.matcher(l.toString()).matches()) {
+              continue;
+            }
+          }
         }
-      }
-      else {
-        if(!pattern.matcher(l.toString()).matches()) {
-          continue;
+        else {
+          // No labels known yet.
+          if(!inverted) {
+            continue;
+          }
         }
+        return Event.NEXT_OBJECT;
+      default:
+        logger.warning("Unknown event: " + ev);
       }
-      bundle.appendSimple(objects.getRow(i));
     }
-    return bundle;
   }
 
   /**
