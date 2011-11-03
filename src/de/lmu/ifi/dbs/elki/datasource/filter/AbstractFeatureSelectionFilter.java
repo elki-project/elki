@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @param <V> the type of FeatureVector contained in both the original and
  *        projected data.
  */
-public abstract class AbstractFeatureSelectionFilter<V extends FeatureVector<?, ?>> extends AbstractConversionFilter<V, V> {
+public abstract class AbstractFeatureSelectionFilter<V extends FeatureVector<?, ?>> extends AbstractStreamConversionFilter<V, V> {
   /**
    * <p>
    * Selected attributes parameter.

@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> the type of FeatureVector contained in both the original data of
  *        the base parser and the projected data of this ProjectionParser
  */
-public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVector<?, ?>> extends AbstractConversionFilter<V, V> {
+public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVector<?, ?>> extends AbstractStreamConversionFilter<V, V> {
   /**
    * The selected attributes
    */
@@ -94,13 +94,17 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
     super();
     this.k = dim;
   }
-
-  @Override
-  protected boolean prepareStart(SimpleTypeInformation<V> in) {
+  
+  /**
+   * Initialize random attributes.
+   * 
+   * Invoke this from {@link #convertedType}!
+   * 
+   * @param in Type information.
+   */
+  void initializeRandomAttributes(SimpleTypeInformation<V> in) {
     int d = ((VectorFieldTypeInformation<V>) in).dimensionality();
     selectedAttributes = Util.randomBitSet(k, d, random);
-    // We don't need the full loop, so return false.
-    return false;
   }
 
   /**
