@@ -235,7 +235,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
     // perform multi-step NN-query
 
     Vector<VectorApprox<V>> candidates = new Vector<VectorApprox<V>>();
-    double minMaxDist = Double.POSITIVE_INFINITY;
+    //double minMaxDist = Double.POSITIVE_INFINITY;
 
     // filter step
 
@@ -257,13 +257,13 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
       minDist = Math.pow(minDist, 1.0 / p);
       maxDist = Math.pow(maxDist, 1.0 / p);
       
-      if(minDist < minMaxDist) // object has to be refined
-      {
+      //if(minDist <= minMaxDist) // object has to be refined
+      //{
         va.increasePMinDist(minDist);
         va.increasePMaxDist(maxDist);
         candidates.add(va);
-      }
-      minMaxDist = Math.min(minMaxDist, maxDist);
+      //}
+      //minMaxDist = Math.min(minMaxDist, maxDist);
       
     }
 
@@ -288,7 +288,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
         }
      
       // retrieve at least k elements while the min distances are smaller than the greatest accurate distance
-      if(result.size() < k || va.getPMinDist() < lastDist) {
+      if(result.size() < k || va.getPMinDist() <= lastDist) {
         V dv = data.getObject(va.getId());
         double dist = 0;
         for(int d = 0; d < dv.getDimensionality(); d++) {
