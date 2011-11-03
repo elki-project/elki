@@ -34,16 +34,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class FilterNoMissingValuesFilter implements ObjectFilter {
+public class NoMissingValuesFilter implements ObjectFilter {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(FilterNoMissingValuesFilter.class);
+  private static final Logging logger = Logging.getLogger(NoMissingValuesFilter.class);
 
   /**
    * Constructor.
    */
-  public FilterNoMissingValuesFilter() {
+  public NoMissingValuesFilter() {
     super();
   }
 
@@ -82,7 +82,7 @@ public class FilterNoMissingValuesFilter implements ObjectFilter {
   public static class Parameterizer extends AbstractParameterizer {
     @Override
     protected Object makeInstance() {
-      return new FilterNoMissingValuesFilter();
+      return new NoMissingValuesFilter();
     }
   }
 }

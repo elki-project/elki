@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 
 /*
  This file is part of ELKI:
@@ -24,6 +24,8 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  */
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 

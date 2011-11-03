@@ -42,11 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * 
  * @apiviz.uses LabelList oneway - - «reads»
  */
-public class FilterByLabelFilter extends AbstractStreamFilter {
+public class ByLabelFilter extends AbstractStreamFilter {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(FilterByLabelFilter.class);
+  private static final Logging logger = Logging.getLogger(ByLabelFilter.class);
 
   /**
    * The filter pattern
@@ -69,7 +69,7 @@ public class FilterByLabelFilter extends AbstractStreamFilter {
    * @param pattern Filter pattern
    * @param inverted Inversion flag
    */
-  public FilterByLabelFilter(Pattern pattern, boolean inverted) {
+  public ByLabelFilter(Pattern pattern, boolean inverted) {
     super();
     this.pattern = pattern;
     this.inverted = inverted;
@@ -190,7 +190,7 @@ public class FilterByLabelFilter extends AbstractStreamFilter {
 
     @Override
     protected Object makeInstance() {
-      return new FilterByLabelFilter(pattern, inverted);
+      return new ByLabelFilter(pattern, inverted);
     }
   }
 }
