@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource.Event;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -203,6 +205,44 @@ public class MultipleObjectsBundle implements ObjectBundle {
     bundle.appendColumn(type1, data1);
     bundle.appendColumn(type2, data2);
     bundle.appendColumn(type3, data3);
+    return bundle;
+  }
+
+  /**
+   * Convert an object stream to a bundle
+   * 
+   * @param source Object stream
+   * @return Static bundle
+   */
+  public static MultipleObjectsBundle fromStream(BundleStreamSource source) {
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+    boolean stop = false;
+    while(!stop) {
+      Event ev = source.nextEvent();
+      switch(ev) {
+      case END_OF_STREAM:
+        stop = true;
+        break;
+      case META_ADDED:
+        BundleMeta meta = source.getMeta();
+        // TODO: assert the existing metas are consistent?
+        for(int i = bundle.metaLength(); i < meta.size(); i++) {
+          List<Object> data = new ArrayList<Object>(bundle.dataLength() + 1);
+          bundle.appendColumn(meta.get(i), data);
+        }
+        continue;
+      case NEXT_OBJECT:
+        for (int i = 0; i < bundle.metaLength(); i++) {
+          @SuppressWarnings("unchecked")
+          final List<Object> col = (List<Object>) bundle.columns.get(i);
+          col.add(source.data(i));
+        }
+        continue;
+      default:
+        LoggingUtil.warning("Unknown event: " + ev);
+        continue;
+      }
+    }
     return bundle;
   }
 
