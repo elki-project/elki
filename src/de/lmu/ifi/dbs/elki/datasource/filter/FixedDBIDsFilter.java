@@ -77,7 +77,7 @@ public class FixedDBIDsFilter extends AbstractStreamFilter {
   @Override
   public Event nextEvent() {
     Event ev = source.nextEvent();
-    if(ev == Event.META_ADDED) {
+    if(ev == Event.META_CHANGED) {
       if(meta == null) {
         meta = new BundleMeta();
         meta.add(TypeUtil.DBID);

@@ -1,4 +1,8 @@
-package de.lmu.ifi.dbs.elki.datasource.bundle;
+package de.lmu.ifi.dbs.elki.datasource.parser;
+
+import java.io.InputStream;
+
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
 
 /*
  This file is part of ELKI:
@@ -24,50 +28,16 @@ package de.lmu.ifi.dbs.elki.datasource.bundle;
  */
 
 /**
- * Convert a MultipleObjectsBundle to a stream
+ * Interface for streaming parsers, that may be much more efficient in
+ * combination with filters.
  * 
  * @author Erich Schubert
  */
-public class StreamFromBundle implements BundleStreamSource {
+public interface StreamingParser extends Parser, BundleStreamSource {
   /**
-   * Bundle to access
-   */
-  MultipleObjectsBundle bundle;
-
-  /**
-   * Offset in bundle
-   */
-  int onum = -2;
-
-  /**
-   * Constructor.
+   * Init the streaming parser for the given input stream.
    * 
-   * @param bundle Existing object bundle
+   * @param in the stream to parse objects from
    */
-  public StreamFromBundle(MultipleObjectsBundle bundle) {
-    super();
-    this.bundle = bundle;
-  }
-
-  @Override
-  public BundleMeta getMeta() {
-    return bundle.meta();
-  }
-
-  @Override
-  public Object data(int rnum) {
-    return bundle.data(onum, rnum);
-  }
-
-  @Override
-  public Event nextEvent() {
-    onum += 1;
-    if(onum < 0) {
-      return Event.META_CHANGED;
-    }
-    if(onum >= bundle.dataLength()) {
-      return Event.END_OF_STREAM;
-    }
-    return Event.NEXT_OBJECT;
-  }
+  void initStream(InputStream in);
 }

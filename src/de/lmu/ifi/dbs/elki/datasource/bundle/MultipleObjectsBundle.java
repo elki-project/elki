@@ -223,12 +223,16 @@ public class MultipleObjectsBundle implements ObjectBundle {
       case END_OF_STREAM:
         stop = true;
         break;
-      case META_ADDED:
-        BundleMeta meta = source.getMeta();
-        // TODO: assert the existing metas are consistent?
-        for(int i = bundle.metaLength(); i < meta.size(); i++) {
+      case META_CHANGED:
+        BundleMeta smeta = source.getMeta();
+        // rebuild bundle meta
+        bundle.meta = new BundleMeta();
+        for(int i = 0; i < bundle.columns.size(); i++) {
+          bundle.meta.add(smeta.get(i));
+        }
+        for(int i = bundle.metaLength(); i < smeta.size(); i++) {
           List<Object> data = new ArrayList<Object>(bundle.dataLength() + 1);
-          bundle.appendColumn(meta.get(i), data);
+          bundle.appendColumn(smeta.get(i), data);
         }
         continue;
       case NEXT_OBJECT:

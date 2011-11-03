@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
+import java.io.InputStream;
+import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,22 +27,25 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
-
 /**
- * A parser that can parse single line.
- * Will be used by a parser to re-read results.
- *
+ * Base class for streaming parsers.
+ * 
  * @author Erich Schubert
  */
-public interface LinebasedParser extends InspectionUtilFrequentlyScanned {
+public abstract class AbstractStreamingParser extends AbstractParser implements StreamingParser {
   /**
-   * Parse a single line into a database object
+   * Constructor.
    * 
-   * @param line single line
-   * @return parsing result
+   * @param colSep Column separator pattern
+   * @param quoteChar Quote character
    */
-  public SingleObjectBundle parseLine(String line);
+  public AbstractStreamingParser(Pattern colSep, char quoteChar) {
+    super(colSep, quoteChar);
+  }
+
+  @Override
+  final public MultipleObjectsBundle parse(InputStream in) {
+    this.initStream(in);
+    return MultipleObjectsBundle.fromStream(this);
+  }
 }

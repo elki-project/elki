@@ -23,11 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,9 +34,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -57,7 +50,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @apiviz.has SparseFloatVector
  */
-// TODO: add a flag to perform TF normalization when using term counts
 @Title("Term frequency parser")
 @Description("Parse a file containing term frequencies. The expected format is 'label term1 <freq> term2 <freq> ...'. Terms must not contain the separator character!")
 public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVector> {
@@ -97,7 +89,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   }
 
   @Override
-  protected void parseLineInternal(String line, List<SparseFloatVector> vectors, List<LabelList> labellist) {
+  protected void parseLineInternal(String line) {
     List<String> entries = tokenize(line);
 
     double len = 0;
@@ -141,31 +133,8 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
       }
     }
 
-    vectors.add(new SparseFloatVector(values, maxdim));
-    labellist.add(labels);
-  }
-
-  @Override
-  public MultipleObjectsBundle parse(InputStream in) {
-    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    int lineNumber = 1;
-    List<SparseFloatVector> vectors = new ArrayList<SparseFloatVector>();
-    List<LabelList> lblc = new ArrayList<LabelList>();
-    try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(!line.startsWith(COMMENT) && line.length() > 0) {
-          parseLineInternal(line, vectors, lblc);
-        }
-      }
-    }
-    catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
-    }
-    // Set maximum dimensionality
-    for(int i = 0; i < vectors.size(); i++) {
-      vectors.get(i).setDimensionality(maxdim);
-    }
-    return MultipleObjectsBundle.makeSimple(getTypeInformation(maxdim), vectors, TypeUtil.LABELLIST, lblc);
+    curvec = new SparseFloatVector(values, maxdim);
+    curlbl = labels;
   }
 
   @Override
