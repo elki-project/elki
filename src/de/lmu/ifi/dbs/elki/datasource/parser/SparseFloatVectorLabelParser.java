@@ -22,11 +22,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,9 +31,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -68,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * @apiviz.has SparseFloatVector
  */
+// FIXME: Maxdim!
 @Title("Sparse Float Vector Label Parser")
 @Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored. Having the file parsed completely, the maximum occuring dimensionality is set as dimensionality to all created SparseFloatvectors.")
 public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<SparseFloatVector> {
@@ -75,6 +69,12 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    * Class logger
    */
   private static final Logging logger = Logging.getLogger(SparseFloatVectorLabelParser.class);
+
+  /**
+   * Holds the dimensionality of the parsed data which is the maximum occurring
+   * index of any attribute.
+   */
+  private int maxdim = -1;
 
   /**
    * Constructor.
@@ -87,14 +87,8 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     super(colSep, quoteChar, labelIndices, SparseFloatVector.STATIC);
   }
 
-  /**
-   * Holds the dimensionality of the parsed data which is the maximum occurring
-   * index of any attribute.
-   */
-  private int dimensionality = -1;
-
   @Override
-  protected void parseLineInternal(String line, List<SparseFloatVector> vectors, List<LabelList> labellist) {
+  protected void parseLineInternal(String line) {
     List<String> entries = tokenize(line);
     int cardinality = Integer.parseInt(entries.get(0));
 
@@ -107,8 +101,8 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
         Float attribute;
         try {
           index = Integer.valueOf(entries.get(i));
-          if(index > dimensionality) {
-            dimensionality = index;
+          if(index > maxdim) {
+            maxdim = index;
           }
           i++;
         }
@@ -123,36 +117,8 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
         labels.add(entries.get(i));
       }
     }
-    vectors.add(new SparseFloatVector(values, dimensionality));
-    labellist.add(labels);
-  }
-
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser#parse(java.io.InputStream)
-   */
-  @Override
-  public MultipleObjectsBundle parse(InputStream in) {
-    dimensionality = -1;
-    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    int lineNumber = 1;
-    List<SparseFloatVector> vectors = new ArrayList<SparseFloatVector>();
-    List<LabelList> lblc = new ArrayList<LabelList>();
-    try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(!line.startsWith(COMMENT) && line.length() > 0) {
-          parseLineInternal(line, vectors, lblc);
-        }
-      }
-    }
-    catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
-    }
-    // Set maximum dimensionality
-    for(int i = 0; i < vectors.size(); i++) {
-      vectors.get(i).setDimensionality(dimensionality);
-    }
-    return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, lblc);
+    curvec = new SparseFloatVector(values, maxdim);
+    curlbl = labels;
   }
 
   @Override

@@ -65,7 +65,7 @@ public abstract class AbstractStreamConversionFilter<I, O> extends AbstractStrea
   @Override
   public Event nextEvent() {
     Event ev = source.nextEvent();
-    if(ev == Event.META_ADDED) {
+    if(ev == Event.META_CHANGED) {
       if(meta == null) {
         meta = new BundleMeta();
       }

@@ -37,8 +37,8 @@ public interface BundleStreamSource {
    * @apiviz.exclude
    */
   public static enum Event {
-    // New meta was added
-    META_ADDED,
+    // Metadata has changed
+    META_CHANGED,
     // Next object available
     NEXT_OBJECT,
     // Stream ended

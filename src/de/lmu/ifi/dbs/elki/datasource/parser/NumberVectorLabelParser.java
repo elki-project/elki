@@ -38,8 +38,7 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -69,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> the type of NumberVector used
  */
-public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends AbstractParser implements LinebasedParser, Parser {
+public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends AbstractStreamingParser {
   /**
    * Logging class.
    */
@@ -105,6 +104,41 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   protected V factory;
 
   /**
+   * Buffer reader
+   */
+  private BufferedReader reader;
+
+  /**
+   * Current line number
+   */
+  protected int lineNumber;
+
+  /**
+   * Dimensionality reported
+   */
+  protected int dimensionality;
+
+  /**
+   * Metadata
+   */
+  protected BundleMeta meta = null;
+
+  /**
+   * Current vector
+   */
+  protected V curvec = null;
+
+  /**
+   * Current labels
+   */
+  protected LabelList curlbl = null;
+  
+  /**
+   * Event to report next
+   */
+  Event nextevent = null;
+
+  /**
    * Constructor
    * 
    * @param colSep
@@ -119,74 +153,80 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   }
 
   @Override
-  public MultipleObjectsBundle parse(InputStream in) {
-    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    int lineNumber = 1;
-    int dimensionality = -1;
-    List<V> vectors = new ArrayList<V>();
-    List<LabelList> labels = new ArrayList<LabelList>();
+  public void initStream(InputStream in) {
+    reader = new BufferedReader(new InputStreamReader(in));
+    lineNumber = 1;
+    dimensionality = -1;
+  }
+
+  @Override
+  public BundleMeta getMeta() {
+    return meta;
+  }
+
+  @Override
+  public Event nextEvent() {
+    if (nextevent != null) {
+      Event ret = nextevent;
+      nextevent = null;
+      return ret;
+    }
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
-          parseLineInternal(line, vectors, labels);
-          V newvec = vectors.get(vectors.size() - 1);
+          parseLineInternal(line);
           if(dimensionality < 0) {
-            dimensionality = newvec.getDimensionality();
+            dimensionality = curvec.getDimensionality();
+            buildMeta();
+            nextevent = Event.NEXT_OBJECT;
+            return Event.META_CHANGED;
           }
           else {
-            if(dimensionality != newvec.getDimensionality()) {
-              throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + newvec.getDimensionality() + " != " + dimensionality);
+            if(dimensionality != curvec.getDimensionality()) {
+              dimensionality = curvec.getDimensionality();
+              buildMeta();
+              nextevent = Event.NEXT_OBJECT;
+              return Event.META_CHANGED;
             }
           }
+          return Event.NEXT_OBJECT;
         }
       }
+      return Event.END_OF_STREAM;
     }
     catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
-    return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, labels);
-  }
-
-  @Override
-  public SingleObjectBundle parseLine(String line) {
-    // TODO: code duplication with parseLineInternal below.
-    List<String> entries = tokenize(line);
-    // Split into numerical attributes and labels
-    List<Double> attributes = new ArrayList<Double>(entries.size());
-    LabelList labels = new LabelList();
-
-    Iterator<String> itr = entries.iterator();
-    for(int i = 0; itr.hasNext(); i++) {
-      String ent = itr.next();
-      if(!labelIndices.get(i)) {
-        try {
-          Double attribute = Double.valueOf(ent);
-          attributes.add(attribute);
-          continue;
-        }
-        catch(NumberFormatException e) {
-          // Ignore attempt, add to labels below.
-        }
-      }
-      labels.add(ent);
-    }
-    V vec = createDBObject(attributes, ArrayLikeUtil.numberListAdapter(attributes));
-    SingleObjectBundle pkg = new SingleObjectBundle();
-    pkg.append(getTypeInformation(vec.getDimensionality()), vec);
-    pkg.append(TypeUtil.LABELLIST, labels);
-    return pkg;
   }
 
   /**
-   * Internal method for parsing a single line. Used by both line based parsig
+   * Update the meta element.
+   */
+  protected void buildMeta() {
+    meta = new BundleMeta(2);
+    meta.add(getTypeInformation(dimensionality));
+    meta.add(TypeUtil.LABELLIST);
+  }
+
+  @Override
+  public Object data(int rnum) {
+    if (rnum == 0) {
+      return curvec;
+    }
+    if (rnum == 1) {
+      return curlbl;
+    }
+    throw new ArrayIndexOutOfBoundsException();
+  }
+
+  /**
+   * Internal method for parsing a single line. Used by both line based parsing
    * as well as block parsing. This saves the building of meta data for each
    * line.
    * 
    * @param line Line to process
-   * @param vectors Vectors
-   * @param labellist Labels
    */
-  protected void parseLineInternal(String line, List<V> vectors, List<LabelList> labellist) {
+  protected void parseLineInternal(String line) {
     List<String> entries = tokenize(line);
     // Split into numerical attributes and labels
     List<Double> attributes = new ArrayList<Double>(entries.size());
@@ -208,8 +248,8 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       labels.add(ent);
     }
 
-    vectors.add(createDBObject(attributes, ArrayLikeUtil.numberListAdapter(attributes)));
-    labellist.add(labels);
+    curvec = createDBObject(attributes, ArrayLikeUtil.numberListAdapter(attributes));
+    curlbl = labels;
   }
 
   /**

@@ -95,7 +95,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
           logger.warning("By label filter was used, but never saw a label relation!");
         }
         return Event.END_OF_STREAM;
-      case META_ADDED:
+      case META_CHANGED:
         // Search for the first label column
         if(lblcol < 0) {
           BundleMeta meta = source.getMeta();
@@ -106,7 +106,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
             }
           }
         }
-        return Event.META_ADDED;
+        return Event.META_CHANGED;
       case NEXT_OBJECT:
         if(lblcol > 0) {
           Object l = source.data(lblcol);
