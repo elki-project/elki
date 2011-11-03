@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 
 /*
  This file is part of ELKI:
