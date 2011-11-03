@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -93,7 +94,9 @@ public class FixedDBIDsFilter extends AbstractStreamFilter {
   @Override
   public Object data(int rnum) {
     if(rnum == 0) {
-      return DBIDUtil.importInteger(curid);
+      DBID ret = DBIDUtil.importInteger(curid);
+      curid++;
+      return ret;
     }
     return source.data(rnum - 1);
   }
