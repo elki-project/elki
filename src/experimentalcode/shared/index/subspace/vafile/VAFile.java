@@ -25,11 +25,9 @@ package experimentalcode.shared.index.subspace.vafile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -37,9 +35,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import experimentalcode.shared.index.subspace.structures.DiskMemory;
 
 /**
@@ -51,6 +52,7 @@ import experimentalcode.shared.index.subspace.structures.DiskMemory;
  */
 public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
   Logger log = Logger.getLogger(VAFile.class.getName());
+
   // Full data representation
   DiskMemory<V> data;
 
@@ -80,8 +82,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
   private int scanPageAccesses;
 
   public VAFile(int pageSize, Relation<V> relation, int partitions) {
-   
-    
+
     this.pageSize = pageSize;
 
     scannedBytes = 0;
@@ -105,8 +106,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
       }
       vectorApprox.add(va);
     }
-    
-   
+
   }
 
   public int getPageAccess() {
@@ -117,7 +117,6 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
     if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2)))
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
 
-    
     int dimensions = DatabaseUtil.dimensionality(objects);
     splitPositions = new double[dimensions][partitions + 1];
     int[][] partitionCount = new int[dimensions][partitions];
@@ -225,7 +224,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
     VectorApprox<V> queryApprox = new VectorApprox<V>(query.getDimensionality());
     try {
       queryApprox.calculateApproximation(query, splitPositions);
-      //System.out.println("*** query: "+query + " " +queryApprox);
+      // System.out.println("*** query: "+query + " " +queryApprox);
     }
     catch(Exception e) {
       e.printStackTrace();
@@ -235,7 +234,7 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
     // perform multi-step NN-query
 
     Vector<VectorApprox<V>> candidates = new Vector<VectorApprox<V>>();
-    //double minMaxDist = Double.POSITIVE_INFINITY;
+    // double minMaxDist = Double.POSITIVE_INFINITY;
 
     // filter step
 
@@ -256,57 +255,52 @@ public class VAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> {
       }
       minDist = Math.pow(minDist, 1.0 / p);
       maxDist = Math.pow(maxDist, 1.0 / p);
-      
-      //if(minDist <= minMaxDist) // object has to be refined
-      //{
-        va.increasePMinDist(minDist);
-        va.increasePMaxDist(maxDist);
-        candidates.add(va);
-      //}
-      //minMaxDist = Math.min(minMaxDist, maxDist);
-      
+
+      // if(minDist <= minMaxDist) // object has to be refined
+      // {
+      va.increasePMinDist(minDist);
+      va.increasePMaxDist(maxDist);
+      candidates.add(va);
+      // }
+      // minMaxDist = Math.min(minMaxDist, maxDist);
+
     }
 
     // refinement step
-
-
-    List<DoubleDistanceResultPair> result = new ArrayList<DoubleDistanceResultPair>();
+    KNNHeap<DoubleDistance> result = new KNNHeap<DoubleDistance>(k);
 
     // sort candidates by lower bound (minDist)
     candidates = VectorApprox.sortByMinDist(candidates);
-//    log.fine("candidates size " + candidates.size());
+    // log.fine("candidates size " + candidates.size());
     // retrieve accurate distances
-   for(int i = 0; i < candidates.size(); i++) {
+    for(int i = 0; i < candidates.size(); i++) {
       VectorApprox<V> va = candidates.get(i);
-      DoubleDistanceResultPair lastElement = null;
-      double lastDist = Double.POSITIVE_INFINITY;
-      
-      if(!result.isEmpty())
-        {
-    	  lastElement = result.get(result.size() - 1);
-    	  lastDist = lastElement.getDoubleDistance();
-        }
-     
-      // retrieve at least k elements while the min distances are smaller than the greatest accurate distance
-      if(result.size() < k || va.getPMinDist() <= lastDist) {
-        V dv = data.getObject(va.getId());
-        double dist = 0;
-        for(int d = 0; d < dv.getDimensionality(); d++) {
-          dist += Math.pow(dv.doubleValue(d + 1) - query.doubleValue(d + 1), p);
-        }
-        dist = Math.pow(dist, 1.0 / p);
-        DoubleDistanceResultPair dp = new DoubleDistanceResultPair(dist, va.getId());
 
-        result.add(dp);
-    	Collections.sort(result, new DoubleDistanceResultPairComparator());
+      // Stop when we are sure to have all elements
+      if(result.size() >= k) {
+        double kDist = result.getKNNDistance().doubleValue();
+        if(va.getPMinDist() > kDist) {
+          break;
+        }
       }
+
+      // refine the next element
+      V dv = data.getObject(va.getId());
+      double dist = 0;
+      for(int d = 0; d < dv.getDimensionality(); d++) {
+        dist += Math.pow(dv.doubleValue(d + 1) - query.doubleValue(d + 1), p);
+      }
+      dist = Math.pow(dist, 1.0 / p);
+      DoubleDistanceResultPair dp = new DoubleDistanceResultPair(dist, va.getId());
+
+      result.add(dp);
     }
     log.finest("\nquery = (" + query + ")");
     log.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
 
     ModifiableDBIDs resultIDs = DBIDUtil.newArray(result.size());
-    for(int i=0; i<k; i++) {
-    	DoubleDistanceResultPair dp = result.get(i);
+    for(int i = 0; i < k; i++) {
+      DistanceResultPair<DoubleDistance> dp = result.poll();
       log.finest(dp.toString());
       resultIDs.add(dp.getDBID());
     }
