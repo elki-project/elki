@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.filter.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
