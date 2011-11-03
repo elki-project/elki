@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * <p>
  * Implementation note: attribute standardization is not used; this is
  * equivalent to using the
- * {@link de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseVarianceNormalization
+ * {@link de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization
  * AttributeWiseVarianceNormalization} filter.
  * </p>
  * 

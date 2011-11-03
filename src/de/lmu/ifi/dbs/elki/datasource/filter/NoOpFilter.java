@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 
 /**
@@ -34,7 +35,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * 
  * @author Erich Schubert
  */
-public class NoOpFilter implements ObjectFilter {
+public class NoOpFilter extends AbstractStreamFilter {
   /**
    * Constructor.
    */
@@ -45,5 +46,20 @@ public class NoOpFilter implements ObjectFilter {
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
     return objects;
+  }
+
+  @Override
+  public BundleMeta getMeta() {
+    return source.getMeta();
+  }
+
+  @Override
+  public Object data(int rnum) {
+    return source.data(rnum);
+  }
+
+  @Override
+  public Event nextEvent() {
+    return source.nextEvent();
   }
 }

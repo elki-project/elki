@@ -23,13 +23,9 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -43,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @apiviz.has DBID oneway - - «produces»
  */
-public class FixedDBIDsFilter implements ObjectFilter {
+public class FixedDBIDsFilter extends AbstractStreamFilter {
   /**
    * Optional parameter to specify the first object ID to use.
    * <p>
@@ -53,9 +49,14 @@ public class FixedDBIDsFilter implements ObjectFilter {
   public static final OptionID IDSTART_ID = OptionID.getOrCreateOptionID("dbc.startid", "Object ID to start counting with");
 
   /**
-   * The first ID to assign
+   * The filtered meta
    */
-  final int startid;
+  BundleMeta meta;
+
+  /**
+   * The next ID to assign
+   */
+  int curid = 0;
 
   /**
    * Constructor.
@@ -64,22 +65,37 @@ public class FixedDBIDsFilter implements ObjectFilter {
    */
   public FixedDBIDsFilter(int startid) {
     super();
-    this.startid = startid;
+    this.curid = startid;
   }
 
   @Override
-  public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
-    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    List<DBID> ids = new ArrayList<DBID>(objects.dataLength());
-    for(int i = 0; i < objects.dataLength(); i++) {
-      ids.add(DBIDUtil.importInteger(startid + i));
+  public BundleMeta getMeta() {
+    return meta;
+  }
+
+  @Override
+  public Event nextEvent() {
+    Event ev = source.nextEvent();
+    if(ev == Event.META_ADDED) {
+      if(meta == null) {
+        meta = new BundleMeta();
+        meta.add(TypeUtil.DBID);
+      }
+      BundleMeta origmeta = source.getMeta();
+      // Note -1 for the injected DBID column
+      for(int i = meta.size() - 1; i < origmeta.size(); i++) {
+        meta.add(origmeta.get(i));
+      }
     }
-    bundle.appendColumn(TypeUtil.DBID, ids);
-    // copy other columns
-    for(int j = 0; j < objects.metaLength(); j++) {
-      bundle.appendColumn(objects.meta(j), objects.getColumn(j));
+    return ev;
+  }
+
+  @Override
+  public Object data(int rnum) {
+    if(rnum == 0) {
+      return DBIDUtil.importInteger(curid);
     }
-    return bundle;
+    return source.data(rnum - 1);
   }
 
   /**
