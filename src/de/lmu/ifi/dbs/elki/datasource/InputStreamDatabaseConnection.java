@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
+import de.lmu.ifi.dbs.elki.datasource.parser.StreamingParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -88,14 +89,27 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
     if(logger.isDebugging()) {
       logger.debugFine("Invoking parsers.");
     }
-    MultipleObjectsBundle parsingResult = parser.parse(in);
+    if(parser instanceof StreamingParser) {
+      final StreamingParser streamParser = (StreamingParser)parser;
+      streamParser.initStream(in);
 
-    // normalize objects and transform labels
-    if(logger.isDebugging()) {
-      logger.debugFine("Invoking filters.");
+      // normalize objects and transform labels
+      if(logger.isDebugging()) {
+        logger.debugFine("Invoking filters.");
+      }
+      MultipleObjectsBundle objects = MultipleObjectsBundle.fromStream(invokeFilters(streamParser));
+      return objects;
     }
-    MultipleObjectsBundle objects = invokeFilters(parsingResult);
-    return objects;
+    else {
+      MultipleObjectsBundle parsingResult = parser.parse(in);
+
+      // normalize objects and transform labels
+      if(logger.isDebugging()) {
+        logger.debugFine("Invoking filters.");
+      }
+      MultipleObjectsBundle objects = invokeFilters(parsingResult);
+      return objects;
+    }
   }
 
   @Override

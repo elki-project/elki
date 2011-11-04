@@ -25,8 +25,11 @@ package de.lmu.ifi.dbs.elki.datasource;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.StreamFromBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.StreamFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -77,12 +80,82 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @return processed objects
    */
   protected MultipleObjectsBundle invokeFilters(MultipleObjectsBundle bundle) {
+    BundleStreamSource prevs = null;
+    MultipleObjectsBundle prevb = bundle;
     if(filters != null) {
       for(ObjectFilter filter : filters) {
-        bundle = filter.filter(bundle);
+        if(filter instanceof StreamFilter) {
+          StreamFilter sfilter = (StreamFilter) filter;
+          if(prevs != null) {
+            sfilter.init(prevs);
+          }
+          else {
+            sfilter.init(new StreamFromBundle(prevb));
+          }
+          prevs = sfilter;
+          prevb = null;
+        }
+        else {
+          if(prevs != null) {
+            prevb = filter.filter(MultipleObjectsBundle.fromStream(prevs));
+            prevs = null;
+          }
+          else {
+            prevb = filter.filter(prevb);
+            prevs = null;
+          }
+        }
       }
     }
-    return bundle;
+    if(prevb != null) {
+      return prevb;
+    }
+    else {
+      return MultipleObjectsBundle.fromStream(prevs);
+    }
+  }
+
+  /**
+   * Transforms the specified list of objects and their labels into a list of
+   * objects and their associations.
+   * 
+   * @param bundle the objects to process
+   * @return processed objects
+   */
+  protected BundleStreamSource invokeFilters(BundleStreamSource bundle) {
+    BundleStreamSource prevs = bundle;
+    MultipleObjectsBundle prevb = null;
+    if(filters != null) {
+      for(ObjectFilter filter : filters) {
+        if(filter instanceof StreamFilter) {
+          StreamFilter sfilter = (StreamFilter) filter;
+          if(prevs != null) {
+            sfilter.init(prevs);
+          }
+          else {
+            sfilter.init(new StreamFromBundle(prevb));
+          }
+          prevs = sfilter;
+          prevb = null;
+        }
+        else {
+          if(prevs != null) {
+            prevb = filter.filter(MultipleObjectsBundle.fromStream(prevs));
+            prevs = null;
+          }
+          else {
+            prevb = filter.filter(prevb);
+            prevs = null;
+          }
+        }
+      }
+    }
+    if(prevs != null) {
+      return prevs;
+    }
+    else {
+      return new StreamFromBundle(prevb);
+    }
   }
 
   /**
