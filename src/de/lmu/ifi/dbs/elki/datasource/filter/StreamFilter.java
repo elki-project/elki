@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
  * in more settings.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses BundleStreamSource - - «filters»
  */
 public interface StreamFilter extends ObjectFilter, BundleStreamSource {
   /**
