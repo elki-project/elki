@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * The cardinality of the subset of attributes is specified as a parameter.
  * 
- * 
  * @author Arthur Zimek
  * @author Erich Schubert
  * 
