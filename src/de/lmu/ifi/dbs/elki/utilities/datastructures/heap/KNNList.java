@@ -347,4 +347,20 @@ public class KNNList<D extends Distance<D>> extends ArrayList<DistanceResultPair
   public static <D extends Distance<D>> List<D> asDistanceList(List<? extends DistanceResultPair<D>> list) {
     return new DistanceView<D>(list);
   }
+
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    buf.append("kNNList[");
+    Iterator<DistanceResultPair<D>> iter = this.iterator();
+    while(iter.hasNext()) {
+      DistanceResultPair<D> pair = iter.next();
+      buf.append(pair.getDistance()).append(":").append(pair.getDBID());
+      if(iter.hasNext()) {
+        buf.append(",");
+      }
+    }
+    buf.append("]");
+    return buf.toString();
+  }
 }
