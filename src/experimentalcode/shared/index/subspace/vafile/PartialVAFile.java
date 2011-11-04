@@ -34,7 +34,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -47,6 +46,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import experimentalcode.franz.utils.SortedDoubleArray;
 import experimentalcode.shared.index.subspace.IndexStatistics;
 import experimentalcode.shared.index.subspace.SubSpace;
@@ -61,9 +61,8 @@ import experimentalcode.shared.index.subspace.structures.DiskMemory;
  * @created 15.09.2009
  * @date 15.09.2009
  */
-public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<V> implements SubspaceIndex<V> {
-
-  Logger log = Logger.getLogger(PartialVAFile.class.getName());
+public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceIndex<V> {
+  Logging log = Logging.getLogger(PartialVAFile.class);
 
   boolean insertedData = false;
 
@@ -184,7 +183,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
-    log.info("PVA: setting partitions (partitionCount=" + (partitions) + ") ...");
+    log.verbose("PVA: setting partitions (partitionCount=" + (partitions) + ") ...");
     ExecutorService threadExecutor = Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime().availableProcessors()));
     for(int i = 0; i < daFiles.length; i++) {
       PartitionBuilder<V> builder = new PartitionBuilder<V>(daFiles[i], partitions, objects);
@@ -205,12 +204,10 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
   }
 
   public double[] getMinDists(int dimension, int queryCell) {
-
     return daFiles[dimension].getMinDists(queryCell);
   }
 
   public double[] getMaxDists(int dimension, int queryCell) {
-
     return daFiles[dimension].getMaxDists(queryCell);
   }
 
@@ -267,14 +264,6 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
     data.resetBuffer();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * experimentalcode.shared.index.subspace.SubspaceIndex#subSpaceKnnQuery(de
-   * .lmu .ifi.dbs.elki.data.DoubleVector,
-   * experimentalcode.shared.index.subspace.SubSpace, int)
-   */
   @Override
   public ArrayDBIDs subSpaceKnnQuery(V query, SubSpace subspace, int k) {
     if(query.getDimensionality() != subspace.fullDimensions) {
@@ -389,12 +378,12 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
 
     // refinement step
     Vector<VectorApprox<V>> sortedCandidates = new Vector<VectorApprox<V>>(candidates2.size());
-    for(VectorApprox<V> va : candidates2) // sortedCandidates.add(vectorApprox.get(id));
-    {
+    for(VectorApprox<V> va : candidates2) {
+      // sortedCandidates.add(vectorApprox.get(id));
       sortedCandidates.add(va);
     }
     // sort candidates by lower bound (minDist)
-    sortedCandidates = VectorApprox.sortByMinDist(sortedCandidates);
+    VectorApprox.sortByMinDist(sortedCandidates);
     List<DoubleDistanceResultPair> result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
 
     queryTime += System.nanoTime() - t;
@@ -419,8 +408,9 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
     List<DoubleDistanceResultPair> result = new ArrayList<DoubleDistanceResultPair>();
     for(VectorApprox<V> va : sortedCandidates) {
       DoubleDistanceResultPair lastElement = null;
-      if(!result.isEmpty())
+      if(!result.isEmpty()) {
         lastElement = result.get(result.size() - 1);
+      }
       DBID currentID = va.getId();
       if(result.size() < k || va.getPMinDist() < lastElement.getDistance().doubleValue()) {
         V dv = data.getObject(currentID);
@@ -445,14 +435,6 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
     return result;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * experimentalcode.shared.index.subspace.SubspaceIndex#subSpaceRangeQuery(de.
-   * lmu.ifi.dbs.elki.data.DoubleVector,
-   * experimentalcode.shared.index.subspace.SubSpace, double)
-   */
   @Override
   public DBIDs subSpaceRangeQuery(V query, SubSpace subspace, double epsilon) {
     issuedQueries++;
@@ -461,12 +443,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
     // generate query approximation and lookup table
 
     VectorApprox<V> queryApprox = new VectorApprox<V>(query.getDimensionality());
-    try {
-      queryApprox.calculateApproximation(query, daFiles);
-    }
-    catch(Exception e) {
-      e.printStackTrace();
-    }
+    queryApprox.calculateApproximation(query, daFiles);
     setLookupTable(query);
 
     // perform multi-step range query
@@ -522,15 +499,11 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
     ModifiableDBIDs resultIDs = DBIDUtil.newArray();
     for(DistanceResultPair<DoubleDistance> dp : candidates) {
       DBID id = dp.getDBID();
-      if(Math.pow(dp.getDistance().doubleValue(), (1.0 / p)) <= epsilon) // candidate
-                                                                         // cannot
-                                                                         // be
-                                                                         // dropped
-      {
+      if(Math.pow(dp.getDistance().doubleValue(), (1.0 / p)) <= epsilon) {
+        // candidate cannot be dropped
         resultIDs.add(id);
       }
-      else // refine candidate
-      {
+      else { // refine candidate
         V dv = data.getObject(id);
         double dist = 0;
         for(int d = 0; d < subspace.subspaceDimensions.length; d++) {
@@ -589,28 +562,21 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractVAFile<
   }
 }
 
-class WorstCaseDistComparator<V extends NumberVector<V, ?>> implements Comparator<DAFile<V>> {
-
+class WorstCaseDistComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile<V>> {
   private VectorApprox<V> query;
 
   public WorstCaseDistComparator(VectorApprox<V> query) {
     this.query = query;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-   */
   @Override
   public int compare(DAFile<V> a, DAFile<V> b) {
     return Double.compare(a.getMaxMaxDist(query.getApproximation(a.getDimension())), b.getMaxMaxDist(query.getApproximation(b.getDimension())));
   }
 }
 
-class PartitionBuilder<V extends NumberVector<V, ?>> implements Runnable {
-
-  private final Logger log = Logger.getLogger(PartitionBuilder.class.getName());
+class PartitionBuilder<V extends NumberVector<?, ?>> implements Runnable {
+  private final Logging log = Logging.getLogger(PartitionBuilder.class);
 
   private final DAFile<V> daFile;
 
@@ -660,10 +626,8 @@ class PartitionBuilder<V extends NumberVector<V, ?>> implements Runnable {
 
         partitionCount[b] += bucketSize;
       }
-      splitPositions[partitions] = tempdata[size - 1] + 0.000001; // make sure
-                                                                  // that last
-                                                                  // object will
-                                                                  // be included
+      // make sure that lastobject will be included
+      splitPositions[partitions] = tempdata[size - 1] + 0.000001;
       daFile.setPartitions(splitPositions);
 
       int d = daFile.getDimension();

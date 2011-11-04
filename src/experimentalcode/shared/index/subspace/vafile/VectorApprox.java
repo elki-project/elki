@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @created 16.09.2009
  * @date 16.09.2009
  */
-public class VectorApprox<V extends NumberVector<V, ?>> {
+public class VectorApprox<V extends NumberVector<?, ?>> {
 
   /**
    * approximation (va cell ids)
@@ -134,11 +134,10 @@ public class VectorApprox<V extends NumberVector<V, ?>> {
   private boolean approximationIsSet(int dim) {
     return approximation[dim] != -1;
   }
-  
-  public void resetPDists()
-  {
-	  minDist = 0;
-	  maxDist = 0;
+
+  public void resetPDists() {
+    minDist = 0;
+    maxDist = 0;
   }
 
   public void resetPMinDist() {
@@ -186,21 +185,14 @@ public class VectorApprox<V extends NumberVector<V, ?>> {
     return numberOfDimensions * (int) (Math.ceil((Math.log(numberOfPartitions) / Math.log(2)) / 8));
   }
 
-  public static <V extends NumberVector<V, ?>> Vector<VectorApprox<V>> sortByMinDist(Vector<VectorApprox<V>> vectorApprox) {
+  public static <V extends NumberVector<?, ?>> void sortByMinDist(Vector<VectorApprox<V>> vectorApprox) {
     Collections.sort(vectorApprox, new MinDistComparator<V>());
-    return vectorApprox;
   }
-}
 
-class MinDistComparator<V extends NumberVector<V, ?>> implements Comparator<VectorApprox<V>> {
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-   */
-  @Override
-  public int compare(VectorApprox<V> a, VectorApprox<V> b) {
-    return Double.compare(a.getPMinDist(), b.getPMinDist());
+  static class MinDistComparator<V extends NumberVector<?, ?>> implements Comparator<VectorApprox<V>> {
+    @Override
+    public int compare(VectorApprox<V> a, VectorApprox<V> b) {
+      return Double.compare(a.getPMinDist(), b.getPMinDist());
+    }
   }
 }
