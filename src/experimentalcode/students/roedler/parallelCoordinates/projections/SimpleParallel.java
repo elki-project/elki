@@ -378,9 +378,17 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return inverted[dimOrder[dim]];
   }
 
+  /**
+   * returns the scale factor
+   */
   @Override
   public double getScale() {
     return Scale;
+  }
+
+  @Override
+  public LinearScale getLinearScale(int dim) {
+    return scales[dim];
   }
   
   
