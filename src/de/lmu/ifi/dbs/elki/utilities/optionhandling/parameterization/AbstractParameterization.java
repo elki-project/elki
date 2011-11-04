@@ -173,7 +173,7 @@ public abstract class AbstractParameterization implements Parameterization {
     }
     catch(Exception e) {
       logger.exception(e);
-      reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
       return null;
     }
   }
@@ -185,7 +185,7 @@ public abstract class AbstractParameterization implements Parameterization {
     }
     catch(Exception e) {
       logger.exception(e);
-      reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
       return null;
     }
   }
