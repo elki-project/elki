@@ -91,7 +91,7 @@ public class UnParameterization implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(r, c, this);
     }
     catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
       return null;
     }
   }
@@ -102,7 +102,7 @@ public class UnParameterization implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(c, c, this);
     }
     catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class.", e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
       return null;
     }
   }
