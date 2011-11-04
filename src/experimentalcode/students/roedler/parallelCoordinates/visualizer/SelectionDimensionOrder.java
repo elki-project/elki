@@ -292,6 +292,7 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
         final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_NOEXPORT, true);
+        task.put(VisualizationTask.META_NOTHUMB, true);
         baseResult.getHierarchy().add(p, task);
       }
     }

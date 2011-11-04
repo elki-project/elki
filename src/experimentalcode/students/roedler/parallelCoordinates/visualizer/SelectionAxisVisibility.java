@@ -86,8 +86,6 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(rep);
 
-    
-   // Element back = svgp.svgRect(proj.getXpos(0) - 8.0, 115.0, (proj.getXpos(proj.getLastVisibleDimension()) - proj.getMarginX()) + 16.0, 4.0);
     Element back = svgp.svgRect(0.0, (proj.getMarginY() * 1.5 + proj.getAxisHeight()), proj.getSizeX(), proj.getSizeY() / 35.);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
     layer.appendChild(back);
@@ -178,17 +176,15 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     else {
       double xpos = proj.getXpos(last);
       if (xpos < 0.){xpos = 0.;}
-      if (vis == dim) { dist = proj.getMarginX() / (notvis + 1.); } //dist = 10.0 / (notvis + 1); }
+      if (vis == dim) { dist = proj.getMarginX() / (notvis + 1.); } 
       else { dist = (proj.getXpos(vis) - xpos) / ((double)notvis + 1.0); }
       
       for (int j = 0; j < notvis; j++){
         border = svgp.svgRect(xpos + (1 + j) * dist - hbs, ypos, bhs, bhs);
-        //border = svgp.svgRect(proj.getXpos(last) + (1 + j) * dist - 1.5, 115.5, 3.0, 3.0);
         SVGUtil.addCSSClass(border, SAV_BORDER);
         layer.appendChild(border);
         
         rect[c] = svgp.svgRect(xpos + (1 + j) * dist - hbs, ypos, bhs, bhs);
-        //rect[c] = svgp.svgRect(proj.getXpos(last) + (1 + j) * dist - 1.5, 115.5, 3.0, 3.0);
         SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
         addEventListener(rect[c], c);
         layer.appendChild(rect[c]);
@@ -291,6 +287,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
         final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_NOEXPORT, true);
+        task.put(VisualizationTask.META_NOTHUMB, true);
         baseResult.getHierarchy().add(p, task);
       }
     }
