@@ -39,7 +39,7 @@ import experimentalcode.franz.utils.ArrayUtils;
  * @created 22.09.2009
  * @date 22.09.2009
  */
-public class DAFile<V extends NumberVector<V, ?>> {
+public class DAFile<V extends NumberVector<?, ?>> {
   private int dimension;
 
   private double[] splitPositions;
@@ -67,8 +67,9 @@ public class DAFile<V extends NumberVector<V, ?>> {
     int remaining = size;
     double[] tempdata = new double[size];
     int j = 0;
-    for(V dv : objects)
+    for(V dv : objects) {
       tempdata[j++] = dv.doubleValue(dimension + 1);
+    }
     Arrays.sort(tempdata);
     tempdata = ArrayUtils.unique(tempdata, 1 / (100 * partitions));
 
@@ -138,31 +139,39 @@ public class DAFile<V extends NumberVector<V, ?>> {
 
     int queryCellGlobal = -1;
     for(int i = 0; i < splitPositions.length; i++) {
-      if(query.doubleValue(dimension + 1) < splitPositions[i])
+      if(query.doubleValue(dimension + 1) < splitPositions[i]) {
         break;
-      else
+      }
+      else {
         queryCellGlobal++;
+      }
     }
     // maxdists
     maxDists = new double[splitPositions.length - 1];
     for(int i = 0; i < maxDists.length; i++) {
-      if(i < queryCellGlobal)
+      if(i < queryCellGlobal) {
         maxDists[i] = lookup[i];
-      else if(i > queryCellGlobal)
+      }
+      else if(i > queryCellGlobal) {
         maxDists[i] = lookup[i + 1];
-      else
+      }
+      else {
         maxDists[i] = Math.max(lookup[i], lookup[i + 1]);
+      }
     }
 
     // mindists
     minDists = new double[splitPositions.length - 1];
     for(int i = 0; i < minDists.length; i++) {
-      if(i < queryCellGlobal)
+      if(i < queryCellGlobal) {
         minDists[i] = lookup[i + 1];
-      else if(i > queryCellGlobal)
+      }
+      else if(i > queryCellGlobal) {
         minDists[i] = lookup[i];
-      else
+      }
+      else {
         minDists[i] = 0;
+      }
     }
 
   }
@@ -205,8 +214,9 @@ public class DAFile<V extends NumberVector<V, ?>> {
   public static <V extends NumberVector<V, ?>> void calculateSelectivityCoeffs(List<DAFile<V>> daFileList, V query, double epsilon) {
     @SuppressWarnings("unchecked")
     DAFile<V>[] daFiles = new DAFile[daFileList.size()];
-    for(DAFile<V> da : daFileList)
+    for(DAFile<V> da : daFileList) {
       daFiles[da.getDimension()] = da;
+    }
 
     int dimensions = query.getDimensionality();
     double[] lowerVals = new double[dimensions];
@@ -234,12 +244,12 @@ public class DAFile<V extends NumberVector<V, ?>> {
     }
   }
 
-  public static <V extends NumberVector<V, ?>> List<DAFile<V>> sortBySelectivity(List<DAFile<V>> daFiles) {
+  public static <V extends NumberVector<?, ?>> List<DAFile<V>> sortBySelectivity(List<DAFile<V>> daFiles) {
     Collections.sort(daFiles, new DAFileSelectivityComparator<V>());
     return daFiles;
   }
 
-  static class DAFileSelectivityComparator<V extends NumberVector<V, ?>> implements Comparator<DAFile<V>> {
+  static class DAFileSelectivityComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile<V>> {
     @Override
     public int compare(DAFile<V> a, DAFile<V> b) {
       return Double.compare(a.getSelectivityCoeff(), b.getSelectivityCoeff());
