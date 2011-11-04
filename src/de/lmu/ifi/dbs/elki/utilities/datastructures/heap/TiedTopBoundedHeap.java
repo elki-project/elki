@@ -110,9 +110,6 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
   @Override
   protected void handleOverflow(E e) {
     if (super.compareExternal(e, 0) == 0) {
-      if (!ties.isEmpty() && super.compareExternalExternal(e, ties.peek()) < 0) {
-        ties.clear();
-      }
       ties.add(e);
     } else {
       // Also remove old ties.
