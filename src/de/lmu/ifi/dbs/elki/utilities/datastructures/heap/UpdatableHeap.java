@@ -42,7 +42,7 @@ public class UpdatableHeap<O> extends Heap<O> {
   /**
    * Holds the indices in the heap of each element.
    */
-  private HashMap<O, Integer> index = new HashMap<O, Integer>();
+  private HashMap<Object, Integer> index = new HashMap<Object, Integer>();
 
   /**
    * Simple constructor with default size.
@@ -86,7 +86,7 @@ public class UpdatableHeap<O> extends Heap<O> {
   }
 
   @Override
-  public synchronized boolean offer(O e) {
+  public boolean offer(O e) {
     Integer pos = index.get(e);
     if(pos == null) {
       // LoggingUtil.logExpensive(Level.INFO, "Inserting: "+e);
@@ -98,9 +98,8 @@ public class UpdatableHeap<O> extends Heap<O> {
       if(compareExternal(e, pos) < 0) {
         // LoggingUtil.logExpensive(Level.INFO,
         // "Updating value: "+e+" vs. "+castQueueElement(pos));
+        heapifyUp(pos, e);
         modCount++;
-        putInQueue(pos, e);
-        heapifyUpParent(pos);
         // We have changed - return true according to {@link Collection#put}
         return true;
       }
@@ -113,18 +112,16 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
   }
 
-  @Override
-  protected void putInQueue(int pos, Object e) {
-    super.putInQueue(pos, e);
+  private final void putInQueue(int pos, Object e) {
+    queue[pos] = e;    
     // Keep index up to date
     if(e != null) {
-      O n = castQueueElement(pos);
-      index.put(n, pos);
+      index.put(e, pos);
     }
   }
 
   @Override
-  protected synchronized O removeAt(int pos) {
+  protected O removeAt(int pos) {
     O node = super.removeAt(pos);
     // Keep index up to date
     index.remove(node);
@@ -152,5 +149,113 @@ public class UpdatableHeap<O> extends Heap<O> {
     O node = super.poll();
     index.remove(node);
     return node;
+  }
+
+  /**
+   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
+   * 
+   * @param pos insertion position
+   * @param elem Element to insert
+   */
+  @SuppressWarnings("unchecked")
+  protected void heapifyUpComparable(int pos, O elem) {
+    final Comparable<Object> cur = (Comparable<Object>) elem; // queue[pos];
+    while(pos > 0) {
+      final int parent = (pos - 1) >>> 1;
+      Object par = queue[parent];
+  
+      if(cur.compareTo(par) >= 0) {
+        break;
+      }
+      putInQueue(pos, par);
+      pos = parent;
+    }
+    putInQueue(pos, cur);
+  }
+
+  /**
+   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
+   * 
+   * @param pos insertion position
+   * @param cur Element to insert
+   */
+  protected void heapifyUpComparator(int pos, O cur) {
+    while(pos > 0) {
+      final int parent = (pos - 1) >>> 1;
+      Object par = queue[parent];
+  
+      if(comparator.compare(cur, par) >= 0) {
+        break;
+      }
+      putInQueue(pos, par);
+      pos = parent;
+    }
+    putInQueue(pos, cur);
+  }
+
+  /**
+   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
+   * 
+   * @param pos re-insertion position
+   */
+  @SuppressWarnings("unchecked")
+  protected void heapifyDownComparable(int pos, Object reinsert) {
+    Comparable<Object> cur = (Comparable<Object>) reinsert;
+    final int half = size >>> 1;
+    while(pos < half) {
+      // Get left child (must exist!)
+      int cpos = (pos << 1) + 1;
+      Object child = queue[cpos];
+      // Test right child, if present
+      final int rchild = cpos + 1;
+      if(rchild < size) {
+        Object right = queue[rchild];
+        if(((Comparable<Object>)child).compareTo(right) > 0) {
+          cpos = rchild;
+          child = right;
+        }
+      }
+      
+      if(cur.compareTo(child) <= 0) {
+        break;
+      }
+      putInQueue(pos, child);
+      pos = cpos;
+    }
+    putInQueue(pos, cur);
+  }
+
+  /**
+   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
+   * 
+   * @param pos re-insertion position
+   */
+  protected void heapifyDownComparator(int pos, Object cur) {
+    final int half = size >>> 1;
+    while(pos < half) {
+      int min = pos;
+      Object best = cur;
+  
+      final int lchild = (pos << 1) + 1;
+      Object left = queue[lchild];
+      if(comparator.compare(best, left) > 0) {
+        min = lchild;
+        best = left;
+      }
+      final int rchild = lchild + 1;
+      if(rchild < size) {
+        Object right = queue[rchild];
+        if(comparator.compare(best, right) > 0) {
+          min = rchild;
+          best = right;
+        }
+      }
+      if(min == pos) {
+        break;
+      }
+      putInQueue(pos, best);
+      pos = min;
+    }
+    putInQueue(pos, cur);
   }
 }
