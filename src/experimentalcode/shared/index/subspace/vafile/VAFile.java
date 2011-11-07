@@ -356,9 +356,9 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
       VectorApprox queryApprox = calculateApproximation(null, query);
 
       // Exact distance function
-      LPNormDistanceFunction exdist = new LPNormDistanceFunction(2.0);
+      LPNormDistanceFunction exdist = new LPNormDistanceFunction(p);
       // Approximative distance function
-      VALPNormDistance vadist = new VALPNormDistance(2.0, splitPositions, query, queryApprox);
+      VALPNormDistance vadist = new VALPNormDistance(p, splitPositions, query, queryApprox);
 
       // Count a VA file scan
       scans += 1;
@@ -369,7 +369,6 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
         VectorApprox va = vectorApprox.get(i);
         double minDist = vadist.getMinDist(va);
 
-        // Skip excess candidate generation:
         if(minDist > eps) {
           continue;
         }
@@ -385,6 +384,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
           result.add(new DoubleDistanceResultPair(dist, va.id));
         }
       }
+      Collections.sort(result);
       return result;
     }
   }
@@ -432,9 +432,9 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
       VectorApprox queryApprox = calculateApproximation(null, query);
 
       // Exact distance function
-      LPNormDistanceFunction exdist = new LPNormDistanceFunction(2.0);
+      LPNormDistanceFunction exdist = new LPNormDistanceFunction(p);
       // Approximative distance function
-      VALPNormDistance vadist = new VALPNormDistance(2.0, splitPositions, query, queryApprox);
+      VALPNormDistance vadist = new VALPNormDistance(p, splitPositions, query, queryApprox);
 
       // Heap for the kth smallest maximum distance
       Heap<Double> minMaxHeap = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
