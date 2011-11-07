@@ -32,8 +32,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -47,69 +49,87 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * @author Thomas Bernecker
  * @author Erich Schubert
  */
-public class VAFile<V extends NumberVector<?, ?>> {
+public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics {
   /**
    * Logging class
    */
   Logging log = Logging.getLogger(VAFile.class);
 
-  // Full data representation
+  /**
+   * The full object relation we index (and need for refinement
+   */
   Relation<V> relation;
 
-  // temporary, full-dimensional VA representation
+  /**
+   * Approximation index
+   */
   private List<VectorApprox> vectorApprox;
 
-  private static final int p = 2;
-
-  int bufferSize = Integer.MAX_VALUE;
-  
-  int pageSize;
-
-  private double[][] splitPositions;
-
+  /**
+   * Number of partitions.
+   */
   private int partitions;
 
-  private int scanPageAccesses;
+  /**
+   * Quantile grid we use
+   */
+  private double[][] splitPositions;
 
-  private int refinements;
+  /**
+   * Page size, for estimating the VA file size
+   */
+  int pageSize;
+
+  /**
+   * Number of scans we performed.
+   */
+  int scans;
+
+  /**
+   * Number of objects we refined.
+   */
+  int refinements;
 
   public VAFile(int pageSize, Relation<V> relation, int partitions) {
+    super();
+    this.partitions = partitions;
     this.pageSize = pageSize;
+    this.relation = relation;
+    this.refinements = 0;
+    this.scans = 0;
 
-    refinements = 0;
-    scanPageAccesses = 0;
-
-    setPartitions(relation, partitions);
-
+    // Initialize index
+    setPartitions();
     vectorApprox = new ArrayList<VectorApprox>();
     for(DBID id : relation.getDBIDs()) {
-      V dv = relation.get(id);
-      VectorApprox va = calculateApproximation(id, dv, splitPositions);
-      vectorApprox.add(va);
+      vectorApprox.add(calculateApproximation(id, relation.get(id)));
     }
   }
 
-  public int getPageAccess() {
-    return refinements + scanPageAccesses;
-  }
-
-  public void setPartitions(Relation<V> objects, int partitions) throws IllegalArgumentException {
+  /**
+   * Initialize the data set grid by computing quantiles.
+   * 
+   * @param objects Data relation
+   * @param partitions Number of partitions to generate
+   * @throws IllegalArgumentException
+   */
+  public void setPartitions() throws IllegalArgumentException {
     if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
-    final int dimensions = DatabaseUtil.dimensionality(objects);
+    final int dimensions = DatabaseUtil.dimensionality(relation);
+    final int size = relation.size();
     splitPositions = new double[dimensions][partitions + 1];
     int[][] partitionCount = new int[dimensions][partitions];
-    this.partitions = partitions;
 
     for(int d = 0; d < dimensions; d++) {
-      int size = objects.size();
       int remaining = size;
       double[] tempdata = new double[size];
       int j = 0;
-      for(DBID id : objects.getDBIDs()) {
-        tempdata[j++] = objects.get(id).doubleValue(d + 1);
+      for(DBID id : relation.iterDBIDs()) {
+        tempdata[j] = relation.get(id).doubleValue(d + 1);
+        j += 1;
       }
       Arrays.sort(tempdata);
 
@@ -146,58 +166,53 @@ public class VAFile<V extends NumberVector<?, ?>> {
     }
   }
 
-  public double[] getMinDists(double[][] lookup, int dimension, int queryCell) {
-    double[] result = new double[splitPositions[dimension].length - 1];
-    for(int i = 0; i < result.length; i++) {
-      if(i < queryCell) {
-        result[i] = lookup[dimension][i + 1];
-      }
-      else if(i > queryCell) {
-        result[i] = lookup[dimension][i];
-      }
+  /**
+   * Calculate the VA file position given the existing borders.
+   * 
+   * @param id Object ID
+   * @param dv Data vector
+   * @return Vector approximation
+   */
+  public VectorApprox calculateApproximation(DBID id, V dv) {
+    VectorApprox va = new VectorApprox(id, dv.getDimensionality());
+    for(int d = 0; d < splitPositions.length; d++) {
+      final double val = dv.doubleValue(d + 1);
+      final int lastBorderIndex = splitPositions[d].length - 1;
+
+      // value is lower outlier
+      if(val < splitPositions[d][0]) {
+        va.approximation[d] = 0;
+        log.warning("Vector outside of VAFile grid!");
+      } // value is upper outlier
+      else if(val > splitPositions[d][lastBorderIndex]) {
+        va.approximation[d] = lastBorderIndex - 1;
+        log.warning("Vector outside of VAFile grid!");
+      } // normal case
       else {
-        result[i] = 0;
+        // Search grid position
+        int pos = Arrays.binarySearch(splitPositions[d], val);
+        pos = (pos >= 0) ? pos : ((-pos) - 2);
+        va.approximation[d] = pos;
       }
     }
-    return result;
+    return va;
   }
 
-  public double[] getMaxDists(double[][] lookup, int dimension, int queryCell) {
-    double[] result = new double[splitPositions[dimension].length - 1];
-    for(int i = 0; i < result.length; i++) {
-      if(i < queryCell) {
-        result[i] = lookup[dimension][i];
-      }
-      else if(i > queryCell) {
-        result[i] = lookup[dimension][i + 1];
-      }
-      else {
-        result[i] = Math.max(lookup[dimension][i], lookup[dimension][i + 1]);
-      }
-    }
-    return result;
-  }
-
-  public double[][] makeLookupTable(V query) {
-    int dimensions = splitPositions.length;
-    int bordercount = splitPositions[0].length;
-    double[][] lookup = new double[dimensions][bordercount];
-    for(int d = 0; d < dimensions; d++) {
-      for(int i = 0; i < bordercount; i++) {
-        lookup[d][i] = Math.pow(splitPositions[d][i] - query.doubleValue(d + 1), p);
-      }
-    }
-    return lookup;
-  }
-
+  /**
+   * Run a KNN query on this index.
+   * 
+   * @param query Query vector
+   * @param k Number of neighbors
+   * @return Neighbor list
+   */
   public KNNList<DoubleDistance> knnQuery(V query, int k) {
     // generate query approximation and lookup table
-    VectorApprox queryApprox = calculateApproximation(null, query, splitPositions);
-    double[][] lookup = makeLookupTable(query);
+    VectorApprox queryApprox = calculateApproximation(null, query);
 
-    // Estimate scan costs.
-    final int newBytesScanned = vectorApprox.size() * VectorApprox.byteOnDisk(query.getDimensionality(), partitions);
-    scanPageAccesses += (int) Math.ceil(((double) newBytesScanned) / pageSize);
+    // Exact distance function
+    LPNormDistanceFunction exdist = new LPNormDistanceFunction(2.0);
+    // Approximative distance function
+    VALPNormDistance vadist = new VALPNormDistance(2.0, splitPositions, query, queryApprox);
 
     // Heap for the kth smallest maximum distance
     Heap<Double> minMaxHeap = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
@@ -205,19 +220,14 @@ public class VAFile<V extends NumberVector<?, ?>> {
     // Candidates with minDist <= kth maxDist
     ArrayList<DoubleObjPair<DBID>> candidates = new ArrayList<DoubleObjPair<DBID>>(vectorApprox.size());
 
+    // Count a VA file scan
+    scans += 1;
+
     // Approximation step
     for(int i = 0; i < vectorApprox.size(); i++) {
       VectorApprox va = vectorApprox.get(i);
-      double minDist = 0;
-      double maxDist = 0;
-      for(int d = 0; d < va.getApproximationSize(); d++) {
-        int queryApproxDim = queryApprox.getApproximation(d);
-        int vectorApproxDim = va.getApproximation(d);
-        minDist += getMinDists(lookup, d, queryApproxDim)[vectorApproxDim];
-        maxDist += getMaxDists(lookup, d, queryApproxDim)[vectorApproxDim];
-      }
-      minDist = Math.pow(minDist, 1.0 / p);
-      maxDist = Math.pow(maxDist, 1.0 / p);
+      double minDist = vadist.getMinDist(va);
+      double maxDist = vadist.getMaxDist(va);
 
       // Skip excess candidate generation:
       if(minDist > minMaxDist) {
@@ -250,14 +260,9 @@ public class VAFile<V extends NumberVector<?, ?>> {
 
       // refine the next element
       V dv = relation.get(va.second);
-      double dist = 0;
-      for(int d = 0; d < dv.getDimensionality(); d++) {
-        dist += Math.pow(dv.doubleValue(d + 1) - query.doubleValue(d + 1), p);
-      }
-      dist = Math.pow(dist, 1.0 / p);
-      result.add(new DoubleDistanceResultPair(dist, va.second));
+      result.add(new DoubleDistanceResultPair(exdist.doubleDistance(dv, query), va.second));
     }
-    if (log.isDebuggingFinest()) {
+    if(log.isDebuggingFinest()) {
       log.finest("query = (" + query + ")");
       log.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
     }
@@ -265,29 +270,28 @@ public class VAFile<V extends NumberVector<?, ?>> {
     return result.toKNNList();
   }
 
-  public VectorApprox calculateApproximation(DBID id, V dv, double[][] borders) {
-    VectorApprox va = new VectorApprox(id, dv.getDimensionality());
-    for(int d = 0; d < borders.length; d++) {
-      double val = dv.doubleValue(d + 1);
-      int lastBorderIndex = borders[d].length - 1;
-  
-      // value is lower outlier
-      if(val < borders[d][0]) {
-        va.approximation[d] = 0;
-        System.err.println("Epsilon value " + val + " is set to first partition.");
-      } // value is upper outlier
-      else if(val > borders[d][lastBorderIndex]) {
-        va.approximation[d] = lastBorderIndex - 1;
-        System.err.println("Epsilon value " + val + " is set to last partition.");
-      } // normal case
-      else {
-        for(int s = 0; s < lastBorderIndex; s++) {
-          if(val >= borders[d][s] && val < borders[d][s + 1] && !va.approximationIsSet(d)) {
-            va.approximation[d] = s;
-          }
-        }
-      }
-    }
-    return va;
+  @Override
+  public long getReadOperations() {
+    int vasize = vectorApprox.size() * VectorApprox.byteOnDisk(splitPositions.length, partitions);
+    vasize = (int) Math.ceil(((double) vasize) / pageSize);
+    return refinements + vasize * scans;
+  }
+
+  @Override
+  public long getWriteOperations() {
+    int vasize = vectorApprox.size() * VectorApprox.byteOnDisk(splitPositions.length, partitions);
+    vasize = (int) Math.ceil(((double) vasize) / pageSize);
+    return vasize;
+  }
+
+  @Override
+  public void resetPageAccess() {
+    refinements = 0;
+    scans = 0;
+  }
+
+  @Override
+  public PageFileStatistics getInnerStatistics() {
+    return null;
   }
 }
