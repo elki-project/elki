@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
@@ -48,6 +50,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
@@ -68,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * @author Thomas Bernecker
  * @author Erich Schubert
  */
-public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics, KNNIndex<V> {
+public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics, KNNIndex<V>, RangeIndex<V> {
   /**
    * Logging class
    */
@@ -289,6 +292,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
   public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_BULK) {
+        // FIXME: support bulk?
         return null;
       }
     }
@@ -301,6 +305,88 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
     }
     // Not supported.
     return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <D extends Distance<D>> RangeQuery<V, D> getRangeQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+    DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
+    if(df instanceof LPNormDistanceFunction) {
+      double p = ((LPNormDistanceFunction) df).getP();
+      DistanceQuery<V, DoubleDistance> ddq = (DistanceQuery<V, DoubleDistance>) distanceQuery;
+      RangeQuery<V, ?> dq = new VAFileRangeQuery(ddq, p);
+      return (RangeQuery<V, D>) dq;
+    }
+    // Not supported.
+    return null;
+  }
+
+  /**
+   * Range query for this index.
+   * 
+   * @author Erich Schubert
+   */
+  class VAFileRangeQuery extends AbstractDistanceRangeQuery<V, DoubleDistance> {
+    /**
+     * LP Norm p parameter.
+     */
+    final double p;
+
+    /**
+     * Constructor.
+     * 
+     * @param distanceQuery Distance query object
+     * @parma p LP norm p
+     */
+
+    public VAFileRangeQuery(DistanceQuery<V, DoubleDistance> distanceQuery, double p) {
+      super(distanceQuery);
+      this.p = p;
+    }
+
+    @Override
+    public List<DistanceResultPair<DoubleDistance>> getRangeForDBID(DBID id, DoubleDistance range) {
+      return getRangeForObject(relation.get(id), range);
+    }
+
+    @Override
+    public List<DistanceResultPair<DoubleDistance>> getRangeForObject(V query, DoubleDistance range) {
+      final double eps = range.doubleValue();
+      // generate query approximation and lookup table
+      VectorApprox queryApprox = calculateApproximation(null, query);
+
+      // Exact distance function
+      LPNormDistanceFunction exdist = new LPNormDistanceFunction(2.0);
+      // Approximative distance function
+      VALPNormDistance vadist = new VALPNormDistance(2.0, splitPositions, query, queryApprox);
+
+      // Count a VA file scan
+      scans += 1;
+
+      List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
+      // Approximation step
+      for(int i = 0; i < vectorApprox.size(); i++) {
+        VectorApprox va = vectorApprox.get(i);
+        double minDist = vadist.getMinDist(va);
+
+        // Skip excess candidate generation:
+        if(minDist > eps) {
+          continue;
+        }
+
+        // TODO: we don't need to refine always (maxDist < eps), if we are
+        // interested in the DBID only! But this needs an API change.
+
+        // refine the next element
+        V dv = relation.get(va.id);
+        refinements++;
+        final double dist = exdist.doubleDistance(dv, query);
+        if(dist <= eps) {
+          result.add(new DoubleDistanceResultPair(dist, va.id));
+        }
+      }
+      return result;
+    }
   }
 
   /**
@@ -396,6 +482,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
 
         // refine the next element
         V dv = relation.get(va.second);
+        refinements++;
         result.add(new DoubleDistanceResultPair(exdist.doubleDistance(dv, query), va.second));
       }
       if(log.isDebuggingFinest()) {
