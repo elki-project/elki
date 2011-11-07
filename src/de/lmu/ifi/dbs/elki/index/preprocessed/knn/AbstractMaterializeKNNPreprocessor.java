@@ -158,7 +158,6 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
   @SuppressWarnings("unchecked")
   @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
-    getLogger().warning("Test: "+this.getClass());
     if(!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
       return null;
     }
