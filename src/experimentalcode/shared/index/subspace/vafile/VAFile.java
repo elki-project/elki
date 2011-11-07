@@ -296,11 +296,11 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
         return null;
       }
     }
-    DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super V, ?> df = distanceQuery.getDistanceFunction();
     if(df instanceof LPNormDistanceFunction) {
       double p = ((LPNormDistanceFunction) df).getP();
-      DistanceQuery<V, DoubleDistance> ddq = (DistanceQuery<V, DoubleDistance>) distanceQuery;
-      KNNQuery<V, ?> dq = new VAFileKNNQuery(ddq, p);
+      DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
+      KNNQuery<V, ?> dq = new VAFileKNNQuery((DistanceQuery<V, DoubleDistance>) ddq, p);
       return (KNNQuery<V, D>) dq;
     }
     // Not supported.
@@ -310,11 +310,11 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> RangeQuery<V, D> getRangeQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
-    DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super V, ?> df = distanceQuery.getDistanceFunction();
     if(df instanceof LPNormDistanceFunction) {
       double p = ((LPNormDistanceFunction) df).getP();
-      DistanceQuery<V, DoubleDistance> ddq = (DistanceQuery<V, DoubleDistance>) distanceQuery;
-      RangeQuery<V, ?> dq = new VAFileRangeQuery(ddq, p);
+      DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
+      RangeQuery<V, ?> dq = new VAFileRangeQuery((DistanceQuery<V, DoubleDistance>) ddq, p);
       return (RangeQuery<V, D>) dq;
     }
     // Not supported.
