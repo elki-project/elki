@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 
 /**
  * Instance of a KNN query for a particular spatial index.
@@ -93,7 +92,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, KNNHeap<DoubleDistance> knnList) {
-    final Heap<DoubleDistanceSearchCandidate> pq = new UpdatableHeap<DoubleDistanceSearchCandidate>();
+    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>(Math.min(knnList.getK() * 2, 20));
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));
@@ -106,32 +105,42 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       if(pqNode.mindist > maxDist) {
         return;
       }
+      maxDist = expandNode(object, knnList, pq, maxDist, pqNode.nodeID);
+    }
+  }
 
-      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
-      // data node
-      if(node.isLeaf()) {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          SpatialEntry entry = node.getEntry(i);
-          double distance = distanceFunction.doubleMinDist(entry, object);
-          tree.distanceCalcs++;
-          if(distance <= maxDist) {
-            knnList.add(new DoubleDistanceResultPair(distance, ((LeafEntry) entry).getDBID()));
-            maxDist = knnList.getKNNDistance().doubleValue();
-          }
+  private double expandNode(O object, KNNHeap<DoubleDistance> knnList, final Heap<DoubleDistanceSearchCandidate> pq, double maxDist, final Integer nodeID) {
+    AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
+    // data node
+    if(node.isLeaf()) {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        SpatialEntry entry = node.getEntry(i);
+        double distance = distanceFunction.doubleMinDist(entry, object);
+        tree.distanceCalcs++;
+        if(distance <= maxDist) {
+          knnList.add(new DoubleDistanceResultPair(distance, ((LeafEntry) entry).getDBID()));
+          maxDist = knnList.getKNNDistance().doubleValue();
         }
       }
-      // directory node
-      else {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          SpatialEntry entry = node.getEntry(i);
-          double distance = distanceFunction.doubleMinDist(entry, object);
-          tree.distanceCalcs++;
+    }
+    // directory node
+    else {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        SpatialEntry entry = node.getEntry(i);
+        double distance = distanceFunction.doubleMinDist(entry, object);
+        tree.distanceCalcs++;
+        // Greedy expand, bypassing the queue
+        if(distance <= 0) {
+          expandNode(object, knnList, pq, maxDist, ((DirectoryEntry) entry).getPageID());
+        }
+        else {
           if(distance <= maxDist) {
-            pq.add(new DoubleDistanceSearchCandidate(distance, ((DirectoryEntry)entry).getPageID()));
+            pq.add(new DoubleDistanceSearchCandidate(distance, ((DirectoryEntry) entry).getPageID()));
           }
         }
       }
     }
+    return maxDist;
   }
 
   /**
@@ -171,7 +180,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
           if(minDist <= knn_q_maxDist) {
             SpatialEntry entry = distEntry.entry;
-            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry)entry).getPageID());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry) entry).getPageID());
             batchNN(child, knnLists);
             break;
           }
@@ -210,7 +219,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * Optimized double distance entry implementation.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.hidden
    */
   class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
@@ -226,7 +235,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
     /**
      * Constructor.
-     *
+     * 
      * @param entry Entry
      * @param distance Distance
      */

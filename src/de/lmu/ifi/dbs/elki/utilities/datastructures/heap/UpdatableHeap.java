@@ -94,21 +94,28 @@ public class UpdatableHeap<O> extends Heap<O> {
       return super.offer(e);
     }
     else {
-      // update
-      if(compareExternal(e, pos) < 0) {
-        // LoggingUtil.logExpensive(Level.INFO,
-        // "Updating value: "+e+" vs. "+castQueueElement(pos));
-        heapifyUp(pos, e);
-        modCount++;
-        // We have changed - return true according to {@link Collection#put}
-        return true;
+      if(comparator == null) {
+        @SuppressWarnings("unchecked")
+        Comparable<Object> c = (Comparable<Object>) e;
+        if(c.compareTo(queue[pos]) < 0) {
+          heapifyUp(pos, e);
+          modCount++;
+          // We have changed - return true according to {@link Collection#put}
+          return true;
+        }
       }
       else {
-        // LoggingUtil.logExpensive(Level.INFO,
-        // "Keeping value: "+e+" vs. "+castQueueElement(pos));
-        // Ignore, no improvement. Return success anyway.
-        return true;
+        if(comparator.compare(e, queue[pos]) < 0) {
+          heapifyUp(pos, e);
+          modCount++;
+          // We have changed - return true according to {@link Collection#put}
+          return true;
+        }
       }
+      // LoggingUtil.logExpensive(Level.INFO,
+      // "Keeping value: "+e+" vs. "+castQueueElement(pos));
+      // Ignore, no improvement. Return "success" anyway.
+      return true;
     }
   }
 
@@ -155,15 +162,15 @@ public class UpdatableHeap<O> extends Heap<O> {
     while(pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
-  
+
       if(cur.compareTo(par) >= 0) {
         break;
       }
-      queue[pos] = par;    
+      queue[pos] = par;
       index.put(par, pos);
       pos = parent;
     }
-    queue[pos] = cur;    
+    queue[pos] = cur;
     index.put(cur, pos);
   }
 
@@ -177,15 +184,15 @@ public class UpdatableHeap<O> extends Heap<O> {
     while(pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
-  
+
       if(comparator.compare(cur, par) >= 0) {
         break;
       }
-      queue[pos] = par;    
+      queue[pos] = par;
       index.put(par, pos);
       pos = parent;
     }
-    queue[pos] = cur;    
+    queue[pos] = cur;
     index.put(cur, pos);
   }
 
@@ -206,20 +213,20 @@ public class UpdatableHeap<O> extends Heap<O> {
       final int rchild = cpos + 1;
       if(rchild < size) {
         Object right = queue[rchild];
-        if(((Comparable<Object>)child).compareTo(right) > 0) {
+        if(((Comparable<Object>) child).compareTo(right) > 0) {
           cpos = rchild;
           child = right;
         }
       }
-      
+
       if(cur.compareTo(child) <= 0) {
         break;
       }
-      queue[pos] = child;    
+      queue[pos] = child;
       index.put(child, pos);
       pos = cpos;
     }
-    queue[pos] = cur;    
+    queue[pos] = cur;
     index.put(cur, pos);
   }
 
@@ -233,7 +240,7 @@ public class UpdatableHeap<O> extends Heap<O> {
     while(pos < half) {
       int min = pos;
       Object best = cur;
-  
+
       final int lchild = (pos << 1) + 1;
       Object left = queue[lchild];
       if(comparator.compare(best, left) > 0) {
@@ -251,11 +258,11 @@ public class UpdatableHeap<O> extends Heap<O> {
       if(min == pos) {
         break;
       }
-      queue[pos] = best;    
+      queue[pos] = best;
       index.put(best, pos);
       pos = min;
     }
-    queue[pos] = cur;    
+    queue[pos] = cur;
     index.put(cur, pos);
   }
 }

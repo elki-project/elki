@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 
 /**
  * Instance of a KNN query for a particular spatial index.
@@ -93,7 +92,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, KNNHeap<D> knnList) {
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericDistanceSearchCandidate<D>>();
+    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>(Math.min(knnList.getK() * 2, 20));
 
     // push root
     pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
@@ -106,32 +105,42 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       if(pqNode.mindist.compareTo(maxDist) > 0) {
         return;
       }
+      maxDist = expandNode(object, knnList, pq, maxDist, pqNode.nodeID);
+    }
+  }
 
-      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
-      // data node
-      if(node.isLeaf()) {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          SpatialEntry entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry, object);
-          tree.distanceCalcs++;
-          if(distance.compareTo(maxDist) <= 0) {
-            knnList.add(distance, ((LeafEntry) entry).getDBID());
-            maxDist = knnList.getKNNDistance();
-          }
+  private D expandNode(O object, KNNHeap<D> knnList, final Heap<GenericDistanceSearchCandidate<D>> pq, D maxDist, final Integer nodeID) {
+    AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
+    // data node
+    if(node.isLeaf()) {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        SpatialEntry entry = node.getEntry(i);
+        D distance = distanceFunction.minDist(entry, object);
+        tree.distanceCalcs++;
+        if(distance.compareTo(maxDist) <= 0) {
+          knnList.add(distance, ((LeafEntry) entry).getDBID());
+          maxDist = knnList.getKNNDistance();
         }
       }
-      // directory node
-      else {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          SpatialEntry entry = node.getEntry(i);
-          D distance = distanceFunction.minDist(entry, object);
-          tree.distanceCalcs++;
+    }
+    // directory node
+    else {
+      for(int i = 0; i < node.getNumEntries(); i++) {
+        SpatialEntry entry = node.getEntry(i);
+        D distance = distanceFunction.minDist(entry, object);
+        tree.distanceCalcs++;
+        // Greedy expand, bypassing the queue
+        if(distance.isNullDistance()) {
+          expandNode(object, knnList, pq, maxDist, ((DirectoryEntry) entry).getPageID());
+        }
+        else {
           if(distance.compareTo(maxDist) <= 0) {
-            pq.add(new GenericDistanceSearchCandidate<D>(distance, ((DirectoryEntry)entry).getPageID()));
+            pq.add(new GenericDistanceSearchCandidate<D>(distance, ((DirectoryEntry) entry).getPageID()));
           }
         }
       }
     }
+    return maxDist;
   }
 
   /**
@@ -170,7 +179,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
             SpatialEntry entry = distEntry.getEntry();
-            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry)entry).getPageID());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry) entry).getPageID());
             batchNN(child, knnLists);
             break;
           }
