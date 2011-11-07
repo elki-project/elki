@@ -112,14 +112,6 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
   }
 
-  private final void putInQueue(int pos, Object e) {
-    queue[pos] = e;    
-    // Keep index up to date
-    if(e != null) {
-      index.put(e, pos);
-    }
-  }
-
   @Override
   protected O removeAt(int pos) {
     O node = super.removeAt(pos);
@@ -167,10 +159,12 @@ public class UpdatableHeap<O> extends Heap<O> {
       if(cur.compareTo(par) >= 0) {
         break;
       }
-      putInQueue(pos, par);
+      queue[pos] = par;    
+      index.put(par, pos);
       pos = parent;
     }
-    putInQueue(pos, cur);
+    queue[pos] = cur;    
+    index.put(cur, pos);
   }
 
   /**
@@ -187,10 +181,12 @@ public class UpdatableHeap<O> extends Heap<O> {
       if(comparator.compare(cur, par) >= 0) {
         break;
       }
-      putInQueue(pos, par);
+      queue[pos] = par;    
+      index.put(par, pos);
       pos = parent;
     }
-    putInQueue(pos, cur);
+    queue[pos] = cur;    
+    index.put(cur, pos);
   }
 
   /**
@@ -219,10 +215,12 @@ public class UpdatableHeap<O> extends Heap<O> {
       if(cur.compareTo(child) <= 0) {
         break;
       }
-      putInQueue(pos, child);
+      queue[pos] = child;    
+      index.put(child, pos);
       pos = cpos;
     }
-    putInQueue(pos, cur);
+    queue[pos] = cur;    
+    index.put(cur, pos);
   }
 
   /**
@@ -253,9 +251,11 @@ public class UpdatableHeap<O> extends Heap<O> {
       if(min == pos) {
         break;
       }
-      putInQueue(pos, best);
+      queue[pos] = best;    
+      index.put(best, pos);
       pos = min;
     }
-    putInQueue(pos, cur);
+    queue[pos] = cur;    
+    index.put(cur, pos);
   }
 }
