@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
-import experimentalcode.shared.index.subspace.structures.DiskMemory;
 
 /**
  * Vector-approximation file (VAFile)
@@ -55,7 +54,7 @@ public class VAFile<V extends NumberVector<?, ?>> {
   Logging log = Logging.getLogger(VAFile.class);
 
   // Full data representation
-  DiskMemory<V> data;
+  Relation<V> relation;
 
   // temporary, full-dimensional VA representation
   private List<VectorApprox> vectorApprox;
@@ -63,9 +62,7 @@ public class VAFile<V extends NumberVector<?, ?>> {
   private static final int p = 2;
 
   int bufferSize = Integer.MAX_VALUE;
-
-  private long scannedBytes;
-
+  
   int pageSize;
 
   private double[][] splitPositions;
@@ -74,27 +71,26 @@ public class VAFile<V extends NumberVector<?, ?>> {
 
   private int scanPageAccesses;
 
+  private int refinements;
+
   public VAFile(int pageSize, Relation<V> relation, int partitions) {
     this.pageSize = pageSize;
 
-    scannedBytes = 0;
+    refinements = 0;
     scanPageAccesses = 0;
 
     setPartitions(relation, partitions);
 
-    int dimensions = DatabaseUtil.dimensionality(relation);
-    data = new DiskMemory<V>(pageSize / (8 * dimensions + 4), bufferSize);
     vectorApprox = new ArrayList<VectorApprox>();
     for(DBID id : relation.getDBIDs()) {
       V dv = relation.get(id);
-      data.add(id, dv);
       VectorApprox va = calculateApproximation(id, dv, splitPositions);
       vectorApprox.add(va);
     }
   }
 
   public int getPageAccess() {
-    return data.pageAccessesL + scanPageAccesses;
+    return refinements + scanPageAccesses;
   }
 
   public void setPartitions(Relation<V> objects, int partitions) throws IllegalArgumentException {
@@ -202,7 +198,6 @@ public class VAFile<V extends NumberVector<?, ?>> {
     // Estimate scan costs.
     final int newBytesScanned = vectorApprox.size() * VectorApprox.byteOnDisk(query.getDimensionality(), partitions);
     scanPageAccesses += (int) Math.ceil(((double) newBytesScanned) / pageSize);
-    scannedBytes += newBytesScanned;
 
     // Heap for the kth smallest maximum distance
     Heap<Double> minMaxHeap = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
@@ -254,7 +249,7 @@ public class VAFile<V extends NumberVector<?, ?>> {
       }
 
       // refine the next element
-      V dv = data.getObject(va.second);
+      V dv = relation.get(va.second);
       double dist = 0;
       for(int d = 0; d < dv.getDimensionality(); d++) {
         dist += Math.pow(dv.doubleValue(d + 1) - query.doubleValue(d + 1), p);
