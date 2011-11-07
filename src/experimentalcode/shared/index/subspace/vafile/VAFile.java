@@ -27,20 +27,39 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
@@ -49,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * @author Thomas Bernecker
  * @author Erich Schubert
  */
-public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics {
+public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics, KNNIndex<V> {
   /**
    * Logging class
    */
@@ -97,10 +116,14 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics 
     this.relation = relation;
     this.refinements = 0;
     this.scans = 0;
+    this.vectorApprox = new ArrayList<VectorApprox>();
+  }
 
-    // Initialize index
+  /**
+   * Initialize index
+   */
+  private void initialize() {
     setPartitions();
-    vectorApprox = new ArrayList<VectorApprox>();
     for(DBID id : relation.getDBIDs()) {
       vectorApprox.add(calculateApproximation(id, relation.get(id)));
     }
@@ -198,78 +221,6 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics 
     return va;
   }
 
-  /**
-   * Run a KNN query on this index.
-   * 
-   * @param query Query vector
-   * @param k Number of neighbors
-   * @return Neighbor list
-   */
-  public KNNList<DoubleDistance> knnQuery(V query, int k) {
-    // generate query approximation and lookup table
-    VectorApprox queryApprox = calculateApproximation(null, query);
-
-    // Exact distance function
-    LPNormDistanceFunction exdist = new LPNormDistanceFunction(2.0);
-    // Approximative distance function
-    VALPNormDistance vadist = new VALPNormDistance(2.0, splitPositions, query, queryApprox);
-
-    // Heap for the kth smallest maximum distance
-    Heap<Double> minMaxHeap = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
-    double minMaxDist = Double.POSITIVE_INFINITY;
-    // Candidates with minDist <= kth maxDist
-    ArrayList<DoubleObjPair<DBID>> candidates = new ArrayList<DoubleObjPair<DBID>>(vectorApprox.size());
-
-    // Count a VA file scan
-    scans += 1;
-
-    // Approximation step
-    for(int i = 0; i < vectorApprox.size(); i++) {
-      VectorApprox va = vectorApprox.get(i);
-      double minDist = vadist.getMinDist(va);
-      double maxDist = vadist.getMaxDist(va);
-
-      // Skip excess candidate generation:
-      if(minDist > minMaxDist) {
-        continue;
-      }
-      candidates.add(new DoubleObjPair<DBID>(minDist, va.id));
-
-      // Update candidate pruning heap
-      minMaxHeap.add(maxDist);
-      if(minMaxHeap.size() >= k) {
-        minMaxDist = minMaxHeap.peek();
-      }
-    }
-    // sort candidates by lower bound (minDist)
-    Collections.sort(candidates);
-
-    // refinement step
-    KNNHeap<DoubleDistance> result = new KNNHeap<DoubleDistance>(k);
-
-    // log.fine("candidates size " + candidates.size());
-    // retrieve accurate distances
-    for(DoubleObjPair<DBID> va : candidates) {
-      // Stop when we are sure to have all elements
-      if(result.size() >= k) {
-        double kDist = result.getKNNDistance().doubleValue();
-        if(va.first > kDist) {
-          break;
-        }
-      }
-
-      // refine the next element
-      V dv = relation.get(va.second);
-      result.add(new DoubleDistanceResultPair(exdist.doubleDistance(dv, query), va.second));
-    }
-    if(log.isDebuggingFinest()) {
-      log.finest("query = (" + query + ")");
-      log.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
-    }
-
-    return result.toKNNList();
-  }
-
   @Override
   public long getReadOperations() {
     int vasize = vectorApprox.size() * VectorApprox.byteOnDisk(splitPositions.length, partitions);
@@ -293,5 +244,254 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics 
   @Override
   public PageFileStatistics getInnerStatistics() {
     return null;
+  }
+
+  @Override
+  public PageFileStatistics getPageFileStatistics() {
+    return this;
+  }
+
+  @Override
+  public void insert(DBID id) {
+    throw new UnsupportedOperationException("VAFile can only be bulk-loaded.");
+  }
+
+  @Override
+  public void insertAll(DBIDs ids) {
+    if(vectorApprox.size() > 0) {
+      throw new UnsupportedOperationException("VAFile can only be bulk-loaded.");
+    }
+    initialize();
+  }
+
+  @Override
+  public boolean delete(DBID id) {
+    throw new UnsupportedOperationException("VAFile can only be bulk-loaded.");
+  }
+
+  @Override
+  public void deleteAll(DBIDs ids) {
+    throw new UnsupportedOperationException("VAFile can only be bulk-loaded.");
+  }
+
+  @Override
+  public String getLongName() {
+    return "VA-file index";
+  }
+
+  @Override
+  public String getShortName() {
+    return "va-file";
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_BULK) {
+        return null;
+      }
+    }
+    DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
+    if(df instanceof LPNormDistanceFunction) {
+      double p = ((LPNormDistanceFunction) df).getP();
+      DistanceQuery<V, DoubleDistance> ddq = (DistanceQuery<V, DoubleDistance>) distanceQuery;
+      KNNQuery<V, ?> dq = new VAFileKNNQuery(ddq, p);
+      return (KNNQuery<V, D>) dq;
+    }
+    // Not supported.
+    return null;
+  }
+
+  /**
+   * KNN query for this index.
+   * 
+   * @author Erich Schubert
+   */
+  class VAFileKNNQuery extends AbstractDistanceKNNQuery<V, DoubleDistance> {
+    /**
+     * LP Norm p parameter.
+     */
+    final double p;
+
+    /**
+     * Constructor.
+     * 
+     * @param distanceQuery Distance query object
+     * @parma p LP norm p
+     */
+    public VAFileKNNQuery(DistanceQuery<V, DoubleDistance> distanceQuery, double p) {
+      super(distanceQuery);
+      this.p = p;
+    }
+
+    @Override
+    public List<List<DistanceResultPair<DoubleDistance>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+      throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Override
+    public void getKNNForBulkHeaps(Map<DBID, KNNHeap<DoubleDistance>> heaps) {
+      throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Override
+    public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
+      return getKNNForObject(relation.get(id), k);
+    }
+
+    @Override
+    public List<DistanceResultPair<DoubleDistance>> getKNNForObject(V query, int k) {
+      // generate query approximation and lookup table
+      VectorApprox queryApprox = calculateApproximation(null, query);
+
+      // Exact distance function
+      LPNormDistanceFunction exdist = new LPNormDistanceFunction(2.0);
+      // Approximative distance function
+      VALPNormDistance vadist = new VALPNormDistance(2.0, splitPositions, query, queryApprox);
+
+      // Heap for the kth smallest maximum distance
+      Heap<Double> minMaxHeap = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
+      double minMaxDist = Double.POSITIVE_INFINITY;
+      // Candidates with minDist <= kth maxDist
+      ArrayList<DoubleObjPair<DBID>> candidates = new ArrayList<DoubleObjPair<DBID>>(vectorApprox.size());
+
+      // Count a VA file scan
+      scans += 1;
+
+      // Approximation step
+      for(int i = 0; i < vectorApprox.size(); i++) {
+        VectorApprox va = vectorApprox.get(i);
+        double minDist = vadist.getMinDist(va);
+        double maxDist = vadist.getMaxDist(va);
+
+        // Skip excess candidate generation:
+        if(minDist > minMaxDist) {
+          continue;
+        }
+        candidates.add(new DoubleObjPair<DBID>(minDist, va.id));
+
+        // Update candidate pruning heap
+        minMaxHeap.add(maxDist);
+        if(minMaxHeap.size() >= k) {
+          minMaxDist = minMaxHeap.peek();
+        }
+      }
+      // sort candidates by lower bound (minDist)
+      Collections.sort(candidates);
+
+      // refinement step
+      KNNHeap<DoubleDistance> result = new KNNHeap<DoubleDistance>(k);
+
+      // log.fine("candidates size " + candidates.size());
+      // retrieve accurate distances
+      for(DoubleObjPair<DBID> va : candidates) {
+        // Stop when we are sure to have all elements
+        if(result.size() >= k) {
+          double kDist = result.getKNNDistance().doubleValue();
+          if(va.first > kDist) {
+            break;
+          }
+        }
+
+        // refine the next element
+        V dv = relation.get(va.second);
+        result.add(new DoubleDistanceResultPair(exdist.doubleDistance(dv, query), va.second));
+      }
+      if(log.isDebuggingFinest()) {
+        log.finest("query = (" + query + ")");
+        log.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
+      }
+
+      return result.toKNNList();
+    }
+  }
+
+  /**
+   * Index factory class
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <V> Vector type
+   */
+  public static class Factory<V extends NumberVector<?, ?>> implements IndexFactory<V, VAFile<V>> {
+    /**
+     * Number of partitions to use in each dimension.
+     * 
+     * <pre>
+     * -vafile.partitions 8
+     * </pre>
+     */
+    public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("vafile.partitions", "Number of partitions to use in each dimension.");
+
+    /**
+     * Page size
+     */
+    int pagesize = 1;
+
+    /**
+     * Number of partitions
+     */
+    int numpart = 2;
+
+    /**
+     * Constructor.
+     * 
+     * @param pagesize Page size
+     * @param numpart Number of partitions
+     */
+    public Factory(int pagesize, int numpart) {
+      super();
+      this.pagesize = pagesize;
+      this.numpart = numpart;
+    }
+
+    @Override
+    public VAFile<V> instantiate(Relation<V> relation) {
+      return new VAFile<V>(pagesize, relation, numpart);
+    }
+
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return TypeUtil.NUMBER_VECTOR_FIELD;
+    }
+
+    /**
+     * Parameterization class
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      /**
+       * Page size
+       */
+      int pagesize = 1;
+
+      /**
+       * Number of partitions
+       */
+      int numpart = 2;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        IntParameter pagesizeP = new IntParameter(TreeIndexFactory.PAGE_SIZE_ID, new GreaterConstraint(0), 1024);
+        if(config.grab(pagesizeP)) {
+          pagesize = pagesizeP.getValue();
+        }
+        IntParameter partitionsP = new IntParameter(Factory.PARTITIONS_ID, new GreaterConstraint(2));
+        if(config.grab(partitionsP)) {
+          numpart = partitionsP.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<?> makeInstance() {
+        return new Factory<NumberVector<?, ?>>(pagesize, numpart);
+      }
+
+    }
   }
 }
