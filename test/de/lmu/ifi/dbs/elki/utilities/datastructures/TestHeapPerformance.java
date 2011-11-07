@@ -24,11 +24,13 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Random;
 
 import org.junit.Test;
@@ -36,10 +38,15 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 
+/**
+ * Unit test to ensure that our heap is not significantly worse than SUN javas regular PriorityQueue.
+ * 
+ * @author Erich Schubert
+ */
 public class TestHeapPerformance implements JUnit4Test {
   final private int queueSize = 100000;
   
-  final private int iterations = 1;
+  final private int iterations = 10;
 
   final private long seed = 123456L;
 
@@ -55,19 +62,21 @@ public class TestHeapPerformance implements JUnit4Test {
       Collections.shuffle(elements, random);
     }
 
+    // Pretest, to trigger hotspot compiler, hopefully.
+    {
+      Heap<Integer> pq = new Heap<Integer>(); //Collections.reverseOrder());
+      testQueue(elements, pq);
+    }
+    {
+      PriorityQueue<Integer> pq = new PriorityQueue<Integer>(); //11, Collections.reverseOrder());
+      testQueue(elements, pq);
+    }
+    
     long hstart = System.currentTimeMillis();
     {
       for(int j = 0; j < iterations; j++) {
         Heap<Integer> pq = new Heap<Integer>(); //Collections.reverseOrder());
-        // Insert all
-        for(int i = 0; i < elements.size(); i++) {
-          pq.add(elements.get(i));
-        }
-        // Poll first half.
-        for(int i = 0; i < elements.size() >> 1; i++) {
-          assertEquals((int) pq.poll(), i);
-          // assertEquals((int) pq.poll(), queueSize - 1 - i);
-        }
+        testQueue(elements, pq);
       }
     }
     long htime = System.currentTimeMillis() - hstart;
@@ -76,18 +85,22 @@ public class TestHeapPerformance implements JUnit4Test {
     {
       for(int j = 0; j < iterations; j++) {
         PriorityQueue<Integer> pq = new PriorityQueue<Integer>(); //11, Collections.reverseOrder());
-        // Insert all
-        for(int i = 0; i < elements.size(); i++) {
-          pq.add(elements.get(i));
-        }
-        // Poll first half.
-        for(int i = 0; i < elements.size() >> 1; i++) {
-          assertEquals((int) pq.poll(), i);
-          // assertEquals((int) pq.poll(), queueSize - 1 - i);
-        }
+        testQueue(elements, pq);
       }
     }
     long pqtime = System.currentTimeMillis() - pqstart;
-    System.err.println(pqtime + " > " + htime);
+    assertTrue("Heap performance regression? "+htime+" >>= "+pqtime, htime < 1.05 * pqtime); // 1.05 allows some difference in measuring
+  }
+
+  private void testQueue(final List<Integer> elements, Queue<Integer> pq) {
+    // Insert all
+    for(int i = 0; i < elements.size(); i++) {
+      pq.add(elements.get(i));
+    }
+    // Poll first half.
+    for(int i = 0; i < elements.size() >> 1; i++) {
+      assertEquals((int) pq.poll(), i);
+      // assertEquals((int) pq.poll(), queueSize - 1 - i);
+    }
   }
 }
