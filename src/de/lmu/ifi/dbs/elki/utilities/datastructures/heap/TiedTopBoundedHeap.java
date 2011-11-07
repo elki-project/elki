@@ -30,8 +30,9 @@ import java.util.LinkedList;
 import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 
 /**
- * A size-limited heap similar to {@link TopBoundedHeap}, discarding elements with
- * the highest value. However, this variation keeps a list of tied elements.
+ * A size-limited heap similar to {@link TopBoundedHeap}, discarding elements
+ * with the highest value. However, this variation keeps a list of tied
+ * elements.
  * 
  * @author Erich Schubert
  * 
@@ -91,27 +92,43 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
 
   @Override
   public synchronized E peek() {
-    if (ties.isEmpty()) {
+    if(ties.isEmpty()) {
       return super.peek();
-    } else {
-      return ties.peek() ;
+    }
+    else {
+      return ties.peek();
     }
   }
 
   @Override
   public E poll() {
-    if (ties.isEmpty()) {
+    if(ties.isEmpty()) {
       return super.poll();
-    } else {
+    }
+    else {
       return ties.poll();
     }
   }
 
   @Override
   protected void handleOverflow(E e) {
-    if (super.compareExternal(e, 0) == 0) {
+    boolean tied = false;
+    if(comparator == null) {
+      @SuppressWarnings("unchecked")
+      Comparable<Object> c = (Comparable<Object>) e;
+      if(c.compareTo(queue[0]) == 0) {
+        tied = true;
+      }
+    }
+    else {
+      if(comparator.compare(e, queue[0]) == 0) {
+        tied = true;
+      }
+    }
+    if(tied) {
       ties.add(e);
-    } else {
+    }
+    else {
       // Also remove old ties.
       ties.clear();
     }

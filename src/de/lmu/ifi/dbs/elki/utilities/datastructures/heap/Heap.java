@@ -307,23 +307,6 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     queue[pos] = cur;
   }
 
-  /**
-   * Compare an external object with the one at a certain position.
-   * 
-   * @param o1 First object
-   * @param pos2 Second object position
-   * @return Comparison result
-   */
-  @SuppressWarnings("unchecked")
-  protected final int compareExternal(E o1, int pos2) {
-    if(comparator != null) {
-      return comparator.compare(o1, queue[pos2]);
-    }
-    else {
-      return ((Comparable<Object>) o1).compareTo(queue[pos2]);
-    }
-  }
-
   @SuppressWarnings("unchecked")
   protected final E castQueueElement(int n) {
     return (E) queue[n];
