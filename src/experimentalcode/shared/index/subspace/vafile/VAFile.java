@@ -53,7 +53,6 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -66,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
+import experimentalcode.shared.index.AbstractRefiningIndex;
 
 /**
  * Vector-approximation file (VAFile)
@@ -82,16 +82,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  */
 @Title("An approximation based data structure for similarity search")
 @Reference(authors = "Weber, R. and Blott, S.", title = "An approximation based data structure for similarity search", booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf")
-public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics, KNNIndex<V>, RangeIndex<V> {
+public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
   /**
    * Logging class
    */
   private static final Logging log = Logging.getLogger(VAFile.class);
-
-  /**
-   * The full object relation we index (and need for refinement
-   */
-  Relation<V> relation;
 
   /**
    * Approximation index
@@ -118,26 +113,17 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
    */
   int scans;
 
-  /**
-   * Number of objects we refined.
-   */
-  int refinements;
-
   public VAFile(int pageSize, Relation<V> relation, int partitions) {
-    super();
+    super(relation);
     this.partitions = partitions;
     this.pageSize = pageSize;
-    this.relation = relation;
-    this.refinements = 0;
     this.scans = 0;
     this.vectorApprox = new ArrayList<VectorApproximation>();
   }
 
-  /**
-   * Initialize index
-   */
-  private void initialize() {
-    setPartitions();
+  @Override
+  protected void initialize(Relation<V> relation, DBIDs ids) {
+    setPartitions(relation);
     for(DBID id : relation.getDBIDs()) {
       vectorApprox.add(calculateApproximation(id, relation.get(id)));
     }
@@ -146,11 +132,10 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
   /**
    * Initialize the data set grid by computing quantiles.
    * 
-   * @param objects Data relation
-   * @param partitions Number of partitions to generate
+   * @param relation Data relation
    * @throws IllegalArgumentException
    */
-  public void setPartitions() throws IllegalArgumentException {
+  public void setPartitions(Relation<V> relation) throws IllegalArgumentException {
     if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
@@ -244,7 +229,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
     // Page capacity
     int vacapacity = pageSize / VectorApproximation.byteOnDisk(splitPositions.length, partitions);
     int vasize = (vectorApprox.size() - 1) / vacapacity + 1;
-    return refinements + vasize * scans;
+    return super.getReadOperations() + vasize * scans;
   }
 
   @Override
@@ -257,42 +242,9 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
 
   @Override
   public void resetPageAccess() {
-    refinements = 0;
+    super.resetPageAccess();
     scans = 0;
     // FIXME: writes
-  }
-
-  @Override
-  public PageFileStatistics getInnerStatistics() {
-    return null;
-  }
-
-  @Override
-  public PageFileStatistics getPageFileStatistics() {
-    return this;
-  }
-
-  @Override
-  public void insert(DBID id) {
-    throw new UnsupportedOperationException("VAFile can only be bulk-loaded.");
-  }
-
-  @Override
-  public void insertAll(DBIDs ids) {
-    if(vectorApprox.size() > 0) {
-      throw new UnsupportedOperationException("VAFile can only be bulk-loaded.");
-    }
-    initialize();
-  }
-
-  @Override
-  public boolean delete(DBID id) {
-    throw new UnsupportedOperationException("VAFile can only be bulk-loaded.");
-  }
-
-  @Override
-  public void deleteAll(DBIDs ids) {
-    throw new UnsupportedOperationException("VAFile can only be bulk-loaded.");
   }
 
   @Override
@@ -395,8 +347,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
         // interested in the DBID only! But this needs an API change.
 
         // refine the next element
-        V dv = relation.get(va.id);
-        refinements++;
+        V dv = refine(va.id);
         final double dist = exdist.doubleDistance(dv, query);
         if(dist <= eps) {
           result.add(new DoubleDistanceResultPair(dist, va.id));
@@ -499,8 +450,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
         }
 
         // refine the next element
-        V dv = relation.get(va.second);
-        refinements++;
+        V dv = refine(va.second);
         result.add(new DoubleDistanceResultPair(exdist.doubleDistance(dv, query), va.second));
       }
       if(log.isDebuggingFinest()) {
@@ -596,7 +546,6 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
       protected Factory<?> makeInstance() {
         return new Factory<NumberVector<?, ?>>(pagesize, numpart);
       }
-
     }
   }
 }

@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import experimentalcode.shared.index.AbstractRefiningIndex;
 import experimentalcode.shared.index.subspace.IndexStatistics;
 import experimentalcode.shared.index.subspace.SubSpace;
 import experimentalcode.shared.index.subspace.SubspaceIndex;
@@ -70,16 +71,11 @@ import experimentalcode.shared.index.subspace.SubspaceIndexName;
  * @author Thomas Bernecker
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
-public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceIndex<V> {
+public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefiningIndex<V> implements SubspaceIndex<V> {
   /**
    * Class logger
    */
   private static final Logging log = Logging.getLogger(PartialVAFile.class);
-
-  /**
-   * The relation used for refinement
-   */
-  Relation<V> relation;
 
   /**
    * VA approximation working space
@@ -109,18 +105,22 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
   private double[][] splitPartitions;
 
   public PartialVAFile(int pageSize, Relation<V> fullDimensionalData, int partitions) {
+    super(fullDimensionalData);
     this.pageSize = pageSize;
     this.scannedBytes = 0;
     this.issuedQueries = 0;
     this.refinements = 0;
     this.partitions = partitions;
     currentSubspaceDims = -1;
-
-    insert(fullDimensionalData);
+  }
+  
+  @Override
+  public void insert(Relation<V> data) throws IllegalStateException {
+    initialize(data, data.getDBIDs());
   }
 
   @Override
-  public void insert(Relation<V> fullDimensionalData) throws IllegalStateException {
+  public void initialize(Relation<V> fullDimensionalData, DBIDs ids) throws IllegalStateException {
     if(vectorApprox != null && vectorApprox.size() > 0) {
       throw new IllegalStateException("Data already inserted.");
     }
@@ -221,7 +221,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
   @Override
   public IndexStatistics getStatisitcs() {
     IndexStatistics is = new IndexStatistics(refinements, refinements, queryTime, scannedBytes / pageSize);
-    is.totalPages = relation.size() + ((VectorApproximation.byteOnDisk(currentSubspaceDims, partitions) * vectorApprox.size()) / pageSize);
+    is.totalPages = /* relation.size() + */ ((VectorApproximation.byteOnDisk(currentSubspaceDims, partitions) * vectorApprox.size()) / pageSize);
     is.pageSize = pageSize;
     is.numQueries = issuedQueries;
     is.indexName = "PartialVA";
@@ -389,7 +389,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
       }
       DBID currentID = va.getId();
       if(result.size() < k || va.getMinDistP() < lastElement.getDistance().doubleValue()) {
-        V dv = relation.get(currentID);
+        V dv = refine(currentID);
         refinements += 1;
         double dist = distf.doubleDistance(dv, query);
         DoubleDistanceResultPair dp = new DoubleDistanceResultPair(dist, currentID);
@@ -480,7 +480,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
         resultIDs.add(id);
       }
       else { // refine candidate
-        V dv = relation.get(id);
+        V dv = refine(id);
         refinements += 1;
         double distance = fulldist.doubleDistance(dv, query);
         if(distance <= epsilon) {
@@ -534,6 +534,11 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
    */
   private static int getIOCosts(DAFile sample, int numberOfDAFiles) {
     return sample.getIOCosts() * numberOfDAFiles;
+  }
+
+  @Override
+  public String getLongName() {
+    return "partial va-file";
   }
 }
 
