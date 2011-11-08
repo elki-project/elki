@@ -39,7 +39,7 @@ import experimentalcode.franz.utils.ArrayUtils;
  * @created 22.09.2009
  * @date 22.09.2009
  */
-public class DAFile<V extends NumberVector<?, ?>> {
+public class DAFile {
   private int dimension;
 
   private double[] splitPositions;
@@ -57,7 +57,7 @@ public class DAFile<V extends NumberVector<?, ?>> {
     selectivityCoeff = -1;
   }
 
-  public void setPartitions(Collection<V> objects, int partitions) {
+  public void setPartitions(Collection<NumberVector<?, ?>> objects, int partitions) {
     long start = System.currentTimeMillis();
 
     splitPositions = new double[partitions + 1];
@@ -67,7 +67,7 @@ public class DAFile<V extends NumberVector<?, ?>> {
     int remaining = size;
     double[] tempdata = new double[size];
     int j = 0;
-    for(V dv : objects) {
+    for(NumberVector<?, ?> dv : objects) {
       tempdata[j++] = dv.doubleValue(dimension + 1);
     }
     Arrays.sort(tempdata);
@@ -130,7 +130,7 @@ public class DAFile<V extends NumberVector<?, ?>> {
     // return result;
   }
 
-  public void setLookupTable(V query) {
+  public void setLookupTable(NumberVector<?, ?> query) {
     int bordercount = splitPositions.length;
     lookup = new double[bordercount];
     for(int i = 0; i < bordercount; i++) {
@@ -211,7 +211,7 @@ public class DAFile<V extends NumberVector<?, ?>> {
    * @param query
    * @param epsilon
    */
-  public static <V extends NumberVector<V, ?>> void calculateSelectivityCoeffs(List<DAFile<V>> daFiles, V query, double epsilon) {
+  public static <V extends NumberVector<V, ?>> void calculateSelectivityCoeffs(List<DAFile> daFiles, V query, double epsilon) {
     final int dimensions = query.getDimensionality();
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
@@ -238,14 +238,14 @@ public class DAFile<V extends NumberVector<?, ?>> {
     }
   }
 
-  public static <V extends NumberVector<?, ?>> List<DAFile<V>> sortBySelectivity(List<DAFile<V>> daFiles) {
+  public static <V extends NumberVector<?, ?>> List<DAFile> sortBySelectivity(List<DAFile> daFiles) {
     Collections.sort(daFiles, new DAFileSelectivityComparator<V>());
     return daFiles;
   }
 
-  static class DAFileSelectivityComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile<V>> {
+  static class DAFileSelectivityComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile> {
     @Override
-    public int compare(DAFile<V> a, DAFile<V> b) {
+    public int compare(DAFile a, DAFile b) {
       return Double.compare(a.getSelectivityCoeff(), b.getSelectivityCoeff());
     }
   }
