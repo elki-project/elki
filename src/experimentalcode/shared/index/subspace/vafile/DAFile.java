@@ -211,14 +211,8 @@ public class DAFile<V extends NumberVector<?, ?>> {
    * @param query
    * @param epsilon
    */
-  public static <V extends NumberVector<V, ?>> void calculateSelectivityCoeffs(List<DAFile<V>> daFileList, V query, double epsilon) {
-    @SuppressWarnings("unchecked")
-    DAFile<V>[] daFiles = new DAFile[daFileList.size()];
-    for(DAFile<V> da : daFileList) {
-      daFiles[da.getDimension()] = da;
-    }
-
-    int dimensions = query.getDimensionality();
+  public static <V extends NumberVector<V, ?>> void calculateSelectivityCoeffs(List<DAFile<V>> daFiles, V query, double epsilon) {
+    final int dimensions = query.getDimensionality();
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
 
@@ -238,9 +232,9 @@ public class DAFile<V extends NumberVector<?, ?>> {
     PartialVectorApproximation<V> upperEpsilonPartitions = new PartialVectorApproximation<V>(null, dimensions);
     upperEpsilonPartitions.calculateApproximation(upperEpsilon, daFiles);
 
-    for(int i = 0; i < daFiles.length; i++) {
+    for(int i = 0; i < daFiles.size(); i++) {
       int coeff = (queryApprox.getApproximation(i) - lowerEpsilonPartitions.getApproximation(i)) + (upperEpsilonPartitions.getApproximation(i) - queryApprox.getApproximation(i)) + 1;
-      daFiles[i].setSelectivityCoeff(coeff);
+      daFiles.get(i).setSelectivityCoeff(coeff);
     }
   }
 

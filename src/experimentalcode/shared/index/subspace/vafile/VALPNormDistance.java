@@ -51,6 +51,26 @@ public class VALPNormDistance {
   }
 
   /**
+   * Get the minimum distance contribution of a single dimension
+   * 
+   * @param dimension Dimension
+   * @param vp Vector position
+   * @return Increment
+   */
+  public double getPartialMinDist(int dimension, int vp) {
+    final int qp = queryApprox.getApproximation(dimension);
+    if(vp < qp) {
+      return lookup[dimension][vp + 1];
+    }
+    else if(vp > qp) {
+      return lookup[dimension][vp];
+    }
+    else {
+      return 0.0;
+    }
+  }
+
+  /**
    * Get the minimum distance to approximated vector vec
    * 
    * @param vec Vector approximation
@@ -61,15 +81,29 @@ public class VALPNormDistance {
     double minDist = 0;
     for(int d = 0; d < dim; d++) {
       final int vp = vec.getApproximation(d);
-      final int qp = queryApprox.getApproximation(d);
-      if(vp < qp) {
-        minDist += lookup[d][vp + 1];
-      }
-      else if(vp > qp) {
-        minDist += lookup[d][vp];
-      } // else: 0
+      minDist += getPartialMinDist(d, vp);
     }
     return Math.pow(minDist, onebyp);
+  }
+
+  /**
+   * Get the maximum distance contribution of a single dimension
+   * 
+   * @param dimension Dimension
+   * @param vp Vector position
+   * @return Increment
+   */
+  public double getPartialMaxDist(int dimension, int vp) {
+    final int qp = queryApprox.getApproximation(dimension);
+    if(vp < qp) {
+      return lookup[dimension][vp];
+    }
+    else if(vp > qp) {
+      return lookup[dimension][vp + 1];
+    }
+    else {
+      return Math.max(lookup[dimension][vp], lookup[dimension][vp + 1]);
+    }
   }
 
   /**
@@ -83,16 +117,7 @@ public class VALPNormDistance {
     double maxDist = 0;
     for(int d = 0; d < dim; d++) {
       final int vp = vec.getApproximation(d);
-      final int qp = queryApprox.getApproximation(d);
-      if(vp < qp) {
-        maxDist += lookup[d][vp];
-      }
-      else if(vp > qp) {
-        maxDist += lookup[d][vp + 1];
-      }
-      else {
-        maxDist += Math.max(lookup[d][vp], lookup[d][vp + 1]);
-      }
+      maxDist += getPartialMaxDist(d, vp);
     }
     return Math.pow(maxDist, onebyp);
   }
