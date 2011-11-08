@@ -58,6 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -68,9 +70,18 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 /**
  * Vector-approximation file (VAFile)
  * 
+ * Reference:
+ * <p>
+ * Weber, R. and Blott, S.<br>
+ * An approximation based data structure for similarity search<br />
+ * in: Report TR1997b, ETH Zentrum, Zurich, Switzerland
+ * </p>
+ * 
  * @author Thomas Bernecker
  * @author Erich Schubert
  */
+@Title("An approximation based data structure for similarity search")
+@Reference(authors = "Weber, R. and Blott, S.", title = "An approximation based data structure for similarity search", booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf")
 public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics, KNNIndex<V>, RangeIndex<V> {
   /**
    * Logging class
