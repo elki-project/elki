@@ -121,7 +121,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
 
   @Override
   public void insert(Relation<V> fullDimensionalData) throws IllegalStateException {
-    if(vectorApprox.size() > 0) {
+    if(vectorApprox != null && vectorApprox.size() > 0) {
       throw new IllegalStateException("Data already inserted.");
     }
 
@@ -140,7 +140,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
       PartialVectorApproximation<V> va = new PartialVectorApproximation<V>(id, dv.getDimensionality());
       va.calculateApproximation(dv, daFiles);
       vectorApprox.add(va);
-      System.out.println(id + ": " + va.toString());
+      // System.out.println(id + ": " + va.toString());
     }
   }
 
