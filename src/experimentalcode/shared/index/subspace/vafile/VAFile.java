@@ -86,7 +86,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
   /**
    * Logging class
    */
-  Logging log = Logging.getLogger(VAFile.class);
+  private static final Logging log = Logging.getLogger(VAFile.class);
 
   /**
    * The full object relation we index (and need for refinement
