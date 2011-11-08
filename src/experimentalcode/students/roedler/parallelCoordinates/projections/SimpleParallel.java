@@ -3,6 +3,7 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.projections.AbstractProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 public class SimpleParallel extends AbstractProjection implements ProjectionParallel {
@@ -185,7 +186,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
         ret.set(i, (v.get(i) - margin[1]) / axisHeight);
       }
       else{
-        ret.set(i, (Math.abs(v.get(i) - margin[1]) - axisHeight) / axisHeight);
+        ret.set(i, Math.abs((v.get(i) - margin[1]) - axisHeight) / axisHeight);
       }
     }
     return sortDims(ret);
@@ -389,6 +390,11 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   @Override
   public LinearScale getLinearScale(int dim) {
     return scales[dim];
+  }
+
+  @Override
+  public CanvasSize estimateViewport() {
+    return new CanvasSize(0., 0., getSizeX(), getSizeY());
   }
   
   
