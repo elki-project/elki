@@ -40,7 +40,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     super(task);
     this.proj = task.getProj();
     this.rep = task.getRelation();
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final double margin = 0.; //context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
   }
 
@@ -56,7 +56,8 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
    */
   public static Element setupCanvas(SVGPlot svgp, ProjectionParallel proj, double margin, double width, double height) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
- //   SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, proj.estimateTransformString(margin, width, height));
+    final String transform = SVGUtil.makeMarginTransform(width, height, proj.getSizeX(), proj.getSizeY(), 0.);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     return layer;
   }
 

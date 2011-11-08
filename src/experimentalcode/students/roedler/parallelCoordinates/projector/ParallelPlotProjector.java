@@ -76,10 +76,8 @@ public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends Abstrac
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0) {
       ProjectionParallel proj = new SimpleParallel(scales, scales.length, new double[]{0.071, 0.071}, new double[]{1.8, 1.}, 0.71, 100.);
-      //  ProjectionParallel proj = new SimpleParallel(scales, scales.length, new double[]{0.071, 0.071}, new double[]{2., 1.}, 0.71);
-    //  ProjectionParallel proj = new SimpleParallel(scales, scales.length, new double[]{10., 10.}, new double[]{280., 140.}, 100.);
+      
       final PlotItem it = new PlotItem(2, 1., proj);
-    //  final PlotItem it = new PlotItem(280., 140., proj);
       it.visualizations = tasks;
       col.add(it);
     }
