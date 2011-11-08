@@ -85,7 +85,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
   /**
    * Approximation index
    */
-  private List<VectorApprox> vectorApprox;
+  private List<VectorApproximation> vectorApprox;
 
   /**
    * Number of partitions.
@@ -119,7 +119,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
     this.relation = relation;
     this.refinements = 0;
     this.scans = 0;
-    this.vectorApprox = new ArrayList<VectorApprox>();
+    this.vectorApprox = new ArrayList<VectorApproximation>();
   }
 
   /**
@@ -199,42 +199,48 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
    * @param dv Data vector
    * @return Vector approximation
    */
-  public VectorApprox calculateApproximation(DBID id, V dv) {
-    VectorApprox va = new VectorApprox(id, dv.getDimensionality());
+  public VectorApproximation calculateApproximation(DBID id, V dv) {
+    int approximation[] = new int[dv.getDimensionality()];
     for(int d = 0; d < splitPositions.length; d++) {
       final double val = dv.doubleValue(d + 1);
       final int lastBorderIndex = splitPositions[d].length - 1;
 
-      // value is lower outlier
+      // Value is below data grid
       if(val < splitPositions[d][0]) {
-        va.approximation[d] = 0;
-        log.warning("Vector outside of VAFile grid!");
-      } // value is upper outlier
+        approximation[d] = 0;
+        if(id != null) {
+          log.warning("Vector outside of VAFile grid!");
+        }
+      } // Value is above data grid
       else if(val > splitPositions[d][lastBorderIndex]) {
-        va.approximation[d] = lastBorderIndex - 1;
-        log.warning("Vector outside of VAFile grid!");
+        approximation[d] = lastBorderIndex - 1;
+        if(id != null) {
+          log.warning("Vector outside of VAFile grid!");
+        }
       } // normal case
       else {
         // Search grid position
         int pos = Arrays.binarySearch(splitPositions[d], val);
         pos = (pos >= 0) ? pos : ((-pos) - 2);
-        va.approximation[d] = pos;
+        approximation[d] = pos;
       }
     }
-    return va;
+    return new VectorApproximation(id, approximation);
   }
 
   @Override
   public long getReadOperations() {
-    int vasize = vectorApprox.size() * VectorApprox.byteOnDisk(splitPositions.length, partitions);
-    vasize = (int) Math.ceil(((double) vasize) / pageSize);
+    // Page capacity
+    int vacapacity = pageSize / VectorApproximation.byteOnDisk(splitPositions.length, partitions);
+    int vasize = (vectorApprox.size() - 1) / vacapacity + 1;
     return refinements + vasize * scans;
   }
 
   @Override
   public long getWriteOperations() {
-    int vasize = vectorApprox.size() * VectorApprox.byteOnDisk(splitPositions.length, partitions);
-    vasize = (int) Math.ceil(((double) vasize) / pageSize);
+    // Page capacity
+    int vacapacity = pageSize / VectorApproximation.byteOnDisk(splitPositions.length, partitions);
+    int vasize = (vectorApprox.size() - 1) / vacapacity + 1;
     return vasize;
   }
 
@@ -242,6 +248,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
   public void resetPageAccess() {
     refinements = 0;
     scans = 0;
+    // FIXME: writes
   }
 
   @Override
@@ -353,7 +360,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
     public List<DistanceResultPair<DoubleDistance>> getRangeForObject(V query, DoubleDistance range) {
       final double eps = range.doubleValue();
       // generate query approximation and lookup table
-      VectorApprox queryApprox = calculateApproximation(null, query);
+      VectorApproximation queryApprox = calculateApproximation(null, query);
 
       // Exact distance function
       LPNormDistanceFunction exdist = new LPNormDistanceFunction(p);
@@ -366,7 +373,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
       List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
       // Approximation step
       for(int i = 0; i < vectorApprox.size(); i++) {
-        VectorApprox va = vectorApprox.get(i);
+        VectorApproximation va = vectorApprox.get(i);
         double minDist = vadist.getMinDist(va);
 
         if(minDist > eps) {
@@ -429,7 +436,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
     @Override
     public List<DistanceResultPair<DoubleDistance>> getKNNForObject(V query, int k) {
       // generate query approximation and lookup table
-      VectorApprox queryApprox = calculateApproximation(null, query);
+      VectorApproximation queryApprox = calculateApproximation(null, query);
 
       // Exact distance function
       LPNormDistanceFunction exdist = new LPNormDistanceFunction(p);
@@ -447,7 +454,7 @@ public class VAFile<V extends NumberVector<?, ?>> implements PageFileStatistics,
 
       // Approximation step
       for(int i = 0; i < vectorApprox.size(); i++) {
-        VectorApprox va = vectorApprox.get(i);
+        VectorApproximation va = vectorApprox.get(i);
         double minDist = vadist.getMinDist(va);
         double maxDist = vadist.getMaxDist(va);
 

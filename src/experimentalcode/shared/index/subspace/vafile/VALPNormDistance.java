@@ -33,7 +33,7 @@ public class VALPNormDistance {
 
   private double[][] lookup;
 
-  private VectorApprox queryApprox;
+  private VectorApproximation queryApprox;
 
   /**
    * Constructor.
@@ -43,7 +43,7 @@ public class VALPNormDistance {
    * @param query Query vector
    * @param queryApprox
    */
-  public VALPNormDistance(double p, double[][] splitPositions, NumberVector<?, ?> query, VectorApprox queryApprox) {
+  public VALPNormDistance(double p, double[][] splitPositions, NumberVector<?, ?> query, VectorApproximation queryApprox) {
     super();
     this.onebyp = 1.0 / p;
     this.queryApprox = queryApprox;
@@ -56,7 +56,7 @@ public class VALPNormDistance {
    * @param vec Vector approximation
    * @return Minimum distance
    */
-  public double getMinDist(VectorApprox vec) {
+  public double getMinDist(VectorApproximation vec) {
     final int dim = lookup.length;
     double minDist = 0;
     for(int d = 0; d < dim; d++) {
@@ -78,7 +78,7 @@ public class VALPNormDistance {
    * @param vec
    * @return
    */
-  public double getMaxDist(VectorApprox vec) {
+  public double getMaxDist(VectorApproximation vec) {
     final int dim = lookup.length;
     double maxDist = 0;
     for(int d = 0; d < dim; d++) {

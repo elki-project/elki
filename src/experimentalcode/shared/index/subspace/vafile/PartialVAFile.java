@@ -70,7 +70,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
   DiskMemory<V> data;
 
   // temporary, full-dimensional VA representation
-  private List<VectorApproxCandidate<V>> vectorApprox;
+  private List<PartialVectorApproximation<V>> vectorApprox;
 
   // VA dimensions
   // FIXME: use ArrayList<DAFile<V>>, better with generics!
@@ -125,11 +125,11 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     setPartitions(fullDimensionalData, this.partitions);
 
     data = new DiskMemory<V>(this.pageSize / (8 * dimensions + 4), this.bufferSize);
-    vectorApprox = new ArrayList<VectorApproxCandidate<V>>();
+    vectorApprox = new ArrayList<PartialVectorApproximation<V>>();
     for(DBID id : fullDimensionalData.getDBIDs()) {
       V dv = fullDimensionalData.get(id);
       data.add(id, dv);
-      VectorApproxCandidate<V> va = new VectorApproxCandidate<V>(id, dv.getDimensionality());
+      PartialVectorApproximation<V> va = new PartialVectorApproximation<V>(id, dv.getDimensionality());
       va.calculateApproximation(dv, daFiles);
       vectorApprox.add(va);
       System.out.println(id + ": " + va.toString());
@@ -137,12 +137,12 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     insertedData = true;
   }
 
-  private LinkedList<VectorApproxCandidate<V>> filter1(int k, int reducedDims, DAFile<V>[] daFiles, VectorApproxCandidate<V> queryApprox, int subspaceDims) {
-    LinkedList<VectorApproxCandidate<V>> candidates1 = new LinkedList<VectorApproxCandidate<V>>();
+  private LinkedList<PartialVectorApproximation<V>> filter1(int k, int reducedDims, DAFile<V>[] daFiles, PartialVectorApproximation<V> queryApprox, int subspaceDims) {
+    LinkedList<PartialVectorApproximation<V>> candidates1 = new LinkedList<PartialVectorApproximation<V>>();
     SortedDoubleArray sda = new SortedDoubleArray(k);
 
     for(int i = 0; i < vectorApprox.size(); i++) {
-      VectorApproxCandidate<V> va = vectorApprox.get(i);
+      PartialVectorApproximation<V> va = vectorApprox.get(i);
 
       va.resetPMaxDist();
       va.resetPMinDist();
@@ -155,20 +155,20 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     return candidates1;
   }
 
-  private void distanceCheck(SortedDoubleArray kMinMaxDists, int k, VectorApproxCandidate<V> va, LinkedList<VectorApproxCandidate<V>> candList) {
+  private void distanceCheck(SortedDoubleArray kMinMaxDists, int k, PartialVectorApproximation<V> va, LinkedList<PartialVectorApproximation<V>> candList) {
     if(kMinMaxDists.size() < k || va.getPMinDist() < kMinMaxDists.get(kMinMaxDists.size() - 1)) {
       candList.add(va);
       kMinMaxDists.add(va.getPMaxDist());
     }
   }
 
-  private void filter1Loop2(int reducedDims, int subspaceDims, VectorApproxCandidate<V> va, DAFile<V>[] daFiles, VectorApproxCandidate<V> queryApprox) {
+  private void filter1Loop2(int reducedDims, int subspaceDims, PartialVectorApproximation<V> va, DAFile<V>[] daFiles, PartialVectorApproximation<V> queryApprox) {
     for(int d = reducedDims; d < subspaceDims; d++) {
       va.increasePMaxDist(daFiles[d].getMaxMaxDist(queryApprox.getApproximation(daFiles[d].getDimension())));
     }
   }
 
-  private void filter1Loop1(int reducedDims, DAFile<V>[] daFiles, VectorApproxCandidate<V> queryApprox, VectorApproxCandidate<V> va) {
+  private void filter1Loop1(int reducedDims, DAFile<V>[] daFiles, PartialVectorApproximation<V> queryApprox, PartialVectorApproximation<V> va) {
     for(int d = 0; d < reducedDims; d++) {
       int dimension = daFiles[d].getDimension();
       int queryCell = queryApprox.getApproximation(dimension);
@@ -221,7 +221,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     return daFiles[dimension];
   }
 
-  public DAFile<V>[] getWorstCaseDistOrder(VectorApprox query, SubSpace subspace) {
+  public DAFile<V>[] getWorstCaseDistOrder(VectorApproximation query, SubSpace subspace) {
     int subspaceLength = subspace.subspaceDimensions.length;
     @SuppressWarnings("unchecked")
     DAFile<V>[] result = new DAFile[subspaceLength];
@@ -240,7 +240,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
   @Override
   public IndexStatistics getStatisitcs() {
     IndexStatistics is = new IndexStatistics(data.pageAccessesL, data.pageAccessesP, queryTime, scannedBytes / pageSize);
-    is.totalPages = data.getPageCount() + ((VectorApprox.byteOnDisk(currentSubspaceDims, partitions) * vectorApprox.size()) / pageSize);
+    is.totalPages = data.getPageCount() + ((VectorApproximation.byteOnDisk(currentSubspaceDims, partitions) * vectorApprox.size()) / pageSize);
     is.pageSize = pageSize;
     is.numQueries = issuedQueries;
     is.indexName = "PartialVA";
@@ -275,7 +275,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     long tmp = System.currentTimeMillis();
 
     // generate query approximation and lookup table
-    VectorApproxCandidate<V> queryApprox = new VectorApproxCandidate<V>(null, query.getDimensionality());
+    PartialVectorApproximation<V> queryApprox = new PartialVectorApproximation<V>(null, query.getDimensionality());
     queryApprox.calculateApproximation(query, daFiles);
     setLookupTable(query);
 
@@ -298,7 +298,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
 
     // filter 1
     tmp = System.currentTimeMillis();
-    LinkedList<VectorApproxCandidate<V>> candidates1 = filter1(k, reducedDims, daFiles, queryApprox, currentSubspaceDims);
+    LinkedList<PartialVectorApproximation<V>> candidates1 = filter1(k, reducedDims, daFiles, queryApprox, currentSubspaceDims);
     // scannedBytes += vectorApprox.size() * (2/3 *
     // vectorApprox.get(0).byteOnDisk());
     // scannedBytes += vectorApprox.size() *
@@ -313,7 +313,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     prunedVectors[currentSubspaceDims - 1] = numBeforePruning - numAfterPruning;
 
     // filters 2+
-    LinkedList<VectorApproxCandidate<V>> candidates2 = null;
+    LinkedList<PartialVectorApproximation<V>> candidates2 = null;
     int addition = reducedDims;
     int filterStep = 2;
 
@@ -335,10 +335,10 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
         if(candidates2 != null) {
           candidates1 = candidates2;
         }
-        candidates2 = new LinkedList<VectorApproxCandidate<V>>();
+        candidates2 = new LinkedList<PartialVectorApproximation<V>>();
 
         SortedDoubleArray kMinMaxDists = new SortedDoubleArray(k);
-        for(VectorApproxCandidate<V> va : candidates1) {
+        for(PartialVectorApproximation<V> va : candidates1) {
           int dimension = daFiles[addition].getDimension();
           int queryCell = queryApprox.getApproximation(dimension);
           int objectCell = va.getApproximation(dimension);
@@ -374,16 +374,16 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
       }
     }
 
-    scannedBytes += vectorApprox.size() * VectorApprox.byteOnDisk(addition, partitions);
+    scannedBytes += vectorApprox.size() * VectorApproximation.byteOnDisk(addition, partitions);
 
     // refinement step
-    Vector<VectorApproxCandidate<V>> sortedCandidates = new Vector<VectorApproxCandidate<V>>(candidates2.size());
-    for(VectorApproxCandidate<V> va : candidates2) {
+    Vector<PartialVectorApproximation<V>> sortedCandidates = new Vector<PartialVectorApproximation<V>>(candidates2.size());
+    for(PartialVectorApproximation<V> va : candidates2) {
       // sortedCandidates.add(vectorApprox.get(id));
       sortedCandidates.add(va);
     }
     // sort candidates by lower bound (minDist)
-    VectorApproxCandidate.sortByMinDist(sortedCandidates);
+    PartialVectorApproximation.sortByMinDist(sortedCandidates);
     List<DoubleDistanceResultPair> result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
 
     queryTime += System.nanoTime() - t;
@@ -404,9 +404,9 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     return resultIDs;
   }
 
-  private List<DoubleDistanceResultPair> retrieveAccurateDistances(Vector<VectorApproxCandidate<V>> sortedCandidates, int k, SubSpace subspace, V query) {
+  private List<DoubleDistanceResultPair> retrieveAccurateDistances(Vector<PartialVectorApproximation<V>> sortedCandidates, int k, SubSpace subspace, V query) {
     List<DoubleDistanceResultPair> result = new ArrayList<DoubleDistanceResultPair>();
-    for(VectorApproxCandidate<V> va : sortedCandidates) {
+    for(PartialVectorApproximation<V> va : sortedCandidates) {
       DoubleDistanceResultPair lastElement = null;
       if(!result.isEmpty()) {
         lastElement = result.get(result.size() - 1);
@@ -429,6 +429,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
         else {
           result.add(dp);
         }
+        // TODO: comparator benötigt?
         Collections.sort(result, new DoubleDistanceResultPairComparator());
       }
     }
@@ -442,7 +443,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
 
     // generate query approximation and lookup table
 
-    VectorApproxCandidate<V> queryApprox = new VectorApproxCandidate<V>(null, query.getDimensionality());
+    PartialVectorApproximation<V> queryApprox = new PartialVectorApproximation<V>(null, query.getDimensionality());
     queryApprox.calculateApproximation(query, daFiles);
     setLookupTable(query);
 
@@ -473,7 +474,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     // important: this structure contains the maxDist values for refinement!
     List<DistanceResultPair<DoubleDistance>> candidates = new ArrayList<DistanceResultPair<DoubleDistance>>();
     for(int i = 0; i < vectorApprox.size(); i++) {
-      VectorApproxCandidate<V> va = vectorApprox.get(i);
+      PartialVectorApproximation<V> va = vectorApprox.get(i);
 
       boolean pruned = false;
       for(DAFile<V> da : subspaceDAFiles) {
@@ -493,7 +494,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
     }
 
     // scannedBytes += vectorApprox.size() * vectorApprox.get(0).byteOnDisk();
-    scannedBytes += vectorApprox.size() * VectorApprox.byteOnDisk(subspaceDims.length, partitions);
+    scannedBytes += vectorApprox.size() * VectorApproximation.byteOnDisk(subspaceDims.length, partitions);
 
     // refinement step
     ModifiableDBIDs resultIDs = DBIDUtil.newArray();
@@ -546,7 +547,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
    * @param subspaceDims the required subspace dimensions
    * @return the cost value (in bytes)
    */
-  private static int getIOCosts(LinkedList<? extends VectorApprox> candidates, int subspaceDims) {
+  private static int getIOCosts(LinkedList<? extends VectorApproximation> candidates, int subspaceDims) {
     return candidates.size() * (subspaceDims * 8 + 4);
   }
 
@@ -563,9 +564,9 @@ public class PartialVAFile<V extends NumberVector<V, ?>> implements SubspaceInde
 }
 
 class WorstCaseDistComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile<V>> {
-  private VectorApprox query;
+  private VectorApproximation query;
 
-  public WorstCaseDistComparator(VectorApprox query) {
+  public WorstCaseDistComparator(VectorApproximation query) {
     this.query = query;
   }
 

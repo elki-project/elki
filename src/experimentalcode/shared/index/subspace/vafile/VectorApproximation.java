@@ -28,28 +28,32 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
- * DBObject
+ * Object in a VA approximation.
  * 
  * @author Thomas Bernecker
- * @created 16.09.2009
- * @date 16.09.2009
+ * @author Erich Schubert
  */
-public class VectorApprox {
+public class VectorApproximation {
   /**
    * approximation (va cell ids)
    */
   int[] approximation;
 
+  /**
+   * Object represented by this approximation
+   */
   protected DBID id;
 
-  public VectorApprox(int dimensions) {
-    approximation = new int[dimensions];
-    Arrays.fill(approximation, -1);
-  }
-
-  public VectorApprox(DBID id, int dimensions) {
-    this(dimensions);
+  /**
+   * Constructor.
+   *
+   * @param id Object represented (may be <code>null</code> for query objects)
+   * @param approximation Approximation
+   */
+  public VectorApproximation(DBID id, int[] approximation) {
+    super();
     this.id = id;
+    this.approximation = approximation;
   }
 
   /**
@@ -59,16 +63,23 @@ public class VectorApprox {
     return id;
   }
 
-  public int getApproximationSize() {
+  /**
+   * Get the dimensionality
+   * 
+   * @return Dimensionality
+   */
+  public int getDimensionality() {
     return approximation.length;
   }
 
+  /**
+   * Get the VA approximation
+   * 
+   * @param dim Dimension
+   * @return Bin number
+   */
   public int getApproximation(int dim) {
     return approximation[dim];
-  }
-
-  protected boolean approximationIsSet(int dim) {
-    return approximation[dim] != -1;
   }
 
   @Override

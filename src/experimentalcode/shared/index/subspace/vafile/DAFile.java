@@ -222,7 +222,7 @@ public class DAFile<V extends NumberVector<?, ?>> {
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
 
-    VectorApproxCandidate<V> queryApprox = new VectorApproxCandidate<V>(null, dimensions);
+    PartialVectorApproximation<V> queryApprox = new PartialVectorApproximation<V>(null, dimensions);
     queryApprox.calculateApproximation(query, daFiles);
 
     for(int i = 0; i < dimensions; i++) {
@@ -231,11 +231,11 @@ public class DAFile<V extends NumberVector<?, ?>> {
     }
 
     V lowerEpsilon = query.newNumberVector(lowerVals);
-    VectorApproxCandidate<V> lowerEpsilonPartitions = new VectorApproxCandidate<V>(null, dimensions);
+    PartialVectorApproximation<V> lowerEpsilonPartitions = new PartialVectorApproximation<V>(null, dimensions);
     lowerEpsilonPartitions.calculateApproximation(lowerEpsilon, daFiles);
 
     V upperEpsilon = query.newNumberVector(upperVals);
-    VectorApproxCandidate<V> upperEpsilonPartitions = new VectorApproxCandidate<V>(null, dimensions);
+    PartialVectorApproximation<V> upperEpsilonPartitions = new PartialVectorApproximation<V>(null, dimensions);
     upperEpsilonPartitions.calculateApproximation(upperEpsilon, daFiles);
 
     for(int i = 0; i < daFiles.length; i++) {
