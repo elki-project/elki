@@ -195,7 +195,7 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
         final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
         if(ocl != null) {
           final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           task.put(CLUSTERING, ocl);
           baseResult.getHierarchy().add(p, task);
         }

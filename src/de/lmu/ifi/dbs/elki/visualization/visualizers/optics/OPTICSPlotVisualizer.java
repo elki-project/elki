@@ -124,7 +124,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractOPTICSV
       for(OPTICSProjector<?> p : IterableUtil.fromIterator(ops)) {
         // Add plots, attach visualizer
         final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         baseResult.getHierarchy().add(p, task);
       }
     }
