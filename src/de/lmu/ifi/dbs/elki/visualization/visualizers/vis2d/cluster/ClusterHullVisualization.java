@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.geometry.AlphaShape;
-import de.lmu.ifi.dbs.elki.math.geometry.ConvexHull2D;
+import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -127,7 +127,7 @@ public class ClusterHullVisualization<NV extends NumberVector<NV, ?>> extends P2
       final DBIDs ids = clus.getIDs();
 
       if(alpha >= Double.POSITIVE_INFINITY) {
-        ConvexHull2D hull = new ConvexHull2D();
+        SweepHullDelaunay2D hull = new SweepHullDelaunay2D();
 
         for(DBID clpnum : ids) {
           double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum));
