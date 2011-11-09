@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
@@ -171,11 +170,5 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<Dista
   @Override
   public D getDistanceFactory() {
     return preprocessor.getDistanceFactory();
-  }
-
-  @Override
-  public DistanceQuery<O, D> getDistanceQuery() {
-    // TODO: remove? throw an exception?
-    return preprocessor.getDistanceQuery();
   }
 }

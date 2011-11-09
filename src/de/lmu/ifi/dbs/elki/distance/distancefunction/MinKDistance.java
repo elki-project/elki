@@ -139,6 +139,11 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
     private int k;
 
     /**
+     * Distance query for parent distance.
+     */
+    private DistanceQuery<T, D> parentDistanceQuery;
+
+    /**
      * Constructor.
      * 
      * @param relation Database
@@ -147,13 +152,14 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
     public Instance(Relation<T> relation, int k, DistanceFunction<? super O, D> parentDistance) {
       super(relation);
       this.k = k;
+      this.parentDistanceQuery = parentDistance.instantiate(relation);
       this.knnQuery = QueryUtil.getKNNQuery(relation, parentDistance, k, DatabaseQuery.HINT_HEAVY_USE);
     }
 
     @Override
     public D distance(DBID id1, DBID id2) {
       List<DistanceResultPair<D>> neighborhood = knnQuery.getKNNForDBID(id1, k);
-      D truedist = knnQuery.getDistanceQuery().distance(id1, id2);
+      D truedist = parentDistanceQuery.distance(id1, id2);
       return computeReachdist(neighborhood, truedist);
     }
 

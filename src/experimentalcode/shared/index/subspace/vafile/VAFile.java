@@ -27,21 +27,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -296,7 +292,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
    * 
    * @author Erich Schubert
    */
-  class VAFileRangeQuery extends AbstractDistanceRangeQuery<V, DoubleDistance> {
+  class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery<DoubleDistance> {
     /**
      * LP Norm p parameter.
      */
@@ -315,18 +311,11 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     }
 
     @Override
-    public List<DistanceResultPair<DoubleDistance>> getRangeForDBID(DBID id, DoubleDistance range) {
-      return getRangeForObject(relation.get(id), range);
-    }
-
-    @Override
     public List<DistanceResultPair<DoubleDistance>> getRangeForObject(V query, DoubleDistance range) {
       final double eps = range.doubleValue();
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 
-      // Exact distance function
-      LPNormDistanceFunction exdist = new LPNormDistanceFunction(p);
       // Approximative distance function
       VALPNormDistance vadist = new VALPNormDistance(p, splitPositions, query, queryApprox);
 
@@ -347,8 +336,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
         // interested in the DBID only! But this needs an API change.
 
         // refine the next element
-        V dv = refine(va.id);
-        final double dist = exdist.doubleDistance(dv, query);
+        final double dist = refine(va.id, query).doubleValue();
         if(dist <= eps) {
           result.add(new DoubleDistanceResultPair(dist, va.id));
         }
@@ -363,7 +351,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
    * 
    * @author Erich Schubert
    */
-  class VAFileKNNQuery extends AbstractDistanceKNNQuery<V, DoubleDistance> {
+  class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery<DoubleDistance> {
     /**
      * LP Norm p parameter.
      */
@@ -381,27 +369,10 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     }
 
     @Override
-    public List<List<DistanceResultPair<DoubleDistance>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
-    public void getKNNForBulkHeaps(Map<DBID, KNNHeap<DoubleDistance>> heaps) {
-      throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
-    public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
-      return getKNNForObject(relation.get(id), k);
-    }
-
-    @Override
     public List<DistanceResultPair<DoubleDistance>> getKNNForObject(V query, int k) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 
-      // Exact distance function
-      LPNormDistanceFunction exdist = new LPNormDistanceFunction(p);
       // Approximative distance function
       VALPNormDistance vadist = new VALPNormDistance(p, splitPositions, query, queryApprox);
 
@@ -450,8 +421,8 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
         }
 
         // refine the next element
-        V dv = refine(va.second);
-        result.add(new DoubleDistanceResultPair(exdist.doubleDistance(dv, query), va.second));
+        final double dist = refine(va.second, query).doubleValue();
+        result.add(new DoubleDistanceResultPair(dist, va.second));
       }
       if(log.isDebuggingFinest()) {
         log.finest("query = (" + query + ")");

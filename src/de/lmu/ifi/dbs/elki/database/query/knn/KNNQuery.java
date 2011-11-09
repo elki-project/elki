@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -84,12 +83,6 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    */
   // TODO: return KNNList<D> instead?
   public List<DistanceResultPair<D>> getKNNForObject(O obj, int k);
-
-  /**
-   * Get the distance query for this function.
-   */
-  // TODO: remove?
-  public DistanceQuery<O, D> getDistanceQuery();
 
   /**
    * Get the distance data type of the function.
