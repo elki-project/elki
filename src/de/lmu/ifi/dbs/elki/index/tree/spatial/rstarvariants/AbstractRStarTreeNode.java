@@ -139,17 +139,18 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     }
     int src = mask.nextClearBit(dest);
     while(src < numEntries) {
-      entries[dest] = entries[src];
       if(!mask.get(src)) {
+        entries[dest] = entries[src];
         dest++;
       }
       src++;
     }
-    while(src < numEntries) {
-      entries[src] = null;
-      src++;
+    int rm = src - dest;
+    while(dest < numEntries) {
+      entries[dest] = null;
+      dest++;
     }
-    numEntries -= (src-dest);
+    numEntries -= rm;
   }
 
   /**
