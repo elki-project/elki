@@ -61,13 +61,6 @@ public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
     }    
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery#getKNNForBulkDBIDs(de.lmu
-   * .ifi.dbs.elki.database.ids.ArrayDBIDs, int)
-   */
   @Override
   public List<List<DistanceResultPair<DoubleDistance>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     List<List<DistanceResultPair<DoubleDistance>>> results = new ArrayList<List<DistanceResultPair<DoubleDistance>>>();
@@ -80,15 +73,5 @@ public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
   @Override
   public List<DistanceResultPair<DoubleDistance>> getKNNForObject(O obj, int k) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return null;
-  }
-
-  @Override
-  public Relation<? extends O> getRelation() {
-    return relation;
   }
 }
