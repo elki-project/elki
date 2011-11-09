@@ -35,16 +35,17 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -54,10 +55,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -69,6 +69,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * @author Arthur Zimek
@@ -82,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
-public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -102,6 +104,11 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
   public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("sod.alpha", "The multiplier for the discriminance value for discerning small from large variances.");
 
   /**
+   * Parameter for the similarity function.
+   */
+  public static final OptionID SIM_ID = OptionID.getOrCreateOptionID("sod.similarity", "The similarity function used for the neighborhood set.");
+
+  /**
    * Holds the value of {@link #KNN_ID}.
    */
   private int knn;
@@ -112,9 +119,9 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
   private double alpha;
 
   /**
-   * The similarity function.
+   * The similarity function {@link #SIM_ID}.
    */
-  private SharedNearestNeighborSimilarityFunction<V> similarityFunction;
+  private SimilarityFunction<V, D> similarityFunction;
 
   /**
    * Constructor with parameters.
@@ -123,7 +130,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
    * @param alpha Alpha parameter
    * @param similarityFunction Shared nearest neighbor similarity function
    */
-  public SOD(int knn, double alpha, SharedNearestNeighborSimilarityFunction<V> similarityFunction) {
+  public SOD(int knn, double alpha, SimilarityFunction<V, D> similarityFunction) {
     super();
     this.knn = knn;
     this.alpha = alpha;
@@ -136,7 +143,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
    * @param relation Data relation to process
    */
   public OutlierResult run(Relation<V> relation) throws IllegalStateException {
-    SimilarityQuery<V, IntegerDistance> snnInstance = similarityFunction.instantiate(relation);
+    SimilarityQuery<V, D> snnInstance = similarityFunction.instantiate(relation);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), logger) : null;
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     DoubleMinMax minmax = new DoubleMinMax();
@@ -145,7 +152,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
       if(progress != null) {
         progress.incrementProcessed(logger);
       }
-      DBIDs knnList = getKNN(relation, snnInstance, queryObject).asDBIDs();
+      DBIDs knnList = getNearestNeighbors(relation, snnInstance, queryObject);
       SODModel<V> model = new SODModel<V>(relation, knnList, alpha, relation.get(queryObject));
       sod_models.put(queryObject, model);
       minmax.put(model.getSod());
@@ -168,23 +175,30 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
    * <p/>
    * The query object is excluded from the knn list.
    * 
-   * @param database the database holding the objects
-   * @param snnInstance similarity function
+   * @param relation the database holding the objects
+   * @param simQ similarity function
    * @param queryObject the query object for which the kNNs should be determined
    * @return the k nearest neighbors in terms of the shared nearest neighbor
    *         distance without the query object
    */
-  private KNNList<DoubleDistance> getKNN(Relation<V> database, SimilarityQuery<V, IntegerDistance> snnInstance, DBID queryObject) {
+  private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBID queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
-    KNNHeap<DoubleDistance> kNearestNeighbors = new KNNHeap<DoubleDistance>(knn, new DoubleDistance(Double.POSITIVE_INFINITY));
-    for(Iterator<DBID> iter = database.iterDBIDs(); iter.hasNext();) {
-      DBID id = iter.next();
+    Heap<DoubleObjPair<DBID>> nearestNeighbors = new TiedTopBoundedHeap<DoubleObjPair<DBID>>(knn);
+    for(DBID id : relation.iterDBIDs()) {
       if(!id.equals(queryObject)) {
-        double distance = 1.0 / snnInstance.similarity(queryObject, id).doubleValue();
-        kNearestNeighbors.add(new DoubleDistanceResultPair(distance, id));
+        double sim = simQ.similarity(queryObject, id).doubleValue();
+        if(sim > 0) {
+          nearestNeighbors.add(new DoubleObjPair<DBID>(sim, id));
+        }
       }
     }
-    return kNearestNeighbors.toKNNList();
+    // Collect DBIDs
+    ArrayModifiableDBIDs dbids = DBIDUtil.newArray(nearestNeighbors.size());
+    while(nearestNeighbors.size() > 0) {
+      final DoubleObjPair<DBID> next = nearestNeighbors.poll();
+      dbids.add(next.second);
+    }
+    return dbids;
   }
 
   @Override
@@ -226,45 +240,51 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
      * @param queryObject Query object
      */
     public SODModel(Relation<O> database, DBIDs neighborhood, double alpha, O queryObject) {
-      // TODO: store database link?
-      centerValues = new double[DatabaseUtil.dimensionality(database)];
-      variances = new double[centerValues.length];
-      for(DBID id : neighborhood) {
-        O databaseObject = database.get(id);
+      if(neighborhood.size() > 0) {
+        // TODO: store database link?
+        centerValues = new double[DatabaseUtil.dimensionality(database)];
+        variances = new double[centerValues.length];
+        for(DBID id : neighborhood) {
+          O databaseObject = database.get(id);
+          for(int d = 0; d < centerValues.length; d++) {
+            centerValues[d] += databaseObject.doubleValue(d + 1);
+          }
+        }
         for(int d = 0; d < centerValues.length; d++) {
-          centerValues[d] += databaseObject.doubleValue(d + 1);
+          centerValues[d] /= neighborhood.size();
         }
-      }
-      for(int d = 0; d < centerValues.length; d++) {
-        centerValues[d] /= neighborhood.size();
-      }
-      for(DBID id : neighborhood) {
-        O databaseObject = database.get(id);
-        for(int d = 0; d < centerValues.length; d++) {
-          // distance
-          double distance = centerValues[d] - databaseObject.doubleValue(d + 1);
-          // variance
-          variances[d] += distance * distance;
+        for(DBID id : neighborhood) {
+          O databaseObject = database.get(id);
+          for(int d = 0; d < centerValues.length; d++) {
+            // distance
+            double distance = centerValues[d] - databaseObject.doubleValue(d + 1);
+            // variance
+            variances[d] += distance * distance;
+          }
         }
-      }
-      expectationOfVariance = 0;
-      for(int d = 0; d < variances.length; d++) {
-        variances[d] /= neighborhood.size();
-        expectationOfVariance += variances[d];
-      }
-      expectationOfVariance /= variances.length;
-      weightVector = new BitSet(variances.length);
-      for(int d = 0; d < variances.length; d++) {
-        if(variances[d] < alpha * expectationOfVariance) {
-          weightVector.set(d, true);
+        expectationOfVariance = 0;
+        for(int d = 0; d < variances.length; d++) {
+          variances[d] /= neighborhood.size();
+          expectationOfVariance += variances[d];
         }
+        expectationOfVariance /= variances.length;
+        weightVector = new BitSet(variances.length);
+        for(int d = 0; d < variances.length; d++) {
+          if(variances[d] < alpha * expectationOfVariance) {
+            weightVector.set(d, true);
+          }
+        }
+        center = DatabaseUtil.assumeVectorField(database).getFactory().newNumberVector(centerValues);
+        sod = subspaceOutlierDegree(queryObject, center, weightVector);
       }
-      center = DatabaseUtil.assumeVectorField(database).getFactory().newNumberVector(centerValues);
-      sod = subspaceOutlierDegree(queryObject, center, weightVector);
+      else {
+        center = queryObject;
+        sod = 0.0;
+      }
     }
 
     /**
-     * 
+     * Compute SOD score
      * 
      * @param queryObject
      * @param center
@@ -273,8 +293,12 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
      */
     private double subspaceOutlierDegree(O queryObject, O center, BitSet weightVector) {
       final DimensionsSelectingEuclideanDistanceFunction df = new DimensionsSelectingEuclideanDistanceFunction(weightVector);
+      final int card = weightVector.cardinality();
+      if(card == 0) {
+        return 0;
+      }
       double distance = df.distance(queryObject, center).doubleValue();
-      distance /= weightVector.cardinality();
+      distance /= card;
       return distance;
     }
 
@@ -316,7 +340,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
      * Model result this is a proxy for.
      */
     Relation<SODModel<?>> models;
-    
+
     /**
      * The IDs we are defined for
      */
@@ -326,7 +350,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
      * Constructor.
      * 
      * @param models Models result
-     * @param dbids IDs we are defined for 
+     * @param dbids IDs we are defined for
      */
     public SODProxyScoreResult(Relation<SODModel<?>> models, DBIDs dbids) {
       super();
@@ -353,7 +377,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
     public DBIDs getDBIDs() {
       return dbids;
     }
-    
+
     @Override
     public IterableIterator<DBID> iterDBIDs() {
       return IterableUtil.fromIterator(dbids.iterator());
@@ -402,7 +426,7 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #KNN_ID}.
      */
@@ -414,16 +438,18 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
     private double alpha = 1.1;
 
     /**
-     * The similarity function.
+     * The similarity function - {@link #SIM_ID}.
      */
-    private SharedNearestNeighborSimilarityFunction<V> similarityFunction;
+    private SimilarityFunction<V, D> similarityFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Class<SharedNearestNeighborSimilarityFunction<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
-      similarityFunction = config.tryInstantiate(cls);
-      
+      final ObjectParameter<SimilarityFunction<V, D>> simP = new ObjectParameter<SimilarityFunction<V, D>>(SIM_ID, SimilarityFunction.class, SharedNearestNeighborSimilarityFunction.class);
+      if(config.grab(simP)) {
+        similarityFunction = simP.instantiateClass(config);
+      }
+
       final IntParameter knnP = new IntParameter(KNN_ID, new GreaterConstraint(0), 1);
       if(config.grab(knnP)) {
         knn = knnP.getValue();
@@ -436,8 +462,8 @@ public class SOD<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlier
     }
 
     @Override
-    protected SOD<V> makeInstance() {
-      return new SOD<V>(knn, alpha, similarityFunction);
+    protected SOD<V, D> makeInstance() {
+      return new SOD<V, D>(knn, alpha, similarityFunction);
     }
   }
 }
