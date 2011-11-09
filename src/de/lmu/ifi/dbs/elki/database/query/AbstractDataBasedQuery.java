@@ -49,9 +49,9 @@ public abstract class AbstractDataBasedQuery<O> implements DatabaseQuery {
   }
 
   /**
-   * Give access to the underlying data query.
+   * Get the queries relation.
    * 
-   * @return data query instance
+   * @return Relation
    */
   public Relation<? extends O> getRelation() {
     return relation;

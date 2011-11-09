@@ -97,9 +97,4 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
     }
     return result;
   }
-
-  @Override
-  public D getDistanceFactory() {
-    return preprocessor.getDistanceFactory();
-  }  
 }

@@ -117,7 +117,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDataStore<Double> knno_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
     // compute distance to the k nearest neighbor.
-    for(DBID id : distanceQuery.getRelation().iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       // distance to the kth nearest neighbor
       final List<DistanceResultPair<D>> knns = knnQuery.getKNNForDBID(id, k);
       final int last = Math.min(k - 1, knns.size() - 1);

@@ -133,18 +133,18 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   public Result run(Database database, Relation<O> relation) {
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
-    WritableRecordStore store = DataStoreUtil.makeRecordStorage(distQuery.getRelation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
+    WritableRecordStore store = DataStoreUtil.makeRecordStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
     pi = store.getStorage(0, DBID.class);
     lambda = store.getStorage(1, distCls);
     // Temporary storage for m.
-    WritableDataStore<D> m = DataStoreUtil.makeStorage(distQuery.getRelation().getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
+    WritableDataStore<D> m = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", distQuery.getRelation().size(), logger) : null;
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", relation.size(), logger) : null;
     // has to be an array for monotonicity reasons!
-    ModifiableDBIDs processedIDs = DBIDUtil.newArray(distQuery.getRelation().size());
+    ModifiableDBIDs processedIDs = DBIDUtil.newArray(relation.size());
 
     // apply the algorithm
-    for(DBID id : distQuery.getRelation().iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       step1(id);
       step2(id, processedIDs, distQuery, m);
       step3(id, processedIDs, m);
@@ -168,8 +168,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     BasicResult result = null;
 
     // Build clusters identified by their target object
-    int minc = minclusters != null ? minclusters : distQuery.getRelation().size();
-    result = extractClusters(distQuery.getRelation().getDBIDs(), pi, lambda, minc);
+    int minc = minclusters != null ? minclusters : relation.size();
+    result = extractClusters(relation.getDBIDs(), pi, lambda, minc);
 
     result.addChildResult(new MaterializedRelation<DBID>("SLINK pi", "slink-order", TypeUtil.DBID, pi, processedIDs));
     result.addChildResult(new MaterializedRelation<D>("SLINK lambda", "slink-order", new SimpleTypeInformation<D>(distCls), lambda, processedIDs));

@@ -340,9 +340,9 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
         }
       }
 
-      if(processedIDs.size() == distFunc.getRelation().size() && noise.size() == 0) {
+      /* if(processedIDs.size() == relation.size() && noise.size() == 0) {
         break;
-      }
+      } */
     }
 
     if(currentCluster.size() >= minpts) {
