@@ -76,7 +76,7 @@ public class SweepHullDelaunay2D {
    * Constructor.
    */
   public SweepHullDelaunay2D() {
-    this.points = new ArrayList<Vector>();
+    this(new ArrayList<Vector>());
   }
 
   /**
@@ -273,13 +273,13 @@ public class SweepHullDelaunay2D {
       // Note that hend can be larger than hull.size() now, interpret as
       // "hend % hull.size()"
       // Update hull, remove points
-      final int tristart = tris.size();
       final int firsttri, lasttri;
       if(hullonly) {
         firsttri = -1;
         lasttri = -1;
       }
       else {
+        final int tristart = tris.size();
         firsttri = tristart;
         lasttri = tristart + newtris.size() - 1;
       }
@@ -340,6 +340,7 @@ public class SweepHullDelaunay2D {
         debugHull();
       }
       if(!hullonly) {
+        final int tristart = tris.size();
         // Connect triads (they are ordered)
         Iterator<Triangle> iter = newtris.iterator();
         for(int o = 0; iter.hasNext(); o++) {
