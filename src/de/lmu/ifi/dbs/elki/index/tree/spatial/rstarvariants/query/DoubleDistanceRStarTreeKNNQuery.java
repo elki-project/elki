@@ -292,9 +292,4 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     AbstractRStarTreeNode<?, ?> root = tree.getRoot();
     batchNN(root, heaps);
   }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return distanceQuery.getDistanceFactory();
-  }
 }

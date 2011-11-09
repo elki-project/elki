@@ -57,9 +57,4 @@ public abstract class AbstractDistanceKNNQuery<O, D extends Distance<D>> extends
 
   @Override
   abstract public List<DistanceResultPair<D>> getKNNForObject(O obj, int k);
-
-  @Override
-  public D getDistanceFactory() {
-    return distanceQuery.getDistanceFactory();
-  }
 }

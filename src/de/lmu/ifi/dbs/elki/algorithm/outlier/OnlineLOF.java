@@ -101,7 +101,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
     RKNNQuery<O, D> rkNNRefer = queries.getSecond().getFirst();
     RKNNQuery<O, D> rkNNReach = queries.getSecond().getSecond();
 
-    LOFResult<O, D> lofResult = super.doRunInTime(kNNRefer, kNNReach, stepprog);
+    LOFResult<O, D> lofResult = super.doRunInTime(relation.getDBIDs(), kNNRefer, kNNReach, stepprog);
     lofResult.setRkNNRefer(rkNNRefer);
     lofResult.setRkNNReach(rkNNReach);
 

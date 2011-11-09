@@ -80,8 +80,8 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         DBID o_r = entry.getRoutingObjectID();
 
         D r_or = entry.getCoveringRadius();
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? entry.getParentDistance() : getDistanceFactory().nullDistance();
+        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
+        D d2 = o_p != null ? entry.getParentDistance() : distanceQuery.nullDistance();
         // o_p != null ?  distanceFunction.distance(o_r, o_p) :/ distanceFunction.nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
@@ -104,8 +104,8 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         MTreeEntry<D> entry = node.getEntry(i);
         DBID o_j = entry.getRoutingObjectID();
 
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : getDistanceFactory().nullDistance();
+        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
+        D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : distanceQuery.nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
@@ -138,8 +138,8 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         DBID o_r = entry.getRoutingObjectID();
 
         D r_or = entry.getCoveringRadius();
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? entry.getParentDistance() : getDistanceFactory().nullDistance();
+        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
+        D d2 = o_p != null ? entry.getParentDistance() : distanceQuery.nullDistance();
         // o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
@@ -160,8 +160,8 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         MTreeEntry<D> entry = node.getEntry(i);
         DBID o_j = entry.getRoutingObjectID();
 
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-        D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : getDistanceFactory().nullDistance();
+        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
+        D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : distanceQuery.nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
