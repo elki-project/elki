@@ -92,12 +92,6 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   }
 
   @Override
-  public DistanceQuery<NumberVector<?, ?>, DoubleDistance> getDistanceQuery() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public DoubleDistance getDistanceFactory() {
     // TODO Auto-generated method stub
     return null;

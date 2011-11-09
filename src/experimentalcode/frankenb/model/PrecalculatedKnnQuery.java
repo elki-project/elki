@@ -83,11 +83,6 @@ public class PrecalculatedKnnQuery<O> implements KNNQuery<O, DoubleDistance> {
   }
 
   @Override
-  public DistanceQuery<O, DoubleDistance> getDistanceQuery() {
-    return null;
-  }
-
-  @Override
   public DoubleDistance getDistanceFactory() {
     return null;
   }
