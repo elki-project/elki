@@ -118,12 +118,6 @@ public class ProxyDatabase extends AbstractDatabase {
     this.relations.add(relation);
   }
 
-  @Deprecated
-  @Override
-  public int size() {
-    return ids.size();
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;

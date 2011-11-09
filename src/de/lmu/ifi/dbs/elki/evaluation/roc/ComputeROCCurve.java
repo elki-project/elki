@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -144,22 +143,6 @@ public class ComputeROCCurve implements Evaluator {
     return rocresult;
   }
 
-  /**
-   * Wrap the uncheckable cast with the manual check.
-   * 
-   * @param ir Interable result
-   * @return Iterator if Integer iterable, null otherwise.
-   */
-  @SuppressWarnings("unchecked")
-  private Iterator<DBID> getDBIDIterator(IterableResult<?> ir) {
-    Iterator<?> testit = ir.iterator();
-    if(testit.hasNext() && (testit.next() instanceof DBID)) {
-      // note: we DO want a fresh iterator here!
-      return (Iterator<DBID>) ir.iterator();
-    }
-    return null;
-  }
-
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Database db = ResultUtil.findDatabase(baseResult);
@@ -173,7 +156,6 @@ public class ComputeROCCurve implements Evaluator {
 
     boolean nonefound = true;
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
-    List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
@@ -183,15 +165,6 @@ public class ComputeROCCurve implements Evaluator {
       nonefound = false;
     }
 
-    // try iterable results first
-    // FIXME: find the appropriate place to call addDerivedResult
-    for(IterableResult<?> ir : iterables) {
-      Iterator<DBID> iter = getDBIDIterator(ir);
-      if(iter != null) {
-        db.getHierarchy().add(ir, computeROCResult(db.size(), positiveids, iter));
-        nonefound = false;
-      }
-    }
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {

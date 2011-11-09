@@ -259,12 +259,6 @@ public class StaticArrayDatabase extends AbstractDatabase implements Database, P
     return relation;
   }
 
-  @Deprecated
-  @Override
-  public final int size() {
-    return ids.size();
-  }
-
   @Override
   protected Logging getLogger() {
     return logger;

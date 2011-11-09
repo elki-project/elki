@@ -283,12 +283,6 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     restoreID(id);
   }
 
-  @Deprecated
-  @Override
-  public final int size() {
-    return ids.size();
-  }
-
   /**
    * Makes the given id reusable for new insertion operations.
    * 
