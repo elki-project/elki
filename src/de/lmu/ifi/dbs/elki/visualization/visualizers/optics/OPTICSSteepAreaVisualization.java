@@ -201,7 +201,7 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
         final SteepAreaResult steep = findSteepAreaResult(p.getResult());
         if(steep != null) {
           final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           baseResult.getHierarchy().add(p, task);
           baseResult.getHierarchy().add(steep, task);
