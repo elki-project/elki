@@ -67,14 +67,6 @@ public interface Database extends HierarchicalResult {
   public void initialize();
 
   /**
-   * Returns the number of objects contained in this Database.
-   * 
-   * @return the number of objects in this Database
-   */
-  @Deprecated
-  int size();
-  
-  /**
    * Get all relations of a database.
    * 
    * @return All relations in the database
