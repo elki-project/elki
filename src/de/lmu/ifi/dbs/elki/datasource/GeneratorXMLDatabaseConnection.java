@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.datasource;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -64,6 +65,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
 
+/**
+ * Data source from an XML specification.
+ * 
+ * This data source will generate random (or pseudo-random, fixed seeds are
+ * supported) data sets that satisfy a given specification file.
+ * 
+ * @author Erich Schubert
+ */
 public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   /**
    * Logger
