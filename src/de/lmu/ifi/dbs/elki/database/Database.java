@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -91,18 +90,6 @@ public interface Database extends HierarchicalResult {
    * @return representation
    */
   <O> Relation<O> getRelation(TypeInformation restriction, Object... hints) throws NoSupportedDataTypeException;
-
-  /**
-   * Get all matching object representations.
-   * 
-   * @param <O> Object type
-   * @param restriction Type restriction
-   * @param hints Optimizer hints
-   * @return Object representation
-   */
-  // TODO: add
-  // <O> Collection<DataQuery<O>> getObjectQueries(TypeInformation restriction,
-  // Object... hints);
 
   /**
    * Get the distance query for a particular distance function.
@@ -208,17 +195,6 @@ public interface Database extends HierarchicalResult {
    */
   // TODO: add
   // MultipleObjectsBundle getBundles(DBIDs id) throws ObjectNotFoundException;
-
-  /**
-   * Returns a list comprising all IDs currently in use.
-   * 
-   * The list returned shall not be linked to any actual list possibly hold in
-   * the database implementation.
-   * 
-   * @return a list comprising all IDs currently in use
-   */
-  @Deprecated
-  StaticDBIDs getDBIDs();
 
   /**
    * Add a new index to the database.
