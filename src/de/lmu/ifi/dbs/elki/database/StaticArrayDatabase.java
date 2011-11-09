@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -264,12 +263,6 @@ public class StaticArrayDatabase extends AbstractDatabase implements Database, P
   @Override
   public final int size() {
     return ids.size();
-  }
-
-  @Deprecated
-  @Override
-  public StaticDBIDs getDBIDs() {
-    return DBIDUtil.makeUnmodifiable(ids);
   }
 
   @Override

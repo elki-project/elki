@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -288,12 +287,6 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   @Override
   public final int size() {
     return ids.size();
-  }
-
-  @Deprecated
-  @Override
-  public StaticDBIDs getDBIDs() {
-    return DBIDUtil.makeUnmodifiable(ids);
   }
 
   /**
