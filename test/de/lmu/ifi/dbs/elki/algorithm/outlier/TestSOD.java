@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -50,7 +51,7 @@ public class TestSOD extends AbstractSimpleAlgorithmTest implements JUnit4Test {
     params.addParameter(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 19);
 
     // setup Algorithm
-    SOD<DoubleVector> sod = ClassGenericsUtil.parameterizeOrAbort(SOD.class, params);
+    SOD<DoubleVector, DoubleDistance> sod = ClassGenericsUtil.parameterizeOrAbort(SOD.class, params);
     testParameterizationOk(params);
 
     // run SOD on database
