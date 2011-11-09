@@ -82,7 +82,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), index.getRootID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(distanceQuery.nullDistance(), index.getRootID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -102,8 +102,8 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
           MTreeEntry<D> entry = node.getEntry(i);
           DBID o_r = entry.getRoutingObjectID();
           D r_or = entry.getCoveringRadius();
-          D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-          D d2 = o_p != null ? distanceQuery.distance(o_r, o_p) : getDistanceFactory().nullDistance();
+          D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
+          D d2 = o_p != null ? distanceQuery.distance(o_r, o_p) : distanceQuery.nullDistance();
 
           D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
@@ -111,7 +111,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
 
           if(diff.compareTo(sum) <= 0) {
             D d3 = distanceQuery.distance(o_r, q);
-            D d_min = DistanceUtil.max(d3.minus(r_or), getDistanceFactory().nullDistance());
+            D d_min = DistanceUtil.max(d3.minus(r_or), distanceQuery.nullDistance());
             if(d_min.compareTo(d_k) <= 0) {
               pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, ((DirectoryEntry)entry).getPageID(), o_r));
             }
@@ -126,8 +126,8 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
           MTreeEntry<D> entry = node.getEntry(i);
           DBID o_j = entry.getRoutingObjectID();
 
-          D d1 = o_p != null ? distanceQuery.distance(o_p, q) : getDistanceFactory().nullDistance();
-          D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : getDistanceFactory().nullDistance();
+          D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
+          D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : distanceQuery.nullDistance();
 
           D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 

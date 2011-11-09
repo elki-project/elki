@@ -180,7 +180,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(relation, stepprog);
     KNNQuery<O, D> kNNRefer = pair.getFirst();
     KNNQuery<O, D> kNNReach = pair.getSecond();
-    return doRunInTime(kNNRefer, kNNReach, stepprog).getResult();
+    return doRunInTime(relation.getDBIDs(), kNNRefer, kNNReach, stepprog).getResult();
   }
 
   /**
@@ -231,7 +231,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    *        function
    * @param kNNReach the kNN query w.r.t. reachability distance function
    */
-  protected LOFResult<O, D> doRunInTime(KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) throws IllegalStateException {
+  protected LOFResult<O, D> doRunInTime(DBIDs ids, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) throws IllegalStateException {
     // Assert we got something
     if(kNNRefer == null) {
       throw new AbortException("No kNN queries supported by database for reference neighborhood distance function.");
@@ -244,13 +244,13 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     if(stepprog != null) {
       stepprog.beginStep(2, "Computing LRDs.", logger);
     }
-    WritableDataStore<Double> lrds = computeLRDs(kNNReach.getRelation().getDBIDs(), kNNReach);
+    WritableDataStore<Double> lrds = computeLRDs(ids, kNNReach);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", logger);
     }
-    Pair<WritableDataStore<Double>, DoubleMinMax> lofsAndMax = computeLOFs(kNNRefer.getRelation().getDBIDs(), lrds, kNNRefer);
+    Pair<WritableDataStore<Double>, DoubleMinMax> lofsAndMax = computeLOFs(ids, lrds, kNNRefer);
     WritableDataStore<Double> lofs = lofsAndMax.getFirst();
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = lofsAndMax.getSecond();
@@ -260,7 +260,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Local Outlier Factor", "lof-outlier", TypeUtil.DOUBLE, lofs, kNNRefer.getRelation().getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Local Outlier Factor", "lof-outlier", TypeUtil.DOUBLE, lofs, ids);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 

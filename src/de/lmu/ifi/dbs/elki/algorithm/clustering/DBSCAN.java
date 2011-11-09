@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -132,7 +131,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   /**
    * Performs the DBSCAN algorithm on the given database.
    */
-  public Clustering<Model> run(Database database, Relation<O> relation) {
+  public Clustering<Model> run(Relation<O> relation) {
     RangeQuery<O, D> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
@@ -142,9 +141,9 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(size);
     if(size >= minpts) {
-      for(DBID id : rangeQuery.getRelation().iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         if(!processedIDs.contains(id)) {
-          expandCluster(database, rangeQuery, id, objprog, clusprog);
+          expandCluster(relation, rangeQuery, id, objprog, clusprog);
         }
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), logger);
@@ -156,7 +155,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       }
     }
     else {
-      for(DBID id : rangeQuery.getRelation().iterDBIDs()) {
+      for(DBID id : relation.iterDBIDs()) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), logger);
@@ -189,12 +188,12 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * <p/>
    * Border-Objects become members of the first possible cluster.
    * 
-   * @param database the database on which the algorithm is run
+   * @param relation Database relation to run on
    * @param rangeQuery Range query to use
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Database database, RangeQuery<O, D> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Relation<O> relation, RangeQuery<O, D> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     List<DistanceResultPair<D>> seeds = rangeQuery.getRangeForDBID(startObjectID, epsilon);
 
     // startObject is no core-object
@@ -245,7 +244,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
         }
       }
 
-      if(processedIDs.size() == rangeQuery.getRelation().size() && noise.size() == 0) {
+      if(processedIDs.size() == relation.size() && noise.size() == 0) {
         break;
       }
 

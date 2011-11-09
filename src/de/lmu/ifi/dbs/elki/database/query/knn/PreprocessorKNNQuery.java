@@ -166,9 +166,4 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<Dista
   public AbstractMaterializeKNNPreprocessor<O, D, T> getPreprocessor() {
     return preprocessor;
   }
-
-  @Override
-  public D getDistanceFactory() {
-    return preprocessor.getDistanceFactory();
-  }
 }

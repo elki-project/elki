@@ -202,15 +202,5 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
       AbstractRefiningIndex.this.refinements++;
       return distanceQuery.distance(q, id);
     }
-
-    @Override
-    public D getDistanceFactory() {
-      return distanceQuery.getDistanceFactory();
-    }
-
-    @Override
-    public Relation<? extends O> getRelation() {
-      return distanceQuery.getRelation();
-    }
   }
 }

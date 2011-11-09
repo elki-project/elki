@@ -254,9 +254,4 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     }
     return result;
   }
-
-  @Override
-  public D getDistanceFactory() {
-    return distanceQuery.getDistanceFactory();
-  }
 }
