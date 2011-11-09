@@ -329,7 +329,7 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     Integer level1 = this.get(VisualizationTask.META_LEVEL, Integer.class);
     Integer level2 = other.get(VisualizationTask.META_LEVEL, Integer.class);
     if(level1 != null && level2 != null && level1 != level2) {
-      return level2 - level1;
+      return level1 - level2;
     }
     // sort by name otherwise.
     String name1 = this.getShortName();
