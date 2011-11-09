@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -69,16 +68,4 @@ public interface RKNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @return reverse k nearest neighbors
    */
   public List<List<DistanceResultPair<D>>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k);
-
-  /**
-   * Get the distance data type of the function.
-   */
-  public D getDistanceFactory();
-  
-  /**
-   * Access the underlying data query.
-   * 
-   * @return data query in use
-   */
-  public abstract Relation<? extends O> getRelation();
 }

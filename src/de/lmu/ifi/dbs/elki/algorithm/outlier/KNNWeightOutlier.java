@@ -119,7 +119,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
     WritableDataStore<Double> knnw_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(DBID id : distanceQuery.getRelation().iterDBIDs()) {
+    for(DBID id : relation.iterDBIDs()) {
       // compute sum of the distances to the k nearest neighbors
 
       List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(id, k);

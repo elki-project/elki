@@ -1,37 +1,37 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -79,10 +79,8 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * 
    */
   public OutlierResult run(Database database, Relation<O> relation) throws IllegalStateException {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    
     // Run the actual score process
-    DataStore<Double> dbodscore = computeOutlierScores(database, distFunc, d);
+    DataStore<Double> dbodscore = computeOutlierScores(database, relation, d);
 
     // Build result representation.
     Relation<Double> scoreResult = new MaterializedRelation<Double>("Density-Based Outlier Detection", "db-outlier", TypeUtil.DOUBLE, dbodscore, relation.getDBIDs());
@@ -92,8 +90,13 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
 
   /**
    * computes an outlier score for each object of the database.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @param d distance
+   * @return computed scores
    */
-  protected abstract DataStore<Double> computeOutlierScores(Database database, DistanceQuery<O, D> distFunc, D d);
+  protected abstract DataStore<Double> computeOutlierScores(Database database, Relation<O> relation, D d);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -108,8 +111,11 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * @apiviz.exclude
    */
   public static abstract class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    /**
+     * Query radius
+     */
     protected D d = null;
-    
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

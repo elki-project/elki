@@ -54,9 +54,4 @@ public abstract class AbstractRKNNQuery<O, D extends Distance<D>> extends Abstra
 
   @Override
   abstract public List<DistanceResultPair<D>> getRKNNForDBID(DBID id, int k);
-
-  @Override
-  public D getDistanceFactory() {
-    return distanceQuery.getDistanceFactory();
-  }
 }
