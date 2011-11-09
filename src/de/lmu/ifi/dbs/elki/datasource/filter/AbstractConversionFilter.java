@@ -65,10 +65,7 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
       // Get the replacement type information
       @SuppressWarnings("unchecked")
       final SimpleTypeInformation<I> castType = (SimpleTypeInformation<I>) type;
-      @SuppressWarnings("unchecked")
-      final List<O> castColumn = (List<O>) column;
-      bundle.appendColumn(convertedType(castType), castColumn);
-      
+
       // When necessary, perform an initialization scan
       if(prepareStart(castType)) {
         for(Object o : column) {
@@ -78,6 +75,10 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
         }
         prepareComplete();
       }
+
+      @SuppressWarnings("unchecked")
+      final List<O> castColumn = (List<O>) column;
+      bundle.appendColumn(convertedType(castType), castColumn);
 
       // Normalization scan
       for(int i = 0; i < objects.dataLength(); i++) {
