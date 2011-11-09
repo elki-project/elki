@@ -48,6 +48,6 @@ public class SparseVectorFieldFilter extends AbstractConversionFilter<SparseFloa
 
   @Override
   protected SimpleTypeInformation<? super SparseFloatVector> convertedType(SimpleTypeInformation<SparseFloatVector> in) {
-    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, maxdim);
+    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, maxdim, SparseFloatVector.STATIC);
   }
 }
