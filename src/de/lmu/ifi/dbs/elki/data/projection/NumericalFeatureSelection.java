@@ -35,7 +35,7 @@ public class NumericalFeatureSelection<V extends NumberVector<V, N>, N extends N
   /**
    * Constructor.
    * 
-   * @param dim Dimensions
+   * @param dims Dimensions
    * @param factory Object factory
    */
   public NumericalFeatureSelection(int[] dims, V factory) {

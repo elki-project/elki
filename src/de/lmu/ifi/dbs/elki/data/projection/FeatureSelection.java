@@ -36,7 +36,7 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> extends Abstract
   /**
    * Constructor.
    * 
-   * @param dim Dimensions
+   * @param dims Dimensions
    * @param factory Object factory
    */
   public FeatureSelection(int[] dims, V factory) {
