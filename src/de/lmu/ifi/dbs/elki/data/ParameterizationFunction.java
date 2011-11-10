@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * A parameterization function describes all lines in a d-dimensional feature
@@ -61,6 +62,11 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
      */
     CONSTANT
   }
+
+  /**
+   * Static factory
+   */
+  public static final ParameterizationFunction STATIC = new ParameterizationFunction(new double[0]);
 
   /**
    * A small number to handle numbers near 0 as 0.
@@ -573,5 +579,19 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
       values[i] = adapter.getDouble(array, i);
     }
     return new ParameterizationFunction(values);
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected ParameterizationFunction makeInstance() {
+      return STATIC;
+    }
   }
 }
