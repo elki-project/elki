@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.snn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -34,8 +32,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -117,13 +115,13 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), getLogger()) : null;
     for(DBID id : relation.iterDBIDs()) {
       TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
-      List<DistanceResultPair<D>> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors);
+      KNNResult<D> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors);
       for(int i = 0; i < kNN.size(); i++) {
         final DBID nid = kNN.get(i).getDBID();
         // if(!id.equals(nid)) {
         neighbors.add(nid);
         // }
-        // Size limitation to exaclty numberOfNeighbors
+        // Size limitation to exactly numberOfNeighbors
         if(neighbors.size() >= numberOfNeighbors) {
           break;
         }

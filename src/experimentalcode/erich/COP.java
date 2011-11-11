@@ -23,8 +23,6 @@ package experimentalcode.erich;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -41,8 +39,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -129,13 +127,9 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
       for(DBID id : data.iterDBIDs()) {
-        List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k + 1);
-        neighbors.remove(0);
-
-        ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.size());
-        for(DistanceResultPair<D> n : neighbors) {
-          nids.add(n.getDBID());
-        }
+        KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
+        ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.asDBIDs());
+        nids.remove(id);
 
         // TODO: do we want to use the query point as centroid?
         CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(data, nids);

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
  */
 
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -34,9 +33,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -163,13 +161,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       }
       else {
         DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-        List<DistanceResultPair<D>> queryResults = database.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
-        ModifiableDBIDs tids = DBIDUtil.newHashSet(this.sampleSize);
-        for(DistanceResultPair<D> qr : queryResults) {
-          tids.add(qr.getDBID());
-        }
-        // Cast to non-modifiable
-        ids = tids;
+        KNNResult<D> queryResults = database.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
+        ids = DBIDUtil.newHashSet(queryResults.asDBIDs());
       }
     }
     else {

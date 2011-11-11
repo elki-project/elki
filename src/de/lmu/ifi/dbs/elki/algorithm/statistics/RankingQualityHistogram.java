@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
@@ -36,9 +35,9 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -121,7 +120,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBID i1 : clus.getIDs()) {
-        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, relation.size());
+        KNNResult<D> knn = knnQuery.getKNNForDBID(i1, relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         mv.put(result);

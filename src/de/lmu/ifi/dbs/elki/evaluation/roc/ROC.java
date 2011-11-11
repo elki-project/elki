@@ -326,7 +326,7 @@ public class ROC {
    * @param nei Query result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, List<DistanceResultPair<D>> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, Iterable<DistanceResultPair<D>> nei) {
     // TODO: ensure the collection has efficient "contains".
     return ROC.computeROCAUCDistanceResult(size, clus.getIDs(), nei);
   }
@@ -340,7 +340,7 @@ public class ROC {
    * @param nei Query Result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, List<DistanceResultPair<D>> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, Iterable<DistanceResultPair<D>> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
     List<DoubleDoublePair> roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<D>(nei.iterator()));
     return computeAUC(roc);

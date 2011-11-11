@@ -32,9 +32,9 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -117,9 +117,8 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
     List<D> knnDistances = new ArrayList<D>(relation.size());
     for(DBID id : relation.iterDBIDs()) {
       if(random.nextDouble() < percentage) {
-        final List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
-        final int last = Math.min(k - 1, neighbors.size() - 1);
-        knnDistances.add(neighbors.get(last).getDistance());
+        final KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k);
+        knnDistances.add(neighbors.getKNNDistance());
       }
     }
     Collections.sort(knnDistances, Collections.reverseOrder());

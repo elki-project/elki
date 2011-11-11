@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -111,7 +112,8 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distQuery);
     DBIDs ids = relation.getDBIDs();
 
-    WritableDataStore<List<DistanceResultPair<D>>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
+    // FIXME: implicit preprocessor.
+    WritableDataStore<KNNResult<D>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, KNNResult.class);
     WritableDataStore<Double> coreDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
     WritableDataStore<Integer> minPtsNeighborhoodSize = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Integer.class);
 
@@ -119,8 +121,8 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     // N_minpts(id) and core-distance(id)
 
     for(DBID id : relation.iterDBIDs()) {
-      List<DistanceResultPair<D>> minptsNeighbours = knnQuery.getKNNForDBID(id, minpts);
-      D d = minptsNeighbours.get(minptsNeighbours.size() - 1).getDistance();
+      KNNResult<D> minptsNeighbours = knnQuery.getKNNForDBID(id, minpts);
+      D d = minptsNeighbours.getKNNDistance();
       nMinPts.put(id, minptsNeighbours);
       coreDistance.put(id, d.doubleValue());
       minPtsNeighborhoodSize.put(id, rangeQuery.getRangeForDBID(id, d).size());

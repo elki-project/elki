@@ -36,10 +36,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
@@ -251,23 +251,23 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getKNNForObject(O obj, int k) {
+  public KNNResult<DoubleDistance> getKNNForObject(O obj, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
     final KNNHeap<DoubleDistance> knnList = new KNNHeap<DoubleDistance>(k, distanceFunction.getDistanceFactory().infiniteDistance());
     doKNNQuery(obj, knnList);
-    return knnList.toSortedArrayList();
+    return knnList.toKNNList();
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
+  public KNNResult<DoubleDistance> getKNNForDBID(DBID id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  public List<List<DistanceResultPair<DoubleDistance>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<KNNResult<DoubleDistance>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -280,9 +280,9 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
     batchNN(tree.getRoot(), knnLists);
 
-    List<List<DistanceResultPair<DoubleDistance>>> result = new ArrayList<List<DistanceResultPair<DoubleDistance>>>();
+    List<KNNResult<DoubleDistance>> result = new ArrayList<KNNResult<DoubleDistance>>();
     for(DBID id : ids) {
-      result.add(knnLists.get(id).toSortedArrayList());
+      result.add(knnLists.get(id).toKNNList());
     }
     return result;
   }

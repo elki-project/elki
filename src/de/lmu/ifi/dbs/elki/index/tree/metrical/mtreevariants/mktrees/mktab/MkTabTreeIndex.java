@@ -29,9 +29,10 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNUtil;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -46,7 +47,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndex
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
@@ -103,8 +103,8 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
    * @return the knn distance of the object with the specified id
    */
   private List<D> knnDistances(O object) {
-    List<DistanceResultPair<D>> knns = knnQuery.getKNNForObject(object, getKmax() - 1);
-    return KNNList.asDistanceList(knns);
+    KNNResult<D> knns = knnQuery.getKNNForObject(object, getKmax() - 1);
+    return KNNUtil.asDistanceList(knns);
   }
 
   @Override

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  */
 
 import java.util.Collections;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -41,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -203,7 +203,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
 
       // Fill the neighborhood matrix F:
       {
-        List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k + 1);
+        KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs neighborhood = DBIDUtil.newArray(neighbors.size());
         for(DistanceResultPair<D> dpair : neighbors) {
           if(id.equals(dpair.getDBID())) {

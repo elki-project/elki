@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
@@ -41,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -280,12 +279,12 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
     for(DBID id : ids) {
       double sum = 0;
-      List<DistanceResultPair<D>> neighbors = knnReach.getKNNForDBID(id, k);
+      KNNResult<D> neighbors = knnReach.getKNNForDBID(id, k);
       int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
       for(DistanceResultPair<D> neighbor : neighbors) {
         if(objectIsInKNN || !neighbor.getDBID().equals(id)) {
-          List<DistanceResultPair<D>> neighborsNeighbors = knnReach.getKNNForDBID(neighbor.getDBID(), k);
-          sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
+          KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor.getDBID(), k);
+          sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
         }
       }
       // Avoid division by 0
@@ -320,7 +319,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       double lrdp = lrds.get(id);
       final Double lof;
       if(lrdp > 0) {
-        List<DistanceResultPair<D>> neighbors = knnRefer.getKNNForDBID(id, k);
+        final KNNResult<D> neighbors = knnRefer.getKNNForDBID(id, k);
         int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
         // skip the point itself
         // neighbors.remove(0);

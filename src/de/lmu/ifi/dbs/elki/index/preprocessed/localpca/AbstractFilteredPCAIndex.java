@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
+import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -100,7 +100,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
 
     // TODO: use a bulk operation?
     for(DBID id : relation.iterDBIDs()) {
-      List<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id);
+      Collection<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(id);
 
       PCAFilteredResult pcares = pca.processQueryResult(objects, relation);
 
@@ -137,7 +137,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
    * @return the list of the objects (i.e. the ids and the distances to the
    *         query object) to be considered within the PCA
    */
-  protected abstract List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id);
+  protected abstract Collection<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id);
 
   /**
    * Factory class

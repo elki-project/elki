@@ -22,8 +22,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
@@ -36,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -121,7 +120,7 @@ public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> exte
       // TODO: use bulk?
       WritableDataStore<DBIDs> s = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBIDs.class);
       for(DBID id : relation.iterDBIDs()) {
-        List<DistanceResultPair<D>> neighbors = knnQuery.getKNNForDBID(id, k);
+        KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k);
         ArrayModifiableDBIDs neighbours = DBIDUtil.newArray(neighbors.size());
         for(DistanceResultPair<D> dpair : neighbors) {
           neighbours.add(dpair.getDBID());

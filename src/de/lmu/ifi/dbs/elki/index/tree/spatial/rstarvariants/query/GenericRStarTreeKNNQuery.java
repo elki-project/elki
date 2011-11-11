@@ -36,9 +36,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -220,23 +220,23 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
   }
 
   @Override
-  public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
+  public KNNResult<D> getKNNForObject(O obj, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
     final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance());
     doKNNQuery(obj, knnList);
-    return knnList.toSortedArrayList();
+    return knnList.toKNNList();
   }
 
   @Override
-  public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
+  public KNNResult<D> getKNNForDBID(DBID id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -248,9 +248,9 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
     batchNN(tree.getRoot(), knnLists);
 
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>();
+    List<KNNResult<D>> result = new ArrayList<KNNResult<D>>();
     for(DBID id : ids) {
-      result.add(knnLists.get(id).toSortedArrayList());
+      result.add(knnLists.get(id).toKNNList());
     }
     return result;
   }

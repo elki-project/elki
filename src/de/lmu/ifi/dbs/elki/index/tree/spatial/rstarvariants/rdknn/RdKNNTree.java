@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -389,7 +390,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
         // q becomes knn of p
         if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
           O obj = relation.get(p.getDBID());
-          List<DistanceResultPair<D>> knns_without_q = knnQuery.getKNNForObject(obj, k_max);
+          KNNResult<D> knns_without_q = knnQuery.getKNNForObject(obj, k_max);
 
           if(knns_without_q.size() + 1 < k_max) {
             p.setKnnDistance(distanceQuery.getDistanceFactory().undefinedDistance());
