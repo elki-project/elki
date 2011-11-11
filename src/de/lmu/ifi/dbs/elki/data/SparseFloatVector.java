@@ -165,6 +165,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
         if(value != 0.0f) {
           this.indexes[pos] = i + 1;
           this.values[pos] = value;
+          pos++;
         }
       }
     }
@@ -515,7 +516,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * Parameterization class
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
