@@ -226,9 +226,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         if(knnList.add(distance, s_id)) {
           // set kNN distance of r
           if(infinite) {
-            pr_knn_distance = knnList.getMaximumDistance();
+            pr_knn_distance = knnList.getKNNDistance();
           }
-          pr_knn_distance = DistanceUtil.max(knnList.getMaximumDistance(), pr_knn_distance);
+          pr_knn_distance = DistanceUtil.max(knnList.getKNNDistance(), pr_knn_distance);
         }
       }
     }
