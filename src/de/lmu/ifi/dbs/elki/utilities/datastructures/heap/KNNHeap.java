@@ -87,7 +87,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * @return KNNList with the heaps contents.
    */
   public KNNList<D> toKNNList() {
-    return new KNNList<D>(this, maxdist);
+    return new KNNList<D>(this);
   }
 
   /**
