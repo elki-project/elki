@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -155,11 +156,11 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
 
   private void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector, DoubleDistance> lin_knn_query, KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query, int k) {
     ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
-    List<List<DistanceResultPair<DoubleDistance>>> lin_knn_ids = lin_knn_query.getKNNForBulkDBIDs(sample, k);
-    List<List<DistanceResultPair<DoubleDistance>>> preproc_knn_ids = preproc_knn_query.getKNNForBulkDBIDs(sample, k);
+    List<KNNResult<DoubleDistance>> lin_knn_ids = lin_knn_query.getKNNForBulkDBIDs(sample, k);
+    List<KNNResult<DoubleDistance>> preproc_knn_ids = preproc_knn_query.getKNNForBulkDBIDs(sample, k);
     for(int i = 0; i < rep.size(); i++) {
-      List<DistanceResultPair<DoubleDistance>> lin_knn = lin_knn_ids.get(i);
-      List<DistanceResultPair<DoubleDistance>> pre_knn = preproc_knn_ids.get(i);
+      KNNResult<DoubleDistance> lin_knn = lin_knn_ids.get(i);
+      KNNResult<DoubleDistance> pre_knn = preproc_knn_ids.get(i);
       if(!lin_knn.equals(pre_knn)) {
         System.out.println("LIN kNN " + lin_knn);
         System.out.println("PRE kNN " + pre_knn);

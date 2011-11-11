@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -32,9 +31,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, List<DistanceResultPair<D>>> {
+public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
   /**
    * Logger
    */
@@ -90,7 +89,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
   @Override
   protected void preprocess() {
     DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing random-sample k nearest neighbors (k=" + k + ")", relation.size(), getLogger()) : null;
 
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
@@ -146,7 +145,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, List<DistanceResultPair<D>>> {
+  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNResult<D>> {
     /**
      * Relative share of objects to get
      */

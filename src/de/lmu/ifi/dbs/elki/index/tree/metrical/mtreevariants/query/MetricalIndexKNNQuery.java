@@ -28,9 +28,9 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
@@ -144,23 +144,23 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
   }
 
   @Override
-  public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
+  public KNNResult<D> getKNNForObject(O obj, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
     final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceQuery.getDistanceFactory().infiniteDistance());
     doKNNQuery(obj, knnList);
-    return knnList.toSortedArrayList();
+    return knnList.toKNNList();
   }
 
   @Override
-  public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
+  public KNNResult<D> getKNNForDBID(DBID id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // TODO: implement
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }

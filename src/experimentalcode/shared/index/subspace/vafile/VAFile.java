@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -369,7 +370,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     }
 
     @Override
-    public List<DistanceResultPair<DoubleDistance>> getKNNForObject(V query, int k) {
+    public KNNResult<DoubleDistance> getKNNForObject(V query, int k) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 

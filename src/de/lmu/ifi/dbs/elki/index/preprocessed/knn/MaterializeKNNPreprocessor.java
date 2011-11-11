@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.event.EventListenerList;
@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -64,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, List<DistanceResultPair<D>>> {
+public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
   /**
    * Logger to use.
    */
@@ -110,7 +111,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
 
     // Try bulk
-    List<List<DistanceResultPair<D>>> kNNList = null;
+    List<KNNResult<D>> kNNList = null;
     if(usebulk) {
       kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
       if(kNNList != null) {
@@ -125,7 +126,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     }
     else {
       for(DBID id : ids) {
-        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(id, k);
+        KNNResult<D> knn = knnQuery.getKNNForDBID(id, k);
         storage.put(id, knn);
         if(progress != null) {
           progress.incrementProcessed(getLogger());
@@ -176,7 +177,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     if(stepprog != null) {
       stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs.", getLogger());
     }
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(aids, k);
+    List<KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(aids, k);
     for(int i = 0; i < aids.size(); i++) {
       DBID id = aids.get(i);
       storage.put(id, kNNList.get(i));
@@ -211,10 +212,9 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for(DBID id1 : oldids) {
-      List<DistanceResultPair<D>> kNNs = storage.get(id1);
+      KNNResult<D> kNNs = storage.get(id1);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
       // look for new kNNs
-      List<DistanceResultPair<D>> newKNNs = new ArrayList<DistanceResultPair<D>>();
       KNNHeap<D> heap = null;
       for(DBID id2 : ids) {
         D dist = distanceQuery.distance(id1, id2);
@@ -227,8 +227,8 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
         }
       }
       if(heap != null) {
-        newKNNs = heap.toSortedArrayList();
-        storage.put(id1, newKNNs);
+        kNNs = heap.toKNNList();
+        storage.put(id1, kNNs);
         rkNN_ids.add(id1);
       }
     }
@@ -246,7 +246,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     TreeSetModifiableDBIDs idsSet = DBIDUtil.newTreeSet(ids);
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
     for(DBID id1 : relation.iterDBIDs()) {
-      List<DistanceResultPair<D>> kNNs = storage.get(id1);
+      KNNResult<D> kNNs = storage.get(id1);
       for(DistanceResultPair<D> kNN : kNNs) {
         if(idsSet.contains(kNN.getDBID())) {
           rkNN_ids.add(id1);
@@ -256,7 +256,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     }
 
     // update the kNNs of the RkNNs
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
+    List<KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
     for(int i = 0; i < rkNN_ids.size(); i++) {
       DBID id = rkNN_ids.get(i);
       storage.put(id, kNNList.get(i));
@@ -343,9 +343,9 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    * @param remove the ids to remove
    * @return the DBIDs in the given collection
    */
-  protected ArrayDBIDs extractAndRemoveIDs(List<List<DistanceResultPair<D>>> extraxt, ArrayDBIDs remove) {
+  protected ArrayDBIDs extractAndRemoveIDs(List<? extends Collection<DistanceResultPair<D>>> extraxt, ArrayDBIDs remove) {
     TreeSetModifiableDBIDs ids = DBIDUtil.newTreeSet();
-    for(List<DistanceResultPair<D>> drps : extraxt) {
+    for(Collection<DistanceResultPair<D>> drps : extraxt) {
       for(DistanceResultPair<D> drp : drps) {
         ids.add(drp.getDBID());
       }
@@ -406,7 +406,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, List<DistanceResultPair<D>>> {
+  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNResult<D>> {
     /**
      * Index factory.
      * 

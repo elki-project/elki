@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.rknn.PreprocessorRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -51,6 +52,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -109,10 +111,10 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     }
 
     // knn query
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
+    List<KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
-      List<DistanceResultPair<D>> kNNs = kNNList.get(i);
+      KNNResult<D> kNNs = kNNList.get(i);
       storage.put(id, kNNs);
       for(DistanceResultPair<D> kNN : kNNs) {
         Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(kNN.getDBID());
@@ -168,10 +170,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for(DBID id1 : oldids) {
-      List<DistanceResultPair<D>> kNNs = storage.get(id1);
-      D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
+      KNNResult<D> kNNs = storage.get(id1);
+      D knnDist = kNNs.getKNNDistance();
       // look for new kNNs
-      List<DistanceResultPair<D>> newKNNs = new ArrayList<DistanceResultPair<D>>();
       KNNHeap<D> heap = null;
       for(DBID id2 : ids) {
         D dist = distanceQuery.distance(id1, id2);
@@ -184,7 +185,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         }
       }
       if(heap != null) {
-        newKNNs = heap.toSortedArrayList();
+        KNNList<D> newKNNs = heap.toKNNList();
         storage.put(id1, newKNNs);
 
         // get the difference
@@ -234,7 +235,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     if(stepprog != null) {
       stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs and RkNNs.", getLogger());
     }
-    List<List<DistanceResultPair<D>>> kNNs = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+    List<KNNResult<D>> kNNs = new ArrayList<KNNResult<D>>(ids.size());
     List<List<DistanceResultPair<D>>> rkNNs = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
     for(DBID id : aids) {
       kNNs.add(storage.get(id));
@@ -250,7 +251,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
       stepprog.beginStep(2, "New deletions ocurred, update the affected kNNs and RkNNs.", getLogger());
     }
     // update the kNNs of the RkNNs
-    List<List<DistanceResultPair<D>>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
+    List<KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
     for(int i = 0; i < rkNN_ids.size(); i++) {
       DBID id = rkNN_ids.get(i);
       storage.put(id, kNNList.get(i));
@@ -289,7 +290,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @param id the query id
    * @return the kNNs
    */
-  public List<DistanceResultPair<D>> getKNN(DBID id) {
+  public KNNResult<D> getKNN(DBID id) {
     return storage.get(id);
   }
 

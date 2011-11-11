@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<?, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor<O, D, List<DistanceResultPair<D>>> {
+public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<?, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
   /**
    * Logger to use
    */
@@ -96,7 +96,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
     SpatialIndexTree<N, E> index = indexes.iterator().next();
 
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
     MeanVariance pagesize = new MeanVariance();
     MeanVariance ksize = new MeanVariance();
     if(getLogger().isVerbose()) {
@@ -137,7 +137,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
           }
         }
         ksize.put(kNN.size());
-        storage.put(id, kNN.toSortedArrayList());
+        storage.put(id, kNN.toKNNList());
       }
       if(getLogger().isDebugging()) {
         if(cache.size() > 0) {
@@ -185,7 +185,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Factory<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector<?, ?>, D, List<DistanceResultPair<D>>> {
+  public static class Factory<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector<?, ?>, D, KNNResult<D>> {
     /**
      * Constructor.
      * 

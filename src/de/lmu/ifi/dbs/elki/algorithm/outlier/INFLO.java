@@ -22,8 +22,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -35,15 +33,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -149,10 +147,8 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
       ModifiableDBIDs s;
       if(!processedIDs.contains(id)) {
         // TODO: use exactly k neighbors?
-        List<DistanceResultPair<D>> list = knnQuery.getKNNForDBID(id, k);
-        for(DistanceResultPair<D> d : list) {
-          knns.get(id).add(d.getDBID());
-        }
+        KNNResult<D> list = knnQuery.getKNNForDBID(id, k);
+        knns.get(id).addAll(list.asDBIDs());
         processedIDs.add(id);
         s = knns.get(id);
         density.put(id, 1 / list.get(k - 1).getDistance().doubleValue());
@@ -164,11 +160,9 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
       for(DBID q : s) {
         if(!processedIDs.contains(q)) {
           // TODO: use exactly k neighbors?
-          List<DistanceResultPair<D>> listQ = knnQuery.getKNNForDBID(q, k);
-          for(DistanceResultPair<D> dq : listQ) {
-            knns.get(q).add(dq.getDBID());
-          }
-          density.put(q, 1 / listQ.get(k - 1).getDistance().doubleValue());
+          KNNResult<D> listQ = knnQuery.getKNNForDBID(q, k);
+          knns.get(q).addAll(listQ.asDBIDs());
+          density.put(q, 1 / listQ.getKNNDistance().doubleValue());
           processedIDs.add(q);
         }
 

@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -177,7 +178,7 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
     }
 
     @Override
-    public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
 
@@ -187,7 +188,7 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
     }
 
     @Override
-    public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
+    public KNNResult<D> getKNNForDBID(DBID id, int k) {
       return getKNNForObject(relation.get(id), k);
     }
 

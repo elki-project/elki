@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  */
 
 import java.util.HashMap;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -33,8 +32,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -62,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
-public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, List<DistanceResultPair<D>>> {
+public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
   // TODO: randomize/shuffle?
 
   /**
@@ -91,7 +90,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
   @Override
   protected void preprocess() {
     DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, List.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
     MeanVariance ksize = new MeanVariance();
     if(logger.isVerbose()) {
       logger.verbose("Approximating nearest neighbor lists to database objects");
@@ -129,7 +128,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
           }
         }
         ksize.put(kNN.size());
-        storage.put(id, kNN.toSortedArrayList());
+        storage.put(id, kNN.toKNNList());
       }
       if(logger.isDebugging()) {
         if(cache.size() > 0) {
@@ -175,7 +174,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, List<DistanceResultPair<D>>> {
+  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNResult<D>> {
     /**
      * Parameter to specify the number of partitions to use for materializing
      * the kNN. Must be an integer greater than 1.

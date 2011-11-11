@@ -24,7 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -32,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -125,7 +125,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
       int[] occurences = new int[getLabels().size()];
 
       KNNQuery<O, D> knnq = database.getKNNQuery(getDistanceQuery(), k);
-      List<DistanceResultPair<D>> query = knnq.getKNNForObject(instance, k);
+      KNNResult<D> query = knnq.getKNNForObject(instance, k);
       Relation<ClassLabel> crep = database.getRelation(TypeUtil.CLASSLABEL);
       for(DistanceResultPair<D> neighbor : query) {
         int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(crep.get(neighbor.getDBID()))));
@@ -149,7 +149,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
   }
 
   @Override
-  public Result run(@SuppressWarnings("unused") Database database) throws IllegalStateException {
+  public Result run(Database database) throws IllegalStateException {
     // TODO Implement sensible default behavior.
     return null;
   }

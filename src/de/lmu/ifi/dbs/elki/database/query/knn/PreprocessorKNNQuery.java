@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<DistanceResultPair<D>>> extends AbstractDataBasedQuery<O> implements KNNQuery<O, D> {
+public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<D>> extends AbstractDataBasedQuery<O> implements KNNQuery<O, D> {
   /**
    * The last preprocessor result
    */
@@ -77,12 +77,12 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<Dista
   }
 
   @Override
-  public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k) {
+  public KNNResult<D> getKNNForDBID(DBID id, int k) {
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
     if(!warned && k < preprocessor.getK()) {
-      List<DistanceResultPair<D>> dr = preprocessor.get(id);
+      KNNResult<D> dr = preprocessor.get(id);
       int subk = k;
       D kdist = dr.get(subk - 1).getDistance();
       while(subk < dr.size()) {
@@ -96,7 +96,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<Dista
         }
       }
       if(subk < dr.size()) {
-        return dr.subList(0, subk);
+        return KNNUtil.subList(dr, subk);
       }
       else {
         return dr;
@@ -106,14 +106,14 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<Dista
   }
 
   @Override
-  public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+    List<KNNResult<D>> result = new ArrayList<KNNResult<D>>(ids.size());
     if(k < preprocessor.getK()) {
       for(DBID id : ids) {
-        List<DistanceResultPair<D>> dr = preprocessor.get(id);
+        KNNResult<D> dr = preprocessor.get(id);
         int subk = k;
         D kdist = dr.get(subk - 1).getDistance();
         while(subk < dr.size()) {
@@ -127,7 +127,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<Dista
           }
         }
         if(subk < dr.size()) {
-          result.add(dr.subList(0, subk));
+          result.add(KNNUtil.subList(dr, subk));
         }
         else {
           result.add(dr);
@@ -154,7 +154,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends List<Dista
   }
 
   @Override
-  public List<DistanceResultPair<D>> getKNNForObject(O obj, int k) {
+  public KNNResult<D> getKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
 

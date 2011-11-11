@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  */
 
 import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
@@ -33,9 +32,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -120,7 +119,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     if(knnQuery != null) {
       for(DBID id : distFunc.getRelation().iterDBIDs()) {
         counter++;
-        final List<DistanceResultPair<D>> knns = knnQuery.getKNNForDBID(id, m);
+        final KNNResult<D> knns = knnQuery.getKNNForDBID(id, m);
         if(logger.isDebugging()) {
           logger.debugFine("distance to mth nearest neighbour" + knns.toString());
         }

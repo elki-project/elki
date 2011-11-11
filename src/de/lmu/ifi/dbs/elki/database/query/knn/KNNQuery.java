@@ -29,7 +29,6 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses DistanceResultPair oneway - - «create»
+ * @apiviz.has KNNResult oneway - - «create»
  * 
  * @param <O> Object type
  * @param <D> Distance type
@@ -52,7 +51,7 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public List<DistanceResultPair<D>> getKNNForDBID(DBID id, int k);
+  public KNNResult<D> getKNNForDBID(DBID id, int k);
 
   /**
    * Bulk query method
@@ -61,7 +60,7 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public List<List<DistanceResultPair<D>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k);
+  public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k);
 
   /**
    * Bulk query method configured by a map.
@@ -80,6 +79,5 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  // TODO: return KNNList<D> instead?
-  public List<DistanceResultPair<D>> getKNNForObject(O obj, int k);
+  public KNNResult<D> getKNNForObject(O obj, int k);
 }

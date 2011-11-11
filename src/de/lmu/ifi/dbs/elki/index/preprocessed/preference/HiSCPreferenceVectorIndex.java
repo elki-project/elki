@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
 
 import java.util.BitSet;
 import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -33,11 +32,9 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -120,16 +117,8 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         msg.append("\n knns: ");
       }
 
-      List<DistanceResultPair<DoubleDistance>> knns = knnQuery.getKNNForDBID(id, k);
-      ModifiableDBIDs knnIDs = DBIDUtil.newArray(knns.size());
-      for(DistanceResultPair<DoubleDistance> knn : knns) {
-        knnIDs.add(knn.getDBID());
-        //if(logger.isDebugging()) {
-        //  msg.append(database.getObjectLabelQuery().get(knn.getID())).append(" ");
-        //}
-      }
-
-      BitSet preferenceVector = determinePreferenceVector(relation, id, knnIDs, msg);
+      KNNResult<DoubleDistance> knns = knnQuery.getKNNForDBID(id, k);
+      BitSet preferenceVector = determinePreferenceVector(relation, id, knns.asDBIDs(), msg);
       storage.put(id, preferenceVector);
 
       if(progress != null) {

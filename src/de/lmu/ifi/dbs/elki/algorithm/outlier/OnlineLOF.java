@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -107,8 +108,8 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
     // add listener
     KNNListener l = new LOFKNNListener(lofResult);
-    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, List<DistanceResultPair<D>>>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
-    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, List<DistanceResultPair<D>>>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, ? extends KNNResult<D>>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, ? extends KNNResult<D>>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
 
     return lofResult.getResult();
   }

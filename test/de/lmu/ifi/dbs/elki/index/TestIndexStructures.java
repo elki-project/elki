@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -185,7 +186,7 @@ public class TestIndexStructures implements JUnit4Test {
       DoubleVector dv = new DoubleVector(querypoint);
       KNNQuery<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
       assertTrue("Returned knn query is not of expected class.", expectKNNQuery.isAssignableFrom(knnq.getClass()));
-      List<DistanceResultPair<DoubleDistance>> ids = knnq.getKNNForObject(dv, k);
+      KNNResult<DoubleDistance> ids = knnq.getKNNForObject(dv, k);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.

@@ -23,16 +23,14 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -158,7 +156,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
 
     @Override
     public D distance(DBID id1, DBID id2) {
-      List<DistanceResultPair<D>> neighborhood = knnQuery.getKNNForDBID(id1, k);
+      KNNResult<D> neighborhood = knnQuery.getKNNForDBID(id1, k);
       D truedist = parentDistanceQuery.distance(id1, id2);
       return computeReachdist(neighborhood, truedist);
     }
@@ -177,7 +175,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
    * @param truedist True distance
    * @return Reachability distance
    */
-  protected D computeReachdist(List<DistanceResultPair<D>> neighborhood, D truedist) {
+  protected D computeReachdist(KNNResult<D> neighborhood, D truedist) {
     // TODO: need to check neighborhood size?
     // TODO: Do we need to check we actually got the object itself in the
     // neighborhood?

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
@@ -40,9 +39,9 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -159,7 +158,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
       for(int ind = 0; ind < cmem.size(); ind++) {
         DBID i1 = cmem.get(ind).getSecond();
-        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(i1, relation.size());
+        KNNResult<D> knn = knnQuery.getKNNForDBID(i1, relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         hist.aggregate(((double) ind) / clus.size(), result);

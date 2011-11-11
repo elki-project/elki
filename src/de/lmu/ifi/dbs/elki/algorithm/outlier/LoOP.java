@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -39,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -233,7 +232,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       }
       FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", relation.size(), logger) : null;
       for(DBID id : relation.iterDBIDs()) {
-        List<DistanceResultPair<D>> neighbors = knnReach.getKNNForDBID(id, kreach);
+        final KNNResult<D> neighbors = knnReach.getKNNForDBID(id, kreach);
         double sqsum = 0.0;
         // use first kref neighbors as reference set
         int ks = 0;
@@ -264,7 +263,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
 
       FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), logger) : null;
       for(DBID id : relation.iterDBIDs()) {
-        List<DistanceResultPair<D>> neighbors = knnComp.getKNNForDBID(id, kcomp);
+        final KNNResult<D> neighbors = knnComp.getKNNForDBID(id, kcomp);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
         int ks = 0;

@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <D> Distance type
+ * 
+ * @apiviz.composedOf DistanceResultPair
  */
 public interface KNNResult<D extends Distance<D>> extends Collection<DistanceResultPair<D>> {
   /**

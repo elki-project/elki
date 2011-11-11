@@ -29,8 +29,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -62,6 +60,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -436,16 +435,16 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       for(Object o : sel) {
         DBID idx = (DBID) o;
 
-        List<DistanceResultPair<D>> knn = knnQuery.getKNNForDBID(idx, k);
+        KNNResult<D> knn = knnQuery.getKNNForDBID(idx, k);
 
-        double maxdist = knn.get(knn.size() - 1).getDistance().doubleValue();
+        double maxdist = knn.getKNNDistance().doubleValue();
         // avoid division by zero.
         if(maxdist == 0) {
           maxdist = 1;
         }
 
-        for(ListIterator<DistanceResultPair<D>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
-          DistanceResultPair<D> pair = iter.previous();
+        for (int i = knn.size() - 1; i >= 0; i--) {
+          DistanceResultPair<D> pair = knn.get(i);
           Element line = plotSeries(pair.getDBID(), MAXRESOLUTION);
           double dist = pair.getDistance().doubleValue() / maxdist;
           Color color = getColor(dist);

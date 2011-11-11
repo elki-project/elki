@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -57,12 +56,12 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
+  public KNNResult<DoubleDistance> getKNNForDBID(DBID id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getKNNForObject(O obj, int k) {
+  public KNNResult<DoubleDistance> getKNNForObject(O obj, int k) {
     @SuppressWarnings("unchecked")
     final PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
     // Optimization for double distances.
@@ -78,7 +77,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
         }
       }
     }
-    return heap.toSortedArrayList();
+    return heap.toKNNList();
   }
 
   @Override
