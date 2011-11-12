@@ -587,7 +587,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
       }
 
       {
-        DoubleParameter param = new DoubleParameter(W_ID, new GreaterEqualConstraint(0), 0.1);
+        DoubleParameter param = new DoubleParameter(W_ID, new GreaterEqualConstraint(0), 0.05);
         if(config.grab(param)) {
           w = param.getValue();
         }
