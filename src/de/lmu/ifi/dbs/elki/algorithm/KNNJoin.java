@@ -160,12 +160,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = index.getNode(ps_entry);
-              pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps, pr_knn_distance);
+              pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps);
             }
           }
           up = false;
         }
-
         else {
           for(int s = ps_candidates.size() - 1; s >= 0; s--) {
             E ps_entry = ps_candidates.get(s);
@@ -173,7 +172,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
               N ps = index.getNode(ps_entry);
-              pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps, pr_knn_distance);
+              pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps);
             }
           }
           up = true;
@@ -212,9 +211,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @param pr_knn_distance the current knn distance of data page pr
    * @return the k-nearest neighbor distance of pr in ps
    */
-  private D processDataPages(DistanceQuery<V, D> distQ, N pr, N ps, WritableDataStore<KNNHeap<D>> knnLists, D pr_knn_distance) {
+  private D processDataPages(DistanceQuery<V, D> distQ, N pr, N ps, WritableDataStore<KNNHeap<D>> knnLists) {
+    D pr_knn_distance = null;    
     // TODO: optimize for double?
-    boolean infinite = pr_knn_distance.isInfiniteDistance();
     for(int i = 0; i < pr.getNumEntries(); i++) {
       DBID r_id = ((LeafEntry) pr.getEntry(i)).getDBID();
       KNNHeap<D> knnList = knnLists.get(r_id);
@@ -223,13 +222,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         DBID s_id = ((LeafEntry) ps.getEntry(j)).getDBID();
 
         D distance = distQ.distance(r_id, s_id);
-        if(knnList.add(distance, s_id)) {
-          // set kNN distance of r
-          if(infinite) {
-            pr_knn_distance = knnList.getKNNDistance();
-          }
-          pr_knn_distance = DistanceUtil.max(knnList.getKNNDistance(), pr_knn_distance);
-        }
+        knnList.add(distance, s_id);
+      }
+      // set kNN distance of r
+      if(pr_knn_distance == null) {
+        pr_knn_distance = knnList.getKNNDistance();
+      }
+      else {
+        pr_knn_distance = DistanceUtil.max(knnList.getKNNDistance(), pr_knn_distance);
       }
     }
     return pr_knn_distance;
