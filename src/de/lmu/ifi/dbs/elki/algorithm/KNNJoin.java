@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -60,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
  * Joins in a given spatial database to each object its k-nearest neighbors.
@@ -129,20 +131,18 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
     try {
       // data pages of s
-      List<E> ps_candidates = index.getLeaves();
+      List<E> ps_candidates = new ArrayList<E>(index.getLeaves());
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), logger) : null;
       IndefiniteProgress pageprog = logger.isVerbose() ? new IndefiniteProgress("Number of processed data pages", logger) : null;
-      if(logger.isDebugging()) {
+      if(logger.isDebuggingFine()) {
         logger.debugFine("# ps = " + ps_candidates.size());
       }
       // data pages of r
-      List<E> pr_candidates = new ArrayList<E>(ps_candidates);
-      if(logger.isDebugging()) {
+      List<E> pr_candidates = ps_candidates;
+      if(logger.isDebuggingFine()) {
         logger.debugFine("# pr = " + pr_candidates.size());
       }
       int processed = 0;
-      int processedPages = 0;
-      boolean up = true;
       for(E pr_entry : pr_candidates) {
         N pr = index.getNode(pr_entry);
         D pr_knn_distance = distq.infiniteDistance();
@@ -156,34 +156,25 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         // Self-join first, as this is expected to improve most.
         pr_knn_distance = processDataPages(distq, pr, pr, knnHeaps);
 
-        if(up) {
-          for(E ps_entry : ps_candidates) {
-            if(ps_entry.equals(pr_entry)) {
-              continue;
-            }
-            D distance = distFunction.minDist(pr_entry, ps_entry);
-
-            if(distance.compareTo(pr_knn_distance) <= 0) {
-              N ps = index.getNode(ps_entry);
-              pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps);
-            }
+        // TODO: bulk-load heap, even faster.
+        Heap<FCPair<D, E>> heap = new Heap<FCPair<D, E>>(ps_candidates.size());
+        for(E ps_entry : ps_candidates) {
+          if(ps_entry.equals(pr_entry)) {
+            continue;
           }
-          up = false;
+          D distance = distFunction.minDist(pr_entry, ps_entry);
+          heap.add(new FCPair<D, E>(distance, ps_entry));
         }
-        else {
-          for(int s = ps_candidates.size() - 1; s >= 0; s--) {
-            E ps_entry = ps_candidates.get(s);
-            if(ps_entry.equals(pr_entry)) {
-              continue;
-            }
-            D distance = distFunction.minDist(pr_entry, ps_entry);
-
-            if(distance.compareTo(pr_knn_distance) <= 0) {
-              N ps = index.getNode(ps_entry);
-              pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps);
-            }
+        // Use a heap, for partial sorting only:
+        while(heap.size() > 0) {
+          FCPair<D, E> pair = heap.poll();
+          // Stop
+          if(pair.first.compareTo(pr_knn_distance) > 0) {
+            heap.clear();
+            break;
           }
-          up = true;
+          N ps = index.getNode(pair.second);
+          pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps);
         }
 
         if(logger.isDebuggingFine()) {
@@ -193,7 +184,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
         if(progress != null && pageprog != null) {
           progress.setProcessed(processed, logger);
-          pageprog.setProcessed(processedPages++, logger);
+          pageprog.incrementProcessed(logger);
         }
       }
       if(pageprog != null) {
