@@ -146,16 +146,21 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       for(E pr_entry : pr_candidates) {
         N pr = index.getNode(pr_entry);
         D pr_knn_distance = distq.infiniteDistance();
-        if(logger.isDebugging()) {
-          logger.debugFine(" ------ PR = " + pr);
+        if(logger.isDebuggingFinest()) {
+          logger.debugFinest(" ------ PR = " + pr);
         }
         // create for each data object a knn list
         for(int j = 0; j < pr.getNumEntries(); j++) {
           knnHeaps.put(((LeafEntry) pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, distq.infiniteDistance()));
         }
+        // Self-join first, as this is expected to improve most.
+        pr_knn_distance = processDataPages(distq, pr, pr, knnHeaps);
 
         if(up) {
           for(E ps_entry : ps_candidates) {
+            if(ps_entry.equals(pr_entry)) {
+              continue;
+            }
             D distance = distFunction.minDist(pr_entry, ps_entry);
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
@@ -168,6 +173,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         else {
           for(int s = ps_candidates.size() - 1; s >= 0; s--) {
             E ps_entry = ps_candidates.get(s);
+            if(ps_entry.equals(pr_entry)) {
+              continue;
+            }
             D distance = distFunction.minDist(pr_entry, ps_entry);
 
             if(distance.compareTo(pr_knn_distance) <= 0) {
@@ -178,6 +186,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
           up = true;
         }
 
+        if(logger.isDebuggingFine()) {
+          logger.debugFine(" ------ PR = " + pr + " dist: " + pr_knn_distance);
+        }
         processed += pr.getNumEntries();
 
         if(progress != null && pageprog != null) {
@@ -212,7 +223,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @return the k-nearest neighbor distance of pr in ps
    */
   private D processDataPages(DistanceQuery<V, D> distQ, N pr, N ps, WritableDataStore<KNNHeap<D>> knnLists) {
-    D pr_knn_distance = null;    
+    D pr_knn_distance = null;
     // TODO: optimize for double?
     for(int i = 0; i < pr.getNumEntries(); i++) {
       DBID r_id = ((LeafEntry) pr.getEntry(i)).getDBID();
