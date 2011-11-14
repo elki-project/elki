@@ -127,8 +127,10 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
     DBIDs ids = relation.getDBIDs();
 
-    WritableDataStore<KNNHeap<D>> knnHeaps = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, KNNHeap.class);
+    // WritableDataStore<KNNHeap<D>> knnHeaps = DataStoreUtil.makeStorage(ids,
+    // DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, KNNHeap.class);
 
+    WritableDataStore<KNNList<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
     try {
       // data pages of s
       List<E> ps_candidates = new ArrayList<E>(index.getLeaves());
@@ -150,11 +152,15 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
           logger.debugFinest(" ------ PR = " + pr);
         }
         // create for each data object a knn list
+        List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(pr.getNumEntries());
         for(int j = 0; j < pr.getNumEntries(); j++) {
-          knnHeaps.put(((LeafEntry) pr.getEntry(j)).getDBID(), new KNNHeap<D>(k, distq.infiniteDistance()));
+          // knnHeaps.put(((LeafEntry) pr.getEntry(j)).getDBID(), new
+          // KNNHeap<D>(k, distq.infiniteDistance()));
+          heaps.add(new KNNHeap<D>(k, distq.infiniteDistance()));
         }
         // Self-join first, as this is expected to improve most.
-        pr_knn_distance = processDataPages(distq, pr, pr, knnHeaps);
+        processDataPages(distq, pr, pr, heaps);
+        pr_knn_distance = computeStopDistance(heaps);
 
         // TODO: bulk-load heap, even faster.
         Heap<FCPair<D, E>> heap = new Heap<FCPair<D, E>>(ps_candidates.size());
@@ -174,7 +180,8 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
             break;
           }
           N ps = index.getNode(pair.second);
-          pr_knn_distance = processDataPages(distq, pr, ps, knnHeaps);
+          processDataPages(distq, pr, ps, heaps);
+          pr_knn_distance = computeStopDistance(heaps);
         }
 
         if(logger.isDebuggingFine()) {
@@ -186,13 +193,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
           progress.setProcessed(processed, logger);
           pageprog.incrementProcessed(logger);
         }
+
+        // Finalize lists
+        for(int j = 0; j < pr.getNumEntries(); j++) {
+          knnLists.put(((LeafEntry) pr.getEntry(j)).getDBID(), heaps.get(j).toKNNList());
+        }
       }
       if(pageprog != null) {
         pageprog.setCompleted(logger);
-      }
-      WritableDataStore<KNNList<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
-      for(DBID id : ids) {
-        knnLists.put(id, knnHeaps.get(id).toKNNList());
       }
       return knnLists;
     }
@@ -209,23 +217,32 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @param distQ the distance to use
    * @param pr the first data page
    * @param ps the second data page
-   * @param knnLists the knn lists for each data object
+   * @param heaps the knn lists for each data object
    * @param pr_knn_distance the current knn distance of data page pr
    * @return the k-nearest neighbor distance of pr in ps
    */
-  private D processDataPages(DistanceQuery<V, D> distQ, N pr, N ps, WritableDataStore<KNNHeap<D>> knnLists) {
-    D pr_knn_distance = null;
+  private void processDataPages(DistanceQuery<V, D> distQ, N pr, N ps, List<KNNHeap<D>> heaps) {
     // TODO: optimize for double?
-    for(int i = 0; i < pr.getNumEntries(); i++) {
-      DBID r_id = ((LeafEntry) pr.getEntry(i)).getDBID();
-      KNNHeap<D> knnList = knnLists.get(r_id);
-
-      for(int j = 0; j < ps.getNumEntries(); j++) {
-        DBID s_id = ((LeafEntry) ps.getEntry(j)).getDBID();
-
+    for(int j = 0; j < ps.getNumEntries(); j++) {
+      DBID s_id = ((LeafEntry) ps.getEntry(j)).getDBID();
+      for(int i = 0; i < pr.getNumEntries(); i++) {
+        DBID r_id = ((LeafEntry) pr.getEntry(i)).getDBID();
         D distance = distQ.distance(r_id, s_id);
-        knnList.add(distance, s_id);
+        heaps.get(i).add(distance, s_id);
       }
+    }
+  }
+
+  /**
+   * Compute the maximum stop distance
+   * 
+   * @param heaps
+   * @return the k-nearest neighbor distance of pr in ps
+   */
+  private D computeStopDistance(List<KNNHeap<D>> heaps) {
+    // Update pruning distance
+    D pr_knn_distance = null;
+    for(KNNHeap<D> knnList : heaps) {
       // set kNN distance of r
       if(pr_knn_distance == null) {
         pr_knn_distance = knnList.getKNNDistance();
