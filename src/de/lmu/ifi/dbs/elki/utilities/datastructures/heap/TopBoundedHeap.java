@@ -109,4 +109,17 @@ public class TopBoundedHeap<E> extends Heap<E> {
   public int getMaxSize() {
     return maxsize;
   }
+
+  /**
+   * NOT FULLY SUPPORTED. Fallback to offer() when maxsize is hit
+   */
+  @Override
+  public boolean lazyOffer(E e) {
+    if(size + 1 < maxsize) {
+      return super.lazyOffer(e);
+    }
+    else {
+      return this.offer(e);
+    }
+  }
 }

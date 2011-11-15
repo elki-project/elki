@@ -49,8 +49,8 @@ public class TestHeap {
     Heap<Integer> hasc = new Heap<Integer>();
     Heap<Integer> hdesc = new Heap<Integer>(Collections.reverseOrder());
     for(Integer i : data) {
-      hasc.add(i);
-      hdesc.add(i);
+      hasc.lazyOffer(i);
+      hdesc.lazyOffer(i);
     }
     for(int i = 0; i < asc.length; i++) {
       final Integer gota = hasc.poll();
