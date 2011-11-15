@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.AbstractQueue;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -59,6 +60,11 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
   protected int size = 0;
 
   /**
+   * Indicate that the heap is valid
+   */
+  protected boolean valid = true;
+
+  /**
    * The comparator or {@code null}
    */
   protected final Comparator<Object> comparator;
@@ -78,6 +84,19 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    */
   public Heap() {
     this(DEFAULT_INITIAL_CAPACITY, null);
+  }
+
+  /**
+   * Repair the heap
+   */
+  private void ensureValid() {
+    if(!valid) {
+      // Bottom up heap construction. Each invocation should be local, so O(n)
+      for (int pos = size / 2; pos >= 0; pos--) {
+        heapifyDown(pos, queue[pos]);
+      }
+      valid = true;
+    }
   }
 
   /**
@@ -120,6 +139,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
 
   @Override
   public boolean offer(E e) {
+    ensureValid();
     // resize when needed
     if(size + 1 > queue.length) {
       resize(size + 1);
@@ -132,16 +152,33 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     return true;
   }
 
+  public boolean lazyOffer(E e) {
+    // resize when needed
+    if(size + 1 > queue.length) {
+      resize(size + 1);
+    }
+    // We are LAZY in reparing the heap - validto says this hasn't been repaired
+    // yet.
+    this.queue[size] = e;
+    this.size += 1;
+    this.valid = false;
+    // We have changed - return true according to {@link Collection#put}
+    modCount++;
+    return true;
+  }
+
   @Override
   public E peek() {
     if(size == 0) {
       return null;
     }
+    ensureValid();
     return castQueueElement(0);
   }
 
   @Override
   public E poll() {
+    ensureValid();
     return removeAt(0);
   }
 
@@ -196,10 +233,10 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       if(cur.compareTo(par) >= 0) {
         break;
       }
-      queue[pos] = par;    
+      queue[pos] = par;
       pos = parent;
     }
-    queue[pos] = cur;    
+    queue[pos] = cur;
   }
 
   /**
@@ -216,10 +253,10 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       if(comparator.compare(cur, par) >= 0) {
         break;
       }
-      queue[pos] = par;    
+      queue[pos] = par;
       pos = parent;
     }
-    queue[pos] = cur;    
+    queue[pos] = cur;
   }
 
   /**
@@ -255,19 +292,19 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       final int rchild = cpos + 1;
       if(rchild < size) {
         Object right = queue[rchild];
-        if(((Comparable<Object>)child).compareTo(right) > 0) {
+        if(((Comparable<Object>) child).compareTo(right) > 0) {
           cpos = rchild;
           child = right;
         }
       }
-      
+
       if(cur.compareTo(child) <= 0) {
         break;
       }
-      queue[pos] = child;    
+      queue[pos] = child;
       pos = cpos;
     }
-    queue[pos] = cur;    
+    queue[pos] = cur;
   }
 
   /**
@@ -355,11 +392,24 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     return false;
   }
 
-  // TODO: bulk add implementation of addAll?
-
   @Override
   public Iterator<E> iterator() {
     return new Itr();
+  }
+
+  @Override
+  public boolean addAll(Collection<? extends E> c) {
+    if(size + c.size() > queue.length) {
+      resize(size + c.size());
+    }    
+    boolean modified = false;
+    // Lazy load - this will cause a typical bulk load
+    for(E elem : c) {
+      if(lazyOffer(elem)) {
+        modified = true;
+      }
+    }
+    return modified;
   }
 
   /**

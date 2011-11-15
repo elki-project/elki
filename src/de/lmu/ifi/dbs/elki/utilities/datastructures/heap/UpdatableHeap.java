@@ -119,6 +119,14 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
   }
 
+  /**
+   * NOT SUPPORTED. Fallback to offer()
+   */
+  @Override
+  public boolean lazyOffer(O e) {
+    return this.offer(e);
+  }
+
   @Override
   protected O removeAt(int pos) {
     O node = super.removeAt(pos);
