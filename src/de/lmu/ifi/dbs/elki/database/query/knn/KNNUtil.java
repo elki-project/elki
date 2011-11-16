@@ -77,10 +77,10 @@ public final class KNNUtil {
       // Compute list size
       // TODO: optimize for double distances.
       {
-        D dist = inner.get(k).getDistance();
+        DistanceResultPair<D> dist = inner.get(k);
         int i = k;
         while(i + 1 < inner.size()) {
-          if(dist.compareTo(inner.get(i + 1).getDistance()) < 0) {
+          if(dist.compareByDistance(inner.get(i + 1)) < 0) {
             break;
           }
           i++;
