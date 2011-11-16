@@ -83,6 +83,7 @@ public final class KNNUtil {
           if(dist.compareTo(inner.get(i + 1).getDistance()) < 0) {
             break;
           }
+          i++;
         }
         size = i;
       }
