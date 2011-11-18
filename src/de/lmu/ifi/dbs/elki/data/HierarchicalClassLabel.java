@@ -188,14 +188,19 @@ public class HierarchicalClassLabel extends ClassLabel {
    * Factory class
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.has HierarchicalClassLabel - - «creates»
    * @apiviz.stereotype factory
    */
   public static class Factory extends ClassLabel.Factory<HierarchicalClassLabel> {
     @Override
     public HierarchicalClassLabel makeFromString(String lbl) {
-      return new HierarchicalClassLabel(lbl);
+      HierarchicalClassLabel l = existing.get(lbl);
+      if(l == null) {
+        l = new HierarchicalClassLabel(lbl);
+        existing.put(lbl, l);
+      }
+      return l;
     }
   }
 }

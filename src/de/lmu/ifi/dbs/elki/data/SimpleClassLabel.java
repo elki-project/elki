@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * A simple class label casting a String as it is as label.
  * 
@@ -36,10 +35,10 @@ public class SimpleClassLabel extends ClassLabel {
    * Holds the String designating the label.
    */
   private String label;
-  
+
   /**
    * Constructor.
-   *
+   * 
    * @param label Label
    */
   public SimpleClassLabel(String label) {
@@ -107,14 +106,19 @@ public class SimpleClassLabel extends ClassLabel {
    * Factory class
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.has SimpleClassLabel - - «creates»
    * @apiviz.stereotype factory
    */
   public static class Factory extends ClassLabel.Factory<SimpleClassLabel> {
     @Override
     public SimpleClassLabel makeFromString(String lbl) {
-      return new SimpleClassLabel(lbl);
+      SimpleClassLabel l = existing.get(lbl);
+      if(l == null) {
+        l = new SimpleClassLabel(lbl);
+        existing.put(lbl, l);
+      }
+      return l;
     }
   }
 }

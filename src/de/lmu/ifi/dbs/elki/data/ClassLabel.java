@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.HashMap;
+
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
 
 /**
@@ -76,16 +78,27 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
   public int hashCode() {
     return toString().hashCode();
   }
-  
+
   /**
    * Class label factory
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.has ClassLabel - - «creates»
    * @apiviz.stereotype factory
    */
   public static abstract class Factory<L extends ClassLabel> implements InspectionUtilFrequentlyScanned {
+    /**
+     * Set for reusing the same objects.
+     */
+    protected HashMap<String, L> existing = new HashMap<String, L>();
+
+    /**
+     * Convert a string into a class label
+     * 
+     * @param lbl String to convert
+     * @return Class label instance.
+     */
     public abstract L makeFromString(String lbl);
   }
 }
