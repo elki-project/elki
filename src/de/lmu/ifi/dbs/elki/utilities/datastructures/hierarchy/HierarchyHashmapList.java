@@ -92,7 +92,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
 
   @Override
   public void remove(O parent, O child) {
-    // Add child to parent.
+    // Remove child from parent.
     {
       List<O> pchi = this.cmap.get(parent);
       if(pchi != null) {
@@ -104,7 +104,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
         }
       }
     }
-    // Add child to parent
+    // Remove parent from child
     {
       List<O> cpar = this.pmap.get(child);
       if(cpar != null) {

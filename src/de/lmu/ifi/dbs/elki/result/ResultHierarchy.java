@@ -76,8 +76,22 @@ public class ResultHierarchy extends HierarchyHashmapList<Result> {
 
   @Override
   public void remove(Result parent, Result child) {
-    // TODO: unlink from hierarchy, fire event
-    throw new UnsupportedOperationException();
+    super.remove(parent, child);
+    if(child instanceof HierarchicalResult) {
+      HierarchicalResult hr = (HierarchicalResult) child;
+      ResultHierarchy newh = new ResultHierarchy();
+      // Add children of child
+      for(Result desc : hr.getHierarchy().getChildren(hr)) {
+        newh.add(hr, desc);
+        if(desc instanceof HierarchicalResult) {
+          ((HierarchicalResult) desc).setHierarchy(newh);
+          // FIXME: recurse properly
+        }
+      }
+      // Update hierarchy
+      hr.setHierarchy(newh);
+    }
+    fireResultRemoved(child, parent);
   }
 
   @Override
@@ -149,7 +163,6 @@ public class ResultHierarchy extends HierarchyHashmapList<Result> {
    * @param child result that has been removed
    * @param parent Parent result that has been removed
    */
-  @SuppressWarnings("unused")
   private void fireResultRemoved(Result child, Result parent) {
     if(logger.isDebugging()) {
       logger.debug("Result removed: " + child + " <- " + parent);
