@@ -316,7 +316,7 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Guess a potentially label-like representation.
+   * Guess a potentially label-like representation, preferring class labels.
    * 
    * @param database
    * @return string representation
