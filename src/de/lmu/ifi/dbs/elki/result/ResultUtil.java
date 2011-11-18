@@ -302,4 +302,19 @@ public class ResultUtil {
       return null;
     }
   }
+
+  /**
+   * Recursively remove a result and its children.
+   * 
+   * @param hierarchy Result hierarchy
+   * @param pp Result to remove
+   */
+  public static void removeRecursive(ResultHierarchy hierarchy, Result child) {
+    for(Result parent : hierarchy.getParents(child)) {
+      hierarchy.remove(parent, child);
+    }
+    for(Result sub : hierarchy.getChildren(child)) {
+      removeRecursive(hierarchy, sub);
+    }
+  }
 }

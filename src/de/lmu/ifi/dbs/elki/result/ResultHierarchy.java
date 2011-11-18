@@ -77,20 +77,6 @@ public class ResultHierarchy extends HierarchyHashmapList<Result> {
   @Override
   public void remove(Result parent, Result child) {
     super.remove(parent, child);
-    if(child instanceof HierarchicalResult) {
-      HierarchicalResult hr = (HierarchicalResult) child;
-      ResultHierarchy newh = new ResultHierarchy();
-      // Add children of child
-      for(Result desc : hr.getHierarchy().getChildren(hr)) {
-        newh.add(hr, desc);
-        if(desc instanceof HierarchicalResult) {
-          ((HierarchicalResult) desc).setHierarchy(newh);
-          // FIXME: recurse properly
-        }
-      }
-      // Update hierarchy
-      hr.setHierarchy(newh);
-    }
     fireResultRemoved(child, parent);
   }
 
