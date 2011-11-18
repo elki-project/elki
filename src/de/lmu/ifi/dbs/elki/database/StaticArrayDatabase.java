@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.uses DatabaseConnection
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
-public class StaticArrayDatabase extends AbstractDatabase implements Database, Parameterizable {
+public class StaticArrayDatabase extends AbstractDatabase implements Parameterizable {
   /**
    * Our logger
    */
