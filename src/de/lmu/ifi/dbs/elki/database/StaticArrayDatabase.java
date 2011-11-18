@@ -191,11 +191,6 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
     this.addChildResult(index);
   }
 
-  @Override
-  public void removeIndex(Index index) {
-    this.indexes.remove(index);
-    this.getHierarchy().remove(this, index);
-  }
 
   /**
    * Find an DBID column.
