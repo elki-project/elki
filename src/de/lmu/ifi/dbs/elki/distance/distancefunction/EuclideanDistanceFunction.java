@@ -71,9 +71,9 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     }
     return Math.sqrt(sqrDist);
   }
-  
+
   @Override
-  public double doubleNorm(NumberVector<?,?> v){
+  public double doubleNorm(NumberVector<?, ?> v) {
     final int dim = v.getDimensionality();
     double sqrDist = 0;
     for(int i = 1; i <= dim; i++) {
@@ -149,11 +149,6 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
-  }
-
-  @Override
   public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }
@@ -199,7 +194,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     if(obj == this) {
       return true;
     }
-    if (this.getClass().equals(obj.getClass())) {
+    if(this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);
