@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 // TODO: add spatial?
-public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Static instance. Use this.
    */
@@ -68,6 +68,16 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceFunctio
     return min;
   }
 
+  @Override
+  public double doubleNorm(NumberVector<?, ?> v) {
+    final int dim = v.getDimensionality();
+    double min = Double.POSITIVE_INFINITY;
+    for(int i = 1; i <= dim; i++) {
+      min = Math.min(v.doubleValue(i), min);
+    }
+    return min;
+  }
+  
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = mbr1.getDimensionality();

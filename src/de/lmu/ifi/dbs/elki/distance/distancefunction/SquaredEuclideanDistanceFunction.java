@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class SquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class SquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Static instance. Use this!
    */
@@ -51,6 +51,17 @@ public class SquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistan
   @Deprecated
   public SquaredEuclideanDistanceFunction() {
     super();
+  }
+
+  @Override
+  public double doubleNorm(NumberVector<?, ?> v) {
+    final int dim = v.getDimensionality();
+    double sum = 0;
+    for(int i = 1; i <= dim; i++) {
+      final double val = v.doubleValue(i);
+      sum += val * val;
+    }
+    return sum;
   }
 
   /**
@@ -144,18 +155,18 @@ public class SquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistan
     if(dim1 != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
-  
+
     double sqrDist = 0;
     for(int d = 1; d <= dim1; d++) {
       final double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
       final double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
-  
+
       final double manhattanI = c1 - c2;
       sqrDist += manhattanI * manhattanI;
     }
     return sqrDist;
   }
-  
+
   @Override
   public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
