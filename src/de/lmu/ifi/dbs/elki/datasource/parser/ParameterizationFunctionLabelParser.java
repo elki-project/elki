@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -98,8 +97,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
           else if(dimensionality != attributes.size()) {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + attributes.size() + " != " + dimensionality);
           }
-
-          vectors.add(new ParameterizationFunction(Util.convertToDoubles(attributes)));
+          vectors.add(new ParameterizationFunction(attributes));
           labels.add(labellist);
         }
       }

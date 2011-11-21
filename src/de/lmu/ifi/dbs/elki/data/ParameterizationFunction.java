@@ -66,7 +66,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
   /**
    * Static factory
    */
-  public static final ParameterizationFunction STATIC = new ParameterizationFunction(new double[0]);
+  public static final ParameterizationFunction STATIC = new ParameterizationFunction(new double[] { 0.0 });
 
   /**
    * A small number to handle numbers near 0 as 0.
