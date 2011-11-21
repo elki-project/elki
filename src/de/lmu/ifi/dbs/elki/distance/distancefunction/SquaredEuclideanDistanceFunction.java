@@ -168,11 +168,6 @@ public class SquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistan
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
-  }
-
-  @Override
   public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }

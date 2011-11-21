@@ -179,11 +179,6 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
-  }
-
-  @Override
   public boolean isMetric() {
     return true;
   }

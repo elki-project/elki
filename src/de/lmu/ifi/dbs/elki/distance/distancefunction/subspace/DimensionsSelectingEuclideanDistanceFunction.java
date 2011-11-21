@@ -160,11 +160,6 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
-  }
-  
-  @Override
   public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }

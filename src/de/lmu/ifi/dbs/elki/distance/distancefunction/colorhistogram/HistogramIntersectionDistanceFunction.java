@@ -70,11 +70,6 @@ public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleD
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
-  }
-
-  @Override
   public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     final int dim1 = v1.getDimensionality();
     if(dim1 != v2.getDimensionality()) {

@@ -127,11 +127,6 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
   }
 
   @Override
-  public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleCenterDistance(mbr1, mbr2));
-  }
-
-  @Override
   public String toString() {
     return "MinimumDistance";
   }

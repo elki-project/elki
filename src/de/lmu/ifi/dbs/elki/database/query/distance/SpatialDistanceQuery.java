@@ -60,28 +60,6 @@ public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Dis
   D minDist(SpatialComparable mbr, DBID id);
 
   /**
-   * Computes the distance between the two given MBRs according to this distance
-   * function.
-   * 
-   * @param mbr1 the first MBR object
-   * @param mbr2 the second MBR object
-   * @return the distance between the two given MBRs according to this distance
-   *         function
-   */
-  D mbrDist(SpatialComparable mbr1, SpatialComparable mbr2);
-
-  /**
-   * Computes the distance between the centroids of the two given MBRs according
-   * to this distance function.
-   * 
-   * @param mbr1 the first MBR object
-   * @param mbr2 the second MBR object
-   * @return the distance between the centroids of the two given MBRs according
-   *         to this distance function
-   */
-  D centerDistance(SpatialComparable mbr1, SpatialComparable mbr2);
-
-  /**
    * Get the inner distance function.
    * 
    * @return Distance function
