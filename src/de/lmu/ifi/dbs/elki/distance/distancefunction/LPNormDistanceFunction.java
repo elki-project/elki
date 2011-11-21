@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @apiviz.landmark
  */
-public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm {
   // TODO: implement SpatialPrimitiveDoubleDistanceFunction?
 
   /**
@@ -91,7 +91,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceFunction
    * @param v the vector to compute the norm of
    * @return the LP norm of the given vector
    */
-  public double norm(NumberVector<?,?> v){
+  public double doubleNorm(NumberVector<?,?> v){
     final int dim = v.getDimensionality();
     double sqrDist = 0;
     for(int i = 1; i <= dim; i++) {

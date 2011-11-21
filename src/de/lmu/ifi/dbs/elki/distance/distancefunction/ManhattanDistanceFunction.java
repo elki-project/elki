@@ -81,7 +81,7 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
    * @param v the vector to compute the norm of
    * @return the Manhattan norm of the given vector
    */
-  public double norm(NumberVector<?,?> v){
+  public double doubleNorm(NumberVector<?,?> v){
     final int dim = v.getDimensionality();
     double sum = 0;
     for(int i = 1; i <= dim; i++) {
