@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 /*
  This file is part of ELKI:
@@ -30,27 +30,27 @@ import java.util.Collections;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 
 /**
- * Test the in-memory heap class.
+ * Test the in-memory bounded heap class.
  * 
  * @author Erich Schubert
  */
-public class TestHeap {
+public class TestTopBoundedHeap {
   /**
-   * Puts 10 integers into both an ascending and a descending heap and verifies
-   * they come out in sequence.
+   * Test bounded heap
    */
   @Test
-  public void testHeap() {
+  public void testBoundedHeap() {
     Integer[] data = { 5, 3, 4, 2, 7, 1, 9, 8, 10, 6 };
-    Integer[] asc = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-    Integer[] desc = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
-    Heap<Integer> hasc = new Heap<Integer>();
-    Heap<Integer> hdesc = new Heap<Integer>(Collections.reverseOrder());
+    Integer[] asc = { 5, 6, 7, 8, 9, 10 };
+    Integer[] desc = { 6, 5, 4, 3, 2, 1 };
+    Heap<Integer> hasc = new TopBoundedHeap<Integer>(asc.length);
+    Heap<Integer> hdesc = new TopBoundedHeap<Integer>(desc.length, Collections.reverseOrder());
     for(Integer i : data) {
-      hasc.lazyOffer(i);
-      hdesc.lazyOffer(i);
+      hasc.add(i);
+      hdesc.add(i);
     }
     for(int i = 0; i < asc.length; i++) {
       final Integer gota = hasc.poll();

@@ -33,10 +33,16 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
  * Basic in-memory heap structure. Closely related to a
  * {@link java.util.PriorityQueue}, but here we can override methods to obtain
  * e.g. a {@link TopBoundedHeap}
+ * 
+ * Additionally, this heap is built lazily: if you first add many elements, then
+ * poll the heap, it will be bulk-loaded in O(n) instead of iteratively built in
+ * O(n log n). This is implemented via a simple validTo counter.
  * 
  * @author Erich Schubert
  * 
@@ -60,9 +66,9 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
   protected int size = 0;
 
   /**
-   * Indicate that the heap is valid
+   * Indicate up to where the heap is valid
    */
-  protected boolean valid = true;
+  protected int validSize = 0;
 
   /**
    * The comparator or {@code null}
@@ -84,19 +90,6 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    */
   public Heap() {
     this(DEFAULT_INITIAL_CAPACITY, null);
-  }
-
-  /**
-   * Repair the heap
-   */
-  private void ensureValid() {
-    if(!valid) {
-      // Bottom up heap construction. Each invocation should be local, so O(n)
-      for (int pos = size / 2; pos >= 0; pos--) {
-        heapifyDown(pos, queue[pos]);
-      }
-      valid = true;
-    }
   }
 
   /**
@@ -139,29 +132,15 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
 
   @Override
   public boolean offer(E e) {
-    ensureValid();
     // resize when needed
     if(size + 1 > queue.length) {
       resize(size + 1);
     }
-    final int pos = size;
-    this.size += 1;
-    heapifyUp(pos, e);
-    // We have changed - return true according to {@link Collection#put}
-    modCount++;
-    return true;
-  }
-
-  public boolean lazyOffer(E e) {
-    // resize when needed
-    if(size + 1 > queue.length) {
-      resize(size + 1);
-    }
-    // We are LAZY in reparing the heap - validto says this hasn't been repaired
-    // yet.
+    // final int pos = size;
     this.queue[size] = e;
     this.size += 1;
-    this.valid = false;
+    heapifyUp(size - 1, e);
+    validSize +=1;
     // We have changed - return true according to {@link Collection#put}
     modCount++;
     return true;
@@ -183,6 +162,66 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
   }
 
   /**
+   * Repair the heap
+   */
+  protected void ensureValid() {
+    if(validSize != size) {
+      if(size > 1) {
+        // Bottom up heap update.
+        if(comparator != null) {
+          // Parent of first invalid
+          int nextmin = validSize > 0 ? ((validSize - 1) >>> 1) : 0;
+          int curmin = MathUtil.nextAllOnesInt(nextmin); // Next line
+          int nextmax = curmin - 1; // End of valid line
+          int pos = (size - 2) >>> 1; // Parent of last element
+          // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin+", "+nextmin);
+          while(pos >= nextmin) {
+            // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
+            while(pos >= curmin) {
+              if(!heapifyDownComparator(pos, queue[pos])) {
+                final int parent = (pos - 1) >>> 1;
+                if(parent < curmin) {
+                  nextmin = Math.min(nextmin, parent);
+                  nextmax = Math.max(nextmax, parent);
+                }
+              }
+              pos--;
+            }
+            curmin = nextmin;
+            pos = Math.min(pos, nextmax);
+            nextmax = -1;
+          }
+        }
+        else {
+          // Parent of first invalid
+          int nextmin = validSize > 0 ? ((validSize - 1) >>> 1) : 0;
+          int curmin = MathUtil.nextAllOnesInt(nextmin); // Next line
+          int nextmax = curmin - 1; // End of valid line
+          int pos = (size - 2) >>> 1; // Parent of last element
+          // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin+", "+nextmin);
+          while(pos >= nextmin) {
+            // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
+            while(pos >= curmin) {
+              if(!heapifyDownComparable(pos, queue[pos])) {
+                final int parent = (pos - 1) >>> 1;
+                if(parent < curmin) {
+                  nextmin = Math.min(nextmin, parent);
+                  nextmax = Math.max(nextmax, parent);
+                }
+              }
+              pos--;
+            }
+            curmin = nextmin;
+            pos = Math.min(pos, nextmax);
+            nextmax = -1;
+          }
+        }
+      }
+      validSize = size;
+    }
+  }
+
+  /**
    * Remove the element at the given position.
    * 
    * @param pos Element position.
@@ -195,8 +234,17 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     // Replacement object:
     final Object reinsert = queue[size - 1];
     queue[size - 1] = null;
-    size -= 1;
-    heapifyDown(pos, reinsert);
+    // Keep heap in sync
+    if(validSize == size) {
+      size -= 1;
+      validSize -= 1;
+      heapifyDown(pos, reinsert);
+    }
+    else {
+      size -= 1;
+      validSize = Math.min(pos >>> 1, validSize);
+      queue[pos] = reinsert;
+    }
     modCount++;
     return ret;
   }
@@ -264,25 +312,28 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * 
    * @param pos re-insertion position
    * @param reinsert Object to reinsert
+   * @return true when the order was changed
    */
-  protected void heapifyDown(int pos, Object reinsert) {
+  protected boolean heapifyDown(int pos, Object reinsert) {
     assert (pos >= 0);
     if(comparator != null) {
-      heapifyDownComparator(pos, reinsert);
+      return heapifyDownComparator(pos, reinsert);
     }
     else {
-      heapifyDownComparable(pos, reinsert);
+      return heapifyDownComparable(pos, reinsert);
     }
   }
 
   /**
    * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
    * 
-   * @param pos re-insertion position
+   * @param ipos re-insertion position
+   * @return true when the order was changed
    */
   @SuppressWarnings("unchecked")
-  protected void heapifyDownComparable(int pos, Object reinsert) {
+  protected boolean heapifyDownComparable(final int ipos, Object reinsert) {
     Comparable<Object> cur = (Comparable<Object>) reinsert;
+    int pos = ipos;
     final int half = size >>> 1;
     while(pos < half) {
       // Get left child (must exist!)
@@ -305,14 +356,17 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       pos = cpos;
     }
     queue[pos] = cur;
+    return (pos == ipos);
   }
 
   /**
    * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
    * 
-   * @param pos re-insertion position
+   * @param ipos re-insertion position
+   * @return true when the order was changed
    */
-  protected void heapifyDownComparator(int pos, Object cur) {
+  protected boolean heapifyDownComparator(final int ipos, Object cur) {
+    int pos = ipos;
     final int half = size >>> 1;
     while(pos < half) {
       int min = pos;
@@ -339,6 +393,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       pos = min;
     }
     queue[pos] = cur;
+    return (pos == ipos);
   }
 
   @SuppressWarnings("unchecked")
@@ -356,7 +411,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * 
    * @param requiredSize required capacity
    */
-  private final void resize(int requiredSize) {
+  protected final void resize(int requiredSize) {
     // Double until 64, then increase by 50% each time.
     int newCapacity = ((queue.length < 64) ? ((queue.length + 1) * 2) : ((queue.length / 2) * 3));
     // overflow?
@@ -376,6 +431,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       queue[i] = null;
     }
     this.size = 0;
+    this.validSize = -1;
     modCount++;
   }
 
@@ -399,17 +455,17 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
 
   @Override
   public boolean addAll(Collection<? extends E> c) {
-    if(size + c.size() > queue.length) {
-      resize(size + c.size());
-    }    
-    boolean modified = false;
-    // Lazy load - this will cause a typical bulk load
-    for(E elem : c) {
-      if(lazyOffer(elem)) {
-        modified = true;
-      }
+    final int addsize = c.size();
+    if(addsize <= 0) {
+      return false;
     }
-    return modified;
+    if(size + addsize > queue.length) {
+      resize(size + addsize);
+    }
+    for(E elem : c) {
+      add(elem);
+    }
+    return true;
   }
 
   /**

@@ -55,4 +55,27 @@ public class TestMathUtil implements JUnit4Test {
     assertEquals("Pearson and weighted pearson should be the same with constant weights.", pear, wpear1, 1E-10);
     assertEquals("Weighted pearsons should be the same with constant weights.", wpear1, wpear2, 1E-10);
   }
+  
+  @Test
+  public void testBitMath() {
+    assertEquals("Bit math issues", 1024, MathUtil.nextPow2Int(912));
+    assertEquals("Bit math issues", 8, MathUtil.nextPow2Int(5));
+    assertEquals("Bit math issues", 4, MathUtil.nextPow2Int(4));
+    assertEquals("Bit math issues", 4, MathUtil.nextPow2Int(3));
+    assertEquals("Bit math issues", 2, MathUtil.nextPow2Int(2));
+    assertEquals("Bit math issues", 1, MathUtil.nextPow2Int(1));
+    assertEquals("Bit math issues", 0, MathUtil.nextPow2Int(0));
+    assertEquals("Bit math issues", 1024L, MathUtil.nextPow2Long(912L));
+    assertEquals("Bit math issues", 0, MathUtil.nextPow2Int(-1));
+    assertEquals("Bit math issues", 0, MathUtil.nextPow2Int(-2));
+    assertEquals("Bit math issues", 0, MathUtil.nextPow2Int(-99));
+    assertEquals("Bit math issues", 15, MathUtil.nextAllOnesInt(8));
+    assertEquals("Bit math issues", 7, MathUtil.nextAllOnesInt(4));
+    assertEquals("Bit math issues", 3, MathUtil.nextAllOnesInt(3));
+    assertEquals("Bit math issues", 3, MathUtil.nextAllOnesInt(2));
+    assertEquals("Bit math issues", 1, MathUtil.nextAllOnesInt(1));
+    assertEquals("Bit math issues", 0, MathUtil.nextAllOnesInt(0));
+    assertEquals("Bit math issues", -1, MathUtil.nextAllOnesInt(-1));
+    assertEquals("Bit math issues", 0, 0 >>> 1);
+  }
 }
