@@ -88,13 +88,13 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
 
   @Override
   public O get(DBID id) {
-    assert (idview.contains(id));
+    assert (idview.contains(id)) : "Accessing object not included in view.";
     return inner.get(id);
   }
 
   @Override
   public void set(DBID id, O val) {
-    assert (idview.contains(id));
+    assert (idview.contains(id)) : "Accessing object not included in view.";
     inner.set(id, val);
   }
 
