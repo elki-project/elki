@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * Minimal GUI built around a table-based parameter editor.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.composedOf SettingsComboboxModel
  * @apiviz.composedOf LoggingStep
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable
@@ -376,8 +376,9 @@ public class MiniGUI extends JPanel {
           else {
             reportErrors(config);
           }
+          logger.debug("Task completed successfully.");
         }
-        catch(Exception e) {
+        catch(Throwable e) {
           logger.exception(e);
         }
         return null;
@@ -435,7 +436,7 @@ public class MiniGUI extends JPanel {
 
     // Create and set up the content pane.
     MiniGUI newContentPane = new MiniGUI();
-    if (args != null && args.length > 0) {
+    if(args != null && args.length > 0) {
       newContentPane.doSetParameters(Arrays.asList(args));
     }
     newContentPane.setOpaque(true); // content panes must be opaque
