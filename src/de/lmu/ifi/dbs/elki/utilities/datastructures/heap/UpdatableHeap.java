@@ -89,56 +89,77 @@ public class UpdatableHeap<O> extends Heap<O> {
   public boolean offer(O e) {
     Integer pos = index.get(e);
     if(pos == null) {
-      // LoggingUtil.logExpensive(Level.INFO, "Inserting: "+e);
-      // insert
-      return super.offer(e);
+      // resize when needed
+      if(size + 1 > queue.length) {
+        resize(size + 1);
+      }
+      // final int pos = size;
+      this.queue[size] = e;
+      index.put(e, size);
+      this.size += 1;
+      // Lazily build the heap, using validto.
+      // heapifyUp(pos, e);
+      // We have changed - return true according to {@link Collection#put}
+      modCount++;
+      return true;
     }
     else {
+      // System.err.println("Updating in UpdatableHeap: " + e.toString());
+      // assert(queue[pos].equals(e));
+      // Did the value improve?
       if(comparator == null) {
         @SuppressWarnings("unchecked")
         Comparable<Object> c = (Comparable<Object>) e;
-        if(c.compareTo(queue[pos]) < 0) {
-          heapifyUp(pos, e);
-          modCount++;
-          // We have changed - return true according to {@link Collection#put}
+        if(c.compareTo(queue[pos]) >= 0) {
+          // Ignore, but return true according to {@link Collection#put}
           return true;
         }
       }
       else {
-        if(comparator.compare(e, queue[pos]) < 0) {
-          heapifyUp(pos, e);
-          modCount++;
-          // We have changed - return true according to {@link Collection#put}
+        if(comparator.compare(e, queue[pos]) >= 0) {
+          // Ignore, but return true according to {@link Collection#put}
           return true;
         }
       }
-      // LoggingUtil.logExpensive(Level.INFO,
-      // "Keeping value: "+e+" vs. "+castQueueElement(pos));
-      // Ignore, no improvement. Return "success" anyway.
+      queue[pos] = e;
+      validSize = Math.min(pos, validSize);
+      modCount++;
+      // We have changed - return true according to {@link Collection#put}
       return true;
     }
   }
 
-  /**
-   * NOT SUPPORTED. Fallback to offer()
-   */
-  @Override
-  public boolean lazyOffer(O e) {
-    return this.offer(e);
-  }
-
   @Override
   protected O removeAt(int pos) {
-    O node = super.removeAt(pos);
+    if(pos < 0 || pos >= size) {
+      return null;
+    }
+    final O ret = castQueueElement(pos);
+    // Replacement object:
+    final Object reinsert = queue[size - 1];
+    queue[size - 1] = null;
+    // Keep heap in sync?
+    if(validSize == size) {
+      size -= 1;
+      validSize -= 1;
+      heapifyDown(pos, reinsert);
+    }
+    else {
+      size -= 1;
+      validSize = Math.min(pos >>> 1, validSize);
+      queue[pos] = reinsert;
+      index.put(reinsert, pos);
+    }
+    modCount++;
     // Keep index up to date
-    index.remove(node);
-    return node;
+    index.remove(ret);
+    return ret;
   }
 
   /**
    * Remove the given object from the queue.
    * 
-   * @param e Obejct to remove
+   * @param e Object to remove
    * @return Existing entry
    */
   public O removeObject(O e) {
@@ -204,14 +225,11 @@ public class UpdatableHeap<O> extends Heap<O> {
     index.put(cur, pos);
   }
 
-  /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
-   * 
-   * @param pos re-insertion position
-   */
   @SuppressWarnings("unchecked")
-  protected void heapifyDownComparable(int pos, Object reinsert) {
+  @Override
+  protected boolean heapifyDownComparable(final int ipos, Object reinsert) {
     Comparable<Object> cur = (Comparable<Object>) reinsert;
+    int pos = ipos;
     final int half = size >>> 1;
     while(pos < half) {
       // Get left child (must exist!)
@@ -236,14 +254,12 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
     queue[pos] = cur;
     index.put(cur, pos);
+    return (pos == ipos);
   }
 
-  /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
-   * 
-   * @param pos re-insertion position
-   */
-  protected void heapifyDownComparator(int pos, Object cur) {
+  @Override
+  protected boolean heapifyDownComparator(final int ipos, Object cur) {
+    int pos = ipos;
     final int half = size >>> 1;
     while(pos < half) {
       int min = pos;
@@ -272,5 +288,6 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
     queue[pos] = cur;
     index.put(cur, pos);
+    return (pos == ipos);
   }
 }

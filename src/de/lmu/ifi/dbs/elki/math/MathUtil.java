@@ -432,4 +432,78 @@ public final class MathUtil {
   public static double angle(Vector v1, Vector v2) {
     return v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
   }
+
+  /**
+   * Find the next power of 2.
+   * 
+   * Classic bit operation, for signed 32-bit. Valid for positive integers only
+   * (0 otherwise).
+   * 
+   * @param x original integer
+   * @return Next power of 2
+   */
+  public static int nextPow2Int(int x) {
+    --x;
+    x |= x >>> 1;
+    x |= x >>> 2;
+    x |= x >>> 4;
+    x |= x >>> 8;
+    x |= x >>> 16;
+    return ++x;
+  }
+
+  /**
+   * Find the next power of 2.
+   * 
+   * Classic bit operation, for signed 64-bit. Valid for positive integers only
+   * (0 otherwise).
+   * 
+   * @param x original long integer
+   * @return Next power of 2
+   */
+  public static long nextPow2Long(long x) {
+    --x;
+    x |= x >>> 1;
+    x |= x >>> 2;
+    x |= x >>> 4;
+    x |= x >>> 16;
+    x |= x >>> 32;
+    return ++x;
+  }
+
+  /**
+   * Find the next larger number with all ones.
+   * 
+   * Classic bit operation, for signed 32-bit. Valid for positive integers only
+   * (-1 otherwise).
+   * 
+   * @param x original integer
+   * @return Next number with all bits set
+   */
+  public static int nextAllOnesInt(int x) {
+    x |= x >>> 1;
+    x |= x >>> 2;
+    x |= x >>> 4;
+    x |= x >>> 8;
+    x |= x >>> 16;
+    return x;
+  }
+
+  /**
+   * Find the next larger number with all ones.
+   * 
+   * Classic bit operation, for signed 64-bit. Valid for positive integers only
+   * (-1 otherwise).
+   * 
+   * @param x original long integer
+   * @return Next number with all bits set
+   */
+  public static long nextAllOnesLong(long x) {
+    x |= x >>> 1;
+    x |= x >>> 2;
+    x |= x >>> 4;
+    x |= x >>> 16;
+    x |= x >>> 32;
+    return x;
+  }
 }

@@ -27,8 +27,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
  * Object for a priority queue with integer priority. Can be used in the
- * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap UpdatableHeap}, since hashcode and equality use the stored objects
- * only, not the priority.
+ * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap
+ * UpdatableHeap}, since hashcode and equality use the stored objects only, not
+ * the priority.
  * 
  * @author Erich Schubert
  * 
@@ -42,13 +43,14 @@ public class IntegerPriorityObject<O> implements PairInterface<Integer, O>, Comp
 
   /**
    * Stored object. Private; since changing this will break an
-   * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap UpdatableHeap}s Hash Map!
+   * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap
+   * UpdatableHeap}s Hash Map!
    */
   private O object;
 
   /**
    * Constructor.
-   *
+   * 
    * @param priority Priority
    * @param object Payload
    */
@@ -114,5 +116,12 @@ public class IntegerPriorityObject<O> implements PairInterface<Integer, O>, Comp
   @Override
   public int compareTo(IntegerPriorityObject<?> o) {
     return o.priority - this.priority;
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    buf.append(priority).append(":").append(object.toString());
+    return buf.toString();
   }
 }

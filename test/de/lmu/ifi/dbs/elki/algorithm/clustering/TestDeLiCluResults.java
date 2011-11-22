@@ -80,6 +80,6 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
     double score = PairCountingFMeasure.compareClusterings(clustering, rbl, 1.0);
     // We cannot test exactly - due to Hashing, DeLiClu sequence is not
     // identical each time, the results will vary slightly.
-    org.junit.Assert.assertTrue(this.getClass().getSimpleName() + ": Score does not match.", score > 0.85);
+    org.junit.Assert.assertTrue(this.getClass().getSimpleName() + ": Score does not match: " + score, score > 0.85);
   }
 }

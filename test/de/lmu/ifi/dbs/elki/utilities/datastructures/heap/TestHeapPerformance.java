@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 /*
  This file is part of ELKI:
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 public class TestHeapPerformance implements JUnit4Test {
   final private int queueSize = 100000;
 
-  final private int iterations = 10;
+  final private int iterations = 20;
 
   final private long seed = 123456L;
 
@@ -65,31 +65,34 @@ public class TestHeapPerformance implements JUnit4Test {
 
     // Pretest, to trigger hotspot compiler, hopefully.
     {
-      for(int j = 0; j < 10 * iterations; j++) {
-        Heap<Integer> pq = new Heap<Integer>(); // Collections.reverseOrder());
-        testQueue(elements, pq);
-      }
-    }
-
-    long hstart = System.currentTimeMillis();
-    {
       for(int j = 0; j < iterations; j++) {
-        Heap<Integer> pq = new Heap<Integer>(); // Collections.reverseOrder());
+        Heap<Integer> pq = new Heap<Integer>();
         testQueue(elements, pq);
       }
-    }
-    long htime = System.currentTimeMillis() - hstart;
-
-    long pqstart = System.currentTimeMillis();
-    {
       for(int j = 0; j < iterations; j++) {
         PriorityQueue<Integer> pq = new PriorityQueue<Integer>(); // 11,
-                                                                  // Collections.reverseOrder());
         testQueue(elements, pq);
       }
     }
-    long pqtime = System.currentTimeMillis() - pqstart;
-    System.err.println("Heap performance test: us: " + htime + " java: " + pqtime);
+
+    long hstart = System.nanoTime();
+    {
+      for(int j = 0; j < iterations; j++) {
+        Heap<Integer> pq = new Heap<Integer>();
+        testQueue(elements, pq);
+      }
+    }
+    long htime = System.nanoTime() - hstart;
+
+    long pqstart = System.nanoTime();
+    {
+      for(int j = 0; j < iterations; j++) {
+        PriorityQueue<Integer> pq = new PriorityQueue<Integer>(); // 11
+        testQueue(elements, pq);
+      }
+    }
+    long pqtime = System.nanoTime() - pqstart;
+    System.err.println("Heap performance test: us: " + htime*1E-9 + " java: " + pqtime*1E-9);
     assertTrue("Heap performance regression - run test individually, since the hotspot optimizations may make the difference! " + htime + " >>= " + pqtime, htime < 1.05 * pqtime);
     // 1.05 allows some difference in measuring
   }
@@ -104,5 +107,7 @@ public class TestHeapPerformance implements JUnit4Test {
       assertEquals((int) pq.poll(), i);
       // assertEquals((int) pq.poll(), queueSize - 1 - i);
     }
+    assertTrue("Heap not half-empty?", pq.size() == (elements.size() >> 1));
+    pq.clear();
   }
 }
