@@ -106,10 +106,8 @@ public class KDDTask implements Parameterizable {
   /**
    * Method to run the specified algorithm using the specified database
    * connection.
-   * 
-   * @throws IllegalStateException on execution errors
    */
-  public void run() throws IllegalStateException {
+  public void run() {
     // Input step
     Database db = inputStep.getDatabase();
 
