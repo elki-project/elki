@@ -30,11 +30,13 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.StreamFromBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.StreamFilter;
+import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection
@@ -57,6 +59,14 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * </p>
    */
   public static final OptionID FILTERS_ID = OptionID.getOrCreateOptionID("dbc.filter", "The filters to apply to the input data.");
+
+  /**
+   * Parameter to specify the parser to provide a database.
+   * <p>
+   * Key: {@code -dbc.parser}
+   * </p>
+   */
+  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("dbc.parser", "Parser to provide the database.");
 
   /**
    * The filters to invoke
@@ -174,6 +184,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    */
   public static abstract class Parameterizer extends AbstractParameterizer {
     protected List<ObjectFilter> filters;
+    protected Parser parser = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -184,6 +195,13 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
       final ObjectListParameter<ObjectFilter> filterParam = new ObjectListParameter<ObjectFilter>(FILTERS_ID, ObjectFilter.class, true);
       if(config.grab(filterParam)) {
         filters = filterParam.instantiateClasses(config);
+      }
+    }
+
+    protected void configParser(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
+      ObjectParameter<Parser> parserParam = new ObjectParameter<Parser>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
+      if(config.grab(parserParam)) {
+        parser = parserParam.instantiateClass(config);
       }
     }
   }

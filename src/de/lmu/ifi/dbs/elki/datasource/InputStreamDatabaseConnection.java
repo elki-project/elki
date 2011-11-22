@@ -34,9 +34,7 @@ import de.lmu.ifi.dbs.elki.datasource.parser.StreamingParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides a database connection expecting input from an input stream such as
@@ -53,14 +51,6 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(InputStreamDatabaseConnection.class);
-
-  /**
-   * Parameter to specify the parser to provide a database.
-   * <p>
-   * Key: {@code -dbc.parser}
-   * </p>
-   */
-  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("dbc.parser", "Parser to provide the database.");
 
   /**
    * Holds the instance of the parser.
@@ -125,20 +115,11 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
-    Parser parser = null;
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configParser(config, Parser.class, NumberVectorLabelParser.class);
       configFilters(config);
-    }
-
-    protected void configParser(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
-      ObjectParameter<Parser> parserParam = new ObjectParameter<Parser>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
-      if(config.grab(parserParam)) {
-        parser = parserParam.instantiateClass(config);
-      }
     }
 
     @Override
