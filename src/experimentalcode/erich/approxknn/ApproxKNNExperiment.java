@@ -2,10 +2,10 @@ package experimentalcode.erich.approxknn;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -19,15 +19,15 @@ import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 public class ApproxKNNExperiment {
   private static final Logging logger = Logging.getLogger(ApproxKNNExperiment.class);
 
-  DistanceFunction<? super NumberVector<?, ?>, DoubleDistance> distanceFunction = EuclideanDistanceFunction.STATIC;
+  DistanceFunction<? super NumberVector<?, ?>, DoubleDistance> distanceFunction = ManhattanDistanceFunction.STATIC;
 
   private void run() {
     Database database = loadDatabase();
@@ -75,7 +75,7 @@ public class ApproxKNNExperiment {
 
     // Number of iterations and step size
     final int iters = 10;
-    final int step = 10;
+    final int step = 1;
     final int maxk = iters * step;
 
     // Build positive ids (outliers) once.
@@ -94,7 +94,7 @@ public class ApproxKNNExperiment {
     }
 
     // Collect the data for output
-    double[][] data = new double[step][3];
+    double[][] data = new double[iters][6];
     // Results for full kNN:
     {
       // Setup preprocessor
@@ -102,25 +102,51 @@ public class ApproxKNNExperiment {
       MaterializeKNNPreprocessor<NumberVector<?, ?>, DoubleDistance> pp = ppf.instantiate(rel);
       database.addIndex(pp);
 
-      FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("kNN iterations", iters, logger) : null;
-      for(int i = 1; i <= iters; i++) {
-        final int k = i * step;
-        KNNOutlier<NumberVector<?, ?>, DoubleDistance> knn = new KNNOutlier<NumberVector<?, ?>, DoubleDistance>(distanceFunction, k);
-        OutlierResult res = knn.run(database, rel);
-        List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
-        double auc = ROC.computeAUC(roccurve);
-        data[i - 1][0] = auc;
+      {
+        FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("kNN iterations", iters, logger) : null;
+        for(int i = 1; i <= iters; i++) {
+          final int k = i * step;
+          KNNOutlier<NumberVector<?, ?>, DoubleDistance> knn = new KNNOutlier<NumberVector<?, ?>, DoubleDistance>(distanceFunction, k);
+          OutlierResult res = knn.run(database, rel);
+          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = ROC.computeAUC(roccurve);
+          data[i - 1][0] = auc;
+          if(prog != null) {
+            prog.incrementProcessed(logger);
+          }
+        }
+
         if(prog != null) {
-          prog.incrementProcessed(logger);
+          prog.ensureCompleted(logger);
+        }
+      }
+      {
+        FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("LOF iterations", iters, logger) : null;
+        for(int i = 1; i <= iters; i++) {
+          final int k = i * step;
+          LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(k, distanceFunction, distanceFunction);
+          OutlierResult res = lof.run(rel);
+          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = ROC.computeAUC(roccurve);
+          data[i - 1][3] = auc;
+          if(prog != null) {
+            prog.incrementProcessed(logger);
+          }
+        }
+
+        if(prog != null) {
+          prog.ensureCompleted(logger);
         }
       }
 
       // Remove the preprocessor again.
       database.removeIndex(pp);
+      ResultUtil.removeRecursive(database.getHierarchy(), pp);
 
-      if(prog != null) {
-        prog.ensureCompleted(logger);
-      }
+      // Trigger GC cleanup
+      pp = null;
+      ppf = null;
+      System.gc();
     }
 
     // Partial kNN outlier
@@ -134,7 +160,7 @@ public class ApproxKNNExperiment {
         RandomSampleKNNPreprocessor<NumberVector<?, ?>, DoubleDistance> pp = ppf.instantiate(rel);
         database.addIndex(pp);
 
-        // Max k run
+        // Max k kNNOutlier run
         {
           KNNOutlier<NumberVector<?, ?>, DoubleDistance> knn = new KNNOutlier<NumberVector<?, ?>, DoubleDistance>(distanceFunction, maxk);
           OutlierResult res = knn.run(database, rel);
@@ -142,7 +168,7 @@ public class ApproxKNNExperiment {
           double auc = ROC.computeAUC(roccurve);
           data[i - 1][1] = auc;
         }
-        // Scaled k run
+        // Scaled k kNNOutlier run
         {
           KNNOutlier<NumberVector<?, ?>, DoubleDistance> knn = new KNNOutlier<NumberVector<?, ?>, DoubleDistance>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
@@ -150,17 +176,43 @@ public class ApproxKNNExperiment {
           double auc = ROC.computeAUC(roccurve);
           data[i - 1][2] = auc;
         }
+        // Max k LOF run
+        {
+          LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(maxk, distanceFunction, distanceFunction);
+          OutlierResult res = lof.run(rel);
+          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = ROC.computeAUC(roccurve);
+          data[i - 1][4] = auc;
+        }
+        // Scaled k LOF run
+        {
+          LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(k, distanceFunction, distanceFunction);
+          OutlierResult res = lof.run(rel);
+          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = ROC.computeAUC(roccurve);
+          data[i - 1][5] = auc;
+        }
+        // Remove preprocessor
+        database.removeIndex(pp);
+        ResultUtil.removeRecursive(database.getHierarchy(), pp);
+
+        // Trigger GC cleanup
+        pp = null;
+        ppf = null;
+        System.gc();
 
         if(prog != null) {
           prog.incrementProcessed(logger);
         }
+        System.out.println(k + " " + FormatUtil.format(data[i - 1], " "));
       }
       if(prog != null) {
         prog.ensureCompleted(logger);
       }
     }
-    for(int i = 0; i < step; i++) {
-      System.out.println((i + 1) + " " + FormatUtil.format(data[i], " "));
+    for(int i = 1; i < iters; i++) {
+      final int k = i * step;
+      System.out.println(k + " " + FormatUtil.format(data[i - 1], " "));
     }
   }
 
@@ -188,8 +240,8 @@ public class ApproxKNNExperiment {
   }
 
   public static void main(String[] args) {
-    LoggingConfiguration.setDefaultLevel(Level.INFO);
-    logger.getWrappedLogger().setLevel(Level.INFO);
+    // LoggingConfiguration.setDefaultLevel(Level.INFO);
+    // logger.getWrappedLogger().setLevel(Level.INFO);
     try {
       new ApproxKNNExperiment().run();
     }
