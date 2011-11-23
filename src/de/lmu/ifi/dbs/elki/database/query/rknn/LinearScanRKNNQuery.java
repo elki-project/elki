@@ -110,7 +110,7 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
       for(DistanceResultPair<D> n : knn) {
         int j = 0;
         for(DBID id : ids) {
-          if(n.getDBID() == id) {
+          if(n.getDBID().equals(id)) {
             List<DistanceResultPair<D>> rNN = rNNList.get(j);
             rNN.add(new GenericDistanceResultPair<D>(n.getDistance(), qid));
           }
