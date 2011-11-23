@@ -24,11 +24,9 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.Comparator;
-
-import de.lmu.ifi.dbs.elki.utilities.datastructures.TroveJavaHashingStrategy;
 
 /**
  * A heap as used in OPTICS that allows updating entries.
@@ -46,7 +44,7 @@ public class UpdatableHeap<O> extends Heap<O> {
   /**
    * Holds the indices in the heap of each element.
    */
-  private final TObjectIntMap<Object> index = new TObjectIntCustomHashMap<Object>(TroveJavaHashingStrategy.STATIC, 100, 0.5f, -1);
+  private final TObjectIntMap<Object> index = new TObjectIntHashMap<Object>(100, 0.5f, -1);
 
   /**
    * Simple constructor with default size.
