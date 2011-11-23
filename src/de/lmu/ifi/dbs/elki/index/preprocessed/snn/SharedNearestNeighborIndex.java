@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.snn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -41,7 +41,7 @@ public interface SharedNearestNeighborIndex<O> extends Index {
    * @param objid Object ID
    * @return Neighbor DBIDs
    */
-  public TreeSetDBIDs getNearestNeighborSet(DBID objid);
+  public ArrayDBIDs getNearestNeighborSet(DBID objid);
 
   /**
    * Get the number of neighbors

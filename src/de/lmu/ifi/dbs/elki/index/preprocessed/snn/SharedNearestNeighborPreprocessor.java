@@ -27,11 +27,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -73,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Shared nearest neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
-public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends AbstractPreprocessorIndex<O, TreeSetDBIDs> implements SharedNearestNeighborIndex<O> {
+public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends AbstractPreprocessorIndex<O, ArrayDBIDs> implements SharedNearestNeighborIndex<O> {
   /**
    * Get a logger for this class.
    */
@@ -109,12 +108,12 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     if(getLogger().isVerbose()) {
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, SetDBIDs.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ArrayDBIDs.class);
     KNNQuery<O, D> knnquery = QueryUtil.getKNNQuery(relation, distanceFunction, numberOfNeighbors);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), getLogger()) : null;
     for(DBID id : relation.iterDBIDs()) {
-      TreeSetModifiableDBIDs neighbors = DBIDUtil.newTreeSet(numberOfNeighbors);
+      ArrayModifiableDBIDs neighbors = DBIDUtil.newArray(numberOfNeighbors);
       KNNResult<D> kNN = knnquery.getKNNForDBID(id, numberOfNeighbors);
       for(int i = 0; i < kNN.size(); i++) {
         final DBID nid = kNN.get(i).getDBID();
@@ -126,6 +125,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
           break;
         }
       }
+      neighbors.sort();
       storage.put(id, neighbors);
       if(progress != null) {
         progress.incrementProcessed(getLogger());
@@ -137,7 +137,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
   }
 
   @Override
-  public TreeSetDBIDs getNearestNeighborSet(DBID objid) {
+  public ArrayDBIDs getNearestNeighborSet(DBID objid) {
     if(storage == null) {
       preprocess();
     }

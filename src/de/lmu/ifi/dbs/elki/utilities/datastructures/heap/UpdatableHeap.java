@@ -23,8 +23,12 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+
 import java.util.Comparator;
-import java.util.HashMap;
+
+import de.lmu.ifi.dbs.elki.utilities.datastructures.TroveJavaHashingStrategy;
 
 /**
  * A heap as used in OPTICS that allows updating entries.
@@ -42,7 +46,7 @@ public class UpdatableHeap<O> extends Heap<O> {
   /**
    * Holds the indices in the heap of each element.
    */
-  private HashMap<Object, Integer> index = new HashMap<Object, Integer>();
+  private final TObjectIntMap<Object> index = new TObjectIntCustomHashMap<Object>(TroveJavaHashingStrategy.STATIC, 100, 0.5f, -1);
 
   /**
    * Simple constructor with default size.
@@ -87,8 +91,8 @@ public class UpdatableHeap<O> extends Heap<O> {
 
   @Override
   public boolean offer(O e) {
-    Integer pos = index.get(e);
-    if(pos == null) {
+    final int pos = index.get(e);
+    if(pos == -1) {
       // resize when needed
       if(size + 1 > queue.length) {
         resize(size + 1);
@@ -97,8 +101,7 @@ public class UpdatableHeap<O> extends Heap<O> {
       this.queue[size] = e;
       index.put(e, size);
       this.size += 1;
-      // Lazily build the heap, using validto.
-      // heapifyUp(pos, e);
+      // We do NOT YET update the heap. This is done lazily.
       // We have changed - return true according to {@link Collection#put}
       modCount++;
       return true;
@@ -121,8 +124,13 @@ public class UpdatableHeap<O> extends Heap<O> {
           return true;
         }
       }
-      queue[pos] = e;
-      validSize = Math.min(pos, validSize);
+      if (pos >= validSize) {
+        queue[pos] = e;
+        // validSize = Math.min(pos, validSize);
+      } else {
+        // ensureValid();
+        heapifyUp(pos, e); 
+      }
       modCount++;
       // We have changed - return true according to {@link Collection#put}
       return true;
@@ -163,8 +171,8 @@ public class UpdatableHeap<O> extends Heap<O> {
    * @return Existing entry
    */
   public O removeObject(O e) {
-    Integer pos = index.get(e);
-    if(pos != null) {
+    int pos = index.get(e);
+    if(pos >= 0) {
       return removeAt(pos);
     }
     else {

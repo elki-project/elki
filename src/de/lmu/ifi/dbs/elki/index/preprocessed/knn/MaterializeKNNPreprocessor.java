@@ -29,10 +29,12 @@ import java.util.List;
 import javax.swing.event.EventListenerList;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -146,7 +148,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
 
   @Override
   public void insertAll(DBIDs ids) {
-    if (storage == null && ids.size() > 0) {
+    if(storage == null && ids.size() > 0) {
       preprocess();
     }
     objectsInserted(ids);
@@ -243,7 +245,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    *         updated
    */
   private ArrayDBIDs updateKNNsAfterDeletion(DBIDs ids) {
-    TreeSetModifiableDBIDs idsSet = DBIDUtil.newTreeSet(ids);
+    SetDBIDs idsSet = DBIDUtil.ensureSet(ids);
     ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
     for(DBID id1 : relation.iterDBIDs()) {
       KNNResult<D> kNNs = storage.get(id1);
@@ -344,15 +346,15 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    * @return the DBIDs in the given collection
    */
   protected ArrayDBIDs extractAndRemoveIDs(List<? extends Collection<DistanceResultPair<D>>> extraxt, ArrayDBIDs remove) {
-    TreeSetModifiableDBIDs ids = DBIDUtil.newTreeSet();
+    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet();
     for(Collection<DistanceResultPair<D>> drps : extraxt) {
       for(DistanceResultPair<D> drp : drps) {
         ids.add(drp.getDBID());
       }
     }
     ids.removeAll(remove);
-    return DBIDUtil.ensureArray(ids);
-
+    // Convert back to array
+    return DBIDUtil.newArray(ids);
   }
 
   /**

@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -102,7 +102,6 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @param ids the IDs of the objects
    */
   private void materializeKNNAndRKNNs(ArrayDBIDs ids, FiniteProgress progress) {
-
     // add an empty list to each rknn
     for(DBID id : ids) {
       if(materialized_RkNN.get(id) == null) {
@@ -261,7 +260,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
       }
     }
     // update the RkNNs of the kNNs
-    TreeSetDBIDs idsSet = DBIDUtil.newTreeSet(ids);
+    SetDBIDs idsSet = DBIDUtil.ensureSet(ids);
     for(int i = 0; i < kNN_ids.size(); i++) {
       DBID id = kNN_ids.get(i);
       SortedSet<DistanceResultPair<D>> rkNN = materialized_RkNN.get(id);

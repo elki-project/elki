@@ -25,8 +25,9 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import java.util.Iterator;
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
@@ -47,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <O> object type
  */
 // todo arthur comment class
-public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, TreeSetDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
+public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, ArrayDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
   /**
    * Constructor.
    * 
@@ -73,7 +74,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
    * 
    * @param <T> Object type
    */
-  public static class Instance<T> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>, TreeSetDBIDs, DoubleDistance> {
+  public static class Instance<T> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>, ArrayDBIDs, DoubleDistance> {
     /**
      * Constructor.
      * 
@@ -84,7 +85,14 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
       super(database, preprocessor);
     }
 
-    static protected int countSharedNeighbors(TreeSetDBIDs neighbors1, TreeSetDBIDs neighbors2) {
+    /**
+     * Compute the intersection size.
+     * 
+     * @param neighbors1 SORTED neighbor ids of first
+     * @param neighbors2 SORTED neighbor ids of second
+     * @return Intersection size
+     */
+    static protected int countSharedNeighbors(DBIDs neighbors1, DBIDs neighbors2) {
       int intersection = 0;
       Iterator<DBID> iter1 = neighbors1.iterator();
       Iterator<DBID> iter2 = neighbors2.iterator();
@@ -109,8 +117,8 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
 
     @Override
     public DoubleDistance similarity(DBID id1, DBID id2) {
-      TreeSetDBIDs neighbors1 = index.getNearestNeighborSet(id1);
-      TreeSetDBIDs neighbors2 = index.getNearestNeighborSet(id2);
+      DBIDs neighbors1 = index.getNearestNeighborSet(id1);
+      DBIDs neighbors2 = index.getNearestNeighborSet(id2);
       int intersection = countSharedNeighbors(neighbors1, neighbors2);
       return new DoubleDistance((double) intersection / index.getNumberOfNeighbors());
     }

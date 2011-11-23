@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
@@ -82,7 +82,14 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
       super(database, preprocessor, parent);
     }
 
-    static protected double jaccardCoefficient(TreeSetDBIDs neighbors1, TreeSetDBIDs neighbors2) {
+    /**
+     * Compute the jaccard coefficient
+     * 
+     * @param neighbors1 SORTED neighbor ids of first
+     * @param neighbors2 SORTED neighbor ids of second
+     * @return
+     */
+    static protected double jaccardCoefficient(DBIDs neighbors1, DBIDs neighbors2) {
       int intersection = 0;
       int union = 0;
       Iterator<DBID> iter1 = neighbors1.iterator();
@@ -118,8 +125,8 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
 
     @Override
     public DoubleDistance distance(DBID id1, DBID id2) {
-      TreeSetDBIDs neighbors1 = index.getNearestNeighborSet(id1);
-      TreeSetDBIDs neighbors2 = index.getNearestNeighborSet(id2);
+      DBIDs neighbors1 = index.getNearestNeighborSet(id1);
+      DBIDs neighbors2 = index.getNearestNeighborSet(id2);
       return new DoubleDistance(1.0 - jaccardCoefficient(neighbors1, neighbors2));
     }
 

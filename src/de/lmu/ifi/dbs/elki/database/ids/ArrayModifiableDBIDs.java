@@ -31,5 +31,8 @@ import java.util.List;
  * @author Erich Schubert
  */
 public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs, List<DBID> {
-  // Empty interface
+  /**
+   * Sort the DBID set.
+   */
+  void sort();
 }

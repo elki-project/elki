@@ -51,7 +51,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
       Object[] data = new Object[range.size()];
       return new ArrayStore<T>(data, new RangeIDMap(range));
     } else {
-      return new MapStore<T>();
+      return new MapIntegerDBIDStore<T>();
     }
   }
 
@@ -62,7 +62,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
       Object[][] data = new Object[range.size()][dataclasses.length];
       return new ArrayRecordStore(data, new RangeIDMap(range));
     } else {
-      return new MapRecordStore(dataclasses.length);
+      return new MapIntegerDBIDRecordStore(dataclasses.length);
     }
   }
 }

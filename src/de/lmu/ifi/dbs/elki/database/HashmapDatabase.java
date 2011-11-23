@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -74,7 +74,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   /**
    * IDs of this database
    */
-  private TreeSetModifiableDBIDs ids;
+  private HashSetModifiableDBIDs ids;
 
   /**
    * The DBID representation we use
@@ -95,7 +95,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   public HashmapDatabase(DatabaseConnection databaseConnection, Collection<IndexFactory<?, ?>> indexFactories) {
     super();
     this.databaseConnection = databaseConnection;
-    this.ids = DBIDUtil.newTreeSet();
+    this.ids = DBIDUtil.newHashSet();
     this.idrep = new DBIDView(this, this.ids);
     this.relations.add(idrep);
     this.addChildResult(idrep);

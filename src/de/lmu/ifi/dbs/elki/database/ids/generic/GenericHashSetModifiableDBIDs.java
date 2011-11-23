@@ -39,9 +39,8 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBID
+ * @apiviz.uses DBID
  */
-// TODO: implement this optimized for integers?
 public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements HashSetModifiableDBIDs {
   /**
    * Serial version

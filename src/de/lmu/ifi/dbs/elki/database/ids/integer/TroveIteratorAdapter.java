@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids;
+package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 /*
  This file is part of ELKI:
@@ -23,12 +23,44 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntIterator;
+
+import java.util.Iterator;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
- * Marker for sorted, tree-organized DBIDs
+ * Adapter for using GNU Trove iterators.
  * 
  * @author Erich Schubert
  */
-public interface TreeSetDBIDs extends SetDBIDs {
-  // Empty
+class TroveIteratorAdapter implements Iterator<DBID> {
+  /**
+   * The actual iterator.
+   */
+  private TIntIterator iterator;
+
+  /**
+   * Constructor.
+   * 
+   * @param iterator Trove iterator
+   */
+  protected TroveIteratorAdapter(TIntIterator iterator) {
+    this.iterator = iterator;
+  }
+
+  @Override
+  public boolean hasNext() {
+    return iterator.hasNext();
+  }
+
+  @Override
+  public DBID next() {
+    return new IntegerDBID(iterator.next());
+  }
+
+  @Override
+  public void remove() {
+    iterator.remove();
+  }
 }

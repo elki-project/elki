@@ -191,3 +191,9 @@ Comment: Apache Commons Logging from FOP Transcoder package
 Implementation-Title: Apache Commons Logging
 Implementation-Vendor: Apache Software Foundation
 Implementation-URL: http://commons.apache.org/logging/
+
+Name: gnu/trove
+Comment: GNU Trove
+Implementation-Title: Trove
+Implementation-Version: 3.0.1
+Implementation-URL: http://trove4j.sourceforge.net/
