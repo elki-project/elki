@@ -449,7 +449,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
           double dist = pair.getDistance().doubleValue() / maxdist;
           Color color = getColor(dist);
           String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
-          String width = (pair.getDBID() == idx) ? "0.5%" : "0.2%";
+          String width = (pair.getDBID().equals(idx)) ? "0.5%" : "0.2%";
           SVGUtil.setStyle(line, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
           newe.appendChild(line);
           // put into cache

@@ -265,7 +265,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
       List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
       for(DistanceResultPair<D> candidate : candidates) {
         for(DistanceResultPair<D> qr : knnLists.get(candidate.getDBID())) {
-          if(qr.getDBID() == id) {
+          if(qr.getDBID().equals(id)) {
             result.add(new GenericDistanceResultPair<T>((T) qr.getDistance(), id));
             break;
           }
