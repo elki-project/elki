@@ -357,7 +357,7 @@ public class TextWriter {
     // Write cluster information
     out.commentPrintLn("Cluster: " + naming.getNameFor(clus));
     Model model = clus.getModel();
-    if (model != ClusterModel.CLUSTER) {
+    if (model != ClusterModel.CLUSTER && model != null) {
       TextWriterWriterInterface<?> mwri = writers.getHandler(model);
       mwri.writeObject(out, null, model);
     }
