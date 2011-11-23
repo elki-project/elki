@@ -29,13 +29,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericHashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericTreeSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -106,47 +102,32 @@ public class TrivialDBIDFactory implements DBIDFactory {
 
   @Override
   public ArrayModifiableDBIDs newArray() {
-    return new GenericArrayModifiableDBIDs();
+    return new TroveArrayModifiableDBIDs();
   }
 
   @Override
   public HashSetModifiableDBIDs newHashSet() {
-    return new GenericHashSetModifiableDBIDs();
-  }
-
-  @Override
-  public TreeSetModifiableDBIDs newTreeSet() {
-    return new GenericTreeSetModifiableDBIDs();
+    return new TroveHashSetModifiableDBIDs();
   }
 
   @Override
   public ArrayModifiableDBIDs newArray(int size) {
-    return new GenericArrayModifiableDBIDs(size);
+    return new TroveArrayModifiableDBIDs(size);
   }
 
   @Override
   public HashSetModifiableDBIDs newHashSet(int size) {
-    return new GenericHashSetModifiableDBIDs(size);
-  }
-
-  @Override
-  public TreeSetModifiableDBIDs newTreeSet(int size) {
-    return new GenericTreeSetModifiableDBIDs(size);
+    return new TroveHashSetModifiableDBIDs(size);
   }
 
   @Override
   public ArrayModifiableDBIDs newArray(DBIDs existing) {
-    return new GenericArrayModifiableDBIDs(existing);
+    return new TroveArrayModifiableDBIDs(existing);
   }
 
   @Override
   public HashSetModifiableDBIDs newHashSet(DBIDs existing) {
-    return new GenericHashSetModifiableDBIDs(existing);
-  }
-
-  @Override
-  public TreeSetModifiableDBIDs newTreeSet(DBIDs existing) {
-    return new GenericTreeSetModifiableDBIDs(existing);
+    return new TroveHashSetModifiableDBIDs(existing);
   }
 
   @Override

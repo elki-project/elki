@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
@@ -60,7 +61,14 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
     return IntegerDistance.FACTORY;
   }
 
-  static protected int countSharedNeighbors(SetDBIDs neighbors1, SetDBIDs neighbors2) {
+  /**
+   * Compute the intersection size
+   * 
+   * @param neighbors1 SORTED neighbors of first
+   * @param neighbors2 SORTED neighbors of second
+   * @return Intersection size
+   */
+  static protected int countSharedNeighbors(DBIDs neighbors1, DBIDs neighbors2) {
     int intersection = 0;
     Iterator<DBID> iter1 = neighbors1.iterator();
     Iterator<DBID> iter2 = neighbors2.iterator();
@@ -112,8 +120,8 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
 
     @Override
     public IntegerDistance similarity(DBID id1, DBID id2) {
-      SetDBIDs neighbors1 = index.getNearestNeighborSet(id1);
-      SetDBIDs neighbors2 = index.getNearestNeighborSet(id2);
+      DBIDs neighbors1 = index.getNearestNeighborSet(id1);
+      DBIDs neighbors2 = index.getNearestNeighborSet(id2);
       return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
     }
 

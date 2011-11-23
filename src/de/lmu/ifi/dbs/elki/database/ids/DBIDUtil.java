@@ -133,15 +133,6 @@ public final class DBIDUtil {
   }
 
   /**
-   * Make a new (modifiable) tree set of DBIDs.
-   * 
-   * @return New tree set
-   */
-  public static TreeSetModifiableDBIDs newTreeSet() {
-    return DBIDFactory.FACTORY.newTreeSet();
-  }
-
-  /**
    * Make a new (modifiable) array of DBIDs.
    * 
    * @param size Size hint
@@ -162,16 +153,6 @@ public final class DBIDUtil {
   }
 
   /**
-   * Make a new (modifiable) tree set of DBIDs.
-   * 
-   * @param size Size hint
-   * @return New tree set
-   */
-  public static TreeSetModifiableDBIDs newTreeSet(int size) {
-    return DBIDFactory.FACTORY.newTreeSet(size);
-  }
-
-  /**
    * Make a new (modifiable) array of DBIDs.
    * 
    * @param existing Existing DBIDs
@@ -189,16 +170,6 @@ public final class DBIDUtil {
    */
   public static HashSetModifiableDBIDs newHashSet(DBIDs existing) {
     return DBIDFactory.FACTORY.newHashSet(existing);
-  }
-
-  /**
-   * Make a new (modifiable) tree set of DBIDs.
-   * 
-   * @param existing Existing DBIDs
-   * @return New tree set
-   */
-  public static TreeSetModifiableDBIDs newTreeSet(DBIDs existing) {
-    return DBIDFactory.FACTORY.newTreeSet(existing);
   }
 
   /**
@@ -285,11 +256,8 @@ public final class DBIDUtil {
    * @return Array DBIDs.
    */
   public static SetDBIDs ensureSet(DBIDs ids) {
-    if(ids instanceof HashSetDBIDs) {
-      return (HashSetDBIDs) ids;
-    }
-    else if(ids instanceof TreeSetDBIDs) {
-      return (TreeSetDBIDs) ids;
+    if(ids instanceof SetDBIDs) {
+      return (SetDBIDs) ids;
     }
     else {
       return newHashSet(ids);
@@ -312,9 +280,6 @@ public final class DBIDUtil {
       }
       if(ids instanceof HashSetDBIDs) {
         return newHashSet(ids);
-      }
-      if(ids instanceof TreeSetDBIDs) {
-        return newTreeSet(ids);
       }
       return newArray(ids);
     }

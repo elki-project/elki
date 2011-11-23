@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.database.datastore.memory.MapRecordStore.StorageAccessor oneway - - projectsTo
+ * @apiviz.has MapRecordStore.StorageAccessor oneway - - projectsTo
  */
 public class MapRecordStore implements WritableRecordStore {
   /**

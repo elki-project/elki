@@ -111,13 +111,6 @@ public interface DBIDFactory {
   public HashSetModifiableDBIDs newHashSet();
   
   /**
-   * Make a new (modifiable) tree set of DBIDs.
-   * 
-   * @return New tree set
-   */
-  public TreeSetModifiableDBIDs newTreeSet();
-  
-  /**
    * Make a new (modifiable) array of DBIDs.
    * 
    * @param size Size hint
@@ -134,14 +127,6 @@ public interface DBIDFactory {
   public HashSetModifiableDBIDs newHashSet(int size);
   
   /**
-   * Make a new (modifiable) tree set of DBIDs.
-   * 
-   * @param size Size hint
-   * @return New tree set
-   */
-  public TreeSetModifiableDBIDs newTreeSet(int size);
-  
-  /**
    * Make a new (modifiable) array of DBIDs.
    * 
    * @param existing existing DBIDs to use
@@ -156,14 +141,6 @@ public interface DBIDFactory {
    * @return New hash set
    */
   public HashSetModifiableDBIDs newHashSet(DBIDs existing);
-  
-  /**
-   * Make a new (modifiable) tree set of DBIDs.
-   * 
-   * @param existing existing DBIDs to use
-   * @return New tree set
-   */
-  public TreeSetModifiableDBIDs newTreeSet(DBIDs existing);
   
   /**
    * Get a serializer for DBIDs

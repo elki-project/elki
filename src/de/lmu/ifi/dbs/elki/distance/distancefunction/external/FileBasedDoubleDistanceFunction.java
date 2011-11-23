@@ -135,7 +135,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    * @return Collection of all IDs in the cache.
    */
   public DBIDs getIDs() {
-    ModifiableDBIDs ids = DBIDUtil.newTreeSet();
+    ModifiableDBIDs ids = DBIDUtil.newHashSet();
     for(DBIDPair pair : cache.keySet()) {
       ids.add(pair.getFirst());
       ids.add(pair.getSecond());

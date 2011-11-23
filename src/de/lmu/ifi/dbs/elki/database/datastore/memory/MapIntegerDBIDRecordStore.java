@@ -23,45 +23,55 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
- * A class to answer representation queries using the stored Array.
+ * A class to answer representation queries using a map and an index within the
+ * record.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf DataStoreIDMap
- * @apiviz.has ArrayRecordStore.StorageAccessor oneway - - projectsTo
+ * @apiviz.has MapIntegerDBIDRecordStore.StorageAccessor oneway - - projectsTo
  */
-public class ArrayRecordStore implements WritableRecordStore {
+public class MapIntegerDBIDRecordStore implements WritableRecordStore {
   /**
-   * Data array
+   * Record length
    */
-  private final Object[][] data;
+  private final int rlen;
 
   /**
-   * DBID to index map
+   * Storage Map
    */
-  private final DataStoreIDMap idmap;
+  private final TIntObjectMap<Object[]> data;
 
   /**
-   * Constructor with existing data
+   * Constructor with existing data.
    * 
-   * @param data Existing data
-   * @param idmap Map for array offsets
+   * @param rlen Number of columns (record length)
+   * @param data Existing data map
    */
-  public ArrayRecordStore(Object[][] data, DataStoreIDMap idmap) {
+  public MapIntegerDBIDRecordStore(int rlen, TIntObjectMap<Object[]> data) {
     super();
+    this.rlen = rlen;
     this.data = data;
-    this.idmap = idmap;
+  }
+
+  /**
+   * Constructor without existing data.
+   * 
+   * @param rlen Number of columns (record length)
+   */
+  public MapIntegerDBIDRecordStore(int rlen) {
+    this(rlen, new TIntObjectHashMap<Object[]>());
   }
 
   @Override
   public <T> WritableDataStore<T> getStorage(int col, Class<? super T> datatype) {
-    // TODO: add type checking safety?
+    // TODO: add type checking?
     return new StorageAccessor<T>(col);
   }
 
@@ -74,16 +84,17 @@ public class ArrayRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T get(DBID id, int index) {
+    Object[] d = data.get(id.getIntegerID());
+    if(d == null) {
+      return null;
+    }
     try {
-      return (T) data[idmap.map(id)][index];
-    }
-    catch(ArrayIndexOutOfBoundsException e) {
-      return null;
-    }
-    catch(NullPointerException e) {
-      return null;
+      return (T) d[index];
     }
     catch(ClassCastException e) {
+      return null;
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       return null;
     }
   }
@@ -93,13 +104,18 @@ public class ArrayRecordStore implements WritableRecordStore {
    * 
    * @param id Database ID
    * @param index column index
-   * @param value New value
-   * @return old value
+   * @param value new value
+   * @return previous value
    */
   @SuppressWarnings("unchecked")
   protected <T> T set(DBID id, int index, T value) {
-    T ret = (T) data[idmap.map(id)][index];
-    data[idmap.map(id)][index] = value;
+    Object[] d = data.get(id.getIntegerID());
+    if(d == null) {
+      d = new Object[rlen];
+      data.put(id.getIntegerID(), d);
+    }
+    T ret = (T) d[index];
+    d[index] = value;
     return ret;
   }
 
@@ -129,22 +145,22 @@ public class ArrayRecordStore implements WritableRecordStore {
     @SuppressWarnings("unchecked")
     @Override
     public T get(DBID id) {
-      return (T) ArrayRecordStore.this.get(id, index);
+      return (T) MapIntegerDBIDRecordStore.this.get(id, index);
     }
 
     @Override
     public T put(DBID id, T value) {
-      return ArrayRecordStore.this.set(id, index, value);
+      return MapIntegerDBIDRecordStore.this.set(id, index, value);
     }
 
     @Override
     public void destroy() {
-      throw new UnsupportedOperationException("ArrayStore record columns cannot be destroyed.");
+      throw new UnsupportedOperationException("Record storage accessors cannot be destroyed.");
     }
 
     @Override
     public void delete(DBID id) {
-      throw new UnsupportedOperationException("ArrayStore record values cannot be deleted.");
+      throw new UnsupportedOperationException("Record storage values cannot be deleted.");
     }
 
     @Override
@@ -160,6 +176,6 @@ public class ArrayRecordStore implements WritableRecordStore {
 
   @Override
   public boolean remove(DBID id) {
-    throw new UnsupportedOperationException("ArrayStore records cannot be removed.");
+    return data.remove(id.getIntegerID()) != null;
   }
 }

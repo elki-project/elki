@@ -365,7 +365,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
      *         ids
      */
     private ArrayModifiableDBIDs mergeIDs(List<List<DistanceResultPair<D>>> queryResults, DBIDs... ids) {
-      ModifiableDBIDs result = DBIDUtil.newTreeSet();
+      ModifiableDBIDs result = DBIDUtil.newHashSet();
       for(DBIDs dbids : ids) {
         result.addDBIDs(dbids);
       }

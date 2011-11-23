@@ -17,18 +17,15 @@
  * <th></th>
  * <th style="border-bottom: 2px">{@link de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs ArrayDBIDs}</th>
  * <th style="border-bottom: 2px">{@link de.lmu.ifi.dbs.elki.database.ids.HashSetDBIDs HashSetDBIDs}</th>
- * <th style="border-bottom: 2px">{@link de.lmu.ifi.dbs.elki.database.ids.TreeSetDBIDs TreeSetDBIDs}</th>
  * </tr>
  * <tr>
  * <th style="border-right: 2px">{@link de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs ModifiableDBIDs}</th>
  * <td>{@link de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs ArrayModifiableDBIDs}</td>
  * <td>{@link de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs HashSetModifiableDBIDs}</td>
- * <td>{@link de.lmu.ifi.dbs.elki.database.ids.TreeSetModifiableDBIDs TreeSetModifiableDBIDs}</td>
  * </tr>
  * <tr>
  * <th style="border-right: 2px">{@link de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs StaticDBIDs}</th>
  * <td>{@link de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs ArrayStaticDBIDs}</td>
- * <td>n/a</td>
  * <td>n/a</td>
  * </tr>
  * </table>
@@ -47,8 +44,6 @@
  * ArrayModifiableDBIDs array = DBIDUtil.newArraySet(123);
  * // new DBID hash set with minimum initial capacity
  * ModifiableDBIDs hash = DBIDUtil.newHashSet();
- * // initialize a tree set with the IDs of the database.
- * ModifiableDBIDs tree = DBIDUtil.newTreeSet(database.getIDs());
  * 
  * // add all DBIDs from the hash
  * tree.addDBIDs(hash)
@@ -78,25 +73,25 @@
  * @apiviz.exclude java.*
  */
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.lmu.ifi.dbs.elki.database.ids;

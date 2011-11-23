@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -40,9 +41,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBID
+ * @apiviz.uses DBID
  */
-// TODO: implement this optimized for integers?
 public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements ArrayModifiableDBIDs  {
   /**
    * Serial version
@@ -87,5 +87,10 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     return super.removeAll(ids.asCollection());
+  }
+
+  @Override
+  public void sort() {
+    Collections.sort(this);
   }
 }

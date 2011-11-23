@@ -55,7 +55,7 @@ public class TestLoOP extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     // run LoOP on database
     OutlierResult result = loop.run(db);
 
-    testSingleScore(result, 945, 0.39805457858293325);
     testAUC(db, "Noise", result, 0.9443796296296296);
+    testSingleScore(result, 945, 0.39805457858293325);
   }
 }

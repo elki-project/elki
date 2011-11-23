@@ -55,7 +55,7 @@ public class TestLDOF extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     // run LDOF on database
     OutlierResult result = ldof.run(db);
 
-    testSingleScore(result, 1025, 0.8976268846182947);
     testAUC(db, "Noise", result, 0.9637948717948718);
+    testSingleScore(result, 1025, 0.8976268846182947);
   }
 }

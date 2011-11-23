@@ -1,4 +1,6 @@
-package de.lmu.ifi.dbs.elki.database.ids;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
+
+import gnu.trove.strategy.HashingStrategy;
 
 /*
  This file is part of ELKI:
@@ -23,13 +25,36 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.NavigableSet;
-
 /**
- * Set-oriented implementation of a modifiable DBID collection.
+ * Hashing strategy for GNU Trove using Java interfaces
  * 
  * @author Erich Schubert
  */
-public interface TreeSetModifiableDBIDs extends ModifiableDBIDs, TreeSetDBIDs, NavigableSet<DBID> {
-  // empty
+public class TroveJavaHashingStrategy implements HashingStrategy<Object> {
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 1197595436947438715L;
+  
+  /**
+   * Static instance
+   */
+  public static final TroveJavaHashingStrategy STATIC = new TroveJavaHashingStrategy();
+  
+  /**
+   * Constructor. Limited visibility, use the static instance.
+   */
+  TroveJavaHashingStrategy() {
+    // Nothing to do here
+  }
+
+  @Override
+  public int computeHashCode(Object object) {
+    return object.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o1, Object o2) {
+    return o1.equals(o2);
+  }
 }
