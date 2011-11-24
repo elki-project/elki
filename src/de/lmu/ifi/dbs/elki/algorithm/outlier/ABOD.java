@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -59,6 +58,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Angle-Based Outlier Detection
@@ -180,7 +180,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     Collections.sort(staticids);
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
-    PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(relation.size(), Collections.reverseOrder());
+    Heap<DoubleObjPair<DBID>> pq = new Heap<DoubleObjPair<DBID>>(relation.size(), Collections.reverseOrder());
 
     // preprocess kNN neighborhoods
     assert (k == this.k);
@@ -214,14 +214,14 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
       // Sample variance probably would be correct, however the numerical
       // instabilities can actually break ABOD here.
-      pq.add(new FCPair<Double, DBID>(s.getNaiveVariance(), objKey));
+      pq.add(new DoubleObjPair<DBID>(s.getNaiveVariance(), objKey));
     }
 
     DoubleMinMax minmaxabod = new DoubleMinMax();
-    WritableDataStore<Double> abodvalues = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(FCPair<Double, DBID> pair : pq) {
-      abodvalues.put(pair.getSecond(), pair.getFirst());
-      minmaxabod.put(pair.getFirst());
+    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    for(DoubleObjPair<DBID> pair : pq) {
+      abodvalues.putDouble(pair.getSecond(), pair.first);
+      minmaxabod.put(pair.first);
     }
     // Build result representation.
     Relation<Double> scoreResult = new MaterializedRelation<Double>("Angle-based Outlier Degree", "abod-outlier", TypeUtil.DOUBLE, abodvalues, relation.getDBIDs());
@@ -244,12 +244,12 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
 
-    PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(relation.size(), Collections.reverseOrder());
+    Heap<DoubleObjPair<DBID>> pq = new Heap<DoubleObjPair<DBID>>(relation.size(), Collections.reverseOrder());
     // get Candidate Ranking
     for(DBID aKey : relation.iterDBIDs()) {
       HashMap<DBID, Double> dists = new HashMap<DBID, Double>(relation.size());
       // determine kNearestNeighbors and pairwise distances
-      PriorityQueue<FCPair<Double, DBID>> nn;
+      Heap<DoubleObjPair<DBID>> nn;
       if(!useRNDSample) {
         nn = calcDistsandNN(relation, kernelMatrix, sampleSize, aKey, dists);
       }
@@ -269,15 +269,15 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
       // getFilter
       double var = getAbofFilter(kernelMatrix, aKey, dists, counter[1], counter[0], neighbors);
-      pq.add(new FCPair<Double, DBID>(var, aKey));
+      pq.add(new DoubleObjPair<DBID>(var, aKey));
       // System.out.println("prog "+(prog++));
     }
     // refine Candidates
-    PriorityQueue<FCPair<Double, DBID>> resqueue = new PriorityQueue<FCPair<Double, DBID>>(k);
+    Heap<DoubleObjPair<DBID>> resqueue = new Heap<DoubleObjPair<DBID>>(k);
     // System.out.println(pq.size() + " objects ordered into candidate list.");
     // int v = 0;
     while(!pq.isEmpty()) {
-      if(resqueue.size() == k && pq.peek().getFirst() > resqueue.peek().getFirst()) {
+      if(resqueue.size() == k && pq.peek().first > resqueue.peek().first) {
         break;
       }
       // double approx = pq.peek().getFirst();
@@ -313,22 +313,22 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       double var = s.getSampleVariance();
       // System.out.println(aKey+ " : " + approx +" " + var);
       if(resqueue.size() < k) {
-        resqueue.add(new FCPair<Double, DBID>(var, aKey));
+        resqueue.add(new DoubleObjPair<DBID>(var, aKey));
       }
       else {
-        if(resqueue.peek().getFirst() > var) {
+        if(resqueue.peek().first > var) {
           resqueue.remove();
-          resqueue.add(new FCPair<Double, DBID>(var, aKey));
+          resqueue.add(new DoubleObjPair<DBID>(var, aKey));
         }
       }
 
     }
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
     DoubleMinMax minmaxabod = new DoubleMinMax();
-    WritableDataStore<Double> abodvalues = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
-    for(FCPair<Double, DBID> pair : pq) {
-      abodvalues.put(pair.getSecond(), pair.getFirst());
-      minmaxabod.put(pair.getFirst());
+    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    for(DoubleObjPair<DBID> pair : pq) {
+      abodvalues.putDouble(pair.getSecond(), pair.first);
+      minmaxabod.put(pair.first);
     }
     // Build result representation.
     Relation<Double> scoreResult = new MaterializedRelation<Double>("Angle-based Outlier Detection", "abod-outlier", TypeUtil.DOUBLE, abodvalues, relation.getDBIDs());
@@ -432,33 +432,33 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return (kernelMatrix.getDistance(ai, ai) + kernelMatrix.getDistance(bi, ci) - kernelMatrix.getDistance(ai, ci) - kernelMatrix.getDistance(ai, bi));
   }
 
-  private PriorityQueue<FCPair<Double, DBID>> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
-    PriorityQueue<FCPair<Double, DBID>> nn = new PriorityQueue<FCPair<Double, DBID>>(sampleSize);
+  private Heap<DoubleObjPair<DBID>> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
+    Heap<DoubleObjPair<DBID>> nn = new Heap<DoubleObjPair<DBID>>(sampleSize);
     for(DBID bKey : data.iterDBIDs()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(nn.size() < sampleSize) {
-        nn.add(new FCPair<Double, DBID>(val, bKey));
+        nn.add(new DoubleObjPair<DBID>(val, bKey));
       }
       else {
-        if(val < nn.peek().getFirst()) {
+        if(val < nn.peek().first) {
           nn.remove();
-          nn.add(new FCPair<Double, DBID>(val, bKey));
+          nn.add(new DoubleObjPair<DBID>(val, bKey));
         }
       }
     }
     return nn;
   }
 
-  private PriorityQueue<FCPair<Double, DBID>> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
-    PriorityQueue<FCPair<Double, DBID>> nn = new PriorityQueue<FCPair<Double, DBID>>(sampleSize);
+  private Heap<DoubleObjPair<DBID>> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
+    Heap<DoubleObjPair<DBID>> nn = new Heap<DoubleObjPair<DBID>>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
     for(DBID bKey : data.iterDBIDs()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(counter % step == 0) {
-        nn.add(new FCPair<Double, DBID>(val, bKey));
+        nn.add(new DoubleObjPair<DBID>(val, bKey));
       }
       counter++;
     }
@@ -474,13 +474,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   public void getExplanations(Relation<V> data) {
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, data, staticids);
     // PQ for Outlier Ranking
-    PriorityQueue<FCPair<Double, DBID>> pq = new PriorityQueue<FCPair<Double, DBID>>(data.size(), Collections.reverseOrder());
+    Heap<DoubleObjPair<DBID>> pq = new Heap<DoubleObjPair<DBID>>(data.size(), Collections.reverseOrder());
     HashMap<DBID, LinkedList<DBID>> explaintab = new HashMap<DBID, LinkedList<DBID>>();
     // test all objects
     for(DBID objKey : data.iterDBIDs()) {
       MeanVariance s = new MeanVariance();
       // Queue for the best explanation
-      PriorityQueue<FCPair<Double, DBID>> explain = new PriorityQueue<FCPair<Double, DBID>>();
+      Heap<DoubleObjPair<DBID>> explain = new Heap<DoubleObjPair<DBID>>();
       // determine Object
       // for each pair of other objects
       Iterator<DBID> iter = data.iterDBIDs();
@@ -504,11 +504,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
             s2.put(tmp, 1 / sqr);
           }
         }
-        explain.add(new FCPair<Double, DBID>(s2.getSampleVariance(), key1));
+        explain.add(new DoubleObjPair<DBID>(s2.getSampleVariance(), key1));
         s.put(s2);
       }
       // build variance of the observed vectors
-      pq.add(new FCPair<Double, DBID>(s.getSampleVariance(), objKey));
+      pq.add(new DoubleObjPair<DBID>(s.getSampleVariance(), objKey));
       //
       LinkedList<DBID> expList = new LinkedList<DBID>();
       expList.add(explain.remove().getSecond());
@@ -539,7 +539,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       if(count > 10) {
         break;
       }
-      double factor = pq.peek().getFirst();
+      double factor = pq.peek().first;
       DBID key = pq.remove().getSecond();
       System.out.print(data.get(key) + " ");
       System.out.println(count + " Factor=" + factor + " " + key);

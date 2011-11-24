@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -159,7 +159,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       }
     }
 
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
     if(breadth) {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
@@ -185,8 +185,8 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
           if(iter.hasNext()) {
             DBID tmpID = iter.next();
             double score = pair.second.get(tmpID);
-            if(scores.get(tmpID) == null) {
-              scores.put(tmpID, score);
+            if(Double.isNaN(scores.doubleValue(tmpID))) {
+              scores.putDouble(tmpID, score);
               minmax.put(score);
             }
           }
@@ -208,9 +208,12 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       for(DBID id : relation.iterDBIDs()) {
         double sum = 0.0;
         for(OutlierResult r : results) {
-          sum += r.getScores().get(id);
+          final Double s = r.getScores().get(id);
+          if (s != null && s != Double.NaN) {
+            sum += s;
+          }
         }
-        scores.put(id, sum);
+        scores.putDouble(id, sum);
         minmax.put(sum);
         if(cprog != null) {
           cprog.incrementProcessed(logger);

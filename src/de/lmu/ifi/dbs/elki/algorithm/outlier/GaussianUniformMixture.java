@@ -30,19 +30,19 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -137,7 +137,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     // Positive masked collection
     DBIDs anomalousObjs = new MaskedDBIDs(objids, bits, false);
     // resulting scores
-    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDoubleDataStore oscores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // compute loglikelihood
     double logLike = relation.size() * logml + loglikelihoodNormal(normalObjs, relation);
     // logger.debugFine("normalsize   " + normalObjs.size() + " anormalsize  " +
@@ -159,7 +159,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
       // if the loglike increases more than a threshold, object stays in
       // anomalous set and is flagged as outlier
       final double loglikeGain = currentLogLike - logLike;
-      oscores.put(curid, loglikeGain);
+      oscores.putDouble(curid, loglikeGain);
       minmax.put(loglikeGain);
 
       if(loglikeGain > c) {

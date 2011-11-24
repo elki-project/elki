@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -202,7 +203,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     E = null;
     // compute the relevance scores between specified Object and its neighbors
     DoubleMinMax minmax = new DoubleMinMax();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(spatial.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
       double gmean = 1.0;
@@ -217,7 +218,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
       }
       final double score = Math.pow(gmean, 1.0 / cnt);
       minmax.put(score);
-      scores.put(id, score);
+      scores.putDouble(id, score);
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("randomwalkec", "RandomWalkEC", TypeUtil.DOUBLE, scores, relation.getDBIDs());

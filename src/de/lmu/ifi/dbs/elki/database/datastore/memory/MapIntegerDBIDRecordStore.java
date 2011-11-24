@@ -69,6 +69,16 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
     this(rlen, new TIntObjectHashMap<Object[]>());
   }
 
+  /**
+   * Constructor without existing data.
+   * 
+   * @param size Expected size
+   * @param rlen Number of columns (record length)
+   */
+  public MapIntegerDBIDRecordStore(int size, int rlen) {
+    this(rlen, new TIntObjectHashMap<Object[]>(size));
+  }
+
   @Override
   public <T> WritableDataStore<T> getStorage(int col, Class<? super T> datatype) {
     // TODO: add type checking?

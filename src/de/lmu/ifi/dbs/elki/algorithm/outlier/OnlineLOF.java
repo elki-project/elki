@@ -26,7 +26,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -268,12 +268,12 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
-      WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
+      WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
       for(DBID id : affected_lrd_id_candidates) {
-        Double new_lrd = new_lrds.get(id);
-        Double old_lrd = lofResult.getLrds().get(id);
-        if(old_lrd == null || !old_lrd.equals(new_lrd)) {
-          lofResult.getLrds().put(id, new_lrd);
+        double new_lrd = new_lrds.doubleValue(id);
+        double old_lrd = lofResult.getLrds().doubleValue(id);
+        if(Double.isNaN(old_lrd) || old_lrd != new_lrd) {
+          lofResult.getLrds().putDouble(id, new_lrd);
           affected_lrd_ids.add(id);
         }
       }
@@ -327,12 +327,12 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
-      WritableDataStore<Double> new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
+      WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
       for(DBID id : affected_lrd_id_candidates) {
-        Double new_lrd = new_lrds.get(id);
-        Double old_lrd = lofResult.getLrds().get(id);
-        if(!old_lrd.equals(new_lrd)) {
-          lofResult.getLrds().put(id, new_lrd);
+        double new_lrd = new_lrds.doubleValue(id);
+        double old_lrd = lofResult.getLrds().doubleValue(id);
+        if(old_lrd != new_lrd) {
+          lofResult.getLrds().putDouble(id, new_lrd);
           affected_lrd_ids.add(id);
         }
       }
@@ -384,10 +384,10 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
      * @param lofResult the result of the former LOF run
      */
     private void recomputeLOFs(DBIDs ids, LOFResult<O, D> lofResult) {
-      Pair<WritableDataStore<Double>, DoubleMinMax> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getKNNRefer());
-      WritableDataStore<Double> new_lofs = lofsAndMax.getFirst();
+      Pair<WritableDoubleDataStore, DoubleMinMax> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getKNNRefer());
+      WritableDoubleDataStore new_lofs = lofsAndMax.getFirst();
       for(DBID id : ids) {
-        lofResult.getLofs().put(id, new_lofs.get(id));
+        lofResult.getLofs().putDouble(id, new_lofs.doubleValue(id));
       }
       // track the maximum value for normalization.
       DoubleMinMax new_lofminmax = lofsAndMax.getSecond();

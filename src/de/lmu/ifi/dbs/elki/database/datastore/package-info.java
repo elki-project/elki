@@ -14,7 +14,7 @@
  * <h2>How to use:</h2>
  * <pre>{@code
  * // Storage for the outlier score of each ID. 
- * final WritableDataStore<Double> scores = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
+ * final WritableDoubleDataStore scores = DataStoreFactory.FACTORY.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
  * }</pre>
  * 
  * @apiviz.exclude datastore.memory

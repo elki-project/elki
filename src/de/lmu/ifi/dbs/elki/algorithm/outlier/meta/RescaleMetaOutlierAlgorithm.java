@@ -33,12 +33,12 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -102,13 +102,13 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
       ((OutlierScalingFunction) scaling).prepare(or);
     }
 
-    WritableDataStore<Double> scaledscores = DataStoreUtil.makeStorage(scores.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scaledscores = DataStoreUtil.makeDoubleStorage(scores.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
 
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : scores.iterDBIDs()) {
       double val = scores.get(id);
       val = scaling.getScaled(val);
-      scaledscores.put(id, val);
+      scaledscores.putDouble(id, val);
       minmax.put(val);
     }
 

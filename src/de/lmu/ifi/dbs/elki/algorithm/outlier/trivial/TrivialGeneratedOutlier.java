@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -123,7 +123,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
    * @return Outlier result
    */
   public OutlierResult run(Relation<Model> models, Relation<NumberVector<?, ?>> vecs, Relation<?> labels) {
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(models.getDBIDs(), DataStoreFactory.HINT_HOT, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(models.getDBIDs(), DataStoreFactory.HINT_HOT);
 
     // Adjustment constant
     final double minscore = expect / (expect + 1);
@@ -170,7 +170,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       score = expect / (expect + score);
       // adjust to 0 to 1 range:
       score = (score - minscore) / (1 - minscore);
-      scores.put(id, score);
+      scores.putDouble(id, score);
     }
     Relation<Double> scoreres = new MaterializedRelation<Double>("Model outlier scores", "model-outlier", TypeUtil.DOUBLE, scores, models.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0., 1.);

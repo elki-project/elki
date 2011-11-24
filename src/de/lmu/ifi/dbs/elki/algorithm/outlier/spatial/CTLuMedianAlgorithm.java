@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -91,7 +91,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     MeanVariance mv = new MeanVariance();
     for(DBID id : relation.iterDBIDs()) {
@@ -118,7 +118,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
         }
       }
       double h = relation.get(id).doubleValue(1) - median;
-      scores.put(id, h);
+      scores.putDouble(id, h);
       mv.put(h);
     }
 
@@ -129,7 +129,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     for(DBID id : relation.iterDBIDs()) {
       double score = Math.abs((scores.get(id) - mean) / stddev);
       minmax.put(score);
-      scores.put(id, score);
+      scores.putDouble(id, score);
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("MO", "Median-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());

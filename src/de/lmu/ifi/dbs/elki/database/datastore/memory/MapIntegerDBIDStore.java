@@ -60,6 +60,15 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
     this.data = new TIntObjectHashMap<T>();
   }
 
+  /**
+   * Constructor.
+   *
+   * @param size Expected size
+   */
+  public MapIntegerDBIDStore(int size) {
+    this.data = new TIntObjectHashMap<T>(size);
+  }
+
   @Override
   public T get(DBID id) {
     return data.get(id.getIntegerID());

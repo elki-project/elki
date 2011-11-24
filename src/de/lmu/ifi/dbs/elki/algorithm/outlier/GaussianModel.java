@@ -28,8 +28,9 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -37,7 +38,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -95,7 +95,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
   public OutlierResult run(Relation<V> relation) throws IllegalStateException {
     DoubleMinMax mm = new DoubleMinMax();
     // resulting scores
-    WritableDataStore<Double> oscores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDoubleDataStore oscores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
 
     // Compute mean and covariance Matrix
     CovarianceMatrix temp = CovarianceMatrix.make(relation);
@@ -117,14 +117,14 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
       final double prob = fakt * Math.exp(-mDist / 2.0);
 
       mm.put(prob);
-      oscores.put(id, prob);
+      oscores.putDouble(id, prob);
     }
 
     final OutlierScoreMeta meta;
     if(invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
       for(DBID id : relation.iterDBIDs()) {
-        oscores.put(id, (max - oscores.get(id)) / max);
+        oscores.putDouble(id, (max - oscores.doubleValue(id)) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);
     }

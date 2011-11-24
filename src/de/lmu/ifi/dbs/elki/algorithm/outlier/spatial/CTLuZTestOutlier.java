@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -99,7 +99,7 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     MeanVariance zmv = new MeanVariance();
     for(DBID id : relation.iterDBIDs()) {
@@ -121,7 +121,7 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       else {
         localdiff = 0.0;
       }
-      scores.put(id, localdiff);
+      scores.putDouble(id, localdiff);
       zmv.put(localdiff);
     }
 
@@ -130,7 +130,7 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     for(DBID id : relation.iterDBIDs()) {
       double score = Math.abs(scores.get(id) - zmv.getMean()) / zmv.getSampleStddev();
       minmax.put(score);
-      scores.put(id, score);
+      scores.putDouble(id, score);
     }
 
     // Wrap result

@@ -28,16 +28,16 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -103,8 +103,8 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
     DistanceQuery<O, D> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
 
-    WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
-    WritableDataStore<Double> lofs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
+    WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     // Compute densities
@@ -118,7 +118,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       if (Double.isNaN(lrd)) {
         lrd = 0;
       }
-      lrds.put(id, lrd);
+      lrds.putDouble(id, lrd);
     }
 
     // Compute density quotients
@@ -130,10 +130,10 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       }
       final double lrd = (avg / neighbors.size()) / lrds.get(id);
       if (!Double.isNaN(lrd)) {
-        lofs.put(id, lrd);
+        lofs.putDouble(id, lrd);
         lofminmax.put(lrd);
       } else {
-        lofs.put(id, 0.0);
+        lofs.putDouble(id, 0.0);
       }
     }
 

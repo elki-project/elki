@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -97,7 +97,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
-    WritableDataStore<Double> means = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDoubleDataStore means = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP);
 
     // Calculate average of neighborhood for each object and perform a linear
     // regression using the covariance matrix
@@ -122,7 +122,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
         m = local;
       }
       // Store the mean for the score calculation
-      means.put(id, m);
+      means.putDouble(id, m);
       covm.put(new double[] { local, m });
     }
     // Finalize covariance matrix, compute linear regression
@@ -137,13 +137,13 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     }
 
     // calculate mean and variance for error
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     MeanVariance mv = new MeanVariance();
     for(DBID id : relation.iterDBIDs()) {
       // Compute the error from the linear regression
       double y_i = relation.get(id).doubleValue(1);
       double e = means.get(id) - (slope * y_i + inter);
-      scores.put(id, e);
+      scores.putDouble(id, e);
       mv.put(e);
     }
 
@@ -155,7 +155,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       for(DBID id : relation.iterDBIDs()) {
         double score = Math.abs((scores.get(id) - mean) / variance);
         minmax.put(score);
-        scores.put(id, score);
+        scores.putDouble(id, score);
       }
     }
     // build representation

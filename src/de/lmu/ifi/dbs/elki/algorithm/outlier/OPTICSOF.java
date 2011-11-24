@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -114,7 +115,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
 
     // FIXME: implicit preprocessor.
     WritableDataStore<KNNResult<D>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, KNNResult.class);
-    WritableDataStore<Double> coreDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDoubleDataStore coreDistance = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     WritableDataStore<Integer> minPtsNeighborhoodSize = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Integer.class);
 
     // Pass 1
@@ -124,19 +125,19 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
       KNNResult<D> minptsNeighbours = knnQuery.getKNNForDBID(id, minpts);
       D d = minptsNeighbours.getKNNDistance();
       nMinPts.put(id, minptsNeighbours);
-      coreDistance.put(id, d.doubleValue());
+      coreDistance.putDouble(id, d.doubleValue());
       minPtsNeighborhoodSize.put(id, rangeQuery.getRangeForDBID(id, d).size());
     }
 
     // Pass 2
     WritableDataStore<List<Double>> reachDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
-    WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     for(DBID id : relation.iterDBIDs()) {
       List<Double> core = new ArrayList<Double>();
       double lrd = 0;
       for(DistanceResultPair<D> neighPair : nMinPts.get(id)) {
         DBID idN = neighPair.getDBID();
-        double coreDist = coreDistance.get(idN);
+        double coreDist = coreDistance.doubleValue(idN);
         double dist = distQuery.distance(id, idN).doubleValue();
         Double rd = Math.max(coreDist, dist);
         lrd = rd + lrd;
@@ -144,22 +145,22 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
       }
       lrd = (minPtsNeighborhoodSize.get(id) / lrd);
       reachDistance.put(id, core);
-      lrds.put(id, lrd);
+      lrds.putDouble(id, lrd);
     }
 
     // Pass 3
     DoubleMinMax ofminmax = new DoubleMinMax();
-    WritableDataStore<Double> ofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore ofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     for(DBID id : relation.iterDBIDs()) {
       double of = 0;
       for(DistanceResultPair<D> pair : nMinPts.get(id)) {
         DBID idN = pair.getDBID();
-        double lrd = lrds.get(id);
-        double lrdN = lrds.get(idN);
+        double lrd = lrds.doubleValue(id);
+        double lrdN = lrds.doubleValue(idN);
         of = of + lrdN / lrd;
       }
       of = of / minPtsNeighborhoodSize.get(id);
-      ofs.put(id, of);
+      ofs.putDouble(id, of);
       // update minimum and maximum
       ofminmax.put(of);
     }
