@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -225,7 +225,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     }
 
     // Probabilistic distances
-    WritableDataStore<Double> pdists = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDoubleDataStore pdists = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     {// computing PRDs
       if(stepprog != null) {
         stepprog.beginStep(3, "Computing pdists", logger);
@@ -246,15 +246,15 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
             }
           }
         }
-        Double pdist = lambda * Math.sqrt(sqsum / ks);
-        pdists.put(id, pdist);
+        double pdist = lambda * Math.sqrt(sqsum / ks);
+        pdists.putDouble(id, pdist);
         if(prdsProgress != null) {
           prdsProgress.incrementProcessed(logger);
         }
       }
     }
     // Compute PLOF values.
-    WritableDataStore<Double> plofs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDoubleDataStore plofs = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     MeanVariance mvplof = new MeanVariance();
     {// compute LOOP_SCORE of each db object
       if(stepprog != null) {
@@ -269,18 +269,18 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         int ks = 0;
         for(DistanceResultPair<D> neighbor1 : neighbors) {
           if(objectIsInKNN || !neighbor1.getDBID().equals(id)) {
-            mv.put(pdists.get(neighbor1.getDBID()));
+            mv.put(pdists.doubleValue(neighbor1.getDBID()));
             ks++;
             if(ks >= kcomp) {
               break;
             }
           }
         }
-        double plof = Math.max(pdists.get(id) / mv.getMean(), 1.0);
+        double plof = Math.max(pdists.doubleValue(id) / mv.getMean(), 1.0);
         if(Double.isNaN(plof) || Double.isInfinite(plof)) {
           plof = 1.0;
         }
-        plofs.put(id, plof);
+        plofs.putDouble(id, plof);
         mvplof.put((plof - 1.0) * (plof - 1.0));
 
         if(progressPLOFs != null) {
@@ -295,7 +295,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     }
 
     // Compute final LoOP values.
-    WritableDataStore<Double> loops = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore loops = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     {// compute LOOP_SCORE of each db object
       if(stepprog != null) {
         stepprog.beginStep(5, "Computing LoOP scores", logger);
@@ -303,7 +303,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
 
       FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), logger) : null;
       for(DBID id : relation.iterDBIDs()) {
-        loops.put(id, NormalDistribution.erf((plofs.get(id) - 1) / (nplof * sqrt2)));
+        loops.putDouble(id, NormalDistribution.erf((plofs.doubleValue(id) - 1) / (nplof * sqrt2)));
 
         if(progressLOOPs != null) {
           progressLOOPs.incrementProcessed(logger);

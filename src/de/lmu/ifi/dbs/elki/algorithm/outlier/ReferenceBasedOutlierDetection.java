@@ -36,18 +36,18 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -147,7 +147,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
 
     DBIDs ids = relation.getDBIDs();
     // storage of distance/score values.
-    WritableDataStore<Double> rbod_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDoubleDataStore rbod_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_HOT);
 
     // Compute density estimation:
     {
@@ -164,7 +164,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
       for(int l = 0; l < firstReferenceDists.size(); l++) {
         double density = computeDensity(firstReferenceDists, l);
         // Initial value
-        rbod_score.put(firstReferenceDists.get(l).getDBID(), density);
+        rbod_score.putDouble(firstReferenceDists.get(l).getDBID(), density);
       }
       // compute density values for all remaining reference points
       while(iter.hasNext()) {
@@ -174,8 +174,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
         for(int l = 0; l < referenceDists.size(); l++) {
           double density = computeDensity(referenceDists, l);
           // Update minimum
-          if(density < rbod_score.get(referenceDists.get(l).getDBID())) {
-            rbod_score.put(referenceDists.get(l).getDBID(), density);
+          if(density < rbod_score.doubleValue(referenceDists.get(l).getDBID())) {
+            rbod_score.putDouble(referenceDists.get(l).getDBID(), density);
           }
         }
       }
@@ -183,15 +183,15 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     // compute maximum density
     double maxDensity = 0.0;
     for(DBID id : relation.iterDBIDs()) {
-      double dens = rbod_score.get(id);
+      double dens = rbod_score.doubleValue(id);
       if(dens > maxDensity) {
         maxDensity = dens;
       }
     }
     // compute ROS
     for(DBID id : relation.iterDBIDs()) {
-      double score = 1 - (rbod_score.get(id) / maxDensity);
-      rbod_score.put(id, score);
+      double score = 1 - (rbod_score.doubleValue(id) / maxDensity);
+      rbod_score.putDouble(id, score);
     }
 
     // adds reference points to the result. header information for the

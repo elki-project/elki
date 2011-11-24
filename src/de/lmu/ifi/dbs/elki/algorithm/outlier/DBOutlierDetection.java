@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -107,7 +107,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     // maximum number of objects in the D-neighborhood of an outlier
     int m = (int) ((distFunc.getRelation().size()) * (1 - p));
 
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
     if(logger.isVerbose()) {
       logger.verbose("computing outlier flag");
     }
@@ -125,11 +125,11 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
         }
         if(knns.get(Math.min(m, knns.size()) - 1).getDistance().compareTo(neighborhoodSize) <= 0) {
           // flag as outlier
-          scores.put(id, 1.0);
+          scores.putDouble(id, 1.0);
         }
         else {
           // flag as no outlier
-          scores.put(id, 0.0);
+          scores.putDouble(id, 0.0);
         }
       }
       if(progressOFlags != null) {
@@ -153,11 +153,11 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
 
         if(count < m) {
           // flag as outlier
-          scores.put(id, 1.0);
+          scores.putDouble(id, 1.0);
         }
         else {
           // flag as no outlier
-          scores.put(id, 0.0);
+          scores.putDouble(id, 0.0);
         }
       }
 

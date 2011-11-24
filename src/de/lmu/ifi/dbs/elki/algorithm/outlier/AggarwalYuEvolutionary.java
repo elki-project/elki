@@ -35,13 +35,13 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -147,23 +147,23 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
 
     Collection<Individuum> individuums = (new EvolutionarySearch(relation, ranges, m, seed)).run();
 
-    WritableDataStore<Double> outlierScore = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore outlierScore = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     for(Individuum ind : individuums) {
       DBIDs ids = computeSubspaceForGene(ind.getGene(), ranges);
       double sparsityC = sparsity(ids.size(), dbsize, k);
       for(DBID id : ids) {
-        Double prev = outlierScore.get(id);
-        if(prev == null || sparsityC < prev) {
-          outlierScore.put(id, sparsityC);
+        double prev = outlierScore.doubleValue(id);
+        if(Double.isNaN(prev) || sparsityC < prev) {
+          outlierScore.putDouble(id, sparsityC);
         }
       }
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
-      Double val = outlierScore.get(id);
-      if(val == null) {
-        outlierScore.put(id, 0.0);
+      double val = outlierScore.doubleValue(id);
+      if(Double.isNaN(val)) {
+        outlierScore.putDouble(id, 0.0);
         val = 0.0;
       }
       minmax.put(val);

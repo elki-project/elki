@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -103,7 +103,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     // calculate normalized attribute values
     // calculate neighborhood average of normalized attribute values.
@@ -132,7 +132,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
       // Note: in the original moran scatterplot, any object with a score < 0 would be an outlier.
       final double score = Math.max(-globalZ * localZ, 0);
       minmax.put(score);
-      scores.put(id, score);
+      scores.putDouble(id, score);
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("MoranOutlier", "Moran Scatterplot Outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());

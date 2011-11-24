@@ -55,14 +55,14 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
       return new ArrayStore<T>(data, new RangeIDMap(range));
     }
     else {
-      return new MapIntegerDBIDStore<T>();
+      return new MapIntegerDBIDStore<T>(ids.size());
     }
   }
 
   @Override
   public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints) {
     // TODO: add range-double-store.
-    return new MapIntegerDBIDDoubleStore();
+    return new MapIntegerDBIDDoubleStore(ids.size());
   }
 
   @Override
@@ -73,7 +73,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
       return new ArrayRecordStore(data, new RangeIDMap(range));
     }
     else {
-      return new MapIntegerDBIDRecordStore(dataclasses.length);
+      return new MapIntegerDBIDRecordStore(ids.size(), dataclasses.length);
     }
   }
 }

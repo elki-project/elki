@@ -29,13 +29,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -140,7 +140,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       }
     }
 
-    WritableDataStore<Double> sparsity = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore sparsity = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     // calculate the sparsity coefficient
     for(Vector<IntIntPair> sub : Rk) {
       DBIDs ids = computeSubspace(sub, ranges);
@@ -148,18 +148,18 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
 
       if(sparsityC < 0) {
         for(DBID id : ids) {
-          Double prev = sparsity.get(id);
-          if(prev == null || sparsityC < prev) {
-            sparsity.put(id, sparsityC);
+          double prev = sparsity.doubleValue(id);
+          if(Double.isNaN(prev) || sparsityC < prev) {
+            sparsity.putDouble(id, sparsityC);
           }
         }
       }
     }
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
-      Double val = sparsity.get(id);
-      if(val == null) {
-        sparsity.put(id, 0.0);
+      double val = sparsity.doubleValue(id);
+      if(Double.isNaN(val)) {
+        sparsity.putDouble(id, 0.0);
         val = 0.0;
       }
       minmax.put(val);

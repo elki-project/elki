@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -117,7 +117,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     // track the maximum value for normalization
     DoubleMinMax ldofminmax = new DoubleMinMax();
     // compute the ldof values
-    WritableDataStore<Double> ldofs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDoubleDataStore ldofs = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
 
     // compute LOF_SCORE of each db object
     if(logger.isVerbose()) {
@@ -147,7 +147,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       if(ldof.isNaN() || ldof.isInfinite()) {
         ldof = 1.0;
       }
-      ldofs.put(id, ldof);
+      ldofs.putDouble(id, ldof);
       // update maximum
       ldofminmax.put(ldof);
 

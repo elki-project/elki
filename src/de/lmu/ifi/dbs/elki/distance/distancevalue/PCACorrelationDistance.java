@@ -147,6 +147,6 @@ public class PCACorrelationDistance extends CorrelationDistance<PCACorrelationDi
 
   @Override
   public boolean isUndefinedDistance() {
-    return correlationValue == -1 && euclideanValue == Double.NaN;
+    return correlationValue == -1 && Double.isNaN(euclideanValue);
   }
 }

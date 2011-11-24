@@ -31,6 +31,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @author Erich Schubert
  */
 public interface DoubleDataStore extends DataStore<Double> {
+  @Deprecated
+  public Double get(DBID id);
+
   /**
    * Retrieves an object from the storage.
    * 

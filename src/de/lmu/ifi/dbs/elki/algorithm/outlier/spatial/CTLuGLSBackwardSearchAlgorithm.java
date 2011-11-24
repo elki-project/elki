@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -123,7 +123,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
    * @return Algorithm result
    */
   public OutlierResult run(Relation<V> relationx, Relation<? extends NumberVector<?, ?>> relationy) {
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relationx.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relationx.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax mm = new DoubleMinMax(0.0, 0.0);
 
     // Outlier detection loop
@@ -138,7 +138,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
         if(candidate.second < phialpha) {
           break;
         }
-        scores.put(candidate.first, candidate.second);
+        scores.putDouble(candidate.first, candidate.second);
         if (!Double.isNaN(candidate.second)) {
           mm.put(candidate.second);
         }
@@ -147,7 +147,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
 
       // Remaining objects are inliers
       for(DBID id : idview) {
-        scores.put(id, 0.0);
+        scores.putDouble(id, 0.0);
       }
     }
 

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -111,7 +111,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
    * @return Result
    */
   public OutlierResult run(Relation<?> relation) {
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT);
     for(DBID id : relation.iterDBIDs()) {
       String label = relation.get(id).toString();
       final double score;
@@ -120,7 +120,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
       } else {
         score = 0.0;
       }
-      scores.put(id, score);
+      scores.putDouble(id, score);
     }
     Relation<Double> scoreres = new MaterializedRelation<Double>("By label outlier scores", "label-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();

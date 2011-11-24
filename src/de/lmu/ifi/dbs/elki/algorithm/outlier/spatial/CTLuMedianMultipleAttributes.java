@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -141,14 +142,14 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
     Matrix cmati = covmaker.destroyToSampleMatrix().inverse();
 
     DoubleMinMax minmax = new DoubleMinMax();
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBID id : attributes.iterDBIDs()) {
       Vector temp = deltas.get(id).minus(mean);
       final Vector res = temp.transposeTimes(cmati).times(temp);
       assert (res.getDimensionality() == 1);
       double score = res.get(0);
       minmax.put(score);
-      scores.put(id, score);
+      scores.putDouble(id, score);
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("Median multiple attributes outlier", "median-outlier", TypeUtil.DOUBLE, scores, attributes.getDBIDs());

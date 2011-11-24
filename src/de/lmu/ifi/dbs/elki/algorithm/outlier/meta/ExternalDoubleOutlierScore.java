@@ -39,14 +39,14 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -140,7 +140,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
    * @return Result
    */
   public OutlierResult run(Database database, Relation<?> relation) {
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     Pattern colSep = Pattern.compile(AbstractParser.WHITESPACE_PATTERN);
     DoubleMinMax minmax = new DoubleMinMax();
@@ -156,7 +156,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
         else if(line.length() > 0) {
           String[] cols = colSep.split(line);
           Integer id = null;
-          Double score = null;
+          double score = Double.NaN;
           for(String str : cols) {
             Matcher mi = idpattern.matcher(str);
             Matcher ms = scorepattern.matcher(str);
@@ -172,17 +172,17 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
               id = Integer.parseInt(str.substring(mi.end()));
             }
             if(msf) {
-              if(score != null) {
+              if(score != Double.NaN) {
                 throw new AbortException("Score pattern matched twice: previous value " + score + " second value: " + str);
               }
               score = Double.parseDouble(str.substring(ms.end()));
             }
           }
-          if(id != null && score != null) {
-            scores.put(DBIDUtil.importInteger(id), score);
+          if(id != null && score != Double.NaN) {
+            scores.putDouble(DBIDUtil.importInteger(id), score);
             minmax.put(score);
           }
-          else if(id == null && score == null) {
+          else if(id == null && Double.isNaN(score)) {
             logger.warning("Line did not match either ID nor score nor comment: " + line);
           }
           else {
@@ -213,7 +213,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     for(DBID id : relation.iterDBIDs()) {
       double val = scoresult.get(id); // scores.get(id);
       val = scaling.getScaled(val);
-      scores.put(id, val);
+      scores.putDouble(id, val);
       mm.put(val);
     }
     meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax());

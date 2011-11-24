@@ -32,11 +32,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -89,14 +89,14 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
     Clustering<EMModel<V>> emresult = emClustering.run(database, relation);
 
     double globmax = 0.0;
-    WritableDataStore<Double> emo_score = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDoubleDataStore emo_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     for(DBID id : relation.iterDBIDs()) {
       double maxProb = Double.POSITIVE_INFINITY;
       double[] probs = emClustering.getProbClusterIGivenX(id);
       for(double prob : probs) {
         maxProb = Math.min(1 - prob, maxProb);
       }
-      emo_score.put(id, maxProb);
+      emo_score.putDouble(id, maxProb);
       globmax = Math.max(maxProb, globmax);
     }
     Relation<Double> scoreres = new MaterializedRelation<Double>("EM outlier scores", "em-outlier", TypeUtil.DOUBLE, emo_score, relation.getDBIDs());

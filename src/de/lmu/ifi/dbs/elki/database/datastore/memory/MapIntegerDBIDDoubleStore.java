@@ -14,7 +14,17 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   /**
    * Data storage
    */
-  private TIntDoubleMap map = new TIntDoubleHashMap();
+  private TIntDoubleMap map;
+  
+  /**
+   * Constructor.
+   *
+   * @param size Expected size
+   */
+  public MapIntegerDBIDDoubleStore(int size) {
+    super();
+    map = new TIntDoubleHashMap(size, 0.5f, Integer.MIN_VALUE, Double.NaN);
+  }
 
   @Override
   public Double get(DBID id) {
@@ -54,6 +64,11 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
 
   @Override
   public double putDouble(DBID id, double value) {
+    return map.put(id.getIntegerID(), value);
+  }
+
+  @Override
+  public double put(DBID id, double value) {
     return map.put(id.getIntegerID(), value);
   }
 }

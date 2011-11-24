@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -112,8 +112,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     assert (DatabaseUtil.dimensionality(relation) == 1) : "TrimmedMean can only process one-dimensional data sets.";
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
 
-    WritableDataStore<Double> errors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, Double.class);
-    WritableDataStore<Double> scores = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore errors = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP);
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing trimmed means", relation.size(), logger) : null;
     for(DBID id : relation.iterDBIDs()) {
@@ -142,7 +142,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
         tm = relation.get(id).doubleValue(1);
       }
       // Error: deviation from trimmed mean
-      errors.put(id, relation.get(id).doubleValue(1) - tm);
+      errors.putDouble(id, relation.get(id).doubleValue(1) - tm);
 
       if(progress != null) {
         progress.incrementProcessed(logger);
@@ -182,7 +182,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
       double score = Math.abs(errors.get(id)) * 0.6745 / median_dev_from_median;
-      scores.put(id, score);
+      scores.putDouble(id, score);
       minmax.put(score);
     }
     //

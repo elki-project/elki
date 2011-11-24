@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -243,14 +243,14 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     if(stepprog != null) {
       stepprog.beginStep(2, "Computing LRDs.", logger);
     }
-    WritableDataStore<Double> lrds = computeLRDs(ids, kNNReach);
+    WritableDoubleDataStore lrds = computeLRDs(ids, kNNReach);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", logger);
     }
-    Pair<WritableDataStore<Double>, DoubleMinMax> lofsAndMax = computeLOFs(ids, lrds, kNNRefer);
-    WritableDataStore<Double> lofs = lofsAndMax.getFirst();
+    Pair<WritableDoubleDataStore, DoubleMinMax> lofsAndMax = computeLOFs(ids, lrds, kNNRefer);
+    WritableDoubleDataStore lofs = lofsAndMax.getFirst();
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = lofsAndMax.getSecond();
 
@@ -274,8 +274,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    *        reachability distance
    * @return the LRDs of the objects
    */
-  protected WritableDataStore<Double> computeLRDs(DBIDs ids, KNNQuery<O, D> knnReach) {
-    WritableDataStore<Double> lrds = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+  protected WritableDoubleDataStore computeLRDs(DBIDs ids, KNNQuery<O, D> knnReach) {
+    WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
     for(DBID id : ids) {
       double sum = 0;
@@ -288,8 +288,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         }
       }
       // Avoid division by 0
-      Double lrd = (sum > 0) ? nsize / sum : 0.0;
-      lrds.put(id, lrd);
+      double lrd = (sum > 0) ? nsize / sum : 0.0;
+      lrds.putDouble(id, lrd);
       if(lrdsProgress != null) {
         lrdsProgress.incrementProcessed(logger);
       }
@@ -309,15 +309,15 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    *        reference distance
    * @return the LOFs of the objects and the maximum LOF
    */
-  protected Pair<WritableDataStore<Double>, DoubleMinMax> computeLOFs(DBIDs ids, DataStore<Double> lrds, KNNQuery<O, D> knnRefer) {
-    WritableDataStore<Double> lofs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
+  protected Pair<WritableDoubleDataStore, DoubleMinMax> computeLOFs(DBIDs ids, DataStore<Double> lrds, KNNQuery<O, D> knnRefer) {
+    WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
     for(DBID id : ids) {
       double lrdp = lrds.get(id);
-      final Double lof;
+      final double lof;
       if(lrdp > 0) {
         final KNNResult<D> neighbors = knnRefer.getKNNForDBID(id, k);
         int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
@@ -334,7 +334,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       else {
         lof = 1.0;
       }
-      lofs.put(id, lof);
+      lofs.putDouble(id, lof);
       // update minimum and maximum
       lofminmax.put(lof);
 
@@ -345,7 +345,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     if(progressLOFs != null) {
       progressLOFs.ensureCompleted(logger);
     }
-    return new Pair<WritableDataStore<Double>, DoubleMinMax>(lofs, lofminmax);
+    return new Pair<WritableDoubleDataStore, DoubleMinMax>(lofs, lofminmax);
   }
 
   @Override
@@ -398,12 +398,12 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     /**
      * The LRD values of the objects.
      */
-    private final WritableDataStore<Double> lrds;
+    private final WritableDoubleDataStore lrds;
 
     /**
      * The LOF values of the objects.
      */
-    private final WritableDataStore<Double> lofs;
+    private final WritableDoubleDataStore lofs;
 
     /**
      * Encapsulates information generated during a run of the {@link LOF}
@@ -415,7 +415,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(OutlierResult result, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, WritableDataStore<Double> lrds, WritableDataStore<Double> lofs) {
+    public LOFResult(OutlierResult result, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, WritableDoubleDataStore lrds, WritableDoubleDataStore lofs) {
       this.result = result;
       this.kNNRefer = kNNRefer;
       this.kNNReach = kNNReach;
@@ -440,14 +440,14 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     /**
      * @return the LRD values of the objects
      */
-    public WritableDataStore<Double> getLrds() {
+    public WritableDoubleDataStore getLrds() {
       return lrds;
     }
 
     /**
      * @return the LOF values of the objects
      */
-    public WritableDataStore<Double> getLofs() {
+    public WritableDoubleDataStore getLofs() {
       return lofs;
     }
 

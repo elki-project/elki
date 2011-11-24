@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -131,7 +132,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // RNNS
     WritableDataStore<ModifiableDBIDs> rnns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
     // density
-    WritableDataStore<Double> density = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.class);
+    WritableDoubleDataStore density = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // init knns and rnns
     for(DBID id : relation.iterDBIDs()) {
       knns.put(id, DBIDUtil.newArray());
@@ -151,7 +152,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
         knns.get(id).addAll(list.asDBIDs());
         processedIDs.add(id);
         s = knns.get(id);
-        density.put(id, 1 / list.get(k - 1).getDistance().doubleValue());
+        density.putDouble(id, 1 / list.get(k - 1).getDistance().doubleValue());
 
       }
       else {
@@ -162,7 +163,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
           // TODO: use exactly k neighbors?
           KNNResult<D> listQ = knnQuery.getKNNForDBID(q, k);
           knns.get(q).addAll(listQ.asDBIDs());
-          density.put(q, 1 / listQ.getKNNDistance().doubleValue());
+          density.putDouble(q, 1 / listQ.getKNNDistance().doubleValue());
           processedIDs.add(q);
         }
 
@@ -180,28 +181,28 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // Calculate INFLO for any Object
     // IF Object is pruned INFLO=1.0
     DoubleMinMax inflominmax = new DoubleMinMax();
-    WritableDataStore<Double> inflos = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore inflos = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBID id : relation.iterDBIDs()) {
       if(!pruned.contains(id)) {
         ModifiableDBIDs knn = knns.get(id);
         ModifiableDBIDs rnn = rnns.get(id);
 
-        double denP = density.get(id);
+        double denP = density.doubleValue(id);
         knn.addAll(rnn);
         double den = 0;
         for(DBID q : knn) {
-          double denQ = density.get(q);
+          double denQ = density.doubleValue(q);
           den = den + denQ;
         }
         den = den / rnn.size();
         den = den / denP;
-        inflos.put(id, den);
+        inflos.putDouble(id, den);
         // update minimum and maximum
         inflominmax.put(den);
 
       }
       if(pruned.contains(id)) {
-        inflos.put(id, 1.0);
+        inflos.putDouble(id, 1.0);
         inflominmax.put(1.0);
       }
     }

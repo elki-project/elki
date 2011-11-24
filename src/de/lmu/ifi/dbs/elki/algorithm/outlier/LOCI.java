@@ -34,11 +34,12 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -46,7 +47,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -187,9 +187,8 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
     // LOCI main step
     FiniteProgress progressLOCI = logger.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), logger) : null;
-    WritableRecordStore store = DataStoreUtil.makeRecordStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class, Double.class);
-    WritableDataStore<Double> mdef_norm = store.getStorage(0, Double.class);
-    WritableDataStore<Double> mdef_radius = store.getStorage(1, Double.class);
+    WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    WritableDoubleDataStore mdef_radius = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(DBID id : relation.iterDBIDs()) {
@@ -245,8 +244,8 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
         maxmdefnorm = 1.0;
         maxnormr = maxdist;
       }
-      mdef_norm.put(id, maxmdefnorm);
-      mdef_radius.put(id, maxnormr);
+      mdef_norm.putDouble(id, maxmdefnorm);
+      mdef_radius.putDouble(id, maxnormr);
       minmax.put(maxmdefnorm);
       if(progressLOCI != null) {
         progressLOCI.incrementProcessed(logger);

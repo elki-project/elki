@@ -29,16 +29,16 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -96,7 +96,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
     DistanceQuery<O, D> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
 
-    WritableDataStore<Double> modifiedDistance = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.class);
+    WritableDoubleDataStore modifiedDistance = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     // calculate D-Tilde
     for(DBID id : relation.iterDBIDs()) {
       double sum = 0;
@@ -114,18 +114,18 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
         maxDist = Math.max(maxDist, dist);
       }
       if(cnt > 1) {
-        modifiedDistance.put(id, ((sum - maxDist) / (cnt - 1)));
+        modifiedDistance.putDouble(id, ((sum - maxDist) / (cnt - 1)));
       }
       else {
         // Use regular distance when the d-tilde trick is undefined.
         // Note: this can be 0 when there were no neighbors.
-        modifiedDistance.put(id, maxDist);
+        modifiedDistance.putDouble(id, maxDist);
       }
     }
 
     // Second step - compute actual SLOM values
     DoubleMinMax slomminmax = new DoubleMinMax();
-    WritableDataStore<Double> sloms = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore sloms = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     for(DBID id : relation.iterDBIDs()) {
       double sum = 0;
@@ -182,7 +182,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
         // No neighbors to compare to - no score.
         slom = 0.0;
       }
-      sloms.put(id, slom);
+      sloms.putDouble(id, slom);
       slomminmax.put(slom);
     }
 
