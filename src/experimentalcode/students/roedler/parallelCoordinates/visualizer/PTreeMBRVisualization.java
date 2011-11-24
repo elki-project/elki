@@ -24,6 +24,7 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
  import java.util.ArrayList;
  import java.util.Iterator;
+import java.util.List;
 
  import org.apache.batik.util.SVGConstants;
  import org.w3c.dom.Element;
@@ -40,6 +41,11 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
  import de.lmu.ifi.dbs.elki.result.ResultUtil;
  import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
  import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
  import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -54,7 +60,7 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
  import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
  import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
  import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
- import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
+import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
  /**
   * Visualize the  of an R-Tree based index.
@@ -88,11 +94,21 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
     * visible parameter.
     */
    protected boolean visible = false;
+   
+   /**
+    * page visibility
+    */
+   protected boolean[] pagevis;
 
    /**
     * The tree we visualize
     */
    protected AbstractRStarTree<N, E> tree;
+   
+   /**
+    * disabled pagevisualization
+    */
+   protected List<Integer> list;
 
    /**
     * Constructor.
@@ -101,19 +117,38 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
     * @param fill Fill flag
     */
    @SuppressWarnings("unchecked")
-   public PTreeMBRVisualization(VisualizationTask task) {
+   public PTreeMBRVisualization(VisualizationTask task, boolean fill, boolean visible, List<Integer> list) {
      super(task);
      this.tree = AbstractRStarTree.class.cast(task.getResult());
-     incrementalRedraw();
+     this.fill = fill;
+     this.visible = visible;
      context.addDataStoreListener(this);
+     context.addContextChangeListener(this);
+     init();
+     incrementalRedraw();
+   }
+   
+   private void init(){
+     pagevis = new boolean[tree.getRootEntry().getDimensionality()];
+     for (int i = 0; i < pagevis.length; i++){
+       pagevis[i] = true;
+     }
+     if (list != null){
+       for (Integer i : list){
+         if (i < pagevis.length){
+           pagevis[i] = false;
+         }
+       }
+     }
    }
 
    @Override
    protected void redraw() {
+     if (pagevis ==  null){ init(); }
      addCSSClasses(svgp);
      if(tree != null && visible) {
        E root = tree.getRootEntry();
-       visualizeRTreeEntry(svgp, layer, proj, tree, root, 0);
+       visualizeRTreeEntry(svgp, layer, proj, tree, root, 0, 0);
      }
    }
    
@@ -175,33 +210,34 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
     * @param entry Current entry
     * @param depth Current depth
     */
-   private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth) {
-     final int dim = DatabaseUtil.dimensionality(rep);
-
-     SVGPath path = new SVGPath();
-     for (int i = 0; i < dim; i++){
-       if (proj.isVisible(i)){
-         path.drawTo(proj.getXpos(i), proj.projectDimension(i, entry.getMax(i + 1)));
+   private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth, int step) {
+     if (pagevis[step] == true){
+       final int dim = DatabaseUtil.dimensionality(rep);
+       SVGPath path = new SVGPath();
+       for (int i = 0; i < dim; i++){
+         if (proj.isVisible(i)){
+           path.drawTo(proj.getXpos(i), proj.projectDimension(i, entry.getMax(proj.getDimensionNumber(i) + 1)));
+         }
        }
-     }
-     for (int i = dim - 1; i >= 0; i--){
-       if (proj.isVisible(i)){
-         path.drawTo(proj.getXpos(i), proj.projectDimension(i, entry.getMin(i + 1)));
+       for (int i = dim - 1; i >= 0; i--){
+         if (proj.isVisible(i)){
+           path.drawTo(proj.getXpos(i), proj.projectDimension(i, entry.getMin(proj.getDimensionNumber(i) + 1)));
+         }
        }
+       path.close();
+       
+       Element intervals = path.makeElement(svgp);
+  
+       SVGUtil.addCSSClass(intervals, INDEX + depth);
+       layer.appendChild(intervals);
      }
-     path.close();
-     
-     Element intervals = path.makeElement(svgp);
-
-     SVGUtil.addCSSClass(intervals, INDEX + depth);
-     layer.appendChild(intervals);
      
      if(!entry.isLeafEntry()) {
        N node = rtree.getNode(entry);
        for(int i = 0; i < node.getNumEntries(); i++) {
          E child = node.getEntry(i);
          if(!child.isLeafEntry()) {
-           visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
+           visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1, ++step);
          }
        }
      }
@@ -209,20 +245,32 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
    @Override
    public SubMenu getMenu() {
-   SubMenu myMenu = new SubMenu(this, NAME);
-   myMenu.addCheckBoxItem("visible", "vis", false);
-   myMenu.addCheckBoxItem("fill", "fill", true);
+   SubMenu myMenu = new SubMenu(NAME, this);
+   myMenu.addCheckBoxItem("visible", "vis", visible);
+   myMenu.addCheckBoxItem("fill", "fill", fill);
+   
+   for (int i = 0; i < pagevis.length; i++){
+     myMenu.addCheckBoxItem("Pagevisible " + i, String.valueOf(i), pagevis[i]);
+   }
    
    return myMenu;
    }
 
    @Override
    public void menuPressed(String id, boolean checked) {
-     if (id == "vis") { visible = checked; }
+     if (id == "vis") { 
+       visible = checked; 
+       incrementalRedraw();
+       return; 
+       }
      if (id == "fill") { 
        fill = checked;
        removeCSSClasses(svgp);
+       incrementalRedraw();
+       return;
      }
+     int iid = Integer.parseInt(id);
+     pagevis[iid] = checked;
      incrementalRedraw();
    }
    
@@ -233,7 +281,7 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
    }
 
    public void contextChanged(ContextChangedEvent e){
-     incrementalRedraw();
+     synchronizedRedraw();
    }
    
    @Override
@@ -254,15 +302,51 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
    public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
 
      /**
-      * Constructor.
+      * Flag for half-transparent filling of pages.
+      * 
+      * <p>
+      * Key: {@code -index.fill}
+      * </p>
       */
-     public Factory() {
+     public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("parallel.index.fill", "Partially transparent filling of index pages.");
+    
+     /**
+      * Flag for visibility of index visualization
+      */
+     public static final OptionID VISIBLE_ID = OptionID.getOrCreateOptionID("parallel.index.visible", "Show index visualization.");
+     
+     public static final OptionID PAGEVIS_ID = OptionID.getOrCreateOptionID("parallel.indexpage.notvisible", "Select not visible indexpages");
+
+     /**
+      * selected cluster
+      */
+     private List<Integer> list;
+     
+     /**
+      * Fill parameter.
+      */
+     protected boolean fill = true;
+     
+     /**
+      * Visible parameter
+      */
+     protected boolean visible = false;
+
+     /**
+      * Constructor.
+      * 
+      * @param fill
+      */
+     public Factory(boolean fill, boolean visible, List<Integer> list) {
        super();
+       this.fill = fill;
+       this.visible = visible;
+       this.list = list;
      }
 
      @Override
      public Visualization makeVisualization(VisualizationTask task) {
-       return new PTreeMBRVisualization<NV, RStarTreeNode, SpatialEntry>(task);
+       return new PTreeMBRVisualization<NV, RStarTreeNode, SpatialEntry>(task, fill, visible, list);
      }
 
      @Override
@@ -278,6 +362,42 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
              baseResult.getHierarchy().add(p, task);
            }
          }
+       }
+     }
+     
+     /**
+      * Parameterization class.
+      * 
+      * @author Erich Schubert
+      * 
+      * @apiviz.exclude
+      */
+     public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+       protected boolean fill = true;
+       protected boolean visible = false;
+       protected List<Integer> p;
+
+       @Override
+       protected void makeOptions(Parameterization config) {
+         super.makeOptions(config);
+         Flag fillF = new Flag(FILL_ID);
+         fillF.setDefaultValue(true);
+         if(config.grab(fillF)) {
+           fill = fillF.getValue();
+         }
+         Flag visF = new Flag(VISIBLE_ID);
+         if(config.grab(visF)) {
+           visible = visF.getValue();
+         }
+         final IntListParameter visL = new IntListParameter(VISIBLE_ID, true);
+         if(config.grab(visL)) {
+           p = visL.getValue();
+         }
+       }
+
+       @Override
+       protected Factory<NV> makeInstance() {
+         return new Factory<NV>(fill, visible, p);
        }
      }
    }

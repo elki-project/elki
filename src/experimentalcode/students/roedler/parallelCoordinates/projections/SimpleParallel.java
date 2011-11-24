@@ -130,6 +130,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
   
   public double getXpos(int dim){
+    if (dim < 0 || dim > dims){ return -1; }
     int notvis = 0;
     if (isVisible[dimOrder[dim]] == false){ return -1.0; }
     for(int i = 0; i < dim; i++){
