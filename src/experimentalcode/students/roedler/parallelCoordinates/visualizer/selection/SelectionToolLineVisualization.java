@@ -23,9 +23,11 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer.selecti
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -34,82 +36,80 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
+import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
 /**
- * Tool-Visualization for the tool to select axis ranges
+ * Tool-Visualization for the tool to select objects
  * 
  * @author Heidi Kolb
  * 
  * @apiviz.has SelectionResult oneway - - updates
- * @apiviz.has RangeSelection oneway - - updates
+ * @apiviz.has DBIDSelection oneway - - updates
  * 
- * @param <NV> Type of the NumberVector being visualized.
+ * @param <NV> vector type
  */
-public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DragableArea.DragListener {
-  /**
-   * The logger for this class.
-   */
-  protected static final Logging logger = Logging.getLogger(SelectionToolAxisRangeVisualization.class);
-
+public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Axis Range Selection";
+  private static final String NAME = "Object Selection";
 
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * CSS class of the selection rectangle while selecting.
    */
-  private static final String CSS_RANGEMARKER = "selectionAxisRangeMarker";
+  private static final String CSS_RANGEMARKER = "selectionRangeMarker";
 
   /**
-   * Dimension
+   * Input modes
+   * 
+   * @apiviz.exclude
    */
-  private int dim;
+  private enum Mode {
+    REPLACE, ADD, INVERT
+  }
 
   /**
    * Element for selection rectangle
    */
-  private Element rtag;
+  Element rtag;
 
   /**
    * Element for the rectangle to add listeners
    */
-  private Element etag;
+  Element etag;
+  
+  int dim;
 
   /**
    * Constructor.
    * 
    * @param task Task
    */
-  public SelectionToolAxisRangeVisualization(VisualizationTask task) {
+  public SelectionToolLineVisualization(VisualizationTask task) {
     super(task);
-    this.dim = DatabaseUtil.dimensionality(rep);
     context.addContextChangeListener(this);
     incrementalRedraw();
+    dim = DatabaseUtil.dimensionality(rep);
   }
 
   @Override
@@ -127,7 +127,7 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
   protected void redraw() {
     addCSSClasses(svgp);
 
-    // rtag: tag for the selected rect
+    //
     rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
     layer.appendChild(rtag);
@@ -149,48 +149,6 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
     }
   }
 
-  /**
-   * Set the selected ranges and the mask for the actual dimensions in the
-   * context
-   * 
-   * @param x1 min x-value 
-   * @param x2 max x-value 
-   * @param y1 min y-value 
-   * @param y2 max y-value 
-   */
-  private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
-    
-    int minaxis = 0;
-    int maxaxis = 0;
-    boolean minx = true;
-    boolean maxx = false;
-    int count = -1;
-    for (int i = 0; i < dim; i++){
-      if (proj.isVisible(i)){ 
-        if (minx && proj.getXpos(i) > x1){
-          minaxis = count + 1;
-          minx = false;
-          maxx = true;
-        }
-        if (maxx && (proj.getXpos(i) > x2 || i == dim - 1)){
-          maxaxis = count;
-          if (i == dim - 1 && proj.getXpos(i) <= x2) { maxaxis++; }
-          break;
-        }
-      }
-      count = i;
-    }
-    for (int i = minaxis; i <= maxaxis; i++){
-      if (proj.isVisible(i)){
-        Vector min = new Vector(1);
-        min.set(0, Math.min(proj.getMarginY() + proj.getAxisHeight(), y1));
-        Vector max = new Vector(1);
-        max.set(0, Math.max(proj.getMarginY(), y2));
-        ranges[i] = new DoubleDoublePair(proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(min).get(0)), proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(max).get(0)));
-      }
-    }
-  }
-
   @Override
   public boolean startDrag(SVGPoint startPoint, Event evt) {
     return true;
@@ -209,69 +167,130 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
 
   @Override
   public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
+    Mode mode = getInputMode(evt);
     deleteChildren(rtag);
     if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
-      updateSelection(proj, startPoint, dragPoint);
+      updateSelection(mode, proj, startPoint, dragPoint);
     }
     return true;
   }
 
   /**
-   * Update the selection in the context.
+   * Get the current input mode, on each mouse event.
    * 
-   * @param proj The projection
-   * @param p1 First Point of the selected rectangle
-   * @param p2 Second Point of the selected rectangle
+   * @param evt Mouse event.
+   * @return current input mode
    */
-  private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
-    DBIDSelection selContext = context.getSelection();
-    ModifiableDBIDs selection;
-    if(selContext != null) {
-      selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
-    }
-    else {
-      selection = DBIDUtil.newHashSet();
-    }
-    DoubleDoublePair[] ranges;
-
-    if(p1 == null || p2 == null) {
-      logger.warning("no rect selected: p1: " + p1 + " p2: " + p2);
-    }
-    else {
-      double x1 = Math.min(p1.getX(), p2.getX());
-      double x2 = Math.max(p1.getX(), p2.getX());
-      double y1 = Math.max(p1.getY(), p2.getY());
-      double y2 = Math.min(p1.getY(), p2.getY());
-
-      if(selContext instanceof RangeSelection) {
-        ranges = ((RangeSelection) selContext).getRanges();
+  private Mode getInputMode(Event evt) {
+    if(evt instanceof DOMMouseEvent) {
+      DOMMouseEvent domme = (DOMMouseEvent) evt;
+      // TODO: visual indication of mode possible?
+      if(domme.getShiftKey()) {
+        return Mode.ADD;
+      }
+      else if(domme.getCtrlKey()) {
+        return Mode.INVERT;
       }
       else {
-        ranges = new DoubleDoublePair[dim];
+        return Mode.REPLACE;
       }
-      updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
+    }
+    // Default mode is replace.
+    return Mode.REPLACE;
+  }
 
-      selection.clear();
-      boolean idIn = true;
-      for(DBID id : rep.iterDBIDs()) {
-        NV dbTupel = rep.get(id);
-        idIn = true;
-        for(int i = 0; i < dim; i++) {
-          if(ranges != null && ranges[i] != null) {
-            if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
-              idIn = false;
-              break;
-            }
+  /**
+   * Updates the selection in the context.<br>
+   * 
+   * @param mode Input mode
+   * @param proj
+   * @param p1 first point of the selected rectangle
+   * @param p2 second point of the selected rectangle
+   */
+  private void updateSelection(Mode mode, ProjectionParallel proj, SVGPoint p1, SVGPoint p2) {
+    DBIDSelection selContext = context.getSelection();
+    // Note: we rely on SET semantics below!
+    HashSetModifiableDBIDs selection;
+    if(selContext == null || mode == Mode.REPLACE) {
+      selection = DBIDUtil.newHashSet();
+    }
+    else {
+      selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
+    }
+    int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
+    Vector yPos;
+    for(DBID id : rep.iterDBIDs()) {
+      yPos = proj.projectDataToRenderSpace(rep.get(id));
+      if (checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))){
+        if(mode == Mode.INVERT) {
+          if(!selection.contains(id)) {
+            selection.add(id);
+          }
+          else {
+            selection.remove(id);
           }
         }
-        if(idIn == true) {
+        else {
+          // In REPLACE and ADD, add objects.
+          // The difference was done before by not re-using the selection.
+          // Since we are using a set, we can just add in any case.
           selection.add(id);
         }
       }
-      context.setSelection(new RangeSelection(selection, ranges));
     }
+    context.setSelection(new DBIDSelection(selection));
+  }
+  
+  private int[] getAxisRange(double x1, double x2){
+    double dim = DatabaseUtil.dimensionality(rep);
+    int minaxis = 0;
+    int maxaxis = 0;
+    boolean minx = true;
+    boolean maxx = false;
+    int count = -1;
+    for (int i = 0; i < dim; i++){
+      if (proj.isVisible(i)){ 
+        if (minx && proj.getXpos(i) > x1){
+          minaxis = count;
+          minx = false;
+          maxx = true;
+        }
+        if (maxx && (proj.getXpos(i) > x2 || i == dim - 1)){
+          maxaxis = count + 1;
+          if (i == dim - 1 && proj.getXpos(i) <= x2) { maxaxis++; }
+          break;
+        }
+      }
+      count = i;
+    }
+    return new int[]{minaxis, maxaxis};
   }
 
+  private boolean checkSelected(int[] ar, Vector yPos, double x1, double x2, double y1, double y2){
+    if (ar[1] >= dim){ ar[1] = dim - 1; }
+    for (int i = ar[0] + 1; i <= ar[1] - 1; i++){
+     if (proj.isVisible(i)){  
+       if (yPos.get(i) <= y1 && yPos.get(i) >= y2){
+         return true;
+       }
+       
+     }
+   }
+    Line2D.Double idline1 = new Line2D.Double(proj.getXpos(ar[0]), yPos.get(ar[0]), proj.getXpos(ar[0] + 1), yPos.get(ar[0] + 1));
+    Line2D.Double idline2 = new Line2D.Double(proj.getXpos(ar[1] - 1), yPos.get(ar[1] - 1), proj.getXpos(ar[1]), yPos.get(ar[1]));
+    Line2D.Double rectline1 = new Line2D.Double(x2, y1, x1, y1);
+    Line2D.Double rectline2 = new Line2D.Double(x2, y1, x2, y2);
+    Line2D.Double rectline3 = new Line2D.Double(x2, y2, x1, y2);
+    Line2D.Double rectline4 = new Line2D.Double(x1, y1, x1, y2);
+    if (idline1.intersectsLine(rectline1) || idline1.intersectsLine(rectline2) || idline1.intersectsLine(rectline3)){
+      return true;
+    }
+    if (idline2.intersectsLine(rectline1) || idline2.intersectsLine(rectline4) || idline2.intersectsLine(rectline3)){
+      return true;
+    }
+    return false;
+  }
+  
   /**
    * Adds the required CSS-Classes
    * 
@@ -289,13 +308,12 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
   }
 
   /**
-   * Factory for tool visualizations for selecting ranges and the inclosed
-   * objects
+   * Factory for tool visualizations for selecting objects
    * 
    * @author Heidi Kolb
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses SelectionToolCubeVisualization oneway - - «create»
+   * @apiviz.uses SelectionToolDotVisualization - - «create»
    * 
    * @param <NV> Type of the NumberVector being visualized.
    */
@@ -310,7 +328,7 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionToolAxisRangeVisualization<NV>(task);
+      return new SelectionToolLineVisualization<NV>(task);
     }
 
     @Override

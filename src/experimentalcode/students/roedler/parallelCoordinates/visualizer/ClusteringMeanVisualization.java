@@ -2,6 +2,7 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 
@@ -19,6 +20,10 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -33,7 +38,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
 import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
+import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMenuItem;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
+import experimentalcode.students.roedler.parallelCoordinates.visualizer.ClusteringVisualization.Factory;
 
 
 /**
@@ -63,17 +70,21 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
   /**
    * menu items
    */
-  JCheckBoxMenuItem items[];
+  CheckboxMenuItem items[];
+  
+  List<Integer> list;
   
   /**
    * Constructor.
    * 
    * @param task VisualizationTask
    */
-  public ClusteringMeanVisualization(VisualizationTask task) {
+  public ClusteringMeanVisualization(VisualizationTask task, List<Integer> list) {
     super(task);
     this.clustering = task.getResult();
     context.addContextChangeListener(this);
+    this.list = list;
+    init();
     incrementalRedraw();
   }
   
@@ -81,6 +92,13 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
     clustervis = new boolean[clustering.getAllClusters().size()];
     for (int i = 0; i < clustervis.length; i++){
       clustervis[i] = false;
+    }
+    if (list != null){
+      for (Integer i : list){
+        if (i < clustervis.length){
+          clustervis[i] = true;
+        }
+      }
     }
   }
   
@@ -95,7 +113,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
     double[][] mean = new double[dim][2];
     double count;
     
-    if (clustervis == null) {init(); }
+//    if (clustervis == null) {init(); }
     
     Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
 
@@ -180,21 +198,21 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
   
   @Override
   public SubMenu getMenu() {
-    SubMenu myMenu = new SubMenu(this, CLUSTERMEAN);
+    SubMenu myMenu = new SubMenu(CLUSTERMEAN, this);
     
     int clus = clustering.getAllClusters().size();
     
-    items = new JCheckBoxMenuItem[clus]; 
+    items = new CheckboxMenuItem[clus]; 
     
     for(int num = 0; num < clus; num++) {
-      items[num] = myMenu.addCheckBoxItem("Cluster " + num, Integer.toString(num), false);
+      items[num] = myMenu.addCheckBoxItem("Cluster " + num, Integer.toString(num), clustervis[num]);
     }
     
-    myMenu.addSeparator();
+  /*  myMenu.addSeparator();
     
     myMenu.addItem("Select all", "-1");
     myMenu.addItem("Unselect all", "-2");
-    myMenu.addItem("Invert all", "-3");
+    myMenu.addItem("Invert all", "-3");*/
     
     return myMenu;
   }
@@ -202,7 +220,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
   @Override
   public void menuPressed(String id, boolean checked) {
     int iid = Integer.parseInt(id);
-    if (iid < 0){
+ /*   if (iid < 0){
       if (iid == -1){
         for(int i = 0; i < clustervis.length; i++){
           items[i].setSelected(true);
@@ -223,7 +241,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
       }
       incrementalRedraw();
       return;
-    }
+    }*/
     
     clustervis[iid] = checked;
     incrementalRedraw(); 
@@ -245,18 +263,27 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
      * A short name characterizing this Visualizer.
      */
     private static final String NAME = "Cluster Means";
+    
+    public static final OptionID VISIBLE_ID = OptionID.getOrCreateOptionID("parallel.clustermean.visible", "Select visible Clustermeans");
+
+    /**
+     * selected cluster
+     */
+    private List<Integer> list;
 
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
-    public Factory() {
+    public Factory(List<Integer> list) {
       super();
+      this.list = list;
+      
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusteringMeanVisualization<NV>(task);
+      return new ClusteringMeanVisualization<NV>(task, list);
     }
 
     @Override
@@ -280,6 +307,31 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
     public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
+    }
+    
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+      protected List<Integer> p;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        final IntListParameter visL = new IntListParameter(VISIBLE_ID, true);
+        if(config.grab(visL)) {
+          p = visL.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<NV> makeInstance() {
+        return new Factory<NV>(p);
+      }
     }
   }
 }
