@@ -53,9 +53,10 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
    * @param insertionStrategy the strategy to find the insertion child
    * @param nodeSplitter the strategy for splitting nodes.
    * @param overflowTreatment the strategy to use for overflow treatment
+   * @param minimumFill the relative minimum fill
    */
-  public DeLiCluTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment);
+  public DeLiCluTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
   }
 
   @Override
@@ -66,6 +67,7 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
     index.setInsertionStrategy(insertionStrategy);
     index.setNodeSplitStrategy(nodeSplitter);
     index.setOverflowTreatment(overflowTreatment);
+    index.setMinimumFill(minimumFill);
     return index;
   }
 
@@ -83,7 +85,7 @@ public class DeLiCluTreeFactory<O extends NumberVector<O, ?>> extends AbstractRS
   public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected DeLiCluTreeFactory<O> makeInstance() {
-      return new DeLiCluTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment);
+      return new DeLiCluTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }

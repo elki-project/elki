@@ -89,9 +89,10 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
    * @param distanceFunction
    * @param nodeSplitter the strategy for splitting nodes.
    * @param overflowTreatment the strategy to use for overflow treatment
+   * @param minimumFill the relative minimum fill
    */
-  public RdKNNTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment);
+  public RdKNNTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
   }
@@ -104,6 +105,7 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
     index.setInsertionStrategy(insertionStrategy);
     index.setNodeSplitStrategy(nodeSplitter);
     index.setOverflowTreatment(overflowTreatment);
+    index.setMinimumFill(minimumFill);
     return index;
   }
 
@@ -145,7 +147,7 @@ public class RdKNNTreeFactory<O extends NumberVector<O, ?>, D extends NumberDist
 
     @Override
     protected RdKNNTreeFactory<O, D> makeInstance() {
-      return new RdKNNTreeFactory<O, D>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, k_max, distanceFunction, nodeSplitter, overflowTreatment);
+      return new RdKNNTreeFactory<O, D>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, k_max, distanceFunction, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }

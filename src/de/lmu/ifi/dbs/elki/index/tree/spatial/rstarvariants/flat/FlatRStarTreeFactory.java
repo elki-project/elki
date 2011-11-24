@@ -54,9 +54,10 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
    * @param insertionStrategy the strategy to find the insertion child
    * @param nodeSplitter the strategy for splitting nodes.
    * @param overflowTreatment the strategy to use for overflow treatment
+   * @param minimumFill the relative minimum fill
    */
-  public FlatRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment);
+  public FlatRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
   }
 
   @Override
@@ -67,6 +68,7 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
     index.setInsertionStrategy(insertionStrategy);
     index.setNodeSplitStrategy(nodeSplitter);
     index.setOverflowTreatment(overflowTreatment);
+    index.setMinimumFill(minimumFill);
     return index;
   }
 
@@ -84,7 +86,7 @@ public class FlatRStarTreeFactory<O extends NumberVector<O, ?>> extends Abstract
   public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected FlatRStarTreeFactory<O> makeInstance() {
-      return new FlatRStarTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment);
+      return new FlatRStarTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }

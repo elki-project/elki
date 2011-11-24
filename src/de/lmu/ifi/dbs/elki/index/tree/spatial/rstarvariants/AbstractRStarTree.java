@@ -117,6 +117,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected OverflowTreatment overflowTreatment = LimitedReinsertOverflowTreatment.RSTAR_OVERFLOW;
 
   /**
+   * Relative minimum fill
+   */
+  protected double relativeMinFill = 0.4;
+
+  /**
    * Constructor
    * 
    * @param pagefile Page file
@@ -169,6 +174,15 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   public void setOverflowTreatment(OverflowTreatment overflowTreatment) {
     this.overflowTreatment = overflowTreatment;
+  }
+
+  /**
+   * Set the relative minimum fill. (Only supported before the tree was used!)
+   * 
+   * @param relative Relative minimum fill
+   */
+  public void setMinimumFill(double relative) {
+    this.relativeMinFill = relative;
   }
 
   /**
@@ -366,7 +380,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     // minimum entries per directory node
-    dirMinimum = (int) Math.round((dirCapacity - 1) * 0.4);
+    dirMinimum = (int) Math.round((dirCapacity - 1) * relativeMinFill);
     if(dirMinimum < 2) {
       dirMinimum = 2;
     }
@@ -380,7 +394,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     // minimum entries per leaf node
-    leafMinimum = (int) Math.round((leafCapacity - 1) * 0.4);
+    leafMinimum = (int) Math.round((leafCapacity - 1) * relativeMinFill);
     if(leafMinimum < 2) {
       leafMinimum = 2;
     }
@@ -699,7 +713,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     BitSet remove = new BitSet();
     List<E> entries = node.getEntries();
     List<E> reInsertEntries = new ArrayList<E>(offs.length);
-    for (int i = 0; i < offs.length; i++) {
+    for(int i = 0; i < offs.length; i++) {
       reInsertEntries.add(entries.get(offs[i]));
       remove.set(offs[i]);
     }
