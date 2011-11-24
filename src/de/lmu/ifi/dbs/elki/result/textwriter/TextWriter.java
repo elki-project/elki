@@ -29,8 +29,8 @@ import java.io.PrintStream;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -225,63 +224,57 @@ public class TextWriter {
    * @throws IOException on IO error
    */
   public void output(Database db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
-    List<Relation<?>> ra = null;
-    List<OrderingResult> ro = null;
-    List<Clustering<? extends Model>> rc = null;
-    List<IterableResult<?>> ri = null;
-    List<SettingsResult> rs = null;
-    HashSet<Result> otherres = null;
+    List<Relation<?>> ra = new LinkedList<Relation<?>>();
+    List<OrderingResult> ro = new LinkedList<OrderingResult>();
+    List<Clustering<?>> rc = new LinkedList<Clustering<?>>();
+    List<IterableResult<?>> ri = new LinkedList<IterableResult<?>>();
+    List<SettingsResult> rs = new LinkedList<SettingsResult>();
+    List<Result> otherres = new LinkedList<Result>();
 
-    ra = ResultUtil.getRelations(r);
-    ro = ResultUtil.getOrderingResults(r);
-    rc = ResultUtil.getClusteringResults(r);
-    ri = ResultUtil.getIterableResults(r);
-    rs = ResultUtil.getSettingsResults(r);
     // collect other results
-    if(r instanceof HierarchicalResult) {
-      final List<Result> resultList = ResultUtil.filterResults((HierarchicalResult) r, Result.class);
-      otherres = new HashSet<Result>(resultList);
-      otherres.removeAll(ra);
-      otherres.removeAll(ro);
-      otherres.removeAll(rc);
-      otherres.removeAll(ri);
-      otherres.removeAll(rs);
-      otherres.remove(db);
-      Iterator<Result> it = otherres.iterator();
-      while(it.hasNext()) {
-        if(it.next() instanceof HierarchicalResult) {
-          it.remove();
+    {
+      for(Result res : ResultUtil.filteredResults(r, Result.class)) {
+        if(res instanceof Database) {
+          continue;
         }
+        if(res instanceof Relation) {
+          ra.add((Relation<?>) res);
+          continue;
+        }
+        if(res instanceof OrderingResult) {
+          ro.add((OrderingResult) res);
+          continue;
+        }
+        if(res instanceof Clustering) {
+          rc.add((Clustering<?>) res);
+          continue;
+        }
+        if(res instanceof IterableResult) {
+          ri.add((IterableResult<?>) res);
+          continue;
+        }
+        if(res instanceof SettingsResult) {
+          rs.add((SettingsResult) res);
+          continue;
+        }
+        otherres.add(res);
       }
     }
 
-    if(ra == null && ro == null && rc == null && ri == null) {
-      throw new UnableToComplyException("No printable result found.");
+    for(IterableResult<?> rii : ri) {
+      writeIterableResult(streamOpener, rii, rs);
     }
-
-    if(ri != null && ri.size() > 0) {
-      // TODO: associations are not passed to ri results.
-      for(IterableResult<?> rii : ri) {
-        writeIterableResult(streamOpener, rii, rs);
+    for(Clustering<?> c : rc) {
+      NamingScheme naming = new SimpleEnumeratingScheme(c);
+      for(Cluster<?> clus : c.getAllClusters()) {
+        writeClusterResult(db, streamOpener, clus, ra, naming, rs);
       }
     }
-    if(rc != null && rc.size() > 0) {
-      for(Clustering<?> c : rc) {
-        NamingScheme naming = new SimpleEnumeratingScheme(c);
-        for(Cluster<?> clus : c.getAllClusters()) {
-          writeClusterResult(db, streamOpener, clus, ra, naming, rs);
-        }
-      }
+    for(OrderingResult ror : ro) {
+      writeOrderingResult(db, streamOpener, ror, ra, rs);
     }
-    if(ro != null && ro.size() > 0) {
-      for(OrderingResult ror : ro) {
-        writeOrderingResult(db, streamOpener, ror, ra, rs);
-      }
-    }
-    if(otherres != null && otherres.size() > 0) {
-      for(Result otherr : otherres) {
-        writeOtherResult(streamOpener, otherr, rs);
-      }
+    for(Result otherr : otherres) {
+      writeOtherResult(streamOpener, otherr, rs);
     }
   }
 
@@ -307,7 +300,7 @@ public class TextWriter {
     if(ra != null) {
       for(Relation<?> a : ra) {
         // Avoid duplicated output.
-        if (dbrels.contains(a)) {
+        if(dbrels.contains(a)) {
           continue;
         }
         String label = a.getShortName();
@@ -357,7 +350,7 @@ public class TextWriter {
     // Write cluster information
     out.commentPrintLn("Cluster: " + naming.getNameFor(clus));
     Model model = clus.getModel();
-    if (model != ClusterModel.CLUSTER && model != null) {
+    if(model != ClusterModel.CLUSTER && model != null) {
       TextWriterWriterInterface<?> mwri = writers.getHandler(model);
       mwri.writeObject(out, null, model);
     }

@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.geometry.ConvexHull2D;
+import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
@@ -214,7 +214,7 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   }
 
   protected Polygon makeHull(Vector[] pc) {
-    ConvexHull2D hull = new ConvexHull2D();
+    SweepHullDelaunay2D hull = new SweepHullDelaunay2D();
 
     Vector diag = new Vector(0, 0);
     for(int j = 0; j < pc.length; j++) {
@@ -240,7 +240,7 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   }
 
   protected Polygon makeHullComplex(Vector[] pc) {
-    ConvexHull2D hull = new ConvexHull2D();
+    SweepHullDelaunay2D hull = new SweepHullDelaunay2D();
 
     Vector diag = new Vector(0, 0);
     for(int j = 0; j < pc.length; j++) {

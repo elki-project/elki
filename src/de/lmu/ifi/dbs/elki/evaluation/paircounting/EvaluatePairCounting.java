@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.evaluation.paircounting;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -32,13 +30,13 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -51,14 +49,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has PairCountingFMeasure
- * @apiviz.has EvaluatePairCountingFMeasure.ScoreResult oneway - - «create»
+ * @apiviz.uses ClusterContingencyTable
+ * @apiviz.has EvaluatePairCounting.ScoreResult oneway - - «create»
  */
-public class EvaluatePairCountingFMeasure implements Evaluator {
+public class EvaluatePairCounting implements Evaluator {
   /**
    * Logger for debug output.
    */
-  protected static final Logging logger = Logging.getLogger(JudgeOutlierScores.class);
+  protected static final Logging logger = Logging.getLogger(EvaluatePairCounting.class);
 
   /**
    * Parameter to obtain the reference clustering. Defaults to a flat label
@@ -72,6 +70,11 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
   public static final OptionID NOISE_ID = OptionID.getOrCreateOptionID("paircounting.noisespecial", "Use special handling for noise clusters.");
 
   /**
+   * Parameter flag to disable self-pairing
+   */
+  public static final OptionID NOSELFPAIR_ID = OptionID.getOrCreateOptionID("paircounting.noselfpair", "Disable self-pairing for cluster comparison.");
+
+  /**
    * Reference algorithm.
    */
   private ClusteringAlgorithm<?> referencealg;
@@ -82,15 +85,22 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
   private boolean noiseSpecialHandling;
 
   /**
+   * Use self-pairing in pair-counting measures
+   */
+  private boolean selfPairing;
+
+  /**
    * Constructor.
    * 
    * @param referencealg Reference clustering
    * @param noiseSpecialHandling Noise handling flag
+   * @param selfPairing Self-pairing flag
    */
-  public EvaluatePairCountingFMeasure(ClusteringAlgorithm<?> referencealg, boolean noiseSpecialHandling) {
+  public EvaluatePairCounting(ClusteringAlgorithm<?> referencealg, boolean noiseSpecialHandling, boolean selfPairing) {
     super();
     this.referencealg = referencealg;
     this.noiseSpecialHandling = noiseSpecialHandling;
+    this.selfPairing = selfPairing;
   }
 
   @Override
@@ -98,7 +108,6 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
     Database db = ResultUtil.findDatabase(baseResult);
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs == null || crs.size() < 1) {
-      // logger.warning("No clustering results found - nothing to evaluate!");
       return;
     }
     // Compute the reference clustering
@@ -113,16 +122,10 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
     }
     Clustering<?> refc = refcrs.get(0);
     for(Clustering<?> c : crs) {
-      long[] countedPairs = PairCountingFMeasure.countPairs(c, refc, noiseSpecialHandling);
-      // Use double, since we want double results at the end!
-      double sum = countedPairs[0] + countedPairs[1] + countedPairs[2];
-      double inboth = countedPairs[0] / sum;
-      double infirst = countedPairs[1] / sum;
-      double insecond = countedPairs[2] / sum;
-      double fmeasure = PairCountingFMeasure.fMeasure(countedPairs[0], countedPairs[1], countedPairs[2], 1.0);
-      ArrayList<Vector> s = new ArrayList<Vector>(4);
-      s.add(new Vector(new double[] { fmeasure, inboth, infirst, insecond }));
-      db.getHierarchy().add(c, new ScoreResult(s));
+      ClusterContingencyTable contmat = new ClusterContingencyTable(selfPairing, noiseSpecialHandling);
+      contmat.process(c, refc);
+
+      db.getHierarchy().add(c, new ScoreResult(contmat));
     }
   }
 
@@ -130,15 +133,54 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
    * Result object for outlier score judgements.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf ClusterContingencyTable
    */
-  public static class ScoreResult extends CollectionResult<Vector> {
+  public static class ScoreResult extends BasicResult implements TextWriteable {
+    /**
+     * Cluster contingency table
+     */
+    protected ClusterContingencyTable contmat;
+
     /**
      * Constructor.
      * 
-     * @param col score result
+     * @param contmat score result
      */
-    public ScoreResult(Collection<Vector> col) {
-      super("Pair Counting F-Measure", "pair-fmeasure", col);
+    public ScoreResult(ClusterContingencyTable contmat) {
+      super("Cluster-Evalation", "cluster-evaluation");
+      this.contmat = contmat;
+    }
+
+    /**
+     * Get the contingency table
+     * 
+     * @return the contingency table
+     */
+    public ClusterContingencyTable getContingencyTable() {
+      return contmat;
+    }
+
+    @Override
+    public void writeToText(TextWriterStream out, String label) {
+      out.commentPrint("F1-Measure, ");
+      out.commentPrint("Precision, ");
+      out.commentPrint("Recall, ");
+      out.commentPrint("Rand, ");
+      out.commentPrint("AdjustedRand, ");
+      out.commentPrint("FowlkesMallows, ");
+      out.commentPrint("Jaccard, ");
+      out.commentPrint("Mirkin");
+      out.flush();
+      out.inlinePrint(contmat.pairF1Measure());
+      out.inlinePrint(contmat.pairPrecision());
+      out.inlinePrint(contmat.pairRecall());
+      out.inlinePrint(contmat.pairRandIndex());
+      out.inlinePrint(contmat.pairAdjustedRandIndex());
+      out.inlinePrint(contmat.pairFowlkesMallows());
+      out.inlinePrint(contmat.pairJaccard());
+      out.inlinePrint(contmat.pairMirkin());
+      out.flush();
     }
   }
 
@@ -150,9 +192,11 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    protected ClusteringAlgorithm< ?> referencealg = null;
+    protected ClusteringAlgorithm<?> referencealg = null;
 
     protected boolean noiseSpecialHandling = false;
+
+    protected boolean noSelfPairing = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -166,11 +210,16 @@ public class EvaluatePairCountingFMeasure implements Evaluator {
       if(config.grab(noiseSpecialHandlingF)) {
         noiseSpecialHandling = noiseSpecialHandlingF.getValue();
       }
+
+      Flag noSelfPairingF = new Flag(NOSELFPAIR_ID);
+      if(config.grab(noSelfPairingF)) {
+        noSelfPairing = noSelfPairingF.getValue();
+      }
     }
 
     @Override
-    protected EvaluatePairCountingFMeasure makeInstance() {
-      return new EvaluatePairCountingFMeasure(referencealg, noiseSpecialHandling);
+    protected EvaluatePairCounting makeInstance() {
+      return new EvaluatePairCounting(referencealg, noiseSpecialHandling, !noSelfPairing);
     }
   }
 }

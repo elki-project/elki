@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.evaluation;
+package de.lmu.ifi.dbs.elki.evaluation.roc;
 
 /*
  This file is part of ELKI:
@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Test to validate ROC curve computation.
  * 
  * @author Erich Schubert
- * 
  */
 public class TestComputeROC implements JUnit4Test {
   /**
