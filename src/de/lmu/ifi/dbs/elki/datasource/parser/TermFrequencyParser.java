@@ -23,13 +23,12 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntFloatIterator;
+import gnu.trove.map.hash.TIntFloatHashMap;
+
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -93,7 +92,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
     List<String> entries = tokenize(line);
 
     double len = 0;
-    Map<Integer, Float> values = new TreeMap<Integer, Float>();
+    TIntFloatHashMap values = new TIntFloatHashMap();
     LabelList labels = new LabelList();
 
     String curterm = null;
@@ -127,8 +126,9 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
     }
     if(normalize) {
       if(Math.abs(len - 1.0) > 1E-10 && len > 1E-10) {
-        for(Entry<Integer, Float> ent : values.entrySet()) {
-          ent.setValue((float) (ent.getValue() / len));
+        for(TIntFloatIterator iter = values.iterator(); iter.hasNext();) {
+          iter.advance();
+          iter.setValue((float) (iter.value() / len));
         }
       }
     }
@@ -139,8 +139,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
 
   @Override
   protected VectorFieldTypeInformation<SparseFloatVector> getTypeInformation(int dimensionality) {
-    final Map<Integer, Float> emptyMap = Collections.emptyMap();
-    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimensionality, new SparseFloatVector(emptyMap, dimensionality));
+    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimensionality, new SparseFloatVector(SparseFloatVector.EMPTYMAP, dimensionality));
   }
 
   @Override

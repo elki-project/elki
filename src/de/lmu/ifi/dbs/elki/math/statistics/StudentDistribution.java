@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.HashMap;
-import java.util.Map;
+import gnu.trove.map.TDoubleDoubleMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 /**
  * Tabelarizes the values for student distribution.
@@ -125,7 +127,7 @@ public class StudentDistribution {
   /**
    * Holds the t-values.
    */
-  private static Map<Integer, Map<Double, Double>> tValues = new HashMap<Integer, Map<Double, Double>>();
+  private static TIntObjectMap<TDoubleDoubleMap> tValues = new TIntObjectHashMap<TDoubleDoubleMap>();
 
   static {
     put(31, new double[] { 0.2533, 0.8416, 1.2816, 1.6449, 1.96, 2.3263, 2.5758, 3.0903, 3.2906 });
@@ -142,7 +144,7 @@ public class StudentDistribution {
     if(n > 30) {
       n = 31;
     }
-    Map<Double, Double> map = tValues.get(n);
+    TDoubleDoubleMap map = tValues.get(n);
     if(map == null) {
       throw new IllegalArgumentException("t-values for n=" + n + " not yet tabularized!");
     }
@@ -162,7 +164,7 @@ public class StudentDistribution {
    * @param values the t-values
    */
   private static void put(int n, double[] values) {
-    Map<Double, Double> map = new HashMap<Double, Double>();
+    TDoubleDoubleMap map = new TDoubleDoubleHashMap();
     map.put(_6000, values[0]);
     map.put(_8000, values[1]);
     map.put(_9000, values[2]);

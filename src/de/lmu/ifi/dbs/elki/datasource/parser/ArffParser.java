@@ -23,17 +23,16 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.map.hash.TIntFloatHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -206,7 +205,7 @@ public class ArffParser implements Parser {
 
   private Object[] loadSparseInstance(StreamTokenizer tokenizer, int[] targ, int[] dimsize, TypeInformation[] elkitypes, int metaLength) throws IOException {
     // logger.warning("Sparse instance.");
-    Map<Integer, Object> map = new TreeMap<Integer, Object>();
+    TIntObjectHashMap<Object> map = new TIntObjectHashMap<Object>();
     while(true) {
       nextToken(tokenizer);
       assert (tokenizer.ttype != StreamTokenizer.TT_EOF && tokenizer.ttype != StreamTokenizer.TT_EOL);
@@ -248,16 +247,17 @@ public class ArffParser implements Parser {
       }
       assert (s >= 0);
       if(elkitypes[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
-        Map<Integer, Float> f = new HashMap<Integer, Float>(dimsize[out]);
-        for(Entry<Integer, Object> key : map.entrySet()) {
-          int i = key.getKey();
+        TIntFloatHashMap f = new TIntFloatHashMap(dimsize[out]);
+        for (TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext(); ) {
+          iter.advance();
+          int i = iter.key();
           if(i < s) {
             continue;
           }
           if(i >= s + dimsize[out]) {
             break;
           }
-          double v = (Double) key.getValue();
+          double v = (Double) iter.value();
           f.put(i - s + 1, (float) v);
         }
         data[out] = new SparseFloatVector(f, dimsize[out]);
@@ -265,15 +265,16 @@ public class ArffParser implements Parser {
       else if(elkitypes[out] == TypeUtil.LABELLIST) {
         // Build a label list out of successive labels
         LabelList ll = new LabelList();
-        for(Entry<Integer, Object> key : map.entrySet()) {
-          int i = key.getKey();
+        for (TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext(); ) {
+          iter.advance();
+          int i = iter.key();
           if(i < s) {
             continue;
           }
           if(i >= s + dimsize[out]) {
             break;
           }
-          String v = (String) key.getValue();
+          String v = (String) iter.value();
           if(ll.size() < i - s) {
             logger.warning("Sparse consecutive labels are currently not correctly supported.");
           }
@@ -411,8 +412,7 @@ public class ArffParser implements Parser {
           bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else {
-          Map<Integer, Float> empty = Collections.emptyMap();
-          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimsize[out], labels, new SparseFloatVector(empty, dimsize[out]));
+          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimsize[out], labels, new SparseFloatVector(SparseFloatVector.EMPTYMAP, dimsize[out]));
           bundle.appendColumn(type, new ArrayList<SparseFloatVector>());
         }
       }

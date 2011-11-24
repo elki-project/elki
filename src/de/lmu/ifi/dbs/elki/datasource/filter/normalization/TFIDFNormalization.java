@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.hash.TIntFloatHashMap;
+
 import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 
@@ -58,9 +58,9 @@ public class TFIDFNormalization extends InverseDocumentFrequencyNormalization {
     if(sum <= 0) {
       sum = 1.0;
     }
-    Map<Integer, Float> vals = new HashMap<Integer, Float>();
+    TIntFloatHashMap vals = new TIntFloatHashMap();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
-      vals.put(i, (float) (featureVector.doubleValue(i) / sum * idf.get(i).doubleValue()));
+      vals.put(i, (float) (featureVector.doubleValue(i) / sum * idf.get(i)));
     }
     return new SparseFloatVector(vals, featureVector.getDimensionality());
   }

@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.hash.TIntFloatHashMap;
+
 import java.io.PrintStream;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
@@ -411,7 +413,7 @@ public final class Util {
    *         SparseFloatVector.
    */
   public static SparseFloatVector project(SparseFloatVector v, BitSet selectedAttributes) {
-    Map<Integer, Float> values = new HashMap<Integer, Float>(selectedAttributes.cardinality(), 1);
+    TIntFloatHashMap values = new TIntFloatHashMap(selectedAttributes.cardinality(), 1);
     for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
       if(v.getValue(d + 1) != 0.0f) {
         values.put(d, v.getValue(d + 1));

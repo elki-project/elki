@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.HashMap;
-import java.util.Map;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 /**
  * A memory based implementation of a PageFile that simulates I/O-access.<br>
@@ -38,7 +38,7 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
   /**
    * Holds the pages.
    */
-  private final Map<Integer, P> file;
+  private final TIntObjectMap<P> file;
 
   /**
    * Creates a new MemoryPageFile that is supported by a cache with the
@@ -48,7 +48,7 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
    */
   public MemoryPageFile(int pageSize) {
     super(pageSize);
-    this.file = new HashMap<Integer, P>();
+    this.file = new TIntObjectHashMap<P>();
   }
 
   @Override
