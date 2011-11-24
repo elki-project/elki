@@ -41,7 +41,7 @@ public class XTreeFactory<O extends NumberVector<O, ?>> extends XTreeBaseFactory
   @Override
   public XTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<XTreeNode> pagefile = makePageFile(getNodeClass());
-    XTreeIndex<O> index = new XTreeIndex<O>(relation, pagefile, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+    XTreeIndex<O> index = new XTreeIndex<O>(relation, pagefile, minimumFill, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
     index.setBulkStrategy(bulkSplitter);
     index.setInsertionStrategy(insertionStrategy);
     index.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(reinsert_fraction, SquaredEuclideanDistanceFunction.STATIC)));
@@ -55,7 +55,7 @@ public class XTreeFactory<O extends NumberVector<O, ?>> extends XTreeBaseFactory
   public static class Parameterizer<O extends NumberVector<O, ?>> extends XTreeBaseFactory.Parameterizer<O> {
     @Override
     protected AbstractRStarTreeFactory<O, ?, ?, ?> makeInstance() {
-      return new XTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+      return new XTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, minimumFill, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
     }
   }
 }

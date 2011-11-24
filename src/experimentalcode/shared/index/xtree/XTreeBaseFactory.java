@@ -47,8 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @param <X> actual tree type
  */
 public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, N extends XNode<E, N>, E extends SpatialEntry, X extends AbstractRStarTree<N, E> & Index> extends AbstractRStarTreeFactory<O, N, E, X> {
-  protected double relativeMinEntries;
-
   protected double relativeMinFanout;
 
   protected float reinsert_fraction;
@@ -72,19 +70,12 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, N extends X
    * @param overlap_type
    */
   public XTreeBaseFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, null, null);
-    this.relativeMinEntries = relativeMinEntries;
+    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, null, null, relativeMinEntries);
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;
     this.max_overlap = max_overlap;
     this.overlap_type = overlap_type;
   }
-
-  /**
-   * Parameter for minimum number of entries per page; defaults to
-   * <code>.4</code> times the number of maximum entries.
-   */
-  public static final OptionID MIN_ENTRIES_ID = OptionID.getOrCreateOptionID("xtree.min_entry_fraction", "The fraction (in [0,1]) of maximally allowed page entries which is to be be used as minimum number of page entries");
 
   /**
    * Parameter for minimum number of entries per directory page when going for a
@@ -131,8 +122,6 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, N extends X
    * @param <O> object type
    */
   public abstract static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
-    protected double relativeMinEntries;
-
     protected double relativeMinFanout;
 
     protected float reinsert_fraction;
@@ -146,10 +135,6 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, N extends X
       super.makeOptions(config);
       // Bulk loads are not supported yet:
       // super.configBulkLoad(config);
-      final DoubleParameter MIN_ENTRIES_PARAMETER = new DoubleParameter(MIN_ENTRIES_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.OPEN), 0.4);
-      if(config.grab(MIN_ENTRIES_PARAMETER)) {
-        relativeMinEntries = MIN_ENTRIES_PARAMETER.getValue();
-      }
       final DoubleParameter MIN_FANOUT_PARAMETER = new DoubleParameter(MIN_FANOUT_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.3);
       if(config.grab(MIN_FANOUT_PARAMETER)) {
         relativeMinFanout = MIN_FANOUT_PARAMETER.getValue();
