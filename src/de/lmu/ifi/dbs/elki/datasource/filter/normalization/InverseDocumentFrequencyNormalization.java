@@ -23,10 +23,12 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntDoubleIterator;
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntFloatHashMap;
+
 import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -44,7 +46,7 @@ public class InverseDocumentFrequencyNormalization extends AbstractNormalization
   /**
    * The IDF storage
    */
-  Map<Integer, Number> idf = new HashMap<Integer, Number>();
+  TIntDoubleMap idf = new TIntDoubleHashMap();
 
   /**
    * The number of objects in the dataset
@@ -88,18 +90,19 @@ public class InverseDocumentFrequencyNormalization extends AbstractNormalization
   protected void prepareComplete() {
     final double dbsize = objcnt;
     // Compute IDF values
-    for(Entry<Integer, Number> ent : idf.entrySet()) {
+    for(TIntDoubleIterator iter = idf.iterator(); iter.hasNext();) {
+      iter.advance();
       // Note: dbsize is a double!
-      ent.setValue(Math.log(dbsize / ent.getValue().intValue()));
+      iter.setValue(Math.log(dbsize / iter.value()));
     }
   }
 
   @Override
   protected SparseFloatVector filterSingleObject(SparseFloatVector featureVector) {
     BitSet b = featureVector.getNotNullMask();
-    Map<Integer, Float> vals = new HashMap<Integer, Float>();
+    TIntFloatHashMap vals = new TIntFloatHashMap();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
-      vals.put(i, (float) (featureVector.doubleValue(i) * idf.get(i).doubleValue()));
+      vals.put(i, (float) (featureVector.doubleValue(i) * idf.get(i)));
     }
     return new SparseFloatVector(vals, featureVector.getDimensionality());
   }
@@ -107,9 +110,9 @@ public class InverseDocumentFrequencyNormalization extends AbstractNormalization
   @Override
   public SparseFloatVector restore(SparseFloatVector featureVector) {
     BitSet b = featureVector.getNotNullMask();
-    Map<Integer, Float> vals = new HashMap<Integer, Float>();
+    TIntFloatHashMap vals = new TIntFloatHashMap();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
-      vals.put(i, (float) (featureVector.doubleValue(i) / idf.get(i).doubleValue()));
+      vals.put(i, (float) (featureVector.doubleValue(i) / idf.get(i)));
     }
     return new SparseFloatVector(vals, featureVector.getDimensionality());
   }

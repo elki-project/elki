@@ -22,9 +22,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import gnu.trove.map.hash.TIntFloatHashMap;
+
 import java.util.BitSet;
-import java.util.Collections;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * </p>
  * 
  * @author Arthur Zimek
- * 
  */
 public class SparseFloatVectorProjectionFilter extends AbstractFeatureSelectionFilter<SparseFloatVector> {
   /**
@@ -64,7 +63,7 @@ public class SparseFloatVectorProjectionFilter extends AbstractFeatureSelectionF
 
   @Override
   protected SimpleTypeInformation<? super SparseFloatVector> convertedType(SimpleTypeInformation<SparseFloatVector> in) {
-    final Map<Integer, Float> emptyMap = Collections.emptyMap();
+    final TIntFloatHashMap emptyMap = new TIntFloatHashMap();
     return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, getDimensionality(), new SparseFloatVector(emptyMap, getDimensionality()));
   }
 

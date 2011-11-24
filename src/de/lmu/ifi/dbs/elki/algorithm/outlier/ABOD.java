@@ -336,31 +336,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  // TODO: remove?
-  @SuppressWarnings("unused")
-  private double[] calcNormalization(Integer xKey, HashMap<Integer, Double> dists) {
-    double[] result = new double[2];
-    for(Integer yKey : dists.keySet()) {
-      if(yKey.equals(xKey)) {
-        continue;
-      }
-      for(Integer zKey : dists.keySet()) {
-        if(zKey <= yKey) {
-          continue;
-        }
-        if(zKey.equals(xKey)) {
-          continue;
-        }
-        if(dists.get(yKey) != 0 && dists.get(zKey) != 0) {
-          double sqr = Math.sqrt(dists.get(yKey) * dists.get(zKey));
-          result[0] += 1 / sqr;
-          result[1] += 1 / (dists.get(yKey) * dists.get(zKey) * sqr);
-        }
-      }
-    }
-    return result;
-  }
-
   private double[] calcFastNormalization(DBID x, HashMap<DBID, Double> dists) {
     double[] result = new double[2];
 

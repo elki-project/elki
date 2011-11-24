@@ -23,9 +23,13 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.impl.unmodifiable.TUnmodifiableIntFloatMap;
+import gnu.trove.iterator.TIntFloatIterator;
+import gnu.trove.map.TIntFloatMap;
+import gnu.trove.map.hash.TIntFloatHashMap;
+
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.datasource.parser.SparseFloatVectorLabelParser;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -90,7 +94,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
-  public SparseFloatVector(Map<Integer, Float> values, int dimensionality) throws IllegalArgumentException {
+  public SparseFloatVector(TIntFloatMap values, int dimensionality) throws IllegalArgumentException {
     if(values.size() > dimensionality) {
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
@@ -99,9 +103,10 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     this.values = new float[values.size()];
     // Import and sort the indexes
     {
-      int i = 0;
-      for(Integer index : values.keySet()) {
-        this.indexes[i] = index;
+      TIntFloatIterator iter = values.iterator();
+      for (int i = 0; iter.hasNext(); i++) {
+        iter.advance();
+        this.indexes[i] = iter.key();
         i++;
       }
       Arrays.sort(this.indexes);
@@ -525,4 +530,9 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       return STATIC;
     }
   }
+  
+  /**
+   * Empty map.
+   */
+  public static final TIntFloatMap EMPTYMAP = new TUnmodifiableIntFloatMap(new TIntFloatHashMap()); 
 }

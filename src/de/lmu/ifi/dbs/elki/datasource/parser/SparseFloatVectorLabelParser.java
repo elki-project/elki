@@ -22,11 +22,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import gnu.trove.map.hash.TIntFloatHashMap;
+
 import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -92,7 +91,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     List<String> entries = tokenize(line);
     int cardinality = Integer.parseInt(entries.get(0));
 
-    Map<Integer, Float> values = new HashMap<Integer, Float>(cardinality, 1);
+    TIntFloatHashMap values = new TIntFloatHashMap(cardinality, 1);
     LabelList labels = new LabelList();
 
     for(int i = 1; i < entries.size() - 1; i++) {
@@ -123,8 +122,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
 
   @Override
   protected VectorFieldTypeInformation<SparseFloatVector> getTypeInformation(int dimensionality) {
-    final Map<Integer, Float> emptyMap = Collections.emptyMap();
-    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimensionality, new SparseFloatVector(emptyMap, dimensionality));
+    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimensionality, new SparseFloatVector(SparseFloatVector.EMPTYMAP, dimensionality));
   }
 
   @Override
