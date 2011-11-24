@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.evaluation;
+package de.lmu.ifi.dbs.elki.evaluation.paircounting;
 
 /*
  This file is part of ELKI:
@@ -39,18 +39,18 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Validate {@link PairCountingFMeasure} with respect to its ability to compare
+ * Validate {@link ClusterContingencyTable} with respect to its ability to compare
  * data clusterings.
  * 
  * @author Erich Schubert
  */
-public class TestPairCountingFMeasure implements JUnit4Test {
+public class TestClusterContingencyTable implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 
@@ -58,7 +58,7 @@ public class TestPairCountingFMeasure implements JUnit4Test {
   int shoulds = 600;
 
   /**
-   * Validate {@link PairCountingFMeasure} with respect to its ability to
+   * Validate {@link ClusterContingencyTable} with respect to its ability to
    * compare data clusterings.
    * 
    * @throws ParameterException on errors.
@@ -89,13 +89,19 @@ public class TestPairCountingFMeasure implements JUnit4Test {
     ByLabelClustering bylabel = new ByLabelClustering();
     Clustering<?> rbl = bylabel.run(db);
 
-    assertEquals(1.0, PairCountingFMeasure.compareClusterings(rai, rai), Double.MIN_VALUE);
-    assertEquals(1.0, PairCountingFMeasure.compareClusterings(ran, ran), Double.MIN_VALUE);
-    assertEquals(1.0, PairCountingFMeasure.compareClusterings(rbl, rbl), Double.MIN_VALUE);
+    assertEquals(1.0, computeFMeasure(rai, rai, false), Double.MIN_VALUE);
+    assertEquals(1.0, computeFMeasure(ran, ran, false), Double.MIN_VALUE);
+    assertEquals(1.0, computeFMeasure(rbl, rbl, false), Double.MIN_VALUE);
 
-    assertEquals(0.009950248756218905, PairCountingFMeasure.compareClusterings(ran, rbl, true), Double.MIN_VALUE);
-    assertEquals(0.0033277870216306157, PairCountingFMeasure.compareClusterings(rai, ran, true), Double.MIN_VALUE);
+    assertEquals(0.009950248756218905, computeFMeasure(ran, rbl, true), Double.MIN_VALUE);
+    assertEquals(0.0033277870216306157, computeFMeasure(rai, ran, true), Double.MIN_VALUE);
 
-    assertEquals(0.5 /* 0.3834296724470135 */, PairCountingFMeasure.compareClusterings(rai, rbl), Double.MIN_VALUE);
+    assertEquals(0.5 /* 0.3834296724470135 */, computeFMeasure(rai, rbl, false), Double.MIN_VALUE);
+  }
+
+  private double computeFMeasure(Clustering<?> c1, Clustering<?> c2, boolean noise) {
+    ClusterContingencyTable ct = new ClusterContingencyTable(true, noise);
+    ct.process(c1, c2);
+    return ct.pairF1Measure();
   }
 }

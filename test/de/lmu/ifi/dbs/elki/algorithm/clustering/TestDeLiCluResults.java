@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -74,10 +74,12 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
     // run DeLiClu on database
     Clustering<?> clustering = opticsxi.run(db);
 
-    // Test F-Measure
+    // Test F-Measure    
     ByLabelClustering bylabel = new ByLabelClustering();
     Clustering<Model> rbl = bylabel.run(db);
-    double score = PairCountingFMeasure.compareClusterings(clustering, rbl, 1.0);
+    ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
+    ct.process(clustering, rbl);
+    double score = ct.pairF1Measure();
     // We cannot test exactly - due to Hashing, DeLiClu sequence is not
     // identical each time, the results will vary slightly.
     org.junit.Assert.assertTrue(this.getClass().getSimpleName() + ": Score does not match: " + score, score > 0.85);

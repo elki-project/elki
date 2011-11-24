@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -154,7 +154,9 @@ public abstract class AbstractSimpleAlgorithmTest {
     ByLabelClustering bylabel = new ByLabelClustering();
     Clustering<Model> rbl = bylabel.run(database);
 
-    double score = PairCountingFMeasure.compareClusterings(clustering, rbl, 1.0);
+    ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
+    ct.process(clustering, rbl);
+    double score = ct.pairF1Measure();
     if(logger.isVerbose()) {
       logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
     }

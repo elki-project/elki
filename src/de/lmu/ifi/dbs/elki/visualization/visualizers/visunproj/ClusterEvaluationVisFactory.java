@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCounting;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -49,7 +49,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualization oneway - - «create»
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure.ScoreResult oneway - - visualizes
+ * @apiviz.has 
+ *             de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure
+ *             .ScoreResult oneway - - visualizes
  */
 public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   /**
@@ -63,11 +65,11 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   public ClusterEvaluationVisFactory() {
     super();
   }
-  
+
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    final ArrayList<EvaluatePairCountingFMeasure.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluatePairCountingFMeasure.ScoreResult.class);
-    for(EvaluatePairCountingFMeasure.ScoreResult sr : srs) {
+    final ArrayList<EvaluatePairCounting.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluatePairCounting.ScoreResult.class);
+    for(EvaluatePairCounting.ScoreResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.width = 1.0;
       task.height = 0.5;
@@ -80,7 +82,8 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   public Visualization makeVisualization(VisualizationTask task) {
     SVGPlot svgp = task.getPlot();
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    EvaluatePairCountingFMeasure.ScoreResult sr = task.getResult();
+    EvaluatePairCounting.ScoreResult sr = task.getResult();
+    ClusterContingencyTable cont = sr.getContingencyTable();
     
     // TODO: use CSSClass and StyleLibrary
     int i = 0;
@@ -89,24 +92,38 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;
-    }    
+    }
     {
       Element object = svgp.svgText(0, i + 0.7, "F1-Measure, Precision and Recall:");
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;
-    }    
-    for(Vector vec : sr) {
+    }
+    {
       StringBuffer buf = new StringBuffer();
-      double fmeasure = vec.get(0);
-      double inboth = vec.get(1);
-      double infirst = vec.get(2);
-      double insecond = vec.get(3);
-      buf.append(FormatUtil.format(fmeasure, FormatUtil.NF6));
+      buf.append(FormatUtil.format(cont.pairF1Measure(), FormatUtil.NF6));
       buf.append(" / ");
-      buf.append(FormatUtil.format(inboth / (inboth + infirst), FormatUtil.NF6));
+      buf.append(FormatUtil.format(cont.pairPrecision(), FormatUtil.NF6));
       buf.append(" / ");
-      buf.append(FormatUtil.format(inboth / (inboth + insecond), FormatUtil.NF6));
+      buf.append(FormatUtil.format(cont.pairRecall(), FormatUtil.NF6));
+      Element object = svgp.svgText(0, i + 0.7, buf.toString());
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      Element object = svgp.svgText(0, i + 0.7, "Rand, Adjusted Rand and Jaccard:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      StringBuffer buf = new StringBuffer();
+      buf.append(FormatUtil.format(cont.pairRandIndex(), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(cont.pairAdjustedRandIndex(), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(cont.pairJaccard(), FormatUtil.NF6));
       Element object = svgp.svgText(0, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
