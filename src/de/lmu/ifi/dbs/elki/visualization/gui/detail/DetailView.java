@@ -216,6 +216,14 @@ public class DetailView extends SVGPlot implements ResultListener {
   }
 
   /**
+   * @return the layermap
+   */
+  // TODO: Temporary
+  public Map<VisualizationTask, Visualization> getLayermap() {
+    return layermap;
+  }
+
+  /**
    * Class used to insert a new visualization layer
    * 
    * @author Erich Schubert
