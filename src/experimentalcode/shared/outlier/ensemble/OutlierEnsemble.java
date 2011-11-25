@@ -34,15 +34,15 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -142,7 +142,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
       }
     }
     // Combine
-    WritableDataStore<Double> sumscore = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore sumscore = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
     {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", ids.size(), logger) : null;
@@ -159,7 +159,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
         }
         if(scores.size() > 0) {
           double combined = voting.combine(scores);
-          sumscore.put(id, combined);
+          sumscore.putDouble(id, combined);
           minmax.put(combined);
         }
         else {

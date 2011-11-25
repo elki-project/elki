@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -118,7 +119,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
     DBIDs ids = data.getDBIDs();
 
-    WritableDataStore<Double> cop_score = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.class);
+    WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDataStore<Vector> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Vector.class);
     WritableDataStore<Matrix> cop_datav = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Matrix.class);
     WritableDataStore<Integer> cop_dim = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Integer.class);
@@ -147,7 +148,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
         double distance = depsol.distance(data.get(id));
         double prob = NormalDistribution.erf(distance / (stddev * sqrt2));
 
-        cop_score.put(id, prob);
+        cop_score.putDouble(id, prob);
 
         Vector errv = depsol.errorVector(data.get(id));
         cop_err_v.put(id, errv);
