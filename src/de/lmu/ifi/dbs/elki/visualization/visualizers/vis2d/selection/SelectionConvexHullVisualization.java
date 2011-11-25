@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
+import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -99,7 +99,7 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
-      SweepHullDelaunay2D hull = new SweepHullDelaunay2D();
+      GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
       for(DBID i : selection) {
         try {
           hull.add(new Vector(proj.fastProjectDataToRenderSpace(rel.get(i))));

@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Restricted;
 
 /**
  * Classes to compute the convex hull of a set of points in 2D, using the
@@ -42,9 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Restricted;
  * 
  * @author Erich Schubert
  */
-@Restricted("Defect?")
 @Reference(authors = "Paul Graham", title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", booktitle = "Information Processing Letters 1")
-public class ConvexHull2D {
+public class GrahamScanConvexHull2D {
   /**
    * The current set of points
    */
@@ -75,7 +73,7 @@ public class ConvexHull2D {
   /**
    * Constructor.
    */
-  public ConvexHull2D() {
+  public GrahamScanConvexHull2D() {
     this.points = new LinkedList<Vector>();
   }
 
@@ -120,7 +118,7 @@ public class ConvexHull2D {
     Collections.sort(this.points, new Comparator<Vector>() {
       @Override
       public int compare(Vector o1, Vector o2) {
-        return isLeft(o1, o2, origin) ? +1 : 0;
+        return isLeft(o1, o2, origin) ? +1 : -1;
       }
     });
 
@@ -130,7 +128,7 @@ public class ConvexHull2D {
 
   /**
    * Find the starting point, and sort it to the beginning of the list. The
-   * starting point must be on the outer hull. Any "skyline" point will do, e.g.
+   * starting point must be on the outer hull. Any "most extreme" point will do, e.g.
    * the one with the lowest Y coordinate and for ties with the lowest X.
    */
   private void findStartingPoint() {
