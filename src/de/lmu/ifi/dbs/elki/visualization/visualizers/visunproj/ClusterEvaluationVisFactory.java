@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCounting;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -84,7 +85,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
     EvaluatePairCounting.ScoreResult sr = task.getResult();
     ClusterContingencyTable cont = sr.getContingencyTable();
-    
+
     // TODO: use CSSClass and StyleLibrary
     int i = 0;
     {
@@ -124,6 +125,25 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       buf.append(FormatUtil.format(cont.pairAdjustedRandIndex(), FormatUtil.NF6));
       buf.append(" / ");
       buf.append(FormatUtil.format(cont.pairJaccard(), FormatUtil.NF6));
+      Element object = svgp.svgText(0, i + 0.7, buf.toString());
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      Element object = svgp.svgText(0, i + 0.7, "Fowlkes-Mallows, Symmetric Gini (+- stdev):");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      StringBuffer buf = new StringBuffer();
+      buf.append(FormatUtil.format(cont.pairFowlkesMallows(), FormatUtil.NF6));
+      buf.append(" / ");
+      final MeanVariance gini = cont.averageSymmetricGini();
+      buf.append(FormatUtil.format(gini.getMean(), FormatUtil.NF6));
+      buf.append(" +- ");
+      buf.append(FormatUtil.format(gini.getSampleStddev(), FormatUtil.NF6));
       Element object = svgp.svgText(0, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
