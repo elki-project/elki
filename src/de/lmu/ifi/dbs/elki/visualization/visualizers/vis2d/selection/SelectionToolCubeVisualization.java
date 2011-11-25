@@ -311,6 +311,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
           task.put(VisualizationTask.META_TOOL, true);
           task.put(VisualizationTask.META_NOTHUMB, true);
           task.put(VisualizationTask.META_NOEXPORT, true);
+          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           baseResult.getHierarchy().add(selres, task);
           baseResult.getHierarchy().add(p, task);
         }

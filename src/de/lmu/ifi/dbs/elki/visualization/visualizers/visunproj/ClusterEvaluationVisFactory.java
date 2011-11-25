@@ -131,7 +131,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       i++;
     }
     {
-      Element object = svgp.svgText(0, i + 0.7, "Fowlkes-Mallows, Symmetric Gini (+- stdev):");
+      Element object = svgp.svgText(0, i + 0.7, "Fowlkes-Mallows, Symmetric Gini:");
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;

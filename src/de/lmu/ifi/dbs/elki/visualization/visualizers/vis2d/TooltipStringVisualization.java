@@ -187,6 +187,7 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
           for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
             final VisualizationTask task = new VisualizationTask(NAME_ID, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             baseResult.getHierarchy().add(rep, task);
             baseResult.getHierarchy().add(p, task);
           }
@@ -196,6 +197,7 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
           for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
             final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             baseResult.getHierarchy().add(rep, task);
             baseResult.getHierarchy().add(p, task);
           }
@@ -205,6 +207,7 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
           for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
             final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             baseResult.getHierarchy().add(rep, task);
             baseResult.getHierarchy().add(p, task);
           }
@@ -214,6 +217,7 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
           for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
             final VisualizationTask task = new VisualizationTask(NAME_EID, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             baseResult.getHierarchy().add(rep, task);
             baseResult.getHierarchy().add(p, task);
           }

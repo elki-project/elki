@@ -69,6 +69,21 @@ public abstract class AbstractTooltipVisualization<NV extends NumberVector<NV, ?
    */
   public static final String TOOLTIP_AREA = "tooltip_area";
 
+  /**
+   * Our event listener.
+   */
+  EventListener hoverer = new EventListener() {
+    @Override
+    public void handleEvent(Event evt) {
+      handleHoverEvent(evt);
+    }
+  };
+
+  /**
+   * Constructor.
+   * 
+   * @param task Visualization task
+   */
   public AbstractTooltipVisualization(VisualizationTask task) {
     super(task);
     context.addDataStoreListener(this);
@@ -84,14 +99,7 @@ public abstract class AbstractTooltipVisualization<NV extends NumberVector<NV, ?
   public void redraw() {
     setupCSS(svgp);
 
-    double dotsize = 2 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
-
-    EventListener hoverer = new EventListener() {
-      @Override
-      public void handleEvent(Event evt) {
-        handleHoverEvent(evt);
-      }
-    };
+    double dotsize = context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
 
     for(DBID id : rel.iterDBIDs()) {
       double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));
@@ -99,7 +107,7 @@ public abstract class AbstractTooltipVisualization<NV extends NumberVector<NV, ?
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
       // sensitive area.
-      Element area = svgp.svgCircle(v[0], v[1], dotsize);
+      Element area = svgp.svgRect(v[0] - dotsize, v[1] - dotsize, 2 * dotsize, 2 * dotsize);
       SVGUtil.addCSSClass(area, TOOLTIP_AREA);
 
       EventTarget targ = (EventTarget) area;
