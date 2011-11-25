@@ -209,7 +209,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         double sum = 0.0;
         for(OutlierResult r : results) {
           final Double s = r.getScores().get(id);
-          if (s != null && s != Double.NaN) {
+          if (s != null && !Double.isNaN(s)) {
             sum += s;
           }
         }

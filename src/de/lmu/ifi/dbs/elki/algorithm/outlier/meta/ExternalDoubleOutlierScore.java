@@ -172,13 +172,13 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
               id = Integer.parseInt(str.substring(mi.end()));
             }
             if(msf) {
-              if(score != Double.NaN) {
+              if(!Double.isNaN(score)) {
                 throw new AbortException("Score pattern matched twice: previous value " + score + " second value: " + str);
               }
               score = Double.parseDouble(str.substring(ms.end()));
             }
           }
-          if(id != null && score != Double.NaN) {
+          if(id != null && !Double.isNaN(score)) {
             scores.putDouble(DBIDUtil.importInteger(id), score);
             minmax.put(score);
           }
