@@ -190,6 +190,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends A
         for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
           final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), this);
           task.put(VisualizationTask.META_TOOL, true);
+          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           baseResult.getHierarchy().add(o.getScores(), task);
           baseResult.getHierarchy().add(p, task);
         }

@@ -230,6 +230,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
         task.put(VisualizationTask.META_TOOL, true);
         task.put(VisualizationTask.META_NOTHUMB, true);
         task.put(VisualizationTask.META_NOEXPORT, true);
+        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
         // baseResult.getHierarchy().add(p.getRelation(), task);
         baseResult.getHierarchy().add(p, task);
       }
