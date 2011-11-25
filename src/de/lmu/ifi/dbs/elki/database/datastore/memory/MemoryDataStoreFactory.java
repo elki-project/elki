@@ -61,8 +61,13 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
 
   @Override
   public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints) {
-    // TODO: add range-double-store.
-    return new MapIntegerDBIDDoubleStore(ids.size());
+    if(ids instanceof DBIDRange) {
+      DBIDRange range = (DBIDRange) ids;
+      return new ArrayDoubleStore(range.size(), new RangeIDMap(range));
+    }
+    else {
+      return new MapIntegerDBIDDoubleStore(ids.size());
+    }
   }
 
   @Override

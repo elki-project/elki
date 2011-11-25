@@ -27,6 +27,7 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   }
 
   @Override
+  @Deprecated
   public Double get(DBID id) {
     return map.get(id.getIntegerID());
   }
@@ -47,6 +48,7 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   }
 
   @Override
+  @Deprecated
   public Double put(DBID id, Double value) {
     return map.put(id.getIntegerID(), value);
   }
