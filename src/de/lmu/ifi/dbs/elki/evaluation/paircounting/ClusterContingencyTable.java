@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -168,7 +169,7 @@ public class ClusterContingencyTable {
         buf.append("\n");
       }
     }
-    if (pairconfuse != null) {
+    if(pairconfuse != null) {
       buf.append(FormatUtil.format(pairconfuse));
     }
     return buf.toString();
@@ -363,5 +364,38 @@ public class ClusterContingencyTable {
   public long pairMirkin() {
     getPairConfusionMatrix();
     return 2 * (pairconfuse[1] + pairconfuse[2]);
+  }
+
+  /**
+   * Compute the average Gini for each cluster (in both clusterings -
+   * symmetric).
+   * 
+   * @return Mean and variance of Gini
+   */
+  public MeanVariance averageSymmetricGini() {
+    MeanVariance mv = new MeanVariance();
+    for(int i1 = 0; i1 < size1; i1++) {
+      double purity = 0.0;
+      if(contingency[i1][size2] > 0) {
+        final double cs = contingency[i1][size2]; // sum, as double.
+        for(int i2 = 0; i2 < size2; i2++) {
+          double rel = contingency[i1][i2] / cs;
+          purity += rel * rel;
+        }
+      }
+      mv.put(purity);
+    }
+    for(int i2 = 0; i2 < size2; i2++) {
+      double purity = 0.0;
+      if(contingency[size1][i2] > 0) {
+        final double cs = contingency[size1][i2]; // sum, as double.
+        for(int i1 = 0; i1 < size1; i1++) {
+          double rel = contingency[i1][i2] / cs;
+          purity += rel * rel;
+        }
+      }
+      mv.put(purity);
+    }
+    return mv;
   }
 }
