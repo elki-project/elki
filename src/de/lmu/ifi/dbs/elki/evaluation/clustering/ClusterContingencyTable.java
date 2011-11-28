@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Class storing the contingency table and related data on two clusterings.
@@ -460,8 +461,16 @@ public class ClusterContingencyTable {
   /**
    * Entropy based measures
    * 
+   * References:
+   * <p>
+   * Meilă, M.<br />
+   * Comparing clusterings by the variation of information<br />
+   * Learning theory and kernel machines Volume 2777/2003
+   * </p>
+   * 
    * @author Sascha Goldhofer
    */
+  @Reference(authors = "Meilă, M.", title = "Comparing clusterings by the variation of information", booktitle = "Learning theory and kernel machines Volume 2777/2003", url = "http://dx.doi.org/10.1007/978-3-540-45167-9_14")
   public class Entropy {
     /**
      * Entropy in first
@@ -654,8 +663,22 @@ public class ClusterContingencyTable {
   /**
    * Set matching purity measures
    * 
+   * References:
+   * <p>
+   * Zhao, Y. and Karypis, G.<br />
+   * Criterion functions for document clustering: Experiments and analysis<br />
+   * University of Minnesota, Department of Computer Science, Technical Report
+   * 01-40, 2001
+   * </p>
+   * <p>
+   * Meilă, M<br />
+   * Comparing clusterings<br />
+   * University of Washington, Seattle, Technical Report 418, 2002
+   * </p>
+   * 
    * @author Sascha Goldhofer
    */
+  @Reference(authors = "Zhao, Y. and Karypis, G.", title = "Criterion functions for document clustering: Experiments and analysis", booktitle = "University of Minnesota, Department of Computer Science, Technical Report 01-40, 2001", url = "http://www-users.cs.umn.edu/~karypis/publications/Papers/PDF/vscluster.pdf")
   public class SetMatchingPurity {
     /**
      * Result cache
