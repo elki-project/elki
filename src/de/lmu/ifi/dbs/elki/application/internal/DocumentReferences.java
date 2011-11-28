@@ -29,8 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +44,9 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
@@ -62,6 +62,11 @@ public class DocumentReferences {
   private static final String CSSFILE = "stylesheet.css";
 
   private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
+
+  /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(DocumentReferences.class);
 
   /**
    * @param args Command line arguments
@@ -87,7 +92,7 @@ public class DocumentReferences {
         throw new RuntimeException(e);
       }
       OutputStream refstream = new BufferedOutputStream(reffo);
-      Document refdoc = documentParameters();
+      Document refdoc = documentReferences();
       try {
         HTMLUtil.writeXHTML(refdoc, refstream);
         refstream.flush();
@@ -101,7 +106,7 @@ public class DocumentReferences {
     }
   }
 
-  private static Document documentParameters() {
+  private static Document documentReferences() {
     List<Pair<Reference, List<Class<?>>>> refs = sortedReferences();
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -165,7 +170,7 @@ public class DocumentReferences {
       {
         boolean first = true;
         for(Class<?> cls : pair.second) {
-          if (!first) {
+          if(!first) {
             classdt.appendChild(htmldoc.createTextNode(", "));
           }
           Element classan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
@@ -177,7 +182,7 @@ public class DocumentReferences {
           classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(cls.getName()));
           classa.setTextContent(cls.getName());
           classdt.appendChild(classa);
-          
+
           first = false;
         }
       }
@@ -223,22 +228,52 @@ public class DocumentReferences {
   }
 
   private static List<Pair<Reference, List<Class<?>>>> sortedReferences() {
-    ArrayList<Class<?>> classes = findAllClassesWithReferences();
-    Collections.sort(classes, new InspectionUtil.ClassSorter());
+    List<Pair<Reference, List<Class<?>>>> refs = new ArrayList<Pair<Reference, List<Class<?>>>>();
+    Map<Reference, List<Class<?>>> map = new HashMap<Reference, List<Class<?>>>();
 
-    List<Pair<Reference, List<Class<?>>>> refs = new ArrayList<Pair<Reference, List<Class<?>>>>(classes.size());
-    Map<Reference, List<Class<?>>> map = new HashMap<Reference, List<Class<?>>>(classes.size());
-    for(Class<?> cls : classes) {
-      Reference ref = DocumentationUtil.getReference(cls);
-      List<Class<?>> list = map.get(ref);
-      if(list == null) {
-        list = new ArrayList<Class<?>>(5);
-        map.put(ref, list);
-        refs.add(new Pair<Reference, List<Class<?>>>(ref, list));
-      }
-      list.add(cls);
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+      inspectClass(cls, refs, map);
     }
     return refs;
+  }
+
+  private static void inspectClass(final Class<?> cls, List<Pair<Reference, List<Class<?>>>> refs, Map<Reference, List<Class<?>>> map) {
+    try {
+      if(cls.isAnnotationPresent(Reference.class)) {
+        Reference ref = cls.getAnnotation(Reference.class);
+        List<Class<?>> list = map.get(ref);
+        if(list == null) {
+          list = new ArrayList<Class<?>>(5);
+          map.put(ref, list);
+          refs.add(new Pair<Reference, List<Class<?>>>(ref, list));
+        }
+        list.add(cls);
+      }
+      // Inner classes
+      for(Class<?> c2 : cls.getDeclaredClasses()) {
+        inspectClass(c2, refs, map);
+      }
+      for(Method m : cls.getDeclaredMethods()) {
+        if(m.isAnnotationPresent(Reference.class)) {
+          Reference ref = m.getAnnotation(Reference.class);
+          List<Class<?>> list = map.get(ref);
+          if(list == null) {
+            list = new ArrayList<Class<?>>(5);
+            map.put(ref, list);
+            refs.add(new Pair<Reference, List<Class<?>>>(ref, list));
+          }
+          list.add(cls);
+        }
+      }
+    }
+    catch(NoClassDefFoundError e) {
+      if(!cls.getCanonicalName().startsWith("experimentalcode.")) {
+        logger.warning("Exception in finding references for class " + cls.getCanonicalName() + " - missing referenced class?");
+      }
+    }
+    catch(Error e) {
+      logger.warning("Exception in finding references for class " + cls.getCanonicalName() + ": " + e, e);
+    }
   }
 
   private static String linkForClassName(String name) {
@@ -256,6 +291,13 @@ public class DocumentReferences {
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
       if(cls.isAnnotationPresent(Reference.class)) {
         references.add(cls);
+      }
+      else {
+        for(Method m : cls.getDeclaredMethods()) {
+          if(m.isAnnotationPresent(Reference.class)) {
+            references.add(cls);
+          }
+        }
       }
     }
     return references;

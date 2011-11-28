@@ -404,10 +404,18 @@ public class ClusterContingencyTable {
     }
 
     /**
-     * Computes the pair-counting Fowlkes-mallows.
+     * Computes the pair-counting Fowlkes-mallows (flat only, non-hierarchical!)
+     * 
+     * <p>
+     * Fowlkes, E.B. and Mallows, C.L.<br />
+     * A method for comparing two hierarchical clusterings<br />
+     * In: Journal of the American Statistical Association, Vol. 78 Issue 383
+     * </p>
      * 
      * @return pair-counting Fowlkes-mallows
      */
+    // TODO: implement for non-flat clusterings!
+    @Reference(authors = "Fowlkes, E.B. and Mallows, C.L.", title = "A method for comparing two hierarchical clusterings", booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383")
     public double fowlkesMallows() {
       return Math.sqrt(precision() * recall());
     }
@@ -415,8 +423,15 @@ public class ClusterContingencyTable {
     /**
      * Computes the Rand index (RI).
      * 
+     * <p>
+     * Rand, W. M.<br />
+     * Objective Criteria for the Evaluation of Clustering Methods<br />
+     * Journal of the American Statistical Association, Vol. 66 Issue 336
+     * </p>
+     * 
      * @return The Rand index (RI).
      */
+    @Reference(authors = "Rand, W. M.", title = "Objective Criteria for the Evaluation of Clustering Methods", booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", url = "http://www.jstor.org/stable/10.2307/2284239")
     public double randIndex() {
       getPairConfusionMatrix();
       final double sum = pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3];
@@ -646,8 +661,17 @@ public class ClusterContingencyTable {
     /**
      * Get the normalized variation of information (normalized, 0 = equal)
      * 
+     * <p>
+     * Vinh, N.X. and Epps, J. and Bailey, J.<br />
+     * Information theoretic measures for clusterings comparison: is a
+     * correction for chance necessary?<br />
+     * In: Proc. ICML '09 Proceedings of the 26th Annual International
+     * Conference on Machine Learning
+     * </p>
+     * 
      * @return Normalized Variation of information
      */
+    @Reference(authors = "Vinh, N.X. and Epps, J. and Bailey, J.", title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", booktitle = "Proc. ICML '09 Proceedings of the 26th Annual International Conference on Machine Learning", url = "http://dx.doi.org/10.1145/1553374.1553511")
     public double normalizedVariationOfInformation() {
       return (1.0 - (entropyMutualInformation() / entropyJoint()));
     }
@@ -675,10 +699,15 @@ public class ClusterContingencyTable {
    * Comparing clusterings<br />
    * University of Washington, Seattle, Technical Report 418, 2002
    * </p>
+   * <p>
+   * Steinbach, M. and Karypis, G. and Kumar, V. and others<br />
+   * A comparison of document clustering techniques<br />
+   * KDD workshop on text mining, 2000
+   * </p>
    * 
    * @author Sascha Goldhofer
    */
-  @Reference(authors = "Zhao, Y. and Karypis, G.", title = "Criterion functions for document clustering: Experiments and analysis", booktitle = "University of Minnesota, Department of Computer Science, Technical Report 01-40, 2001", url = "http://www-users.cs.umn.edu/~karypis/publications/Papers/PDF/vscluster.pdf")
+  @Reference(authors = "Meilă, M", title = "Comparing clusterings", booktitle = "University of Washington, Seattle, Technical Report 418, 2002", url = "http://www.stat.washington.edu/mmp/www.stat.washington.edu/mmp/Papers/compare-colt.pdf")
   public class SetMatchingPurity {
     /**
      * Result cache
@@ -691,6 +720,7 @@ public class ClusterContingencyTable {
      * 
      * @return purity
      */
+    @Reference(authors = "Zhao, Y. and Karypis, G.", title = "Criterion functions for document clustering: Experiments and analysis", booktitle = "University of Minnesota, Department of Computer Science, Technical Report 01-40, 2001", url = "http://www-users.cs.umn.edu/~karypis/publications/Papers/PDF/vscluster.pdf")
     public double purity() {
       if(smPurity < 0) {
         smPurity = 0.0;
@@ -734,8 +764,15 @@ public class ClusterContingencyTable {
     /**
      * Get the set matching F1-Measure
      * 
+     * <p>
+     * Steinbach, M. and Karypis, G. and Kumar, V. and others<br />
+     * A comparison of document clustering techniques<br />
+     * KDD workshop on text mining, 2000
+     * </p>
+     * 
      * @return Set Matching F1-Measure
      */
+    @Reference(authors = "Steinbach, M. and Karypis, G. and Kumar, V. and others", title = "A comparison of document clustering techniques", booktitle = "KDD workshop on text mining, 2000", url = "http://www-users.itlabs.umn.edu/~karypis/publications/Papers/PDF/doccluster.pdf")
     public double f1Measure() {
       return Util.f1Measure(purity(), inversePurity());
     }
@@ -744,8 +781,16 @@ public class ClusterContingencyTable {
   /**
    * Edit distance measures
    * 
+   * <p>
+   * Pantel, P. and Lin, D.<br />
+   * Document clustering with committees<br/>
+   * Proc. 25th ACM SIGIR conference on Research and development in information
+   * retrieval
+   * </p>
+   * 
    * @author Sascha Goldhofer
    */
+  @Reference(authors = "Pantel, P. and Lin, D.", title = "Document clustering with committees", booktitle = "Proc. 25th ACM SIGIR conference on Research and development in information retrieval", url = "http://dx.doi.org/10.1145/564376.564412")
   public class EditDistance {
     /**
      * Edit operations for first clustering to second clustering.
@@ -854,10 +899,19 @@ public class ClusterContingencyTable {
   }
 
   /**
-   * BCubed measures
+   * BCubed measures.
+   * 
+   * Reference:
+   * <p>
+   * Bagga, A. and Baldwin, B.<br />
+   * Entity-based cross-document coreferencing using the Vector Space Model<br />
+   * Proc. COLING '98 Proceedings of the 17th international conference on
+   * Computational linguistics
+   * </p>
    * 
    * @author Sascha Goldhofer
    */
+  @Reference(authors = "Bagga, A. and Baldwin, B.", title = "Entity-based cross-document coreferencing using the Vector Space Model", booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", url = "http://dx.doi.org/10.3115/980451.980859")
   public class BCubed {
     /**
      * Result cache
