@@ -16,22 +16,16 @@ package experimentalcode.students.kolbh;
   import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
   /**
-   * Class to perform and //TODO: undo a normalization on real vectors with
+   * Class to perform a normalization on vectors to norm 1.
    *  
    * @author Heidi Kolb
    * @param <V> vector type
    */
   // TODO: extract superclass AbstractAttributeWiseNormalization
   public class NormalizationNorm1<V extends NumberVector<V, ?>> extends AbstractNormalization<V> {
-    /**
-     * The logger for this class.
-     */
-    private static final Logging logger = Logging.getLogger(AngleNormalizationDistanceToAngle.class);
 
     /**
-     * Constructor with parameters.
-     * 
-     * @param viewpoint viewpoint
+     * Constructor 
      */
     public NormalizationNorm1() {
     }
