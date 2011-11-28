@@ -156,7 +156,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
     ct.process(clustering, rbl);
-    double score = ct.pairF1Measure();
+    double score = ct.getPaircount().f1Measure();
     if(logger.isVerbose()) {
       logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
     }

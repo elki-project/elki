@@ -172,14 +172,14 @@ public class EvaluatePairCounting implements Evaluator {
       out.commentPrint("Jaccard, ");
       out.commentPrint("Mirkin");
       out.flush();
-      out.inlinePrint(contmat.pairF1Measure());
-      out.inlinePrint(contmat.pairPrecision());
-      out.inlinePrint(contmat.pairRecall());
-      out.inlinePrint(contmat.pairRandIndex());
-      out.inlinePrint(contmat.pairAdjustedRandIndex());
-      out.inlinePrint(contmat.pairFowlkesMallows());
-      out.inlinePrint(contmat.pairJaccard());
-      out.inlinePrint(contmat.pairMirkin());
+      out.inlinePrint(contmat.getPaircount().f1Measure());
+      out.inlinePrint(contmat.getPaircount().precision());
+      out.inlinePrint(contmat.getPaircount().recall());
+      out.inlinePrint(contmat.getPaircount().randIndex());
+      out.inlinePrint(contmat.getPaircount().adjustedRandIndex());
+      out.inlinePrint(contmat.getPaircount().fowlkesMallows());
+      out.inlinePrint(contmat.getPaircount().jaccard());
+      out.inlinePrint(contmat.getPaircount().mirkin());
       out.flush();
     }
   }

@@ -29,6 +29,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable.PairCounting;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCounting;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -100,13 +101,14 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       layer.appendChild(object);
       i++;
     }
+    PairCounting paircount = cont.getPaircount();
     {
       StringBuffer buf = new StringBuffer();
-      buf.append(FormatUtil.format(cont.pairF1Measure(), FormatUtil.NF6));
+      buf.append(FormatUtil.format(paircount.f1Measure(), FormatUtil.NF6));
       buf.append(" / ");
-      buf.append(FormatUtil.format(cont.pairPrecision(), FormatUtil.NF6));
+      buf.append(FormatUtil.format(paircount.precision(), FormatUtil.NF6));
       buf.append(" / ");
-      buf.append(FormatUtil.format(cont.pairRecall(), FormatUtil.NF6));
+      buf.append(FormatUtil.format(paircount.recall(), FormatUtil.NF6));
       Element object = svgp.svgText(0, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
@@ -120,11 +122,11 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
     }
     {
       StringBuffer buf = new StringBuffer();
-      buf.append(FormatUtil.format(cont.pairRandIndex(), FormatUtil.NF6));
+      buf.append(FormatUtil.format(paircount.randIndex(), FormatUtil.NF6));
       buf.append(" / ");
-      buf.append(FormatUtil.format(cont.pairAdjustedRandIndex(), FormatUtil.NF6));
+      buf.append(FormatUtil.format(paircount.adjustedRandIndex(), FormatUtil.NF6));
       buf.append(" / ");
-      buf.append(FormatUtil.format(cont.pairJaccard(), FormatUtil.NF6));
+      buf.append(FormatUtil.format(paircount.jaccard(), FormatUtil.NF6));
       Element object = svgp.svgText(0, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
@@ -138,7 +140,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
     }
     {
       StringBuffer buf = new StringBuffer();
-      buf.append(FormatUtil.format(cont.pairFowlkesMallows(), FormatUtil.NF6));
+      buf.append(FormatUtil.format(paircount.fowlkesMallows(), FormatUtil.NF6));
       buf.append(" / ");
       final MeanVariance gini = cont.averageSymmetricGini();
       buf.append(FormatUtil.format(gini.getMean(), FormatUtil.NF6));
