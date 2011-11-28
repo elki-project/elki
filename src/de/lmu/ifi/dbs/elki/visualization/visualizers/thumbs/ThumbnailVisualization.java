@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
+import java.awt.image.BufferedImage;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -48,7 +49,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses Thumbnailer
  * @apiviz.uses ThumbnailThread
  */
 public class ThumbnailVisualization extends AbstractVisualization implements ThumbnailThread.Listener, DataStoreListener {
@@ -68,9 +68,9 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   protected final VisFactory visFactory;
 
   /**
-   * The thumbnail file.
+   * The thumbnail id.
    */
-  protected File thumb = null;
+  protected int thumbid = -1;
 
   /**
    * Pending redraw
@@ -88,6 +88,11 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   private int mask;
 
   /**
+   * Our thumbnail (keep a reference to prevent garbage collection!)
+   */
+  private BufferedImage thumb;
+
+  /**
    * Constructor.
    * 
    * @param visFactory Visualizer Factory to use
@@ -100,6 +105,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     Integer tres = task.getGenerics(VisualizationTask.THUMBNAIL_RESOLUTION, Integer.class);
     this.tresolution = tres;
     this.layer = task.getPlot().svgElement(SVGConstants.SVG_G_TAG);
+    this.thumbid = -1;
     this.thumb = null;
     this.mask = mask;
     // Listen for database events only when needed.
@@ -117,6 +123,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     if(pendingThumbnail != null) {
       ThumbnailThread.UNQUEUE(pendingThumbnail);
     }
+    // TODO: remove image from registry?
     context.removeResultListener(this);
     context.removeContextChangeListener(this);
     context.removeDataStoreListener(this);
@@ -124,7 +131,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public Element getLayer() {
-    if(thumb == null) {
+    if(thumbid < 0) {
       synchronizedRedraw();
     }
     return layer;
@@ -182,7 +189,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
    */
   @Override
   protected void redraw() {
-    if(thumb == null) {
+    if(thumbid < 0) {
       // LoggingUtil.warning("Generating new thumbnail " + this);
       layer.appendChild(SVGUtil.svgWaitIcon(task.getPlot().getDocument(), 0, 0, task.getWidth(), task.getHeight()));
       if(pendingThumbnail == null) {
@@ -196,13 +203,13 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
       SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, task.getWidth());
       SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, task.getHeight());
-      i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, thumb.toURI().toString());
+      i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, ThumbnailRegistryEntry.INTERNAL_PROTOCOL + ":" + thumbid);
       layer.appendChild(i);
     }
   }
 
   @Override
-  public synchronized void doThumbnail(Thumbnailer t) {
+  public synchronized void doThumbnail() {
     pendingThumbnail = null;
     try {
       SVGPlot plot = new SVGPlot();
@@ -217,7 +224,8 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       plot.updateStyleElement();
       final int tw = (int) (task.getWidth() * tresolution);
       final int th = (int) (task.getHeight() * tresolution);
-      thumb = t.thumbnail(plot, tw, th);
+      thumb = plot.makeAWTImage(tw, th);
+      thumbid = ThumbnailRegistryEntry.registerImage(thumb);
       // The visualization will not be used anymore.
       vis.destroy();
       synchronizedRedraw();
@@ -236,7 +244,9 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   protected void refreshThumbnail() {
     // Discard an existing thumbnail
+    thumbid = -1;
     thumb = null;
+    // TODO: also purge from ThumbnailRegistryEntry?
     synchronizedRedraw();
   }
 

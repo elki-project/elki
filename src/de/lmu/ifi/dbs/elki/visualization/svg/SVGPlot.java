@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,6 +70,7 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeListIterator;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailTranscoder;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -165,7 +167,7 @@ public class SVGPlot {
     // create a CSS class manager.
     cssman = new CSSClassManager();
   }
-  
+
   /**
    * Clean up the plot.
    */
@@ -296,6 +298,7 @@ public class SVGPlot {
 
   /**
    * Convenience method to add a CSS class or log an error.
+   * 
    * @param cls CSS class to add.
    */
   public void addCSSClassOrLogError(CSSClass cls) {
@@ -515,6 +518,24 @@ public class SVGPlot {
     else {
       throw new IOException("Unknown file extension: " + extension);
     }
+  }
+
+  /**
+   * Convert the SVG to a thumbnail image.
+   * 
+   * @param width Width of thumbnail
+   * @param height Height of thumbnail
+   * @return Buffered image
+   */
+  public BufferedImage makeAWTImage(int width, int height) throws TranscoderException {
+    ThumbnailTranscoder t = new ThumbnailTranscoder();
+    t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(width));
+    t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(height));
+    // Clone - avoid GWT interactions.
+    SVGDocument doc = (SVGDocument) DOMUtilities.deepCloneDocument(getDocument(), getDocument().getImplementation());
+    TranscoderInput input = new TranscoderInput(doc);
+    t.transcode(input, null);
+    return t.getLastImage();
   }
 
   /**
