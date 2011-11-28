@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-
 /**
  * Thread to render thumbnails in the background.
  * 
@@ -45,11 +44,6 @@ public class ThumbnailThread extends Thread {
    * Flag to signal shutdown.
    */
   private boolean shutdown = false;
-
-  /**
-   * Thumbnailer to use.
-   */
-  private Thumbnailer t = new Thumbnailer();
 
   /**
    * The static thumbnail thread.
@@ -113,7 +107,7 @@ public class ThumbnailThread extends Thread {
    * @param ti Visualization task
    */
   private void generateThumbnail(Task ti) {
-    ti.callback.doThumbnail(t);
+    ti.callback.doThumbnail();
   }
 
   @Override
@@ -163,9 +157,7 @@ public class ThumbnailThread extends Thread {
   public interface Listener {
     /**
      * Callback when to (re-)compute the thumbnail.
-     * 
-     * @param t Thumbnailer to use
      */
-    public void doThumbnail(Thumbnailer t);
+    public void doThumbnail();
   }
 }

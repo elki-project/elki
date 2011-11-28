@@ -1,0 +1,199 @@
+package de.lmu.ifi.dbs.elki.visualization.batikutil;
+
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.SoftReference;
+import java.util.Iterator;
+
+import org.apache.batik.ext.awt.image.GraphicsUtil;
+import org.apache.batik.ext.awt.image.renderable.Filter;
+import org.apache.batik.ext.awt.image.renderable.RedRable;
+import org.apache.batik.ext.awt.image.spi.AbstractRegistryEntry;
+import org.apache.batik.ext.awt.image.spi.ImageTagRegistry;
+import org.apache.batik.ext.awt.image.spi.MagicNumberRegistryEntry;
+import org.apache.batik.ext.awt.image.spi.URLRegistryEntry;
+import org.apache.batik.svggen.ErrorConstants;
+import org.apache.batik.util.ParsedURL;
+import org.apache.batik.util.ParsedURLData;
+import org.apache.batik.util.ParsedURLProtocolHandler;
+
+import de.lmu.ifi.dbs.elki.logging.Logging;
+
+/**
+ * Access images via an internal image registry.
+ * 
+ * @author Erich Schubert
+ */
+public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URLRegistryEntry, ParsedURLProtocolHandler {
+  /**
+   * ELKI internal thumbnail protocol id.
+   */
+  public static final String INTERNAL_PROTOCOL = "thumb";
+
+  /**
+   * Mime type
+   */
+  public static final String INTERNAL_MIME_TYPE = "internal/thumb";
+
+  /**
+   * The priority of this entry.
+   */
+  public static final float PRIORITY = 1 * MagicNumberRegistryEntry.PRIORITY;
+
+  /**
+   * The logger class.
+   */
+  private static final Logging logger = Logging.getLogger(ThumbnailRegistryEntry.class);
+
+  /**
+   * The image cache.
+   */
+  private static final TIntObjectMap<SoftReference<RenderedImage>> images = new TIntObjectHashMap<SoftReference<RenderedImage>>();
+
+  /**
+   * Object counter
+   */
+  private static int counter = 1;
+
+  /**
+   * Constructor.
+   * 
+   * Note: there will usually be two instances created. One for handling the
+   * image type, one for the URL handling. This is ok.
+   */
+  public ThumbnailRegistryEntry() {
+    super("Internal", PRIORITY, new String[0], new String[] { INTERNAL_MIME_TYPE });
+    if(logger.isDebuggingFiner()) {
+      logger.debugFiner("Registry initialized.");
+    }
+  }
+
+  /**
+   * Put an image into the repository (note: the repository is only keeping a
+   * weak reference!)
+   * 
+   * @param img Image to put
+   * @return Key
+   */
+  public static int registerImage(RenderedImage img) {
+    synchronized(images) {
+      int key = counter;
+      counter++;
+      assert (images.get(key) == null);
+      images.put(key, new SoftReference<RenderedImage>(img));
+      // Reorganize map, purge old entries
+      if(counter % 50 == 49) {
+        for(TIntObjectIterator<SoftReference<RenderedImage>> iter = images.iterator(); iter.hasNext();) {
+          iter.advance();
+          if(iter.value() == null || iter.value().get() == null) {
+            iter.remove();
+          }
+        }
+      }
+      if(logger.isDebuggingFiner()) {
+        logger.debugFiner("Registered image: " + key);
+      }
+      return key;
+    }
+  }
+
+  @Override
+  public boolean isCompatibleURL(ParsedURL url) {
+    // logger.warning("isCompatible " + url.toString());
+    return url.getProtocol().equals(INTERNAL_PROTOCOL);
+  }
+
+  @Override
+  public Filter handleURL(ParsedURL url, boolean needRawData) {
+    if(logger.isDebuggingFiner()) {
+      logger.debugFiner("handleURL " + url.toString());
+    }
+    if(!url.getProtocol().equals(INTERNAL_PROTOCOL)) {
+      return null;
+    }
+    int id;
+    try {
+      id = Integer.parseInt(url.getPath());
+    }
+    catch(NumberFormatException e) {
+      return null;
+    }
+    SoftReference<RenderedImage> ref = images.get(id);
+    if(ref != null) {
+      RenderedImage ri = ref.get();
+      if(ri == null) {
+        logger.warning("Referenced image has expired from the cache!");
+      }
+      else {
+        return new RedRable(GraphicsUtil.wrap(ri));
+      }
+    }
+    // Image not found in registry.
+    return ImageTagRegistry.getBrokenLinkImage(ThumbnailRegistryEntry.this, ErrorConstants.ERR_IMAGE_DIR_DOES_NOT_EXIST, new Object[0]);
+  }
+
+  /**
+   * URL representation for internal URLs.
+   * 
+   * @author Erich Schubert
+   */
+  class InternalParsedURLData extends ParsedURLData {
+    /**
+     * Constructor.
+     */
+    public InternalParsedURLData(String id) {
+      super();
+      this.protocol = INTERNAL_PROTOCOL;
+      this.contentType = INTERNAL_MIME_TYPE;
+      this.path = id;
+    }
+
+    @Override
+    public String getContentType(String userAgent) {
+      return INTERNAL_MIME_TYPE;
+    }
+
+    @Override
+    public boolean complete() {
+      return true;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public InputStream openStream(String userAgent, Iterator mimeTypes) throws IOException {
+      // Return null, since we don't want to use streams.
+      return null;
+    }
+  }
+
+  @Override
+  public ParsedURLData parseURL(String urlStr) {
+    if(logger.isDebuggingFinest()) {
+      logger.debugFinest("parseURL: " + urlStr, new Throwable());
+    }
+    if(urlStr.startsWith(INTERNAL_PROTOCOL)) {
+      if(urlStr.charAt(INTERNAL_PROTOCOL.length()) == ':') {
+        InternalParsedURLData ret = new InternalParsedURLData(urlStr.substring(INTERNAL_PROTOCOL.length() + 1));
+        return ret;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public ParsedURLData parseURL(ParsedURL basepurl, String urlStr) {
+    // Won't happen in a relative way anyway, and is not particularly
+    // supported (as the objects might be dropped from the cache)
+    return parseURL(urlStr);
+  }
+
+  @Override
+  public String getProtocolHandled() {
+    return INTERNAL_PROTOCOL;
+  }
+}
