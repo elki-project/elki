@@ -28,9 +28,13 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable.PairCounting;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCounting;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.BCubed;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.EditDistance;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.Entropy;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.PairCounting;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.SetMatchingPurity;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -51,9 +55,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualization oneway - - «create»
- * @apiviz.has 
- *             de.lmu.ifi.dbs.elki.evaluation.paircounting.EvaluatePairCountingFMeasure
- *             .ScoreResult oneway - - visualizes
+ * @apiviz.has EvaluateClustering.ScoreResult oneway - - visualizes
  */
 public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   /**
@@ -70,11 +72,11 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    final ArrayList<EvaluatePairCounting.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluatePairCounting.ScoreResult.class);
-    for(EvaluatePairCounting.ScoreResult sr : srs) {
+    final ArrayList<EvaluateClustering.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluateClustering.ScoreResult.class);
+    for(EvaluateClustering.ScoreResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.width = 1.0;
-      task.height = 0.5;
+      task.height = 2.0;
       task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
       baseResult.getHierarchy().add(sr, task);
     }
@@ -84,19 +86,21 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   public Visualization makeVisualization(VisualizationTask task) {
     SVGPlot svgp = task.getPlot();
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    EvaluatePairCounting.ScoreResult sr = task.getResult();
+    EvaluateClustering.ScoreResult sr = task.getResult();
     ClusterContingencyTable cont = sr.getContingencyTable();
 
     // TODO: use CSSClass and StyleLibrary
+
     int i = 0;
+    // Pair-counting measures:
     {
-      Element object = svgp.svgText(0, i + 0.7, "Same-cluster object pairs");
+      Element object = svgp.svgText(0, i + 0.7, "Pair-counting measures:");
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;
     }
     {
-      Element object = svgp.svgText(0, i + 0.7, "F1-Measure, Precision and Recall:");
+      Element object = svgp.svgText(0.3, i + 0.7, "F1-Measure, Precision and Recall:");
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;
@@ -109,13 +113,13 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       buf.append(FormatUtil.format(paircount.precision(), FormatUtil.NF6));
       buf.append(" / ");
       buf.append(FormatUtil.format(paircount.recall(), FormatUtil.NF6));
-      Element object = svgp.svgText(0, i + 0.7, buf.toString());
+      Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
       i++;
     }
     {
-      Element object = svgp.svgText(0, i + 0.7, "Rand, Adjusted Rand and Jaccard:");
+      Element object = svgp.svgText(0.3, i + 0.7, "Rand, Adjusted Rand and Jaccard:");
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;
@@ -127,13 +131,13 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       buf.append(FormatUtil.format(paircount.adjustedRandIndex(), FormatUtil.NF6));
       buf.append(" / ");
       buf.append(FormatUtil.format(paircount.jaccard(), FormatUtil.NF6));
-      Element object = svgp.svgText(0, i + 0.7, buf.toString());
+      Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
       i++;
     }
     {
-      Element object = svgp.svgText(0, i + 0.7, "Fowlkes-Mallows, Symmetric Gini:");
+      Element object = svgp.svgText(0.3, i + 0.7, "Fowlkes-Mallows, Mirkin-Index:");
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;
@@ -142,17 +146,129 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       StringBuffer buf = new StringBuffer();
       buf.append(FormatUtil.format(paircount.fowlkesMallows(), FormatUtil.NF6));
       buf.append(" / ");
+      buf.append(FormatUtil.format(paircount.mirkin()));
+      Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(object);
+      i++;
+    }
+    // Entropy-based measures
+    {
+      Element object = svgp.svgText(0, i + 0.7, "Entropy measures:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      Element object = svgp.svgText(0.3, i + 0.7, "VI, NormalizedVI, F-Measure:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      Entropy entropy = cont.getEntropy();
+      StringBuffer buf = new StringBuffer();
+      buf.append(FormatUtil.format(entropy.variationOfInformation(), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(entropy.normalizedVariationOfInformation(), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(entropy.f1Measure(), FormatUtil.NF6));
+      Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(object);
+      i++;
+    }
+    // BCubed-based measures
+    {
+      Element object = svgp.svgText(0, i + 0.7, "BCubed measures:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      Element object = svgp.svgText(0.3, i + 0.7, "F-Measure / Precision / Recall:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      BCubed bcubed = cont.getBCubed();
+      StringBuffer buf = new StringBuffer();
+      buf.append(FormatUtil.format(bcubed.f1Measure(), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(bcubed.precision(), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(bcubed.recall(), FormatUtil.NF6));
+      Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(object);
+      i++;
+    }
+    // Set-Matching-based measures
+    {
+      Element object = svgp.svgText(0, i + 0.7, "Set-Matching measures:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      Element object = svgp.svgText(0.3, i + 0.7, "F-Measure / Inverse Purity / Purity:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      SetMatchingPurity setm = cont.getSetMatching();
+      StringBuffer buf = new StringBuffer();
+      buf.append(FormatUtil.format(setm.f1Measure(), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(setm.inversePurity(), FormatUtil.NF6));
+      buf.append(" / ");
+      buf.append(FormatUtil.format(setm.purity(), FormatUtil.NF6));
+      Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(object);
+      i++;
+    }
+    // Edit-distance measures
+    {
+      Element object = svgp.svgText(0, i + 0.7, "Edit-distance measures:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      EditDistance edit = cont.getEdit();
+      StringBuffer buf = new StringBuffer();
+      buf.append("Edit F1: ");
+      buf.append(FormatUtil.format(edit.f1Measure(), FormatUtil.NF6));
+      Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(object);
+      i++;
+    }
+    // Gini measures
+    {
+      Element object = svgp.svgText(0, i + 0.7, "Gini measures:");
+      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+      layer.appendChild(object);
+      i++;
+    }
+    {
+      StringBuffer buf = new StringBuffer();
+      buf.append("Mean: ");
       final MeanVariance gini = cont.averageSymmetricGini();
       buf.append(FormatUtil.format(gini.getMean(), FormatUtil.NF6));
       buf.append(" +- ");
       buf.append(FormatUtil.format(gini.getSampleStddev(), FormatUtil.NF6));
-      Element object = svgp.svgText(0, i + 0.7, buf.toString());
+      Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
       i++;
     }
 
-    int cols = Math.max(10, (int) (i * task.getHeight() / task.getWidth()));
+    int cols = 10; // Math.max(10, (int) (i * task.getHeight() /
+                   // task.getWidth()));
     int rows = i;
     final double margin = task.getContext().getStyleLibrary().getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);

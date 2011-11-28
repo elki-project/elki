@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.evaluation.paircounting;
+package de.lmu.ifi.dbs.elki.evaluation.clustering;
 
 /*
  This file is part of ELKI:
@@ -240,6 +240,18 @@ public class ClusterContingencyTable {
       bcubed = new BCubed();
     }
     return bcubed;
+  }
+
+  /**
+   * The set-matching measures
+   * 
+   * @return Set-Matching measures
+   */
+  public SetMatchingPurity getSetMatching() {
+    if(smp == null) {
+      smp = new SetMatchingPurity();
+    }
+    return smp;
   }
 
   /**
