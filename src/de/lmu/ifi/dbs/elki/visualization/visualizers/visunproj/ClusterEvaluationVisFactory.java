@@ -28,13 +28,13 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.evaluation.clustering.BCubed;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.EditDistance;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.Entropy;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.BCubed;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.EditDistance;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.Entropy;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.PairCounting;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.SetMatchingPurity;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.PairCounting;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.SetMatchingPurity;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
