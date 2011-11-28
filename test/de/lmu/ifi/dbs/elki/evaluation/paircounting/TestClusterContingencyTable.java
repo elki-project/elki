@@ -102,6 +102,6 @@ public class TestClusterContingencyTable implements JUnit4Test {
   private double computeFMeasure(Clustering<?> c1, Clustering<?> c2, boolean noise) {
     ClusterContingencyTable ct = new ClusterContingencyTable(true, noise);
     ct.process(c1, c2);
-    return ct.pairF1Measure();
+    return ct.getPaircount().f1Measure();
   }
 }

@@ -79,7 +79,7 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
     Clustering<Model> rbl = bylabel.run(db);
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
     ct.process(clustering, rbl);
-    double score = ct.pairF1Measure();
+    double score = ct.getPaircount().f1Measure();
     // We cannot test exactly - due to Hashing, DeLiClu sequence is not
     // identical each time, the results will vary slightly.
     org.junit.Assert.assertTrue(this.getClass().getSimpleName() + ": Score does not match: " + score, score > 0.85);
