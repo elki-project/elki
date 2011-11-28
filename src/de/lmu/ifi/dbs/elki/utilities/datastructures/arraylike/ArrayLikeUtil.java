@@ -67,6 +67,11 @@ public final class ArrayLikeUtil {
   public static final NumberArrayAdapter<Double, double[]> DOUBLEARRAYADAPTER = new DoubleArrayAdapter();
 
   /**
+   * USe a Trove double list as array.
+   */
+  public static final TDoubleListAdapter TDOUBLELISTADAPTER = new TDoubleListAdapter();
+  
+  /**
    * Cast the static instance.
    * 
    * @param dummy Dummy variable, for type inference

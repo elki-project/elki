@@ -23,11 +23,12 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.array.TDoubleArrayList;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
@@ -132,7 +133,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * Current labels
    */
   protected LabelList curlbl = null;
-  
+
   /**
    * Event to report next
    */
@@ -166,7 +167,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
 
   @Override
   public Event nextEvent() {
-    if (nextevent != null) {
+    if(nextevent != null) {
       Event ret = nextevent;
       nextevent = null;
       return ret;
@@ -210,10 +211,10 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
 
   @Override
   public Object data(int rnum) {
-    if (rnum == 0) {
+    if(rnum == 0) {
       return curvec;
     }
-    if (rnum == 1) {
+    if(rnum == 1) {
       return curlbl;
     }
     throw new ArrayIndexOutOfBoundsException();
@@ -229,7 +230,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   protected void parseLineInternal(String line) {
     List<String> entries = tokenize(line);
     // Split into numerical attributes and labels
-    List<Double> attributes = new ArrayList<Double>(entries.size());
+    TDoubleArrayList attributes = new TDoubleArrayList(entries.size());
     LabelList labels = new LabelList();
 
     Iterator<String> itr = entries.iterator();
@@ -237,7 +238,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       String ent = itr.next();
       if(!labelIndices.get(i)) {
         try {
-          Double attribute = Double.valueOf(ent);
+          double attribute = Double.valueOf(ent);
           attributes.add(attribute);
           continue;
         }
@@ -248,7 +249,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       labels.add(ent);
     }
 
-    curvec = createDBObject(attributes, ArrayLikeUtil.numberListAdapter(attributes));
+    curvec = createDBObject(attributes, ArrayLikeUtil.TDOUBLELISTADAPTER);
     curlbl = labels;
   }
 
