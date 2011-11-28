@@ -44,42 +44,42 @@ public class ClusterContingencyTable {
   /**
    * Noise cluster handling
    */
-  boolean breakNoiseClusters = false;
+  protected boolean breakNoiseClusters = false;
 
   /**
    * Self pairing
    */
-  boolean selfPairing = true;
+  protected boolean selfPairing = true;
 
   /**
    * Number of clusters in first
    */
-  int size1 = -1;
+  protected int size1 = -1;
 
   /**
    * Number of clusters in second
    */
-  int size2 = -1;
+  protected int size2 = -1;
 
   /**
    * Contingency matrix
    */
-  int[][] contingency = null;
+  protected int[][] contingency = null;
 
   /**
    * Noise flags
    */
-  BitSet noise1 = null;
+  protected BitSet noise1 = null;
 
   /**
    * Noise flags
    */
-  BitSet noise2 = null;
+  protected BitSet noise2 = null;
 
   /**
    * Pair counting confusion matrix (flat: inBoth, inFirst, inSecond, inNone)
    */
-  long[] pairconfuse = null;
+  protected long[] pairconfuse = null;
 
   /**
    * Constructor.
