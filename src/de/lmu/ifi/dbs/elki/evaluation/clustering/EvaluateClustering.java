@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.evaluation.paircounting;
+package de.lmu.ifi.dbs.elki.evaluation.clustering;
 
 /*
  This file is part of ELKI:
@@ -50,13 +50,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @apiviz.landmark
  * @apiviz.uses ClusterContingencyTable
- * @apiviz.has EvaluatePairCounting.ScoreResult oneway - - «create»
+ * @apiviz.has EvaluateClustering.ScoreResult oneway - - «create»
  */
-public class EvaluatePairCounting implements Evaluator {
+public class EvaluateClustering implements Evaluator {
   /**
    * Logger for debug output.
    */
-  protected static final Logging logger = Logging.getLogger(EvaluatePairCounting.class);
+  protected static final Logging logger = Logging.getLogger(EvaluateClustering.class);
 
   /**
    * Parameter to obtain the reference clustering. Defaults to a flat label
@@ -96,7 +96,7 @@ public class EvaluatePairCounting implements Evaluator {
    * @param noiseSpecialHandling Noise handling flag
    * @param selfPairing Self-pairing flag
    */
-  public EvaluatePairCounting(ClusteringAlgorithm<?> referencealg, boolean noiseSpecialHandling, boolean selfPairing) {
+  public EvaluateClustering(ClusteringAlgorithm<?> referencealg, boolean noiseSpecialHandling, boolean selfPairing) {
     super();
     this.referencealg = referencealg;
     this.noiseSpecialHandling = noiseSpecialHandling;
@@ -163,14 +163,24 @@ public class EvaluatePairCounting implements Evaluator {
 
     @Override
     public void writeToText(TextWriterStream out, String label) {
-      out.commentPrint("F1-Measure, ");
-      out.commentPrint("Precision, ");
-      out.commentPrint("Recall, ");
-      out.commentPrint("Rand, ");
-      out.commentPrint("AdjustedRand, ");
-      out.commentPrint("FowlkesMallows, ");
-      out.commentPrint("Jaccard, ");
-      out.commentPrint("Mirkin");
+      out.commentPrint("Pair-F1, ");
+      out.commentPrint("Pair-Precision, ");
+      out.commentPrint("Pair-Recall, ");
+      out.commentPrint("Pair-Rand, ");
+      out.commentPrint("Pair-AdjustedRand, ");
+      out.commentPrint("Pair-FowlkesMallows, ");
+      out.commentPrint("Pair-Jaccard, ");
+      out.commentPrint("Pair-Mirkin, ");
+      out.commentPrint("Entropy-VI, ");
+      out.commentPrint("Entropy-NormalizedVI, ");
+      out.commentPrint("Entropy-F1, ");
+      out.commentPrint("Edit-F1, ");
+      out.commentPrint("SM-InvPurity, ");
+      out.commentPrint("SM-Purity, ");
+      out.commentPrint("SM-F1, ");
+      out.commentPrint("BCubed-Precision, ");
+      out.commentPrint("BCubed-Recall, ");
+      out.commentPrint("BCubed-F1");
       out.flush();
       out.inlinePrint(contmat.getPaircount().f1Measure());
       out.inlinePrint(contmat.getPaircount().precision());
@@ -180,6 +190,16 @@ public class EvaluatePairCounting implements Evaluator {
       out.inlinePrint(contmat.getPaircount().fowlkesMallows());
       out.inlinePrint(contmat.getPaircount().jaccard());
       out.inlinePrint(contmat.getPaircount().mirkin());
+      out.inlinePrint(contmat.getEntropy().variationOfInformation());
+      out.inlinePrint(contmat.getEntropy().normalizedVariationOfInformation());
+      out.inlinePrint(contmat.getEntropy().f1Measure());
+      out.inlinePrint(contmat.getEdit().f1Measure());
+      out.inlinePrint(contmat.getSetMatching().inversePurity());
+      out.inlinePrint(contmat.getSetMatching().purity());
+      out.inlinePrint(contmat.getSetMatching().f1Measure());
+      out.inlinePrint(contmat.getBCubed().precision());
+      out.inlinePrint(contmat.getBCubed().recall());
+      out.inlinePrint(contmat.getBCubed().f1Measure());
       out.flush();
     }
   }
@@ -218,8 +238,8 @@ public class EvaluatePairCounting implements Evaluator {
     }
 
     @Override
-    protected EvaluatePairCounting makeInstance() {
-      return new EvaluatePairCounting(referencealg, noiseSpecialHandling, !noSelfPairing);
+    protected EvaluateClustering makeInstance() {
+      return new EvaluateClustering(referencealg, noiseSpecialHandling, !noSelfPairing);
     }
   }
 }

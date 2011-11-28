@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.ClusterContingencyTable;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
