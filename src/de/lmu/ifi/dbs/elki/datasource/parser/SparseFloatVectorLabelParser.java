@@ -96,21 +96,19 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
 
     for(int i = 1; i < entries.size() - 1; i++) {
       if(!labelIndices.get(i)) {
-        Integer index;
-        Float attribute;
         try {
-          index = Integer.valueOf(entries.get(i));
+          int index = Integer.valueOf(entries.get(i));
           if(index > maxdim) {
             maxdim = index;
           }
+          float attribute = Float.valueOf(entries.get(i));
+          values.put(index, attribute);
           i++;
         }
         catch(NumberFormatException e) {
           labels.add(entries.get(i));
           continue;
         }
-        attribute = Float.valueOf(entries.get(i));
-        values.put(index, attribute);
       }
       else {
         labels.add(entries.get(i));
