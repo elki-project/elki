@@ -124,7 +124,9 @@ public abstract class AbstractParser {
         // Closing quote found?
         if(m.start() > index + 1 && input.charAt(m.start() - 1) == quoteChar) {
           // Strip quote characters
-          matchList.add(input.substring(index + 1, m.start() - 1));
+          if (index + 1 < m.start() - 1) {
+            matchList.add(input.substring(index + 1, m.start() - 1));
+          }
           // Seek past
           index = m.end();
           // new quote?
@@ -133,7 +135,9 @@ public abstract class AbstractParser {
       }
       else {
         // Add match before separator
-        matchList.add(input.substring(index, m.start()));
+        if (index < m.start()) {
+          matchList.add(input.substring(index, m.start()));
+        }
         // Seek past separator
         index = m.end();
         // new quote?
@@ -148,15 +152,21 @@ public abstract class AbstractParser {
     // Add tail after last separator.
     if(inquote) {
       if(input.charAt(input.length() - 1) == quoteChar) {
-        matchList.add(input.substring(index + 1, input.length() - 1));
+        if (index + 1 < input.length() - 1) {
+          matchList.add(input.substring(index + 1, input.length() - 1));
+        }
       }
       else {
         getLogger().warning("Invalid quoted line in input.");
-        matchList.add(input.substring(index, input.length()));
+        if (index < input.length()) {
+          matchList.add(input.substring(index, input.length()));
+        }
       }
     }
     else {
-      matchList.add(input.substring(index, input.length()));
+      if (index < input.length()) {
+        matchList.add(input.substring(index, input.length()));
+      }
     }
     // Return
     return matchList;

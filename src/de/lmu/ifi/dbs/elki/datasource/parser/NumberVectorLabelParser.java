@@ -193,6 +193,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
           return Event.NEXT_OBJECT;
         }
       }
+      reader.close();
       return Event.END_OF_STREAM;
     }
     catch(IOException e) {
