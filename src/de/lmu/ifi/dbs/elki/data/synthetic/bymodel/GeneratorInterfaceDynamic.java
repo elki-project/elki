@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Interface for a dynamic cluster generator.
  * 
@@ -41,15 +40,14 @@ public interface GeneratorInterfaceDynamic extends GeneratorInterface {
   public int getDiscarded();
 
   /**
-   * Indicate that points were discarded.
-   * 
-   * @param discarded number of points that were discarded.
-   */
-  public void addDiscarded(int discarded);
-  
-  /**
    * Retrieve remaining number of retries.
+   * 
    * @return remaining number of retries
    */
   public int getRetries();
+
+  /**
+   * Increment the number of elements discarded.
+   */
+  public void incrementDiscarded();
 }

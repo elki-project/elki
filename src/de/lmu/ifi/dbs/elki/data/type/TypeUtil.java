@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -127,6 +128,11 @@ public final class TypeUtil {
    * Matrix type.
    */
   public static final SimpleTypeInformation<Matrix> MATRIX = new SimpleTypeInformation<Matrix>(Matrix.class);
+
+  /**
+   * Cluster model type.
+   */
+  public static final SimpleTypeInformation<Model> MODEL = new SimpleTypeInformation<Model>(Model.class);
 
   /**
    * Make a type array easily.

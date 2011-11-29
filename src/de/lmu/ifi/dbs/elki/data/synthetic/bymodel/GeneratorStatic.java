@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class GeneratorStatic implements GeneratorInterface {
    */
   @Override
   public List<Vector> generate(int count) {
-    return new ArrayList<Vector>(points);
+    return Collections.unmodifiableList(points);
   }
 
   @Override
@@ -89,11 +89,6 @@ public class GeneratorStatic implements GeneratorInterface {
   @Override
   public String getName() {
     return name;
-  }
-
-  @Override
-  public List<Vector> getPoints() {
-    return points;
   }
 
   @Override

@@ -67,17 +67,6 @@ public interface GeneratorInterface {
   public abstract double getDensity(Vector p);
 
   /**
-   * Get points.
-   * 
-   * NOTE: The list may be modified by the caller, it is not immutable.
-   * The class should not return a copy, but should allow modification.
-   * However when removing points, the called is expected to call setDiscarded.
-   * 
-   * @return points
-   */
-  public List<Vector> getPoints(); 
-
-  /**
    * Get cluster name
    * @return cluster name
    */
