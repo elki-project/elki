@@ -183,8 +183,8 @@ public final class SpatialUtil {
    * @return the perimeter of this SpatialComparable
    */
   public static double perimeter(SpatialComparable box) {
-    double perimeter = 0;
     final int dim = box.getDimensionality();
+    double perimeter = 0;
     for(int i = 1; i <= dim; i++) {
       perimeter += box.getMax(i) - box.getMin(i);
     }
@@ -243,18 +243,15 @@ public final class SpatialUtil {
       throw new IllegalArgumentException("This HyperBoundingBox and the given HyperBoundingBox need same dimensionality");
     }
 
-    // the maximal and minimal value of the overlap box.
-    double omax, omin;
-
     // the overlap volume
     double overlap = 1.0;
 
     for(int i = 1; i <= dim; i++) {
       // The maximal value of that overlap box in the current
       // dimension is the minimum of the max values.
-      omax = Math.min(box1.getMax(i), box2.getMax(i));
+      final double omax = Math.min(box1.getMax(i), box2.getMax(i));
       // The minimal value is the maximum of the min values.
-      omin = Math.max(box1.getMin(i), box2.getMin(i));
+      final double omin = Math.max(box1.getMin(i), box2.getMin(i));
 
       // if omax <= omin in any dimension, the overlap box has a volume of zero
       if(omax <= omin) {
