@@ -77,7 +77,7 @@ public class HierarchicalClassLabel extends ClassLabel {
     this.separatorPattern = regex;
     this.separatorString = separator;
     String[] levelwiseStrings = separatorPattern.split(name);
-    this.levelwiseNames = new Comparable[levelwiseStrings.length];
+    this.levelwiseNames = new Comparable<?>[levelwiseStrings.length];
     for(int i = 0; i < levelwiseStrings.length; i++) {
       try {
         levelwiseNames[i] = new Integer(levelwiseStrings[i]);
