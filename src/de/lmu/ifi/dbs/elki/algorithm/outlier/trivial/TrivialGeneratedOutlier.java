@@ -27,8 +27,8 @@ import java.util.HashSet;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.GeneratorModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -128,11 +128,11 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     // Adjustment constant
     final double minscore = expect / (expect + 1);
     
-    HashSet<GeneratorModel> generators = new HashSet<GeneratorModel>();
+    HashSet<GeneratorSingleCluster> generators = new HashSet<GeneratorSingleCluster>();
     for(DBID id : models.iterDBIDs()) {
       Model model = models.get(id);
-      if(model instanceof GeneratorModel) {
-        generators.add((GeneratorModel) model);
+      if(model instanceof GeneratorSingleCluster) {
+        generators.add((GeneratorSingleCluster) model);
       }
     }
     if(generators.size() == 0) {
@@ -143,11 +143,11 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       double score = 0.0;
       // Convert to a math vector
       Vector v = vecs.get(id).getColumnVector();
-      for(GeneratorModel gen : generators) {
+      for(GeneratorSingleCluster gen : generators) {
         Vector tv = v;
         // Transform backwards
-        if(gen.getTransform() != null) {
-          tv = gen.getTransform().applyInverse(v);
+        if(gen.getTransformation() != null) {
+          tv = gen.getTransformation().applyInverse(v);
         }
         final int dim = tv.getDimensionality();
         double lensq = 0.0;

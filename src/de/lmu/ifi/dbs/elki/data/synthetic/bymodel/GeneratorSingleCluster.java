@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
 import java.util.LinkedList;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.data.model.GeneratorModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * @apiviz.composedOf Distribution
  * @apiviz.composedOf AffineTransformation
  */
-public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
+public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model {
   /**
    * The distribution generators for each axis
    */
@@ -90,11 +90,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * Discarded count
    */
   private int discarded = 0;
-
-  /**
-   * The generated cluster points.
-   */
-  public LinkedList<Vector> points = new LinkedList<Vector>();
 
   /**
    * Random generator (used for initializing random generators)
@@ -281,20 +276,11 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   }
 
   /**
-   * Get axis generators. Used for printing model information
-   * 
-   * @return list of distributions
-   */
-  public LinkedList<Distribution> getAxes() {
-    return axes;
-  }
-
-  /**
    * Get transformation
    * 
    * @return transformation matrix, may be null.
    */
-  public AffineTransformation getTrans() {
+  public AffineTransformation getTransformation() {
     return trans;
   }
 
@@ -320,23 +306,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
       return null;
     }
     return clipmax.copy();
-  }
-
-  /**
-   * Return the list of points (no copy)
-   */
-  @Override
-  public LinkedList<Vector> getPoints() {
-    return points;
-  }
-
-  /**
-   * Set the list of points in the cluster
-   * 
-   * @param points New list of points in this cluster.
-   */
-  public void setPoints(LinkedList<Vector> points) {
-    this.points = points;
   }
 
   /**
@@ -375,8 +344,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @param discarded number of points discarded.
    */
   @Override
-  public void addDiscarded(int discarded) {
-    this.discarded += discarded;
+  public void incrementDiscarded() {
+    ++this.discarded;
   }
 
   /**
@@ -421,7 +390,17 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @return Model
    */
-  public GeneratorModel makeModel() {
-    return new GeneratorModel(trans, axes);
+  public Model makeModel() {
+    return this;
+  }
+
+  /**
+   * Get distribution along (generator) axis i.
+   * 
+   * @param i Generator axis i
+   * @return
+   */
+  public Distribution getDistribution(int i) {
+    return axes.get(i);
   }
 }

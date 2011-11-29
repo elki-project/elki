@@ -23,22 +23,30 @@ package de.lmu.ifi.dbs.elki.application;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface;
-import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterfaceDynamic;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorSingleCluster;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.GeneratorXMLDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -124,27 +132,52 @@ public class GeneratorXMLSpec extends AbstractApplication {
    * @throws IOException thrown on write errors
    */
   public void writeClusters(OutputStreamWriter outStream, MultipleObjectsBundle data) throws IOException {
-    List<GeneratorInterface> clusters = generator.gen.getGenerators();
+    int modelcol = -1;
+    { // Find model column
+      for(int i = 0; i < data.metaLength(); i++) {
+        if(TypeUtil.MODEL.isAssignableFromType(data.meta(i))) {
+          modelcol = i;
+          break;
+        }
+      }
+    }
+    if(modelcol < 0) {
+      throw new AbortException("No model column found in bundle.");
+    }
+    ArrayList<Model> models = new ArrayList<Model>();
+    Map<Model, TIntList> modelMap = new HashMap<Model, TIntList>();
+    { // Build a map from model to the actual objects
+      for(int i = 0; i < data.dataLength(); i++) {
+        Model model = (Model) data.data(i, modelcol);
+        TIntList modelids = modelMap.get(model);
+        if(modelids == null) {
+          models.add(model);
+          modelids = new TIntArrayList();
+          modelMap.put(model, modelids);
+        }
+        modelids.add(i);
+      }
+    }
     // compute global discard values
     int totalsize = 0;
     int totaldisc = 0;
-    assert (clusters.size() > 0);
-    for(GeneratorInterface curclus : clusters) {
-      totalsize = totalsize + curclus.getSize();
-      if(curclus instanceof GeneratorSingleCluster) {
-        totaldisc = totaldisc + ((GeneratorSingleCluster) curclus).getDiscarded();
+    for(Entry<Model, TIntList> ent : modelMap.entrySet()) {
+      totalsize = totalsize + ent.getValue().size();
+      if(ent.getKey() instanceof GeneratorSingleCluster) {
+        totaldisc = totaldisc + ((GeneratorSingleCluster) ent.getKey()).getDiscarded();
       }
     }
     double globdens = (double) (totalsize + totaldisc) / totalsize;
     outStream.write("########################################################" + LINE_SEPARATOR);
-    outStream.write("## Number of clusters: " + clusters.size() + LINE_SEPARATOR);
-    for(GeneratorInterface curclus : clusters) {
+    outStream.write("## Number of clusters: " + models.size() + LINE_SEPARATOR);
+    for(Model model : models) {
+      TIntList ids = modelMap.get(model);
       outStream.write("########################################################" + LINE_SEPARATOR);
-      outStream.write("## Cluster: " + curclus.getName() + LINE_SEPARATOR);
-      outStream.write("########################################################" + LINE_SEPARATOR);
-      outStream.write("## Size: " + curclus.getSize() + LINE_SEPARATOR);
-      if(curclus instanceof GeneratorSingleCluster) {
-        GeneratorSingleCluster cursclus = (GeneratorSingleCluster) curclus;
+      outStream.write("## Size: " + ids.size() + LINE_SEPARATOR);
+      if(model instanceof GeneratorSingleCluster) {
+        GeneratorSingleCluster cursclus = (GeneratorSingleCluster) model;
+        outStream.write("########################################################" + LINE_SEPARATOR);
+        outStream.write("## Cluster: " + cursclus.getName() + LINE_SEPARATOR);
         Vector cmin = cursclus.getClipmin();
         Vector cmax = cursclus.getClipmax();
         if(cmin != null && cmax != null) {
@@ -152,27 +185,30 @@ public class GeneratorXMLSpec extends AbstractApplication {
         }
         outStream.write("## Density correction factor: " + cursclus.getDensityCorrection() + LINE_SEPARATOR);
         outStream.write("## Generators:" + LINE_SEPARATOR);
-        for(Distribution gen : cursclus.getAxes()) {
+        for(int i = 0; i < cursclus.getDim(); i++) {
+          Distribution gen = cursclus.getDistribution(i);
           outStream.write("##   " + gen.toString() + LINE_SEPARATOR);
         }
-        if(cursclus.getTrans() != null && cursclus.getTrans().getTransformation() != null) {
+        if(cursclus.getTransformation() != null && cursclus.getTransformation().getTransformation() != null) {
           outStream.write("## Affine transformation matrix:" + LINE_SEPARATOR);
-          outStream.write(FormatUtil.format(cursclus.getTrans().getTransformation(), "## ") + LINE_SEPARATOR);
+          outStream.write(FormatUtil.format(cursclus.getTransformation().getTransformation(), "## ") + LINE_SEPARATOR);
         }
-      }
-      if(curclus instanceof GeneratorInterfaceDynamic) {
-        GeneratorSingleCluster cursclus = (GeneratorSingleCluster) curclus;
         outStream.write("## Discards: " + cursclus.getDiscarded() + " Retries left: " + cursclus.getRetries() + LINE_SEPARATOR);
         double corf = /* cursclus.overweight */(double) (cursclus.getSize() + cursclus.getDiscarded()) / cursclus.getSize() / globdens;
         outStream.write("## Density correction factor estimation: " + corf + LINE_SEPARATOR);
 
       }
       outStream.write("########################################################" + LINE_SEPARATOR);
-      for(Vector p : curclus.getPoints()) {
-        for(int i = 0; i < p.getRowDimensionality(); i++) {
-          outStream.write(p.get(i) + " ");
+      for(TIntIterator iter = ids.iterator(); iter.hasNext();) {
+        int num = iter.next();
+        for(int c = 0; c < data.metaLength(); c++) {
+          if(c != modelcol) {
+            if (c > 0) {
+              outStream.write(" ");
+            }
+            outStream.write(data.data(num, c).toString());
+          }
         }
-        outStream.write(curclus.getName());
         outStream.write(LINE_SEPARATOR);
       }
     }

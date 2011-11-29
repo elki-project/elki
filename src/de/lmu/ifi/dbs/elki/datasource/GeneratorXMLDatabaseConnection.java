@@ -115,11 +115,6 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   double sizescale = 1.0;
 
   /**
-   * The actual generator class
-   */
-  public GeneratorMain gen = new GeneratorMain();
-
-  /**
    * Random generator used for initializing cluster generators.
    */
   private Random clusterRandom = null;
@@ -127,7 +122,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   /**
    * Set testAgainstModel flag
    */
-  private boolean testAgainstModel = true;
+  private Boolean testAgainstModel;
 
   /**
    * Constructor.
@@ -151,8 +146,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     if(logger.isVerbose()) {
       logger.verbose("Loading specification ...");
     }
+    GeneratorMain gen;
     try {
-      loadXMLSpecification();
+      gen = loadXMLSpecification();
     }
     catch(UnableToComplyException e) {
       throw new AbortException("Cannot load XML specification", e);
@@ -160,10 +156,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     if(logger.isVerbose()) {
       logger.verbose("Generating clusters ...");
     }
-    gen.setTestAgainstModel(testAgainstModel);
+    if(testAgainstModel != null) {
+      gen.setTestAgainstModel(testAgainstModel);
+    }
     try {
-      gen.generate();
-      return gen.getBundle();
+      return gen.generate();
     }
     catch(UnableToComplyException e) {
       throw new AbortException("Data generation failed. ", e);
@@ -174,8 +171,10 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
    * Load the XML configuration file.
    * 
    * @throws UnableToComplyException
+   * 
+   * @return Generator
    */
-  private void loadXMLSpecification() throws UnableToComplyException {
+  private GeneratorMain loadXMLSpecification() throws UnableToComplyException {
     try {
       InputStream in = new FileInputStream(specfile);
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -197,7 +196,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
       Document doc = dbf.newDocumentBuilder().parse(in);
       Node root = doc.getDocumentElement();
       if(root.getNodeName() == "dataset") {
-        processElementDataset(root);
+        GeneratorMain gen = new GeneratorMain();
+        processElementDataset(gen, root);
+        return gen;
       }
       else {
         throw new UnableToComplyException("Experiment specification has incorrect document element: " + root.getNodeName());
@@ -220,10 +221,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   /**
    * Process a 'dataset' Element in the XML stream.
    * 
+   * @param gen Generator
    * @param cur Current document nod
    * @throws UnableToComplyException
    */
-  private void processElementDataset(Node cur) throws UnableToComplyException {
+  private void processElementDataset(GeneratorMain gen, Node cur) throws UnableToComplyException {
     // *** get parameters
     String seedstr = ((Element) cur).getAttribute("random-seed");
     if(seedstr != null && seedstr != "") {
@@ -236,10 +238,10 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
       if(child.getNodeName() == "cluster") {
-        processElementCluster(child);
+        processElementCluster(gen, child);
       }
       else if(child.getNodeName() == "static") {
-        processElementStatic(child);
+        processElementStatic(gen, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
@@ -250,10 +252,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   /**
    * Process a 'cluster' Element in the XML stream.
    * 
+   * @param gen Generator
    * @param cur Current document nod
    * @throws UnableToComplyException
    */
-  private void processElementCluster(Node cur) throws UnableToComplyException {
+  private void processElementCluster(GeneratorMain gen, Node cur) throws UnableToComplyException {
     int size = -1;
     double overweight = 1.0;
 
@@ -515,10 +518,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   /**
    * Process a 'static' cluster Element in the XML stream.
    * 
+   * @param gen Generator
    * @param cur Current document nod
    * @throws UnableToComplyException
    */
-  private void processElementStatic(Node cur) throws UnableToComplyException {
+  private void processElementStatic(GeneratorMain gen, Node cur) throws UnableToComplyException {
     String name = ((Element) cur).getAttribute("name");
     if(name == null) {
       throw new UnableToComplyException("No cluster name given in specification file.");

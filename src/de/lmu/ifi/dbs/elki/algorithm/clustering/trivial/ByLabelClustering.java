@@ -85,9 +85,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   public static final OptionID MULTIPLE_ID = OptionID.getOrCreateOptionID("bylabelclustering.multiple", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
   /**
-   * Flag to indicate that multiple cluster assignment is possible. If an
-   * assignment to multiple clusters is desired, the labels indicating the
-   * clusters need to be separated by blanks.
+   * Pattern to recognize noise clusters by.
    */
   public static final OptionID NOISE_ID = OptionID.getOrCreateOptionID("bylabelclustering.noise", "Pattern to recognize noise classes by their label.");
 
@@ -144,7 +142,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
     Clustering<Model> result = new Clustering<Model>("By Label Clustering", "bylabel-clustering");
     for(Entry<String, ModifiableDBIDs> entry : labelMap.entrySet()) {
-      ModifiableDBIDs ids = labelMap.get(entry.getKey());
+      ModifiableDBIDs ids = entry.getValue();
       if(ids.size() <= 1) {
         noiseids.addDBIDs(ids);
         continue;

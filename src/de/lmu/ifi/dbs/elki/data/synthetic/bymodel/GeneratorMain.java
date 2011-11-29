@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -93,26 +92,41 @@ public class GeneratorMain {
    * @throws UnableToComplyException when model not satisfiable or no clusters
    *         specified.
    */
-  public void generate() throws UnableToComplyException {
+  public MultipleObjectsBundle generate() throws UnableToComplyException {
     // we actually need some clusters.
     if(generators.size() < 1) {
       throw new UnableToComplyException("No clusters specified.");
     }
     // Assert that cluster dimensions agree.
     final int dim = generators.get(0).getDim();
-    for(GeneratorInterface c : generators) {
-      if(c.getDim() != dim) {
-        throw new UnableToComplyException("Cluster dimensions do not agree.");
+    {
+      for(GeneratorInterface c : generators) {
+        if(c.getDim() != dim) {
+          throw new UnableToComplyException("Cluster dimensions do not agree.");
+        }
       }
     }
+    // Vector factory. TODO: make configurable
+    final DoubleVector factory = new DoubleVector(new double[dim]);
+    // Prepare result bundle
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, factory);
+    bundle.appendColumn(type, new ArrayList<Object>());
+    bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
+    bundle.appendColumn(TypeUtil.MODEL, new ArrayList<Model>());
+
     // generate clusters
     for(GeneratorInterface curclus : generators) {
-      while(curclus.getPoints().size() < curclus.getSize()) {
+      ClassLabel l = new SimpleClassLabel(curclus.getName());
+      Model model = curclus.makeModel();
+      int kept = 0;
+      while(kept < curclus.getSize()) {
         // generate the "missing" number of points
-        List<Vector> newp = curclus.generate(curclus.getSize() - curclus.getPoints().size());
+        List<Vector> newp = curclus.generate(curclus.getSize() - kept);
         if(curclus instanceof GeneratorInterfaceDynamic) {
           GeneratorInterfaceDynamic cursclus = (GeneratorInterfaceDynamic) curclus;
           for(Vector p : newp) {
+            boolean keep = true;
             if(testAgainstModel) {
               double max = 0.0;
               double is = 0.0;
@@ -127,20 +141,23 @@ public class GeneratorMain {
               }
               // Only keep the point if the largest density was the cluster it
               // was generated for
-              if(is >= max) {
-                cursclus.getPoints().add(p);
-              }
-              else {
-                cursclus.addDiscarded(1);
+              if(is < max) {
+                keep = false;
               }
             }
+            if(keep) {
+              DoubleVector dv = new DoubleVector(p);
+              bundle.appendSimple(dv, l, model);
+              ++kept;
+            }
             else {
-              cursclus.getPoints().add(p);
+              cursclus.incrementDiscarded();
             }
           }
         }
       }
     }
+    return bundle;
   }
 
   /**
@@ -168,30 +185,5 @@ public class GeneratorMain {
    */
   public List<GeneratorInterface> getGenerators() {
     return Collections.unmodifiableList(generators);
-  }
-
-  /**
-   * Get the objects bundle
-   * 
-   * @return Bundle
-   */
-  public MultipleObjectsBundle getBundle() {
-    final int dim = generators.get(0).getDim();
-    final DoubleVector factory = new DoubleVector(new double[dim]);
-    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, factory);
-    bundle.appendColumn(type, new ArrayList<Object>());
-    bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
-    bundle.appendColumn(new SimpleTypeInformation<Model>(Model.class), new ArrayList<Model>());
-
-    for(GeneratorInterface generator : generators) {
-      ClassLabel l = new SimpleClassLabel(generator.getName());
-      Model model = generator.makeModel();
-      for(Vector v : generator.getPoints()) {
-        DoubleVector dv = new DoubleVector(v);
-        bundle.appendSimple(dv, l, model);
-      }
-    }
-    return bundle;
   }
 }
