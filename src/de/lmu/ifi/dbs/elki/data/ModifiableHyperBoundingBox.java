@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * MBR class allowing modifications (as opposed to {@link HyperBoundingBox}).
  * 
  * @author Marisa Thoma
- * 
  */
 public class ModifiableHyperBoundingBox extends HyperBoundingBox {
   /**
@@ -123,7 +122,7 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    * @param obj Spatial object to extend with
    * @return true when the MBR changed.
    */
-  public <E extends SpatialComparable> boolean extend(E obj) {
+  public boolean extend(SpatialComparable obj) {
     final int dim = min.length;
     assert (!LoggingConfiguration.DEBUG || (obj.getDimensionality() == dim));
     boolean extended = false;
