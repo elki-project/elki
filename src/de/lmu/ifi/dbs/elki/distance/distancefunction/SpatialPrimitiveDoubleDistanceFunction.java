@@ -49,15 +49,4 @@ public interface SpatialPrimitiveDoubleDistanceFunction<V extends SpatialCompara
    *         distance function
    */
   double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2);
-
-  /**
-   * Computes the distance between the centroids of the two given MBRs
-   * according to this distance function.
-   * 
-   * @param mbr1 the first MBR object
-   * @param mbr2 the second MBR object
-   * @return the distance between the centroids of the two given MBRs
-   *         according to this distance function
-   */
-  double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2);
 }

@@ -108,20 +108,6 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   }
 
   @Override
-  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if(dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
-    }
-
-    double c1 = (mbr1.getMin(dim) + mbr1.getMax(dim)) / 2;
-    double c2 = (mbr2.getMin(dim) + mbr2.getMax(dim)) / 2;
-
-    double manhattan = c1 - c2;
-
-    return Math.abs(manhattan);
-  }
-
-  @Override
   public DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
     return new DoubleDistance(doubleDistance(o1, o2));
   }

@@ -112,26 +112,6 @@ public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleD
   }
 
   @Override
-  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim1 = mbr1.getDimensionality();
-    if(dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n" + mbr1.getDimensionality() + "!=" + mbr2.getDimensionality());
-    }
-    double dist = 0;
-    double norm1 = 0;
-    double norm2 = 0;
-    for(int i = 1; i <= dim1; i++) {
-      final double val1 = (mbr1.getMin(i) + mbr1.getMax(i)) / 2;
-      final double val2 = (mbr2.getMin(i) + mbr2.getMax(i)) / 2;
-      dist += Math.min(val1, val2);
-      norm1 += val1;
-      norm2 += val2;
-    }
-    dist = 1 - dist / Math.min(norm1, norm2);
-    return dist;
-  }
-  
-  @Override
   public <T extends NumberVector<?, ?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }

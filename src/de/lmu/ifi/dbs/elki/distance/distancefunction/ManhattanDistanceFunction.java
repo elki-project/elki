@@ -156,24 +156,6 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
   }
 
   @Override
-  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim1 = mbr1.getDimensionality();
-    if(dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
-    }
-  
-    double sumDist = 0;
-    for(int d = 1; d <= dim1; d++) {
-      final double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
-      final double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
-  
-      final double manhattanI = c1 - c2;
-      sumDist += Math.abs(manhattanI);
-    }
-    return sumDist;
-  }
-
-  @Override
   public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }
