@@ -103,22 +103,6 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
   }
 
   @Override
-  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim1 = mbr1.getDimensionality();
-    if(dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects.");
-    }
-    double max = 0;
-    for(int i = 1; i <= dim1; i++) {
-      final double c1 = (mbr1.getMax(i) - mbr1.getMin(i)) / 2;
-      final double c2 = (mbr2.getMax(i) - mbr2.getMin(i)) / 2;
-      final double d = Math.abs(c2 - c1);
-      max = Math.max(d, max);
-    }
-    return max;
-  }
-
-  @Override
   public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }

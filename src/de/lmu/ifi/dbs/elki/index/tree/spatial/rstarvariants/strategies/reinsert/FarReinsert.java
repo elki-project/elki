@@ -59,7 +59,7 @@ public class FarReinsert extends AbstractPartialReinsert {
     DoubleIntPair[] order = new DoubleIntPair[getter.size(entries)];
     DoubleVector centroid = new DoubleVector(SpatialUtil.centroid(page));
     for(int i = 0; i < order.length; i++) {
-      double distance = distanceFunction.doubleCenterDistance(getter.get(entries, i), centroid);
+      double distance = distanceFunction.doubleMinDist(new DoubleVector(SpatialUtil.centroid(getter.get(entries, i))), centroid);
       order[i] = new DoubleIntPair(distance, i);
     }
     Arrays.sort(order, Collections.reverseOrder());

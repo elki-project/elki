@@ -135,26 +135,6 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
   }
 
   @Override
-  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
-    }
-    if(mbr1.getDimensionality() < getSelectedDimensions().size()) {
-      throw new IllegalArgumentException("The dimensionality of the feature space " + "is not consistent with the specified dimensions " + "to be considered for distance computation.\n  " + "dimensionality of the feature space: " + mbr1.getDimensionality() + "\n  " + "specified dimensions: " + getSelectedDimensions());
-    }
-
-    double sqrDist = 0;
-    for(int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
-      double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
-      double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
-
-      double manhattanI = c1 - c2;
-      sqrDist += manhattanI * manhattanI;
-    }
-    return Math.sqrt(sqrDist);
-  }
-
-  @Override
   public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }

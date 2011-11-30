@@ -108,20 +108,6 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
   }
 
   @Override
-  public double doubleCenterDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim = mbr1.getDimensionality();
-    if(dim != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
-    }
-    double min = Double.MAX_VALUE;
-    for(int i = 1; i <= dim; i++) {
-      final double d = Math.abs((mbr1.getMin(i) + mbr1.getMax(i)) / 2 - (mbr2.getMin(i) + mbr1.getMax(i)) / 2);
-      min = Math.min(d, min);
-    }
-    return min;
-  }
-
-  @Override
   public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }
