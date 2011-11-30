@@ -3,7 +3,9 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert
 import java.util.Arrays;
 import java.util.Collections;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -55,8 +57,9 @@ public class CloseReinsert extends AbstractPartialReinsert {
   @Override
   public <E extends SpatialComparable, A> int[] computeReinserts(A entries, ArrayAdapter<E, A> getter, SpatialComparable page) {
     DoubleIntPair[] order = new DoubleIntPair[getter.size(entries)];
+    DoubleVector centroid = new DoubleVector(SpatialUtil.centroid(page)); 
     for(int i = 0; i < order.length; i++) {
-      double distance = distanceFunction.doubleCenterDistance(getter.get(entries, i), page);
+      double distance = distanceFunction.doubleCenterDistance(getter.get(entries, i), centroid);
       order[i] = new DoubleIntPair(distance, i);
     }
     Arrays.sort(order, Collections.reverseOrder());

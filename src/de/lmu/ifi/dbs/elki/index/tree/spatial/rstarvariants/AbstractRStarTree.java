@@ -727,11 +727,14 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     while(childPath.getParentPath() != null) {
       N parent = getNode(childPath.getParentPath().getLastPathComponent().getEntry());
       int indexOfChild = childPath.getLastPathComponent().getIndex();
-      child.adjustEntry(parent.getEntry(indexOfChild));
-      writeNode(parent);
-      childPath = childPath.getParentPath();
-      child = parent;
-      // TODO: stop writing when MBR didn't change!
+      if (child.adjustEntry(parent.getEntry(indexOfChild))) {
+        writeNode(parent);
+        childPath = childPath.getParentPath();
+        child = parent;
+      } else {
+        break;
+        // TODO: stop writing when MBR didn't change!
+      }
     }
 
     // reinsert the first entries

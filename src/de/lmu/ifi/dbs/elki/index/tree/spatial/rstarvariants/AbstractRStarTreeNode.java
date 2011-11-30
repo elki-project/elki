@@ -30,6 +30,7 @@ import java.util.BitSet;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
@@ -69,7 +70,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   @Override
   public double getMin(int dimension) {
     double min = getEntry(0).getMin(dimension);
-    for(int i = 1; i < getNumEntries(); i++) {
+    for(int i = 1; i < numEntries; i++) {
       min = Math.min(min, getEntry(i).getMin(dimension));
     }
     return min;
@@ -78,7 +79,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   @Override
   public double getMax(int dimension) {
     double max = getEntry(0).getMax(dimension);
-    for(int i = 1; i < getNumEntries(); i++) {
+    for(int i = 1; i < numEntries; i++) {
       max = Math.min(max, getEntry(i).getMax(dimension));
     }
     return max;
@@ -94,23 +95,12 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     if(firstEntry == null) {
       return null;
     }
-    int dim = firstEntry.getDimensionality();
     // Note: we deliberately get a cloned copy here, since we will modify it.
-    double[] min = SpatialUtil.getMin(firstEntry);
-    double[] max = SpatialUtil.getMax(firstEntry);
-
-    for(int i = 1; i < getNumEntries(); i++) {
-      SpatialComparable mbr = getEntry(i);
-      for(int d = 1; d <= dim; d++) {
-        if(min[d - 1] > mbr.getMin(d)) {
-          min[d - 1] = mbr.getMin(d);
-        }
-        if(max[d - 1] < mbr.getMax(d)) {
-          max[d - 1] = mbr.getMax(d);
-        }
-      }
+    ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(firstEntry);
+    for(int i = 1; i < numEntries; i++) {
+      mbr.extend(getEntry(i));
     }
-    return new HyperBoundingBox(min, max);
+    return mbr;
   }
 
   @Override
@@ -123,8 +113,31 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * 
    * @param entry the entry representing this node
    */
-  public void adjustEntry(E entry) {
-    ((SpatialDirectoryEntry) entry).setMBR(computeMBR());
+  public boolean adjustEntry(E entry) {
+    final SpatialDirectoryEntry se = (SpatialDirectoryEntry) entry;
+    final HyperBoundingBox mbr = computeMBR();
+    boolean changed = false;
+    if(se.hasMBR()) {
+      final int dim = se.getDimensionality();
+      // Test for changes
+      for(int i = 1; i <= dim; i++) {
+        if(Math.abs(se.getMin(i) - mbr.getMin(i)) > Float.MIN_NORMAL) {
+          changed = true;
+          break;
+        }
+        if(Math.abs(se.getMax(i) - mbr.getMax(i)) > Float.MIN_NORMAL) {
+          changed = true;
+          break;
+        }
+      }
+    }
+    else { // No preexisting MBR.
+      changed = true;
+    }
+    if(changed) {
+      se.setMBR(mbr);
+    }
+    return changed;
   }
 
   /**

@@ -88,13 +88,14 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
   }
 
   @Override
-  public void adjustEntry(DeLiCluEntry entry) {
-    super.adjustEntry(entry);
+  public boolean adjustEntry(DeLiCluEntry entry) {
+    boolean changed = super.adjustEntry(entry);
     // adjust hasHandled and hasUnhandled flag
     boolean hasHandled = hasHandled();
     boolean hasUnhandled = hasUnhandled();
     entry.setHasHandled(hasHandled);
     entry.setHasUnhandled(hasUnhandled);
+    return changed;
   }
 
   /**

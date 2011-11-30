@@ -89,6 +89,15 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
   }
 
   /**
+   * Test whether this entry already has an MBR.
+   * 
+   * @return True when an MBR exists.
+   */
+  public boolean hasMBR() {
+    return (this.mbr != null);
+  }
+
+  /**
    * Sets the MBR of this entry.
    * 
    * @param mbr the MBR to be set

@@ -72,9 +72,10 @@ public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTree
   }
 
   @Override
-  public void adjustEntry(RdKNNEntry<D> entry) {
-    super.adjustEntry(entry);
+  public boolean adjustEntry(RdKNNEntry<D> entry) {
+    boolean changed = super.adjustEntry(entry);
     entry.setKnnDistance(kNNDistance());
+    return changed;
   }
 
   /**
