@@ -1,26 +1,27 @@
 package experimentalcode.shared.index.xtree;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2011
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -145,7 +146,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     this.max_overlap = max_overlap;
     this.overlap_type = overlap_type;
   }
-  
+
   @Override
   public void setNodeSplitStrategy(SplitStrategy nodeSplitter) {
     throw new UnsupportedOperationException("XTree split strategy cannot be set this way.");
@@ -157,15 +158,11 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     return null;
   }
 
-
-
   @Override
   protected E createRootEntry() {
     // TODO Auto-generated method stub
     return null;
   }
-
-
 
   @Override
   protected N createNewLeafNode() {
@@ -173,15 +170,11 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     return null;
   }
 
-
-
   @Override
   protected N createNewDirectoryNode() {
     // TODO Auto-generated method stub
     return null;
   }
-
-
 
   /**
    * Returns true if in the specified node an overflow occurred, false
@@ -919,7 +912,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       return null;
     }
     // Handled by reinsertion?
-    if (overflowTreatment.handleOverflow(this, node, path)) {
+    if(overflowTreatment.handleOverflow(this, node, path)) {
       return null;
     }
     return split(node, splitAxis);
