@@ -209,6 +209,24 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   }
 
   @Override
+  public double getBinMean(int bin) {
+    materialize();
+    return super.getBinMean(bin);
+  }
+
+  @Override
+  public double getBinMin(int bin) {
+    materialize();
+    return super.getBinMin(bin);
+  }
+
+  @Override
+  public double getBinMax(int bin) {
+    materialize();
+    return super.getBinMax(bin);
+  }
+
+  @Override
   public Iterator<Pair<Double, T>> iterator() {
     materialize();
     return super.iterator();
