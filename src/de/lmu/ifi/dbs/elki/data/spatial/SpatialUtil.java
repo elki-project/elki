@@ -245,13 +245,17 @@ public final class SpatialUtil {
 
     // the overlap volume
     double overlap = 1.0;
+    double vol1 = 1.0;
+    double vol2 = 1.0;
 
     for(int i = 1; i <= dim; i++) {
-      // The maximal value of that overlap box in the current
-      // dimension is the minimum of the max values.
-      final double omax = Math.min(box1.getMax(i), box2.getMax(i));
-      // The minimal value is the maximum of the min values.
-      final double omin = Math.max(box1.getMin(i), box2.getMin(i));
+      final double box1min = box1.getMin(i);
+      final double box1max = box1.getMax(i);
+      final double box2min = box2.getMin(i);
+      final double box2max = box2.getMax(i);
+
+      final double omax = Math.min(box1max, box2max);
+      final double omin = Math.max(box1min, box2min);
 
       // if omax <= omin in any dimension, the overlap box has a volume of zero
       if(omax <= omin) {
@@ -259,9 +263,11 @@ public final class SpatialUtil {
       }
 
       overlap *= omax - omin;
+      vol1 *= box1max - box1min;
+      vol2 *= box2max - box2min;
     }
 
-    return overlap / (volume(box1) + volume(box2));
+    return overlap / (vol1 + vol2);
   }
 
   /**
