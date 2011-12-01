@@ -194,6 +194,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
         }
       }
       reader.close();
+      reader = null;
       return Event.END_OF_STREAM;
     }
     catch(IOException e) {
