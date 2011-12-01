@@ -47,6 +47,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * In: Pattern Recognition volume 40, Issue 10
  * </p>
  * 
+ * Implementation note: the LMCLUS algorithm seems to lack good stopping
+ * criterions. We can't entirely reproduce the good results from the original
+ * publication, in particular not on noisy data. But the questionable parts are
+ * as in the original publication, associated thesis and published source code.
+ * The minimum cluster size however can serve as a hidden stopping criterion.
+ * 
  * @author Ernst Waas
  * @author Erich Schubert
  */
@@ -57,30 +63,48 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    */
   private static final Logging logger = Logging.getLogger(LMCLUS.class);
 
+  /**
+   * Epsilon
+   */
   private final static double NOT_FROM_ONE_CLUSTER_PROBABILITY = 0.2;
 
+  /**
+   * Histogram resolution
+   */
   private final static int BINS = 50;
-
-  private final static int NOISE_SIZE = 20;
 
   /**
    * The current threshold value calculated by the findSeperation Method.
    */
   private final double sensitivityThreshold;
 
+  /**
+   * Maximum cluster dimensionality
+   */
   private final int maxLMDim;
 
+  /**
+   * Minimum cluster size
+   */
+  private final int minsize;
+
+  /**
+   * Number of sampling rounds to find a good split
+   */
   private final int samplingLevel;
 
   /**
    * Constructor.
    * 
    * @param maxdim Maximum dimensionality
+   * @param minsize Minimum cluster size
    * @param samplingLevel Sampling level
-   * @param sensitivityThreshold Treshold
+   * @param sensitivityThreshold Threshold
    */
-  public LMCLUS(int maxdim, int samplingLevel, double sensitivityThreshold) {
+  public LMCLUS(int maxdim, int minsize, int samplingLevel, double sensitivityThreshold) {
+    super();
     this.maxLMDim = maxdim;
+    this.minsize = minsize;
     this.samplingLevel = samplingLevel;
     this.sensitivityThreshold = sensitivityThreshold;
   }
@@ -101,8 +125,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * 
    * @param d The database to operate on
    * @param relation
-   * @return A Clustering Object containing all the clusters found by the
-   *         algorithm.
+   * @return Clustering result
    * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    */
   public Clustering<Model> run(Database database, Relation<NumberVector<?, ?>> relation) throws UnableToComplyException {
@@ -113,12 +136,15 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
     final int maxdim = Math.min(maxLMDim, DatabaseUtil.dimensionality(relation));
     int cnum = 0;
-    while(unclustered.size() > NOISE_SIZE) {
+    while(unclustered.size() > minsize) {
       DBIDs current = unclustered;
       int lmDim = 1;
       for(int k = 1; k <= maxdim; k++) {
-        // System.out.println("Current dim: " + k);
-        // System.out.println("Sampling level:" + samplingLevel);
+        // Implementation note: this while loop is from the original publication
+        // and the published LMCLUS source code. It doesn't make sense to me -
+        // it is lacking a stop criterion other than "cluster is too small" and
+        // "cluster is inseparable"! Additionally, there is good criterion for
+        // stopping at the appropriate dimensionality either.
         while(true) {
           Separation separation = findSeparation(relation, current, k);
           // logger.verbose("k: " + k + " goodness: " + separation.goodness +
@@ -133,7 +159,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
             }
           }
           // logger.verbose("size:"+subset.size());
-          if(subset.size() < NOISE_SIZE) {
+          if(subset.size() < minsize) {
             break;
           }
           current = subset;
@@ -142,7 +168,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         }
       }
       // No more clusters found
-      if(current.size() < NOISE_SIZE || current == unclustered) {
+      if(current.size() < minsize || current == unclustered) {
         break;
       }
       // New cluster found
@@ -184,7 +210,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   private double deviation(Vector delta, Matrix beta) {
     double a = delta.euclideanLength();
     double b = beta.transposeTimes(delta).euclideanLength();
-    return (a * a) - (b * b);
+    return Math.sqrt((a * a) - (b * b));
   }
 
   /**
@@ -243,6 +269,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       }
       // Generate and fill a histogram.
       FlexiHistogram<Double, Double> histogram = FlexiHistogram.DoubleSumHistogram(BINS);
+      double w = 1.0 / currentids.size();
       for(DBID point : currentids) {
         // Skip sampled points
         if(sample.contains(point)) {
@@ -250,7 +277,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         }
         Vector vec = relation.get(point).getColumnVector().minusEquals(originV);
         final double distance = deviation(vec, basis);
-        histogram.aggregate(distance, 1.0);
+        histogram.aggregate(distance, w);
       }
       double[] th = findAndEvaluateThreshold(histogram); // evaluate threshold
       if(th[1] > separation.goodness) {
@@ -454,6 +481,11 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("lmclus.maxdim", "Maximum linear manifold dimension to search.");
 
     /**
+     * Parameter for the minimum cluster size
+     */
+    public static final OptionID MINSIZE_ID = OptionID.getOrCreateOptionID("lmclus.minsize", "Minimum cluster size to allow.");
+
+    /**
      * Sampling intensity level
      */
     public static final OptionID SAMPLINGL_ID = OptionID.getOrCreateOptionID("lmclus.sampling-level", "A number used to determine how many samples are taken in each search.");
@@ -467,6 +499,11 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
      * Maximum dimensionality to search for
      */
     private int maxdim = Integer.MAX_VALUE;
+
+    /**
+     * Minimum cluster size.
+     */
+    private int minsize;
 
     /**
      * Sampling level
@@ -485,11 +522,14 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       if(config.grab(maxLMDimP)) {
         maxdim = maxLMDimP.getValue();
       }
+      IntParameter minsizeP = new IntParameter(MINSIZE_ID, new GreaterEqualConstraint(1));
+      if(config.grab(minsizeP)) {
+        minsize = minsizeP.getValue();
+      }
       IntParameter samplingLevelP = new IntParameter(SAMPLINGL_ID, 100);
       if(config.grab(samplingLevelP)) {
         samplingLevel = samplingLevelP.getValue();
       }
-
       DoubleParameter sensivityThresholdP = new DoubleParameter(THRESHOLD_ID);
       if(config.grab(sensivityThresholdP)) {
         threshold = sensivityThresholdP.getValue();
@@ -498,7 +538,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
     @Override
     protected LMCLUS makeInstance() {
-      return new LMCLUS(maxdim, samplingLevel, threshold);
+      return new LMCLUS(maxdim, minsize, samplingLevel, threshold);
     }
   }
 }
