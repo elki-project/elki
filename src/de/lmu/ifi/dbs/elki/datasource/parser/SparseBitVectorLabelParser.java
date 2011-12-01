@@ -86,7 +86,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
           BitSet bitSet = new BitSet();
-          LabelList labels = new LabelList();
+          LabelList labels = null;
 
           for(String entry : entries) {
             try {
@@ -95,6 +95,9 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
               dimensionality = Math.max(dimensionality, index);
             }
             catch(NumberFormatException e) {
+              if(labels == null) {
+                labels = new LabelList(1);
+              }
               labels.add(entry);
             }
           }

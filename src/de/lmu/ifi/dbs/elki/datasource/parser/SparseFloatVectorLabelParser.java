@@ -92,7 +92,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     int cardinality = Integer.parseInt(entries.get(0));
 
     TIntFloatHashMap values = new TIntFloatHashMap(cardinality, 1);
-    LabelList labels = new LabelList();
+    LabelList labels = null;
 
     for(int i = 1; i < entries.size() - 1; i++) {
       if(!labelIndices.get(i)) {
@@ -106,11 +106,17 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
           i++;
         }
         catch(NumberFormatException e) {
+          if(labels == null) {
+            labels = new LabelList(1);
+          }
           labels.add(entries.get(i));
           continue;
         }
       }
       else {
+        if(labels == null) {
+          labels = new LabelList(1);
+        }
         labels.add(entries.get(i));
       }
     }

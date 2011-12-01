@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +40,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -79,14 +83,17 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
-          List<Double> attributes = new ArrayList<Double>(entries.size());
-          LabelList labellist = new LabelList();
+          TDoubleList attributes = new TDoubleArrayList(entries.size());
+          LabelList labellist = null;
           for(String entry : entries) {
             try {
-              Double attribute = Double.valueOf(entry);
+              double attribute = Double.valueOf(entry);
               attributes.add(attribute);
             }
             catch(NumberFormatException e) {
+              if(labellist == null) {
+                labellist = new LabelList(1);
+              }
               labellist.add(entry);
             }
           }
@@ -97,7 +104,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
           else if(dimensionality != attributes.size()) {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + attributes.size() + " != " + dimensionality);
           }
-          vectors.add(new ParameterizationFunction(attributes));
+          vectors.add(ParameterizationFunction.STATIC.newNumberVector(attributes, ArrayLikeUtil.TDOUBLELISTADAPTER));
           labels.add(labellist);
         }
       }

@@ -264,7 +264,7 @@ public class ArffParser implements Parser {
       }
       else if(elkitypes[out] == TypeUtil.LABELLIST) {
         // Build a label list out of successive labels
-        LabelList ll = new LabelList();
+        LabelList ll = new LabelList(1);
         for (TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext(); ) {
           iter.advance();
           int i = iter.key();
@@ -327,7 +327,7 @@ public class ArffParser implements Parser {
       }
       else if(etyp[out] == TypeUtil.LABELLIST) {
         // Build a label list out of successive labels
-        LabelList ll = new LabelList();
+        LabelList ll = new LabelList(dimsize[out]);
         for(int k = 0; k < dimsize[out]; k++) {
           if(tokenizer.ttype != StreamTokenizer.TT_WORD) {
             throw new AbortException("Expected word token, got: " + tokenizer.toString());

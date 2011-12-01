@@ -233,7 +233,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     List<String> entries = tokenize(line);
     // Split into numerical attributes and labels
     TDoubleArrayList attributes = new TDoubleArrayList(entries.size());
-    LabelList labels = new LabelList();
+    LabelList labels = null;
 
     Iterator<String> itr = entries.iterator();
     for(int i = 0; itr.hasNext(); i++) {
@@ -247,6 +247,9 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
         catch(NumberFormatException e) {
           // Ignore attempt, add to labels below.
         }
+      }
+      if(labels == null) {
+        labels = new LabelList(1);
       }
       labels.add(ent);
     }

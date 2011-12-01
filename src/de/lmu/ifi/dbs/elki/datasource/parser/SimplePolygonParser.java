@@ -93,9 +93,9 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           Object[] objs = parseLine(line);
-          polys.add((PolygonsObject)objs[0]);
-          labels.add((LabelList)objs[1]);
-          eids.add((ExternalID)objs[2]);
+          polys.add((PolygonsObject) objs[0]);
+          labels.add((LabelList) objs[1]);
+          eids.add((ExternalID) objs[2]);
         }
       }
     }
@@ -117,7 +117,8 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     List<String> entries = tokenize(line);
     Iterator<String> iter = entries.iterator();
 
-    LabelList labels = new LabelList();
+    ExternalID eid = null;
+    LabelList labels = null;
     List<Polygon> polys = new java.util.Vector<Polygon>(1);
 
     List<Vector> coords = new ArrayList<Vector>();
@@ -149,15 +150,22 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
         }
         continue;
       }
-      // Label
-      labels.add(cur);
+      // First label will become the External ID
+      if(eid == null) {
+        eid = new ExternalID(cur);
+      }
+      else {
+        // Label
+        if(labels == null) {
+          labels = new LabelList(1);
+        }
+        labels.add(cur);
+      }
     }
     // Complete polygon
     if(coords.size() > 0) {
       polys.add(new Polygon(coords));
     }
-    // Use first label as eternal ID
-    ExternalID eid = labels.size() > 0 ? new ExternalID(labels.remove(0)) : null;
     return new Object[] { new PolygonsObject(polys), labels, eid };
   }
 
