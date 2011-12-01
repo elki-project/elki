@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Note: the iterator returns pairs containing the coordinate and the bin value!
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.ReplacingHistogram.Adapter
  * 
  * @param <T> Histogram data type.
@@ -44,17 +44,18 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * Interface to plug in a data type T.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @param <T> Data type
    */
   public static abstract class Adapter<T> {
     /**
      * Construct a new T when needed.
+     * 
      * @return new T
      */
     public abstract T make();
   }
-  
+
   /**
    * Array shift to account for negative indices.
    */
@@ -66,16 +67,15 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   protected int size;
 
   /**
-   * Array 'base', i.e. the point of 0.0.
-   * Usually the minimum.
+   * Array 'base', i.e. the point of 0.0. Usually the minimum.
    */
   protected double base;
-  
+
   /**
    * To avoid introducing an extra bucket for the maximum value.
    */
   protected double max;
-  
+
   /**
    * Width of a bin.
    */
@@ -85,7 +85,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * Data storage
    */
   protected ArrayList<T> data;
-  
+
   /**
    * Constructor for new elements
    */
@@ -106,14 +106,14 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
     this.size = bins;
     this.data = new ArrayList<T>(bins);
     this.maker = maker;
-    for (int i = 0; i < bins; i++) {
+    for(int i = 0; i < bins; i++) {
       this.data.add(maker.make());
     }
   }
 
   /**
-   * Histogram constructor without 'Constructor' to generate new elements.
-   * Empty bins will be initialized with 'null'.
+   * Histogram constructor without 'Constructor' to generate new elements. Empty
+   * bins will be initialized with 'null'.
    * 
    * @param bins Number of bins
    * @param min Minimum value
@@ -122,7 +122,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   public ReplacingHistogram(int bins, double min, double max) {
     this(bins, min, max, null);
   }
-  
+
   /**
    * Get the data at a given Coordinate.
    * 
@@ -144,8 +144,8 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   }
 
   /**
-   * Put data at a given coordinate.
-   * Note: this replaces the contents, it doesn't "add" or "count".
+   * Put data at a given coordinate. Note: this replaces the contents, it
+   * doesn't "add" or "count".
    * 
    * @param coord Coordinate
    * @param d New Data
@@ -156,18 +156,19 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   }
 
   /**
-   * Compute the bin number.
-   * Has a special case for rounding max down to the last bin.
-   *
+   * Compute the bin number. Has a special case for rounding max down to the
+   * last bin.
+   * 
    * @param coord Coordinate
    * @return bin number
    */
   protected int getBinNr(double coord) {
-    if (Double.isInfinite(coord) || Double.isNaN(coord)) {
-      throw new UnsupportedOperationException("Encountered non-finite value in Histogram: "+coord);
+    if(Double.isInfinite(coord) || Double.isNaN(coord)) {
+      throw new UnsupportedOperationException("Encountered non-finite value in Histogram: " + coord);
     }
-    if (coord == max) {
-      //System.err.println("Triggered special case: "+ (Math.floor((coord - base) / binsize) + offset) + " vs. " + (size - 1));
+    if(coord == max) {
+      // System.err.println("Triggered special case: "+ (Math.floor((coord -
+      // base) / binsize) + offset) + " vs. " + (size - 1));
       return size - 1;
     }
     return (int) Math.floor((coord - base) / binsize) + offset;
@@ -198,7 +199,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
     }
     else if(bin >= size) {
       this.data.ensureCapacity(bin + 1);
-      while (data.size() < bin) {
+      while(data.size() < bin) {
         data.add(maker.make());
       }
       // add the new data.
@@ -212,7 +213,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
       this.data.set(bin, d);
     }
   }
-  
+
   /**
    * Get the number of bins actually in use.
    * 
@@ -229,6 +230,36 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    */
   public double getBinsize() {
     return binsize;
+  }
+
+  /**
+   * Mean of bin
+   * 
+   * @param bin Bin number
+   * @return Mean
+   */
+  public double getBinMean(int bin) {
+    return base + (bin + 0.5 - offset) * binsize;
+  }
+
+  /**
+   * Minimum of bin
+   * 
+   * @param bin Bin number
+   * @return Lower bound
+   */
+  public double getBinMin(int bin) {
+    return base + (bin - offset) * binsize;
+  }
+
+  /**
+   * Maximum of bin
+   * 
+   * @param bin Bin number
+   * @return Upper bound
+   */
+  public double getBinMax(int bin) {
+    return base + (bin + 1 - offset) * binsize;
   }
 
   /**
@@ -257,7 +288,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   public ArrayList<T> getData() {
     return data;
   }
-  
+
   /**
    * Make a new bin.
    * 
@@ -266,7 +297,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   protected T make() {
     return maker.make();
   }
-  
+
   /**
    * Iterator class to iterate over all bins.
    * 
@@ -279,7 +310,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
      * Current bin number
      */
     int bin = 0;
-    
+
     @Override
     public boolean hasNext() {
       return bin < size;
@@ -310,7 +341,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
      * Current bin number
      */
     int bin = size - 1;
-    
+
     @Override
     public boolean hasNext() {
       return bin >= 0;
@@ -336,7 +367,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   public Iterator<Pair<Double, T>> iterator() {
     return new Iter();
   }
-  
+
   /**
    * Get an iterator over all histogram bins.
    */
@@ -344,10 +375,10 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   public Iterator<Pair<Double, T>> reverseIterator() {
     return new RIter();
   }
-  
+
   /**
-   * Convenience constructor for Integer-based Histograms.
-   * Uses a constructor to initialize bins with Integer(0)
+   * Convenience constructor for Integer-based Histograms. Uses a constructor to
+   * initialize bins with Integer(0)
    * 
    * @param bins Number of bins
    * @param min Minimum coordinate
@@ -364,8 +395,8 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   }
 
   /**
-   * Convenience constructor for Double-based Histograms.
-   * Uses a constructor to initialize bins with Double(0)
+   * Convenience constructor for Double-based Histograms. Uses a constructor to
+   * initialize bins with Double(0)
    * 
    * @param bins Number of bins
    * @param min Minimum coordinate
@@ -382,37 +413,37 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   }
 
   /**
-   * Convenience constructor for Histograms with pairs of Integers
-   * Uses a constructor to initialize bins with Pair(Integer(0),Integer(0))
+   * Convenience constructor for Histograms with pairs of Integers Uses a
+   * constructor to initialize bins with Pair(Integer(0),Integer(0))
    * 
    * @param bins Number of bins
    * @param min Minimum coordinate
    * @param max Maximum coordinate
    * @return New histogram for Integer pairs.
    */
-  public static ReplacingHistogram<Pair<Integer,Integer>> IntIntHistogram(int bins, double min, double max) {
-    return new ReplacingHistogram<Pair<Integer,Integer>>(bins, min, max, new Adapter<Pair<Integer,Integer>>() {
+  public static ReplacingHistogram<Pair<Integer, Integer>> IntIntHistogram(int bins, double min, double max) {
+    return new ReplacingHistogram<Pair<Integer, Integer>>(bins, min, max, new Adapter<Pair<Integer, Integer>>() {
       @Override
-      public Pair<Integer,Integer> make() {
-        return new Pair<Integer,Integer>(0,0);
+      public Pair<Integer, Integer> make() {
+        return new Pair<Integer, Integer>(0, 0);
       }
     });
   }
 
   /**
-   * Convenience constructor for Histograms with pairs of Doubles
-   * Uses a constructor to initialize bins with Pair(Double(0),Double(0))
+   * Convenience constructor for Histograms with pairs of Doubles Uses a
+   * constructor to initialize bins with Pair(Double(0),Double(0))
    * 
    * @param bins Number of bins
    * @param min Minimum coordinate
    * @param max Maximum coordinate
    * @return New histogram for Double pairs.
    */
-  public static ReplacingHistogram<Pair<Double,Double>> DoubleDoubleHistogram(int bins, double min, double max) {
-    return new ReplacingHistogram<Pair<Double,Double>>(bins, min, max, new Adapter<Pair<Double,Double>>() {
+  public static ReplacingHistogram<Pair<Double, Double>> DoubleDoubleHistogram(int bins, double min, double max) {
+    return new ReplacingHistogram<Pair<Double, Double>>(bins, min, max, new Adapter<Pair<Double, Double>>() {
       @Override
-      public Pair<Double,Double> make() {
-        return new Pair<Double,Double>(0.0,0.0);
+      public Pair<Double, Double> make() {
+        return new Pair<Double, Double>(0.0, 0.0);
       }
     });
   }
