@@ -21,9 +21,12 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.histograms.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -35,10 +38,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
+ * Linear manifold clustering in high dimensional spaces by stochastic search.
+ * 
+ * Reference:
+ * <p>
+ * Robert Haralick, Rave Harpaz<br />
+ * Linear manifold clustering in high dimensional spaces by stochastic search<br/>
+ * In: Pattern Recognition volume 40, Issue 10
+ * </p>
  * 
  * @author Ernst Waas
+ * @author Erich Schubert
  */
-public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<Model>> {
+@Reference(authors = "Robert Haralick, Rave Harpaz", title = "Linear manifold clustering in high dimensional spaces by stochastic search", booktitle = "Pattern Recognition volume 40, Issue 10", url = "http://dx.doi.org/10.1016/j.patcog.2007.01.020")
+public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -49,8 +62,6 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
   private final static int BINS = 50;
 
   private final static int NOISE_SIZE = 20;
-
-  private final static double SMALL_NUMBER = 0;
 
   /**
    * The current threshold value calculated by the findSeperation Method.
@@ -94,20 +105,24 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    *         algorithm.
    * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    */
-  public Clustering<Model> run(Database database, Relation<V> relation) throws UnableToComplyException {
+  public Clustering<Model> run(Database database, Relation<NumberVector<?, ?>> relation) throws UnableToComplyException {
     Clustering<Model> ret = new Clustering<Model>("LMCLUS Clustering", "lmclus-clustering");
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), logger) : null;
     IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Clusters found", logger) : null;
     ModifiableDBIDs unclustered = DBIDUtil.newHashSet(relation.getDBIDs());
+
+    final int maxdim = Math.min(maxLMDim, DatabaseUtil.dimensionality(relation));
     int cnum = 0;
     while(unclustered.size() > NOISE_SIZE) {
       DBIDs current = unclustered;
       int lmDim = 1;
-      for(int k = 1; k <= maxLMDim; k++) {
+      for(int k = 1; k <= maxdim; k++) {
         // System.out.println("Current dim: " + k);
         // System.out.println("Sampling level:" + samplingLevel);
         while(true) {
           Separation separation = findSeparation(relation, current, k);
+          // logger.verbose("k: " + k + " goodness: " + separation.goodness +
+          // " threshold: " + separation.threshold);
           if(separation.goodness <= sensitivityThreshold) {
             break;
           }
@@ -117,6 +132,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
               subset.add(id);
             }
           }
+          // logger.verbose("size:"+subset.size());
           if(subset.size() < NOISE_SIZE) {
             break;
           }
@@ -132,7 +148,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       // New cluster found
       // TODO: annotate cluster with dimensionality
       final Cluster<Model> cluster = new Cluster<Model>(current);
-      cluster.setName("Cluster_" + cnum + "_" + lmDim);
+      cluster.setName("Cluster_" + lmDim + "d_" + cnum);
       cnum++;
       ret.addCluster(cluster);
       // Remove from main working set.
@@ -159,6 +175,19 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
   }
 
   /**
+   * Deviation from a manifold described by beta.
+   * 
+   * @param delta Delta from origin vector
+   * @param beta Manifold
+   * @return Deviation score
+   */
+  private double deviation(Vector delta, Matrix beta) {
+    double a = delta.euclideanLength();
+    double b = beta.transposeTimes(delta).euclideanLength();
+    return (a * a) - (b * b);
+  }
+
+  /**
    * This method samples a number of linear manifolds an tries to determine
    * which the one with the best cluster is.
    * 
@@ -177,18 +206,16 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * @return the overall goodness of the separation. The values origin basis and
    *         threshold are returned indirectly over class variables.
    */
-  private Separation findSeparation(Relation<V> relation, DBIDs currentids, int dimension) {
+  private Separation findSeparation(Relation<NumberVector<?, ?>> relation, DBIDs currentids, int dimension) {
     Separation separation = new Separation();
     // determine the number of samples needed, to secure that with a specific
     // probability
     // in at least on sample every sampled point is from the same cluster.
     int samples = (int) Math.min(Math.log(NOT_FROM_ONE_CLUSTER_PROBABILITY) / (Math.log(1 - Math.pow((1.0d / samplingLevel), dimension))), (double) currentids.size());
-    // System.out.println("Dimension: " + dimension);
-    System.out.println("Number of samples: " + samples);
+    // System.out.println("Number of samples: " + samples);
     Random r = new Random();
     int remaining_retries = 100;
     for(int i = 1; i <= samples; i++) {
-      // System.out.println(i);
       DBIDs sample = DBIDUtil.randomSample(currentids, dimension + 1, r.nextLong());
       final Iterator<DBID> iter = sample.iterator();
       // Use first as origin
@@ -200,7 +227,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
         List<Vector> vectors = new ArrayList<Vector>(sample.size() - 1);
         while(iter.hasNext()) {
           Vector vec = relation.get(iter.next()).getColumnVector();
-          vectors.add(vec.minus(originV));
+          vectors.add(vec.minusEquals(originV));
         }
         // generate orthogonal basis
         basis = generateOrthonormalBasis(vectors);
@@ -214,7 +241,6 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
           continue;
         }
       }
-      // System.out.println("Basis: " + tempBasis);
       // Generate and fill a histogram.
       FlexiHistogram<Double, Double> histogram = FlexiHistogram.DoubleSumHistogram(BINS);
       for(DBID point : currentids) {
@@ -226,8 +252,7 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
         final double distance = deviation(vec, basis);
         histogram.aggregate(distance, 1.0);
       }
-      // System.out.println("breakPoint");
-      double[] th = evaluateThreshold(histogram); // evaluate threshold
+      double[] th = findAndEvaluateThreshold(histogram); // evaluate threshold
       if(th[1] > separation.goodness) {
         separation.goodness = th[1];
         separation.threshold = th[0];
@@ -235,7 +260,6 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
         separation.basis = basis;
       }
     }
-    System.out.println("Goodness:" + separation.goodness);
     return separation;
   }
 
@@ -291,122 +315,90 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
   }
 
   /**
+   * Evaluate the histogram to find a suitable threshold
    * 
-   * @param histogramm
+   * @param histogram
    * @return
    */
-  private double[] evaluateThreshold(FlexiHistogram<Double, Double> histogramm) {
-    // histogramm.replace(threshold, threshold); // FIXME: ????
-    // double ret = 0;
-    int n = histogramm.getNumBins();
+  private double[] findAndEvaluateThreshold(FlexiHistogram<Double, Double> histogram) {
+    int n = histogram.getNumBins();
     double[] p1 = new double[n];
     double[] p2 = new double[n];
     double[] mu1 = new double[n];
     double[] mu2 = new double[n];
     double[] sigma1 = new double[n];
     double[] sigma2 = new double[n];
-    double[] jt = new double[n - 1];
-    Iterator<Pair<Double, Double>> forward = histogramm.iterator();
-    Iterator<Pair<Double, Double>> backwards = histogramm.reverseIterator();
-    backwards.next();
-    p1[0] = forward.next().second;
-    p2[n - 2] = backwards.next().second;
-    mu1[0] = 0;
-    mu2[n - 2] = (p2[n - 2] == 0 ? 0 : (n - 1));
-    sigma1[0] = 0;
-    sigma2[n - 2] = 0;
-    for(int i = 1, j = n - 3; i <= n - 2; i++, j--) {
-      double hi = forward.next().second;
-      double hj = backwards.next().second;
-      p1[i] = p1[i - 1] + hi;
-      if(p1[i] != 0) {
-        mu1[i] = ((mu1[i - 1] * p1[i - 1]) + (i * hi)) / p1[i];
-        sigma1[i] = (p1[i - 1] * (sigma1[i - 1] + (mu1[i - 1] - mu1[i]) * (mu1[i - 1] - mu1[i])) + hi * (i - mu1[i]) * (i - mu1[i])) / p1[i];
+    double[] jt = new double[n];
+    // Forward pass
+    {
+      MeanVariance mv = new MeanVariance();
+      Iterator<Pair<Double, Double>> forward = histogram.iterator();
+      for(int i = 0; forward.hasNext(); i++) {
+        Pair<Double, Double> pair = forward.next();
+        p1[i] = pair.second + ((i > 0) ? p1[i - 1] : 0);
+        mv.put(i, pair.second);
+        mu1[i] = mv.getMean();
+        sigma1[i] = mv.getNaiveStddev();
       }
-      else {
-        mu1[i] = 0;
-        sigma1[i] = 0;
-      }
-
-      p2[j] = p2[j + 1] + hj;
-      if(p2[j] != 0) {
-        mu2[j] = ((mu2[j + 1] * p2[j + 1]) + ((j + 1) * hj)) / p2[j];
-        sigma2[j] = (p2[j + 1] * (sigma2[j + 1] + (mu2[j + 1] - mu2[j]) * (mu2[j + 1] - mu2[j])) + hj * (j + 1 - mu2[j]) * (j + 1 - mu2[j])) / p2[j];
-      }
-      else {
-        mu2[j] = 0;
-        sigma2[j] = 0;
+    }
+    // Backwards pass
+    {
+      MeanVariance mv = new MeanVariance();
+      Iterator<Pair<Double, Double>> backwards = histogram.reverseIterator();
+      for(int j = n - 1; backwards.hasNext(); j--) {
+        Pair<Double, Double> pair = backwards.next();
+        p2[j] = pair.second + ((j + 1 < n) ? p2[j + 1] : 0);
+        mv.put(j, pair.second);
+        mu2[j] = mv.getMean();
+        sigma2[j] = mv.getNaiveStddev();
       }
     }
 
-    for(int i = 0; i < n - 1; i++) {
-      if(p1[i] != 0 && p2[i] != 0 && sigma1[i] > SMALL_NUMBER && sigma2[i] > SMALL_NUMBER) {
-        jt[i] = 1.0d + 2.0d * (p1[i] * Math.log(Math.sqrt(sigma1[i])) + p2[i] * Math.log(Math.sqrt(sigma2[i]))) - 2.0d * (p1[i] * Math.log(p1[i]) + p2[i] * Math.log(p2[i]));
-      }
-      else {
-        jt[i] = -1;
-      }
+    for(int i = 0; i < n; i++) {
+      jt[i] = 1.0 + 2 * (p1[i] * (Math.log(sigma1[i]) - Math.log(p1[i])) + p2[i] * (Math.log(sigma2[i]) - Math.log(p2[i])));
     }
 
-    int min = 0;
+    int bestpos = -1;
+    double bestgoodness = Double.NEGATIVE_INFINITY;
+
     double devPrev = jt[1] - jt[0];
-    double globalDepth = -1;
-    double discriminability = -1;
     for(int i = 1; i < jt.length - 1; i++) {
       double devCur = jt[i + 1] - jt[i];
       // System.out.println(p1[i]);
       // System.out.println(jt[i + 1]);
       // System.out.println(jt[i]);
       // System.out.println(devCur);
-      // Minimum found calculate depth
+      // Local minimum found - calculate depth
       if(devCur >= 0 && devPrev <= 0) {
-        double localDepth = 0;
-        int leftHeight = i;
-        while(leftHeight >= 1 && jt[leftHeight - 1] >= jt[leftHeight]) {
-          leftHeight--;
-        }
-        int rightHeight = i;
-        while(rightHeight < jt.length - 1 && jt[rightHeight] <= jt[rightHeight + 1]) {
-          rightHeight++;
-        }
-
-        if(jt[leftHeight] < jt[rightHeight]) {
-          localDepth = jt[leftHeight] - jt[i];
-        }
-        else {
-          localDepth = jt[rightHeight] - jt[i];
-        }
-        if(localDepth > globalDepth) {
-          // System.out.println("Minimum");
-          // System.out.println(localDepth);
-          min = i;
-          globalDepth = localDepth;
-          discriminability = Math.abs(mu1[i] - mu2[i]) / (Math.sqrt(sigma1[i] - sigma2[i]));
-          if(Double.isNaN(discriminability)) {
-            discriminability = -1;
+        double lowestMaxima = Double.POSITIVE_INFINITY;
+        for(int j = i - 1; j > 0; j--) {
+          if(jt[j - 1] < jt[j]) {
+            lowestMaxima = Math.min(lowestMaxima, jt[j]);
+            break;
           }
-          // System.out.println(discriminability);
+        }
+        for(int j = i + 1; j < n - 2; j++) {
+          if(jt[j + 1] < jt[j]) {
+            lowestMaxima = Math.min(lowestMaxima, jt[j]);
+            break;
+          }
+        }
+        double localDepth = lowestMaxima - jt[i];
+
+        final double mud = mu1[i] - mu2[i];
+        double discriminability = mud * mud / (sigma1[i] * sigma1[i] + sigma2[i] * sigma2[i]);
+        if(Double.isNaN(discriminability)) {
+          discriminability = -1;
+        }
+        double goodness = localDepth * discriminability;
+        if(goodness > bestgoodness) {
+          bestgoodness = goodness;
+          bestpos = i;
         }
       }
+      devPrev = devCur;
     }
-    // ret = min * histogramm.getBinsize();
-    double goodness = globalDepth * discriminability;
-    // System.out.println("GLobal goodness:" + goodness + ";" + globalDepth +
-    // ";" + discriminability);
-    return new double[] { min * histogramm.getBinsize(), goodness };
-  }
-
-  /**
-   * Deviation from a manifold described by beta.
-   * 
-   * @param delta Delta from origin vector
-   * @param beta Manifold
-   * @return Deviation score
-   */
-  private double deviation(Vector delta, Matrix beta) {
-    double a = delta.euclideanLength();
-    double b = beta.transposeTimes(delta).euclideanLength();
-    return (a * a) - (b * b);
+    return new double[] { histogram.getBinMax(bestpos), bestgoodness };
   }
 
   @Override
@@ -419,50 +411,94 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  public class Separation {
+  /**
+   * Class to represent a linear manifold separation
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private static class Separation {
+    /**
+     * Goodness of separation
+     */
     double goodness = Double.NEGATIVE_INFINITY;
 
+    /**
+     * Threshold
+     */
     double threshold = Double.NEGATIVE_INFINITY;
 
+    /**
+     * Basis of manifold
+     */
     Matrix basis = null;
 
+    /**
+     * Origin vector
+     */
     Vector originV = null;
   }
 
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
-    public static final OptionID MAXLM_ID = OptionID.getOrCreateOptionID("lmclus.maxLMDim", "Maximum linear manifold dimension to compute.");
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter with the maximum dimension to search for
+     */
+    public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("lmclus.maxdim", "Maximum linear manifold dimension to search.");
 
-    public static final OptionID SAMPLINGL_ID = OptionID.getOrCreateOptionID("lmclus.samplingLevel", "A number used to determine how many samples are taken.");
+    /**
+     * Sampling intensity level
+     */
+    public static final OptionID SAMPLINGL_ID = OptionID.getOrCreateOptionID("lmclus.sampling-level", "A number used to determine how many samples are taken in each search.");
 
+    /**
+     * Global significance threshold
+     */
     public static final OptionID THRESHOLD_ID = OptionID.getOrCreateOptionID("lmclus.threshold", "Threshold to determine if a cluster was found.");
 
-    private int maxdim;
+    /**
+     * Maximum dimensionality to search for
+     */
+    private int maxdim = Integer.MAX_VALUE;
 
+    /**
+     * Sampling level
+     */
     private int samplingLevel;
 
-    private double treshold;
+    /**
+     * Threshold
+     */
+    private double threshold;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter maxLMDimP = new IntParameter(MAXLM_ID, new GreaterEqualConstraint(1));
+      IntParameter maxLMDimP = new IntParameter(MAXDIM_ID, new GreaterEqualConstraint(1), true);
       if(config.grab(maxLMDimP)) {
         maxdim = maxLMDimP.getValue();
       }
-      IntParameter samplingLevelP = new IntParameter(SAMPLINGL_ID);
+      IntParameter samplingLevelP = new IntParameter(SAMPLINGL_ID, 100);
       if(config.grab(samplingLevelP)) {
         samplingLevel = samplingLevelP.getValue();
       }
 
       DoubleParameter sensivityThresholdP = new DoubleParameter(THRESHOLD_ID);
       if(config.grab(sensivityThresholdP)) {
-        treshold = sensivityThresholdP.getValue();
+        threshold = sensivityThresholdP.getValue();
       }
     }
 
     @Override
-    protected LMCLUS<V> makeInstance() {
-      return new LMCLUS<V>(maxdim, samplingLevel, treshold);
+    protected LMCLUS makeInstance() {
+      return new LMCLUS(maxdim, samplingLevel, threshold);
     }
   }
 }
