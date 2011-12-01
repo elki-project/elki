@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
@@ -34,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.composedOf String
  */
-public class LabelList extends LinkedList<String> {
+public class LabelList extends ArrayList<String> {
   /**
    * Serial number
    */
@@ -45,6 +46,24 @@ public class LabelList extends LinkedList<String> {
    */
   public LabelList() {
     super();
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param c existing collection
+   */
+  public LabelList(Collection<? extends String> c) {
+    super(c);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param initialCapacity initial size
+   */
+  public LabelList(int initialCapacity) {
+    super(initialCapacity);
   }
 
   @Override

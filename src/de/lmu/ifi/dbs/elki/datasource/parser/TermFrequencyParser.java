@@ -93,7 +93,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
 
     double len = 0;
     TIntFloatHashMap values = new TIntFloatHashMap();
-    LabelList labels = new LabelList();
+    LabelList labels = null;
 
     String curterm = null;
     for(int i = 0; i < entries.size(); i++) {
@@ -115,6 +115,9 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
         }
         catch(NumberFormatException e) {
           if(curterm != null) {
+            if(labels == null) {
+              labels = new LabelList(1);
+            }
             labels.add(curterm);
           }
           curterm = entries.get(i);
@@ -122,6 +125,9 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
       }
     }
     if(curterm != null) {
+      if(labels == null) {
+        labels = new LabelList(1);
+      }
       labels.add(curterm);
     }
     if(normalize) {

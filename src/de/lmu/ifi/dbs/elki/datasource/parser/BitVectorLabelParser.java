@@ -82,15 +82,18 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
-          // TODO: use more efficient storage right away?
+          // FIXME: use more efficient storage right away?
           List<Bit> attributes = new ArrayList<Bit>();
-          LabelList ll = new LabelList();
+          LabelList ll = null;
           for(String entry : entries) {
             try {
               Bit attribute = Bit.valueOf(entry);
               attributes.add(attribute);
             }
             catch(NumberFormatException e) {
+              if(ll == null) {
+                ll = new LabelList(1);
+              }
               ll.add(entry);
             }
           }
