@@ -215,13 +215,13 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * 
    * 
    * @author Arthur Zimek
-   * @param <O> the type of DatabaseObjects handled by this Result
+   * @param <V> the type of DatabaseObjects handled by this Result
    */
   // TODO: arthur comment
-  public static class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Comparable<SODModel<?>> {
+  public static class SODModel<V extends NumberVector<V, ?>> implements TextWriteable, Comparable<SODModel<?>> {
     private double[] centerValues;
 
-    private O center;
+    private V center;
 
     private double[] variances;
 
@@ -234,18 +234,18 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     /**
      * Initialize SOD Model
      * 
-     * @param database Database
+     * @param relation Database
      * @param neighborhood Neighborhood
      * @param alpha Alpha value
      * @param queryObject Query object
      */
-    public SODModel(Relation<O> database, DBIDs neighborhood, double alpha, O queryObject) {
+    public SODModel(Relation<V> relation, DBIDs neighborhood, double alpha, V queryObject) {
       if(neighborhood.size() > 0) {
         // TODO: store database link?
-        centerValues = new double[DatabaseUtil.dimensionality(database)];
+        centerValues = new double[DatabaseUtil.dimensionality(relation)];
         variances = new double[centerValues.length];
         for(DBID id : neighborhood) {
-          O databaseObject = database.get(id);
+          V databaseObject = relation.get(id);
           for(int d = 0; d < centerValues.length; d++) {
             centerValues[d] += databaseObject.doubleValue(d + 1);
           }
@@ -254,7 +254,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
           centerValues[d] /= neighborhood.size();
         }
         for(DBID id : neighborhood) {
-          O databaseObject = database.get(id);
+          V databaseObject = relation.get(id);
           for(int d = 0; d < centerValues.length; d++) {
             // distance
             double distance = centerValues[d] - databaseObject.doubleValue(d + 1);
@@ -274,7 +274,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
             weightVector.set(d, true);
           }
         }
-        center = DatabaseUtil.assumeVectorField(database).getFactory().newNumberVector(centerValues);
+        center = DatabaseUtil.assumeVectorField(relation).getFactory().newNumberVector(centerValues);
         sod = subspaceOutlierDegree(queryObject, center, weightVector);
       }
       else {
@@ -291,7 +291,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
      * @param weightVector
      * @return sod value
      */
-    private double subspaceOutlierDegree(O queryObject, O center, BitSet weightVector) {
+    private double subspaceOutlierDegree(V queryObject, V center, BitSet weightVector) {
       final DimensionsSelectingEuclideanDistanceFunction df = new DimensionsSelectingEuclideanDistanceFunction(weightVector);
       final int card = weightVector.cardinality();
       if(card == 0) {
