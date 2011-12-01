@@ -45,7 +45,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
-import org.apache.batik.dom.util.DOMUtilities;
 import org.apache.batik.svggen.SVGSyntax;
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
@@ -339,8 +338,7 @@ public class SVGPlot {
     OutputStream out = new FileOutputStream(file);
     // TODO embed linked images.
     javax.xml.transform.Result result = new StreamResult(out);
-    // deep clone document
-    SVGDocument doc = (SVGDocument) DOMUtilities.deepCloneDocument(getDocument(), getDocument().getImplementation());
+    SVGDocument doc = cloneDocument();
     NodeList imgs = doc.getElementsByTagNameNS(SVGConstants.SVG_NAMESPACE_URI, SVGConstants.SVG_IMAGE_TAG);
     final String tmpurl = new File(System.getProperty("java.io.tmpdir") + File.separator).toURI().toString();
     for(Node img : new XMLNodeListIterator(imgs)) {
@@ -390,17 +388,26 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors
    */
   protected void transcode(File file, Transcoder transcoder) throws IOException, TranscoderException {
-    // Since the Transcoder is Batik-based, it will replace the rendering tree,
-    // which would then break display. Thus we need to deep clone the document
-    // first.
-    // -- found by Simon.
-    SVGDocument doc = (SVGDocument) DOMUtilities.deepCloneDocument(getDocument(), getDocument().getImplementation());
+    SVGDocument doc = cloneDocument();
     TranscoderInput input = new TranscoderInput(doc);
     OutputStream out = new FileOutputStream(file);
     TranscoderOutput output = new TranscoderOutput(out);
     transcoder.transcode(input, output);
     out.flush();
     out.close();
+  }
+
+  /**
+   * Clone the SVGPlot document for transcoding.
+   * 
+   * This will usually be necessary for exporting the SVG document if it is
+   * currently being displayed: otherwise, we break the Batik rendering trees.
+   * (Discovered by Simon).
+   * 
+   * @return cloned document
+   */
+  protected SVGDocument cloneDocument() {
+    return (SVGDocument) new SVGCloneVisible().cloneDocument(SVGDOMImplementation.getDOMImplementation(), document);
   }
 
   /**
@@ -531,8 +538,7 @@ public class SVGPlot {
     ThumbnailTranscoder t = new ThumbnailTranscoder();
     t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(width));
     t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(height));
-    // Clone - avoid GWT interactions.
-    SVGDocument doc = (SVGDocument) DOMUtilities.deepCloneDocument(getDocument(), getDocument().getImplementation());
+    SVGDocument doc = cloneDocument();
     TranscoderInput input = new TranscoderInput(doc);
     t.transcode(input, null);
     return t.getLastImage();
