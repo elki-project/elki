@@ -176,7 +176,7 @@ public class MeanVariance extends Mean {
    * @return sample variance
    */
   public double getSampleVariance() {
-    assert (wsum > 1);
+    assert (wsum > 1) : "Cannot compute a reasonable sample variance with weight <= 1.0!";
     return nvar / (wsum - 1);
   }
 
