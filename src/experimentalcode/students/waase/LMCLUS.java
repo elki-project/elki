@@ -13,25 +13,22 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.histograms.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -58,43 +55,23 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
   /**
    * The current threshold value calculated by the findSeperation Method.
    */
-  private DoubleDistance threshold;
+  private final double sensitivityThreshold;
+
+  private final int maxLMDim;
+
+  private final int samplingLevel;
 
   /**
-   * The basis of the linear manifold calculated by the findSeperation Method.
+   * Constructor.
+   * 
+   * @param maxdim Maximum dimensionality
+   * @param samplingLevel Sampling level
+   * @param sensitivityThreshold Treshold
    */
-  private Matrix basis;
-
-  /**
-   * The id of the origin used to calculate the linear manifold in the
-   * findSeperation Method.
-   */
-  private DBID origin;
-
-  // private double goodness;
-
-  public static final OptionID MAXLM_ID = OptionID.getOrCreateOptionID("lmclus.maxLMDim", "Maximum linear manifold dimension to compute.");
-
-  public static final OptionID SAMPLINGL_ID = OptionID.getOrCreateOptionID("lmclus.samplingLevel", "A number used to determine how many samples are taken.");
-
-  public static final OptionID THRESHOLD_ID = OptionID.getOrCreateOptionID("lmclus.threshold", "Threshold to determine if a cluster was found.");
-
-  private final IntParameter maxLMDim = new IntParameter(MAXLM_ID);
-
-  private final IntParameter samplingLevel = new IntParameter(SAMPLINGL_ID);
-
-  private final DoubleParameter sensivityThreshold = new DoubleParameter(THRESHOLD_ID);
-
-  public LMCLUS(Parameterization config) {
-    super();
-    config = config.descend(this);
-    config.grab(maxLMDim);
-    config.grab(samplingLevel);
-    config.grab(sensivityThreshold);
-  }
-
-  public Clustering<Model> run(Database database, Relation<V> relation) throws UnableToComplyException {
-    return runLMCLUS(database, relation, maxLMDim.getValue(), samplingLevel.getValue(), sensivityThreshold.getValue());
+  public LMCLUS(int maxdim, int samplingLevel, double sensitivityThreshold) {
+    this.maxLMDim = maxdim;
+    this.samplingLevel = samplingLevel;
+    this.sensitivityThreshold = sensitivityThreshold;
   }
 
   /**
@@ -113,47 +90,70 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * 
    * @param d The database to operate on
    * @param relation
-   * @param maxLMDim The maximum dimension of the linear manifolds to look for.
-   * @param samplingLevel
-   * @param sensivityThreshold the threshold specifying if a manifold is good
-   *        enough to be seen as cluster.
    * @return A Clustering Object containing all the clusters found by the
    *         algorithm.
    * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    */
-  private Clustering<Model> runLMCLUS(Database database, Relation<V> relation, int maxLMDim, int samplingLevel, double sensivityThreshold) throws UnableToComplyException {
+  public Clustering<Model> run(Database database, Relation<V> relation) throws UnableToComplyException {
     Clustering<Model> ret = new Clustering<Model>("LMCLUS Clustering", "lmclus-clustering");
-    Relation<V> rel = relation;
-    while(rel.size() > NOISE_SIZE) {
-      Relation<V> subrel = new ProxyView<V>(database, rel.getDBIDs(), relation);
-      int lMDim = 1;
-      for(int i = 1; i <= maxLMDim; i++) {
-        System.out.println("Current dim: " + i);
-        System.out.println("Sampling level:" + samplingLevel);
-        System.out.println("Threshold" + sensivityThreshold);
-        while(findSeparation(rel, i, samplingLevel) > sensivityThreshold) {
-          final RangeQuery<V, DoubleDistance> rangeQ = QueryUtil.getRangeQuery(subrel, new LMCLUSDistanceFunction(basis), DatabaseQuery.HINT_SINGLE);
-          V originv = relation.get(origin);
-          List<DistanceResultPair<DoubleDistance>> res = rangeQ.getRangeForObject(originv, threshold);
-          if(res.size() < NOISE_SIZE) {
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), logger) : null;
+    IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Clusters found", logger) : null;
+    ModifiableDBIDs unclustered = DBIDUtil.newHashSet(relation.getDBIDs());
+    int cnum = 0;
+    while(unclustered.size() > NOISE_SIZE) {
+      DBIDs current = unclustered;
+      int lmDim = 1;
+      for(int k = 1; k <= maxLMDim; k++) {
+        // System.out.println("Current dim: " + k);
+        // System.out.println("Sampling level:" + samplingLevel);
+        while(true) {
+          Separation separation = findSeparation(relation, current, k);
+          if(separation.goodness <= sensitivityThreshold) {
             break;
           }
-          // Collect ids.
-          ModifiableDBIDs partition = DBIDUtil.newArray();
-          for(DistanceResultPair<DoubleDistance> point : res) {
-            partition.add(point.getDBID());
+          ModifiableDBIDs subset = DBIDUtil.newArray(current.size());
+          for(DBID id : current) {
+            if(deviation(relation.get(id).getColumnVector().minusEquals(separation.originV), separation.basis) < separation.threshold) {
+              subset.add(id);
+            }
           }
-          subrel = new ProxyView<V>(database, partition, relation);
-          // TODO partition database according to range
-          lMDim = i;
-          System.out.println("Partition: " + partition.size());
+          if(subset.size() < NOISE_SIZE) {
+            break;
+          }
+          current = subset;
+          lmDim = k;
+          // System.out.println("Partition: " + subset.size());
         }
       }
-      DBIDs delete = subrel.getDBIDs();
-      HashSetModifiableDBIDs all = DBIDUtil.newHashSet(rel.getDBIDs());
-      all.removeDBIDs(delete);
-      rel = new ProxyView<V>(database, all, relation);
-      ret.addCluster(new Cluster<Model>(all));
+      // No more clusters found
+      if(current.size() < NOISE_SIZE || current == unclustered) {
+        break;
+      }
+      // New cluster found
+      // TODO: annotate cluster with dimensionality
+      final Cluster<Model> cluster = new Cluster<Model>(current);
+      cluster.setName("Cluster_" + cnum + "_" + lmDim);
+      cnum++;
+      ret.addCluster(cluster);
+      // Remove from main working set.
+      unclustered.removeDBIDs(current);
+      if(progress != null) {
+        progress.setProcessed(relation.size() - unclustered.size(), logger);
+      }
+      if(cprogress != null) {
+        cprogress.setProcessed(cnum, logger);
+      }
+    }
+    // Remaining objects are noise
+    if(unclustered.size() > 0) {
+      ret.addCluster(new Cluster<Model>(unclustered, true));
+    }
+    if(progress != null) {
+      progress.setProcessed(relation.size(), logger);
+      progress.ensureCompleted(logger);
+    }
+    if(cprogress != null) {
+      cprogress.setCompleted(logger);
     }
     return ret;
   }
@@ -171,76 +171,72 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * The process is redone until a specific number of samples is taken.
    * </PRE>
    * 
-   * @param databasePartition The partition of the database to search for the
-   *        cluster.
+   * @param relation The vector relation
+   * @param currentids Current DBIDs
    * @param dimension the dimension of the linear manifold to sample.
-   * @param samplingLevel
    * @return the overall goodness of the separation. The values origin basis and
    *         threshold are returned indirectly over class variables.
    */
-  private double findSeparation(Relation<V> databasePartition, int dimension, int samplingLevel) {
-    double goodness = -1;
-    double threshold = -1;
-    DBID origin = null;
-    Matrix basis = null;
+  private Separation findSeparation(Relation<V> relation, DBIDs currentids, int dimension) {
+    Separation separation = new Separation();
     // determine the number of samples needed, to secure that with a specific
     // probability
     // in at least on sample every sampled point is from the same cluster.
-    int samples = (int) Math.min(Math.log(NOT_FROM_ONE_CLUSTER_PROBABILITY) / (Math.log(1 - Math.pow((1.0d / samplingLevel), dimension))), (double) databasePartition.size());
-    System.out.println("Dimension: " + dimension);
+    int samples = (int) Math.min(Math.log(NOT_FROM_ONE_CLUSTER_PROBABILITY) / (Math.log(1 - Math.pow((1.0d / samplingLevel), dimension))), (double) currentids.size());
+    // System.out.println("Dimension: " + dimension);
     System.out.println("Number of samples: " + samples);
     Random r = new Random();
     int remaining_retries = 100;
     for(int i = 1; i <= samples; i++) {
-      //System.out.println(i);
-      DBIDs sample = DBIDUtil.randomSample(databasePartition.getDBIDs(), dimension + 1, r.nextLong());
+      // System.out.println(i);
+      DBIDs sample = DBIDUtil.randomSample(currentids, dimension + 1, r.nextLong());
       final Iterator<DBID> iter = sample.iterator();
-      DBID o = iter.next();
-      Vector tempOrigin = databasePartition.get(o).getColumnVector();
-      List<Vector> vectors = new ArrayList<Vector>(sample.size() - 1);
-      while(iter.hasNext()) {
-        Vector vec = databasePartition.get(iter.next()).getColumnVector();
-        vectors.add(vec.minus(tempOrigin));
-      }
-      // generate orthogonal basis
-      Matrix tempBasis = generateOrthonormalBasis(vectors);
-      if(tempBasis == null) {
-        // new sample has to be taken.
-        i--;
-        remaining_retries--;
-        if(remaining_retries < 0) {
-          throw new AbortException("Too many retries in sampling.");
+      // Use first as origin
+      DBID origin = iter.next();
+      Vector originV = relation.get(origin).getColumnVector();
+      // Build orthogonal basis from remainder
+      Matrix basis;
+      {
+        List<Vector> vectors = new ArrayList<Vector>(sample.size() - 1);
+        while(iter.hasNext()) {
+          Vector vec = relation.get(iter.next()).getColumnVector();
+          vectors.add(vec.minus(originV));
         }
-        continue;
+        // generate orthogonal basis
+        basis = generateOrthonormalBasis(vectors);
+        if(basis == null) {
+          // new sample has to be taken.
+          i--;
+          remaining_retries--;
+          if(remaining_retries < 0) {
+            throw new AbortException("Too many retries in sampling, and always a linear dependant data set.");
+          }
+          continue;
+        }
       }
-      //System.out.println("Basis: " + tempBasis);
-      // Generate and fill a histogramm.
-      FlexiHistogram<Double, Double> histogramm = FlexiHistogram.DoubleSumHistogram(BINS);
-      LMCLUSDistanceFunction fun = new LMCLUSDistanceFunction(tempBasis);
-      for(DBID point : databasePartition.iterDBIDs()) {
+      // System.out.println("Basis: " + tempBasis);
+      // Generate and fill a histogram.
+      FlexiHistogram<Double, Double> histogram = FlexiHistogram.DoubleSumHistogram(BINS);
+      for(DBID point : currentids) {
+        // Skip sampled points
         if(sample.contains(point)) {
           continue;
         }
-        Vector vec = databasePartition.get(point).getColumnVector();
-        final double distance = fun.doubleDistance(vec, tempOrigin);
-        // System.out.println("Distance " + distance);
-        histogramm.aggregate(distance, 1.0);
+        Vector vec = relation.get(point).getColumnVector().minusEquals(originV);
+        final double distance = deviation(vec, basis);
+        histogram.aggregate(distance, 1.0);
       }
-      //System.out.println("breakPoint");
-      double[] th = evaluateThreshold(histogramm);// evaluate threshold
-      // double g = this.goodness;// Evaluate goodness
-      if(th[1] > goodness) {
-        goodness = th[1];
-        threshold = th[0];
-        origin = o;
-        basis = tempBasis;
+      // System.out.println("breakPoint");
+      double[] th = evaluateThreshold(histogram); // evaluate threshold
+      if(th[1] > separation.goodness) {
+        separation.goodness = th[1];
+        separation.threshold = th[0];
+        separation.originV = originV;
+        separation.basis = basis;
       }
     }
-    this.basis = basis;
-    this.origin = origin;
-    this.threshold = new DoubleDistance(threshold);
-    System.out.println("Goodness:" + goodness);
-    return goodness;
+    System.out.println("Goodness:" + separation.goodness);
+    return separation;
   }
 
   /**
@@ -259,7 +255,8 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * @throws RuntimeException if the given vectors are not linear independent.
    */
   private Matrix generateOrthonormalBasis(List<Vector> vectors) {
-    final Vector first = vectors.get(0);
+    Vector first = vectors.get(0);
+    first = first.times(1.0 / first.euclideanLength());
     Matrix ret = new Matrix(first.getDimensionality(), vectors.size());
     ret.setColumnVector(0, first);
     for(int i = 1; i < vectors.size(); i++) {
@@ -291,17 +288,6 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       ret.setColumnVector(i, u_i);
     }
     return ret;
-  }
-
-  /**
-   * This Method calculates: <v,u>/<u,u> *u
-   * 
-   * @param u a vector
-   * @param v a vector
-   * @return the result of the calculation.
-   */
-  private Vector projection(Vector u, Vector v) {
-    return u.times(v.scalarProduct(u) / u.scalarProduct(u));
   }
 
   /**
@@ -405,8 +391,22 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     }
     // ret = min * histogramm.getBinsize();
     double goodness = globalDepth * discriminability;
-    // System.out.println("GLobal goodness:" + goodness + ";" + globalDepth + ";" + discriminability);
+    // System.out.println("GLobal goodness:" + goodness + ";" + globalDepth +
+    // ";" + discriminability);
     return new double[] { min * histogramm.getBinsize(), goodness };
+  }
+
+  /**
+   * Deviation from a manifold described by beta.
+   * 
+   * @param delta Delta from origin vector
+   * @param beta Manifold
+   * @return Deviation score
+   */
+  private double deviation(Vector delta, Matrix beta) {
+    double a = delta.euclideanLength();
+    double b = beta.transposeTimes(delta).euclideanLength();
+    return (a * a) - (b * b);
   }
 
   @Override
@@ -417,5 +417,52 @@ public class LMCLUS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  public class Separation {
+    double goodness = Double.NEGATIVE_INFINITY;
+
+    double threshold = Double.NEGATIVE_INFINITY;
+
+    Matrix basis = null;
+
+    Vector originV = null;
+  }
+
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    public static final OptionID MAXLM_ID = OptionID.getOrCreateOptionID("lmclus.maxLMDim", "Maximum linear manifold dimension to compute.");
+
+    public static final OptionID SAMPLINGL_ID = OptionID.getOrCreateOptionID("lmclus.samplingLevel", "A number used to determine how many samples are taken.");
+
+    public static final OptionID THRESHOLD_ID = OptionID.getOrCreateOptionID("lmclus.threshold", "Threshold to determine if a cluster was found.");
+
+    private int maxdim;
+
+    private int samplingLevel;
+
+    private double treshold;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter maxLMDimP = new IntParameter(MAXLM_ID, new GreaterEqualConstraint(1));
+      if(config.grab(maxLMDimP)) {
+        maxdim = maxLMDimP.getValue();
+      }
+      IntParameter samplingLevelP = new IntParameter(SAMPLINGL_ID);
+      if(config.grab(samplingLevelP)) {
+        samplingLevel = samplingLevelP.getValue();
+      }
+
+      DoubleParameter sensivityThresholdP = new DoubleParameter(THRESHOLD_ID);
+      if(config.grab(sensivityThresholdP)) {
+        treshold = sensivityThresholdP.getValue();
+      }
+    }
+
+    @Override
+    protected LMCLUS<V> makeInstance() {
+      return new LMCLUS<V>(maxdim, samplingLevel, treshold);
+    }
   }
 }
