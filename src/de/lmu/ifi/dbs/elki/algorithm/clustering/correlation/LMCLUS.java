@@ -1,4 +1,4 @@
-package experimentalcode.students.waase;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import java.util.ArrayList;
 import java.util.Iterator;
