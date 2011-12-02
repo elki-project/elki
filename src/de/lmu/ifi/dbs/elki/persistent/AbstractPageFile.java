@@ -61,7 +61,7 @@ public abstract class AbstractPageFile<P extends Page> implements PageFile<P> {
    */
   @Override
   public final synchronized int writePage(P page) {
-    Integer pageid = setPageID(page);
+    int pageid = setPageID(page);
     writePage(pageid, page);
     return pageid;
   }
@@ -72,7 +72,7 @@ public abstract class AbstractPageFile<P extends Page> implements PageFile<P> {
    * @param pageid Page id
    * @param page Page to write
    */
-  protected abstract void writePage(Integer pageid, P page);
+  protected abstract void writePage(int pageid, P page);
 
   @Override
   public void close() {

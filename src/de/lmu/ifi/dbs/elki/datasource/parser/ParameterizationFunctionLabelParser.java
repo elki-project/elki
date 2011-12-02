@@ -87,7 +87,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser implemen
           LabelList labellist = null;
           for(String entry : entries) {
             try {
-              double attribute = Double.valueOf(entry);
+              double attribute = Double.parseDouble(entry);
               attributes.add(attribute);
             }
             catch(NumberFormatException e) {

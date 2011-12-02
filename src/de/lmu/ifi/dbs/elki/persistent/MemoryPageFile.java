@@ -58,7 +58,7 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
   }
   
   @Override
-  protected void writePage(Integer pageID, P page) {
+  protected void writePage(int pageID, P page) {
     writeAccess++;
     file.put(pageID, page);
     page.setDirty(false);

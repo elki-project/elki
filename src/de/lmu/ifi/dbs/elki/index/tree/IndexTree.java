@@ -121,7 +121,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * 
    * @return page id
    */
-  public final Integer getRootID() {
+  public final int getRootID() {
     return getPageID(rootEntry);
   }
   
@@ -141,7 +141,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @return Whether the page ID is the root
    */
   protected boolean isRoot(N page) {
-    return getRootID().equals(page.getPageID());
+    return getRootID() == page.getPageID();
   }
 
   /**
@@ -150,7 +150,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @param entry Entry
    * @return Page ID
    */
-  protected Integer getPageID(Entry entry) {
+  protected int getPageID(Entry entry) {
     if (entry.isLeafEntry()) {
       throw new AbortException("Leafs do not have page ids!");
     }
@@ -163,7 +163,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @param nodeID the page id of the node to be returned
    * @return the node with the specified id
    */
-  public N getNode(Integer nodeID) {
+  public N getNode(int nodeID) {
     if(nodeID == getPageID(rootEntry)) {
       return getRoot();
     }

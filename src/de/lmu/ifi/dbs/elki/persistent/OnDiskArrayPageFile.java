@@ -139,7 +139,7 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
    * @param page the page which has to be written to disk
    */
   @Override
-  public void writePage(Integer pageID, P page) {
+  public void writePage(int pageID, P page) {
     if(page.isDirty()) {
       try {
         writeAccess++;
