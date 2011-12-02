@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  */
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
@@ -46,7 +45,7 @@ public class GeneratorStatic implements GeneratorInterface {
   /**
    * Cluster points
    */
-  public LinkedList<Vector> points;
+  public List<Vector> points;
 
   /**
    * Construct generator using given name and points
@@ -54,7 +53,7 @@ public class GeneratorStatic implements GeneratorInterface {
    * @param name Cluster name
    * @param points Cluster points
    */
-  public GeneratorStatic(String name, LinkedList<Vector> points) {
+  public GeneratorStatic(String name, List<Vector> points) {
     super();
     this.name = name;
     this.points = points;
@@ -83,7 +82,7 @@ public class GeneratorStatic implements GeneratorInterface {
 
   @Override
   public int getDim() {
-    return points.getFirst().getDimensionality();
+    return points.get(0).getDimensionality();
   }
 
   @Override
