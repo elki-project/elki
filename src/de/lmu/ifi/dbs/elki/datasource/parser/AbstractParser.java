@@ -54,7 +54,7 @@ public abstract class AbstractParser {
   public static final String QUOTE_CHAR = "\"";
 
   /**
-   * A pattern catching most numbers that can be parsed using Double.valueOf:
+   * A pattern catching most numbers that can be parsed using Double.parseDouble:
    * 
    * Some examples: <code>1</code> <code>1.</code> <code>1.2</code>
    * <code>.2</code> <code>-.2e-03</code>

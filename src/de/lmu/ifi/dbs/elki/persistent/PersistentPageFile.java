@@ -156,7 +156,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
    * @param page the page which has to be written to disk
    */
   @Override
-  public void writePage(Integer pageID, P page) {
+  public void writePage(int pageID, P page) {
     try {
       writeAccess++;
       byte[] array = pageToByteArray(page);
@@ -167,7 +167,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
       page.setDirty(false);
     }
     catch(IOException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error writing to page file.", e);
     }
   }
 

@@ -127,10 +127,10 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       Matcher m = COORD.matcher(cur);
       if(m.find()) {
         try {
-          double c1 = Double.valueOf(m.group(1));
-          double c2 = Double.valueOf(m.group(2));
+          double c1 = Double.parseDouble(m.group(1));
+          double c2 = Double.parseDouble(m.group(2));
           if(m.group(3) != null) {
-            double c3 = Double.valueOf(m.group(3));
+            double c3 = Double.parseDouble(m.group(3));
             coords.add(new Vector(new double[] { c1, c2, c3 }));
           }
           else {

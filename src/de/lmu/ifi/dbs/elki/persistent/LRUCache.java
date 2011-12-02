@@ -111,7 +111,7 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
   }
 
   @Override
-  public synchronized void writePage(Integer pageID, P page) {
+  public synchronized void writePage(int pageID, P page) {
     writeAccess++;
     page.setDirty(true);
     map.put(pageID, page);

@@ -269,7 +269,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     String dcostr = ((Element) cur).getAttribute("density-correction");
     if(dcostr != null && dcostr != "") {
-      overweight = Double.valueOf(dcostr);
+      overweight = Double.parseDouble(dcostr);
     }
 
     if(size < 0) {
@@ -324,11 +324,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     String minstr = ((Element) cur).getAttribute("min");
     if(minstr != null && minstr != "") {
-      min = Double.valueOf(minstr);
+      min = Double.parseDouble(minstr);
     }
     String maxstr = ((Element) cur).getAttribute("max");
     if(maxstr != null && maxstr != "") {
-      max = Double.valueOf(maxstr);
+      max = Double.parseDouble(maxstr);
     }
 
     // *** new uniform generator
@@ -356,11 +356,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double stddev = 1.0;
     String meanstr = ((Element) cur).getAttribute("mean");
     if(meanstr != null && meanstr != "") {
-      mean = Double.valueOf(meanstr);
+      mean = Double.parseDouble(meanstr);
     }
     String stddevstr = ((Element) cur).getAttribute("stddev");
     if(stddevstr != null && stddevstr != "") {
-      stddev = Double.valueOf(stddevstr);
+      stddev = Double.parseDouble(stddevstr);
     }
 
     // *** New normal distribution generator
@@ -388,11 +388,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double theta = 1.0;
     String kstr = ((Element) cur).getAttribute("k");
     if(kstr != null && kstr != "") {
-      k = Double.valueOf(kstr);
+      k = Double.parseDouble(kstr);
     }
     String thetastr = ((Element) cur).getAttribute("theta");
     if(thetastr != null && thetastr != "") {
-      theta = Double.valueOf(thetastr);
+      theta = Double.parseDouble(thetastr);
     }
 
     // *** New normal distribution generator
@@ -430,7 +430,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     }
     String anstr = ((Element) cur).getAttribute("angle");
     if(anstr != null && anstr != "") {
-      angle = Double.valueOf(anstr);
+      angle = Double.parseDouble(anstr);
     }
     if(axis1 <= 0 || axis1 > cluster.getDim()) {
       throw new UnableToComplyException("Invalid axis1 number given in specification file.");
@@ -589,7 +589,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double[] d = new double[entries.length];
     for(int i = 0; i < entries.length; i++) {
       try {
-        d[i] = Double.valueOf(entries[i]);
+        d[i] = Double.parseDouble(entries[i]);
       }
       catch(NumberFormatException e) {
         throw new UnableToComplyException("Could not parse vector.");

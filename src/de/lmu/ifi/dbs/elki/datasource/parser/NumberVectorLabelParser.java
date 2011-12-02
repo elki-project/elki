@@ -240,7 +240,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       String ent = itr.next();
       if(!labelIndices.get(i)) {
         try {
-          double attribute = Double.valueOf(ent);
+          double attribute = Double.parseDouble(ent);
           attributes.add(attribute);
           continue;
         }

@@ -327,7 +327,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
       double[] vals = new double[dimensionality];
       for(int d = 0; d < dimensionality; d++) {
         if(d == columnIndex - 3) {
-          vals[d] = Double.valueOf((String) aValue);
+          vals[d] = Double.parseDouble((String) aValue);
         }
         else {
           vals[d] = obj.doubleValue(d + 1);
