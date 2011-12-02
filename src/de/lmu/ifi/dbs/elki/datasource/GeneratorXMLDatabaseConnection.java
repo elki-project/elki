@@ -29,7 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -528,7 +529,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
       throw new UnableToComplyException("No cluster name given in specification file.");
     }
 
-    LinkedList<Vector> points = new LinkedList<Vector>();
+    ArrayList<Vector> points = new ArrayList<Vector>();
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
       if(child.getNodeName() == "point") {
@@ -554,7 +555,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
    * @param cur Current document nod
    * @throws UnableToComplyException
    */
-  private void processElementPoint(LinkedList<Vector> points, Node cur) throws UnableToComplyException {
+  private void processElementPoint(List<Vector> points, Node cur) throws UnableToComplyException {
     Vector point = null;
     String vstr = ((Element) cur).getAttribute("vector");
     if(vstr != null && vstr != "") {
