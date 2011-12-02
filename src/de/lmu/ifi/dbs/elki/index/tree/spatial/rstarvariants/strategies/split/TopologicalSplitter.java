@@ -61,12 +61,10 @@ public class TopologicalSplitter implements SplitStrategy {
     Split<A, E> split = new Split<A, E>(entries, getter);
     split.chooseSplitAxis(minEntries);
     split.chooseSplitPoint(minEntries);
-    int splitpoint = split.getSplitPoint();
-    DoubleIntPair[] sorted = split.getBestSorting();
 
     BitSet assignment = new BitSet(split.size);
-    for(int i = splitpoint; i < split.size; i++) {
-      assignment.set(sorted[i].second);
+    for(int i = split.splitPoint; i < split.size; i++) {
+      assignment.set(split.bestSorting[i].second);
     }
     return assignment;
   }
@@ -186,8 +184,9 @@ public class TopologicalSplitter implements SplitStrategy {
     protected void initMinMaxArrays() {
       maxSorting = new DoubleIntPair[size];
       minSorting = new DoubleIntPair[size];
+      // Prefill
       for(int j = 0; j < size; j++) {
-        minSorting[j] = new DoubleIntPair(0, -1); // invalid, but allocate the objects
+        minSorting[j] = new DoubleIntPair(0, -1);
         maxSorting[j] = new DoubleIntPair(0, -1);
       }
     }
@@ -224,34 +223,43 @@ public class TopologicalSplitter implements SplitStrategy {
       // the volume of mbr1 and mbr2
       double volume = 0.0;
       // indicates whether the sorting according to maximal or to minimal value
-      // is
-      // best for the split axis
+      // is best for the split axis
       bestSorting = null;
 
-      for(int i = 0; i <= size - 2 * minEntries; i++) {
-        // test the sorting with respect to the minimal values
-        HyperBoundingBox mbr1 = mbr(minSorting, 0, minEntries + i);
-        HyperBoundingBox mbr2 = mbr(minSorting, minEntries + i, size);
-        double currentOverlap = SpatialUtil.relativeOverlap(mbr1, mbr2);
-        double vol1 = SpatialUtil.volume(mbr1);
-        double vol2 = SpatialUtil.volume(mbr2);
-        if(currentOverlap < minOverlap || (currentOverlap == minOverlap && (vol1 + vol2) < volume)) {
-          minOverlap = currentOverlap;
-          splitPoint = minEntries + i;
-          bestSorting = minSorting;
-          volume = vol1 + vol2;
+      // test the sorting with respect to the minimal values
+      {
+        ModifiableHyperBoundingBox mbr1 = mbr(minSorting, 0, minEntries - 1);
+        for(int i = 0; i <= size - 2 * minEntries; i++) {
+          mbr1.extend(getter.get(entries, minSorting[minEntries + i - 1].second));
+          HyperBoundingBox mbr2 = mbr(minSorting, minEntries + i, size);
+          double currentOverlap = SpatialUtil.relativeOverlap(mbr1, mbr2);
+          if(currentOverlap <= minOverlap) {
+            double vol = SpatialUtil.volume(mbr1) + SpatialUtil.volume(mbr2);
+            if(currentOverlap < minOverlap || vol < volume) {
+              minOverlap = currentOverlap;
+              volume = vol;
+              splitPoint = minEntries + i;
+              bestSorting = minSorting;
+            }
+          }
         }
-        // test the sorting with respect to the maximal values
-        mbr1 = mbr(maxSorting, 0, minEntries + i);
-        mbr2 = mbr(maxSorting, minEntries + i, size);
-        currentOverlap = SpatialUtil.relativeOverlap(mbr1, mbr2);
-        vol1 = SpatialUtil.volume(mbr1);
-        vol2 = SpatialUtil.volume(mbr2);
-        if(currentOverlap < minOverlap || (currentOverlap == minOverlap && (vol1 + vol2) < volume)) {
-          minOverlap = currentOverlap;
-          splitPoint = minEntries + i;
-          bestSorting = maxSorting;
-          volume = vol1 + vol2;
+      }
+      // test the sorting with respect to the maximal values
+      {
+        ModifiableHyperBoundingBox mbr1 = mbr(maxSorting, 0, minEntries - 1);
+        for(int i = 0; i <= size - 2 * minEntries; i++) {
+          mbr1.extend(getter.get(entries, maxSorting[minEntries + i - 1].second));
+          HyperBoundingBox mbr2 = mbr(maxSorting, minEntries + i, size);
+          double currentOverlap = SpatialUtil.relativeOverlap(mbr1, mbr2);
+          if(currentOverlap <= minOverlap) {
+            double vol = SpatialUtil.volume(mbr1) + SpatialUtil.volume(mbr2);
+            if(currentOverlap < minOverlap || vol < volume) {
+              minOverlap = currentOverlap;
+              volume = vol;
+              splitPoint = minEntries + i;
+              bestSorting = maxSorting;
+            }
+          }
         }
       }
     }
@@ -273,31 +281,12 @@ public class TopologicalSplitter implements SplitStrategy {
      * @param to the end index
      * @return the mbr of the specified nodes
      */
-    private HyperBoundingBox mbr(final DoubleIntPair[] sorting, final int from, final int to) {
+    private ModifiableHyperBoundingBox mbr(final DoubleIntPair[] sorting, final int from, final int to) {
       ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(get(sorting[from]));
       for(int i = from + 1; i < to; i++) {
         mbr.extend(get(sorting[i]));
       }
       return mbr;
-    }
-
-    /**
-     * Returns the split point.
-     * 
-     * @return the split point
-     */
-    public int getSplitPoint() {
-      return splitPoint;
-    }
-
-    /**
-     * Returns whether the sorting according to maximal or to minimal value has
-     * been used for choosing the split axis and split point.
-     * 
-     * @return The sorting to use
-     */
-    public DoubleIntPair[] getBestSorting() {
-      return bestSorting;
     }
   }
 
