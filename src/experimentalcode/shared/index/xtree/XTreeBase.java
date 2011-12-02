@@ -263,7 +263,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * @return the node with the specified id
    */
   @Override
-  public N getNode(Integer nodeID) {
+  public N getNode(int nodeID) {
     N nID = supernodes.get(new Long(nodeID));
     if(nID != null) {
       return nID;
@@ -774,7 +774,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     double multiOverlapInc = 0, multiOverlapMult = 1, mOOld = 1, mONew = 1;
     double ol, olT; // dimensional overlap
     for(E ej : entries) {
-      if(!getPageID(ej).equals(getPageID(ei))) {
+      if(getPageID(ej) != getPageID(ei)) {
         multiOverlapMult = 1; // is constant for a unchanged dimension
         mOOld = 1; // overlap for old MBR on changed dimensions
         mONew = 1; // overlap on new MBR on changed dimension
