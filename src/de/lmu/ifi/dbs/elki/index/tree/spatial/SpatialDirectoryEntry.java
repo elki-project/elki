@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
 
 /**
@@ -45,7 +46,7 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
   /**
    * The minimum bounding rectangle of the underlying spatial node.
    */
-  private HyperBoundingBox mbr;
+  private ModifiableHyperBoundingBox mbr;
 
   /**
    * Empty constructor for serialization purposes.
@@ -60,7 +61,7 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    * @param id the unique id of the underlying spatial node
    * @param mbr the minimum bounding rectangle of the underlying spatial node
    */
-  public SpatialDirectoryEntry(int id, HyperBoundingBox mbr) {
+  public SpatialDirectoryEntry(int id, ModifiableHyperBoundingBox mbr) {
     super(id);
     this.mbr = mbr;
   }
@@ -102,7 +103,7 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    * 
    * @param mbr the MBR to be set
    */
-  public void setMBR(HyperBoundingBox mbr) {
+  public void setMBR(ModifiableHyperBoundingBox mbr) {
     this.mbr = mbr;
   }
 
@@ -131,7 +132,17 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.mbr = new HyperBoundingBox();
+    this.mbr = new ModifiableHyperBoundingBox();
     this.mbr.readExternal(in);
+  }
+
+  /**
+   * Extend the MBR of this node.
+   * 
+   * @param responsibleMBR
+   * @return true when the MBR changed
+   */
+  public boolean extendMBR(SpatialComparable responsibleMBR) {
+    return this.mbr.extend(responsibleMBR);
   }
 }

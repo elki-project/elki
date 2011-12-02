@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.data.spatial;
  */
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 
@@ -278,7 +279,7 @@ public final class SpatialUtil {
    * @return the union HyperBoundingBox of this HyperBoundingBox and the given
    *         HyperBoundingBox
    */
-  public static HyperBoundingBox union(SpatialComparable box1, SpatialComparable box2) {
+  public static ModifiableHyperBoundingBox union(SpatialComparable box1, SpatialComparable box2) {
     final int dim = box1.getDimensionality();
     if(dim != box2.getDimensionality()) {
       throw new IllegalArgumentException("This HyperBoundingBox and the given HyperBoundingBox need same dimensionality");
@@ -291,7 +292,7 @@ public final class SpatialUtil {
       min[i - 1] = Math.min(box1.getMin(i), box2.getMin(i));
       max[i - 1] = Math.max(box1.getMax(i), box2.getMax(i));
     }
-    return new HyperBoundingBox(min, max);
+    return new ModifiableHyperBoundingBox(min, max);
   }
 
   /**

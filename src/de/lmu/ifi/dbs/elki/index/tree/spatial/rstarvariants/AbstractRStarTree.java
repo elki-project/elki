@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -358,7 +359,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      HyperBoundingBox hb = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
+      ModifiableHyperBoundingBox hb = new ModifiableHyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
       SpatialDirectoryEntry sl = new SpatialDirectoryEntry(0, hb);
       while(baos.size() <= getPageSize()) {
         sl.writeExternal(oos);
@@ -727,11 +728,12 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     while(childPath.getParentPath() != null) {
       N parent = getNode(childPath.getParentPath().getLastPathComponent().getEntry());
       int indexOfChild = childPath.getLastPathComponent().getIndex();
-      if (child.adjustEntry(parent.getEntry(indexOfChild))) {
+      if(child.adjustEntry(parent.getEntry(indexOfChild))) {
         writeNode(parent);
         childPath = childPath.getParentPath();
         child = parent;
-      } else {
+      }
+      else {
         break;
         // TODO: stop writing when MBR didn't change!
       }
@@ -809,11 +811,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       if(!isRoot(node)) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         E entry = parent.getEntry(subtree.getLastPathComponent().getIndex());
-        lastInsertedEntry = node.adjustEntryIncremental(entry, lastInsertedEntry);
-        // node.adjustEntry(parent.getEntry(index));
-        // write changes in parent to file
-        writeNode(parent);
-        adjustTree(subtree.getParentPath());
+        boolean changed = node.adjustEntryIncremental(entry, lastInsertedEntry);
+        if(changed) {
+          // node.adjustEntry(parent.getEntry(index));
+          // write changes in parent to file
+          writeNode(parent);
+          adjustTree(subtree.getParentPath());
+        }
       }
       // root level is reached
       else {
