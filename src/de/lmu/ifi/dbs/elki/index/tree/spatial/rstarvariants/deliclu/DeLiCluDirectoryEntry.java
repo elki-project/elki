@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 
 /**
@@ -64,7 +64,7 @@ public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLi
    * @param hasHandled indicates if this entry has handled nodes
    * @param hasUnhandled indicates if this entry has unhandled nodes
    */
-  public DeLiCluDirectoryEntry(int id, HyperBoundingBox mbr, boolean hasHandled, boolean hasUnhandled) {
+  public DeLiCluDirectoryEntry(int id, ModifiableHyperBoundingBox mbr, boolean hasHandled, boolean hasUnhandled) {
     super(id, mbr);
     this.hasHandled = hasHandled;
     this.hasUnhandled = hasUnhandled;

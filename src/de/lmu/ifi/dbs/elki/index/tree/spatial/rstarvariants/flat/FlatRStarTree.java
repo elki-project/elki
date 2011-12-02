@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -147,7 +147,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
     getFile().setNextPageID(getRootID() + 1);
     FlatRStarTreeNode leaf = createNewLeafNode();
     writeNode(leaf);
-    HyperBoundingBox mbr = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
+    ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
     root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getPageID(), mbr));
 
     setHeight(2);

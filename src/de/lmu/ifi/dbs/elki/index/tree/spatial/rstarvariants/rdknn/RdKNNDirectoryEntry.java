@@ -23,13 +23,13 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 
 /**
  * Represents an entry in a directory node of an RdKNN-Tree. Additionally to a
@@ -61,7 +61,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, ?>> extends Spatial
    * @param mbr the minimum bounding rectangle of the underlying node
    * @param knnDistance the aggregated knn distance of this entry
    */
-  public RdKNNDirectoryEntry(int id, HyperBoundingBox mbr, D knnDistance) {
+  public RdKNNDirectoryEntry(int id, ModifiableHyperBoundingBox mbr, D knnDistance) {
     super(id, mbr);
     this.knnDistance = knnDistance;
   }

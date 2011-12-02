@@ -90,7 +90,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * 
    * @return MBR
    */
-  public HyperBoundingBox computeMBR() {
+  public ModifiableHyperBoundingBox computeMBR() {
     E firstEntry = getEntry(0);
     if(firstEntry == null) {
       return null;
@@ -115,7 +115,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    */
   public boolean adjustEntry(E entry) {
     final SpatialDirectoryEntry se = (SpatialDirectoryEntry) entry;
-    final HyperBoundingBox mbr = computeMBR();
+    final ModifiableHyperBoundingBox mbr = computeMBR();
     boolean changed = false;
     if(se.hasMBR()) {
       final int dim = se.getDimensionality();
@@ -173,11 +173,10 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param entry the entry representing this node
    * @param responsibleMBR the MBR of the object or node which is responsible
    *        for the call of the method
-   * @return the MBR of the new Node
+   * @return true when the entry has changed
    */
-  public E adjustEntryIncremental(E entry, SpatialComparable responsibleMBR) {
-    ((SpatialDirectoryEntry) entry).setMBR(SpatialUtil.union(entry, responsibleMBR));
-    return entry;
+  public boolean adjustEntryIncremental(E entry, SpatialComparable responsibleMBR) {
+    return ((SpatialDirectoryEntry) entry).extendMBR(responsibleMBR);
   }
 
   /**
