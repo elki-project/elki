@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -475,7 +474,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, data, staticids);
     // PQ for Outlier Ranking
     Heap<DoubleObjPair<DBID>> pq = new Heap<DoubleObjPair<DBID>>(data.size(), Collections.reverseOrder());
-    HashMap<DBID, LinkedList<DBID>> explaintab = new HashMap<DBID, LinkedList<DBID>>();
+    HashMap<DBID, DBIDs> explaintab = new HashMap<DBID, DBIDs>();
     // test all objects
     for(DBID objKey : data.iterDBIDs()) {
       MeanVariance s = new MeanVariance();
@@ -510,7 +509,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       // build variance of the observed vectors
       pq.add(new DoubleObjPair<DBID>(s.getSampleVariance(), objKey));
       //
-      LinkedList<DBID> expList = new LinkedList<DBID>();
+      ModifiableDBIDs expList = DBIDUtil.newArray();
       expList.add(explain.remove().getSecond());
       while(!explain.isEmpty()) {
         DBID nextKey = explain.remove().getSecond();
@@ -543,14 +542,14 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       DBID key = pq.remove().getSecond();
       System.out.print(data.get(key) + " ");
       System.out.println(count + " Factor=" + factor + " " + key);
-      LinkedList<DBID> expList = explaintab.get(key);
+      DBIDs expList = explaintab.get(key);
       generateExplanation(data, key, expList);
       count++;
     }
     System.out.println("--------------------------------------------");
   }
 
-  private void generateExplanation(Relation<V> data, DBID key, LinkedList<DBID> expList) {
+  private void generateExplanation(Relation<V> data, DBID key, DBIDs expList) {
     V vect1 = data.get(key);
     Iterator<DBID> iter = expList.iterator();
     while(iter.hasNext()) {
