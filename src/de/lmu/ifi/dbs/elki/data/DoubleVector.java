@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.TDoubleList;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -33,6 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -292,7 +295,10 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
 
   @Override
   public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    int dim = adapter.size(array);
+    if(adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
+      return new DoubleVector(((TDoubleList) array).toArray(), true);
+    }
+    final int dim = adapter.size(array);
     double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {
       values[i] = adapter.getDouble(array, i);
@@ -307,9 +313,9 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
     if(buffer.remaining() < len) {
       throw new IOException("Not enough data for a double vector!");
     }
-    double[] values = new double[dimensionality];
+    final double[] values = new double[dimensionality];
     buffer.asDoubleBuffer().get(values);
-    return new DoubleVector(values, false);
+    return new DoubleVector(values, true);
   }
 
   @Override
