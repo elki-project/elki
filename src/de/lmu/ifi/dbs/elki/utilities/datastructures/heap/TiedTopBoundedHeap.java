@@ -23,9 +23,10 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 
@@ -47,7 +48,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
   /**
    * List to keep ties in.
    */
-  private LinkedList<E> ties = new LinkedList<E>();
+  private List<E> ties = new ArrayList<E>();
 
   /**
    * Constructor with comparator.
@@ -96,7 +97,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
       return super.peek();
     }
     else {
-      return ties.peek();
+      return ties.get(ties.size() - 1);
     }
   }
 
@@ -106,7 +107,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
       return super.poll();
     }
     else {
-      return ties.poll();
+      return ties.remove(ties.size() - 1);
     }
   }
 
