@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -46,7 +47,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
   /**
    * The distribution generators for each axis
    */
-  private LinkedList<Distribution> axes = new LinkedList<Distribution>();
+  private List<Distribution> axes = new ArrayList<Distribution>();
 
   /**
    * The transformation matrix
@@ -229,8 +230,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
    * @see de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface#generate(int)
    */
   @Override
-  public LinkedList<Vector> generate(int count) throws UnableToComplyException {
-    LinkedList<Vector> result = new LinkedList<Vector>();
+  public List<Vector> generate(int count) throws UnableToComplyException {
+    ArrayList<Vector> result = new ArrayList<Vector>(count);
     while(result.size() < count) {
       double[] d = new double[dim];
       int i = 0;
