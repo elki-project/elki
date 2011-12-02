@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -36,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -200,8 +200,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @return the shared nearest neighbors of the specified query object in the
    *         given database
    */
-  protected List<DBID> findSNNNeighbors(SimilarityQuery<O, IntegerDistance> snnInstance, DBID queryObject) {
-    List<DBID> neighbors = new LinkedList<DBID>();
+  protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O, IntegerDistance> snnInstance, DBID queryObject) {
+    ArrayModifiableDBIDs neighbors = DBIDUtil.newArray();
     for(DBID id : snnInstance.getRelation().iterDBIDs()) {
       if(snnInstance.similarity(queryObject, id).compareTo(epsilon) >= 0) {
         neighbors.add(id);
@@ -222,7 +222,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    *        clustering
    */
   protected void expandCluster(SimilarityQuery<O, IntegerDistance> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    List<DBID> seeds = findSNNNeighbors(snnInstance, startObjectID);
+    ArrayModifiableDBIDs seeds = findSNNNeighbors(snnInstance, startObjectID);
 
     // startObject is no core-object
     if(seeds.size() < minpts) {
@@ -247,11 +247,10 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
         noise.remove(seed);
       }
     }
-    seeds.remove(0);
 
     while(seeds.size() > 0) {
-      DBID o = seeds.remove(0);
-      List<DBID> neighborhood = findSNNNeighbors(snnInstance, o);
+      DBID o = seeds.remove(seeds.size() - 1);
+      ArrayModifiableDBIDs neighborhood = findSNNNeighbors(snnInstance, o);
 
       if(neighborhood.size() >= minpts) {
         for(DBID p : neighborhood) {
