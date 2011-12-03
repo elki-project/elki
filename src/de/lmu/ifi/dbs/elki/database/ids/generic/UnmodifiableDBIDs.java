@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
@@ -73,6 +74,11 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
   @Override
   public Iterator<DBID> iterator() {
     return new UnmodifiableIterator<DBID>(inner.iterator());
+  }
+  
+  @Override
+  public DBIDIter iter() {
+    return inner.iter();
   }
 
   @Override

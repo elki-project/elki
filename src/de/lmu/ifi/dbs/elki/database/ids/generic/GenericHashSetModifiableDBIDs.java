@@ -27,13 +27,15 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 
 /**
  * Set-oriented implementation of a modifiable DBID collection.
  * 
- * This should only be instantiated by a {@link de.lmu.ifi.dbs.elki.database.ids.DBIDFactory}!
+ * This should only be instantiated by a
+ * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDFactory}!
  * 
  * Use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHashSet}!
  * 
@@ -90,5 +92,10 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
   @Override
   public boolean retainAll(DBIDs ids) {
     return super.retainAll(ids.asCollection());
+  }
+
+  @Override
+  public DBIDIter iter() {
+    return new DBIDIterAdapter(iterator());
   }
 }

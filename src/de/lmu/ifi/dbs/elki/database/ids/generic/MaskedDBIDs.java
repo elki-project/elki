@@ -30,6 +30,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -76,6 +77,16 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
     }
     else {
       return new Itr();
+    }
+  }
+  
+  @Override
+  public DBIDIter iter() {
+    if(inverse) {
+      return new InvDBIDItr();
+    }
+    else {
+      return new DBIDItr();
     }
   }
 
@@ -133,6 +144,47 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
   }
 
   /**
+   * Iterator over set bits
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected class DBIDItr implements DBIDIter {
+    /**
+     * Next position.
+     */
+    private int pos;
+
+    /**
+     * Constructor
+     */
+    protected DBIDItr() {
+      this.pos = bits.nextSetBit(0);
+    }
+
+    @Override
+    public boolean valid() {
+      return pos >= 0;
+    }
+
+    @Override
+    public void advance() {
+      pos = bits.nextSetBit(pos + 1);
+    }
+
+    @Override
+    public int getIntegerID() {
+      return data.get(pos).getIntegerID();
+    }
+
+    @Override
+    public DBID getDBID() {
+      return data.get(pos);
+    }
+  }
+
+  /**
    * Iterator over unset elements.
    * 
    * @author Erich Schubert
@@ -167,6 +219,47 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
     @Override
     public void remove() {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  /**
+   * Iterator over set bits
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected class InvDBIDItr implements DBIDIter {
+    /**
+     * Next position.
+     */
+    private int pos;
+
+    /**
+     * Constructor
+     */
+    protected InvDBIDItr() {
+      this.pos = bits.nextClearBit(0);
+    }
+
+    @Override
+    public boolean valid() {
+      return pos >= 0;
+    }
+
+    @Override
+    public void advance() {
+      pos = bits.nextClearBit(pos + 1);
+    }
+
+    @Override
+    public int getIntegerID() {
+      return data.get(pos).getIntegerID();
+    }
+
+    @Override
+    public DBID getDBID() {
+      return data.get(pos);
     }
   }
 

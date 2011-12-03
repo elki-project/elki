@@ -31,6 +31,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -161,7 +162,7 @@ public final class KNNUtil {
    * 
    * @author Erich Schubert
    */
-  protected static class DBIDItr implements Iterator<DBID> {
+  protected static class DBIDIterator implements Iterator<DBID> {
     /**
      * The real iterator.
      */
@@ -170,7 +171,7 @@ public final class KNNUtil {
     /**
      * Constructor.
      */
-    protected DBIDItr(Iterator<? extends DistanceResultPair<?>> itr) {
+    protected DBIDIterator(Iterator<? extends DistanceResultPair<?>> itr) {
       super();
       this.itr = itr;
     }
@@ -188,6 +189,57 @@ public final class KNNUtil {
     @Override
     public void remove() {
       itr.remove();
+    }
+  }
+
+  /**
+   * Proxy iterator for accessing DBIDs.
+   * 
+   * @author Erich Schubert
+   */
+  protected static class DBIDItr implements DBIDIter {
+    /**
+     * Current result
+     */
+    DistanceResultPair<?> cur;
+
+    /**
+     * The real iterator.
+     */
+    Iterator<? extends DistanceResultPair<?>> itr;
+
+    /**
+     * Constructor.
+     */
+    protected DBIDItr(Iterator<? extends DistanceResultPair<?>> itr) {
+      super();
+      this.itr = itr;
+      advance();
+    }
+
+    @Override
+    public boolean valid() {
+      return cur != null;
+    }
+
+    @Override
+    public void advance() {
+      if(itr.hasNext()) {
+        cur = itr.next();
+      }
+      else {
+        cur = null;
+      }
+    }
+
+    @Override
+    public int getIntegerID() {
+      return cur.getDBID().getIntegerID();
+    }
+
+    @Override
+    public DBID getDBID() {
+      return cur.getDBID();
     }
   }
 
@@ -224,6 +276,11 @@ public final class KNNUtil {
 
     @Override
     public Iterator<DBID> iterator() {
+      return new DBIDIterator(parent.iterator());
+    }
+
+    @Override
+    public DBIDIter iter() {
       return new DBIDItr(parent.iterator());
     }
 

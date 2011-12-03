@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 
 /**
  * Abstract base class for GNU Trove array based lists.
@@ -22,10 +23,15 @@ public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements Arra
    * @return the store
    */
   abstract protected TIntList getStore();
-  
+
   @Override
   public Iterator<DBID> iterator() {
     return new TroveIteratorAdapter(getStore().iterator());
+  }
+
+  @Override
+  public DBIDIter iter() {
+    return new DBIDItr(getStore());
   }
 
   @Override
@@ -66,4 +72,53 @@ public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements Arra
     return new TroveArrayStaticDBIDs(getStore().subList(fromIndex, toIndex));
   }
 
+  /**
+   * Iterate over a Trove IntList, ELKI/C-style
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected static class DBIDItr implements DBIDIter {
+    /**
+     * Current position
+     */
+    int pos = 0;
+
+    /**
+     * The actual store we use
+     */
+    TIntList store;
+    
+    /**
+     * Constructor.
+     *
+     * @param store The actual trove store
+     */
+    public DBIDItr(TIntList store) {
+      super();
+      this.store = store;
+    }
+
+    @Override
+    public boolean valid() {
+      return pos < store.size();
+    }
+
+    @Override
+    public void advance() {
+      pos++;
+    }
+
+    @Override
+    public int getIntegerID() {
+      return store.get(pos);
+    }
+
+    @Override
+    public DBID getDBID() {
+      return new IntegerDBID(store.get(pos));
+    }
+
+  }
 }

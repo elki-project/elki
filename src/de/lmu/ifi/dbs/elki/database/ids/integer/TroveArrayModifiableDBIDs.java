@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import gnu.trove.list.array.TIntArrayList;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -52,8 +53,8 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   @Override
   public boolean addDBIDs(DBIDs ids) {
     boolean success = false;
-    for(DBID id : ids) {
-      success |= store.add(id.getIntegerID());
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      success |= store.add(iter.getIntegerID());
     }
     return success;
   }

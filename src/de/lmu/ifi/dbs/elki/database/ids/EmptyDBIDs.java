@@ -27,6 +27,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
 
@@ -36,6 +37,18 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
  * @author Erich Schubert
  */
 class EmptyDBIDs extends AbstractList<DBID> implements ArrayStaticDBIDs {
+  /**
+   * Empty DBID iterator
+   */
+  public static final EmptyDBIDIterator EMPTY_ITERATOR = new EmptyDBIDIterator();
+
+  /**
+   * Constructor.
+   */
+  protected EmptyDBIDs() {
+    super();
+  }
+
   @Override
   public Collection<DBID> asCollection() {
     return new ArrayList<DBID>(0);
@@ -64,5 +77,37 @@ class EmptyDBIDs extends AbstractList<DBID> implements ArrayStaticDBIDs {
   @Override
   public DBID get(int i) {
     throw new ArrayIndexOutOfBoundsException();
+  }
+
+  @Override
+  public DBIDIter iter() {
+    return EMPTY_ITERATOR;
+  }
+
+  /**
+   * Iterator for empty DBIDs
+   * 
+   * @author Erich Schubert
+   */
+  protected static class EmptyDBIDIterator implements DBIDIter {
+    @Override
+    public boolean valid() {
+      return false;
+    }
+
+    @Override
+    public void advance() {
+      assert (false) : "Misplaced call to advance()";
+    }
+
+    @Override
+    public int getIntegerID() {
+      throw new NoSuchElementException();
+    }
+
+    @Override
+    public DBID getDBID() {
+      throw new NoSuchElementException();
+    }
   }
 }

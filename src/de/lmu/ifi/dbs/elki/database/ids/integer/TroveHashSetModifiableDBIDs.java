@@ -1,7 +1,10 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
+import gnu.trove.impl.hash.THashPrimitiveIterator;
+import gnu.trove.impl.hash.TIntHash;
 import gnu.trove.set.hash.TIntHashSet;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 
@@ -60,7 +63,7 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
 
   /**
    * Constructor.
-   *
+   * 
    * @param existing Existing IDs
    */
   protected TroveHashSetModifiableDBIDs(DBIDs existing) {
@@ -69,10 +72,15 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
   }
 
   @Override
+  public DBIDIter iter() {
+    return new DBIDItr(store);
+  }
+
+  @Override
   public boolean addDBIDs(DBIDs ids) {
     boolean success = false;
-    for(DBID id : ids) {
-      success |= store.add(id.getIntegerID());
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      success |= store.add(iter.getIntegerID());
     }
     return success;
   }
@@ -104,5 +112,50 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
   @Override
   protected TIntHashSet getStore() {
     return store;
+  }
+
+  /**
+   * Iterator over trove hashs.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected static class DBIDItr extends THashPrimitiveIterator implements DBIDIter {
+    /**
+     * The has we access
+     */
+    private TIntHash hash;
+
+    /**
+     * Constructor.
+     *
+     * @param hash Trove hash
+     */
+    public DBIDItr(TIntHash hash) {
+      super(hash);
+      this.hash = hash;
+      moveToNextIndex(); // Find first element
+    }
+
+    @Override
+    public boolean valid() {
+      return _index >= 0;
+    }
+
+    @Override
+    public void advance() {
+      moveToNextIndex();
+    }
+
+    @Override
+    public int getIntegerID() {
+      return hash._set[_index];
+    }
+
+    @Override
+    public DBID getDBID() {
+      return new IntegerDBID(hash._set[_index]);
+    }
   }
 }
