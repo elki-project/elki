@@ -29,6 +29,7 @@ import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 
@@ -92,5 +93,10 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   @Override
   public void sort() {
     Collections.sort(this);
+  }
+
+  @Override
+  public DBIDIter iter() {
+    return new DBIDIterAdapter(iterator());
   }
 }

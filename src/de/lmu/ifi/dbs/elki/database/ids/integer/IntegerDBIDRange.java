@@ -29,8 +29,8 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-
 
 /**
  * Representing a DBID range allocation
@@ -44,12 +44,12 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
    * Start value
    */
   protected final int start;
-  
+
   /**
    * Length value
    */
   protected final int len;
-  
+
   /**
    * Constructor.
    * 
@@ -72,6 +72,11 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
     return new Itr();
   }
 
+  @Override
+  public DBIDIter iter() {
+    return new DBIDItr();
+  }
+
   /**
    * Iterator class.
    * 
@@ -89,7 +94,7 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
 
     @Override
     public DBID next() {
-      DBID ret = DBIDFactory.FACTORY.importInteger(pos + start);
+      DBID ret = new IntegerDBID(pos + start);
       pos++;
       return ret;
     }
@@ -100,9 +105,38 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
     }
   }
 
-  /*
-   * "Contains" operations
+  /**
+   * Iterator in ELKI/C++ style.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
+  protected class DBIDItr implements DBIDIter {
+    int pos = 0;
+
+    @Override
+    public boolean valid() {
+      return pos < len;
+    }
+
+    @Override
+    public void advance() {
+      pos++;
+    }
+
+    @Override
+    public int getIntegerID() {
+      return start + pos;
+    }
+
+    @Override
+    public DBID getDBID() {
+      return new IntegerDBID(start + pos);
+    }
+
+  }
+
   @Override
   public boolean contains(Object o) {
     if(o instanceof DBID) {
@@ -137,11 +171,11 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
 
   @Override
   public DBID get(int i) {
-    if (i > len || i < 0) {
+    if(i > len || i < 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
     return DBIDFactory.FACTORY.importInteger(start + i);
- }
+  }
 
   /**
    * For storage array offsets.

@@ -30,7 +30,7 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 
 /**
  * Static (no modifications allowed) set of Database Object IDs.
@@ -59,7 +59,12 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
   public Iterator<DBID> iterator() {
     return new Itr();
   }
-  
+
+  @Override
+  public DBIDIter iter() {
+    return new DBIDItr();
+  }
+
   /**
    * Iterator class.
    * 
@@ -77,7 +82,7 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
 
     @Override
     public DBID next() {
-      DBID ret = DBIDFactory.FACTORY.importInteger(ids[off]);
+      DBID ret = new IntegerDBID(ids[off]);
       off++;
       return ret;
     }
@@ -88,11 +93,43 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
     }
   }
 
+  /**
+   * DBID iterator in ELKI/C style.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected class DBIDItr implements DBIDIter {
+    int pos = 0;
+
+    @Override
+    public boolean valid() {
+      return pos < ids.length;
+    }
+
+    @Override
+    public void advance() {
+      pos++;
+    }
+
+    @Override
+    public int getIntegerID() {
+      return ids[pos];
+    }
+
+    @Override
+    public DBID getDBID() {
+      return new IntegerDBID(ids[pos]);
+    }
+
+  }
+
   @Override
   public int size() {
     return ids.length;
   }
-  
+
   /*
    * "Contains" operations
    */

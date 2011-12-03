@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
@@ -126,6 +127,11 @@ class IntegerDBID extends AbstractList<DBID> implements DBID {
   public Iterator<DBID> iterator() {
     return new Itr();
   }
+  
+  @Override
+  public DBIDIter iter() {
+    return new DBIDItr();
+  }
 
   @Override
   public int size() {
@@ -160,6 +166,40 @@ class IntegerDBID extends AbstractList<DBID> implements DBID {
     @Override
     public void remove() {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  /**
+   * Pseudo iterator for DBIDs interface.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected class DBIDItr implements DBIDIter {
+    /**
+     * Whether we've already returned our object.
+     */
+    boolean first = true;
+
+    @Override
+    public void advance() {
+      first = false;
+    }
+
+    @Override
+    public int getIntegerID() {
+      return id;
+    }
+
+    @Override
+    public DBID getDBID() {
+      return IntegerDBID.this;
+    }
+
+    @Override
+    public boolean valid() {
+      return first;
     }
   }
 

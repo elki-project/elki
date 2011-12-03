@@ -49,6 +49,13 @@ public interface DBIDs extends Iterable<DBID> {
    */
   @Override
   public Iterator<DBID> iterator();
+  
+  /**
+   * Get a DBIDIterator (a more efficient API).
+   * 
+   * @return iterator
+   */
+  public DBIDIter iter();
 
   /**
    * Retrieve the collection / data size.

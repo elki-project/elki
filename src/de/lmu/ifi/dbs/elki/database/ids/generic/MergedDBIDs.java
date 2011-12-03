@@ -27,8 +27,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Merge the IDs of multiple layers into one.
@@ -43,7 +44,7 @@ public class MergedDBIDs implements DBIDs, Collection<DBID> {
    * Childs to merge
    */
   DBIDs childs[];
-  
+
   /**
    * Constructor.
    * 
@@ -61,8 +62,12 @@ public class MergedDBIDs implements DBIDs, Collection<DBID> {
 
   @Override
   public Iterator<DBID> iterator() {
-    // TODO Auto-generated method stub
-    return null;
+    throw new AbortException("Merged iterators not completely implemented yet!");
+  }
+
+  @Override
+  public DBIDIter iter() {
+    throw new AbortException("Merged iterators not completely implemented yet!");
   }
 
   @Override
@@ -93,7 +98,7 @@ public class MergedDBIDs implements DBIDs, Collection<DBID> {
       r = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), si);
     }
     int i = 0;
-    for (Iterator<DBID> iter = iterator(); iter.hasNext(); i++) {
+    for(Iterator<DBID> iter = iterator(); iter.hasNext(); i++) {
       DBID id = iter.next();
       r[i] = (T) id;
     }
