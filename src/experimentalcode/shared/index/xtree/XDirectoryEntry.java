@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import experimentalcode.shared.index.xtree.util.SplitHistory;
 
@@ -45,7 +45,7 @@ public class XDirectoryEntry extends SpatialDirectoryEntry implements SplitHisto
     super();
   }
 
-  public XDirectoryEntry(int id, HyperBoundingBox mbr) {
+  public XDirectoryEntry(int id, ModifiableHyperBoundingBox mbr) {
     super(id, mbr);
     if(mbr != null) {
       splitHistory = new SplitHistory(mbr.getDimensionality());

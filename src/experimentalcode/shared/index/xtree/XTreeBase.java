@@ -550,7 +550,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       int cap = 0;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
-      HyperBoundingBox hb = new HyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
+      ModifiableHyperBoundingBox hb = new ModifiableHyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
       XDirectoryEntry xl = new XDirectoryEntry(0, hb);
       while(baos.size() <= getPageSize()) {
         xl.writeExternal(oos);
