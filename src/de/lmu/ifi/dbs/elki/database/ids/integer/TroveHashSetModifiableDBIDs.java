@@ -135,7 +135,7 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
     public DBIDItr(TIntHash hash) {
       super(hash);
       this.hash = hash;
-      moveToNextIndex(); // Find first element
+      this._index = nextIndex(); // Find first element
     }
 
     @Override
@@ -145,7 +145,7 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
 
     @Override
     public void advance() {
-      moveToNextIndex();
+      this._index = nextIndex();
     }
 
     @Override
