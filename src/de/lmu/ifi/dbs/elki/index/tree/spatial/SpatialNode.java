@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.Node;
 
 /**
@@ -38,6 +37,6 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
  * @param <N> Self reference
  * @param <E> Entry type
  */
-public interface SpatialNode<N extends SpatialNode<N, E>, E extends SpatialEntry> extends Node<E>, SpatialComparable {
+public interface SpatialNode<N extends SpatialNode<N, E>, E extends SpatialEntry> extends Node<E> {
   // No additional methods.
 }

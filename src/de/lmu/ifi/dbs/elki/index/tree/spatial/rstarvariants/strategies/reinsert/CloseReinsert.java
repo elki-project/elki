@@ -55,7 +55,7 @@ public class CloseReinsert extends AbstractPartialReinsert {
   }
 
   @Override
-  public <E extends SpatialComparable, A> int[] computeReinserts(A entries, ArrayAdapter<E, A> getter, SpatialComparable page) {
+  public <A> int[] computeReinserts(A entries, ArrayAdapter<? extends SpatialComparable, ? super A> getter, SpatialComparable page) {
     DoubleIntPair[] order = new DoubleIntPair[getter.size(entries)];
     DoubleVector centroid = new DoubleVector(SpatialUtil.centroid(page)); 
     for(int i = 0; i < order.length; i++) {

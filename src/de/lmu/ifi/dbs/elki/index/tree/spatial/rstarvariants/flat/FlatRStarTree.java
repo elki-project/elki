@@ -114,7 +114,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
     }
     // create leaf nodes
     getFile().setNextPageID(getRootID() + 1);
-    List<FlatRStarTreeNode> nodes = createBulkLeafNodes(spatialObjects);
+    List<SpatialEntry> nodes = createBulkLeafNodes(spatialObjects);
     int numNodes = nodes.size();
     if(logger.isDebugging()) {
       logger.debugFine("  numLeafNodes = " + numNodes);
@@ -123,8 +123,8 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
     // create root
     root = createNewDirectoryNode();
     root.setPageID(getRootID());
-    for(FlatRStarTreeNode node : nodes) {
-      root.addDirectoryEntry(createNewDirectoryEntry(node));
+    for(SpatialEntry entry : nodes) {
+      root.addDirectoryEntry(entry);
     }
     numNodes++;
     setHeight(2);

@@ -24,16 +24,16 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow
  */
 
 import java.util.BitSet;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.ReinsertStrategy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -75,7 +75,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
 
   @Override
   public <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E> tree, N node, IndexTreePath<E> path) {
-    final int level = tree.getHeight() - (path.getPathCount() - 1);
+    final int level = /* tree.getHeight() - */(path.getPathCount() - 1);
     // No reinsertions at root level
     if(path.getPathCount() == 1) {
       return false;
@@ -86,8 +86,9 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
     }
 
     reinsertions.set(level);
-    List<E> entries = node.getEntries();
-    int[] cands = reinsertStrategy.computeReinserts(entries, ArrayLikeUtil.listAdapter(entries), node);
+    final E entry = path.getLastPathComponent().getEntry();
+    assert (!entry.isLeafEntry()) : "Unexpected leaf entry";
+    int[] cands = reinsertStrategy.computeReinserts(node, STATIC_ADAPTER, entry);
     if(cands == null || cands.length == 0) {
       return false;
     }
@@ -99,6 +100,30 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
   public void reinitialize() {
     reinsertions.clear();
   }
+
+  /**
+   * Access the entries of a node as array.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <E> Entry type
+   */
+  protected static class NodeAdapter implements ArrayAdapter<SpatialEntry, AbstractNode<? extends SpatialEntry>> {
+    @Override
+    public int size(AbstractNode<? extends SpatialEntry> array) {
+      return array.getNumEntries();
+    }
+
+    @Override
+    public SpatialEntry get(AbstractNode<? extends SpatialEntry> array, int off) throws IndexOutOfBoundsException {
+      return array.getEntry(off);
+    }
+  }
+
+  /**
+   * Static adapter.
+   */
+  protected static NodeAdapter STATIC_ADAPTER = new NodeAdapter();
 
   /**
    * Parameterization class.
