@@ -1153,7 +1153,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     // TODO: see whether root entry is ALWAYS a directory entry .. it SHOULD!
     sh = ((XDirectoryEntry) getRootEntry()).getSplitHistory();
     if(sh == null) {
-      sh = new SplitHistory(oldRoot.getDimensionality());
+      sh = new SplitHistory(getRootEntry().getDimensionality());
     }
     sh.setDim(splitAxis);
 
@@ -1190,8 +1190,8 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     writeNode(newNode);
     if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRoot) + " " + new HyperBoundingBox(oldRootEntry);
-      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNode) + " " + new HyperBoundingBox(newNodeEntry);
+      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRootEntry);
+      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNodeEntry);
       msg += "\n";
       getLogger().debugFine(msg);
     }
