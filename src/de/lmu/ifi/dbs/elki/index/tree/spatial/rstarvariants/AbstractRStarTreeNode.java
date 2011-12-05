@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.BitSet;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -115,32 +114,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       se.setMBR(mbr);
     }
     return changed;
-  }
-
-  /**
-   * Remove entries according to the given mask.
-   * 
-   * @param mask Mask to remove
-   */
-  public void removeMask(BitSet mask) {
-    int dest = mask.nextSetBit(0);
-    if(dest < 0) {
-      return;
-    }
-    int src = mask.nextClearBit(dest);
-    while(src < numEntries) {
-      if(!mask.get(src)) {
-        entries[dest] = entries[src];
-        dest++;
-      }
-      src++;
-    }
-    int rm = src - dest;
-    while(dest < numEntries) {
-      entries[dest] = null;
-      dest++;
-    }
-    numEntries -= rm;
   }
 
   /**

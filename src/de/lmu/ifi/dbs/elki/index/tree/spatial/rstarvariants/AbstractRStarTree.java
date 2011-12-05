@@ -53,9 +53,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.NodeArrayAdapter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -628,9 +628,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     N childNode = getNode(node.getEntry(0));
-    final List<E> entries = node.getEntries();
-    int num = insertionStrategy.choose(entries, ArrayLikeUtil.listAdapter(entries), mbr, height, subtree.getPathCount());
-    TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<E>(entries.get(num), num);
+    int num = insertionStrategy.choose(node, NodeArrayAdapter.STATIC, mbr, height, subtree.getPathCount());
+    TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<E>(node.getEntry(num), num);
     // children are leafs
     if(childNode.isLeaf()) {
       if(height - subtree.getPathCount() == level) {
@@ -680,8 +679,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   private N split(N node) {
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
-    final List<E> entries = node.getEntries();
-    BitSet split = nodeSplitter.split(entries, ArrayLikeUtil.listAdapter(entries), minimum);
+    BitSet split = nodeSplitter.split(node, NodeArrayAdapter.STATIC, minimum);
 
     // New node
     final N newNode;
@@ -692,7 +690,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       newNode = createNewDirectoryNode();
     }
     // do the split
-    node.splitTo(newNode, entries, split);
+    node.splitByMask(newNode, split);
 
     // write changes to file
     writeNode(node);
@@ -712,10 +710,9 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     final int level = height - (path.getPathCount() - 1);
 
     BitSet remove = new BitSet();
-    List<E> entries = node.getEntries();
     List<E> reInsertEntries = new ArrayList<E>(offs.length);
     for(int i = 0; i < offs.length; i++) {
-      reInsertEntries.add(entries.get(offs[i]));
+      reInsertEntries.add(node.getEntry(offs[i]));
       remove.set(offs[i]);
     }
     // Remove the entries we reinsert

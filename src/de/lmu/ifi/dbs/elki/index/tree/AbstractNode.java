@@ -32,9 +32,10 @@ import java.util.BitSet;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
@@ -277,11 +278,15 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    * Returns a list of the entries.
    * 
    * @return a list of the entries
+   * 
+   * @deprecated Using this method means an extra copy - usually at the cost of
+   *             performance.
    */
+  @Deprecated
   public final List<E> getEntries() {
     List<E> result = new ArrayList<E>(numEntries);
     for(E entry : entries) {
-      if (entry != null) {
+      if(entry != null) {
         result.add(entry);
       }
     }
@@ -298,6 +303,32 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   private int addEntry(E entry) {
     entries[numEntries++] = entry;
     return numEntries - 1;
+  }
+
+  /**
+   * Remove entries according to the given mask.
+   * 
+   * @param mask Mask to remove
+   */
+  public void removeMask(BitSet mask) {
+    int dest = mask.nextSetBit(0);
+    if(dest < 0) {
+      return;
+    }
+    int src = mask.nextClearBit(dest);
+    while(src < numEntries) {
+      if(!mask.get(src)) {
+        entries[dest] = entries[src];
+        dest++;
+      }
+      src++;
+    }
+    int rm = src - dest;
+    while(dest < numEntries) {
+      entries[dest] = null;
+      dest++;
+    }
+    numEntries -= rm;
   }
 
   /**
@@ -328,7 +359,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
       }
     }
     if(msg != null) {
-      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+      Logging.getLogger(this.getClass().getName()).fine(msg.toString());
     }
   }
 
@@ -360,7 +391,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
       newNode.addEntry(entry);
     }
     if(msg != null) {
-      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+      Logging.getLogger(this.getClass()).fine(msg.toString());
     }
   }
 
@@ -368,33 +399,33 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    * Splits the entries of this node into a new node using the given assignments
    * 
    * @param newNode Node to split to
-   * @param entries Entries list
    * @param assignment Assignment mask
    */
-  public final void splitTo(AbstractNode<E> newNode, List<E> entries, BitSet assignment) {
+  public final void splitByMask(AbstractNode<E> newNode, BitSet assignment) {
     assert (isLeaf() == newNode.isLeaf());
-    deleteAllEntries();
-    StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer() : null;
-
-    for(int i = 0; i < entries.size(); i++) {
-      E entry = entries.get(i);
-      // assignments to this node
-      if(assignment.get(i)) {
-        if(msg != null) {
-          msg.append("n_").append(getPageID()).append(" ").append(entry).append("\n");
-        }
-        addEntry(entry);
+    int dest = assignment.nextSetBit(0);
+    if(dest < 0) {
+      LoggingUtil.warning("Split with no bits set?!?");
+      return;
+    }
+    int pos = dest;
+    while(pos < numEntries) {
+      if(assignment.get(pos)) {
+        // Move to new node
+        newNode.addEntry(entries[pos]);
       }
       else {
-        // assignments to the new node
-        if(msg != null) {
-          msg.append("n_").append(newNode.getPageID()).append(" ").append(entry).append("\n");
-        }
-        newNode.addEntry(entry);
+        // Move to new position
+        entries[dest] = entries[pos];
+        dest++;
       }
+      pos++;
     }
-    if(msg != null) {
-      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
+    final int rm = numEntries - dest;
+    while(dest < numEntries) {
+      entries[dest] = null;
+      dest++;
     }
+    numEntries -= rm;
   }
 }
