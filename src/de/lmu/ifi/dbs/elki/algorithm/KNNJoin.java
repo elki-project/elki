@@ -200,11 +200,13 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         if(dor && dos) {
           processDataPagesOptimize(distFunction, doubleOptimize, pr_heaps, ps_heaps, pr, ps);
         }
-        if(dor) {
-          processDataPagesOptimize(distFunction, doubleOptimize, pr_heaps, null, pr, ps);
-        }
-        else /* dos */{
-          processDataPagesOptimize(distFunction, doubleOptimize, ps_heaps, null, ps, pr);
+        else {
+          if(dor) {
+            processDataPagesOptimize(distFunction, doubleOptimize, pr_heaps, null, pr, ps);
+          }
+          else /* dos */{
+            processDataPagesOptimize(distFunction, doubleOptimize, ps_heaps, null, ps, pr);
+          }
         }
         if(fprogress != null) {
           fprogress.incrementProcessed(logger);
