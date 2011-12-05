@@ -67,24 +67,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     super(capacity, isLeaf, eclass);
   }
 
-  @Override
-  public double getMin(int dimension) {
-    double min = getEntry(0).getMin(dimension);
-    for(int i = 1; i < numEntries; i++) {
-      min = Math.min(min, getEntry(i).getMin(dimension));
-    }
-    return min;
-  }
-
-  @Override
-  public double getMax(int dimension) {
-    double max = getEntry(0).getMax(dimension);
-    for(int i = 1; i < numEntries; i++) {
-      max = Math.min(max, getEntry(i).getMax(dimension));
-    }
-    return max;
-  }
-
   /**
    * Recomputing the MBR is rather expensive.
    * 
@@ -101,11 +83,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       mbr.extend(getEntry(i));
     }
     return mbr;
-  }
-
-  @Override
-  public int getDimensionality() {
-    return getEntry(0).getDimensionality();
   }
 
   /**

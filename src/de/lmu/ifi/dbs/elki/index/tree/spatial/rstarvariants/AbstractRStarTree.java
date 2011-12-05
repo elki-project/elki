@@ -420,23 +420,23 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param objects the objects to be inserted
    * @return the array of leaf nodes containing the objects
    */
-  protected List<N> createBulkLeafNodes(List<E> objects) {
+  protected List<E> createBulkLeafNodes(List<E> objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
 
-    ArrayList<N> result = new ArrayList<N>();
+    ArrayList<E> result = new ArrayList<E>();
     List<List<E>> partitions = bulkSplitter.partition(objects, minEntries, maxEntries);
 
     for(List<E> partition : partitions) {
       // create leaf node
       N leafNode = createNewLeafNode();
-      result.add(leafNode);
 
       // insert data
       for(E o : partition) {
         leafNode.addLeafEntry(o);
       }
 
+      result.add(createNewDirectoryEntry(leafNode));
       // write to file
       writeNode(leafNode);
 
@@ -544,8 +544,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     writeNode(newNode);
     if(getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
-      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRoot) + " " + new HyperBoundingBox(oldRootEntry);
-      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNode) + " " + new HyperBoundingBox(newNodeEntry);
+      msg += "\nchild1 " + oldRoot + " " + new HyperBoundingBox(oldRootEntry);
+      msg += "\nchild2 " + newNode + " " + new HyperBoundingBox(newNodeEntry);
       msg += "\n";
       getLogger().debugFine(msg);
     }
@@ -939,7 +939,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     if(initialized) {
       N node = getRoot();
-      int dim = node.getDimensionality();
+      int dim = getRootEntry().getDimensionality();
 
       while(!node.isLeaf()) {
         if(node.getNumEntries() > 0) {

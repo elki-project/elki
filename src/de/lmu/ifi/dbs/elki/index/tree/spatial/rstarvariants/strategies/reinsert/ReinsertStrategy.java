@@ -40,5 +40,5 @@ public interface ReinsertStrategy {
    * @param page Spatial extend of the page
    * @return index of pages to reinsert.
    */
-  public <E extends SpatialComparable, A> int[] computeReinserts(A entries, ArrayAdapter<E, A> getter, SpatialComparable page);
+  public <A> int[] computeReinserts(A entries, ArrayAdapter<? extends SpatialComparable, ? super A> getter, SpatialComparable page);
 }

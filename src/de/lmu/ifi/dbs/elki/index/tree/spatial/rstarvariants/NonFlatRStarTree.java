@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -142,7 +141,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
       writeNode(root);
 
       // create leaf nodes
-      List<N> nodes = createBulkLeafNodes(spatialObjects);
+      List<E> nodes = createBulkLeafNodes(spatialObjects);
 
       int numNodes = nodes.size();
       if(msg != null) {
@@ -152,13 +151,13 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
 
       // create directory nodes
       while(nodes.size() > (dirCapacity - 1)) {
-        nodes = createDirectoryNodes(nodes);
+        nodes = createBulkDirectoryNodes(nodes);
         numNodes += nodes.size();
         setHeight(getHeight() + 1);
       }
 
       // create root
-      createRoot(root, new ArrayList<N>(nodes));
+      createRoot(root, nodes);
       numNodes++;
       setHeight(getHeight() + 1);
       if(msg != null) {
@@ -178,24 +177,24 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
    * @param nodes the nodes to be inserted
    * @return the directory nodes containing the nodes
    */
-  private List<N> createDirectoryNodes(List<N> nodes) {
+  private List<E> createBulkDirectoryNodes(List<E> nodes) {
     int minEntries = dirMinimum;
     int maxEntries = dirCapacity - 1;
 
-    ArrayList<N> result = new ArrayList<N>();
-    List<List<N>> partitions = bulkSplitter.partition(nodes, minEntries, maxEntries);
+    ArrayList<E> result = new ArrayList<E>();
+    List<List<E>> partitions = bulkSplitter.partition(nodes, minEntries, maxEntries);
 
-    for(List<N> partition : partitions) {
+    for(List<E> partition : partitions) {
       // create node
       N dirNode = createNewDirectoryNode();
       writeNode(dirNode);
-      result.add(dirNode);
 
       // insert nodes
-      for(N o : partition) {
-        dirNode.addDirectoryEntry(createNewDirectoryEntry(o));
+      for(E o : partition) {
+        dirNode.addDirectoryEntry(o);
       }
 
+      result.add(createNewDirectoryEntry(dirNode));
       // write to file
       writeNode(dirNode);
       if(getLogger().isDebuggingFiner()) {
@@ -217,17 +216,15 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
    * @param objects the spatial objects to be inserted
    * @return the root node
    */
-  @SuppressWarnings("unchecked")
-  private N createRoot(N root, List<? extends SpatialComparable> objects) {
+  private N createRoot(N root, List<E> objects) {
     // insert data
-    for(SpatialComparable object : objects) {
-      if(object instanceof SpatialEntry) {
-        E entry = (E) object;
+    for(E entry : objects) {
+      if (entry.isLeafEntry()) {
         root.addLeafEntry(entry);
         throw new AbortException("Unexpected spatial comparable encountered.");
       }
       else {
-        root.addDirectoryEntry(createNewDirectoryEntry((N) object));
+        root.addDirectoryEntry(entry);
       }
     }
 
