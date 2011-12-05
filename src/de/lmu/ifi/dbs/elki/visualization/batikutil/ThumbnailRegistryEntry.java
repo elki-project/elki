@@ -36,6 +36,11 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   public static final String INTERNAL_PROTOCOL = "thumb";
 
   /**
+   * ELKI internal thumbnail protocol prefix
+   */
+  public static final String INTERNAL_PREFIX = INTERNAL_PROTOCOL + ":";
+
+  /**
    * Mime type
    */
   public static final String INTERNAL_MIME_TYPE = "internal/thumb";
@@ -105,15 +110,40 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   @Override
   public boolean isCompatibleURL(ParsedURL url) {
     // logger.warning("isCompatible " + url.toString());
+    return isCompatibleURLStatic(url);
+  }
+
+  /**
+   * Test for a compatible URL.
+   * 
+   * @param url URL
+   * @return Success code
+   */
+  public static boolean isCompatibleURLStatic(ParsedURL url) {
     return url.getProtocol().equals(INTERNAL_PROTOCOL);
   }
 
   @Override
   public Filter handleURL(ParsedURL url, boolean needRawData) {
+    Filter ret = handleURL(url);
+    if(ret != null) {
+      return ret;
+    }
+    // Image not found in registry.
+    return ImageTagRegistry.getBrokenLinkImage(ThumbnailRegistryEntry.this, ErrorConstants.ERR_IMAGE_DIR_DOES_NOT_EXIST, new Object[0]);
+  }
+
+  /**
+   * Statically handle the URL access.
+   * 
+   * @param url URL to access
+   * @return Image, or null
+   */
+  public static Filter handleURL(ParsedURL url) {
     if(logger.isDebuggingFiner()) {
       logger.debugFiner("handleURL " + url.toString());
     }
-    if(!url.getProtocol().equals(INTERNAL_PROTOCOL)) {
+    if(!isCompatibleURLStatic(url)) {
       return null;
     }
     int id;
@@ -134,7 +164,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
       }
     }
     // Image not found in registry.
-    return ImageTagRegistry.getBrokenLinkImage(ThumbnailRegistryEntry.this, ErrorConstants.ERR_IMAGE_DIR_DOES_NOT_EXIST, new Object[0]);
+    return null;
   }
 
   /**
@@ -176,11 +206,9 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
     if(logger.isDebuggingFinest()) {
       logger.debugFinest("parseURL: " + urlStr, new Throwable());
     }
-    if(urlStr.startsWith(INTERNAL_PROTOCOL)) {
-      if(urlStr.charAt(INTERNAL_PROTOCOL.length()) == ':') {
-        InternalParsedURLData ret = new InternalParsedURLData(urlStr.substring(INTERNAL_PROTOCOL.length() + 1));
-        return ret;
-      }
+    if(urlStr.startsWith(INTERNAL_PREFIX)) {
+      InternalParsedURLData ret = new InternalParsedURLData(urlStr.substring(INTERNAL_PREFIX.length()));
+      return ret;
     }
     return null;
   }

@@ -24,15 +24,11 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  */
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -45,14 +41,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
-import org.apache.batik.svggen.SVGSyntax;
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.apache.batik.util.Base64EncoderStream;
 import org.apache.batik.util.SVGConstants;
 import org.apache.fop.render.ps.EPSTranscoder;
 import org.apache.fop.render.ps.PSTranscoder;
@@ -60,15 +54,13 @@ import org.apache.fop.svg.PDFTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeListIterator;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.CloneInlineImages;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailTranscoder;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
@@ -339,38 +331,6 @@ public class SVGPlot {
     // TODO embed linked images.
     javax.xml.transform.Result result = new StreamResult(out);
     SVGDocument doc = cloneDocument();
-    NodeList imgs = doc.getElementsByTagNameNS(SVGConstants.SVG_NAMESPACE_URI, SVGConstants.SVG_IMAGE_TAG);
-    final String tmpurl = new File(System.getProperty("java.io.tmpdir") + File.separator).toURI().toString();
-    for(Node img : new XMLNodeListIterator(imgs)) {
-      if(img instanceof Element) {
-        try {
-          Element i = (Element) img;
-          String href = i.getAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_ATTRIBUTE);
-          if(href.startsWith(tmpurl) && href.endsWith(".png")) {
-            // need to convert the image into an inline image.
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            Base64EncoderStream encoder = new Base64EncoderStream(os);
-            File in = new File(new URI(href));
-            FileInputStream instream = new FileInputStream(in);
-            byte[] buf = new byte[4096];
-            while(true) {
-              int read = instream.read(buf, 0, buf.length);
-              if(read <= 0) {
-                break;
-              }
-              encoder.write(buf, 0, read);
-            }
-            instream.close();
-            encoder.close();
-            // replace HREF with inlined image data.
-            i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_ATTRIBUTE, SVGSyntax.DATA_PROTOCOL_PNG_PREFIX + os.toString());
-          }
-        }
-        catch(URISyntaxException e) {
-          LoggingUtil.warning("Error in embedding PNG image.");
-        }
-      }
-    }
     // Use a transformer for pretty printing
     Transformer xformer = TransformerFactory.newInstance().newTransformer();
     xformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -407,7 +367,7 @@ public class SVGPlot {
    * @return cloned document
    */
   protected SVGDocument cloneDocument() {
-    return (SVGDocument) new SVGCloneVisible().cloneDocument(SVGDOMImplementation.getDOMImplementation(), document);
+    return (SVGDocument) new CloneInlineImages().cloneDocument(SVGDOMImplementation.getDOMImplementation(), document);
   }
 
   /**
