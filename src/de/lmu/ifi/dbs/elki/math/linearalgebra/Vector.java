@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -495,55 +494,16 @@ public class Vector implements MatrixLike<Vector>, Serializable {
   }
 
   /**
-   * Inverts every element of the vector.
-   * 
-   * @return the resulting vector
-   */
-  public final Vector inverseVector() {
-    final Vector inv = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
-      inv.elements[i] = 1.0 / elements[i];
-    }
-    return inv;
-  }
-
-  /**
-   * Square roots every element of the vector.
-   * 
-   * @return the resulting vector
-   */
-  public final Vector sqrtVector() {
-    final Vector sqrt = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
-      sqrt.elements[i] = Math.sqrt(elements[i]);
-    }
-    return sqrt;
-  }
-
-  /**
    * Returns the length of this vector.
    * 
    * @return the length of this vector
    */
   public final double euclideanLength() {
-    double sqlen = 0.0;
+    double len = 0.0;
     for(int row = 0; row < elements.length; row++) {
-      sqlen += elements[row] * elements[row];
+      len = Math.hypot(len, elements[row]);
     }
-    return Math.sqrt(sqlen);
-  }
-
-  /**
-   * Frobenius norm
-   * 
-   * @return sqrt of sum of squares of all elements.
-   */
-  public double normF() {
-    double f = 0;
-    for(int i = 0; i < elements.length; i++) {
-      f = MathUtil.hypotenuse(f, elements[i]);
-    }
-    return f;
+    return len;
   }
 
   /**

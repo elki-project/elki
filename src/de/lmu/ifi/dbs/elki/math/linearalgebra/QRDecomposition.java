@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * QR Decomposition.
@@ -88,7 +87,7 @@ public class QRDecomposition implements java.io.Serializable {
       // Compute 2-norm of k-th column without under/overflow.
       double nrm = 0;
       for(int i = k; i < m; i++) {
-        nrm = MathUtil.hypotenuse(nrm, QR[i][k]);
+        nrm = Math.hypot(nrm, QR[i][k]);
       }
 
       if(nrm != 0.0) {
