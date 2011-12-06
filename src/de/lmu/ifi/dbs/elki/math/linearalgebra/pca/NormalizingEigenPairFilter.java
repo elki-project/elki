@@ -86,7 +86,7 @@ public class NormalizingEigenPairFilter implements EigenPairFilter {
    */
   private void normalizeEigenPair(final EigenPair eigenPair) {
     final Vector eigenvector = eigenPair.getEigenvector();
-    final double scaling = 1.0 / Math.sqrt(eigenPair.getEigenvalue()) * eigenvector.normF();
+    final double scaling = 1.0 / Math.sqrt(eigenPair.getEigenvalue()) * eigenvector.euclideanLength();
     eigenvector.timesEquals(scaling);
   }
 }

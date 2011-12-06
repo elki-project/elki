@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.RationalNumber;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -1241,7 +1240,7 @@ public class Matrix implements MatrixLike<Matrix>, Serializable {
     double f = 0;
     for(int i = 0; i < elements.length; i++) {
       for(int j = 0; j < columndimension; j++) {
-        f = MathUtil.hypotenuse(f, elements[i][j]);
+        f = Math.hypot(f, elements[i][j]);
       }
     }
     return f;
