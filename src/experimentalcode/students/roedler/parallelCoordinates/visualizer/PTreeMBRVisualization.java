@@ -91,11 +91,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
    protected boolean fill = true;
    
    /**
-    * visible parameter.
-    */
-   protected boolean visible = false;
-   
-   /**
     * page visibility
     */
    protected boolean[] pagevis;
@@ -117,11 +112,10 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
     * @param fill Fill flag
     */
    @SuppressWarnings("unchecked")
-   public PTreeMBRVisualization(VisualizationTask task, boolean fill, boolean visible, List<Integer> list) {
+   public PTreeMBRVisualization(VisualizationTask task, boolean fill, List<Integer> list) {
      super(task);
      this.tree = AbstractRStarTree.class.cast(task.getResult());
      this.fill = fill;
-     this.visible = visible;
      context.addDataStoreListener(this);
      context.addContextChangeListener(this);
      init();
@@ -146,7 +140,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
    protected void redraw() {
      if (pagevis ==  null){ init(); }
      addCSSClasses(svgp);
-     if(tree != null && visible) {
+     if(tree != null) {
        E root = tree.getRootEntry();
        visualizeRTreeEntry(svgp, layer, proj, tree, root, 0, 0);
      }
@@ -246,7 +240,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
    @Override
    public SubMenu getMenu() {
    SubMenu myMenu = new SubMenu(NAME, this);
-   myMenu.addCheckBoxItem("visible", "vis", visible);
    myMenu.addCheckBoxItem("fill", "fill", fill);
    
    for (int i = 0; i < pagevis.length; i++){
@@ -258,11 +251,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
 
    @Override
    public void menuPressed(String id, boolean checked) {
-     if (id == "vis") { 
-       visible = checked; 
-       incrementalRedraw();
-       return; 
-       }
      if (id == "fill") { 
        fill = checked;
        removeCSSClasses(svgp);
@@ -310,10 +298,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
       */
      public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("parallel.index.fill", "Partially transparent filling of index pages.");
     
-     /**
-      * Flag for visibility of index visualization
-      */
-     public static final OptionID VISIBLE_ID = OptionID.getOrCreateOptionID("parallel.index.visible", "Show index visualization.");
      
      public static final OptionID PAGEVIS_ID = OptionID.getOrCreateOptionID("parallel.indexpage.notvisible", "Select not visible indexpages");
 
@@ -326,27 +310,21 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
       * Fill parameter.
       */
      protected boolean fill = true;
-     
-     /**
-      * Visible parameter
-      */
-     protected boolean visible = false;
 
      /**
       * Constructor.
       * 
       * @param fill
       */
-     public Factory(boolean fill, boolean visible, List<Integer> list) {
+     public Factory(boolean fill, List<Integer> list) {
        super();
        this.fill = fill;
-       this.visible = visible;
        this.list = list;
      }
 
      @Override
      public Visualization makeVisualization(VisualizationTask task) {
-       return new PTreeMBRVisualization<NV, RStarTreeNode, SpatialEntry>(task, fill, visible, list);
+       return new PTreeMBRVisualization<NV, RStarTreeNode, SpatialEntry>(task, fill, list);
      }
 
      @Override
@@ -374,7 +352,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
       */
      public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
        protected boolean fill = true;
-       protected boolean visible = false;
        protected List<Integer> p;
 
        @Override
@@ -385,11 +362,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
          if(config.grab(fillF)) {
            fill = fillF.getValue();
          }
-         Flag visF = new Flag(VISIBLE_ID);
-         if(config.grab(visF)) {
-           visible = visF.getValue();
-         }
-         final IntListParameter visL = new IntListParameter(VISIBLE_ID, true);
+         final IntListParameter visL = new IntListParameter(PAGEVIS_ID, true);
          if(config.grab(visL)) {
            p = visL.getValue();
          }
@@ -397,7 +370,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
 
        @Override
        protected Factory<NV> makeInstance() {
-         return new Factory<NV>(fill, visible, p);
+         return new Factory<NV>(fill, p);
        }
      }
    }
