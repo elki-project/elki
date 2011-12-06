@@ -330,7 +330,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
       }
       dimOrder[rn] = temp;
     }
-    else {
+    else if(dim < rn) {
       int temp = dimOrder[dim];
      
       for (int i = dim; i < rn - 1; i++){

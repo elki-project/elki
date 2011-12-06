@@ -186,7 +186,7 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
         min.set(0, Math.min(proj.getMarginY() + proj.getAxisHeight(), y1));
         Vector max = new Vector(1);
         max.set(0, Math.max(proj.getMarginY(), y2));
-        ranges[i] = new DoubleDoublePair(proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(min).get(0)), proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(max).get(0)));
+        ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(min).get(0)), proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(max).get(0)));
       }
     }
   }
