@@ -7,6 +7,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -42,20 +43,20 @@ public class TestMathUtil implements JUnit4Test {
     double[] weight2 = new double[size];
 
     Random r = new Random(seed);
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       data1[i] = r.nextDouble();
       data2[i] = r.nextDouble();
       weight1[i] = 1.0;
       weight2[i] = 0.1;
     }
-    
+
     double pear = MathUtil.pearsonCorrelationCoefficient(data1, data2);
     double wpear1 = MathUtil.weightedPearsonCorrelationCoefficient(data1, data2, weight1);
     double wpear2 = MathUtil.weightedPearsonCorrelationCoefficient(data1, data2, weight2);
     assertEquals("Pearson and weighted pearson should be the same with constant weights.", pear, wpear1, 1E-10);
     assertEquals("Weighted pearsons should be the same with constant weights.", wpear1, wpear2, 1E-10);
   }
-  
+
   @Test
   public void testBitMath() {
     assertEquals("Bit math issues", 1024, MathUtil.nextPow2Int(912));
@@ -77,5 +78,22 @@ public class TestMathUtil implements JUnit4Test {
     assertEquals("Bit math issues", 0, MathUtil.nextAllOnesInt(0));
     assertEquals("Bit math issues", -1, MathUtil.nextAllOnesInt(-1));
     assertEquals("Bit math issues", 0, 0 >>> 1);
+  }
+
+  @Test
+  public void testFloatToDouble() {
+    Random r = new Random(1l);
+    for(int i = 0; i < 10000; i++) {
+      final double dbl = Double.longBitsToDouble(r.nextLong());
+      final float flt = (float) dbl;
+      final double uppd = MathUtil.floatToDoubleUpper(flt);
+      final float uppf = (float) uppd;
+      final double lowd = MathUtil.floatToDoubleLower(flt);
+      final float lowf = (float) lowd;
+      assertTrue("Expected value to become larger, but " + uppd + " < " + dbl, uppd >= dbl || Double.isNaN(dbl));
+      assertTrue("Expected value to round to the same float.", flt == uppf || Double.isNaN(flt));
+      assertTrue("Expected value to become smaller, but " + lowd + " > " + dbl, lowd <= dbl || Double.isNaN(dbl));
+      assertTrue("Expected value to round to the same float.", flt == lowf || Double.isNaN(flt));
+    }
   }
 }
