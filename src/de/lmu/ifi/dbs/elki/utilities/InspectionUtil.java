@@ -250,7 +250,7 @@ public class InspectionUtil {
         if(name.endsWith(".class")) {
           String classname = name.substring(0, name.length() - ".class".length());
           if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
-            return classname.replace("/", ".");
+            return classname.replace('/', '.');
           }
         }
       }
@@ -337,7 +337,7 @@ public class InspectionUtil {
         if(name.endsWith(".class")) {
           String classname = name.substring(0, name.length() - ".class".length());
           if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
-            return classname.replace(File.separator, ".");
+            return classname.replace(File.separatorChar, '.');
           }
         }
       }
