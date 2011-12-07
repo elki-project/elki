@@ -522,7 +522,7 @@ public final class MathUtil {
         bits = (bits >>> 1) + (bits2 >>> 1) - 1l;
       }
       else {
-        bits += 0xfff_ffffl; // 28 extra bits
+        bits += 0xfffffffl; // 28 extra bits
       }
       return Double.longBitsToDouble(bits);
     }
@@ -541,7 +541,7 @@ public final class MathUtil {
         bits = (bits >>> 1) + (bits2 >>> 1) + 1l;
       }
       else {
-        bits -= 0xfff_ffffl; // 28 extra bits
+        bits -= 0xfffffffl; // 28 extra bits
       }
       return Double.longBitsToDouble(bits);
     }
@@ -584,7 +584,7 @@ public final class MathUtil {
         bits = (bits >>> 1) + (bits2 >>> 1) + 1l; // + (0xfff_ffffl << 18);
       }
       else {
-        bits -= 0xfff_ffffl; // 28 extra bits
+        bits -= 0xfffffffl; // 28 extra bits
       }
       return Double.longBitsToDouble(bits);
     }
@@ -603,7 +603,7 @@ public final class MathUtil {
         bits = (bits >>> 1) + (bits2 >>> 1) - 1l;
       }
       else {
-        bits += 0xfff_ffffl; // 28 extra bits
+        bits += 0xfffffffl; // 28 extra bits
       }
       return Double.longBitsToDouble(bits);
     }
