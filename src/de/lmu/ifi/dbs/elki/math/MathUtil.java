@@ -484,4 +484,128 @@ public final class MathUtil {
     x |= x >>> 32;
     return x;
   }
+
+  /**
+   * Return the largest double that rounds down to this float.
+   * 
+   * Note: Probably not always correct - subnormal values are quite tricky. So
+   * some of the bounds might not be tight.
+   * 
+   * @param f Float value
+   * @return Double value
+   */
+  public static double floatToDoubleUpper(float f) {
+    if(Float.isNaN(f)) {
+      return Double.NaN;
+    }
+    if(Float.isInfinite(f)) {
+      if(f > 0) {
+        return Double.POSITIVE_INFINITY;
+      }
+      else {
+        return Double.longBitsToDouble(0xc7efffffffffffffl);
+      }
+    }
+    long bits = Double.doubleToRawLongBits((double) f);
+    if((bits & 0x8000000000000000l) == 0) { // Positive
+      if(bits == 0l) {
+        return Double.longBitsToDouble(0x3690000000000000l);
+      }
+      if(f == Float.MIN_VALUE) {
+        // bits += 0x7_ffff_ffff_ffffl;
+        return Double.longBitsToDouble(0x36a7ffffffffffffl);
+      }
+      if(Float.MIN_NORMAL > f && f >= Double.MIN_NORMAL) {
+        // The most tricky case:
+        // a denormalized float, but a normalized double
+        final long bits2 = Double.doubleToRawLongBits((double) Math.nextUp(f));
+        bits = (bits >>> 1) + (bits2 >>> 1) - 1l;
+      }
+      else {
+        bits += 0xfff_ffffl; // 28 extra bits
+      }
+      return Double.longBitsToDouble(bits);
+    }
+    else {
+      if(bits == 0x8000000000000000l) {
+        return -0.0d;
+      }
+      if(f == -Float.MIN_VALUE) {
+        // bits -= 0xf_ffff_ffff_ffffl;
+        return Double.longBitsToDouble(0xb690000000000001l);
+      }
+      if(-Float.MIN_NORMAL < f && f <= -Double.MIN_NORMAL) {
+        // The most tricky case:
+        // a denormalized float, but a normalized double
+        final long bits2 = Double.doubleToRawLongBits((double) Math.nextUp(f));
+        bits = (bits >>> 1) + (bits2 >>> 1) + 1l;
+      }
+      else {
+        bits -= 0xfff_ffffl; // 28 extra bits
+      }
+      return Double.longBitsToDouble(bits);
+    }
+  }
+
+  /**
+   * Return the largest double that rounds up to this float.
+   * 
+   * Note: Probably not always correct - subnormal values are quite tricky. So
+   * some of the bounds might not be tight.
+   * 
+   * @param f Float value
+   * @return Double value
+   */
+  public static double floatToDoubleLower(float f) {
+    if(Float.isNaN(f)) {
+      return Double.NaN;
+    }
+    if(Float.isInfinite(f)) {
+      if(f < 0) {
+        return Double.NEGATIVE_INFINITY;
+      }
+      else {
+        return Double.longBitsToDouble(0x47efffffffffffffl);
+      }
+    }
+    long bits = Double.doubleToRawLongBits((double) f);
+    if((bits & 0x8000000000000000l) == 0) { // Positive
+      if(bits == 0l) {
+        return +0.0d;
+      }
+      if(f == Float.MIN_VALUE) {
+        // bits -= 0xf_ffff_ffff_ffffl;
+        return Double.longBitsToDouble(0x3690000000000001l);
+      }
+      if(Float.MIN_NORMAL > f /* && f >= Double.MIN_NORMAL */) {
+        // The most tricky case:
+        // a denormalized float, but a normalized double
+        final long bits2 = Double.doubleToRawLongBits((double) -Math.nextUp(-f));
+        bits = (bits >>> 1) + (bits2 >>> 1) + 1l; // + (0xfff_ffffl << 18);
+      }
+      else {
+        bits -= 0xfff_ffffl; // 28 extra bits
+      }
+      return Double.longBitsToDouble(bits);
+    }
+    else {
+      if(bits == 0x8000000000000000l) {
+        return Double.longBitsToDouble(0xb690000000000000l);
+      }
+      if(f == -Float.MIN_VALUE) {
+        // bits += 0x7_ffff_ffff_ffffl;
+        return Double.longBitsToDouble(0xb6a7ffffffffffffl);
+      }
+      if(-Float.MIN_NORMAL < f /* && f <= -Double.MIN_NORMAL */) {
+        // The most tricky case:
+        // a denormalized float, but a normalized double
+        final long bits2 = Double.doubleToRawLongBits((double) -Math.nextUp(-f));
+        bits = (bits >>> 1) + (bits2 >>> 1) - 1l;
+      }
+      else {
+        bits += 0xfff_ffffl; // 28 extra bits
+      }
+      return Double.longBitsToDouble(bits);
+    }
+  }
 }
