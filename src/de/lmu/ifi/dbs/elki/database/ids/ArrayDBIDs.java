@@ -50,4 +50,16 @@ public interface ArrayDBIDs extends DBIDs {
    * @return size
    */
   public int size();
+
+  /**
+   * Search for the position of the given key, assuming that the data set is
+   * sorted.
+   * 
+   * For keys not found, <code>-(1+insertion position)</code> is returned, as
+   * for Java {@link java.util.Collections#binarySearch}
+   * 
+   * @param key Key to search for
+   * @return Offset of key
+   */
+  public int binarySearch(DBID key);
 }

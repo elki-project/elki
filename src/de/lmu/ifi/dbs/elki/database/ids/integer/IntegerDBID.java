@@ -139,6 +139,11 @@ class IntegerDBID implements DBID {
     return 1;
   }
 
+  @Override
+  public int binarySearch(DBID key) {
+    return equals(key) ? 0 : -1;
+  }
+
   /**
    * Pseudo iterator for DBIDs interface.
    * 

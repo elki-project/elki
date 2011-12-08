@@ -107,6 +107,11 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
   }
 
   @Override
+  public boolean remove(DBID o) {
+    return store.remove(o.getIntegerID());
+  }
+
+  @Override
   public boolean retainAll(DBIDs set) {
     boolean modified = false;
     Iterator<DBID> it = iterator();

@@ -349,7 +349,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
         res.addCluster(c);
         noiseIDs.removeDBIDs(interval.getIDs());
         clusterIDs.addDBIDs(interval.getIDs());
-        processedIDs.addAll(interval.getIDs());
+        processedIDs.addDBIDs(interval.getIDs());
       }
 
       // Rebuild heap
@@ -372,13 +372,13 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
       if(dim == noiseDim) {
         Cluster<Model> c = new Cluster<Model>(noiseIDs, true, ClusterModel.CLUSTER);
         res.addCluster(c);
-        processedIDs.addAll(noiseIDs);
+        processedIDs.addDBIDs(noiseIDs);
       }
       else if(noiseIDs.size() >= minPts) {
         LinearEquationSystem les = runDerivator(fulldatabase, dim - 1, noiseIDs);
         Cluster<Model> c = new Cluster<Model>(noiseIDs, true, new LinearEquationModel(les));
         res.addCluster(c);
-        processedIDs.addAll(noiseIDs);
+        processedIDs.addDBIDs(noiseIDs);
       }
     }
 

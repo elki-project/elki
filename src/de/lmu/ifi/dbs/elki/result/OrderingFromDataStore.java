@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
 import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
@@ -122,10 +121,10 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
   public IterableIterator<DBID> iter(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
     if(comparator != null) {
-      Collections.sort(sorted, new DerivedComparator());
+      sorted.sort(new DerivedComparator());
     }
     else {
-      Collections.sort(sorted, new ImpliedComparator());
+      sorted.sort(new ImpliedComparator());
     }
     return IterableUtil.fromIterable(sorted);
   }

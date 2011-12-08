@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -88,6 +89,11 @@ public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements Arra
     return new TroveArrayStaticDBIDs(getStore().subList(fromIndex, toIndex));
   }
 
+  @Override
+  public int binarySearch(DBID key) {
+    return getStore().binarySearch(key.getIntegerID());
+  }
+
   /**
    * Iterate over a Trove IntList, ELKI/C-style
    * 
@@ -105,10 +111,10 @@ public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements Arra
      * The actual store we use
      */
     TIntList store;
-    
+
     /**
      * Constructor.
-     *
+     * 
      * @param store The actual trove store
      */
     public DBIDItr(TIntList store) {
@@ -135,6 +141,5 @@ public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements Arra
     public DBID getDBID() {
       return new IntegerDBID(store.get(pos));
     }
-
   }
 }

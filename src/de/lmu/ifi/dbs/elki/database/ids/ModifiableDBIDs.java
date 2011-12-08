@@ -23,14 +23,16 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 /**
  * Interface for a generic modifiable DBID collection.
  * 
+ * Note: we had this use the Java Collections API for a long time, however this
+ * prevented certain optimizations. So it now only mimics the Collections API
+ * <em>deliberately</em>.
+ * 
  * @author Erich Schubert
  */
-public interface ModifiableDBIDs extends DBIDs, Collection<DBID> {
+public interface ModifiableDBIDs extends DBIDs {
   /**
    * Add DBIDs to collection.
    * 
@@ -38,7 +40,7 @@ public interface ModifiableDBIDs extends DBIDs, Collection<DBID> {
    * @return {@code true} when modified
    */
   boolean addDBIDs(DBIDs ids);
-  
+
   /**
    * Remove DBIDs from collection.
    * 
@@ -46,4 +48,23 @@ public interface ModifiableDBIDs extends DBIDs, Collection<DBID> {
    * @return {@code true} when modified
    */
   boolean removeDBIDs(DBIDs ids);
+
+  /**
+   * Add a single DBID to the collection.
+   * 
+   * @param id ID to add
+   */
+  boolean add(DBID id);
+
+  /**
+   * Remove a single DBID from the collection.
+   * 
+   * @param id ID to remove
+   */
+  boolean remove(DBID id);
+
+  /**
+   * Clear this collection.
+   */
+  void clear();
 }
