@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 /*
@@ -107,7 +107,7 @@ public class DataDistributionResult extends BasicResult {
    * @param dim Dimension
    * @return Iterator for the histogram
    */
-  public Iterator<Pair<Double, Double>> iterHistogram(int dim) {
+  public Iterator<DoubleObjPair<Double>> iterHistogram(int dim) {
     return histograms.get(dim).iterator();
   }
 }

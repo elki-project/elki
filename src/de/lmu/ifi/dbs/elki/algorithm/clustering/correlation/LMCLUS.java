@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Linear manifold clustering in high dimensional spaces by stochastic search.
@@ -381,9 +381,9 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     // Forward pass
     {
       MeanVariance mv = new MeanVariance();
-      Iterator<Pair<Double, Double>> forward = histogram.iterator();
+      Iterator<DoubleObjPair<Double>> forward = histogram.iterator();
       for(int i = 0; forward.hasNext(); i++) {
-        Pair<Double, Double> pair = forward.next();
+        DoubleObjPair<Double> pair = forward.next();
         p1[i] = pair.second + ((i > 0) ? p1[i - 1] : 0);
         mv.put(i, pair.second);
         mu1[i] = mv.getMean();
@@ -393,9 +393,9 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     // Backwards pass
     {
       MeanVariance mv = new MeanVariance();
-      Iterator<Pair<Double, Double>> backwards = histogram.reverseIterator();
+      Iterator<DoubleObjPair<Double>> backwards = histogram.reverseIterator();
       for(int j = n - 1; backwards.hasNext(); j--) {
-        Pair<Double, Double> pair = backwards.next();
+        DoubleObjPair<Double> pair = backwards.next();
         p2[j] = pair.second + ((j + 1 < n) ? p2[j + 1] : 0);
         mv.put(j, pair.second);
         mu2[j] = mv.getMean();

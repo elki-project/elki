@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -249,7 +250,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     // count the number of samples we have in the data
     long inum = 0;
     long onum = 0;
-    for(Pair<Double, Pair<Long, Long>> ppair : histogram) {
+    for(DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
       inum += ppair.getSecond().getFirst();
       onum += ppair.getSecond().getSecond();
     }
@@ -258,12 +259,12 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     assert (bnum == relation.size() * (relation.size() - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
-    for(Pair<Double, Pair<Long, Long>> ppair : histogram) {
+    for(DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
       final double icof = (inum == 0) ? 0 : ((double) ppair.getSecond().getFirst()) / inum / histogram.getBinsize();
       final double icaf = ((double) ppair.getSecond().getFirst()) / bnum / histogram.getBinsize();
       final double ocof = (onum == 0) ? 0 : ((double) ppair.getSecond().getSecond()) / onum / histogram.getBinsize();
       final double ocaf = ((double) ppair.getSecond().getSecond()) / bnum / histogram.getBinsize();
-      DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), icof, icaf, ocof, ocaf });
+      DoubleVector row = new DoubleVector(new double[] { ppair.first, icof, icaf, ocof, ocaf });
       binstat.add(row);
     }
     HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>("Distance Histogram", "distance-histogram", binstat);

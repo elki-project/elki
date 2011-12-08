@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.histograms;
  */
 
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -234,17 +235,17 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
    * @param max Maximum value
    * @return Histogram object
    */
-  public static AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> DoubleSumDoubleSumHistogram(int bins, double min, double max) {
-    return new AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>>(bins, min, max, new Adapter<Pair<Double, Double>, Pair<Double, Double>>() {
+  public static AggregatingHistogram<DoubleDoublePair, DoubleDoublePair> DoubleSumDoubleSumHistogram(int bins, double min, double max) {
+    return new AggregatingHistogram<DoubleDoublePair, DoubleDoublePair>(bins, min, max, new Adapter<DoubleDoublePair, DoubleDoublePair>() {
       @Override
-      public Pair<Double, Double> make() {
-        return new Pair<Double, Double>(0.,0.);
+      public DoubleDoublePair make() {
+        return new DoubleDoublePair(0.,0.);
       }
 
       @Override
-      public Pair<Double, Double> aggregate(Pair<Double, Double> existing, Pair<Double, Double> data) {
-        existing.setFirst(existing.getFirst() + data.getFirst());
-        existing.setSecond(existing.getSecond() + data.getSecond());
+      public DoubleDoublePair aggregate(DoubleDoublePair existing, DoubleDoublePair data) {
+        existing.setFirst(existing.first + data.first);
+        existing.setSecond(existing.second + data.second);
         return existing;
       }
     });

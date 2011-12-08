@@ -29,8 +29,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.histograms.ReplacingHistogram;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * JUnit test to test the {@link ReplacingHistogram} class.
@@ -67,8 +66,8 @@ public class TestReplacingHistogram implements JUnit4Test {
 
     // compare results via Iterator.
     int off = 0;
-    for(Pair<Double, Double> pair : hist) {
-      assertEquals("Array iterator bin position", -0.15 + 0.1 * off, pair.getFirst(), 0.00001);
+    for(DoubleObjPair<Double> pair : hist) {
+      assertEquals("Array iterator bin position", -0.15 + 0.1 * off, pair.first, 0.00001);
       assertEquals("Array iterator bin contents", resized[off], pair.getSecond(), 0.00001);
       off++;
     }
