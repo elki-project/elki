@@ -143,7 +143,6 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     int[][] partitionCount = new int[dimensions][partitions];
 
     for(int d = 0; d < dimensions; d++) {
-      int remaining = size;
       double[] tempdata = new double[size];
       int j = 0;
       for(DBID id : relation.iterDBIDs()) {
@@ -152,23 +151,11 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
       }
       Arrays.sort(tempdata);
 
-      int bucketSize = (int) (size / (double) partitions);
-      int i = 0;
       for(int b = 0; b < partitions; b++) {
-        assert i <= tempdata.length : "i out ouf bounds " + i + " <> " + tempdata.length;
-        splitPositions[d][b] = tempdata[i];
-        remaining -= bucketSize;
-        i += bucketSize;
-
-        // test: are there remaining objects that have to be put in the first
-        // buckets?
-        if(remaining > (bucketSize * (partitionCount.length - b - 1))) {
-          i++;
-          remaining--;
-          partitionCount[d][b]++;
-        }
-
-        partitionCount[d][b] += bucketSize;
+        int start = (int) (b * size / (double) partitions);
+        int end = (int) ((b + 1) * size / (double) partitions) - 1;
+        splitPositions[d][b] = tempdata[start];
+        partitionCount[d][b] = (end - start);
       }
       // make sure that last object will be included
       splitPositions[d][partitions] = tempdata[size - 1] + 0.000001;
