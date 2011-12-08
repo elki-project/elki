@@ -244,7 +244,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
         }
         else {
           ModifiableDBIDs merged = DBIDUtil.newHashSet(noise.getIDs());
-          merged.addAll(clus.getIDs().asCollection());
+          merged.addDBIDs(clus.getIDs());
           noise.setIDs(merged);
         }
       }
