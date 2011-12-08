@@ -40,7 +40,6 @@ import javax.swing.event.ChangeListener;
 import de.lmu.ifi.dbs.elki.gui.configurator.ConfiguratorPanel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.designpattern.Observable;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.designpattern.Observers;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  */
-public abstract class ParameterTabPanel extends JPanel implements Observable<ParameterTabPanel>, ChangeListener {
+public abstract class ParameterTabPanel extends JPanel implements ChangeListener {
   /**
    * Serial version
    */
@@ -323,12 +322,10 @@ public abstract class ParameterTabPanel extends JPanel implements Observable<Par
     runButton.setEnabled(canRun());
   }
 
-  @Override
   public void addObserver(Observer<? super ParameterTabPanel> o) {
     observers.add(o);
   }
 
-  @Override
   public void removeObserver(Observer<? super ParameterTabPanel> o) {
     observers.remove(o);
   }
