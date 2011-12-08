@@ -53,22 +53,24 @@ public class InspectionUtil {
    * Default package ignores.
    */
   private static final String[] DEFAULT_IGNORES = {
-  // Sun Java
+      // Sun Java
   "java.", "com.sun.",
-  // Batik classes
+      // Batik classes
   "org.apache.",
-  // W3C / SVG / XML classes
+      // W3C / SVG / XML classes
   "org.w3c.", "org.xml.", "javax.xml.",
-  // JUnit
+      // JUnit
   "org.junit.", "junit.", "org.hamcrest.",
-  // Eclipse
+      // Eclipse
   "org.eclipse.",
-  // ApiViz
+      // ApiViz
   "org.jboss.apiviz.",
-  // JabRef
+      // JabRef
   "spin.", "osxadapter.", "antlr.", "ca.odell.", "com.jgoodies.", "com.michaelbaranov.", "com.mysql.", "gnu.dtools.", "net.sf.ext.", "net.sf.jabref.", "org.antlr.", "org.gjt.", "org.java.plugin.", "org.jempbox.", "org.pdfbox.", "wsi.ra.",
-  // Wrappers don't have important own parameters, they just set some defaults
-  "experimentalcode.shared.wrapper." };
+      // GNU trove
+  "gnu.trove.",
+  //
+  };
 
   /**
    * If we have a non-static classpath, we do more extensive scanning for user
@@ -98,7 +100,7 @@ public class InspectionUtil {
    * @return Found implementations
    */
   public static List<Class<?>> cachedFindAllImplementations(Class<?> c) {
-    if (c == null) {
+    if(c == null) {
       return Collections.emptyList();
     }
     if(InspectionUtilFrequentlyScanned.class.isAssignableFrom(c)) {
@@ -315,6 +317,29 @@ public class InspectionUtil {
     private String findNext() {
       while(set.size() > 0) {
         File f = set.pop();
+        // Ignore unix-hidden files
+        if(f.getName().startsWith(".")) {
+          continue;
+        }
+        // Classes
+        if(f.getName().endsWith(".class")) {
+          String name = f.getAbsolutePath();
+          if(name.startsWith(prefix)) {
+            int l = prefix.length();
+            if(name.charAt(l) == File.separatorChar) {
+              l += 1;
+            }
+            name = name.substring(l);
+          }
+          else {
+            LoggingUtil.warning("I was expecting all directories to start with '" + prefix + "' but '" + name + "' did not.");
+          }
+          String classname = name.substring(0, name.length() - ".class".length());
+          if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
+            return classname.replace(File.separatorChar, '.');
+          }
+          continue;
+        }
         // recurse into directories
         if(f.isDirectory()) {
           // TODO: do not recurse into ignored packages!.
@@ -322,23 +347,6 @@ public class InspectionUtil {
             set.push(newf);
           }
           continue;
-        }
-        String name = f.getAbsolutePath();
-        if(name.startsWith(prefix)) {
-          int l = prefix.length();
-          if(name.charAt(l) == File.separatorChar) {
-            l += 1;
-          }
-          name = name.substring(l);
-        }
-        else {
-          LoggingUtil.warning("I was expecting all directories to start with '" + prefix + "' but '" + name + "' did not.");
-        }
-        if(name.endsWith(".class")) {
-          String classname = name.substring(0, name.length() - ".class".length());
-          if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
-            return classname.replace(File.separatorChar, '.');
-          }
         }
       }
       return null;
