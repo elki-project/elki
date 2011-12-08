@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 /*
  This file is part of ELKI:
@@ -31,7 +31,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.statistics.QuickSelect;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
  * Test the QuickSelect math class.
