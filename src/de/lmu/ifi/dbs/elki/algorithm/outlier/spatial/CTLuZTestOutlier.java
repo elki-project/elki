@@ -128,7 +128,7 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     // Normalize scores using mean and variance
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
-      double score = Math.abs(scores.get(id) - zmv.getMean()) / zmv.getSampleStddev();
+      double score = Math.abs(scores.doubleValue(id) - zmv.getMean()) / zmv.getSampleStddev();
       minmax.put(score);
       scores.putDouble(id, score);
     }

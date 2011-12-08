@@ -136,18 +136,18 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
         if(neighbor.equals(id)) {
           continue;
         }
-        sum += modifiedDistance.get(neighbor);
+        sum += modifiedDistance.doubleValue(neighbor);
         cnt++;
       }
       double slom;
       if(cnt > 0) {
         // With and without the object itself:
-        double avgPlus = (sum + modifiedDistance.get(id)) / (cnt + 1);
+        double avgPlus = (sum + modifiedDistance.doubleValue(id)) / (cnt + 1);
         double avg = sum / cnt;
 
         double beta = 0;
         for(DBID neighbor : neighbors) {
-          final double dist = modifiedDistance.get(neighbor).doubleValue();
+          final double dist = modifiedDistance.doubleValue(neighbor);
           if(dist > avgPlus) {
             beta += 1;
           }
@@ -157,7 +157,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
         }
         // Include object itself
         if(!neighbors.contains(id)) {
-          final double dist = modifiedDistance.get(id).doubleValue();
+          final double dist = modifiedDistance.doubleValue(id);
           if(dist > avgPlus) {
             beta += 1;
           }
@@ -176,7 +176,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
         }
         beta = beta / (1 + avg);
 
-        slom = beta * modifiedDistance.get(id);
+        slom = beta * modifiedDistance.doubleValue(id);
       }
       else {
         // No neighbors to compare to - no score.

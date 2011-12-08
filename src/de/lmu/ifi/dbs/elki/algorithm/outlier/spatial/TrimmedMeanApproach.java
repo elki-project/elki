@@ -162,7 +162,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       {
         int i = 0;
         for(DBID id : relation.iterDBIDs()) {
-          ei[i] = errors.get(id);
+          ei[i] = errors.doubleValue(id);
           i++;
         }
       }
@@ -181,7 +181,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     // calculate score
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
-      double score = Math.abs(errors.get(id)) * 0.6745 / median_dev_from_median;
+      double score = Math.abs(errors.doubleValue(id)) * 0.6745 / median_dev_from_median;
       scores.putDouble(id, score);
       minmax.put(score);
     }
