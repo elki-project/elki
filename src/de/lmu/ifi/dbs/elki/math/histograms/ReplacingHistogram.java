@@ -26,8 +26,9 @@ package de.lmu.ifi.dbs.elki.math.histograms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * Class to manage a simple Histogram.
@@ -422,11 +423,11 @@ public class ReplacingHistogram<T> implements Iterable<DoubleObjPair<T>> {
    * @param max Maximum coordinate
    * @return New histogram for Integer pairs.
    */
-  public static ReplacingHistogram<Pair<Integer, Integer>> IntIntHistogram(int bins, double min, double max) {
-    return new ReplacingHistogram<Pair<Integer, Integer>>(bins, min, max, new Adapter<Pair<Integer, Integer>>() {
+  public static ReplacingHistogram<IntIntPair> IntIntHistogram(int bins, double min, double max) {
+    return new ReplacingHistogram<IntIntPair>(bins, min, max, new Adapter<IntIntPair>() {
       @Override
-      public Pair<Integer, Integer> make() {
-        return new Pair<Integer, Integer>(0, 0);
+      public IntIntPair make() {
+        return new IntIntPair(0, 0);
       }
     });
   }
@@ -440,11 +441,11 @@ public class ReplacingHistogram<T> implements Iterable<DoubleObjPair<T>> {
    * @param max Maximum coordinate
    * @return New histogram for Double pairs.
    */
-  public static ReplacingHistogram<Pair<Double, Double>> DoubleDoubleHistogram(int bins, double min, double max) {
-    return new ReplacingHistogram<Pair<Double, Double>>(bins, min, max, new Adapter<Pair<Double, Double>>() {
+  public static ReplacingHistogram<DoubleDoublePair> DoubleDoubleHistogram(int bins, double min, double max) {
+    return new ReplacingHistogram<DoubleDoublePair>(bins, min, max, new Adapter<DoubleDoublePair>() {
       @Override
-      public Pair<Double, Double> make() {
-        return new Pair<Double, Double>(0.0, 0.0);
+      public DoubleDoublePair make() {
+        return new DoubleDoublePair(0.0, 0.0);
       }
     });
   }
