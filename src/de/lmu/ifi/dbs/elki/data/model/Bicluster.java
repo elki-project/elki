@@ -86,7 +86,7 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
   @Deprecated
   public Bicluster(int[] rowIDs, int[] colIDs, Relation<V> database) {
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rowIDs.length);
-    for (int rowid : rowIDs) {
+    for(int rowid : rowIDs) {
       ids.add(DBIDUtil.importInteger(rowid));
     }
     this.rowIDs = ids;
@@ -101,7 +101,7 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
     if(!(this.rowIDs instanceof ModifiableDBIDs)) {
       this.rowIDs = DBIDUtil.newArray(this.rowIDs);
     }
-    Collections.sort(this.rowIDs);
+    Collections.sort((ArrayModifiableDBIDs) this.rowIDs);
     Arrays.sort(this.colIDs);
   }
 
