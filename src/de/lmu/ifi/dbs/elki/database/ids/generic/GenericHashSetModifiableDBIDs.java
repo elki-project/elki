@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -71,27 +71,41 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
    * @param c Existing DBIDs.
    */
   public GenericHashSetModifiableDBIDs(DBIDs c) {
-    super(c.asCollection());
-  }
-
-  @Override
-  public Collection<DBID> asCollection() {
-    return this;
+    super(c.size());
+    for(DBID id : c) {
+      add(id);
+    }
   }
 
   @Override
   public boolean addDBIDs(DBIDs ids) {
-    return super.addAll(ids.asCollection());
+    boolean changed = false;
+    for(DBID id : ids) {
+      changed |= add(id);
+    }
+    return changed;
   }
 
   @Override
   public boolean removeDBIDs(DBIDs ids) {
-    return super.removeAll(ids.asCollection());
+    boolean changed = false;
+    for(DBID id : ids) {
+      changed |= remove(id);
+    }
+    return changed;
   }
 
   @Override
   public boolean retainAll(DBIDs ids) {
-    return super.retainAll(ids.asCollection());
+    boolean modified = false;
+    Iterator<DBID> it = iterator();
+    while(it.hasNext()) {
+      if(!ids.contains(it.next())) {
+        it.remove();
+        modified = true;
+      }
+    }
+    return modified;
   }
 
   @Override

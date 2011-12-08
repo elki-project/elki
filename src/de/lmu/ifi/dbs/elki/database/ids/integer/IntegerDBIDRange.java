@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import java.util.AbstractList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -186,10 +185,5 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
   @Override
   public int getOffset(DBID dbid) {
     return dbid.getIntegerID() - start;
-  }
-
-  @Override
-  public Collection<DBID> asCollection() {
-    return this;
   }
 }

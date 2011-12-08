@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
+import java.util.Iterator;
+
 import gnu.trove.impl.hash.THashPrimitiveIterator;
 import gnu.trove.impl.hash.TIntHash;
 import gnu.trove.set.hash.TIntHashSet;
@@ -106,7 +108,15 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
 
   @Override
   public boolean retainAll(DBIDs set) {
-    return retainAll(set.asCollection());
+    boolean modified = false;
+    Iterator<DBID> it = iterator();
+    while(it.hasNext()) {
+      if(!set.contains(it.next())) {
+        it.remove();
+        modified = true;
+      }
+    }
+    return modified;
   }
 
   @Override
@@ -129,7 +139,7 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
 
     /**
      * Constructor.
-     *
+     * 
      * @param hash Trove hash
      */
     public DBIDItr(TIntHash hash) {

@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import java.util.AbstractCollection;
 import java.util.AbstractList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -248,7 +247,7 @@ public final class KNNUtil {
    * 
    * @author Erich Schubert
    */
-  protected static class DBIDView extends AbstractList<DBID> implements ArrayDBIDs {
+  protected static class DBIDView implements ArrayDBIDs {
     /**
      * The true list.
      */
@@ -270,11 +269,6 @@ public final class KNNUtil {
     }
 
     @Override
-    public Collection<DBID> asCollection() {
-      return this;
-    }
-
-    @Override
     public Iterator<DBID> iterator() {
       return new DBIDIterator(parent.iterator());
     }
@@ -287,6 +281,22 @@ public final class KNNUtil {
     @Override
     public int size() {
       return parent.size();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+      // TODO: optimize
+      for(DBID id : this) {
+        if(id.equals(o)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return parent.size() == 0;
     }
   }
 

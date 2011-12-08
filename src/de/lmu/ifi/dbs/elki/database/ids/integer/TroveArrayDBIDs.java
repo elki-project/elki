@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import gnu.trove.list.TIntList;
 
 import java.util.AbstractList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -64,11 +63,6 @@ public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements Arra
   @Override
   public int size() {
     return getStore().size();
-  }
-
-  @Override
-  public Collection<DBID> asCollection() {
-    return this;
   }
 
   @Override

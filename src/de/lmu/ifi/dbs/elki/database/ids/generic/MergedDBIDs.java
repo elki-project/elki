@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs
  */
 // TODO: include ID mapping?
-public class MergedDBIDs implements DBIDs, Collection<DBID> {
+public class MergedDBIDs implements DBIDs {
   /**
    * Childs to merge
    */
@@ -53,11 +52,6 @@ public class MergedDBIDs implements DBIDs, Collection<DBID> {
   public MergedDBIDs(DBIDs... childs) {
     super();
     this.childs = childs;
-  }
-
-  @Override
-  public Collection<DBID> asCollection() {
-    return this;
   }
 
   @Override
@@ -85,31 +79,6 @@ public class MergedDBIDs implements DBIDs, Collection<DBID> {
   }
 
   @Override
-  public Object[] toArray() {
-    return toArray(new Object[size()]);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T[] toArray(T[] a) {
-    final int si = size();
-    T[] r = a;
-    if(a.length < si) {
-      r = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), si);
-    }
-    int i = 0;
-    for(Iterator<DBID> iter = iterator(); iter.hasNext(); i++) {
-      DBID id = iter.next();
-      r[i] = (T) id;
-    }
-    // zero-terminate array
-    if(r.length > si) {
-      r[si] = null;
-    }
-    return r;
-  }
-
-  @Override
   public boolean contains(Object o) {
     for(DBIDs child : childs) {
       if(child.contains(o)) {
@@ -117,46 +86,5 @@ public class MergedDBIDs implements DBIDs, Collection<DBID> {
       }
     }
     return false;
-  }
-
-  @Override
-  public boolean containsAll(Collection<?> c) {
-    Iterator<?> e = c.iterator();
-    while(e.hasNext()) {
-      if(!contains(e.next())) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
-  }
-
-  @Override
-  public boolean add(DBID e) {
-    throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
-  }
-
-  @Override
-  public boolean addAll(Collection<? extends DBID> c) {
-    throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
-  }
-
-  @Override
-  public boolean remove(Object o) {
-    throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
-  }
-
-  @Override
-  public boolean removeAll(Collection<?> c) {
-    throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
-  }
-
-  @Override
-  public boolean retainAll(Collection<?> c) {
-    throw new UnsupportedOperationException(MergedDBIDs.class.getName() + " are unmodifiable!");
   }
 }
