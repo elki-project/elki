@@ -29,6 +29,7 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
@@ -42,11 +43,11 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * @param <T> Type of data in histogram
  * @param <D> Type of input data
  */
-public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
+public class FlexiHistogram<T, D> extends AggregatingHistogram<T, D> {
   /**
    * Adapter class, extended "maker".
    */
-  private Adapter<T,D> downsampler;
+  private Adapter<T, D> downsampler;
 
   /**
    * Cache for elements when not yet initialized.
@@ -67,7 +68,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * @param <T> Type of data in histogram
    * @param <D> Type of input data
    */
-  public static abstract class Adapter<T,D> extends AggregatingHistogram.Adapter<T,D> {
+  public static abstract class Adapter<T, D> extends AggregatingHistogram.Adapter<T, D> {
     /**
      * Rule to combine two bins into one.
      * 
@@ -97,7 +98,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * @param bins Target number of bins
    * @param adapter Adapter for data types and combination rules.
    */
-  public FlexiHistogram(int bins, Adapter<T,D> adapter) {
+  public FlexiHistogram(int bins, Adapter<T, D> adapter) {
     super(bins, 0.0, 1.0, adapter);
     this.destsize = bins;
     this.downsampler = adapter;
@@ -155,9 +156,10 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       // Resampling.
       ArrayList<T> newdata = new ArrayList<T>(this.destsize * 2);
       for(int i = 0; i < super.size; i += 2) {
-        if (i + 1 < super.size) {
+        if(i + 1 < super.size) {
           newdata.add(downsampler.downsample(super.data.get(i), super.data.get(i + 1)));
-        } else {
+        }
+        else {
           newdata.add(downsampler.downsample(super.data.get(i), super.make()));
         }
       }
@@ -393,32 +395,32 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * @param bins Number of bins.
    * @return New Histogram object
    */
-  public static FlexiHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>> IntSumIntSumHistogram(int bins) {
-    return new FlexiHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>>(bins, new Adapter<Pair<Integer, Integer>, Pair<Integer, Integer>>() {
+  public static FlexiHistogram<IntIntPair, IntIntPair> IntSumIntSumHistogram(int bins) {
+    return new FlexiHistogram<IntIntPair, IntIntPair>(bins, new Adapter<IntIntPair, IntIntPair>() {
       @Override
-      public Pair<Integer, Integer> make() {
-        return new Pair<Integer, Integer>(0,0);
+      public IntIntPair make() {
+        return new IntIntPair(0, 0);
       }
 
       @Override
-      public Pair<Integer, Integer> cloneForCache(Pair<Integer, Integer> data) {
-        return new Pair<Integer, Integer>(data.getFirst(), data.getSecond());
+      public IntIntPair cloneForCache(IntIntPair data) {
+        return new IntIntPair(data.first, data.second);
       }
 
       @Override
-      public Pair<Integer, Integer> downsample(Pair<Integer, Integer> first, Pair<Integer, Integer> second) {
-        return new Pair<Integer, Integer>(first.getFirst() + second.getFirst(), first.getSecond() + second.getSecond());
+      public IntIntPair downsample(IntIntPair first, IntIntPair second) {
+        return new IntIntPair(first.first + second.first, first.second + second.second);
       }
 
       @Override
-      public Pair<Integer, Integer> aggregate(Pair<Integer, Integer> existing, Pair<Integer, Integer> data) {
-        existing.setFirst(existing.getFirst() + data.getFirst());
-        existing.setSecond(existing.getSecond() + data.getSecond());
+      public IntIntPair aggregate(IntIntPair existing, IntIntPair data) {
+        existing.first = existing.first + data.first;
+        existing.second = existing.second + data.second;
         return existing;
       }
     });
   }
-  
+
   /**
    * Histograms that work like two {@link #LongSumHistogram}, component wise.
    * 
@@ -429,7 +431,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
     return new FlexiHistogram<Pair<Long, Long>, Pair<Long, Long>>(bins, new Adapter<Pair<Long, Long>, Pair<Long, Long>>() {
       @Override
       public Pair<Long, Long> make() {
-        return new Pair<Long, Long>(0L,0L);
+        return new Pair<Long, Long>(0L, 0L);
       }
 
       @Override
@@ -461,7 +463,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
     return new FlexiHistogram<DoubleDoublePair, DoubleDoublePair>(bins, new Adapter<DoubleDoublePair, DoubleDoublePair>() {
       @Override
       public DoubleDoublePair make() {
-        return new DoubleDoublePair(0.,0.);
+        return new DoubleDoublePair(0., 0.);
       }
 
       @Override
@@ -476,8 +478,8 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
 
       @Override
       public DoubleDoublePair aggregate(DoubleDoublePair existing, DoubleDoublePair data) {
-        existing.setFirst(existing.first + data.first);
-        existing.setSecond(existing.second + data.second);
+        existing.first = existing.first + data.first;
+        existing.second = existing.second + data.second;
         return existing;
       }
     });

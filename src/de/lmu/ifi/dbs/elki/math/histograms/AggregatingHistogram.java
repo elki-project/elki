@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.histograms;
 
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -48,7 +49,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
    * Adapter class for an AggregatingHistogram
    * 
    * @author Erich Schubert
-   *
+   * 
    * @param <T> Histogram bin type
    * @param <D> Incoming data type
    */
@@ -64,7 +65,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
   }
 
   /**
-   * Constructor with Adapter. 
+   * Constructor with Adapter.
    * 
    * @param bins Number of bins
    * @param min Minimum value
@@ -183,31 +184,31 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
    * Histograms that work like two {@link #IntSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
-   * @param min Minimum value 
+   * @param min Minimum value
    * @param max Maximum value
    * @return Histogram object
    */
-  public static AggregatingHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>> IntSumIntSumHistogram(int bins, double min, double max) {
-    return new AggregatingHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>>(bins, min, max, new Adapter<Pair<Integer, Integer>, Pair<Integer, Integer>>() {
+  public static AggregatingHistogram<IntIntPair, IntIntPair> IntSumIntSumHistogram(int bins, double min, double max) {
+    return new AggregatingHistogram<IntIntPair, IntIntPair>(bins, min, max, new Adapter<IntIntPair, IntIntPair>() {
       @Override
-      public Pair<Integer, Integer> make() {
-        return new Pair<Integer, Integer>(0,0);
+      public IntIntPair make() {
+        return new IntIntPair(0, 0);
       }
 
       @Override
-      public Pair<Integer, Integer> aggregate(Pair<Integer, Integer> existing, Pair<Integer, Integer> data) {
-        existing.setFirst(existing.getFirst() + data.getFirst());
-        existing.setSecond(existing.getSecond() + data.getSecond());
+      public IntIntPair aggregate(IntIntPair existing, IntIntPair data) {
+        existing.first = existing.first + data.first;
+        existing.second = existing.second + data.second;
         return existing;
       }
     });
   }
-  
+
   /**
    * Histograms that work like two {@link #LongSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
-   * @param min Minimum value 
+   * @param min Minimum value
    * @param max Maximum value
    * @return Histogram object
    */
@@ -215,7 +216,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
     return new AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>>(bins, min, max, new Adapter<Pair<Long, Long>, Pair<Long, Long>>() {
       @Override
       public Pair<Long, Long> make() {
-        return new Pair<Long, Long>(0L,0L);
+        return new Pair<Long, Long>(0L, 0L);
       }
 
       @Override
@@ -226,12 +227,12 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
       }
     });
   }
-  
+
   /**
    * Histograms that work like two {@link #DoubleSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
-   * @param min Minimum value 
+   * @param min Minimum value
    * @param max Maximum value
    * @return Histogram object
    */
@@ -239,13 +240,13 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
     return new AggregatingHistogram<DoubleDoublePair, DoubleDoublePair>(bins, min, max, new Adapter<DoubleDoublePair, DoubleDoublePair>() {
       @Override
       public DoubleDoublePair make() {
-        return new DoubleDoublePair(0.,0.);
+        return new DoubleDoublePair(0., 0.);
       }
 
       @Override
       public DoubleDoublePair aggregate(DoubleDoublePair existing, DoubleDoublePair data) {
-        existing.setFirst(existing.first + data.first);
-        existing.setSecond(existing.second + data.second);
+        existing.first = existing.first + data.first;
+        existing.second = existing.second + data.second;
         return existing;
       }
     });
