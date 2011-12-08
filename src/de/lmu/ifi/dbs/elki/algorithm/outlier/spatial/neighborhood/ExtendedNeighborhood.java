@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -132,15 +133,15 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
       // Expand multiple steps
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Expanding neighborhoods", database.size(), logger) : null;
       for(final DBID id : database.iterDBIDs()) {
-        ModifiableDBIDs res = DBIDUtil.newHashSet(id);
+        HashSetModifiableDBIDs res = DBIDUtil.newHashSet(id);
         DBIDs todo = id;
         for(int i = 0; i < steps; i++) {
           ModifiableDBIDs ntodo = DBIDUtil.newHashSet();
           for(final DBID oid : todo) {
             DBIDs add = innerinst.getNeighborDBIDs(oid);
             if(add != null) {
-              for (DBID nid: add) {
-                if (res.contains(add)) {
+              for(DBID nid : add) {
+                if(res.contains(nid)) {
                   continue;
                 }
                 ntodo.add(nid);
@@ -148,7 +149,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
               }
             }
           }
-          if (ntodo.size() == 0) {
+          if(ntodo.size() == 0) {
             continue;
           }
           todo = ntodo;
