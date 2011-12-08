@@ -99,7 +99,7 @@ public class MaskedDBIDs implements DBIDs {
   }
 
   @Override
-  public boolean contains(Object o) {
+  public boolean contains(DBID o) {
     // TODO: optimize.
     for(DBID id : this) {
       if(id.equals(o)) {

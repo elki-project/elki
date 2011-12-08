@@ -130,17 +130,12 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
     return ids.length;
   }
 
-  /*
-   * "Contains" operations
-   */
   @Override
-  public boolean contains(Object o) {
-    if(o instanceof DBID) {
-      int oid = ((DBID) o).getIntegerID();
-      for(int i = 0; i < ids.length; i++) {
-        if(ids[i] == oid) {
-          return true;
-        }
+  public boolean contains(DBID o) {
+    final int oid = o.getIntegerID();
+    for(int i = 0; i < ids.length; i++) {
+      if(ids[i] == oid) {
+        return true;
       }
     }
     return false;

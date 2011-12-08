@@ -77,11 +77,8 @@ public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements Arra
   }
 
   @Override
-  public boolean contains(Object o) {
-    if(o instanceof DBID) {
-      return getStore().contains(((DBID) o).getIntegerID());
-    }
-    return false;
+  public boolean contains(DBID o) {
+    return getStore().contains(o.getIntegerID());
   }
 
   @Override

@@ -23,14 +23,12 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Set;
-
 /**
  * Set-oriented implementation of a modifiable DBID collection.
  * 
  * @author Erich Schubert
  */
-public interface HashSetModifiableDBIDs extends Set<DBID>, HashSetDBIDs, ModifiableDBIDs {
+public interface HashSetModifiableDBIDs extends HashSetDBIDs, ModifiableDBIDs {
   /**
    * Retain all elements that also are in the second set.
    * 

@@ -47,7 +47,7 @@ class EmptyDBIDs implements ArrayStaticDBIDs {
   }
 
   @Override
-  public boolean contains(Object o) {
+  public boolean contains(DBID o) {
     return false;
   }
 

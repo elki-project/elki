@@ -55,7 +55,7 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
   }
 
   @Override
-  public boolean contains(Object o) {
+  public boolean contains(DBID o) {
     return inner.contains(o);
   }
 

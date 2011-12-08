@@ -117,4 +117,9 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
   public DBIDIter iter() {
     return new DBIDIterAdapter(iterator());
   }
+
+  @Override
+  public boolean contains(DBID o) {
+    return super.contains(o);
+  }
 }

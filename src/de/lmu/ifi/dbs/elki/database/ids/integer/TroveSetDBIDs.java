@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -54,10 +55,7 @@ public abstract class TroveSetDBIDs extends AbstractSet<DBID> implements SetDBID
   }
 
   @Override
-  public boolean contains(Object o) {
-    if(o instanceof DBID) {
-      return getStore().contains(((DBID) o).getIntegerID());
-    }
-    return false;
+  public boolean contains(DBID o) {
+    return getStore().contains(((DBID) o).getIntegerID());
   }
 }

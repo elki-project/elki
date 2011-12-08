@@ -137,18 +137,15 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
   }
 
   @Override
-  public boolean contains(Object o) {
-    if(o instanceof DBID) {
-      int oid = ((DBID) o).getIntegerID();
-      if(oid < start) {
-        return false;
-      }
-      if(oid >= start + len) {
-        return false;
-      }
-      return true;
+  public boolean contains(DBID o) {
+    int oid = o.getIntegerID();
+    if(oid < start) {
+      return false;
     }
-    return false;
+    if(oid >= start + len) {
+      return false;
+    }
+    return true;
   }
 
   @SuppressWarnings("unchecked")
