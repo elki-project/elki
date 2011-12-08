@@ -109,7 +109,7 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   public void sort(Comparator<? super DBID> comparator) {
     Collections.sort(this, comparator);
   }
-  
+
   @Override
   public DBIDIter iter() {
     return new DBIDIterAdapter(iterator());
@@ -118,5 +118,10 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   @Override
   public int binarySearch(DBID key) {
     return Collections.binarySearch(this, key);
+  }
+
+  @Override
+  public boolean contains(DBID o) {
+    return super.contains(o);
   }
 }

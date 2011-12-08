@@ -130,8 +130,8 @@ class IntegerDBID implements DBID {
   }
 
   @Override
-  public boolean contains(Object o) {
-    return equals(o);
+  public boolean contains(DBID o) {
+    return o.getIntegerID() == id;
   }
 
   @Override

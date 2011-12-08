@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -42,7 +41,7 @@ public interface DBIDs extends Iterable<DBID> {
    */
   @Override
   public Iterator<DBID> iterator();
-  
+
   /**
    * Get a DBIDIterator (a more efficient API).
    * 
@@ -56,15 +55,14 @@ public interface DBIDs extends Iterable<DBID> {
    * @return collection size
    */
   public int size();
-  
+
   /**
    * Test whether an ID is contained.
-   * Signature compatible with {@link Collection}.
    * 
    * @param o object to test
    * @return true when contained
    */
-  public boolean contains(Object o);
+  public boolean contains(DBID o);
 
   /**
    * Test for an empty DBID collection.

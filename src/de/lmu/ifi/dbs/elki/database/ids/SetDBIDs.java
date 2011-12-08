@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Set;
 
 /**
  * Interface for DBIDs that support fast "set" operations, in particular
@@ -31,6 +30,6 @@ import java.util.Set;
  * 
  * @author Erich Schubert
  */
-public interface SetDBIDs extends DBIDs, Set<DBID> {
+public interface SetDBIDs extends DBIDs {
   // empty marker interface
 }

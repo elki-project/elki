@@ -79,7 +79,7 @@ public class MergedDBIDs implements DBIDs {
   }
 
   @Override
-  public boolean contains(Object o) {
+  public boolean contains(DBID o) {
     for(DBIDs child : childs) {
       if(child.contains(o)) {
         return true;

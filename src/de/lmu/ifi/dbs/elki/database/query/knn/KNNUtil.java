@@ -284,8 +284,7 @@ public final class KNNUtil {
     }
 
     @Override
-    public boolean contains(Object o) {
-      // TODO: optimize
+    public boolean contains(DBID o) {
       for(DBID id : this) {
         if(id.equals(o)) {
           return true;
