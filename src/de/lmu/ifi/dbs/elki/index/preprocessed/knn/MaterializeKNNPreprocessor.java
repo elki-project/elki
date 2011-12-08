@@ -211,7 +211,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    *         updated
    */
   private ArrayDBIDs updateKNNsAfterInsertion(DBIDs ids) {
-    ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
+    ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for(DBID id1 : oldids) {
       KNNResult<D> kNNs = storage.get(id1);
@@ -246,7 +246,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    */
   private ArrayDBIDs updateKNNsAfterDeletion(DBIDs ids) {
     SetDBIDs idsSet = DBIDUtil.ensureSet(ids);
-    ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
+    ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     for(DBID id1 : relation.iterDBIDs()) {
       KNNResult<D> kNNs = storage.get(id1);
       for(DistanceResultPair<D> kNN : kNNs) {
@@ -352,7 +352,9 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
         ids.add(drp.getDBID());
       }
     }
-    ids.removeAll(remove);
+    for(DBID id : remove) {
+      ids.remove(id);
+    }
     // Convert back to array
     return DBIDUtil.newArray(ids);
   }

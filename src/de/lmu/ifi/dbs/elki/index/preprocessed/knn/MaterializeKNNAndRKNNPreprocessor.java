@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -166,7 +167,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    *         updated
    */
   private ArrayDBIDs updateKNNsAndRkNNs(DBIDs ids) {
-    ArrayDBIDs rkNN_ids = DBIDUtil.newArray();
+    ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for(DBID id1 : oldids) {
       KNNResult<D> kNNs = storage.get(id1);
