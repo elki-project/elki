@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 /**
  * Histogram with flexible size, guaranteed to be in [bin, 2*bin[

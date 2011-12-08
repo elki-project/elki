@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.scales;
+package de.lmu.ifi.dbs.elki.math.scales;
 
 /*
  This file is part of ELKI:

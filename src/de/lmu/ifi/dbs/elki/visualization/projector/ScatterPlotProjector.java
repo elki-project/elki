@@ -30,6 +30,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.math.scales.Scales;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -38,8 +40,6 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projections.Simple2D;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
 
 /**

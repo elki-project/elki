@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 /*
  This file is part of ELKI:

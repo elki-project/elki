@@ -37,12 +37,12 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**

@@ -1,9 +1,9 @@
 package experimentalcode.students.roedler.parallelCoordinates.projections;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 public interface ProjectionParallel extends Projection {
 

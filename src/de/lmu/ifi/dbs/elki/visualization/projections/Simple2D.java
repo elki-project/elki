@@ -27,7 +27,7 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 
 /**
  * Dimension-selecting 2D projection.
