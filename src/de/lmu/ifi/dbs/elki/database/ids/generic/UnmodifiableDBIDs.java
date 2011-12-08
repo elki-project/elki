@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -54,11 +52,6 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
   public UnmodifiableDBIDs(DBIDs inner) {
     super();
     this.inner = inner;
-  }
-
-  @Override
-  public Collection<DBID> asCollection() {
-    return Collections.unmodifiableCollection(inner.asCollection());
   }
 
   @Override

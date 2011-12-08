@@ -23,9 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.AbstractCollection;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -40,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs
  */
-public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Collection<DBID> {
+public class MaskedDBIDs implements DBIDs {
   /**
    * Data storage
    */
@@ -79,7 +77,7 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
       return new Itr();
     }
   }
-  
+
   @Override
   public DBIDIter iter() {
     if(inverse) {
@@ -91,11 +89,6 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
   }
 
   @Override
-  public Collection<DBID> asCollection() {
-    return this;
-  }
-
-  @Override
   public int size() {
     if(inverse) {
       return data.size() - bits.cardinality();
@@ -103,6 +96,22 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
     else {
       return bits.cardinality();
     }
+  }
+
+  @Override
+  public boolean contains(Object o) {
+    // TODO: optimize.
+    for(DBID id : this) {
+      if(id.equals(o)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return size() == 0;
   }
 
   /**
@@ -261,20 +270,5 @@ public class MaskedDBIDs extends AbstractCollection<DBID> implements DBIDs, Coll
     public DBID getDBID() {
       return data.get(pos);
     }
-  }
-
-  @Override
-  public boolean add(DBID e) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean remove(Object o) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException();
   }
 }

@@ -36,13 +36,6 @@ import java.util.Iterator;
  */
 public interface DBIDs extends Iterable<DBID> {
   /**
-   * Retrieve collection access to the IDs
-   * 
-   * @return a collection of IDs
-   */
-  public Collection<DBID> asCollection();
-
-  /**
    * Retrieve Iterator access to the IDs.
    * 
    * @return an iterator for the IDs

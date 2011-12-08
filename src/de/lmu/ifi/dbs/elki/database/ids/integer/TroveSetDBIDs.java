@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import gnu.trove.set.TIntSet;
 
 import java.util.AbstractSet;
-import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -52,11 +51,6 @@ public abstract class TroveSetDBIDs extends AbstractSet<DBID> implements SetDBID
   @Override
   public int size() {
     return getStore().size();
-  }
-
-  @Override
-  public Collection<DBID> asCollection() {
-    return this;
   }
 
   @Override

@@ -23,20 +23,31 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 /**
  * Interface for array based DBIDs.
  * 
  * @author Erich Schubert
  */
-public interface ArrayDBIDs extends DBIDs, List<DBID> {
+public interface ArrayDBIDs extends DBIDs {
   /**
    * Get the i'th entry (starting at 0)
    * 
    * @param i Index
    * @return DBID of i'th entry.
    */
-  // In List<DBID> which confuses the java compiler
-  /* public DBID get(int i); */
+  public DBID get(int i);
+
+  /**
+   * Iterable
+   * 
+   * @return Iterator
+   */
+  public DBIDIter iter();
+
+  /**
+   * Size of the DBID "collection".
+   * 
+   * @return size
+   */
+  public int size();
 }

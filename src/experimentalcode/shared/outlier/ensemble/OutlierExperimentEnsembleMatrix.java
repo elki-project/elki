@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -121,7 +121,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
       }
     }
 
-    ArrayDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
     ids.remove(firstid);
     final int size = ids.size();
 

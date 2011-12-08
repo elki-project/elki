@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 /**
  * Database ID object.
  * 
@@ -39,7 +37,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @apiviz.landmark
  */
-public interface DBID extends Comparable<DBID>, ArrayStaticDBIDs {
+public interface DBID extends Comparable<DBID>, ArrayDBIDs {
   /**
    * Return the integer value of the object ID, if possible.
    * 

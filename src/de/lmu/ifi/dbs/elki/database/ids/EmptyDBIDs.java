@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -36,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
  * 
  * @author Erich Schubert
  */
-class EmptyDBIDs extends AbstractList<DBID> implements ArrayStaticDBIDs {
+class EmptyDBIDs implements ArrayStaticDBIDs {
   /**
    * Empty DBID iterator
    */
@@ -47,11 +44,6 @@ class EmptyDBIDs extends AbstractList<DBID> implements ArrayStaticDBIDs {
    */
   protected EmptyDBIDs() {
     super();
-  }
-
-  @Override
-  public Collection<DBID> asCollection() {
-    return new ArrayList<DBID>(0);
   }
 
   @Override

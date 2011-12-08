@@ -24,8 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import java.nio.ByteBuffer;
-import java.util.AbstractList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -51,7 +49,7 @@ import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
  * @apiviz.composedOf DynamicSerializer
  * @apiviz.composedOf StaticSerializer
  */
-class IntegerDBID extends AbstractList<DBID> implements DBID {
+class IntegerDBID implements DBID {
   /**
    * The actual object ID.
    */
@@ -114,23 +112,26 @@ class IntegerDBID extends AbstractList<DBID> implements DBID {
   }
 
   @Override
-  public Collection<DBID> asCollection() {
-    return this;
+  public DBIDIter iter() {
+    return new DBIDItr();
   }
 
   @Override
-  public boolean contains(Object o) {
-    return this.equals(o);
+  public DBID get(int i) {
+    if(i != 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    return this;
   }
 
   @Override
   public Iterator<DBID> iterator() {
     return new Itr();
   }
-  
+
   @Override
-  public DBIDIter iter() {
-    return new DBIDItr();
+  public boolean contains(Object o) {
+    return equals(o);
   }
 
   @Override
@@ -206,16 +207,6 @@ class IntegerDBID extends AbstractList<DBID> implements DBID {
   @Override
   public boolean isEmpty() {
     return false;
-  }
-
-  @Override
-  public DBID get(int i) {
-    if(i == 0) {
-      return this;
-    }
-    else {
-      throw new ArrayIndexOutOfBoundsException();
-    }
   }
 
   /**

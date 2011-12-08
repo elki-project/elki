@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -32,11 +31,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
-
 /**
  * Array-oriented implementation of a modifiable DBID collection.
  * 
- * This should only be instantiated by a {@link de.lmu.ifi.dbs.elki.database.ids.DBIDFactory}!
+ * This should only be instantiated by a
+ * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDFactory}!
  * 
  * Use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newArray}!
  * 
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @apiviz.uses DBID
  */
-public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements ArrayModifiableDBIDs  {
+public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements ArrayModifiableDBIDs {
   /**
    * Serial version
    */
@@ -72,22 +71,27 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
    * @param c Existing DBIDs.
    */
   public GenericArrayModifiableDBIDs(DBIDs c) {
-    super(c.asCollection());
-  }
-
-  @Override
-  public Collection<DBID> asCollection() {
-    return this;
+    super(c.size());
+    addDBIDs(c);
   }
 
   @Override
   public boolean addDBIDs(DBIDs ids) {
-    return super.addAll(ids.asCollection());
+    super.ensureCapacity(size() + ids.size());
+    boolean changed = false;
+    for(DBID id : ids) {
+      changed |= add(id);
+    }
+    return changed;
   }
 
   @Override
   public boolean removeDBIDs(DBIDs ids) {
-    return super.removeAll(ids.asCollection());
+    boolean changed = false;
+    for(DBID id : ids) {
+      changed |= remove(id);
+    }
+    return changed;
   }
 
   @Override
