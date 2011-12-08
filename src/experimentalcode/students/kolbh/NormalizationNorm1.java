@@ -1,19 +1,13 @@
 package experimentalcode.students.kolbh;
 
-  import java.util.List;
-
   import de.lmu.ifi.dbs.elki.data.NumberVector;
-  import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-  import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-  import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
-  import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
-  import de.lmu.ifi.dbs.elki.logging.Logging;
-  import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-  import de.lmu.ifi.dbs.elki.utilities.Util;
-  import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-  import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-  import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-  import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
   /**
    * Class to perform a normalization on vectors to norm 1.

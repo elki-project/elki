@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -190,7 +190,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       histogram.aggregate(pos, inc);
     }
     // for scaling, get the maximum occurring value in the bins:
-    for(Pair<Double, double[]> bin : histogram) {
+    for(DoubleObjPair<double[]> bin : histogram) {
       for(double val : bin.second) {
         minmax.put(val);
       }
@@ -225,9 +225,9 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     double binwidth = histogram.getBinsize();
     // Visualizing
     if(!curves) {
-      for(Pair<Double, double[]> bin : histogram) {
-        double lpos = xscale.getScaled(bin.getFirst() - binwidth / 2);
-        double rpos = xscale.getScaled(bin.getFirst() + binwidth / 2);
+      for(DoubleObjPair<double[]> bin : histogram) {
+        double lpos = xscale.getScaled(bin.first - binwidth / 2);
+        double rpos = xscale.getScaled(bin.first + binwidth / 2);
         double stack = 0.0;
         final int start = numc > 0 ? 1 : 0;
         for(int key = start; key < cols; key++) {
@@ -251,9 +251,9 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       }
 
       // draw histogram lines
-      for(Pair<Double, double[]> bin : histogram) {
-        left = xscale.getScaled(bin.getFirst() - binwidth / 2);
-        right = xscale.getScaled(bin.getFirst() + binwidth / 2);
+      for(DoubleObjPair<double[]> bin : histogram) {
+        left = xscale.getScaled(bin.first - binwidth / 2);
+        right = xscale.getScaled(bin.first + binwidth / 2);
         for(int i = 0; i < cols; i++) {
           double val = yscale.getScaled(bin.getSecond()[i]);
           if(lasty[i] != val) {

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
@@ -49,7 +51,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   /**
    * Cache for elements when not yet initialized.
    */
-  private ArrayList<Pair<Double, D>> tempcache = null;
+  private ArrayList<DoubleObjPair<D>> tempcache = null;
 
   /**
    * Destination (minimum) size of the structure. At most 2*destsize bins are
@@ -99,7 +101,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
     super(bins, 0.0, 1.0, adapter);
     this.destsize = bins;
     this.downsampler = adapter;
-    tempcache = new ArrayList<Pair<Double, D>>(this.destsize * 2);
+    tempcache = new ArrayList<DoubleObjPair<D>>(this.destsize * 2);
   }
 
   private synchronized void materialize() {
@@ -115,7 +117,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
     }
     double min = Double.MAX_VALUE;
     double max = Double.MIN_VALUE;
-    for(Pair<Double, D> pair : tempcache) {
+    for(DoubleObjPair<D> pair : tempcache) {
       min = Math.min(min, pair.first);
       max = Math.max(max, pair.first);
     }
@@ -132,7 +134,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       this.data.add(downsampler.make());
     }
     // re-insert data we have
-    for(Pair<Double, D> pair : tempcache) {
+    for(DoubleObjPair<D> pair : tempcache) {
       super.aggregate(pair.first, pair.second);
     }
     // delete cache, signal that we're initialized
@@ -227,13 +229,13 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   }
 
   @Override
-  public Iterator<Pair<Double, T>> iterator() {
+  public Iterator<DoubleObjPair<T>> iterator() {
     materialize();
     return super.iterator();
   }
 
   @Override
-  public Iterator<Pair<Double, T>> reverseIterator() {
+  public Iterator<DoubleObjPair<T>> reverseIterator() {
     materialize();
     return super.reverseIterator();
   }
@@ -242,7 +244,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   public void aggregate(double coord, D value) {
     if(tempcache != null) {
       if(tempcache.size() < this.destsize * 2) {
-        tempcache.add(new Pair<Double, D>(coord, downsampler.cloneForCache(value)));
+        tempcache.add(new DoubleObjPair<D>(coord, downsampler.cloneForCache(value)));
         return;
       }
       else {
@@ -455,27 +457,27 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * @param bins Number of bins.
    * @return New Histogram object
    */
-  public static FlexiHistogram<Pair<Double, Double>, Pair<Double, Double>> DoubleSumDoubleSumHistogram(int bins) {
-    return new FlexiHistogram<Pair<Double, Double>, Pair<Double, Double>>(bins, new Adapter<Pair<Double, Double>, Pair<Double, Double>>() {
+  public static FlexiHistogram<DoubleDoublePair, DoubleDoublePair> DoubleSumDoubleSumHistogram(int bins) {
+    return new FlexiHistogram<DoubleDoublePair, DoubleDoublePair>(bins, new Adapter<DoubleDoublePair, DoubleDoublePair>() {
       @Override
-      public Pair<Double, Double> make() {
-        return new Pair<Double, Double>(0.,0.);
+      public DoubleDoublePair make() {
+        return new DoubleDoublePair(0.,0.);
       }
 
       @Override
-      public Pair<Double, Double> cloneForCache(Pair<Double, Double> data) {
-        return new Pair<Double, Double>(data.getFirst(), data.getSecond());
+      public DoubleDoublePair cloneForCache(DoubleDoublePair data) {
+        return new DoubleDoublePair(data.first, data.second);
       }
 
       @Override
-      public Pair<Double, Double> downsample(Pair<Double, Double> first, Pair<Double, Double> second) {
-        return new Pair<Double, Double>(first.getFirst() + second.getFirst(), first.getSecond() + second.getSecond());
+      public DoubleDoublePair downsample(DoubleDoublePair first, DoubleDoublePair second) {
+        return new DoubleDoublePair(first.first + second.first, first.second + second.second);
       }
 
       @Override
-      public Pair<Double, Double> aggregate(Pair<Double, Double> existing, Pair<Double, Double> data) {
-        existing.setFirst(existing.getFirst() + data.getFirst());
-        existing.setSecond(existing.getSecond() + data.getSecond());
+      public DoubleDoublePair aggregate(DoubleDoublePair existing, DoubleDoublePair data) {
+        existing.setFirst(existing.first + data.first);
+        existing.setSecond(existing.second + data.second);
         return existing;
       }
     });

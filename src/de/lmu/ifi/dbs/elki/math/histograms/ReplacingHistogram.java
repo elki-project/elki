@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.histograms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <T> Histogram data type.
  */
-public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
+public class ReplacingHistogram<T> implements Iterable<DoubleObjPair<T>> {
   /**
    * Interface to plug in a data type T.
    * 
@@ -305,7 +306,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * 
    * @apiviz.exclude
    */
-  protected class Iter implements Iterator<Pair<Double, T>> {
+  protected class Iter implements Iterator<DoubleObjPair<T>> {
     /**
      * Current bin number
      */
@@ -317,8 +318,8 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
     }
 
     @Override
-    public Pair<Double, T> next() {
-      Pair<Double, T> pair = new Pair<Double, T>(base + (bin + 0.5 - offset) * binsize, data.get(bin));
+    public DoubleObjPair<T> next() {
+      DoubleObjPair<T> pair = new DoubleObjPair<T>(base + (bin + 0.5 - offset) * binsize, data.get(bin));
       bin++;
       return pair;
     }
@@ -336,7 +337,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * 
    * @apiviz.exclude
    */
-  protected class RIter implements Iterator<Pair<Double, T>> {
+  protected class RIter implements Iterator<DoubleObjPair<T>> {
     /**
      * Current bin number
      */
@@ -348,8 +349,8 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
     }
 
     @Override
-    public Pair<Double, T> next() {
-      Pair<Double, T> pair = new Pair<Double, T>(base + (bin + 0.5 - offset) * binsize, data.get(bin));
+    public DoubleObjPair<T> next() {
+      DoubleObjPair< T> pair = new DoubleObjPair<T>(base + (bin + 0.5 - offset) * binsize, data.get(bin));
       bin--;
       return pair;
     }
@@ -364,7 +365,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * Get an iterator over all histogram bins.
    */
   @Override
-  public Iterator<Pair<Double, T>> iterator() {
+  public Iterator<DoubleObjPair<T>> iterator() {
     return new Iter();
   }
 
@@ -372,7 +373,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * Get an iterator over all histogram bins.
    */
   // TODO: is there some interface to implement.
-  public Iterator<Pair<Double, T>> reverseIterator() {
+  public Iterator<DoubleObjPair<T>> reverseIterator() {
     return new RIter();
   }
 

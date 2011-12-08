@@ -29,10 +29,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.histograms.FlexiHistogram;
-import de.lmu.ifi.dbs.elki.math.histograms.ReplacingHistogram;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * JUnit test to test the {@link ReplacingHistogram} class.
@@ -70,15 +68,15 @@ public class TestFlexiHistogram implements JUnit4Test {
 
     // compare results via Iterator.
     int off = 0;
-    for(Pair<Double, Double> pair : hist) {
-      assertEquals("Array iterator bin position", -0.1 + 0.2 * off, pair.getFirst(), 0.00001);
+    for(DoubleObjPair<Double> pair : hist) {
+      assertEquals("Array iterator bin position", -0.1 + 0.2 * off, pair.first, 0.00001);
       assertEquals("Array iterator bin contents", resized[off], pair.getSecond(), 0.00001);
       off++;
     }
     // backwards...
     off--;
-    for(Pair<Double, Double> pair : IterableUtil.fromIterator(hist.reverseIterator())) {
-      assertEquals("Array iterator bin position", -0.1 + 0.2 * off, pair.getFirst(), 0.00001);
+    for(DoubleObjPair<Double> pair : IterableUtil.fromIterator(hist.reverseIterator())) {
+      assertEquals("Array iterator bin position", -0.1 + 0.2 * off, pair.first, 0.00001);
       assertEquals("Array iterator bin contents", resized[off], pair.getSecond(), 0.00001);
       off--;
     }

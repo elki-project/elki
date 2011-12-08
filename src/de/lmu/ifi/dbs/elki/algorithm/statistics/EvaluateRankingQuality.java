@@ -62,8 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Evaluate a distance function with respect to kNN queries. For each point, the
@@ -175,8 +175,8 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
-    for(Pair<Double, MeanVariance> pair : hist) {
-      DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getSampleVariance() });
+    for(DoubleObjPair<MeanVariance> pair : hist) {
+      DoubleVector row = new DoubleVector(new double[] { pair.first, pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getSampleVariance() });
       res.add(row);
     }
     return new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
