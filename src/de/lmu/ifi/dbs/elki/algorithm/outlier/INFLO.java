@@ -188,7 +188,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
         ModifiableDBIDs rnn = rnns.get(id);
 
         double denP = density.doubleValue(id);
-        knn.addAll(rnn);
+        knn.addDBIDs(rnn);
         double den = 0;
         for(DBID q : knn) {
           double denQ = density.doubleValue(q);

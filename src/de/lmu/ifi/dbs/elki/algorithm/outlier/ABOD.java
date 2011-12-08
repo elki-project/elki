@@ -176,7 +176,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   public OutlierResult getRanking(Relation<V> relation, int k) {
     // Fix a static set of IDs
     staticids = DBIDUtil.newArray(relation.getDBIDs());
-    Collections.sort(staticids);
+    staticids.sort();
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
     Heap<DoubleObjPair<DBID>> pq = new Heap<DoubleObjPair<DBID>>(relation.size(), Collections.reverseOrder());
@@ -239,7 +239,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   public OutlierResult getFastRanking(Relation<V> relation, int k, int sampleSize) {
     // Fix a static set of IDs
     staticids = DBIDUtil.newArray(relation.getDBIDs());
-    Collections.sort(staticids);
+    staticids.sort();
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
 
@@ -413,7 +413,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
   private int mapDBID(DBID aKey) {
     // TODO: this is not the most efficient...
-    int off = Collections.binarySearch(staticids, aKey);
+    int off = staticids.binarySearch(aKey);
     if(off < 0) {
       throw new AbortException("Did not find id " + aKey.toString() + " in staticids. " + staticids.contains(aKey));
     }

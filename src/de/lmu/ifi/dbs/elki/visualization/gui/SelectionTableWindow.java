@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collections;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
@@ -202,7 +201,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     DBIDSelection sel = context.getSelection();
     if(sel != null) {
       this.dbids = DBIDUtil.newArray(sel.getSelectedIds());
-      Collections.sort(this.dbids);
+      this.dbids.sort();
     }
     else {
       this.dbids = DBIDUtil.newArray();

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  */
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
@@ -101,7 +100,7 @@ public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, 
     if(!(this.rowIDs instanceof ModifiableDBIDs)) {
       this.rowIDs = DBIDUtil.newArray(this.rowIDs);
     }
-    Collections.sort((ArrayModifiableDBIDs) this.rowIDs);
+    ((ArrayModifiableDBIDs) this.rowIDs).sort();
     Arrays.sort(this.colIDs);
   }
 

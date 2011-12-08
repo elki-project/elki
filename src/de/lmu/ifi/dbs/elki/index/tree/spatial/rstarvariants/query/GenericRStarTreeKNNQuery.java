@@ -169,7 +169,9 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     }
     else {
       ModifiableDBIDs ids = DBIDUtil.newArray(knnLists.size());
-      ids.addAll(knnLists.keySet());
+      for(DBID id : knnLists.keySet()) {
+        ids.add(id);
+      }
       List<DistanceEntry<D, SpatialEntry>> entries = getSortedEntries(node, ids);
       for(DistanceEntry<D, SpatialEntry> distEntry : entries) {
         D minDist = distEntry.getDistance();

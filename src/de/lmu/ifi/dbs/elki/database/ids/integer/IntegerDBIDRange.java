@@ -186,4 +186,17 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
   public int getOffset(DBID dbid) {
     return dbid.getIntegerID() - start;
   }
+
+  @Override
+  public int binarySearch(DBID key) {
+    int keyid = key.getIntegerID();
+    if(keyid < start) {
+      return -1;
+    }
+    final int off = keyid - start;
+    if(off < len) {
+      return off;
+    }
+    return -(len + 1);
+  }
 }

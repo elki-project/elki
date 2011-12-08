@@ -170,7 +170,9 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     }
     else {
       ModifiableDBIDs ids = DBIDUtil.newArray(knnLists.size());
-      ids.addAll(knnLists.keySet());
+      for(DBID id : knnLists.keySet()) {
+        ids.add(id);
+      }
       List<DoubleDistanceEntry> entries = getSortedEntries(node, ids);
       for(DoubleDistanceEntry distEntry : entries) {
         double minDist = distEntry.distance;

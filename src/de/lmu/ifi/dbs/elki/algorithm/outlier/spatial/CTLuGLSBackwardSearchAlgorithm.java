@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -172,7 +170,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
     // We need stable indexed DBIDs
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relationx.getDBIDs());
     // Sort, so we can do a binary search below.
-    Collections.sort(ids);
+    ids.sort();
 
     // init F,X,Z
     Matrix X = new Matrix(ids.size(), 6);
@@ -216,7 +214,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
         final int nweight = -1 / neighborhood.size();
         // We need to find the index positions of the neighbors, unfortunately.
         for(DBID nid : neighborhood) {
-          int pos = Collections.binarySearch(ids, nid);
+          int pos = ids.binarySearch(nid);
           assert (pos >= 0);
           F.set(pos, i, nweight);
         }

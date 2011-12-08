@@ -96,7 +96,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   public DistanceParsingResult<D> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
-    
+
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
     Map<DBIDPair, D> distanceCache = new HashMap<DBIDPair, D>();
     try {
@@ -162,7 +162,12 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
       logger.debugFine("add to objectAndLabelsList");
     }
 
-    List<DBID> objects = new ArrayList<DBID>(ids);
+    // This is unusual for ELKI, but here we really need an ArrayList, not a
+    // DBIDs object. So convert.
+    List<DBID> objects = new ArrayList<DBID>(ids.size());
+    for(DBID id : ids) {
+      objects.add(id);
+    }
     return new DistanceParsingResult<D>(MultipleObjectsBundle.makeSimple(TypeUtil.DBID, objects), distanceCache);
   }
 

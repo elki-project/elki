@@ -76,6 +76,11 @@ class EmptyDBIDs implements ArrayStaticDBIDs {
     return EMPTY_ITERATOR;
   }
 
+  @Override
+  public int binarySearch(DBID key) {
+    return -1; // Not found
+  }
+
   /**
    * Iterator for empty DBIDs
    * 

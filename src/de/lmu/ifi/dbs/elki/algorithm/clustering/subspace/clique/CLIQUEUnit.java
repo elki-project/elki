@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
 /**
@@ -265,7 +266,7 @@ public class CLIQUEUnit<V extends NumberVector<V, ?>> {
     resultIntervals.add(this.intervals.last());
     resultIntervals.add(other.intervals.last());
 
-    ModifiableDBIDs resultIDs = DBIDUtil.newHashSet(this.ids);
+    HashSetModifiableDBIDs resultIDs = DBIDUtil.newHashSet(this.ids);
     resultIDs.retainAll(other.ids);
 
     if(resultIDs.size() / all >= tau) {

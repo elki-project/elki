@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -251,7 +250,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       clusters.get(minIndex).add(id);
     }
     for(ArrayModifiableDBIDs cluster : clusters) {
-      Collections.sort(cluster);
+      cluster.sort();
     }
     return clusters;
   }

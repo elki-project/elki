@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -165,5 +166,10 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
   @Override
   public DBID get(int i) {
     return DBIDFactory.FACTORY.importInteger(ids[i]);
+  }
+
+  @Override
+  public int binarySearch(DBID key) {
+    return Arrays.binarySearch(ids, key.getIntegerID());
   }
 }

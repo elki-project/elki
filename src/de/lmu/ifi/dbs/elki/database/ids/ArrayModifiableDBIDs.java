@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
+import java.util.Comparator;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,16 +25,38 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 /**
  * Array-oriented implementation of a modifiable DBID collection.
  * 
  * @author Erich Schubert
  */
-public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs, List<DBID> {
+public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
   /**
    * Sort the DBID set.
    */
   void sort();
+
+  /**
+   * Sort the DBID set.
+   * 
+   * @param comparator Comparator to use
+   */
+  void sort(Comparator<? super DBID> comparator);
+
+  /**
+   * Remove the i'th entry (starting at 0)
+   * 
+   * @param i Index
+   * @return value removed
+   */
+  public DBID remove(int i);
+
+  /**
+   * Replace the i'th entry (starting at 0)
+   * 
+   * @param i Index
+   * @param newval New value
+   * @return previous value
+   */
+  public DBID set(int i, DBID newval);
 }

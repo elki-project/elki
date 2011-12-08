@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -21,6 +22,9 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Collections;
+import java.util.Comparator;
 
 import gnu.trove.list.array.TIntArrayList;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -59,7 +63,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
 
   /**
    * Constructor.
-   *
+   * 
    * @param existing Existing ids
    */
   protected TroveArrayModifiableDBIDs(DBIDs existing) {
@@ -101,6 +105,11 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   }
 
   @Override
+  public boolean remove(DBID o) {
+    return store.remove(o.getIntegerID());
+  }
+
+  @Override
   public DBID set(int index, DBID element) {
     int prev = store.set(index, element.getIntegerID());
     return new IntegerDBID(prev);
@@ -119,5 +128,10 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   @Override
   public void sort() {
     store.sort();
+  }
+
+  @Override
+  public void sort(Comparator<? super DBID> comparator) {
+    Collections.sort(this, comparator);
   }
 }

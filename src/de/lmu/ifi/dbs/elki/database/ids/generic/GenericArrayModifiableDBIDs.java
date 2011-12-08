@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -89,9 +90,14 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   public boolean removeDBIDs(DBIDs ids) {
     boolean changed = false;
     for(DBID id : ids) {
-      changed |= remove(id);
+      changed |= super.remove(id);
     }
     return changed;
+  }
+
+  @Override
+  public boolean remove(DBID id) {
+    return super.remove(id);
   }
 
   @Override
@@ -100,7 +106,17 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   }
 
   @Override
+  public void sort(Comparator<? super DBID> comparator) {
+    Collections.sort(this, comparator);
+  }
+  
+  @Override
   public DBIDIter iter() {
     return new DBIDIterAdapter(iterator());
+  }
+
+  @Override
+  public int binarySearch(DBID key) {
+    return Collections.binarySearch(this, key);
   }
 }

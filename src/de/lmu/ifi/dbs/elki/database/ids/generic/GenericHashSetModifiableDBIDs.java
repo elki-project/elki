@@ -90,9 +90,14 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
   public boolean removeDBIDs(DBIDs ids) {
     boolean changed = false;
     for(DBID id : ids) {
-      changed |= remove(id);
+      changed |= super.remove(id);
     }
     return changed;
+  }
+
+  @Override
+  public boolean remove(DBID id) {
+    return super.remove(id);
   }
 
   @Override

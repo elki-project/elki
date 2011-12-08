@@ -298,6 +298,16 @@ public final class KNNUtil {
     public boolean isEmpty() {
       return parent.size() == 0;
     }
+
+    /**
+     * A binary search does not make sense here, as the (read-only) result is sorted by
+     * distance, not DBID. Thus unsupported.
+     */
+    @Override
+    @Deprecated
+    public int binarySearch(DBID key) {
+      throw new UnsupportedOperationException("Since the result is usually not sorted, a binary Search does not make sense!");
+    }
   }
 
   /**

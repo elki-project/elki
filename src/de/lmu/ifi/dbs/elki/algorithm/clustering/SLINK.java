@@ -288,7 +288,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     D stopdist = null;
     // sort by lambda
     ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
-    Collections.sort(order, new CompareByLambda<D>(lambda));
+    order.sort(new CompareByLambda<D>(lambda));
     int index = ids.size() - minclusters - 1;
     while(index >= 0) {
       if(lambda.get(order.get(index)).equals(lambda.get(order.get(index + 1)))) {
@@ -458,7 +458,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     // extract a hierarchical clustering
     ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
     // sort by lambda
-    Collections.sort(order, new CompareByLambda<D>(lambda));
+    order.sort(new CompareByLambda<D>(lambda));
     D curdist = null;
 
     D stopdist = null;

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.result.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
 import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -82,7 +81,7 @@ public class OrderingFromRelation implements OrderingResult {
   @Override
   public IterableIterator<DBID> iter(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
-    Collections.sort(sorted, new ImpliedComparator());
+    sorted.sort(new ImpliedComparator());
     return new IterableIteratorAdapter<DBID>(sorted);
   }
 

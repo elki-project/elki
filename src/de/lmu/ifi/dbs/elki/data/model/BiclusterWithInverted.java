@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
-
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -95,7 +93,7 @@ public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Biclus
   public void sortIDs() {
     super.sortIDs();
     if(this.invertedRows != null) {
-      Collections.sort(this.invertedRows);
+      this.invertedRows.sort();
     }
   }
 
