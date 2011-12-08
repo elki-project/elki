@@ -27,13 +27,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -164,16 +165,11 @@ public class InspectionUtil {
     ArrayList<Class<?>> res = new ArrayList<Class<?>>();
     ClassLoader cl = ClassLoader.getSystemClassLoader();
     for(Iterable<String> iter : iters) {
-      for(String classname : iter) {
-        boolean ignore = false;
+      nextclass: for(String classname : iter) {
         for(String pkg : ignorepackages) {
           if(classname.startsWith(pkg)) {
-            ignore = true;
-            break;
+            continue nextclass;
           }
-        }
-        if(ignore) {
-          continue;
         }
         try {
           Class<?> cls = cl.loadClass(classname);
@@ -286,9 +282,11 @@ public class InspectionUtil {
    * @apiviz.exclude
    */
   static class DirClassIterator implements Iterator<String>, Iterable<String> {
+    private static final int CLASS_EXT_LENGTH = ".class".length();
+
     private String prefix;
 
-    private Stack<File> set = new Stack<File>();
+    private Deque<File> set = new ArrayDeque<File>();
 
     private String cur;
 
@@ -324,13 +322,7 @@ public class InspectionUtil {
         // Classes
         if(f.getName().endsWith(".class")) {
           String name = f.getAbsolutePath();
-          if(name.startsWith(prefix)) {
-            name = name.substring(prefix.length());
-          }
-          else {
-            LoggingUtil.warning("I was expecting all directories to start with '" + prefix + "' but '" + name + "' did not.");
-          }
-          String classname = name.substring(0, name.length() - ".class".length());
+          String classname = name.substring(prefix.length(), name.length() - CLASS_EXT_LENGTH);
           if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
             return classname.replace(File.separatorChar, '.');
           }
@@ -341,7 +333,7 @@ public class InspectionUtil {
           for(File newf : f.listFiles()) {
             // TODO: do not recurse into ignored packages!.
             // Ignore unix-hidden files/dirs
-            if(!newf.getName().startsWith(".")) {
+            if(newf.getName().charAt(0) != '.') {
               set.push(newf);
             }
           }
