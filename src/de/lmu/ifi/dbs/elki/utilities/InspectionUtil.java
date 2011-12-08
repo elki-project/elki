@@ -299,6 +299,10 @@ public class InspectionUtil {
      */
     public DirClassIterator(File path) {
       this.prefix = path.getAbsolutePath();
+      if(prefix.charAt(prefix.length() - 1) != File.separatorChar) {
+        prefix = prefix + File.separatorChar;
+      }
+
       this.set.push(path);
       this.cur = findNext();
     }
@@ -317,19 +321,11 @@ public class InspectionUtil {
     private String findNext() {
       while(set.size() > 0) {
         File f = set.pop();
-        // Ignore unix-hidden files
-        if(f.getName().startsWith(".")) {
-          continue;
-        }
         // Classes
         if(f.getName().endsWith(".class")) {
           String name = f.getAbsolutePath();
           if(name.startsWith(prefix)) {
-            int l = prefix.length();
-            if(name.charAt(l) == File.separatorChar) {
-              l += 1;
-            }
-            name = name.substring(l);
+            name = name.substring(prefix.length());
           }
           else {
             LoggingUtil.warning("I was expecting all directories to start with '" + prefix + "' but '" + name + "' did not.");
@@ -342,9 +338,12 @@ public class InspectionUtil {
         }
         // recurse into directories
         if(f.isDirectory()) {
-          // TODO: do not recurse into ignored packages!.
           for(File newf : f.listFiles()) {
-            set.push(newf);
+            // TODO: do not recurse into ignored packages!.
+            // Ignore unix-hidden files/dirs
+            if(!newf.getName().startsWith(".")) {
+              set.push(newf);
+            }
           }
           continue;
         }
