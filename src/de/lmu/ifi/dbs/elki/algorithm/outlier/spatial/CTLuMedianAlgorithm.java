@@ -127,7 +127,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     final double stddev = mv.getNaiveStddev();
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBID id : relation.iterDBIDs()) {
-      double score = Math.abs((scores.get(id) - mean) / stddev);
+      double score = Math.abs((scores.doubleValue(id) - mean) / stddev);
       minmax.put(score);
       scores.putDouble(id, score);
     }

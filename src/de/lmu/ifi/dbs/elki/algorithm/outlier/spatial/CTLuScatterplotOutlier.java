@@ -142,7 +142,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     for(DBID id : relation.iterDBIDs()) {
       // Compute the error from the linear regression
       double y_i = relation.get(id).doubleValue(1);
-      double e = means.get(id) - (slope * y_i + inter);
+      double e = means.doubleValue(id) - (slope * y_i + inter);
       scores.putDouble(id, e);
       mv.put(e);
     }
@@ -153,7 +153,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       final double mean = mv.getMean();
       final double variance = mv.getNaiveStddev();
       for(DBID id : relation.iterDBIDs()) {
-        double score = Math.abs((scores.get(id) - mean) / variance);
+        double score = Math.abs((scores.doubleValue(id) - mean) / variance);
         minmax.put(score);
         scores.putDouble(id, score);
       }

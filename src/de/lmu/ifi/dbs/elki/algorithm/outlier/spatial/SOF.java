@@ -126,9 +126,9 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       double avg = 0;
       for(DBID n : neighbors) {
-        avg += lrds.get(n);
+        avg += lrds.doubleValue(n);
       }
-      final double lrd = (avg / neighbors.size()) / lrds.get(id);
+      final double lrd = (avg / neighbors.size()) / lrds.doubleValue(id);
       if (!Double.isNaN(lrd)) {
         lofs.putDouble(id, lrd);
         lofminmax.put(lrd);
