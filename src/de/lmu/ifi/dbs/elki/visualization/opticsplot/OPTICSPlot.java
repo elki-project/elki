@@ -25,11 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
@@ -42,6 +38,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
@@ -62,11 +59,6 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * Logger
    */
   protected static final Logging logger = Logging.getLogger(OPTICSPlot.class);
-
-  /**
-   * Prefix for filenames
-   */
-  private static final String IMGFILEPREFIX = "elki-optics-";
 
   /**
    * Scale to use
@@ -104,9 +96,9 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
   protected RenderedImage plot;
 
   /**
-   * The plot saved to a temp file.
+   * The plot number for Batik
    */
-  protected File tempFile;
+  protected int plotnum = -1;
 
   /**
    * Constructor.
@@ -245,7 +237,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * @return the scale
    */
   public LinearScale getScale() {
-    if(plot == null && tempFile == null) {
+    if(plot == null) {
       replot();
     }
     return scale;
@@ -255,7 +247,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * @return the width
    */
   public int getWidth() {
-    if(plot == null && tempFile == null) {
+    if(plot == null) {
       replot();
     }
     return width;
@@ -265,7 +257,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * @return the height
    */
   public int getHeight() {
-    if(plot == null && tempFile == null) {
+    if(plot == null) {
       replot();
     }
     return height;
@@ -277,7 +269,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * @return {@code width / height}
    */
   public double getRatio() {
-    if(plot == null && tempFile == null) {
+    if(plot == null) {
       replot();
     }
     return ((double) width) / height;
@@ -305,25 +297,23 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
   }
 
   /**
-   * Get a temporary file for the optics plot.
-   * 
-   * @return Temp file containing the plot
-   * @throws IOException
-   */
-  public File getAsTempFile() throws IOException {
-    if(tempFile == null) {
-      tempFile = File.createTempFile(IMGFILEPREFIX, ".png");
-      tempFile.deleteOnExit();
-      ImageIO.write(getPlot(), "PNG", tempFile);
-    }
-    return tempFile;
-  }
-
-  /**
    * Free memory used by rendered image.
    */
   public void forgetRenderedImage() {
+    plotnum = -1;
     plot = null;
+  }
+
+  /**
+   * Get the SVG registered plot number
+   * 
+   * @return Plot URI
+   */
+  public String getSVGPlotURI() {
+    if(plotnum < 0) {
+      plotnum = ThumbnailRegistryEntry.registerImage(plot);
+    }
+    return ThumbnailRegistryEntry.INTERNAL_PREFIX + plotnum;
   }
 
   @Override
@@ -335,10 +325,10 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
   public String getShortName() {
     return "optics plot";
   }
-  
+
   /**
-   * Static method to find an optics plot for a result,
-   * or to create a new one using the given context.
+   * Static method to find an optics plot for a result, or to create a new one
+   * using the given context.
    * 
    * @param <D> Distance type
    * @param co Cluster order
@@ -348,18 +338,19 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    */
   public static <D extends Distance<D>> OPTICSPlot<D> plotForClusterOrder(ClusterOrderResult<D> co, VisualizerContext context) {
     // Check for an existing plot
-    // ArrayList<OPTICSPlot<D>> plots = ResultUtil.filterResults(co, OPTICSPlot.class);
+    // ArrayList<OPTICSPlot<D>> plots = ResultUtil.filterResults(co,
+    // OPTICSPlot.class);
     // if (plots.size() > 0) {
-    //   return plots.get(0);
+    // return plots.get(0);
     // }
     // Supported by this class?
-    if (!OPTICSPlot.canPlot(co)) {
+    if(!OPTICSPlot.canPlot(co)) {
       return null;
     }
     final ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
     final Clustering<?> refc = context.getOrCreateDefaultClustering();
     final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
-    
+
     OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor);
     // co.addChildResult(opticsplot);
     return opticsplot;

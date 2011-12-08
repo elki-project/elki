@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -74,13 +72,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractOPTICSV
     // addCSSClasses();
 
     OPTICSPlot<D> opticsplot = optics.getOPTICSPlot(context);
-    File imgfile = null;
-    try {
-      imgfile = opticsplot.getAsTempFile();
-    }
-    catch(IOException e) {
-      LoggingUtil.exception("Could not generate OPTICS plot.", e);
-    }
+    String ploturi = opticsplot.getSVGPlotURI();
 
     Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
     SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
@@ -88,7 +80,7 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractOPTICSV
     SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, 0);
     SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, plotwidth);
     SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, plotheight);
-    itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, imgfile.toURI().toString());
+    itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, ploturi);
 
     layer.appendChild(itag);
 
