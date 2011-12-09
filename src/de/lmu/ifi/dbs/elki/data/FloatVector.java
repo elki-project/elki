@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -151,12 +151,12 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
 
   @Override
   public Vector getColumnVector() {
-    return new Vector(Util.convertToDoubles(values));
+    return new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(values,  ArrayLikeUtil.FLOATARRAYADAPTER));
   }
 
   @Override
   public Matrix getRowVector() {
-    return new Matrix(new double[][] { Util.convertToDoubles(values) });
+    return new Matrix(new double[][] { ArrayLikeUtil.toPrimitiveDoubleArray(values,  ArrayLikeUtil.FLOATARRAYADAPTER) });
   }
 
   @Override

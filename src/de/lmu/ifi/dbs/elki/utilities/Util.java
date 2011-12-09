@@ -36,6 +36,7 @@ import java.util.StringTokenizer;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
  * This class collects various static helper methods.
@@ -61,21 +62,6 @@ public final class Util {
   }
 
   /**
-   * Returns the unboxed double array of the given Object Double array.
-   * 
-   * @param array the array to be unboxed
-   * @return the unboxed double array
-   */
-  public static double[] unbox(Double[] array) {
-    double[] unboxed = new double[array.length];
-    // noinspection ManualArrayCopy
-    for(int i = 0; i < unboxed.length; i++) {
-      unboxed[i] = array[i];
-    }
-    return unboxed;
-  }
-
-  /**
    * Returns a new <code>Double</code> array initialized to the values
    * represented by the specified <code>String</code> and separated by comma, as
    * performed by the <code>valueOf</code> method of class <code>Double</code>.
@@ -90,21 +76,7 @@ public final class Util {
       String d = tokenizer.nextToken();
       result.add(Double.parseDouble(d));
     }
-    return unbox(result.toArray(new Double[result.size()]));
-  }
-
-  /**
-   * Converts the specified array of doubles to an array of floats.
-   * 
-   * @param values the array of doubles to be converted
-   * @return the converted array of floats
-   */
-  public static double[] convertToDoubles(float[] values) {
-    double[] result = new double[values.length];
-    for(int i = 0; i < values.length; i++) {
-      result[i] = values[i];
-    }
-    return result;
+    return ArrayLikeUtil.toPrimitiveDoubleArray(result);
   }
 
   /**
@@ -125,26 +97,6 @@ public final class Util {
         out.print(separator);
       }
     }
-  }
-
-  /**
-   * Returns the index of the maximum of the given values. If no value is bigger
-   * than the first, the index of the first entry is returned.
-   * 
-   * @param values the values to find the index of the maximum
-   * @return the index of the maximum in the given values
-   * @throws ArrayIndexOutOfBoundsException if <code>values.length==0</code>
-   */
-  public static int getIndexOfMaximum(double[] values) throws ArrayIndexOutOfBoundsException {
-    int index = 0;
-    double max = values[index];
-    for(int i = 0; i < values.length; i++) {
-      if(values[i] > max) {
-        max = values[i];
-        index = i;
-      }
-    }
-    return index;
   }
 
   /**
@@ -221,22 +173,6 @@ public final class Util {
     }
     SparseFloatVector projectedVector = new SparseFloatVector(values, selectedAttributes.cardinality());
     return projectedVector;
-  }
-
-  /**
-   * Search an (unsorted) array linearly for an object.
-   * 
-   * @param arr Array to search
-   * @param ref Object to search for
-   * @return Index of object or -1 if not found.
-   */
-  public static int arrayFind(String[] arr, Object ref) {
-    for(int index = 0; index < arr.length; index++) {
-      if(ref.equals(arr[index])) {
-        return index;
-      }
-    }
-    return -1;
   }
 
   /**

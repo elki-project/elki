@@ -36,7 +36,6 @@ import org.apache.batik.transcoder.TranscoderException;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
@@ -151,12 +150,12 @@ public class SVGSaveDialog {
 	 */
 	public static String guessFormat(String name) {
     String ext = FileUtil.getFilenameExtension(name);
-    int index = Util.arrayFind(formats, ext);
-    if (index >= 0) {
-      return ext;
-    } else {
-      return null;
+    for (String format : formats) {
+      if (format.equals(ext)) {
+        return ext;
+      }
     }
+    return null;
 	}
 
   /**

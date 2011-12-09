@@ -44,8 +44,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
 /**
  * A component (JPanel) which can be displayed in the save dialog to show
  * additional options when saving as JPEG or PNG.
@@ -251,7 +249,14 @@ public class SaveOptionsPanel extends JPanel {
   }
 
   protected void setFormat(String format) {
-    int index = Util.arrayFind(SVGSaveDialog.getVisibleFormats(), format);
+    String[] formats = SVGSaveDialog.getVisibleFormats();
+    int index = -1;
+    for(int i = 0; i < formats.length; i++) {
+      if(formats[i].equals(format)) {
+        index = i;
+        break;
+      }
+    }
     if(index != formatSelector.getSelectedIndex() && index >= 0) {
       formatSelector.setSelectedIndex(index);
     }

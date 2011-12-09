@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -114,7 +114,7 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
       super.makeOptions(config);
       DoubleListParameter ps_param = new DoubleListParameter(EXPONENTS_ID);
       if(config.grab(ps_param)) {
-        ps = Util.unbox(ps_param.getValue().toArray(new Double[] {}));
+        ps = ArrayLikeUtil.toPrimitiveDoubleArray(ps_param.getValue());
       }
     }
 

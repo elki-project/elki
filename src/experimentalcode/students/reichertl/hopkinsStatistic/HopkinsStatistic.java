@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
@@ -272,13 +272,11 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       }
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
       if(config.grab(minimaP)) {
-        List<Double> min_list = minimaP.getValue();
-        minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
+        minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
       if(config.grab(maximaP)) {
-        List<Double> max_list = maximaP.getValue();
-        maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
+        maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
       ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();

@@ -67,15 +67,20 @@ public final class ArrayLikeUtil {
   public static final NumberArrayAdapter<Double, double[]> DOUBLEARRAYADAPTER = new DoubleArrayAdapter();
 
   /**
+   * Use a float array in the array API.
+   */
+  public static final NumberArrayAdapter<Float, float[]> FLOATARRAYADAPTER = new FloatArrayAdapter();
+
+  /**
    * Use a Trove double list as array.
    */
   public static final TDoubleListAdapter TDOUBLELISTADAPTER = new TDoubleListAdapter();
-  
+
   /**
    * Use ArrayDBIDs as array.
    */
   public static final ArrayDBIDsAdapter ARRAYDBIDADAPTER = new ArrayDBIDsAdapter();
-  
+
   /**
    * Cast the static instance.
    * 
@@ -138,5 +143,91 @@ public final class ArrayLikeUtil {
    */
   public static NumberArrayAdapter<Double, double[]> doubleArrayAdapter() {
     return DOUBLEARRAYADAPTER;
+  }
+
+  /**
+   * Returns the index of the maximum of the given values. If no value is bigger
+   * than the first, the index of the first entry is returned.
+   * 
+   * @param <A> array type
+   * @param array Array to inspect
+   * @param adapter API adapter class
+   * @return the index of the maximum in the given values
+   * @throws IndexOutOfBoundsException if the length of the array is 0.
+   */
+  public static <A> int getIndexOfMaximum(A array, NumberArrayAdapter<?, A> adapter) throws IndexOutOfBoundsException {
+    final int size = adapter.size(array);
+    int index = 0;
+    double max = adapter.getDouble(array, 0);
+    for(int i = 1; i < size; i++) {
+      double val = adapter.getDouble(array, i);
+      if(val > max) {
+        max = val;
+        index = i;
+      }
+    }
+    return index;
+  }
+
+  /**
+   * Returns the index of the maximum of the given values. If no value is bigger
+   * than the first, the index of the first entry is returned.
+   * 
+   * @param array Array to inspect
+   * @return the index of the maximum in the given values
+   * @throws IndexOutOfBoundsException if the length of the array is 0.
+   */
+  public static int getIndexOfMaximum(double[] array) throws IndexOutOfBoundsException {
+    return getIndexOfMaximum(array, DOUBLEARRAYADAPTER);
+  }
+
+  /**
+   * Convert a numeric array-like to a <code>double[]</code>
+   * 
+   * @param array Array-like
+   * @param adapter Adapter
+   * @return primitive double array
+   */
+  public static <A> double[] toPrimitiveDoubleArray(A array, NumberArrayAdapter<?, A> adapter) {
+    double[] ret = new double[adapter.size(array)];
+    for(int i = 0; i < ret.length; i++) {
+      ret[i] = adapter.getDouble(array, i);
+    }
+    return ret;
+  }
+
+  /**
+   * Convert a list of numbers to <code>double[]</code>.
+   * 
+   * @param array List of numbers
+   * @return double array
+   */
+  public static double[] toPrimitiveDoubleArray(List<? extends Number> array) {
+    return toPrimitiveDoubleArray(array, NUMBERLISTADAPTER);
+  }
+
+  /**
+   * Convert a numeric array-like to a <code>float[]</code>
+   * 
+   * @param array Array-like
+   * @param adapter Adapter
+   * @return primitive float array
+   */
+  public static <A> float[] toPrimitiveFloatArray(A array, NumberArrayAdapter<?, A> adapter) {
+    float[] ret = new float[adapter.size(array)];
+    for(int i = 0; i < ret.length; i++) {
+      ret[i] = adapter.getFloat(array, i);
+    }
+    return ret;
+  }
+
+  /**
+   * Convert a list of numbers to <code>float[]</code>.
+   * 
+   * @param array List of numbers
+   * @return float array
+   */
+  public static float[] toPrimitiveFloatArray(List<? extends Number> array) {
+    return toPrimitiveFloatArray(array, NUMBERLISTADAPTER);
   }
 }

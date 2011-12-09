@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  */
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -33,7 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -236,11 +235,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
       config.grab(stddevP);
       // Note: grab first, then use isDefined, to ensure the stddev is grabbed.
       if(meanP.isDefined() && stddevP.isDefined()) {
-        List<Double> mean_list = meanP.getValue();
-        List<Double> stddev_list = stddevP.getValue();
-
-        mean = Util.unbox(mean_list.toArray(new Double[mean_list.size()]));
-        stddev = Util.unbox(stddev_list.toArray(new Double[stddev_list.size()]));
+        mean = ArrayLikeUtil.toPrimitiveDoubleArray(meanP.getValue());
+        stddev = ArrayLikeUtil.toPrimitiveDoubleArray(stddevP.getValue());
 
         for(double d : stddev) {
           if(d == 0) {
