@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
  * @author Erich Schubert
  * 
  */
-class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifiableDBIDs {
+class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   /**
    * The actual store.
    */
@@ -102,11 +102,6 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
   }
 
   @Override
-  public boolean remove(Object o) {
-    return store.remove(((DBID) o).getIntegerID());
-  }
-
-  @Override
   public boolean remove(DBID o) {
     return store.remove(o.getIntegerID());
   }
@@ -125,8 +120,28 @@ class TroveHashSetModifiableDBIDs extends TroveSetDBIDs implements HashSetModifi
   }
 
   @Override
-  protected TIntHashSet getStore() {
-    return store;
+  public Iterator<DBID> iterator() {
+    return new TroveIteratorAdapter(store.iterator());
+  }
+
+  @Override
+  public int size() {
+    return store.size();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return store.isEmpty();
+  }
+
+  @Override
+  public void clear() {
+    store.clear();
+  }
+
+  @Override
+  public boolean contains(DBID o) {
+    return store.contains(o.getIntegerID());
   }
 
   /**
