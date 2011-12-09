@@ -67,9 +67,14 @@ public final class ArrayLikeUtil {
   public static final NumberArrayAdapter<Double, double[]> DOUBLEARRAYADAPTER = new DoubleArrayAdapter();
 
   /**
-   * USe a Trove double list as array.
+   * Use a Trove double list as array.
    */
   public static final TDoubleListAdapter TDOUBLELISTADAPTER = new TDoubleListAdapter();
+  
+  /**
+   * Use ArrayDBIDs as array.
+   */
+  public static final ArrayDBIDsAdapter ARRAYDBIDADAPTER = new ArrayDBIDsAdapter();
   
   /**
    * Cast the static instance.
