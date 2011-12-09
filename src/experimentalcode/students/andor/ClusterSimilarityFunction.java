@@ -1,7 +1,5 @@
 package experimentalcode.students.andor;
 
-import java.util.Collections;
-
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -23,11 +21,12 @@ public class ClusterSimilarityFunction<C extends Cluster<?>> extends AbstractPri
   public IntegerDistance similarity(C o1, C o2) {
     ArrayModifiableDBIDs data1 = DBIDUtil.newArray(o1.getIDs());
     ArrayModifiableDBIDs data2 = DBIDUtil.newArray(o2.getIDs());
-    Collections.sort(data1);
-    Collections.sort(data2);
+    
+    data1.sort();
+    data2.sort();
     int intersection = 0;
     for(DBID id: data1){
-      if(Collections.binarySearch(data2, id)>=0){
+      if(data2.binarySearch(id)>=0){
         intersection++;
       }
     }
