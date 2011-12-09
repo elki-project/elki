@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -119,7 +120,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
   /**
    * The set of points we're working on.
    */
-  private Vector<DBID> S;
+  private ArrayModifiableDBIDs S;
 
   /**
    * Dimensionality of the data set we're currently working on.
@@ -184,7 +185,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
     d = DatabaseUtil.dimensionality(relation);
 
     // Get available DBIDs as a set we can remove items from.
-    S = new Vector<DBID>(relation.getDBIDs().asCollection());
+    S = DBIDUtil.newArray(relation.getDBIDs());
 
     // Precompute values as described in Figure 2.
     r = Math.abs(Math.log10(d + d) / Math.log10(beta / 2));
@@ -231,7 +232,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
         }
 
         // Remove all points of the cluster from the set and continue.
-        S.removeAll(C.getIDs().asCollection());
+        S.removeDBIDs(C.getIDs());
       }
     }
 
@@ -251,7 +252,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
   private Cluster<SubspaceModel<V>> runDOC(Relation<V> relation) {
 
     // Best cluster for the current run.
-    Vector<DBID> C = null;
+    ArrayModifiableDBIDs C = null;
     // Relevant attributes for the best cluster.
     BitSet D = null;
     // Quality of the best cluster.
@@ -262,7 +263,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
 
     for(int i = 0; i < n; ++i) {
       // Pick a random seed point.
-      DBID p = S.elementAt(random.nextInt(S.size()));
+      DBID p = S.get(random.nextInt(S.size()));
       V pV = relation.get(p);
 
       for(int j = 0; j < m; ++j) {
@@ -270,9 +271,10 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
         // the
         // first r elements.
         Collections.shuffle(S);
+        // FIXME: use DBIDUtil.randomSample(S, r, seed);
 
         // Initialize cluster info.
-        Vector<DBID> nC = new Vector<DBID>();
+        ArrayModifiableDBIDs nC = DBIDUtil.newArray();
         BitSet nD = new BitSet(d);
 
         // Test each dimension and build bounding box while we're at
@@ -375,13 +377,14 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
 
     outer: for(int i = 0; i < n; ++i) {
       // Pick a random seed point.
-      DBID p = S.elementAt(random.nextInt(S.size()));
+      DBID p = S.get(random.nextInt(S.size()));
       V pV = relation.get(p);
 
       for(int j = 0; j < m; ++j) {
         // Choose a set of random points. Shuffle the list and use
         // the first r elements.
         Collections.shuffle(S);
+        // FIXME: use DBIDUtil.randomSample(S, r, seed);
 
         // Initialize cluster info.
         BitSet nD = new BitSet(d);
@@ -434,7 +437,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
     HyperBoundingBox bounds = new HyperBoundingBox(min, max);
 
     // Accumulate points inside the bounds.
-    Vector<DBID> C = new Vector<DBID>();
+    ArrayModifiableDBIDs C = DBIDUtil.newArray();
 
     // Get all points in the box.
     // TODO nicer way to do this?
@@ -507,9 +510,9 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
    * @param D the relevant dimensions.
    * @return an object representing the subspace cluster.
    */
-  private Cluster<SubspaceModel<V>> makeCluster(Relation<V> relation, Vector<DBID> C, BitSet D) {
+  private Cluster<SubspaceModel<V>> makeCluster(Relation<V> relation, DBIDs C, BitSet D) {
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(C.size());
-    ids.addAll(C);
+    ids.addDBIDs(C);
     Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(ids);
     cluster.setModel(new SubspaceModel<V>(new Subspace<V>(D), DatabaseUtil.centroid(relation, ids)));
     return cluster;
