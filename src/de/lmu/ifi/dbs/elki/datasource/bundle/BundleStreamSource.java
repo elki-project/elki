@@ -27,6 +27,8 @@ package de.lmu.ifi.dbs.elki.datasource.bundle;
  * Soruce for a bundle stream
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf BundleMeta
  */
 public interface BundleStreamSource {
   /**
