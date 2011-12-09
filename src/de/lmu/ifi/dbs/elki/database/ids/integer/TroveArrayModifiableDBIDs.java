@@ -23,10 +23,11 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
+import gnu.trove.list.array.TIntArrayList;
+
+import java.util.Arrays;
 import java.util.Comparator;
 
-import gnu.trove.list.array.TIntArrayList;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -100,11 +101,6 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   }
 
   @Override
-  public boolean remove(Object o) {
-    return store.remove(((DBID) o).getIntegerID());
-  }
-
-  @Override
   public boolean remove(DBID o) {
     return store.remove(o.getIntegerID());
   }
@@ -116,13 +112,13 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   }
 
   @Override
-  public void add(int index, DBID element) {
-    store.insert(index, element.getIntegerID());
+  public DBID remove(int index) {
+    return new IntegerDBID(store.removeAt(index));
   }
 
   @Override
-  public DBID remove(int index) {
-    return new IntegerDBID(store.removeAt(index));
+  public void clear() {
+    store.clear();
   }
 
   @Override
@@ -132,6 +128,17 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
 
   @Override
   public void sort(Comparator<? super DBID> comparator) {
-    Collections.sort(this, comparator);
+    // FIXME: optimize, avoid the extra copy.
+    // Clone data
+    DBID[] data = new DBID[store.size()];
+    for(int i = 0; i < store.size(); i++) {
+      data[i] = new IntegerDBID(store.get(i));
+    }
+    // Sort
+    Arrays.sort(data, comparator);
+    // Copy back
+    for(int i = 0; i < store.size(); i++) {
+      store.set(i, data[i].getIntegerID());
+    }
   }
 }

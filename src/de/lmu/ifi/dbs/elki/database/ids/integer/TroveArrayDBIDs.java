@@ -25,9 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 import gnu.trove.list.TIntList;
 
-import java.util.AbstractList;
 import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -38,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
  * 
  * @author Erich Schubert
  */
-public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
+public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   /**
    * Get the array store
    * 
@@ -65,25 +63,15 @@ public abstract class TroveArrayDBIDs extends AbstractList<DBID> implements Arra
   public int size() {
     return getStore().size();
   }
-
+  
   @Override
-  public int indexOf(Object o) {
-    return getStore().indexOf(((DBID) o).getIntegerID());
-  }
-
-  @Override
-  public int lastIndexOf(Object o) {
-    return getStore().lastIndexOf(((DBID) o).getIntegerID());
+  public boolean isEmpty() {
+    return getStore().isEmpty();
   }
 
   @Override
   public boolean contains(DBID o) {
     return getStore().contains(o.getIntegerID());
-  }
-
-  @Override
-  public List<DBID> subList(int fromIndex, int toIndex) {
-    return new TroveArrayStaticDBIDs(getStore().subList(fromIndex, toIndex));
   }
 
   @Override
