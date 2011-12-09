@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf IntegerDBID
+ * @apiviz.has IntegerDBID
  */
 class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
   /**

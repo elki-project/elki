@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has IntegerDBID
+ * @apiviz.has TroveIteratorAdapter
  */
 class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   /**
