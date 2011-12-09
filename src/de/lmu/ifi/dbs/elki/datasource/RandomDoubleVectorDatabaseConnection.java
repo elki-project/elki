@@ -79,7 +79,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
   
   @Override
   public MultipleObjectsBundle loadData() {
-    VectorFieldTypeInformation<DoubleVector> type = VectorFieldTypeInformation.get(DoubleVector.class, dim);
+    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC, dim);
     List<DoubleVector> vectors = new ArrayList<DoubleVector>(size);
 
     // Setup random generator

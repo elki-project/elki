@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.data.type;
 
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,7 +25,6 @@ package de.lmu.ifi.dbs.elki.data.type;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Class wrapping a particular data type.
  * 
@@ -36,11 +37,16 @@ public class SimpleTypeInformation<T> implements TypeInformation {
    * The restriction class we represent.
    */
   private Class<? super T> cls;
-  
+
   /**
    * Type label
    */
   private String label = null;
+
+  /**
+   * Type serializer
+   */
+  private ByteBufferSerializer<? super T> serializer = null;
 
   /**
    * Constructor.
@@ -64,6 +70,33 @@ public class SimpleTypeInformation<T> implements TypeInformation {
     this.label = label;
   }
 
+  /**
+   * Constructor.
+   * 
+   * @param cls restriction class
+   * @param serializer Serializer
+   */
+  public SimpleTypeInformation(Class<? super T> cls, ByteBufferSerializer<? super T> serializer) {
+    super();
+    this.cls = cls;
+    this.serializer = serializer;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param cls restriction class
+   * @param label type label
+   * @param serializer Serializer
+   */
+  public SimpleTypeInformation(Class<? super T> cls, String label, ByteBufferSerializer<? super T> serializer) {
+    super();
+    this.cls = cls;
+    this.label = label;
+    this.serializer = serializer;
+  }
+
+  
   /**
    * Get the raw restriction class.
    * 
@@ -110,5 +143,14 @@ public class SimpleTypeInformation<T> implements TypeInformation {
    */
   public String getLabel() {
     return label;
+  }
+
+  /**
+   * Get the serializer for this type.
+   * 
+   * @return Type serializer
+   */
+  public ByteBufferSerializer<? super T> getSerializer() {
+    return serializer;
   }
 }

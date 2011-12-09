@@ -408,7 +408,7 @@ public class ArffParser implements Parser {
           labels[i] = names.get(out + i);
         }
         if(!sparse) {
-          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dimsize[out], labels, new DoubleVector(new double[dimsize[out]]));
+          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC, dimsize[out], labels, new DoubleVector(new double[dimsize[out]]));
           bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else {
