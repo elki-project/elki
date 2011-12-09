@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
  * Abstract base class for GNU Trove array based lists.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has IntegerDBID
+ * @apiviz.has TroveIteratorAdapter
  */
 public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   /**

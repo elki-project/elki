@@ -46,9 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @apiviz.uses IntegerDBID oneway - - «create»
  * @apiviz.uses IntegerDBIDPair oneway - - «create»
  * @apiviz.uses IntegerDBIDRange oneway - - «create»
- * @apiviz.uses GenericArrayModifiableDBIDs oneway - - «create»
- * @apiviz.uses GenericHashSetModifiableDBIDs oneway - - «create»
- * @apiviz.uses GenericTreeSetModifiableDBIDs oneway - - «create»
+ * @apiviz.uses TroveArrayModifiableDBIDs oneway - - «create»
+ * @apiviz.uses TroveHashSetModifiableDBIDs oneway - - «create»
  */
 public class SimpleDBIDFactory implements DBIDFactory {
   /**

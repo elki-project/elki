@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf IntegerDBID
+ * @apiviz.has IntegerDBID
  */
 public class IntegerDBIDPair implements DBIDPair {
   /**

@@ -27,7 +27,7 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -37,9 +37,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf IntegerDBID
+ * @apiviz.has IntegerDBID
  */
-public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements ArrayDBIDs {
+public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements ArrayStaticDBIDs {
   /**
    * The actual storage.
    */
