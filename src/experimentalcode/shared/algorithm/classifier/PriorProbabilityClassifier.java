@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -103,7 +103,7 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
     for(int i = 0; i < distribution.length; i++) {
       distribution[i] = occurences[i] / size;
     }
-    prediction = Util.getIndexOfMaximum(distribution);
+    prediction = ArrayLikeUtil.getIndexOfMaximum(distribution);
   }
 
   /**

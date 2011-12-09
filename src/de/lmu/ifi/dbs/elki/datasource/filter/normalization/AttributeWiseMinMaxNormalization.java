@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
@@ -214,13 +214,11 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
       super.makeOptions(config);
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
       if(config.grab(minimaP)) {
-        List<Double> min_list = minimaP.getValue();
-        minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
+        minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
       if(config.grab(maximaP)) {
-        List<Double> max_list = maximaP.getValue();
-        maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
+        maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
       ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
