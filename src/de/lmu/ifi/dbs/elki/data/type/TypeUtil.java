@@ -33,8 +33,10 @@ import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 
 /**
  * Utility package containing various common types
@@ -53,12 +55,12 @@ public final class TypeUtil {
   /**
    * Database IDs
    */
-  public static final SimpleTypeInformation<DBID> DBID = new SimpleTypeInformation<DBID>(DBID.class);
+  public static final SimpleTypeInformation<DBID> DBID = new SimpleTypeInformation<DBID>(DBID.class, DBIDFactory.FACTORY.getDBIDSerializer());
 
   /**
    * A string
    */
-  public static final SimpleTypeInformation<String> STRING = new SimpleTypeInformation<String>(String.class);
+  public static final SimpleTypeInformation<String> STRING = new SimpleTypeInformation<String>(String.class, ByteArrayUtil.STRING_SERIALIZER);
 
   /**
    * A class label
@@ -87,7 +89,7 @@ public final class TypeUtil {
    * 
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
-  public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class);
+  public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC);
 
   /**
    * Input type for algorithms that require number vector fields.
@@ -112,12 +114,12 @@ public final class TypeUtil {
   /**
    * Double type, outlier scores etc.
    */
-  public static final SimpleTypeInformation<Double> DOUBLE = new SimpleTypeInformation<Double>(Double.class);
+  public static final SimpleTypeInformation<Double> DOUBLE = new SimpleTypeInformation<Double>(Double.class, ByteArrayUtil.DOUBLE_SERIALIZER);
 
   /**
    * Integer type.
    */
-  public static final SimpleTypeInformation<Integer> INTEGER = new SimpleTypeInformation<Integer>(Integer.class);
+  public static final SimpleTypeInformation<Integer> INTEGER = new SimpleTypeInformation<Integer>(Integer.class, ByteArrayUtil.INT_SERIALIZER);
 
   /**
    * Vector type.

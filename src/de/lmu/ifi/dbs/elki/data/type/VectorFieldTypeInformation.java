@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  */
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
  * Type information to specify that a type has a fixed dimensionality.
@@ -44,24 +45,83 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   private String[] labels = null;
 
   /**
-   * Constructor for a request without fixed dimensionality.
+   * Constructor with given dimensionality and factory, so usually an instance.
+   * 
+   * @param cls Restriction java class
+   * @param serializer Serializer
+   * @param dim Dimensionality
+   * @param labels Labels
+   * @param factory Factory class
+   */
+  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int dim, String[] labels, V factory) {
+    super(cls, serializer, dim, dim);
+    this.labels = labels;
+    this.factory = factory;
+    assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
+  }
+
+  /**
+   * Constructor for a request with minimum and maximum dimensionality.
    * 
    * @param cls Vector restriction class.
+   * @param serializer Serializer
+   * @param mindim Minimum dimensionality request
+   * @param maxdim Maximum dimensionality request
    */
-  public VectorFieldTypeInformation(Class<? super V> cls) {
-    super(cls);
+  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim) {
+    super(cls, serializer, mindim, maxdim);
     this.factory = null;
+  }
+
+  /**
+   * Constructor with given dimensionality and factory, so usually an instance.
+   * 
+   * @param cls Restriction java class
+   * @param serializer Serializer
+   * @param dim Dimensionality
+   * @param factory Factory class
+   */
+  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int dim, V factory) {
+    super(cls, serializer, dim, dim);
+    this.factory = factory;
   }
 
   /**
    * Constructor for a request with fixed dimensionality.
    * 
    * @param cls Vector restriction class.
+   * @param serializer Serializer
    * @param dim Dimensionality request
    */
-  public VectorFieldTypeInformation(Class<? super V> cls, int dim) {
-    super(cls, dim, dim);
+  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int dim) {
+    super(cls, serializer, dim, dim);
     this.factory = null;
+  }
+
+  /**
+   * Constructor for a request without fixed dimensionality.
+   * 
+   * @param cls Vector restriction class.
+   * @param serializer Serializer
+   */
+  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer) {
+    super(cls, serializer);
+    this.factory = null;
+  }
+
+  /**
+   * Constructor with given dimensionality and factory, so usually an instance.
+   * 
+   * @param cls Restriction java class
+   * @param dim Dimensionality
+   * @param labels Labels
+   * @param factory Factory class
+   */
+  public VectorFieldTypeInformation(Class<? super V> cls, int dim, String[] labels, V factory) {
+    super(cls, dim, dim);
+    this.labels = labels;
+    this.factory = factory;
+    assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
   }
 
   /**
@@ -89,18 +149,24 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   }
 
   /**
-   * Constructor with given dimensionality and factory, so usually an instance.
+   * Constructor for a request with fixed dimensionality.
    * 
-   * @param cls Restriction java class
-   * @param dim Dimensionality
-   * @param labels Labels
-   * @param factory Factory class
+   * @param cls Vector restriction class.
+   * @param dim Dimensionality request
    */
-  public VectorFieldTypeInformation(Class<? super V> cls, int dim, String[] labels, V factory) {
+  public VectorFieldTypeInformation(Class<? super V> cls, int dim) {
     super(cls, dim, dim);
-    this.labels = labels;
-    this.factory = factory;
-    assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
+    this.factory = null;
+  }
+
+  /**
+   * Constructor for a request without fixed dimensionality.
+   * 
+   * @param cls Vector restriction class.
+   */
+  public VectorFieldTypeInformation(Class<? super V> cls) {
+    super(cls);
+    this.factory = null;
   }
 
   @Override

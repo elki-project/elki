@@ -62,7 +62,7 @@ public class DoubleVectorRandomProjectionFilter extends AbstractRandomFeatureSel
   @Override
   protected SimpleTypeInformation<? super DoubleVector> convertedType(SimpleTypeInformation<DoubleVector> in) {
     initializeRandomAttributes(in);
-    return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, k, new DoubleVector(new double[k]));
+    return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC, k, DoubleVector.STATIC);
   }
   
   /**

@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -280,6 +281,12 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     @SuppressWarnings("unchecked")
     Class<V> cls = (Class<V>) factory.getClass();
     V f = factory.newNumberVector(new double[dimensionality]);
+    if(f instanceof ByteBufferSerializer) {
+      // TODO: Remove, once we have serializers for all types
+      @SuppressWarnings("unchecked")
+      final ByteBufferSerializer<V> ser = (ByteBufferSerializer<V>) f;
+      return new VectorFieldTypeInformation<V>(cls, ser, dimensionality, f);
+    }
     return new VectorFieldTypeInformation<V>(cls, dimensionality, f);
   }
 

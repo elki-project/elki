@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  */
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
  * Construct a type information for vector spaces with fixed dimensionality.
@@ -47,11 +48,12 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
    * Constructor.
    * 
    * @param cls base class
+   * @param serializer Serializer
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
    */
-  public VectorTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
-    super(cls);
+  public VectorTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim) {
+    super(cls, serializer);
     assert (this.mindim <= this.maxdim);
     this.mindim = mindim;
     this.maxdim = maxdim;
@@ -60,10 +62,31 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   /**
    * Constructor without size constraints.
    * 
+   * @param cls base class
+   * @param serializer Serializer
+   */
+  public VectorTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer) {
+    this(cls, serializer, -1, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param cls base class
+   * @param mindim Minimum dimensionality
+   * @param maxdim Maximum dimensionality
+   */
+  public VectorTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
+    this(cls, null, mindim, maxdim);
+  }
+
+  /**
+   * Constructor without size constraints.
+   * 
    * @param cls
    */
   public VectorTypeInformation(Class<? super V> cls) {
-    this(cls, -1, Integer.MAX_VALUE);
+    this(cls, null, -1, Integer.MAX_VALUE);
   }
 
   @Override
