@@ -70,43 +70,11 @@ public class ZCurveBulkSplit extends AbstractBulkSplit {
    */
   @Override
   public <N extends SpatialComparable> List<List<N>> partition(List<N> spatialObjects, int minEntries, int maxEntries) {
-    List<List<N>> partitions = new ArrayList<List<N>>();
     List<N> objects = new ArrayList<N>(spatialObjects);
 
     // one dimensional special case
     if(spatialObjects.size() > 0 && spatialObjects.get(0).getDimensionality() == 1) {
-      // TODO: move this Comparator into shared code.
-      Collections.sort(objects, new Comparator<SpatialComparable>() {
-        @Override
-        public int compare(SpatialComparable o1, SpatialComparable o2) {
-          return Double.compare(o1.getMin(1), o2.getMin(1));
-        }
-      });
-
-      // build partitions
-      // reinitialize array with correct size. Array will not use more space
-      // than necessary.
-      int numberPartitions = (int) Math.ceil(1d * spatialObjects.size() / maxEntries);
-      partitions = new ArrayList<List<N>>(numberPartitions);
-      List<N> onePartition = null;
-      for(N o : objects) {
-        if(onePartition == null || onePartition.size() >= maxEntries) {
-          onePartition = new ArrayList<N>(maxEntries);
-          partitions.add(onePartition);
-        }
-        onePartition.add(o);
-      }
-
-      // okay, check last partition for underfill
-      // only check if there is more than 1 partition
-      if(partitions.size() > 1) {
-        List<N> last = partitions.get(partitions.size() - 1);
-        List<N> nextToLast = partitions.get(partitions.size() - 2);
-        while(last.size() < minEntries) {
-          last.add(0, nextToLast.remove(nextToLast.size() - 1));
-        }
-      }
-      return partitions;
+      return OneDimSortBulkSplit.STATIC.partition(spatialObjects, minEntries, maxEntries);
     }
 
     // get z-values
@@ -162,30 +130,7 @@ public class ZCurveBulkSplit extends AbstractBulkSplit {
       }
     };
     Collections.sort(objects, comparator);
-
-    // insert into partition
-    while(objects.size() > 0) {
-      StringBuffer msg = new StringBuffer();
-      int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
-      List<N> partition1 = new ArrayList<N>();
-      for(int i = 0; i < splitPoint; i++) {
-        N o = objects.remove(0);
-        partition1.add(o);
-      }
-      partitions.add(partition1);
-
-      // copy array
-      if(logger.isDebugging()) {
-        msg.append("\ncurrent partition " + partition1);
-        msg.append("\nremaining objects # ").append(objects.size());
-        logger.debugFine(msg.toString());
-      }
-    }
-
-    if(logger.isDebugging()) {
-      logger.debugFine("partitions " + partitions);
-    }
-    return partitions;
+    return trivialPartition(objects, minEntries, maxEntries);
   }
 
   /**

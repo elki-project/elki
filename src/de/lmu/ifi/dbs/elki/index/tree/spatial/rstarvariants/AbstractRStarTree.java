@@ -435,15 +435,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       for(E o : partition) {
         leafNode.addLeafEntry(o);
       }
-
-      result.add(createNewDirectoryEntry(leafNode));
       // write to file
       writeNode(leafNode);
 
+      result.add(createNewDirectoryEntry(leafNode));
+
       if(getLogger().isDebugging()) {
-        StringBuffer msg = new StringBuffer();
-        msg.append("pageNo ").append(leafNode.getPageID()).append("\n");
-        getLogger().debugFine(msg.toString());
+        getLogger().debugFine("Created leaf page "+leafNode.getPageID());
       }
     }
 

@@ -123,7 +123,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
 
     StringBuffer msg = getLogger().isDebuggingFine() ? new StringBuffer() : null;
 
-    // Tiny tree that fit into a single page
+    // Tiny tree that fits into a single page
     if(spatialObjects.size() <= leafCapacity) {
       N root = createNewLeafNode();
       root.setPageID(getRootID());
@@ -187,20 +187,16 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     for(List<E> partition : partitions) {
       // create node
       N dirNode = createNewDirectoryNode();
-      writeNode(dirNode);
-
       // insert nodes
       for(E o : partition) {
         dirNode.addDirectoryEntry(o);
       }
-
-      result.add(createNewDirectoryEntry(dirNode));
       // write to file
       writeNode(dirNode);
+
+      result.add(createNewDirectoryEntry(dirNode));
       if(getLogger().isDebuggingFiner()) {
-        StringBuffer msg = new StringBuffer();
-        msg.append("\npageNo ").append(dirNode.getPageID());
-        getLogger().debugFiner(msg.toString() + "\n");
+        getLogger().debugFiner("Directory page no: "+dirNode.getPageID());
       }
     }
 
