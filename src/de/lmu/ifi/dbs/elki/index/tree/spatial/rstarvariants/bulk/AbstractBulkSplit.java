@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -58,5 +61,31 @@ public abstract class AbstractBulkSplit implements BulkSplit {
     else {
       return maxEntries;
     }
+  }
+
+  /**
+   * Perform the trivial partitioning of the given list.
+   * 
+   * @param objects Objects to partition
+   * @param minEntries Minimum number of objects per page
+   * @param maxEntries Maximum number of objects per page.
+   * @return
+   */
+  protected <T> List<List<T>> trivialPartition(List<T> objects, int minEntries, int maxEntries) {
+    // build partitions
+    final int size = objects.size();
+    final int numberPartitions = (int) Math.ceil(((double) size) / maxEntries);
+    List<List<T>> partitions = new ArrayList<List<T>>(numberPartitions);
+    int start = 0;
+    for(int pnum = 0; pnum < numberPartitions; pnum++) {
+      int end = (int) ((pnum + 1.) * size / numberPartitions);
+      if(pnum == numberPartitions - 1) {
+        end = size;
+      }
+      assert ((end - start) >= minEntries && (end - start) <= maxEntries);
+      partitions.add(objects.subList(start, end));
+      start = end;
+    }
+    return partitions;
   }
 }
