@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk;
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,13 +22,25 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 public class HilbertBulkSplit extends AbstractBulkSplit {
+  /**
+   * Constructor.
+   */
+  protected HilbertBulkSplit() {
+    super();
+  }
 
   @Override
   public <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries) {
-    // TODO Auto-generated method stub
-    return null;
+    hilbertSort(spatialObjects, 0, spatialObjects.size(), 1, false);
+    return trivialPartition(spatialObjects, minEntries, maxEntries);
   }
-
+  
+  protected void hilbertSort(List<? extends SpatialComparable> objs, int start, int end, int dim, boolean desc) {
+    // FIXME: implement!
+  }
 }
