@@ -26,7 +26,6 @@ import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Bulk-load an R-tree index by presorting the objects with their position on
@@ -82,26 +81,27 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
   protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int dim, BitSet bits, boolean desc) {
     // Find the splitting points.
     final double min = mms[2 * dim], max = mms[2 * dim + 1];
+    final double tfirst = (min + min + max) / 3.;
+    final double tsecond = (min + max + max) / 3.;
     // Safeguard against duplicate points:
-    if(max - min < 1E-10) {
+    if(max - tsecond < 1E-10 || tsecond - tfirst < 1E-10 || tfirst - min < 1E-10) {
       boolean ok = false;
       for(int d = 0; d < mms.length; d += 2) {
         if(mms[d + 1] - mms[d] >= 1E-10) {
-          LoggingUtil.warning("No: " + (mms[d + 1] - mms[d]));
+          // LoggingUtil.warning("No: " + (mms[d + 1] - mms[d]));
           ok = true;
           break;
         }
       }
       if(!ok) {
+        // LoggingUtil.warning("Stop.");
         return;
       }
     }
-    double tfirst = (min + min + max) / 3.;
-    double tsecond = (min + max + max) / 3.;
-    // Split the data set into three parts
-    // LoggingUtil.warning("dim: " + dim + " " + min + "<" + tfirst + "<" +
-    // tsecond + "<" + max);
     final boolean inv = bits.get(dim) ^ desc;
+    // LoggingUtil.warning("dim: " + dim + " " + inv + " " + bits.toString() +
+    // "^" + desc);
+    // Split the data set into three parts
     int fsplit, ssplit;
     if(!inv) {
       fsplit = pivotizeList1D(objs, start, end, dim + 1, tfirst, false);
@@ -111,25 +111,26 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
       fsplit = pivotizeList1D(objs, start, end, dim + 1, tsecond, true);
       ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim + 1, tfirst, true) : fsplit;
     }
-    // LoggingUtil.warning("start: " + start + " end: " + end + " s: " + fsplit
-    // + ", " + ssplit);
+    // LoggingUtil.warning("dim: " + dim + " " + min + "<" + tfirst + "<" +
+    // tsecond + "<" + max + " " + start + " < " + fsplit + " < " + ssplit +
+    // " < " + end);
     int nextdim = (dim + 1) % objs.get(0).getDimensionality();
     // Do we need to update the min/max values?
     if(start < fsplit - 1) {
-      mms[2 * dim] = min;
-      mms[2 * dim + 1] = tfirst;
+      mms[2 * dim] = !inv ? min : tsecond;
+      mms[2 * dim + 1] = !inv ? tfirst : max;
       peanoSort(objs, start, fsplit, mms, nextdim, bits, desc);
     }
     if(fsplit < ssplit - 1) {
-      bits.flip(dim);
+      bits.flip(dim); // set (all but dim: we also flip "desc")
       mms[2 * dim] = tfirst;
       mms[2 * dim + 1] = tsecond;
       peanoSort(objs, fsplit, ssplit, mms, nextdim, bits, !desc);
-      bits.flip(dim); // restore
+      bits.flip(dim);
     }
     if(ssplit < end - 1) {
-      mms[2 * dim] = tsecond;
-      mms[2 * dim + 1] = max;
+      mms[2 * dim] = !inv ? tsecond : min;
+      mms[2 * dim + 1] = !inv ? max : tfirst;
       peanoSort(objs, ssplit, end, mms, nextdim, bits, desc);
     }
     // Restore ranges
