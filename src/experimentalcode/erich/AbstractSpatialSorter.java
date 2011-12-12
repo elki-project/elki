@@ -59,15 +59,28 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
     threshold = 2 * threshold; // faster
     int s = start, e = end;
     while(s < e) {
-      double sminmax = getMinPlusMaxObject(objs, s, dim);
-      while((sminmax < threshold) != desc && s + 1 <= e && s + 1 < end) {
-        s++;
-        sminmax = getMinPlusMaxObject(objs, s, dim);
-      }
-      double eminmax = getMinPlusMaxObject(objs, e - 1, dim);
-      while((eminmax >= threshold) != desc && s < e - 1 && start < e - 1) {
-        e--;
-        eminmax = getMinPlusMaxObject(objs, e - 1, dim);
+      if(!desc) {
+        double sminmax = getMinPlusMaxObject(objs, s, dim);
+        while((sminmax < threshold) && s + 1 <= e && s + 1 < end) {
+          s++;
+          sminmax = getMinPlusMaxObject(objs, s, dim);
+        }
+        double eminmax = getMinPlusMaxObject(objs, e - 1, dim);
+        while((eminmax >= threshold) && s < e - 1 && start < e - 1) {
+          e--;
+          eminmax = getMinPlusMaxObject(objs, e - 1, dim);
+        }
+      } else {
+        double sminmax = getMinPlusMaxObject(objs, s, dim);
+        while((sminmax > threshold) && s + 1 <= e && s + 1 < end) {
+          s++;
+          sminmax = getMinPlusMaxObject(objs, s, dim);
+        }
+        double eminmax = getMinPlusMaxObject(objs, e - 1, dim);
+        while((eminmax <= threshold) && s < e - 1 && start < e - 1) {
+          e--;
+          eminmax = getMinPlusMaxObject(objs, e - 1, dim);
+        }
       }
       if(s >= e) {
         assert (s == e);
