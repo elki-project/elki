@@ -22,52 +22,64 @@ package experimentalcode.erich;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.AbstractBulkSplit;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Bulk-load an R-tree index by presorting the objects with their position on
  * the Peano curve.
  * 
- * INCOMPLETE attempt at a divdie & conquer solution. TODO: for small sets,
+ * The basic shape of this space-filling curve looks like this:
+ * 
+ * <pre>
+ *   3---4   9
+ *   |   |   |
+ *   2   5   8
+ *   |   |   |
+ *   1   6---7
+ * </pre>
+ * 
+ * Which then expands to the next level as:
+ * 
+ * <pre>
+ *   +-+ +-+ +-+ +-+ +
+ *   | | | | | | | | |
+ *   | +-+ +-+ | | +-+
+ *   |         | |    
+ *   | +-+ +-+ | | +-+
+ *   | | | | | | | | |
+ *   +-+ | | +-+ +-+ |
+ *       | |         |
+ *   +-+ | | +-+ +-+ |
+ *   | | | | | | | | |
+ *   + +-+ +-+ +-+ +-+
+ * </pre>
+ * 
+ * and so on.
+ * 
+ * INCOMPLETE attempt at a divide & conquer solution. TODO: for small sets,
  * resort to different strategy? Dupe handling? Fixme: Orientations
  * 
  * @author Erich Schubert
  */
-public class PeanoBulkSplit extends AbstractBulkSplit {
+public class PeanoSpatialSorter extends AbstractSpatialSorter {
   /**
    * Constructor.
    */
-  public PeanoBulkSplit() {
+  public PeanoSpatialSorter() {
     super();
   }
 
   @Override
-  public <T extends SpatialComparable> List<List<T>> partition(List<T> objs, int minEntries, int maxEntries) {
-    final int dim = objs.get(0).getDimensionality();
-    // Compute min and max for each dimension:
-    double[] mm = new double[dim * 2];
-    {
-      for(int i = 0; i < dim; i++) {
-        mm[i * 2] = Double.POSITIVE_INFINITY;
-        mm[i * 2 + 1] = Double.NEGATIVE_INFINITY;
-      }
-      for(SpatialComparable obj : objs) {
-        for(int d = 0; d < dim; d++) {
-          mm[2 * d] = Math.min(mm[2 * d], obj.getMin(d + 1));
-          mm[2 * d + 1] = Math.max(mm[2 * d + 1], obj.getMax(d + 1));
-        }
-      }
-    }
-
-    peanoSort(objs, 0, objs.size(), mm, 0, false);
-    return trivialPartition(objs, minEntries, maxEntries);
+  public <T extends SpatialComparable> void sort(List<T> objs) {
+    double[] mm = computeMinMax(objs);
+    peanoSort(objs, 0, objs.size(), mm, 0, new BitSet(), false);
   }
 
-  protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int dim, boolean desc) {
+  protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int dim, BitSet bits, boolean desc) {
     // Find the splitting points.
     final double min = mms[2 * dim], max = mms[2 * dim + 1];
     // Safeguard against duplicate points:
@@ -89,8 +101,16 @@ public class PeanoBulkSplit extends AbstractBulkSplit {
     // Split the data set into three parts
     // LoggingUtil.warning("dim: " + dim + " " + min + "<" + tfirst + "<" +
     // tsecond + "<" + max);
-    int fsplit = splitSort(objs, start, end, dim + 1, 2 * tfirst, desc);
-    int ssplit = (fsplit < end - 1) ? splitSort(objs, fsplit, end, dim + 1, 2 * tsecond, desc) : fsplit;
+    final boolean inv = bits.get(dim) ^ desc;
+    int fsplit, ssplit;
+    if(!inv) {
+      fsplit = pivotizeList1D(objs, start, end, dim + 1, tfirst, false);
+      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim + 1, tsecond, false) : fsplit;
+    }
+    else {
+      fsplit = pivotizeList1D(objs, start, end, dim + 1, tsecond, true);
+      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim + 1, tfirst, true) : fsplit;
+    }
     // LoggingUtil.warning("start: " + start + " end: " + end + " s: " + fsplit
     // + ", " + ssplit);
     int nextdim = (dim + 1) % objs.get(0).getDimensionality();
@@ -98,52 +118,23 @@ public class PeanoBulkSplit extends AbstractBulkSplit {
     if(start < fsplit - 1) {
       mms[2 * dim] = min;
       mms[2 * dim + 1] = tfirst;
-      peanoSort(objs, start, fsplit, mms, nextdim, desc);
+      peanoSort(objs, start, fsplit, mms, nextdim, bits, desc);
     }
     if(fsplit < ssplit - 1) {
+      bits.flip(dim);
       mms[2 * dim] = tfirst;
       mms[2 * dim + 1] = tsecond;
-      peanoSort(objs, fsplit, ssplit, mms, nextdim, !desc);
+      peanoSort(objs, fsplit, ssplit, mms, nextdim, bits, !desc);
+      bits.flip(dim); // restore
     }
     if(ssplit < end - 1) {
       mms[2 * dim] = tsecond;
       mms[2 * dim + 1] = max;
-      peanoSort(objs, ssplit, end, mms, nextdim, desc);
+      peanoSort(objs, ssplit, end, mms, nextdim, bits, desc);
     }
-    // Restore
+    // Restore ranges
     mms[2 * dim] = min;
     mms[2 * dim + 1] = max;
     // FIXME: implement completely and test.
-  }
-
-  protected <T extends SpatialComparable> int splitSort(List<T> objs, int start, int end, int dim, double tfirst, boolean desc) {
-    int s = start, e = end;
-    while(s < e) {
-      double stm = getMinMaxObject(objs, s, dim);
-      while((stm <= tfirst) != desc && s + 1 < e) {
-        s++;
-        stm = getMinMaxObject(objs, s, dim);
-      }
-      double etm = getMinMaxObject(objs, e - 1, dim);
-      while((etm >= tfirst) != desc && s < e - 1) {
-        e--;
-        etm = getMinMaxObject(objs, e - 1, dim);
-      }
-      if(s >= e) {
-        assert (s == e);
-        break;
-      }
-      // Swap
-      objs.set(s, objs.set(e - 1, objs.get(s)));
-      s++;
-      e--;
-    }
-    return s;
-  }
-
-  protected double getMinMaxObject(List<? extends SpatialComparable> objs, int s, int dim) {
-    SpatialComparable sobj = objs.get(s);
-    double stm = sobj.getMin(dim) + sobj.getMax(dim);
-    return stm;
   }
 }
