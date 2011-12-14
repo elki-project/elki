@@ -27,14 +27,22 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Simple bulk loading strategy by sorting the data along the first dimension
+ * Simple bulk loading strategy by sorting the data along the first dimension.
+ * 
+ * This is also known as Nearest-X, and attributed to:
+ * <p>
+ * Roussopoulos, N. and Leifker, D.:<br />
+ * Direct spatial search on pictorial databases using packed R-trees<br />
+ * In: ACM SIGMOD Record 14-4
+ * </p>
  * 
  * @author Erich Schubert
  */
-// TODO: make sorting dimension parameterizable?
+@Reference(authors = "Roussopoulos, N. and Leifker, D.", title = "Direct spatial search on pictorial databases using packed R-trees", booktitle = "ACM SIGMOD Record 14-4", url = "http://dx.doi.org/10.1145/971699.318900")
 public class OneDimSortBulkSplit extends AbstractBulkSplit {
   /**
    * Static instance
