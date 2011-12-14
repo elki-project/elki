@@ -317,7 +317,10 @@ public class ArffParser implements Parser {
         // For multi-column vectors, read successive columns
         double[] cur = new double[dimsize[out]];
         for(int k = 0; k < dimsize[out]; k++) {
-          if(tokenizer.ttype != StreamTokenizer.TT_NUMBER) {
+          if(tokenizer.ttype == '?') {
+            tokenizer.nval = Double.NaN;
+          }
+          else if(tokenizer.ttype != StreamTokenizer.TT_NUMBER) {
             throw new AbortException("Expected word token, got: " + tokenizer.toString());
           }
           cur[k] = tokenizer.nval;
