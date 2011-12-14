@@ -61,7 +61,7 @@ public class PatternParameter extends Parameter<Pattern, Pattern> {
    * @param defaultValue the default value of the parameter
    */
   public PatternParameter(OptionID optionID, List<ParameterConstraint<Pattern>> constraint, String defaultValue) {
-    super(optionID, constraint, Pattern.compile(defaultValue));
+    super(optionID, constraint, Pattern.compile(defaultValue, Pattern.CASE_INSENSITIVE));
   }
 
   /**
@@ -108,7 +108,7 @@ public class PatternParameter extends Parameter<Pattern, Pattern> {
    * @param defaultValue the default value of the parameter
    */
   public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint, String defaultValue) {
-    super(optionID, constraint, Pattern.compile(defaultValue));
+    super(optionID, constraint, Pattern.compile(defaultValue, Pattern.CASE_INSENSITIVE));
   }
 
   /**
@@ -151,7 +151,7 @@ public class PatternParameter extends Parameter<Pattern, Pattern> {
    * @param defaultValue the default value of the parameter
    */
   public PatternParameter(OptionID optionID, String defaultValue) {
-    super(optionID, Pattern.compile(defaultValue));
+    super(optionID, Pattern.compile(defaultValue, Pattern.CASE_INSENSITIVE));
   }
 
   /**
@@ -173,13 +173,11 @@ public class PatternParameter extends Parameter<Pattern, Pattern> {
     super(optionID);
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     return getValue().toString();
   }
 
-  /** {@inheritDoc} */
   @Override
   protected Pattern parseValue(Object obj) throws ParameterException {
     if(obj == null) {
@@ -190,7 +188,7 @@ public class PatternParameter extends Parameter<Pattern, Pattern> {
     }
     if(obj instanceof String) {
       try {
-        return Pattern.compile((String) obj);
+        return Pattern.compile((String) obj, Pattern.CASE_INSENSITIVE);
       }
       catch(PatternSyntaxException e) {
         throw new WrongParameterValueException("Given pattern \"" + obj + "\" for parameter \"" + getName() + "\" is no valid regular expression!");
