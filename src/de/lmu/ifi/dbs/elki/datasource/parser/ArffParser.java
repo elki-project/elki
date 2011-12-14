@@ -93,7 +93,7 @@ public class ArffParser implements Parser {
   /**
    * Pattern to auto-convert columns to external ids.
    */
-  public static final String DEFAULT_ARFF_MAGIC_EID = "(ID|External-?ID)";
+  public static final String DEFAULT_ARFF_MAGIC_EID = "(External-?ID)";
 
   /**
    * Pattern to auto-convert columns to class labels.
