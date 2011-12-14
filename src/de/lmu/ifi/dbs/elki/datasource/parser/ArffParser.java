@@ -248,7 +248,7 @@ public class ArffParser implements Parser {
       assert (s >= 0);
       if(elkitypes[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
         TIntFloatHashMap f = new TIntFloatHashMap(dimsize[out]);
-        for (TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext(); ) {
+        for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
           iter.advance();
           int i = iter.key();
           if(i < s) {
@@ -265,7 +265,7 @@ public class ArffParser implements Parser {
       else if(elkitypes[out] == TypeUtil.LABELLIST) {
         // Build a label list out of successive labels
         LabelList ll = new LabelList(1);
-        for (TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext(); ) {
+        for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
           iter.advance();
           int i = iter.key();
           if(i < s) {
@@ -585,20 +585,22 @@ public class ArffParser implements Parser {
     else if((tokenizer.ttype == StreamTokenizer.TT_WORD) && (tokenizer.sval.equals("?"))) {
       tokenizer.ttype = '?';
     }
-    if(tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
-      logger.debug("token: " + tokenizer.nval);
-    }
-    else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
-      logger.debug("token: " + tokenizer.sval);
-    }
-    else if(tokenizer.ttype == StreamTokenizer.TT_EOF) {
-      logger.debug("token: EOF");
-    }
-    else if(tokenizer.ttype == StreamTokenizer.TT_EOL) {
-      logger.debug("token: EOL");
-    }
-    else {
-      logger.debug("token type: " + tokenizer.ttype);
+    if(logger.isDebugging()) {
+      if(tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
+        logger.debug("token: " + tokenizer.nval);
+      }
+      else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
+        logger.debug("token: " + tokenizer.sval);
+      }
+      else if(tokenizer.ttype == StreamTokenizer.TT_EOF) {
+        logger.debug("token: EOF");
+      }
+      else if(tokenizer.ttype == StreamTokenizer.TT_EOL) {
+        logger.debug("token: EOL");
+      }
+      else {
+        logger.debug("token type: " + tokenizer.ttype);
+      }
     }
   }
 
@@ -606,7 +608,7 @@ public class ArffParser implements Parser {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
