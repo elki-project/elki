@@ -70,8 +70,6 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
 
   @Override
   public BitSet getSelectedDimensions() {
-    BitSet dimensions = new BitSet(this.dimensions.size());
-    dimensions.or(this.dimensions);
     return dimensions;
   }
 

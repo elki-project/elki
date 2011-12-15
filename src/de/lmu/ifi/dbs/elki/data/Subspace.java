@@ -62,9 +62,8 @@ public class Subspace<V extends FeatureVector<V, ?>> {
    * @param dimensions the dimensions building this subspace
    */
   public Subspace(BitSet dimensions) {
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      this.dimensions.set(d);
-    }
+    this.dimensions.clear();
+    this.dimensions.or(dimensions);
     dimensionality = dimensions.cardinality();
   }
 
@@ -74,7 +73,7 @@ public class Subspace<V extends FeatureVector<V, ?>> {
    * @return the dimensions of this subspace
    */
   public final BitSet getDimensions() {
-    return dimensions;
+    return (BitSet) dimensions.clone();
   }
 
   /**
