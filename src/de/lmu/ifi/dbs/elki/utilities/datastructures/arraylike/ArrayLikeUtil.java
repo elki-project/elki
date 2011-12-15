@@ -188,7 +188,7 @@ public final class ArrayLikeUtil {
    * @param adapter Adapter
    * @return primitive double array
    */
-  public static <A> double[] toPrimitiveDoubleArray(A array, NumberArrayAdapter<?, A> adapter) {
+  public static <A> double[] toPrimitiveDoubleArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
     double[] ret = new double[adapter.size(array)];
     for(int i = 0; i < ret.length; i++) {
       ret[i] = adapter.getDouble(array, i);
@@ -207,13 +207,23 @@ public final class ArrayLikeUtil {
   }
 
   /**
+   * Convert a number vector to <code>double[]</code>.
+   * 
+   * @param obj Object to convert
+   * @return primitive double array
+   */
+  public static <N extends Number> double[] toPrimitiveDoubleArray(NumberVector<?, N> obj) {
+    return toPrimitiveDoubleArray(obj, numberVectorAdapter(obj));
+  }
+
+  /**
    * Convert a numeric array-like to a <code>float[]</code>
    * 
    * @param array Array-like
    * @param adapter Adapter
    * @return primitive float array
    */
-  public static <A> float[] toPrimitiveFloatArray(A array, NumberArrayAdapter<?, A> adapter) {
+  public static <A> float[] toPrimitiveFloatArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
     float[] ret = new float[adapter.size(array)];
     for(int i = 0; i < ret.length; i++) {
       ret[i] = adapter.getFloat(array, i);
@@ -229,5 +239,15 @@ public final class ArrayLikeUtil {
    */
   public static float[] toPrimitiveFloatArray(List<? extends Number> array) {
     return toPrimitiveFloatArray(array, NUMBERLISTADAPTER);
+  }
+
+  /**
+   * Convert a number vector to <code>float[]</code>.
+   * 
+   * @param obj Object to convert
+   * @return primitive float array
+   */
+  public static <N extends Number> float[] toPrimitiveFloatArray(NumberVector<?, N> obj) {
+    return toPrimitiveFloatArray(obj, numberVectorAdapter(obj));
   }
 }
