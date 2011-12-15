@@ -111,7 +111,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
     this.partitions = partitions;
     currentSubspaceDims = -1;
   }
-  
+
   @Override
   public void insert(Relation<V> data) throws IllegalStateException {
     initialize(data, data.getDBIDs());
@@ -182,7 +182,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
     }
   }
 
-  public void setPartitions(Relation<V> objects, int partitions) {
+  private void setPartitions(Relation<V> objects, int partitions) {
     if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
@@ -192,18 +192,9 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
       log.verbose("PVA: setting partitions (partitionCount=" + (partitions) + ") ...");
     }
     for(int i = 0; i < daFiles.size(); i++) {
-      PartitionBuilder<V> builder = new PartitionBuilder<V>(daFiles.get(i), partitions, objects);
-      builder.run();
+      daFiles.get(i).setPartitions(objects, partitions);
       splitPartitions[i] = daFiles.get(i).getSplitPositions();
     }
-  }
-
-  public double[] getSplitPositions(int dimension) {
-    return daFiles.get(dimension).getSplitPositions();
-  }
-
-  public DAFile getDAFile(int dimension) {
-    return daFiles.get(dimension);
   }
 
   public List<DAFile> getWorstCaseDistOrder(VectorApproximation query, SubSpace subspace) {
@@ -219,18 +210,13 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
   @Override
   public IndexStatistics getStatisitcs() {
     IndexStatistics is = new IndexStatistics(refinements, refinements, queryTime, scannedBytes / pageSize);
-    is.totalPages = /* relation.size() + */ ((VectorApproximation.byteOnDisk(currentSubspaceDims, partitions) * vectorApprox.size()) / pageSize);
+    is.totalPages = /* relation.size() + */((VectorApproximation.byteOnDisk(currentSubspaceDims, partitions) * vectorApprox.size()) / pageSize);
     is.pageSize = pageSize;
     is.numQueries = issuedQueries;
     is.indexName = "PartialVA";
     return is;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see experimentalcode.shared.index.subspace.SubspaceIndex#resetStatisitcs()
-   */
   @Override
   public void resetStatisitcs() {
     queryTime = 0;
@@ -538,40 +524,17 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
   public String getLongName() {
     return "partial va-file";
   }
-}
 
-class WorstCaseDistComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile> {
-  private VectorApproximation query;
+  static class WorstCaseDistComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile> {
+    private VectorApproximation query;
 
-  public WorstCaseDistComparator(VectorApproximation query) {
-    this.query = query;
-  }
+    public WorstCaseDistComparator(VectorApproximation query) {
+      this.query = query;
+    }
 
-  @Override
-  public int compare(DAFile a, DAFile b) {
-    return Double.compare(a.getMaxMaxDist(query.getApproximation(a.getDimension())), b.getMaxMaxDist(query.getApproximation(b.getDimension())));
-  }
-}
-
-class PartitionBuilder<V extends NumberVector<?, ?>> implements Runnable {
-  private final static Logging log = Logging.getLogger(PartitionBuilder.class);
-
-  private final DAFile daFile;
-
-  private final int partitions;
-
-  private final Relation<V> relation;
-
-  public PartitionBuilder(DAFile da, int partitions, Relation<V> relation) {
-    this.daFile = da;
-    this.partitions = partitions;
-    this.relation = relation;
-  }
-
-  public void run() {
-    log.fine("Dimension " + daFile.getDimension() + " started");
-    daFile.setPartitions(relation, partitions);
-    log.fine("Dimension " + daFile.getDimension() + " finished!");
-
+    @Override
+    public int compare(DAFile a, DAFile b) {
+      return Double.compare(a.getMaxMaxDist(query.getApproximation(a.getDimension())), b.getMaxMaxDist(query.getApproximation(b.getDimension())));
+    }
   }
 }
