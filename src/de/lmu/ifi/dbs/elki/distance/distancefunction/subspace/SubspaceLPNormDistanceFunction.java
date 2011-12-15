@@ -63,6 +63,15 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   }
 
   /**
+   * Get the value of p.
+   * 
+   * @return p
+   */
+  public double getP() {
+    return p;
+  }
+
+  /**
    * Provides the Euclidean distance between two given feature vectors in the
    * selected dimensions.
    * 
