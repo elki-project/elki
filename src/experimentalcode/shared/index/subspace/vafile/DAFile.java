@@ -24,12 +24,13 @@ package experimentalcode.shared.index.subspace.vafile;
  */
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import experimentalcode.franz.utils.ArrayUtils;
 
 /**
@@ -44,11 +45,7 @@ public class DAFile {
 
   private double[] splitPositions;
 
-  private double[] lookup;
-
   private int selectivityCoeff;
-
-  private static int p = 2;
 
   double[] maxDists, minDists;
 
@@ -57,51 +54,24 @@ public class DAFile {
     selectivityCoeff = -1;
   }
 
-  public void setPartitions(Collection<NumberVector<?, ?>> objects, int partitions) {
-    long start = System.currentTimeMillis();
-
+  public void setPartitions(Relation<? extends NumberVector<?, ?>> relation, int partitions) {
     splitPositions = new double[partitions + 1];
-    int[] partitionCount = new int[partitions];
+    final int size = relation.size();
 
-    int size = objects.size();
-    int remaining = size;
     double[] tempdata = new double[size];
     int j = 0;
-    for(NumberVector<?, ?> dv : objects) {
-      tempdata[j++] = dv.doubleValue(dimension + 1);
+    for(DBID id : relation.iterDBIDs()) {
+      tempdata[j] = relation.get(id).doubleValue(dimension + 1);
+      j += 1;
     }
     Arrays.sort(tempdata);
-    tempdata = ArrayUtils.unique(tempdata, 1 / (100 * partitions));
 
-    int bucketSize = (int) (size / (double) partitions);
-    int i = 0;
-    for(int b = 0; b < partitionCount.length; b++) {
-      splitPositions[b] = tempdata[i];
-      remaining -= bucketSize;
-      i += bucketSize;
-
-      // test: are there remaining objects that have to be put in the
-      // first buckets?
-      if(remaining > (bucketSize * (partitionCount.length - b - 1))) {
-        i++;
-        remaining--;
-        partitionCount[b]++;
-      }
-
-      partitionCount[b] += bucketSize;
+    for(int b = 0; b < partitions; b++) {
+      int start = (int) (b * size / (double) partitions);
+      splitPositions[b] = tempdata[start];
     }
-    splitPositions[partitions] = tempdata[size - 1] + 0.000001; // make sure
-                                                                // that
-    // last object will
-    // be included
-
-    System.out.println("dimension " + dimension + " finished! (time: " + (System.currentTimeMillis() - start) + " ms)");
-
-    assert splitPositions != null : "borders are null";
-  }
-
-  public void setPartitions(double[] borders) {
-    this.splitPositions = borders;
+    // make sure that last object will be included
+    splitPositions[partitions] = tempdata[size - 1] + 0.000001;
   }
 
   /**
@@ -128,52 +98,6 @@ public class DAFile {
     // result = Math.max(result, maxDists[i]);
     // }
     // return result;
-  }
-
-  public void setLookupTable(NumberVector<?, ?> query) {
-    int bordercount = splitPositions.length;
-    lookup = new double[bordercount];
-    for(int i = 0; i < bordercount; i++) {
-      lookup[i] = Math.pow(splitPositions[i] - query.doubleValue(dimension + 1), p);
-    }
-
-    int queryCellGlobal = -1;
-    for(int i = 0; i < splitPositions.length; i++) {
-      if(query.doubleValue(dimension + 1) < splitPositions[i]) {
-        break;
-      }
-      else {
-        queryCellGlobal++;
-      }
-    }
-    // maxdists
-    maxDists = new double[splitPositions.length - 1];
-    for(int i = 0; i < maxDists.length; i++) {
-      if(i < queryCellGlobal) {
-        maxDists[i] = lookup[i];
-      }
-      else if(i > queryCellGlobal) {
-        maxDists[i] = lookup[i + 1];
-      }
-      else {
-        maxDists[i] = Math.max(lookup[i], lookup[i + 1]);
-      }
-    }
-
-    // mindists
-    minDists = new double[splitPositions.length - 1];
-    for(int i = 0; i < minDists.length; i++) {
-      if(i < queryCellGlobal) {
-        minDists[i] = lookup[i + 1];
-      }
-      else if(i > queryCellGlobal) {
-        minDists[i] = lookup[i];
-      }
-      else {
-        minDists[i] = 0;
-      }
-    }
-
   }
 
   /**

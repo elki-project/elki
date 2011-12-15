@@ -140,7 +140,6 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     final int dimensions = DatabaseUtil.dimensionality(relation);
     final int size = relation.size();
     splitPositions = new double[dimensions][partitions + 1];
-    int[][] partitionCount = new int[dimensions][partitions];
 
     for(int d = 0; d < dimensions; d++) {
       double[] tempdata = new double[size];
@@ -153,22 +152,10 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
 
       for(int b = 0; b < partitions; b++) {
         int start = (int) (b * size / (double) partitions);
-        int end = (int) ((b + 1) * size / (double) partitions) - 1;
         splitPositions[d][b] = tempdata[start];
-        partitionCount[d][b] = (end - start);
       }
       // make sure that last object will be included
       splitPositions[d][partitions] = tempdata[size - 1] + 0.000001;
-
-      if(log.isDebuggingFinest()) {
-        log.finest("dim " + (d + 1) + ": ");
-        for(int b = 0; b < splitPositions[d].length; b++) {
-          log.finest(splitPositions[d][b] + "  ");
-          if(b < splitPositions[d].length - 1) {
-            log.finest("(bucket " + (b + 1) + "/" + partitions + ", " + partitionCount[d][b] + ")  ");
-          }
-        }
-      }
     }
   }
 
