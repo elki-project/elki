@@ -59,7 +59,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
   /**
    * The parameter sampleSizes
    */
-  private List<Integer> sampleSizes = new ArrayList<Integer>();
+  private int sampleSize;
   
   /**
    * Parameter to specify the number of repetitions of computing the hopkins value.
@@ -98,9 +98,9 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
    */
   private double[] minima = new double[0];
 
-  public HopkinsStatistic(PrimitiveDistanceFunction<? super V, D> distanceFunction, List<Integer> sampleSizes, Long seed, int rep, double[] minima, double[] maxima) {
+  public HopkinsStatistic(PrimitiveDistanceFunction<? super V, D> distanceFunction, int sampleSize, Long seed, int rep, double[] minima, double[] maxima) {
     super(distanceFunction);
-    this.sampleSizes = sampleSizes;
+    this.sampleSize = sampleSize;
     this.seed = seed;
     this.rep = rep;
     this.minima = minima;
@@ -111,25 +111,28 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
    * Runs the algorithm in the timed evaluation part.
    */
   public HopkinsResult run(Database database, Relation<V> relation) {
-    final DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+   
     final Random masterRandom = (this.seed != null) ? new Random(this.seed) : new Random();
+    DoubleDoublePair hopkins = hopkins(database, relation, masterRandom);
+    
+      // turn into result object
+      String r =   " hopins mean: " + hopkins.first + " hopkins variance: " + hopkins.second;
+    ArrayList<String> bla = new ArrayList<String>();
+    bla.add(r);
+      return new HopkinsResult(bla);
+  }
+
+  protected DoubleDoublePair hopkins(Database database, Relation<V> relation, final Random masterRandom) {
+    final DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<V, D> knnQuery = database.getKNNQuery(distanceQuery, 2);
-    double hopkins;
     DoubleDoublePair pair;
-    ArrayList<DoubleDoublePair> result = new ArrayList<DoubleDoublePair>();
     MeanVariance mv = new MeanVariance();
-    for(int i = 0; i < sampleSizes.size(); i++) {
-      int sampleSize = sampleSizes.get(i);
       //compute the hopkins value several times and use the average value for a more stable result
       for(int j=0; j < this.rep; j++){
-        mv.put(computeHopkinsValue(knnQuery, relation, masterRandom, sampleSize));
+        mv.put(computeHopkinsValue(knnQuery, relation,new Random( masterRandom.nextLong()), sampleSize));
       }
-      logger.fine("hopkins " + mv.getMean() + " samplesize " + sampleSize);
-      // turn into result object
       pair = new DoubleDoublePair(mv.getMean(), mv.getSampleVariance());
-      result.add(pair);
-    }
-    return new HopkinsResult(result);
+    return pair;
   }
 
   private double computeHopkinsValue(KNNQuery<V, D> knnQuery, Relation<V> relation, Random masterRandom, int sampleSize) {
@@ -153,7 +156,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     }
 
     // compute hopkins statistik
-    double result = b / (a + b);
+    double result = a / (a + b);
     return result;
   }
 
@@ -213,15 +216,15 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
-  public static class HopkinsResult extends CollectionResult<DoubleDoublePair> {
+  public static class HopkinsResult extends CollectionResult<String> {
 
     /**
      * Constructor.
      * 
      * @param hopkins result value Hopkinsstatistic
      */
-    public HopkinsResult(Collection<DoubleDoublePair> hopkinsResult) {
-      super("Hopkinsstatistic", "hopkins", hopkinsResult);
+    public HopkinsResult(Collection<String> r) {
+      super("Hopkinsstatistic", "hopkins", r);
     }
 
   }
@@ -235,7 +238,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
    */
   public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
 
-    protected List<Integer> sampleSizes;
+    protected int sampleSize;
     
     protected int rep;
     
@@ -262,9 +265,9 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
         rep = r.getDefaultValue();
       }
         
-      IntListParameter sample = new IntListParameter(SAMPLESIZE_ID);
+      IntParameter sample = new IntParameter(SAMPLESIZE_ID);
       if(config.grab(sample)) {
-        sampleSizes = sample.getValue();
+        sampleSize = sample.getValue();
       }
       LongParameter seedP = new LongParameter(SEED_ID, true);
       if(config.grab(seedP)) {
@@ -293,7 +296,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
 
     @Override
     protected HopkinsStatistic<V, D> makeInstance() {
-      return new HopkinsStatistic<V, D>(distanceFunction, sampleSizes, seed,rep, minima, maxima);
+      return new HopkinsStatistic<V, D>(distanceFunction, sampleSize, seed,rep, minima, maxima);
     }
   }
 }
