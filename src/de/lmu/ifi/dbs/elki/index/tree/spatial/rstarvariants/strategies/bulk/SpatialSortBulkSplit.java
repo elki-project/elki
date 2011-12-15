@@ -26,6 +26,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -35,8 +36,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Bulk loading by spatially sorting the objects, then partitioning the sorted
  * list appropriately.
  * 
+ * Based conceptually on:
+ * <p>
+ * On packing R-trees<br/>
+ * Kamel, I. and Faloutsos, C.<br/>
+ * Proc. 2of the second international conference on Information and knowledge
+ * management
+ * </p>
+ * 
  * @author Erich Schubert
  */
+@Reference(title = "On packing R-trees", authors = "Kamel, I. and Faloutsos, C.", booktitle = "Proc. 2of the second international conference on Information and knowledge management", url = "http://dx.doi.org/10.1145/170088.170403")
 public class SpatialSortBulkSplit extends AbstractBulkSplit {
   /**
    * Sorting class
