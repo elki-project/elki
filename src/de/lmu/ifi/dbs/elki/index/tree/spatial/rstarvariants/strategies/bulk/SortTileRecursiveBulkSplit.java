@@ -93,6 +93,8 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
   /**
    * Comparison helper.
    * 
+   * @apiviz.exclude
+   * 
    * @author Erich Schubert
    * 
    * @param <T> Type
