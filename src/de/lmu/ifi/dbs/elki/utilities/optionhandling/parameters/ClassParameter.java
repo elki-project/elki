@@ -54,6 +54,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // TODO: add additional constructors with parameter constraints.
 // TODO: turn restrictionClass into a constraint?
 public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
+  /**
+   * Class loader.
+   */
+  protected static final ClassLoader loader = ClassLoader.getSystemClassLoader();
+  
+  /**
+   * Factory class postfix.
+   */
   public static final String FACTORY_POSTFIX = "$Factory";
 
   /**
@@ -133,26 +141,26 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
       try {
         // Try exact class factory first.
         try {
-          return (Class<? extends C>) Class.forName(value + FACTORY_POSTFIX);
+          return (Class<? extends C>) loader.loadClass(value + FACTORY_POSTFIX);
         }
         catch(ClassNotFoundException e) {
           // Ignore, retry
         }
         try {
-          return (Class<? extends C>) Class.forName(value);
+          return (Class<? extends C>) loader.loadClass(value);
         }
         catch(ClassNotFoundException e) {
           // Ignore, retry
         }
         // Try factory for guessed name next
         try {
-          return (Class<? extends C>) Class.forName(restrictionClass.getPackage().getName() + "." + value + FACTORY_POSTFIX);
+          return (Class<? extends C>) loader.loadClass(restrictionClass.getPackage().getName() + "." + value + FACTORY_POSTFIX);
         }
         catch(ClassNotFoundException e) {
           // Ignore, retry
         }
         // Last try: guessed name prefix only
-        return (Class<? extends C>) Class.forName(restrictionClass.getPackage().getName() + "." + value);
+        return (Class<? extends C>) loader.loadClass(restrictionClass.getPackage().getName() + "." + value);
       }
       catch(ClassNotFoundException e) {
         throw new WrongParameterValueException(this, value, "Given class \"" + value + "\" not found.", e);

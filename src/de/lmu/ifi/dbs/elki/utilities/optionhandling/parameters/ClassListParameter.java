@@ -54,6 +54,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // TODO: Add missing constructors. (ObjectListParameter also!)
 public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   /**
+   * Class loader
+   */
+  protected static final ClassLoader loader = ClassLoader.getSystemClassLoader();
+
+  /**
    * The restriction class for the list of class names.
    */
   protected Class<C> restrictionClass;
@@ -145,11 +150,11 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
         try {
           Class<?> c;
           try {
-            c = Class.forName(cl);
+            c = loader.loadClass(cl);
           }
           catch(ClassNotFoundException e) {
             // try in package of restriction class
-            c = Class.forName(restrictionClass.getPackage().getName() + "." + cl);
+            c = loader.loadClass(restrictionClass.getPackage().getName() + "." + cl);
           }
           // Redundant check, also in validate(), but not expensive.
           if(!restrictionClass.isAssignableFrom(c)) {
