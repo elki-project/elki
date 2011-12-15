@@ -227,7 +227,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
   }
 
   @Override
-  public <D extends Distance<D>> KNNList<D> subSpaceKnnQuery(V query, DimensionSelectingSubspaceDistanceFunction<V, ?> distance, int k) {
+  public <D extends Distance<D>> KNNList<D> subSpaceKnnQuery(V query, DimensionSelectingSubspaceDistanceFunction<? super V, ?> distance, int k) {
     issuedQueries++;
     long t = System.nanoTime();
     long tmp = System.currentTimeMillis();
@@ -389,7 +389,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
   }
 
   @Override
-  public <D extends Distance<D>> DBIDs subSpaceRangeQuery(V query, DimensionSelectingSubspaceDistanceFunction<V, D> distance, D eps) {
+  public <D extends Distance<D>> DBIDs subSpaceRangeQuery(V query, DimensionSelectingSubspaceDistanceFunction<? super V, D> distance, D eps) {
     issuedQueries++;
     long t = System.nanoTime();
 
