@@ -24,13 +24,11 @@ package experimentalcode.shared.index.subspace.vafile;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -196,7 +194,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
     for(int i = 0; i < daFiles.size(); i++) {
       PartitionBuilder<V> builder = new PartitionBuilder<V>(daFiles.get(i), partitions, objects);
       builder.run();
-      splitPartitions[i] = builder.getSplitPositions();
+      splitPartitions[i] = daFiles.get(i).getSplitPositions();
     }
   }
 
@@ -562,75 +560,18 @@ class PartitionBuilder<V extends NumberVector<?, ?>> implements Runnable {
 
   private final int partitions;
 
-  private final double[] splitPositions;
+  private final Relation<V> relation;
 
-  private final Relation<V> objects;
-
-  public PartitionBuilder(DAFile da, int partitions, Relation<V> objects) {
+  public PartitionBuilder(DAFile da, int partitions, Relation<V> relation) {
     this.daFile = da;
     this.partitions = partitions;
-    this.objects = objects;
-    this.splitPositions = new double[partitions + 1];
+    this.relation = relation;
   }
 
   public void run() {
-    try {
-      log.fine("Dimension " + daFile.getDimension() + " started");
-      int[] partitionCount = new int[partitions];
-
-      int size = objects.size();
-      int remaining = size;
-      double[] tempdata = new double[size];
-      int j = 0;
-      for(DBID id : objects.getDBIDs()) {
-        tempdata[j++] = objects.get(id).doubleValue(daFile.getDimension() + 1);
-      }
-      Arrays.sort(tempdata);
-      // tempdata = unique(tempdata, 1 / (100 * partitions));
-
-      int bucketSize = (int) (size / (double) partitions);
-      int i = 0;
-      for(int b = 0; b < partitions; b++) {
-        assert i <= tempdata.length : "i out ouf bounds " + i + " <> " + tempdata.length;
-        splitPositions[b] = tempdata[i];
-        remaining -= bucketSize;
-        i += bucketSize;
-
-        // test: are there remaining objects that have to be put in the
-        // first buckets?
-        if(remaining > (bucketSize * (partitionCount.length - b - 1))) {
-          i++;
-          remaining--;
-          partitionCount[b]++;
-        }
-
-        partitionCount[b] += bucketSize;
-      }
-      // make sure that lastobject will be included
-      splitPositions[partitions] = tempdata[size - 1] + 0.000001;
-      daFile.setPartitions(splitPositions);
-
-      if(log.isDebuggingFine()) {
-        int d = daFile.getDimension();
-        StringBuffer buf = new StringBuffer();
-        buf.append("dim " + (d + 1) + ": ");
-        for(int b = 0; b < splitPositions.length; b++) {
-          buf.append(splitPositions[b] + "  ");
-          if(b < splitPositions.length - 1) {
-            buf.append("(bucket " + (b + 1) + "/" + partitions + ", " + partitionCount[b] + ")  ");
-          }
-        }
-        log.fine(buf);
-      }
-    }
-    catch(Throwable t) {
-      log.log(Level.SEVERE, "Exception occured in Partition Builder!", t);
-    }
+    log.fine("Dimension " + daFile.getDimension() + " started");
+    daFile.setPartitions(relation, partitions);
     log.fine("Dimension " + daFile.getDimension() + " finished!");
 
-  }
-
-  public double[] getSplitPositions() {
-    return splitPositions;
   }
 }
