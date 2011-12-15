@@ -46,6 +46,11 @@ public class IterateKnownImplementations implements IterableIterator<Class<?>> {
   private static final Logging logger = Logging.getLogger(Properties.class);
   
   /**
+   * Class loader.
+   */
+  private static final ClassLoader loader = ClassLoader.getSystemClassLoader();
+
+  /**
    * Pattern to detect comments
    */
   private final static Pattern COMMENTS = Pattern.compile("^\\s*(#.*)?$");
@@ -96,7 +101,7 @@ public class IterateKnownImplementations implements IterableIterator<Class<?>> {
         continue;
       }
       try {
-        cur = Class.forName(name);
+        cur = loader.loadClass(name);
       }
       catch(ClassNotFoundException e) {
         logger.warning("Class " + name + " (from properties file) not found for superclass " + this.superclass.getName());

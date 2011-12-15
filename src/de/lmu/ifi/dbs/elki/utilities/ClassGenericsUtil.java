@@ -68,6 +68,11 @@ public final class ClassGenericsUtil {
   private static final Logging logger = Logging.getLogger(ClassGenericsUtil.class);
 
   /**
+   * Class loader.
+   */
+  private static final ClassLoader loader = ClassLoader.getSystemClassLoader();
+
+  /**
    * Name for a static "parameterize" factory method.
    */
   public static final String FACTORY_METHOD_NAME = "parameterize";
@@ -93,11 +98,11 @@ public final class ClassGenericsUtil {
     T instance;
     try {
       try {
-        instance = type.cast(Class.forName(className).newInstance());
+        instance = type.cast(loader.loadClass(className).newInstance());
       }
       catch(ClassNotFoundException e) {
         // try package of type
-        instance = type.cast(Class.forName(type.getPackage().getName() + "." + className).newInstance());
+        instance = type.cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
     catch(InstantiationException e) {
@@ -144,11 +149,11 @@ public final class ClassGenericsUtil {
     // (probably not because generics are implemented via erasure.
     try {
       try {
-        instance = ((Class<T>) type).cast(Class.forName(className).newInstance());
+        instance = ((Class<T>) type).cast(loader.loadClass(className).newInstance());
       }
       catch(ClassNotFoundException e) {
         // try package of type
-        instance = ((Class<T>) type).cast(Class.forName(type.getPackage().getName() + "." + className).newInstance());
+        instance = ((Class<T>) type).cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
     catch(InstantiationException e) {
