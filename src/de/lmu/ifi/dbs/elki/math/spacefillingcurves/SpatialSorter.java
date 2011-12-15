@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk;
+package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
 
 /*
  This file is part of ELKI:
@@ -22,46 +22,23 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Trivial bulk loading - assumes that the file has been appropriately sorted
- * before.
+ * Interface for spatial sorting - ZCurves, Peano curves, Hilber curves, ...
  * 
  * @author Erich Schubert
  */
-public class FileOrderBulkSplit extends AbstractBulkSplit {
+public interface SpatialSorter {
   /**
-   * Static instance
-   */
-  public static final FileOrderBulkSplit STATIC = new FileOrderBulkSplit();
-
-  /**
-   * Constructor.
-   */
-  protected FileOrderBulkSplit() {
-    super();
-  }
-
-  @Override
-  public <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries) {
-    return trivialPartition(spatialObjects, minEntries, maxEntries);
-  }
-
-  /**
-   * Parameterization class.
+   * Partitions the specified feature vectors
    * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
+   * @param <T> actual type we sort
+   * @param objs the spatial objects to be sorted
    */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected FileOrderBulkSplit makeInstance() {
-      return FileOrderBulkSplit.STATIC;
-    }
-  }
+  public <T extends SpatialComparable> void sort(List<T> objs);
+
 }

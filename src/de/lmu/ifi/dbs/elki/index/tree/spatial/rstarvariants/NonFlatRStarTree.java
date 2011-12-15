@@ -29,7 +29,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract superclass for all non-flat R*-Tree variants.
@@ -217,7 +216,6 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     for(E entry : objects) {
       if (entry.isLeafEntry()) {
         root.addLeafEntry(entry);
-        throw new AbortException("Unexpected spatial comparable encountered.");
       }
       else {
         root.addDirectoryEntry(entry);

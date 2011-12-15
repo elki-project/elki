@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
 
 /*
  This file is part of ELKI:
