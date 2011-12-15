@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
 
 import java.util.List;
 

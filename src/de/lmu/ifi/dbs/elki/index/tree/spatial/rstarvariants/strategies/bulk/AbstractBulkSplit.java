@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk;
 
 import java.util.ArrayList;
 import java.util.List;
