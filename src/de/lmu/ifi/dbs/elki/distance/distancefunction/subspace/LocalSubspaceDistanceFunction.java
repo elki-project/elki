@@ -48,13 +48,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @apiviz.has Instance
  */
-public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> {
+public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> {
   /**
    * Constructor
    * 
    * @param indexFactory Index factory
    */
-  public SubspaceDistanceFunction(IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>> indexFactory) {
+  public LocalSubspaceDistanceFunction(IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>> indexFactory) {
     super(indexFactory);
   }
 
@@ -76,12 +76,12 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance, SubspaceDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance> {
+  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance, LocalSubspaceDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance> {
     /**
      * @param database Database
      * @param index Index
      */
-    public Instance(Relation<V> database, FilteredLocalPCAIndex<V> index, SubspaceDistanceFunction distanceFunction) {
+    public Instance(Relation<V> database, FilteredLocalPCAIndex<V> index, LocalSubspaceDistanceFunction distanceFunction) {
       super(database, index, distanceFunction);
     }
 
@@ -145,8 +145,8 @@ public class SubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction
    }
 
     @Override
-    protected SubspaceDistanceFunction makeInstance() {
-      return new SubspaceDistanceFunction(factory);
+    protected LocalSubspaceDistanceFunction makeInstance() {
+      return new LocalSubspaceDistanceFunction(factory);
     }
   }
 }

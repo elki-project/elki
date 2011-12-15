@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
@@ -292,7 +292,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
      * @return sod value
      */
     private double subspaceOutlierDegree(V queryObject, V center, BitSet weightVector) {
-      final DimensionsSelectingEuclideanDistanceFunction df = new DimensionsSelectingEuclideanDistanceFunction(weightVector);
+      final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(weightVector);
       final int card = weightVector.cardinality();
       if(card == 0) {
         return 0;
