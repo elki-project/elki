@@ -31,8 +31,13 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DoubleNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Provides a distance function that computes the Euclidean distance between
@@ -40,14 +45,21 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Elke Achtert
  */
-public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?, ?>> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?, ?>> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>>, DoubleNorm<NumberVector<?, ?>> {
+  /**
+   * Value of p
+   */
+  private double p;
+
   /**
    * Constructor.
    * 
    * @param dimensions Selected dimensions
+   * @param p p value
    */
-  public DimensionsSelectingEuclideanDistanceFunction(BitSet dimensions) {
+  public SubspaceLPNormDistanceFunction(double p, BitSet dimensions) {
     super(dimensions);
+    this.p = p;
   }
 
   /**
@@ -65,44 +77,35 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " + "first argument: " + v1 + "\n  " + "second argument: " + v2);
     }
 
-    if(v1.getDimensionality() < getSelectedDimensions().cardinality()) {
-      throw new IllegalArgumentException("The dimensionality of the feature space " + "is not consistent with the specified dimensions " + "to be considered for distance computation.\n  " + "dimensionality of the feature space: " + v1.getDimensionality() + "\n  " + "specified dimensions: " + getSelectedDimensions());
-    }
-
     double sqrDist = 0;
-    for(int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
-      double manhattanI = v1.doubleValue(d + 1) - v2.doubleValue(d + 1);
-      sqrDist += manhattanI * manhattanI;
+    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+      double manhattanI = Math.abs(v1.doubleValue(d + 1) - v2.doubleValue(d + 1));
+      sqrDist += Math.pow(manhattanI, p);
     }
-    return Math.sqrt(sqrDist);
+    return Math.pow(sqrDist, 1. / p);
   }
 
   protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
-    if(v.getDimensionality() < getSelectedDimensions().size()) {
-      throw new IllegalArgumentException("The dimensionality of the feature space " + "is not consistent with the specified dimensions " + "to be considered for distance computation.\n  " + "dimensionality of the feature space: " + v.getDimensionality() + "\n  " + "specified dimensions: " + getSelectedDimensions());
-    }
 
     double sqrDist = 0;
-    for(int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
+    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
       double value = v.doubleValue(d);
-      double r;
+      double min;
       if(value < mbr.getMin(d)) {
-        r = mbr.getMin(d);
+        min = mbr.getMin(d) - value;
       }
       else if(value > mbr.getMax(d)) {
-        r = mbr.getMax(d);
+        min = value - mbr.getMax(d);
       }
       else {
-        r = value;
+        continue;
       }
-
-      double manhattanI = value - r;
-      sqrDist += manhattanI * manhattanI;
+      sqrDist += Math.pow(min, p);
     }
-    return Math.sqrt(sqrDist);
+    return Math.pow(sqrDist, 1. / p);
   }
 
   @Override
@@ -110,12 +113,8 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
-    if(mbr1.getDimensionality() < getSelectedDimensions().size()) {
-      throw new IllegalArgumentException("The dimensionality of the feature space " + "is not consistent with the specified dimensions " + "to be considered for distance computation.\n  " + "dimensionality of the feature space: " + mbr1.getDimensionality() + "\n  " + "specified dimensions: " + getSelectedDimensions());
-    }
-
     double sqrDist = 0;
-    for(int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
+    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
       final double m1, m2;
       if(mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr1.getMax(d);
@@ -128,15 +127,35 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
       else { // The mbrs intersect!
         continue;
       }
-      double manhattanI = m1 - m2;
-      sqrDist += manhattanI * manhattanI;
+      double manhattanI = Math.abs(m1 - m2);
+      sqrDist += Math.pow(manhattanI, p);
     }
-    return Math.sqrt(sqrDist);
+    return Math.pow(sqrDist, 1. / p);
   }
 
   @Override
   public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return new DoubleDistance(doubleMinDist(mbr1, mbr2));
+  }
+
+  @Override
+  public DoubleDistance norm(NumberVector<?, ?> obj) {
+    return new DoubleDistance(doubleNorm(obj));
+  }
+
+  @Override
+  public double doubleNorm(NumberVector<?, ?> obj) {
+    double sqrDist = 0;
+    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+      double manhattanI = Math.abs(obj.doubleValue(d + 1));
+      sqrDist += Math.pow(manhattanI, p);
+    }
+    return Math.pow(sqrDist, 1. / p);
+  }
+
+  @Override
+  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
+    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
   }
 
   @Override
@@ -149,11 +168,6 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
     return true;
   }
 
-  @Override
-  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
-  }
-
   /**
    * Parameterization class.
    * 
@@ -162,9 +176,29 @@ public class DimensionsSelectingEuclideanDistanceFunction extends AbstractDimens
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDimensionsSelectingDoubleDistanceFunction.Parameterizer {
+    /**
+     * Value of p
+     */
+    private double p;
+
     @Override
-    protected DimensionsSelectingEuclideanDistanceFunction makeInstance() {
-      return new DimensionsSelectingEuclideanDistanceFunction(dimensions);
+    protected void makeOptions(Parameterization config) {
+      final DoubleParameter paramP = new DoubleParameter(LPNormDistanceFunction.P_ID, new GreaterConstraint(0));
+      if(config.grab(paramP)) {
+        p = paramP.getValue();
+      }
+      super.makeOptions(config);
+    }
+
+    @Override
+    protected SubspaceLPNormDistanceFunction makeInstance() {
+      if (p == 2.0) {
+        return new SubspaceEuclideanDistanceFunction(dimensions);
+      }
+      if (p == 1.0) {
+        return new SubspaceManhattanDistanceFunction(dimensions);
+      }
+      return new SubspaceLPNormDistanceFunction(p, dimensions);
     }
   }
 }

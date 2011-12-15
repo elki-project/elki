@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -144,7 +144,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("LOF iterations", num, logger) : null;
       for(int i = 0; i < num; i++) {
         BitSet dimset = randomSubspace(dbdim, mindim, maxdim);
-        DimensionsSelectingEuclideanDistanceFunction df = new DimensionsSelectingEuclideanDistanceFunction(dimset);
+        SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
         LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(k, df, df);
 
         // run LOF and collect the result

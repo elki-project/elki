@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<?, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements PrimitiveDoubleDistanceFunction<V> {
+public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<?, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements PrimitiveDoubleDistanceFunction<V>, DimensionSelectingSubspaceDistanceFunction<V, DoubleDistance> {
   /**
    * Dimensions parameter.
    */
@@ -51,7 +51,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   /**
    * The dimensions to be considered for distance computation.
    */
-  private BitSet dimensions;
+  protected BitSet dimensions;
 
   /**
    * Constructor.
@@ -68,22 +68,14 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
     return new DoubleDistance(doubleDistance(o1, o2));
   }
 
-  /**
-   * Returns a bit set representing the selected dimensions.
-   * 
-   * @return a bit set representing the selected dimensions
-   */
+  @Override
   public BitSet getSelectedDimensions() {
     BitSet dimensions = new BitSet(this.dimensions.size());
     dimensions.or(this.dimensions);
     return dimensions;
   }
 
-  /**
-   * Sets the selected dimensions according to the set bits in the given BitSet.
-   * 
-   * @param dimensions a BitSet designating the new selected dimensions
-   */
+  @Override
   public void setSelectedDimensions(BitSet dimensions) {
     this.dimensions.clear();
     this.dimensions.or(dimensions);

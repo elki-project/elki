@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -94,7 +94,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
   /**
    * The distance function to determine the distance between database objects.
    * <p>
-   * Default value: {@link DimensionsSelectingEuclideanDistanceFunction}
+   * Default value: {@link SubspaceEuclideanDistanceFunction}
    * </p>
    * <p>
    * Key: {@code -subclu.distancefunction}
@@ -477,7 +477,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> param = new ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(DISTANCE_FUNCTION_ID, AbstractDimensionsSelectingDoubleDistanceFunction.class, DimensionsSelectingEuclideanDistanceFunction.class);
+      ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> param = new ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(DISTANCE_FUNCTION_ID, AbstractDimensionsSelectingDoubleDistanceFunction.class, SubspaceEuclideanDistanceFunction.class);
       if(config.grab(param)) {
         distance = param.instantiateClass(config);
       }
