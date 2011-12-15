@@ -208,7 +208,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
   }
 
   @Override
-  public IndexStatistics getStatisitcs() {
+  public IndexStatistics getStatistics() {
     IndexStatistics is = new IndexStatistics(refinements, refinements, queryTime, scannedBytes / pageSize);
     is.totalPages = /* relation.size() + */((VectorApproximation.byteOnDisk(currentSubspaceDims, partitions) * vectorApprox.size()) / pageSize);
     is.pageSize = pageSize;
@@ -218,7 +218,7 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
   }
 
   @Override
-  public void resetStatisitcs() {
+  public void resetStatistics() {
     queryTime = 0;
     scannedBytes = 0;
     refinements = 0;
