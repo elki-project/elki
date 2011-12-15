@@ -22,7 +22,6 @@ package experimentalcode.erich;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
@@ -41,15 +40,15 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs) {
     double[] mm = computeMinMax(objs);
-    hilbertSort(objs, 0, objs.size(), mm, 0, 0, 0L, new BitSet());
+    hilbertSort(objs, 0, objs.size(), mm, 0, 0, 0L, 0L);
   }
 
-  private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int axis, long history, BitSet inversions) {
+  private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int axis, long history, long inversions) {
     final int dims = mms.length >>> 1;
     // Completed level of hilbert curve?
     final boolean complete = (depth + 1) % dims == 0;
-    final boolean right = (history & (1 << axis)) != 0;
-    final boolean inv = inversions.get(axis);
+    //final boolean right = (history & (1 << axis)) != 0;
+    final boolean inv = (inversions & (1 << axis)) != 0;
 
     // Find the splitting point.
     final double min = mms[2 * axis], max = mms[2 * axis + 1];
@@ -70,7 +69,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       }
     }
     // if(complete)
-    LoggingUtil.warning("Depth: " + depth + (complete ? " !" : " ") + " axis: " + (inv ? "-" : "+") + axis + (right ? "R" : " ") + " history: " + history + " inversions: " + inversions + " " + FormatUtil.format(mms));
+    LoggingUtil.warning("Depth: " + depth + (complete ? " !" : " ") + " axis: " + (inv ? "-" : "+") + axis + /* (right ? "R" : " ") + */ " history: " + history + " inversions: " + inversions + " " + FormatUtil.format(mms));
     int split = pivotizeList1D(objs, start, end, axis + 1, half, inv);
     // Need to descend?
     if(end - split <= 1 && split - start <= 1) {
@@ -85,11 +84,11 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         hilbertSort(objs, start, split, mms, depth + 1, nextaxis, history << 1, inversions);
       }
       if(split < end - 1) {
-        inversions.flip(nextaxis);
+        inversions ^= 1L << nextaxis;
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
         hilbertSort(objs, split, end, mms, depth + 1, nextaxis, history << 1 ^ 1, inversions);
-        inversions.flip(nextaxis);
+        inversions ^= 1L << nextaxis;
       }
     }
     else {
@@ -98,36 +97,38 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       int leftaxis = bound(axis - card * (high ? -1 : 1), dims);
       int rightaxis = bound(axis - (card + 1) * (high ? -1 : 1), dims);
       LoggingUtil.warning("History: " + history + " card: " + card + " axis: " + (inv ? "-" : "+") + axis + " left: " + leftaxis + " right: " + rightaxis);
-      if((card & 1) == 1) {
-        inversions.flip(axis);
-      }
+      LoggingUtil.warning("History gray: "+gray(history)+" inversions gray: "+gray(inversions));
       if(start < split - 1) {
+        if ((card % 2) == 1) {
+          inversions ^= 1L << axis;
+        }
+        LoggingUtil.warning("History gray: "+gray(history<<1)+" inversions gray: "+gray(inversions));
+        LoggingUtil.warning("LFlip: " + inversions + " ax:" + (inv ? "-" : "+") + axis + " lax:" + leftaxis + " card:" + card);
         mms[2 * axis] = !inv ? min : half;
         mms[2 * axis + 1] = !inv ? half : max;
         hilbertSort(objs, start, split, mms, depth + 1, leftaxis, 0L, inversions);
+        if ((card % 2) == 1) {
+          inversions ^= 1L << axis;
+        }
       }
       if(split < end - 1) {
-        LoggingUtil.warning("RFlip: " + inversions + " ax:" + axis + " rax:" + rightaxis + " card:" + card);
-        if((card & 1) == 1) {
-          inversions.flip(rightaxis);
-          inversions.flip(0, dims);
-        }
+        LoggingUtil.warning("History gray: "+gray(1+(history<<1))+" inversions gray: "+gray(inversions ^ 1L << rightaxis));
+        LoggingUtil.warning("RFlip: " + inversions + " ax:" + (inv ? "-" : "+") + axis + " rax:" + rightaxis + " card:" + (card+1));
+        // inversions.flip(rightaxis);
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
         hilbertSort(objs, split, end, mms, depth + 1, rightaxis, 1L, inversions);
-        if((card & 1) == 1) {
-          inversions.flip(rightaxis);
-          inversions.flip(0, dims);
-        }
-      }
-      if((card & 1) == 1) {
-        inversions.flip(axis);
+        // inversions.flip(rightaxis);
       }
     }
     // Restore ranges
     mms[2 * axis] = min;
     mms[2 * axis + 1] = max;
     // FIXME: implement completely and test.
+  }
+
+  private long gray(long v) {
+    return v ^ (v >>> 1);
   }
 
   private int bound(int val, int max) {
