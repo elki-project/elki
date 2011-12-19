@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -48,14 +50,21 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunc
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.shared.index.AbstractRefiningIndex;
 import experimentalcode.shared.index.subspace.IndexStatistics;
 import experimentalcode.shared.index.subspace.SubSpace;
@@ -75,7 +84,7 @@ import experimentalcode.shared.index.subspace.SubSpace;
  * @author Thomas Bernecker
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
-public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
+public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
   /**
    * Class logger
    */
@@ -602,6 +611,93 @@ public class PartialVAFile<V extends NumberVector<V, ?>> extends AbstractRefinin
     @Override
     public int compare(DAFile a, DAFile b) {
       return Double.compare(a.getMaxMaxDist(query.getApproximation(a.getDimension())), b.getMaxMaxDist(query.getApproximation(b.getDimension())));
+    }
+  }
+
+  /**
+   * Index factory class
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <V> Vector type
+   */
+  public static class Factory<V extends NumberVector<?, ?>> implements IndexFactory<V, PartialVAFile<V>> {
+    /**
+     * Number of partitions to use in each dimension.
+     * 
+     * <pre>
+     * -vafile.partitions 8
+     * </pre>
+     */
+    public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("vafile.partitions", "Number of partitions to use in each dimension.");
+
+    /**
+     * Page size
+     */
+    int pagesize = 1;
+
+    /**
+     * Number of partitions
+     */
+    int numpart = 2;
+
+    /**
+     * Constructor.
+     * 
+     * @param pagesize Page size
+     * @param numpart Number of partitions
+     */
+    public Factory(int pagesize, int numpart) {
+      super();
+      this.pagesize = pagesize;
+      this.numpart = numpart;
+    }
+
+    @Override
+    public PartialVAFile<V> instantiate(Relation<V> relation) {
+      return new PartialVAFile<V>(pagesize, relation, numpart);
+    }
+
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+      return TypeUtil.NUMBER_VECTOR_FIELD;
+    }
+
+    /**
+     * Parameterization class
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      /**
+       * Page size
+       */
+      int pagesize = 1;
+
+      /**
+       * Number of partitions
+       */
+      int numpart = 2;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        IntParameter pagesizeP = new IntParameter(TreeIndexFactory.PAGE_SIZE_ID, new GreaterConstraint(0), 1024);
+        if(config.grab(pagesizeP)) {
+          pagesize = pagesizeP.getValue();
+        }
+        IntParameter partitionsP = new IntParameter(Factory.PARTITIONS_ID, new GreaterConstraint(2));
+        if(config.grab(partitionsP)) {
+          numpart = partitionsP.getValue();
+        }
+      }
+
+      @Override
+      protected Factory<?> makeInstance() {
+        return new Factory<NumberVector<?, ?>>(pagesize, numpart);
+      }
     }
   }
 }

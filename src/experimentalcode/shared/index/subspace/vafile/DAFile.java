@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -135,7 +136,7 @@ public class DAFile {
    * @param query
    * @param epsilon
    */
-  public static <V extends NumberVector<V, ?>> void calculateSelectivityCoeffs(List<DAFile> daFiles, V query, double epsilon) {
+  public static <V extends NumberVector<?, ?>> void calculateSelectivityCoeffs(List<DAFile> daFiles, V query, double epsilon) {
     final int dimensions = query.getDimensionality();
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
@@ -148,12 +149,12 @@ public class DAFile {
       upperVals[i] = query.doubleValue(i + 1) + epsilon;
     }
 
-    V lowerEpsilon = query.newNumberVector(lowerVals);
-    PartialVectorApproximation<V> lowerEpsilonPartitions = new PartialVectorApproximation<V>(null, dimensions);
+    DoubleVector lowerEpsilon = new DoubleVector(lowerVals);
+    PartialVectorApproximation<DoubleVector> lowerEpsilonPartitions = new PartialVectorApproximation<DoubleVector>(null, dimensions);
     lowerEpsilonPartitions.calculateApproximation(lowerEpsilon, daFiles);
 
-    V upperEpsilon = query.newNumberVector(upperVals);
-    PartialVectorApproximation<V> upperEpsilonPartitions = new PartialVectorApproximation<V>(null, dimensions);
+    DoubleVector upperEpsilon = new DoubleVector(upperVals);
+    PartialVectorApproximation<DoubleVector> upperEpsilonPartitions = new PartialVectorApproximation<DoubleVector>(null, dimensions);
     upperEpsilonPartitions.calculateApproximation(upperEpsilon, daFiles);
 
     for(int i = 0; i < daFiles.size(); i++) {
