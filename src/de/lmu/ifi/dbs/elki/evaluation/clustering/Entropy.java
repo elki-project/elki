@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -232,12 +231,5 @@ public class Entropy {
   @Reference(authors = "Vinh, N.X. and Epps, J. and Bailey, J.", title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", booktitle = "Proc. ICML '09 Proceedings of the 26th Annual International Conference on Machine Learning", url = "http://dx.doi.org/10.1145/1553374.1553511")
   public double normalizedVariationOfInformation() {
     return (1.0 - (entropyMutualInformation() / entropyJoint()));
-  }
-
-  /**
-   * Get the entropy F1-Measure
-   */
-  public double f1Measure() {
-    return Util.f1Measure(entropyFirst, entropySecond);
   }
 }

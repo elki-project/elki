@@ -192,7 +192,6 @@ public class EvaluateClustering implements Evaluator {
       out.inlinePrint(contmat.getPaircount().mirkin());
       out.inlinePrint(contmat.getEntropy().variationOfInformation());
       out.inlinePrint(contmat.getEntropy().normalizedVariationOfInformation());
-      out.inlinePrint(contmat.getEntropy().f1Measure());
       out.inlinePrint(contmat.getEdit().f1Measure());
       out.inlinePrint(contmat.getSetMatching().inversePurity());
       out.inlinePrint(contmat.getSetMatching().purity());

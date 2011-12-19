@@ -160,7 +160,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       i++;
     }
     {
-      Element object = svgp.svgText(0.3, i + 0.7, "VI, NormalizedVI, F-Measure:");
+      Element object = svgp.svgText(0.3, i + 0.7, "VI, NormalizedVI:");
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
       layer.appendChild(object);
       i++;
@@ -171,8 +171,6 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
       buf.append(FormatUtil.format(entropy.variationOfInformation(), FormatUtil.NF6));
       buf.append(" / ");
       buf.append(FormatUtil.format(entropy.normalizedVariationOfInformation(), FormatUtil.NF6));
-      buf.append(" / ");
-      buf.append(FormatUtil.format(entropy.f1Measure(), FormatUtil.NF6));
       Element object = svgp.svgText(0.3, i + 0.7, buf.toString());
       object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(object);
