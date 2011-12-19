@@ -457,7 +457,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       int numBeforePruning = 0, numAfterPruning = 0;
 
       // sort DA files by worst case distance
-      List<DAFile> daFiles = getWorstCaseDistOrder(queryApprox, subspace);
+      List<DAFile> daFiles = getWorstCaseDistOrder(dist, subspace);
       // for (int i=0; i<daFiles.length; i++)
       // log.info("daFiles[" + i + "]: dim " +
       // daFiles[i].getDimension() + " - worstCaseDist " +
@@ -517,7 +517,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
             int objectCell = va.getApproximation(dimension);
 
             va.increaseMinDistP(dist.getPartialMinDist(dimension, objectCell));
-            va.decreaseMaxDistP(daFiles.get(addition).getMaxMaxDist(queryApprox.getApproximation(daFiles.get(addition).getDimension())));
+            va.decreaseMaxDistP(dist.getPartialMaxMaxDist(dimension));
             va.increaseMaxDistP(dist.getPartialMaxDist(dimension, objectCell));
 
             distanceCheck(kMinMaxDists, k, va, candidates2);
@@ -583,13 +583,12 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
 
       for (VectorApproximation va : vectorApprox) {
         PartialVACandidate pva = new PartialVACandidate(va);
-        
 
         pva.resetPMaxDist();
         pva.resetPMinDist();
 
         filter1Loop1(reducedDims, daFiles, pva, dist);
-        filter1Loop2(reducedDims, subspaceDims, pva, daFiles, queryApprox);
+        filter1Loop2(reducedDims, subspaceDims, pva, daFiles, dist);
         distanceCheck(sda, k, pva, candidates1);
       }
 
@@ -603,18 +602,18 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       }
     }
 
-    private void filter1Loop2(int reducedDims, int subspaceDims, PartialVACandidate va, List<DAFile> daFiles, VectorApproximation queryApprox) {
-      for(int d = reducedDims; d < subspaceDims; d++) {
-        va.increaseMaxDistP(daFiles.get(d).getMaxMaxDist(queryApprox.getApproximation(daFiles.get(d).getDimension())));
-      }
-    }
-
     private void filter1Loop1(int reducedDims, List<DAFile> daFiles, PartialVACandidate va, VALPNormDistance dist) {
       for(int d = 0; d < reducedDims; d++) {
         int dimension = daFiles.get(d).getDimension();
         int objectCell = va.getApproximation(dimension);
         va.increaseMinDistP(dist.getPartialMinDist(dimension, objectCell));
         va.increaseMaxDistP(dist.getPartialMaxDist(dimension, objectCell));
+      }
+    }
+
+    private void filter1Loop2(int reducedDims, int subspaceDims, PartialVACandidate va, List<DAFile> daFiles, VALPNormDistance dist) {
+      for(int d = reducedDims; d < subspaceDims; d++) {
+        va.increaseMaxDistP(dist.getPartialMaxMaxDist(daFiles.get(d).getDimension()));
       }
     }
 
@@ -640,13 +639,13 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       return sample.getIOCosts() * numberOfDAFiles;
     }
 
-    public List<DAFile> getWorstCaseDistOrder(VectorApproximation query, SubSpace subspace) {
+    public List<DAFile> getWorstCaseDistOrder(VALPNormDistance dist, SubSpace subspace) {
       int subspaceLength = subspace.subspaceDimensions.length;
       List<DAFile> result = new ArrayList<DAFile>(subspaceLength);
       for(int i = 0; i < subspaceLength; i++) {
         result.add(daFiles.get(subspace.subspaceDimensions[i]));
       }
-      Collections.sort(result, new WorstCaseDistComparator<V>(query));
+      Collections.sort(result, new WorstCaseDistComparator<V>(dist));
       return result;
     }
 
@@ -668,15 +667,15 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   }
 
   static class WorstCaseDistComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile> {
-    private VectorApproximation query;
+    private VALPNormDistance dist;
 
-    public WorstCaseDistComparator(VectorApproximation query) {
-      this.query = query;
+    public WorstCaseDistComparator(VALPNormDistance dist) {
+      this.dist = dist;
     }
 
     @Override
     public int compare(DAFile a, DAFile b) {
-      return Double.compare(a.getMaxMaxDist(query.getApproximation(a.getDimension())), b.getMaxMaxDist(query.getApproximation(b.getDimension())));
+      return Double.compare(dist.getPartialMaxMaxDist(a.getDimension()), dist.getPartialMaxMaxDist(b.getDimension()));
     }
   }
 
