@@ -141,8 +141,7 @@ public class DAFile {
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
 
-    PartialVectorApproximation<V> queryApprox = new PartialVectorApproximation<V>(null, dimensions);
-    queryApprox.calculateApproximation(query, daFiles);
+    VectorApproximation queryApprox = calculateApproximation(null, query, daFiles);
 
     for(int i = 0; i < dimensions; i++) {
       lowerVals[i] = query.doubleValue(i + 1) - epsilon;
@@ -150,17 +149,41 @@ public class DAFile {
     }
 
     DoubleVector lowerEpsilon = new DoubleVector(lowerVals);
-    PartialVectorApproximation<DoubleVector> lowerEpsilonPartitions = new PartialVectorApproximation<DoubleVector>(null, dimensions);
-    lowerEpsilonPartitions.calculateApproximation(lowerEpsilon, daFiles);
+    VectorApproximation lowerEpsilonPartitions = calculateApproximation(null, lowerEpsilon, daFiles);
 
     DoubleVector upperEpsilon = new DoubleVector(upperVals);
-    PartialVectorApproximation<DoubleVector> upperEpsilonPartitions = new PartialVectorApproximation<DoubleVector>(null, dimensions);
-    upperEpsilonPartitions.calculateApproximation(upperEpsilon, daFiles);
+    VectorApproximation upperEpsilonPartitions = calculateApproximation(null, upperEpsilon, daFiles);
 
     for(int i = 0; i < daFiles.size(); i++) {
       int coeff = (queryApprox.getApproximation(i) - lowerEpsilonPartitions.getApproximation(i)) + (upperEpsilonPartitions.getApproximation(i) - queryApprox.getApproximation(i)) + 1;
       daFiles.get(i).setSelectivityCoeff(coeff);
     }
+  }
+
+  public static VectorApproximation calculateApproximation(DBID id, NumberVector<?, ?> dv, List<DAFile> daFiles) {
+    int[] approximation = new int[dv.getDimensionality()];
+    for(int i = 0; i < daFiles.size(); i++) {
+      double val = dv.doubleValue(i + 1);
+      double[] borders = daFiles.get(i).getSplitPositions();
+      assert borders != null : "borders are null";
+      int lastBorderIndex = borders.length - 1;
+
+      // value is lower outlier
+      if(val < borders[0]) {
+        approximation[i] = 0;
+      } // value is upper outlier
+      else if(val > borders[lastBorderIndex]) {
+        approximation[i] = lastBorderIndex - 1;
+      } // normal case
+      else {
+        for(int s = 0; s < lastBorderIndex; s++) {
+          if(val >= borders[s] && val < borders[s + 1] && approximation[i] != -1) {
+            approximation[i] = s;
+          }
+        }
+      }
+    }
+    return new VectorApproximation(id, approximation);
   }
 
   public static <V extends NumberVector<?, ?>> List<DAFile> sortBySelectivity(List<DAFile> daFiles) {

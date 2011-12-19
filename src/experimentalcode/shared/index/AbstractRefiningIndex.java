@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
@@ -161,20 +162,14 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
    * 
    * @author Erich Schubert
    */
-  abstract public class AbstractKNNQuery<D extends Distance<D>> implements KNNQuery<O, D> {
-    /**
-     * Hold the distance function to be used.
-     */
-    private DistanceQuery<O, D> distanceQuery;
-
+  abstract public class AbstractKNNQuery<D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> implements KNNQuery<O, D> {
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query object
      */
     public AbstractKNNQuery(DistanceQuery<O, D> distanceQuery) {
-      super();
-      this.distanceQuery = distanceQuery;
+      super(distanceQuery);
     }
 
     @Override

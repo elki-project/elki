@@ -1,7 +1,5 @@
 package experimentalcode.shared.index.subspace.vafile;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,14 +23,27 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+
+/**
+ * Lp-Norm distance function for partially computed objects
+ * 
+ * @author Erich Schubert
+ */
 public class VALPNormDistance {
   /**
    * Value of 1/p for lP norm
    */
   private final double onebyp;
 
+  /**
+   * Lookup table for grid cells
+   */
   private double[][] lookup;
 
+  /**
+   * Approximation of the query vector
+   */
   private VectorApproximation queryApprox;
 
   /**
