@@ -73,15 +73,19 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
 
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double value = v.doubleValue(d + 1);
-      if(value < mbr.getMin(d + 1)) {
-        sum += mbr.getMin(d + 1) - value;
-      }
-      else if(value > mbr.getMax(d + 1)) {
-        sum += value - mbr.getMax(d + 1);
+      final double value = v.doubleValue(d + 1);
+      final double omin = mbr.getMin(d + 1);
+      if(value < omin) {
+        sum += omin - value;
       }
       else {
-        continue;
+        final double omax = mbr.getMax(d + 1);
+        if(value > omax) {
+          sum += value - omax;
+        }
+        else {
+          continue;
+        }
       }
     }
     return sum;
@@ -94,14 +98,20 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
     }
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      if(mbr1.getMax(d + 1) < mbr2.getMin(d + 1)) {
-        sum += mbr2.getMin(d + 1) - mbr1.getMax(d + 1);
+      final double max1 = mbr1.getMax(d + 1);
+      final double min2 = mbr2.getMin(d + 1);
+      if(max1 < min2) {
+        sum += min2 - max1;
       }
-      else if(mbr1.getMin(d + 1) > mbr2.getMax(d + 1)) {
-        sum += mbr1.getMin(d + 1) - mbr2.getMax(d + 1);
-      }
-      else { // The mbrs intersect!
-        continue;
+      else {
+        final double min1 = mbr1.getMin(d + 1);
+        final double max2 = mbr2.getMax(d + 1);
+        if(min1 > max2) {
+          sum += min1 - max2;
+        }
+        else { // The mbrs intersect!
+          continue;
+        }
       }
     }
     return sum;

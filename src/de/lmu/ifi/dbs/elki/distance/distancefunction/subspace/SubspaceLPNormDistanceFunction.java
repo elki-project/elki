@@ -88,8 +88,8 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double manhattanI = Math.abs(v1.doubleValue(d + 1) - v2.doubleValue(d + 1));
-      sqrDist += Math.pow(manhattanI, p);
+      double delta = Math.abs(v1.doubleValue(d + 1) - v2.doubleValue(d + 1));
+      sqrDist += Math.pow(delta, p);
     }
     return Math.pow(sqrDist, 1. / p);
   }
@@ -101,18 +101,22 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double value = v.doubleValue(d + 1);
-      double min;
-      if(value < mbr.getMin(d + 1)) {
-        min = mbr.getMin(d + 1) - value;
-      }
-      else if(value > mbr.getMax(d + 1)) {
-        min = value - mbr.getMax(d + 1);
+      final double delta;
+      final double value = v.doubleValue(d + 1);
+      final double omin = mbr.getMin(d + 1);
+      if(value < omin) {
+        delta = omin - value;
       }
       else {
-        continue;
+        final double omax = mbr.getMax(d + 1);
+        if(value > omax) {
+          delta = value - omax;
+        }
+        else {
+          continue;
+        }
       }
-      sqrDist += Math.pow(min, p);
+      sqrDist += Math.pow(delta, p);
     }
     return Math.pow(sqrDist, 1. / p);
   }
@@ -124,20 +128,23 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
     }
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      final double m1, m2;
-      if(mbr1.getMax(d + 1) < mbr2.getMin(d + 1)) {
-        m1 = mbr1.getMax(d + 1);
-        m2 = mbr2.getMin(d + 1);
+      final double delta;
+      final double max1 = mbr1.getMax(d + 1);
+      final double min2 = mbr2.getMin(d + 1);
+      if(max1 < min2) {
+        delta = min2 - max1;
       }
-      else if(mbr1.getMin(d + 1) > mbr2.getMax(d + 1)) {
-        m1 = mbr1.getMin(d + 1);
-        m2 = mbr2.getMax(d + 1);
+      else {
+        final double min1 = mbr1.getMin(d + 1);
+        final double max2 = mbr2.getMax(d + 1);
+        if(min1 > max2) {
+          delta = min1 - max2;
+        }
+        else { // The mbrs intersect!
+          continue;
+        }
       }
-      else { // The mbrs intersect!
-        continue;
-      }
-      double manhattanI = Math.abs(m1 - m2);
-      sqrDist += Math.pow(manhattanI, p);
+      sqrDist += Math.pow(delta, p);
     }
     return Math.pow(sqrDist, 1. / p);
   }
@@ -156,8 +163,8 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   public double doubleNorm(NumberVector<?, ?> obj) {
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double manhattanI = Math.abs(obj.doubleValue(d + 1));
-      sqrDist += Math.pow(manhattanI, p);
+      double delta = Math.abs(obj.doubleValue(d + 1));
+      sqrDist += Math.pow(delta, p);
     }
     return Math.pow(sqrDist, 1. / p);
   }
@@ -201,10 +208,10 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
     @Override
     protected SubspaceLPNormDistanceFunction makeInstance() {
-      if (p == 2.0) {
+      if(p == 2.0) {
         return new SubspaceEuclideanDistanceFunction(dimensions);
       }
-      if (p == 1.0) {
+      if(p == 1.0) {
         return new SubspaceManhattanDistanceFunction(dimensions);
       }
       return new SubspaceLPNormDistanceFunction(p, dimensions);

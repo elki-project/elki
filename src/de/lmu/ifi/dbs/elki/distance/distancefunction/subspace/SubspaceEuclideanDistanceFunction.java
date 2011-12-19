@@ -61,8 +61,8 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
 
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double manhattanI = v1.doubleValue(d + 1) - v2.doubleValue(d + 1);
-      sqrDist += manhattanI * manhattanI;
+      final double delta = v1.doubleValue(d + 1) - v2.doubleValue(d + 1);
+      sqrDist += delta * delta;
     }
     return Math.sqrt(sqrDist);
   }
@@ -74,20 +74,22 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
 
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double value = v.doubleValue(d + 1);
-      double r;
-      if(value < mbr.getMin(d + 1)) {
-        r = mbr.getMin(d + 1);
-      }
-      else if(value > mbr.getMax(d + 1)) {
-        r = mbr.getMax(d + 1);
+      final double delta;
+      final double value = v.doubleValue(d + 1);
+      final double omin = mbr.getMin(d + 1);
+      if(value < omin) {
+        delta = omin - value;
       }
       else {
-        continue;
+        final double omax = mbr.getMax(d + 1);
+        if(value > omax) {
+          delta = value - omax;
+        }
+        else {
+          continue;
+        }
       }
-
-      double manhattanI = value - r;
-      sqrDist += manhattanI * manhattanI;
+      sqrDist += delta * delta;
     }
     return Math.sqrt(sqrDist);
   }
@@ -99,20 +101,23 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
     }
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      final double m1, m2;
-      if(mbr1.getMax(d + 1) < mbr2.getMin(d + 1)) {
-        m1 = mbr1.getMax(d + 1);
-        m2 = mbr2.getMin(d + 1);
+      final double delta;
+      final double max1 = mbr1.getMax(d + 1);
+      final double min2 = mbr2.getMin(d + 1);
+      if(max1 < min2) {
+        delta = min2 - max1;
       }
-      else if(mbr1.getMin(d + 1) > mbr2.getMax(d + 1)) {
-        m1 = mbr1.getMin(d + 1);
-        m2 = mbr2.getMax(d + 1);
+      else {
+        final double min1 = mbr1.getMin(d + 1);
+        final double max2 = mbr2.getMax(d + 1);
+        if(min1 > max2) {
+          delta = min1 - max2;
+        }
+        else { // The mbrs intersect!
+          continue;
+        }
       }
-      else { // The mbrs intersect!
-        continue;
-      }
-      double manhattanI = m1 - m2;
-      sqrDist += manhattanI * manhattanI;
+      sqrDist += delta * delta;
     }
     return Math.sqrt(sqrDist);
   }
@@ -121,8 +126,8 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
   public double doubleNorm(NumberVector<?, ?> obj) {
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double manhattanI = obj.doubleValue(d + 1);
-      sqrDist += manhattanI * manhattanI;
+      final double delta = obj.doubleValue(d + 1);
+      sqrDist += delta * delta;
     }
     return Math.sqrt(sqrDist);
   }
