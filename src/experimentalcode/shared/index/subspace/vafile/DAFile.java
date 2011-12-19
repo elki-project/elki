@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import experimentalcode.franz.utils.ArrayUtils;
 
 /**
  * DAFile
@@ -47,8 +46,6 @@ public class DAFile {
   private double[] splitPositions;
 
   private int selectivityCoeff;
-
-  double[] maxDists, minDists;
 
   public DAFile(int dimension) {
     this.dimension = dimension;
@@ -80,25 +77,6 @@ public class DAFile {
    */
   public double[] getSplitPositions() {
     return splitPositions;
-  }
-
-  public double[] getMinDists(int queryCell) {
-    return minDists;
-  }
-
-  public double[] getMaxDists(int queryCell) {
-    return maxDists;
-  }
-
-  public double getMaxMaxDist(int queryCell) {
-    return ArrayUtils.maxValue(getMaxDists(queryCell));
-    // double[] maxDists = getMaxDists(queryCell);
-    // double result = Double.NEGATIVE_INFINITY;
-    // for (int i = 0; i < maxDists.length; i++)
-    // {
-    // result = Math.max(result, maxDists[i]);
-    // }
-    // return result;
   }
 
   /**

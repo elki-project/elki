@@ -134,6 +134,21 @@ public class VALPNormDistance {
   }
 
   /**
+   * Get the maximum distance.
+   * 
+   * @param d Dimension 
+   * @return
+   */
+  public double getPartialMaxMaxDist(int dimension) {
+    double[] data = lookup[dimension];
+    double max = data[0];
+    for (int i = 1; i < data.length; i++) {
+      max = Math.max(max, data[i]);
+    }
+    return max;
+  }
+
+  /**
    * Initialize the lookup table
    * 
    * @param splitPositions Split positions
