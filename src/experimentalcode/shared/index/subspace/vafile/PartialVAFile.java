@@ -24,6 +24,8 @@ package experimentalcode.shared.index.subspace.vafile;
  */
 
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -46,7 +48,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -55,6 +57,7 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
@@ -108,18 +111,6 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
 
   protected Statistics stats;
 
-  public static class Statistics {
-    private long scannedBytes = 0;
-
-    private long queryTime = 0;
-
-    private int issuedQueries = 0;
-
-    private int refinements = 0;
-
-    private int[] prunedVectors;
-  }
-
   public PartialVAFile(int pageSize, Relation<V> fullDimensionalData, int partitions) {
     super(fullDimensionalData);
     this.pageSize = pageSize;
@@ -133,14 +124,20 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       throw new IllegalStateException("Data already inserted.");
     }
 
-    DBID sampleID = fullDimensionalData.getDBIDs().iterator().next();
-    int dimensions = fullDimensionalData.get(sampleID).getDimensionality();
-    daFiles = new ArrayList<DAFile>(dimensions);
-    for(int d = 0; d < dimensions; d++) {
-      daFiles.add(new DAFile(d));
+    if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
+      throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
-    setPartitions(fullDimensionalData, this.partitions);
+    int dimensions = DatabaseUtil.dimensionality(fullDimensionalData);
+
+    splitPartitions = new double[dimensions][];
+    daFiles = new ArrayList<DAFile>(dimensions);
+    for(int d = 0; d < dimensions; d++) {
+      final DAFile f = new DAFile(d);
+      f.setPartitions(fullDimensionalData, partitions);
+      splitPartitions[d] = f.getSplitPositions();
+      daFiles.add(f);
+    }
 
     vectorApprox = new ArrayList<PartialVectorApproximation<V>>();
     for(DBID id : fullDimensionalData.getDBIDs()) {
@@ -152,22 +149,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
   }
 
-  private void setPartitions(Relation<V> objects, int partitions) {
-    if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
-      throw new IllegalArgumentException("Number of partitions must be a power of 2!");
-    }
-    splitPartitions = new double[daFiles.size()][];
-
-    if(log.isVerbose()) {
-      log.verbose("PVA: setting partitions (partitionCount=" + (partitions) + ") ...");
-    }
-    for(int i = 0; i < daFiles.size(); i++) {
-      daFiles.get(i).setPartitions(objects, partitions);
-      splitPartitions[i] = daFiles.get(i).getSplitPositions();
-    }
-  }
-
-  // TODO: Remove
+  // TODO: Remove/refactor?
   public IndexStatistics getStatistics() {
     IndexStatistics is = new IndexStatistics(stats.refinements, stats.refinements, stats.queryTime, stats.scannedBytes / pageSize);
     // is.totalPages = /* relation.size() +
@@ -179,7 +161,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     return is;
   }
 
-  // TODO: remove
+  // TODO: remove/refactor.
   public void resetStatistics() {
     stats = new Statistics();
   }
@@ -192,28 +174,6 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     return stats.prunedVectors;
   }
 
-  /**
-   * Computes IO costs (in bytes) needed for refining the candidates.
-   * 
-   * @param candidates the candidate IDs
-   * @param subspaceDims the required subspace dimensions
-   * @return the cost value (in bytes)
-   */
-  private static int getIOCosts(LinkedList<? extends VectorApproximation> candidates, int subspaceDims) {
-    return candidates.size() * (subspaceDims * 8 + 4);
-  }
-
-  /**
-   * Computes IO costs (in bytes) needed for reading several DA-files.
-   * 
-   * @param sample the DA-file specific costs
-   * @param numberOfDAFiles the number of DA-files that have to be read
-   * @return the cost value (in bytes)
-   */
-  private static int getIOCosts(DAFile sample, int numberOfDAFiles) {
-    return sample.getIOCosts() * numberOfDAFiles;
-  }
-
   @Override
   public String getShortName() {
     return "pva-file";
@@ -222,6 +182,21 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   @Override
   public String getLongName() {
     return "partial va-file";
+  }
+
+  /**
+   * Fake subspace (full-dimensional).
+   * 
+   * @param relation Relation with full dimensionality
+   * @return Bit set with all bits set.
+   */
+  protected static BitSet fakeSubspace(Relation<? extends NumberVector<?, ?>> relation) {
+    int dim = DatabaseUtil.dimensionality(relation);
+    BitSet bits = new BitSet();
+    for(int i = 0; i < dim; i++) {
+      bits.set(i);
+    }
+    return bits;
   }
 
   @SuppressWarnings("unchecked")
@@ -235,8 +210,17 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
     DistanceFunction<? super V, ?> df = distanceQuery.getDistanceFunction();
     if(df instanceof SubspaceLPNormDistanceFunction) {
+      double p = ((SubspaceLPNormDistanceFunction) df).getP();
+      BitSet bits = ((SubspaceLPNormDistanceFunction) df).getSelectedDimensions();
       DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
-      KNNQuery<V, ?> dq = new PartialVAFileKNNQuery((DistanceQuery<V, DoubleDistance>) ddq, (SubspaceLPNormDistanceFunction) df);
+      KNNQuery<V, ?> dq = new PartialVAFileKNNQuery((DistanceQuery<V, DoubleDistance>) ddq, p, new SubSpace(bits));
+      return (KNNQuery<V, D>) dq;
+    }
+    if(df instanceof LPNormDistanceFunction) {
+      double p = ((LPNormDistanceFunction) df).getP();
+      BitSet bits = fakeSubspace(distanceQuery.getRelation());
+      DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
+      KNNQuery<V, ?> dq = new PartialVAFileKNNQuery((DistanceQuery<V, DoubleDistance>) ddq, p, new SubSpace(bits));
       return (KNNQuery<V, D>) dq;
     }
     // Not supported.
@@ -248,12 +232,33 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   public <D extends Distance<D>> RangeQuery<V, D> getRangeQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
     DistanceFunction<? super V, ?> df = distanceQuery.getDistanceFunction();
     if(df instanceof SubspaceLPNormDistanceFunction) {
+      double p = ((SubspaceLPNormDistanceFunction) df).getP();
+      BitSet bits = ((SubspaceLPNormDistanceFunction) df).getSelectedDimensions();
       DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
-      RangeQuery<V, ?> dq = new PartialVAFileRangeQuery((DistanceQuery<V, DoubleDistance>) ddq, (SubspaceLPNormDistanceFunction) df);
+      RangeQuery<V, ?> dq = new PartialVAFileRangeQuery((DistanceQuery<V, DoubleDistance>) ddq, p, new SubSpace(bits));
+      return (RangeQuery<V, D>) dq;
+    }
+    if(df instanceof LPNormDistanceFunction) {
+      double p = ((LPNormDistanceFunction) df).getP();
+      BitSet bits = fakeSubspace(distanceQuery.getRelation());
+      DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
+      RangeQuery<V, ?> dq = new PartialVAFileRangeQuery((DistanceQuery<V, DoubleDistance>) ddq, p, new SubSpace(bits));
       return (RangeQuery<V, D>) dq;
     }
     // Not supported.
     return null;
+  }
+
+  public static class Statistics {
+    private long scannedBytes = 0;
+
+    private long queryTime = 0;
+
+    private int issuedQueries = 0;
+
+    private int refinements = 0;
+
+    private int[] prunedVectors;
   }
 
   /**
@@ -263,19 +268,26 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    */
   class PartialVAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery<DoubleDistance> {
     /**
-     * The actual distance function to use
+     * Lp-Norm p
      */
-    protected final SubspaceLPNormDistanceFunction fulldist;
+    private double p;
+    
+    /**
+     * Subspace
+     */
+    private SubSpace subspace;
 
     /**
      * Constructor.
      * 
      * @param ddq Distance query
-     * @param df subspace distance function
+     * @param p LP Norm p
+     * @param subspace Subspace
      */
-    public PartialVAFileRangeQuery(DistanceQuery<V, DoubleDistance> ddq, SubspaceLPNormDistanceFunction df) {
+    public PartialVAFileRangeQuery(DistanceQuery<V, DoubleDistance> ddq, double p, SubSpace subspace) {
       super(ddq);
-      this.fulldist = df;
+      this.p = p;
+      this.subspace = subspace;
     }
 
     @Override
@@ -283,9 +295,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       stats.issuedQueries++;
       long t = System.nanoTime();
 
-      final double p = fulldist.getP();
       final double epsilon = ((DoubleDistance) range).doubleValue();
-      final SubSpace subspace = new SubSpace(fulldist.getSelectedDimensions());
 
       // generate query approximation and lookup table
       PartialVectorApproximation<V> queryApprox = new PartialVectorApproximation<V>(null, query.getDimensionality());
@@ -379,9 +389,14 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    */
   class PartialVAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery<DoubleDistance> {
     /**
-     * The actual distance function
+     * Lp-Norm p
      */
-    private SubspaceLPNormDistanceFunction fulldist;
+    private double p;
+    
+    /**
+     * Subspace
+     */
+    private SubSpace subspace;
 
     // TODO: make non-class variable
     private int currentSubspaceDims;
@@ -392,18 +407,16 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
      * @param ddq Distance query
      * @param df Distance function
      */
-    public PartialVAFileKNNQuery(DistanceQuery<V, DoubleDistance> ddq, SubspaceLPNormDistanceFunction df) {
+    public PartialVAFileKNNQuery(DistanceQuery<V, DoubleDistance> ddq, double p, SubSpace subspace) {
       super(ddq);
-      this.fulldist = df;
+      this.p = p;
+      this.subspace = subspace;
     }
 
     @Override
     public KNNResult<DoubleDistance> getKNNForObject(V query, int k) {
       stats.issuedQueries++;
       long t = System.nanoTime();
-
-      final double p = fulldist.getP();
-      SubSpace subspace = new SubSpace(fulldist.getSelectedDimensions());
 
       // generate query approximation and lookup table
       PartialVectorApproximation<V> queryApprox = new PartialVectorApproximation<V>(null, query.getDimensionality());
@@ -515,7 +528,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       }
       // sort candidates by lower bound (minDist)
       PartialVectorApproximation.sortByMinDist(sortedCandidates);
-      KNNList<DoubleDistance> result = retrieveAccurateDistances(fulldist, sortedCandidates, k, subspace, query);
+      KNNList<DoubleDistance> result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
 
       stats.queryTime += System.nanoTime() - t;
 
@@ -574,6 +587,28 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       }
     }
 
+    /**
+     * Computes IO costs (in bytes) needed for refining the candidates.
+     * 
+     * @param candidates the candidate IDs
+     * @param subspaceDims the required subspace dimensions
+     * @return the cost value (in bytes)
+     */
+    private int getIOCosts(Collection<? extends VectorApproximation> candidates, int subspaceDims) {
+      return candidates.size() * (subspaceDims * 8 + 4);
+    }
+
+    /**
+     * Computes IO costs (in bytes) needed for reading several DA-files.
+     * 
+     * @param sample the DA-file specific costs
+     * @param numberOfDAFiles the number of DA-files that have to be read
+     * @return the cost value (in bytes)
+     */
+    private int getIOCosts(DAFile sample, int numberOfDAFiles) {
+      return sample.getIOCosts() * numberOfDAFiles;
+    }
+
     public List<DAFile> getWorstCaseDistOrder(VectorApproximation query, SubSpace subspace) {
       int subspaceLength = subspace.subspaceDimensions.length;
       List<DAFile> result = new ArrayList<DAFile>(subspaceLength);
@@ -584,7 +619,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       return result;
     }
 
-    protected KNNList<DoubleDistance> retrieveAccurateDistances(PrimitiveDoubleDistanceFunction<? super V> distf, Vector<PartialVectorApproximation<V>> sortedCandidates, int k, SubSpace subspace, V query) {
+    protected KNNList<DoubleDistance> retrieveAccurateDistances(Vector<PartialVectorApproximation<V>> sortedCandidates, int k, SubSpace subspace, V query) {
       KNNHeap<DoubleDistance> result = new KNNHeap<DoubleDistance>(k, DoubleDistance.FACTORY.infiniteDistance());
       for(PartialVectorApproximation<V> va : sortedCandidates) {
         double stopdist = result.getKNNDistance().doubleValue();
