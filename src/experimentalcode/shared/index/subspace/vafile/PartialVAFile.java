@@ -371,8 +371,8 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
         for(DAFile da : subspaceDAFiles) {
           int dimension = da.getDimension();
           int objectCell = va.getApproximation(dimension);
-          pva.increaseMinDistP(dist.getPartialMinDist(dimension + 1, objectCell));
-          pva.increaseMaxDistP(dist.getPartialMaxDist(dimension + 1, objectCell));
+          pva.increaseMinDistP(dist.getPartialMinDist(dimension, objectCell));
+          pva.increaseMaxDistP(dist.getPartialMaxDist(dimension, objectCell));
           if(Math.pow(pva.getMinDistP(), onebyp) > epsilon) {
             pruned = true;
             break;
@@ -395,6 +395,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
           }
         }
       }
+      Collections.sort(result);
 
       // scannedBytes += vectorApprox.size() * vectorApprox.get(0).byteOnDisk();
       stats.scannedBytes += relation.size() * VectorApproximation.byteOnDisk(subspace.cardinality(), partitions);
