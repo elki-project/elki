@@ -37,16 +37,29 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * DAFile
  * 
  * @author Thomas Bernecker
- * @created 22.09.2009
- * @date 22.09.2009
+ * @author Erich Schubert
  */
 public class DAFile {
+  /**
+   * Dimension of this approximation file
+   */
   private int dimension;
 
+  /**
+   * Splitting grid
+   */
   private double[] splitPositions;
 
+  /**
+   * Selectivity coefficient
+   */
   private int selectivityCoeff;
 
+  /**
+   * Constructor.
+   *
+   * @param dimension Dimension of this file
+   */
   public DAFile(int dimension) {
     this.dimension = dimension;
     selectivityCoeff = -1;

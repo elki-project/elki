@@ -84,6 +84,7 @@ import experimentalcode.shared.index.subspace.SubSpace;
  * </p>
  * 
  * @author Thomas Bernecker
+ * @author Erich Schubert
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
 public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
@@ -97,28 +98,47 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    */
   List<DAFile> daFiles;
 
-  private int partitions;
+  /**
+   * Number of partitions
+   */
+  private final int partitions;
 
-  int pageSize;
+  /**
+   * Page size
+   */
+  private final int pageSize;
 
+  /**
+   * Splitting grid
+   */
   private double[][] splitPartitions;
 
+  /**
+   * Statistics
+   */
   protected Statistics stats;
 
   /**
-   * The (full) vector approximations.
+   * The (full - we are in-memory only right now) vector approximations.
    */
   private ArrayList<VectorApproximation> vectorApprox;
 
-  public PartialVAFile(int pageSize, Relation<V> fullDimensionalData, int partitions) {
-    super(fullDimensionalData);
+  /**
+   * Constructor.
+   *
+   * @param pageSize Page size
+   * @param relation Data relation
+   * @param partitions Number of partitions
+   */
+  public PartialVAFile(int pageSize, Relation<V> relation, int partitions) {
+    super(relation);
     this.pageSize = pageSize;
     this.partitions = partitions;
     this.stats = new Statistics();
   }
 
   @Override
-  public void initialize(Relation<V> fullDimensionalData, DBIDs ids) throws IllegalStateException {
+  public void initialize(Relation<V> relation, DBIDs ids) throws IllegalStateException {
     if(splitPartitions != null) {
       throw new IllegalStateException("Data already inserted.");
     }
@@ -127,20 +147,20 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
-    int dimensions = DatabaseUtil.dimensionality(fullDimensionalData);
+    final int dimensions = DatabaseUtil.dimensionality(relation);
 
     splitPartitions = new double[dimensions][];
     daFiles = new ArrayList<DAFile>(dimensions);
     for(int d = 0; d < dimensions; d++) {
       final DAFile f = new DAFile(d);
-      f.setPartitions(fullDimensionalData, partitions);
+      f.setPartitions(relation, partitions);
       splitPartitions[d] = f.getSplitPositions();
       daFiles.add(f);
     }
 
     vectorApprox = new ArrayList<VectorApproximation>();
-    for(DBID id : fullDimensionalData.getDBIDs()) {
-      V dv = fullDimensionalData.get(id);
+    for(DBID id : relation.getDBIDs()) {
+      V dv = relation.get(id);
       VectorApproximation va = calculateApproximation(id, dv);
       vectorApprox.add(va);
     }
