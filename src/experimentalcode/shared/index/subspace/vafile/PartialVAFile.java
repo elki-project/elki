@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -35,9 +36,7 @@ import java.util.Vector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -91,7 +90,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   /**
    * Class logger
    */
-  private static final Logging log = Logging.getLogger(PartialVAFile.class);
+  private static final Logging logger = Logging.getLogger(PartialVAFile.class);
 
   /**
    * Partial VA files
@@ -138,13 +137,12 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       splitPartitions[d] = f.getSplitPositions();
       daFiles.add(f);
     }
-    
+
     vectorApprox = new ArrayList<VectorApproximation>();
     for(DBID id : fullDimensionalData.getDBIDs()) {
       V dv = fullDimensionalData.get(id);
       VectorApproximation va = calculateApproximation(id, dv);
       vectorApprox.add(va);
-      // System.out.println(id + ": " + va.toString());
     }
   }
 
@@ -163,14 +161,6 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   // TODO: remove/refactor.
   public void resetStatistics() {
     stats = new Statistics();
-  }
-
-  /**
-   * 
-   * @return number of pruned objects in each subspace dimension
-   */
-  public int[] getPrunedVectors() {
-    return stats.prunedVectors;
   }
 
   @Override
@@ -197,7 +187,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
     return bits;
   }
-  
+
   /**
    * Calculate the VA file position given the existing borders.
    * 
@@ -215,13 +205,13 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       if(val < splitPartitions[d][0]) {
         approximation[d] = 0;
         if(id != null) {
-          log.warning("Vector outside of VAFile grid!");
+          logger.warning("Vector outside of VAFile grid!");
         }
       } // Value is above data grid
       else if(val > splitPartitions[d][lastBorderIndex]) {
         approximation[d] = lastBorderIndex - 1;
         if(id != null) {
-          log.warning("Vector outside of VAFile grid!");
+          logger.warning("Vector outside of VAFile grid!");
         }
       } // normal case
       else {
@@ -292,8 +282,6 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     private int issuedQueries = 0;
 
     private int refinements = 0;
-
-    private int[] prunedVectors;
   }
 
   /**
@@ -306,7 +294,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
      * Lp-Norm p
      */
     private double p;
-    
+
     /**
      * Subspace
      */
@@ -343,7 +331,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       // calculate selectivity coefficients
 
       List<DAFile> subspaceDAFiles = new ArrayList<DAFile>(subspace.cardinality());
-      for (int d = subspace.nextSetBit(0); d >= 0; d = subspace.nextSetBit(d + 1)) {
+      for(int d = subspace.nextSetBit(0); d >= 0; d = subspace.nextSetBit(d + 1)) {
         DAFile daFile = daFiles.get(d);
         subspaceDAFiles.add(daFile);
       }
@@ -363,7 +351,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
       final double onebyp = 1.0 / p;
       int candidates = 0;
-      for (VectorApproximation va : vectorApprox) {
+      for(VectorApproximation va : vectorApprox) {
         DBID id = va.getId();
         PartialVACandidate pva = new PartialVACandidate(va);
 
@@ -402,11 +390,11 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
 
       stats.queryTime += System.nanoTime() - t;
 
-      if(log.isDebuggingFine()) {
-        log.fine("\nquery = " + query);
+      if(logger.isDebuggingFine()) {
+        logger.fine("\nquery = " + query);
         // log.info("database: " + vectorApprox.size() + ", candidates: " +
         // candidates.size() + ", results: " + resultIDs.size());
-        log.fine("database: " + relation.size() + ", candidates: " + candidates + ", results: " + result.size());
+        logger.fine("database: " + relation.size() + ", candidates: " + candidates + ", results: " + result.size());
       }
 
       return result;
@@ -423,7 +411,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
      * Lp-Norm p
      */
     private double p;
-    
+
     /**
      * Subspace
      */
@@ -453,22 +441,15 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       VectorApproximation queryApprox = DAFile.calculateApproximation(null, query, daFiles);
       final VALPNormDistance dist = new VALPNormDistance(p, splitPartitions, query, queryApprox);
 
-      // perform multi-step k-NN query
-      int numBeforePruning = 0, numAfterPruning = 0;
-
       // sort DA files by worst case distance
       List<DAFile> daFiles = getWorstCaseDistOrder(dist, subspace);
-      // for (int i=0; i<daFiles.length; i++)
-      // log.info("daFiles[" + i + "]: dim " +
-      // daFiles[i].getDimension() + " - worstCaseDist " +
-      // daFiles[i].getMaxMaxDist(queryApprox.getApproximation(daFiles[i].getDimension())));
-      currentSubspaceDims = subspace.subspaceDimensions.length;
-      int reducedDims = 2 * currentSubspaceDims / 3;
+
+      currentSubspaceDims = subspace.dimensions();
+      int reducedDims = (2 * currentSubspaceDims) / 3;
       reducedDims = Math.max(1, reducedDims);
-      stats.prunedVectors = new int[currentSubspaceDims];
-      // log.fine("subspaceDims=" + currentSubspaceDims + ", reducedDims=" +
-      // reducedDims);
-      System.out.println("subspaceDims=" + currentSubspaceDims + ", reducedDims=" + reducedDims);
+      if(logger.isDebuggingFine()) {
+        logger.fine("subspaceDims=" + currentSubspaceDims + ", reducedDims=" + reducedDims);
+      }
 
       // filter 1
       LinkedList<PartialVACandidate> candidates1 = filter1(k, reducedDims, daFiles, queryApprox, currentSubspaceDims, dist);
@@ -476,15 +457,9 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       // vectorApprox.get(0).byteOnDisk());
       // scannedBytes += vectorApprox.size() *
       // VectorApprox<V>.byteOnDisk(reducedDims, partitions);
-      // log.fine("candidate set after filter 1: " + candidates1.size());
-      System.out.println("candidate set after filter 1: " + candidates1.size());
-      // log.fine("filter1 took " + (System.currentTimeMillis() - tmp) + " ms");
-      // System.out.println("filter1 took " + (System.currentTimeMillis() - tmp)
-      // + " ms");
-
-      numBeforePruning = relation.size();
-      numAfterPruning = candidates1.size();
-      stats.prunedVectors[currentSubspaceDims - 1] = numBeforePruning - numAfterPruning;
+      if(logger.isDebuggingFine()) {
+        logger.fine("candidate set after filter 1: " + candidates1.size());
+      }
 
       // filters 2+
       LinkedList<PartialVACandidate> candidates2 = null;
@@ -498,20 +473,17 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
         // continue filtering until I/O costs of refining candidates < I/O
         // costs of loading new DA files
         while(candidates2 == null || (getIOCosts(candidates2.size(), currentSubspaceDims) >= getIOCosts(daFiles.get(0), currentSubspaceDims - addition)) && addition < currentSubspaceDims) {
-          // if (candidates2 != null)
-          // log.info("filter " + filterStep +": refining costs " +
-          // getIOCosts(candidates2, subspaceDims) + " (" + candidates2.size() +
-          // "/" + subspaceDims + "), DA file costs " + getIOCosts(daFiles[0],
-          // subspaceDims-addition) + " (" +daFiles[0].getBorders().length + "/"
-          // +
-          // (subspaceDims-addition) + ") (dim " + (addition+1) + " of " +
-          // subspaceDims + ")");
+          if(candidates2 != null && logger.isDebuggingFine()) {
+            logger.finer("filter " + filterStep + ": refining costs " + getIOCosts(candidates2.size(), currentSubspaceDims) + " (" + candidates2.size() + "/" + currentSubspaceDims + "), DA file costs " + getIOCosts(daFiles.get(0), currentSubspaceDims - addition) + " (dim " + (addition + 1) + " of " + currentSubspaceDims + ")");
+            // + " (" + daFiles.get(0).getBorders().length + "/" +
+            // (currentSubspaceDims - addition) + ")" +
+          }
           if(candidates2 != null) {
             candidates1 = candidates2;
           }
           candidates2 = new LinkedList<PartialVACandidate>();
 
-          Heap<Double> kMinMaxDists = new TopBoundedHeap<Double>(k);
+          Heap<Double> kMinMaxDists = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
           for(PartialVACandidate va : candidates1) {
             int dimension = daFiles.get(addition).getDimension();
             int objectCell = va.getApproximation(dimension);
@@ -532,16 +504,13 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
           // System.out.println("filter2 took " + (System.currentTimeMillis() -
           // tmp) + " ms");
 
-          // log.fine("candidate set after filter " + filterStep + ": " +
-          // candidates2.size());
-          System.out.println("candidate set after filter " + filterStep + ": " + candidates2.size());
+          if(logger.isDebuggingFine()) {
+            logger.fine("candidate set after filter " + filterStep + ": " + candidates2.size());
+          }
+          // System.out.println("candidate set after filter " + filterStep +
+          // ": " + candidates2.size());
           // for (Integer i: candidates2) System.out.print(i + " ");
           // log.info();
-
-          // set pruning power for current dimension number
-          numBeforePruning = candidates1.size();
-          numAfterPruning = candidates2.size();
-          stats.prunedVectors[addition] = stats.prunedVectors[addition - 1] + (numBeforePruning - numAfterPruning);
 
           addition++;
           filterStep++;
@@ -561,42 +530,35 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       KNNList<DoubleDistance> result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
 
       stats.queryTime += System.nanoTime() - t;
-
-      // log.fine("query = " + query);
-      System.out.println("query = (" + query + ")");
-      // log.info("database: " + vectorApprox.size() + ", candidates: " +
-      // sortedCandidates.size() + ", results: " + (result.size()-1));
-      // log.fine("database: " + vectorApprox.size() + ", candidates: " +
-      // sortedCandidates.size() + ", results: " + (result.size() - 1));
-      System.out.println("database: " + relation.size() + ", candidates: " + sortedCandidates.size() + ", results: " + (result.size() - 1));
-      ArrayModifiableDBIDs resultIDs = DBIDUtil.newArray(result.size());
-      for(DistanceResultPair<DoubleDistance> dp : result) {
-        resultIDs.add(dp.getDBID());
-      }
-
       return result;
     }
 
     private LinkedList<PartialVACandidate> filter1(int k, int reducedDims, List<DAFile> daFiles, VectorApproximation queryApprox, int subspaceDims, VALPNormDistance dist) {
       LinkedList<PartialVACandidate> candidates1 = new LinkedList<PartialVACandidate>();
-      Heap<Double> sda = new TopBoundedHeap<Double>(k);
+      Heap<Double> minmaxdist = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
 
-      for (VectorApproximation va : vectorApprox) {
+      for(VectorApproximation va : vectorApprox) {
         PartialVACandidate pva = new PartialVACandidate(va);
-
-        pva.resetPMaxDist();
-        pva.resetPMinDist();
 
         filter1Loop1(reducedDims, daFiles, pva, dist);
         filter1Loop2(reducedDims, subspaceDims, pva, daFiles, dist);
-        distanceCheck(sda, k, pva, candidates1);
+        distanceCheck(minmaxdist, k, pva, candidates1);
+      }
+      // Drop candidates that don't satisfy the latest minmaxdist
+      final double minmax = minmaxdist.peek();
+      Iterator<PartialVACandidate> it = candidates1.iterator();
+      while(it.hasNext()) {
+        PartialVACandidate pva = it.next();
+        if(pva.getMinDistP() > minmax) {
+          it.remove();
+        }
       }
 
       return candidates1;
     }
 
     private void distanceCheck(Heap<Double> kMinMaxDists, int k, PartialVACandidate va, LinkedList<PartialVACandidate> candList) {
-      if(kMinMaxDists.size() < k || va.getMinDistP() < kMinMaxDists.peek()) {
+      if(kMinMaxDists.size() < k || va.getMinDistP() <= kMinMaxDists.peek()) {
         candList.add(va);
         kMinMaxDists.add(va.getMaxDistP());
       }
