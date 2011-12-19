@@ -73,12 +73,12 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
 
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double value = v.doubleValue(d);
-      if(value < mbr.getMin(d)) {
-        sum += mbr.getMin(d) - value;
+      double value = v.doubleValue(d + 1);
+      if(value < mbr.getMin(d + 1)) {
+        sum += mbr.getMin(d + 1) - value;
       }
-      else if(value > mbr.getMax(d)) {
-        sum += value - mbr.getMax(d);
+      else if(value > mbr.getMax(d + 1)) {
+        sum += value - mbr.getMax(d + 1);
       }
       else {
         continue;
@@ -94,11 +94,11 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
     }
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      if(mbr1.getMax(d) < mbr2.getMin(d)) {
-        sum += mbr2.getMin(d) - mbr1.getMax(d);
+      if(mbr1.getMax(d + 1) < mbr2.getMin(d + 1)) {
+        sum += mbr2.getMin(d + 1) - mbr1.getMax(d + 1);
       }
-      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
-        sum += mbr1.getMin(d) - mbr2.getMax(d);
+      else if(mbr1.getMin(d + 1) > mbr2.getMax(d + 1)) {
+        sum += mbr1.getMin(d + 1) - mbr2.getMax(d + 1);
       }
       else { // The mbrs intersect!
         continue;

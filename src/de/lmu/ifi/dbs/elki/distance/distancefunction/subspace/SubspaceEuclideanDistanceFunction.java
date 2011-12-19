@@ -74,13 +74,13 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
 
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      double value = v.doubleValue(d);
+      double value = v.doubleValue(d + 1);
       double r;
-      if(value < mbr.getMin(d)) {
-        r = mbr.getMin(d);
+      if(value < mbr.getMin(d + 1)) {
+        r = mbr.getMin(d + 1);
       }
-      else if(value > mbr.getMax(d)) {
-        r = mbr.getMax(d);
+      else if(value > mbr.getMax(d + 1)) {
+        r = mbr.getMax(d + 1);
       }
       else {
         continue;
@@ -100,13 +100,13 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
       final double m1, m2;
-      if(mbr1.getMax(d) < mbr2.getMin(d)) {
-        m1 = mbr1.getMax(d);
-        m2 = mbr2.getMin(d);
+      if(mbr1.getMax(d + 1) < mbr2.getMin(d + 1)) {
+        m1 = mbr1.getMax(d + 1);
+        m2 = mbr2.getMin(d + 1);
       }
-      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
-        m1 = mbr1.getMin(d);
-        m2 = mbr2.getMax(d);
+      else if(mbr1.getMin(d + 1) > mbr2.getMax(d + 1)) {
+        m1 = mbr1.getMin(d + 1);
+        m2 = mbr2.getMax(d + 1);
       }
       else { // The mbrs intersect!
         continue;
