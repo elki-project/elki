@@ -131,7 +131,7 @@ public class EditDistance {
    * @return Editing distance first into second clustering
    */
   public double editDistanceFirst() {
-    return 1.0 * editOperationsFirst() / editOperationsBaseline();
+    return 1.0 - (1.0 * editOperationsFirst() / editOperationsBaseline());
   }
 
   /**
@@ -141,7 +141,7 @@ public class EditDistance {
    * @return Editing distance second into first clustering
    */
   public double editDistanceSecond() {
-    return 1.0 * editOperationsSecond() / editOperationsBaseline();
+    return 1.0 - (1.0 * editOperationsSecond() / editOperationsBaseline());
   }
 
   /**
