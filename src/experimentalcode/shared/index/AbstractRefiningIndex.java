@@ -155,6 +155,15 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
       AbstractRefiningIndex.this.refinements++;
       return distanceQuery.distance(q, id);
     }
+
+    /**
+     * Count extra refinements.
+     * 
+     * @param c Refinements
+     */
+    protected void incRefinements(int c) {
+      AbstractRefiningIndex.this.refinements += c;
+    }
   }
 
   /**
@@ -197,6 +206,15 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
     protected D refine(DBID id, O q) {
       AbstractRefiningIndex.this.refinements++;
       return distanceQuery.distance(q, id);
+    }
+
+    /**
+     * Count extra refinements.
+     * 
+     * @param c Refinements
+     */
+    protected void incRefinements(int c) {
+      AbstractRefiningIndex.this.refinements += c;
     }
   }
 }
