@@ -24,11 +24,9 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.AbstractCollection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -55,9 +53,10 @@ public class KNNList<D extends Distance<D>> extends AbstractCollection<DistanceR
   private final Object[] data;
 
   /**
-   * Constructor, to be called from KNNHeap only!
+   * Constructor, to be called from KNNHeap only. Use {@link KNNHeap#toKNNList}
+   * instead!
    * 
-   * @param heap Calling heap.
+   * @param heap Calling heap
    */
   protected KNNList(KNNHeap<D> heap) {
     super();
@@ -70,24 +69,29 @@ public class KNNList<D extends Distance<D>> extends AbstractCollection<DistanceR
       assert (i >= 0);
       data[i] = heap.poll();
     }
-    assert (data[0] != null);
+    assert (data.length == 0 || data[0] != null);
     assert (heap.size() == 0);
   }
 
   /**
-   * Constructor, to be called from KNNHeap only!
+   * Constructor. With a KNNHeap, use {@link KNNHeap#toKNNList} instead!
    * 
-   * @param list Existing list
-   * @param k k
-   * @param maxdist infinite distance to return.
+   * @param heap Calling heap
+   * @param k K value
    */
-  public KNNList(Collection<DistanceResultPair<D>> list, int k, D maxdist) {
+  public KNNList(Queue<D> heap, int k) {
     super();
-    this.data = list.toArray(new Object[0]);
+    this.data = new Object[heap.size()];
     this.k = k;
-    // TODO: sorting correct?
-    Arrays.sort(this.data, Collections.reverseOrder());
-    assert (data[0] != null);
+    // Get sorted data from heap; but in reverse.
+    int i = heap.size();
+    while(!heap.isEmpty()) {
+      i--;
+      assert (i >= 0);
+      data[i] = heap.poll();
+    }
+    assert (data.length == 0 || data[0] != null);
+    assert (heap.size() == 0);
   }
 
   /**
