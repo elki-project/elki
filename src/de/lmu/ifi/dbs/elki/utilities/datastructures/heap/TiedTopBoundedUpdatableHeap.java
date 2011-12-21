@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
  * 
  * @param <E> Object type
  */
-public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
+public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
   /**
    * Serial version
    */
@@ -56,7 +56,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
    * @param maxsize Maximum size of heap (unless tied)
    * @param comparator Comparator
    */
-  public TiedTopBoundedHeap(int maxsize, Comparator<? super E> comparator) {
+  public TiedTopBoundedUpdatableHeap(int maxsize, Comparator<? super E> comparator) {
     super(maxsize, comparator);
   }
 
@@ -65,7 +65,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
    * 
    * @param maxsize Maximum size of heap (unless tied)
    */
-  public TiedTopBoundedHeap(int maxsize) {
+  public TiedTopBoundedUpdatableHeap(int maxsize) {
     this(maxsize, null);
   }
 
@@ -92,6 +92,21 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
   }
 
   @Override
+  public boolean offerAt(int pos, E e) {
+    if(pos == IN_TIES) {
+      for(E e2 : ties) {
+        if(e.equals(e2)) {
+          if(isWorse(e, e2)) {
+            // while we did not change, this still was "successful".
+            return true;
+          }
+        }
+      }
+    }
+    return super.offerAt(pos, e);
+  }
+
+  @Override
   public E peek() {
     if(ties.isEmpty()) {
       return super.peek();
@@ -107,7 +122,9 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
       return super.poll();
     }
     else {
-      return ties.remove(ties.size() - 1);
+      E e = ties.remove(ties.size() - 1);
+      index.remove(e);
+      return e;
     }
   }
 
@@ -128,9 +145,14 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
     }
     if(tied) {
       ties.add(e);
+      index.put(e, IN_TIES);
     }
     else {
+      index.remove(e);
       // Also remove old ties.
+      for(E e2 : ties) {
+        index.remove(e2);
+      }
       ties.clear();
     }
   }

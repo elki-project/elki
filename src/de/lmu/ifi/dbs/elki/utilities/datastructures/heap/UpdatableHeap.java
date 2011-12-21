@@ -37,6 +37,16 @@ import java.util.Comparator;
  */
 public class UpdatableHeap<O> extends Heap<O> {
   /**
+   * Constant for "not in heap"
+   */
+  protected static final int NO_VALUE = Integer.MIN_VALUE;
+
+  /**
+   * Constant for "in ties list", for tied heaps.
+   */
+  protected static final int IN_TIES = -1;
+
+  /**
    * Serial version
    */
   private static final long serialVersionUID = 1L;
@@ -44,7 +54,7 @@ public class UpdatableHeap<O> extends Heap<O> {
   /**
    * Holds the indices in the heap of each element.
    */
-  private final TObjectIntMap<Object> index = new TObjectIntHashMap<Object>(100, 0.5f, -1);
+  protected final TObjectIntMap<Object> index = new TObjectIntHashMap<Object>(100, 0.5f, NO_VALUE);
 
   /**
    * Simple constructor with default size.
@@ -90,7 +100,11 @@ public class UpdatableHeap<O> extends Heap<O> {
   @Override
   public boolean offer(O e) {
     final int pos = index.get(e);
-    if(pos == -1) {
+    return offerAt(pos, e);
+  }
+
+  protected boolean offerAt(final int pos, O e) {
+    if(pos == NO_VALUE) {
       // resize when needed
       if(size + 1 > queue.length) {
         resize(size + 1);
@@ -105,6 +119,7 @@ public class UpdatableHeap<O> extends Heap<O> {
       return true;
     }
     else {
+      assert(pos >= 0) : "Unexpected negative position.";
       // System.err.println("Updating in UpdatableHeap: " + e.toString());
       // assert(queue[pos].equals(e));
       // Did the value improve?
@@ -122,12 +137,13 @@ public class UpdatableHeap<O> extends Heap<O> {
           return true;
         }
       }
-      if (pos >= validSize) {
+      if(pos >= validSize) {
         queue[pos] = e;
         // validSize = Math.min(pos, validSize);
-      } else {
+      }
+      else {
         // ensureValid();
-        heapifyUp(pos, e); 
+        heapifyUp(pos, e);
       }
       modCount++;
       // We have changed - return true according to {@link Collection#put}
