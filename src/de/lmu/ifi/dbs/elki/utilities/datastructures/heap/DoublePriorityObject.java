@@ -1,0 +1,127 @@
+package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2011
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
+
+/**
+ * Object for a priority queue with integer priority. Can be used in the
+ * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap
+ * UpdatableHeap}, since hashcode and equality use the stored objects only, not
+ * the priority.
+ * 
+ * @author Erich Schubert
+ * 
+ * @param <O> Stored object type.
+ */
+public class DoublePriorityObject<O> implements PairInterface<Double, O>, Comparable<DoublePriorityObject<?>> {
+  /**
+   * Priority.
+   */
+  double priority;
+
+  /**
+   * Stored object. Private; since changing this will break an
+   * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap
+   * UpdatableHeap}s Hash Map!
+   */
+  private O object;
+
+  /**
+   * Constructor.
+   * 
+   * @param priority Priority
+   * @param object Payload
+   */
+  public DoublePriorityObject(double priority, O object) {
+    super();
+    this.priority = priority;
+    this.object = object;
+  }
+
+  /**
+   * Get the priority.
+   * 
+   * @return Priority
+   */
+  public double getPriority() {
+    return priority;
+  }
+
+  /**
+   * Get the stored object payload
+   * 
+   * @return object data
+   */
+  public O getObject() {
+    return object;
+  }
+
+  @Override
+  public Double getFirst() {
+    return priority;
+  }
+
+  @Override
+  public O getSecond() {
+    return object;
+  }
+
+  @Override
+  public int hashCode() {
+    return ((object == null) ? 0 : object.hashCode());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(!(obj instanceof DoublePriorityObject)) {
+      return false;
+    }
+    DoublePriorityObject<?> other = (DoublePriorityObject<?>) obj;
+    if(object == null) {
+      return (other.object == null);
+    }
+    else {
+      return object.equals(other.object);
+    }
+  }
+
+  @Override
+  public int compareTo(DoublePriorityObject<?> o) {
+    return Double.compare(o.priority, this.priority);
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    buf.append(priority).append(":").append(object.toString());
+    return buf.toString();
+  }
+}
