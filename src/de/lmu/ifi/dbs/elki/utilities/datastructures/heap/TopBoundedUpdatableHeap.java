@@ -67,14 +67,15 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
   }
 
   @Override
-  public boolean offerAt(final int pos, E e) {
+  public boolean offerAt(int pos, E e) {
     // don't add if we hit maxsize and are worse
     if(pos == NO_VALUE && super.size() >= maxsize) {
       ensureValid();
-      if(isWorse(e, queue[0])) {
+      if(compare(e, queue[0]) < 0) {
         // while we did not change, this still was "successful".
         return true;
       }
+      pos = index.get(e);
     }
     boolean result = super.offerAt(pos, e);
     // purge unneeded entry(s)
@@ -91,20 +92,15 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
    * @param object Reference object
    * @return True when an update is needed
    */
-  protected boolean isWorse(E e, Object object) {
+  protected int compare(Object e, Object object) {
     if(comparator == null) {
       @SuppressWarnings("unchecked")
       Comparable<Object> c = (Comparable<Object>) e;
-      if(c.compareTo(queue[0]) < 0) {
-        return true;
-      }
+      return c.compareTo(queue[0]);
     }
     else {
-      if(comparator.compare(e, queue[0]) < 0) {
-        return true;
-      }
+      return comparator.compare(e, queue[0]);
     }
-    return false;
   }
 
   /**
