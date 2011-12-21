@@ -62,6 +62,7 @@ public class KNNList<D extends Distance<D>> extends AbstractCollection<DistanceR
     super();
     this.data = new Object[heap.size()];
     this.k = heap.getK();
+    assert(heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
     while(!heap.isEmpty()) {
@@ -83,6 +84,7 @@ public class KNNList<D extends Distance<D>> extends AbstractCollection<DistanceR
     super();
     this.data = new Object[heap.size()];
     this.k = k;
+    assert(heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
     while(!heap.isEmpty()) {
