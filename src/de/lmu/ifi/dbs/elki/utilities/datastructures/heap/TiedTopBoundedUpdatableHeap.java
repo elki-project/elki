@@ -96,14 +96,24 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
     if(pos == IN_TIES) {
       for(E e2 : ties) {
         if(e.equals(e2)) {
-          if(isWorse(e, e2)) {
+          if(compare(e, e2) <= 0) {
             // while we did not change, this still was "successful".
             return true;
           }
         }
       }
     }
-    return super.offerAt(pos, e);
+    // Updated object will be worse than the current ties
+    if (pos > 0 && ties.size() > 0 && compare(e, ties.get(0)) < 0) {
+      removeObject(e);
+      // Move one object back from ties
+      final E e2 = ties.remove(ties.size() - 1);
+      index.remove(e2);
+      super.offerAt(NO_VALUE, e2);
+      return true;
+    }
+    boolean result = super.offerAt(pos, e);
+    return result;
   }
 
   @Override

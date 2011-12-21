@@ -120,8 +120,7 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
     else {
       assert(pos >= 0) : "Unexpected negative position.";
-      // System.err.println("Updating in UpdatableHeap: " + e.toString());
-      // assert(queue[pos].equals(e));
+      assert(queue[pos].equals(e));
       // Did the value improve?
       if(comparator == null) {
         @SuppressWarnings("unchecked")
