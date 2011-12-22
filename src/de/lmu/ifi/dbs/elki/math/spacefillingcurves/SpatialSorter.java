@@ -28,7 +28,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /**
- * Interface for spatial sorting - ZCurves, Peano curves, Hilber curves, ...
+ * Interface for spatial sorting - ZCurves, Peano curves, Hilbert curves, ...
  * 
  * @author Erich Schubert
  */
@@ -41,4 +41,14 @@ public interface SpatialSorter {
    */
   public <T extends SpatialComparable> void sort(List<T> objs);
 
+  /**
+   * Sort part of the list (start to end).
+   * 
+   * @param <T> actual type we sort
+   * @param objs the spatial objects to be sorted
+   * @param start First index to sort (e.g. 0)
+   * @param end End of range (e.g. <code>site()</code>)
+   * @param minmax Array with dim pairs of (min, max) of value ranges
+   */
+  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax);
 }

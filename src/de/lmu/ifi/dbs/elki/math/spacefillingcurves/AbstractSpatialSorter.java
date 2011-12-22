@@ -40,6 +40,12 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
     super();
   }
 
+  @Override
+  public <T extends SpatialComparable> void sort(List<T> objs) {
+    double[] mms = computeMinMax(objs);
+    sort(objs, 0, objs.size(), mms);
+  }
+
   /**
    * "Pivotize" the list, such that all elements before the given position are
    * less than, all elements after the position are larger than the threshold
@@ -70,7 +76,8 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
           e--;
           eminmax = getMinPlusMaxObject(objs, e - 1, dim);
         }
-      } else {
+      }
+      else {
         double sminmax = getMinPlusMaxObject(objs, s, dim);
         while((sminmax > threshold) && s + 1 <= e && s + 1 < end) {
           s++;
