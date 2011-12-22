@@ -31,8 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
  * Access the entries of a node as array-like.
  * 
  * @author Erich Schubert
- * 
- * @param <E> Entry type
  */
 public class NodeArrayAdapter implements ArrayAdapter<SpatialEntry, AbstractNode<? extends SpatialEntry>> {
   /**

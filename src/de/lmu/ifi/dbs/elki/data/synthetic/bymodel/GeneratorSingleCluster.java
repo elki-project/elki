@@ -341,8 +341,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Increase number of discarded points
-   * 
-   * @param discarded number of points discarded.
    */
   @Override
   public void incrementDiscarded() {
@@ -399,7 +397,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
    * Get distribution along (generator) axis i.
    * 
    * @param i Generator axis i
-   * @return
+   * @return Distribution
    */
   public Distribution getDistribution(int i) {
     return axes.get(i);

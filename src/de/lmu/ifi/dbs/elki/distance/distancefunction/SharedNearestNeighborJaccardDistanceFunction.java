@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
+ * @apiviz.composedOf SharedNearestNeighborIndex.Factory
  * @apiviz.has SharedNearestNeighborJaccardDistanceFunction.Instance oneway - - «create»
  * 
  * @param <O> object type
@@ -83,11 +83,11 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
     }
 
     /**
-     * Compute the jaccard coefficient
+     * Compute the Jaccard coefficient
      * 
      * @param neighbors1 SORTED neighbor ids of first
      * @param neighbors2 SORTED neighbor ids of second
-     * @return
+     * @return Jaccard coefficient
      */
     static protected double jaccardCoefficient(DBIDs neighbors1, DBIDs neighbors2) {
       int intersection = 0;
