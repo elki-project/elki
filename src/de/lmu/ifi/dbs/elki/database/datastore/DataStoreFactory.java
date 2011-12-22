@@ -84,7 +84,6 @@ public interface DataStoreFactory {
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.
    * 
-   * @param <T> stored data type
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @return new data store

@@ -83,7 +83,6 @@ public class DOMCloner {
    * 
    * @param doc Document
    * @param eold Existing node
-   * @param filter Filter method
    * @return Cloned node
    */
   public Node cloneNode(Document doc, Node eold) {

@@ -52,7 +52,6 @@ public final class DataStoreUtil {
    * 
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
-   * @param dataclass class to store
    * @return new data store
    */
   public static WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints) {

@@ -145,8 +145,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * For details see {@link LMCLUS}.
    * </PRE>
    * 
-   * @param d The database to operate on
-   * @param relation
+   * @param database The database to operate on
+   * @param relation Relation
    * @return Clustering result
    * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    */
@@ -366,8 +366,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * Evaluate the histogram to find a suitable threshold
    * 
-   * @param histogram
-   * @return
+   * @param histogram Histogram to evaluate
+   * @return Position and goodness
    */
   private double[] findAndEvaluateThreshold(FlexiHistogram<Double, Double> histogram) {
     int n = histogram.getNumBins();
