@@ -73,11 +73,21 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
   }
 
   @Override
-  public <T extends SpatialComparable> void sort(List<T> objs) {
-    double[] mm = computeMinMax(objs);
-    peanoSort(objs, 0, objs.size(), mm, 0, new BitSet(), false);
+  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
+    peanoSort(objs, start, end, minmax, 0, new BitSet(), false);
   }
 
+  /**
+   * Sort by Peano curve.
+   * 
+   * @param objs Objects
+   * @param start Start index
+   * @param end End
+   * @param mms Minmax values
+   * @param dim Dimension
+   * @param bits Bit set for inversions
+   * @param desc Current ordering
+   */
   protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int dim, BitSet bits, boolean desc) {
     // Find the splitting points.
     final double min = mms[2 * dim], max = mms[2 * dim + 1];

@@ -38,9 +38,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
   }
 
   @Override
-  public <T extends SpatialComparable> void sort(List<T> objs) {
-    double[] mm = computeMinMax(objs);
-    hilbertSort(objs, 0, objs.size(), mm, 0, 0, 0L, 0L);
+  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
+    hilbertSort(objs, start, end, minmax, 0, 0, 0L, 0L);
   }
 
   private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int axis, long history, long inversions) {
