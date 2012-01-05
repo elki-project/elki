@@ -78,7 +78,7 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
       int e2 = start + (int) (((i + 1) * len) / s);
       // LoggingUtil.warning("STR " + dim + " s2:" + s2 + " e2:" + e2);
       if(e2 < end) {
-        QuickSelect.quickSelect(objs, c, s2, end - 1, e2);
+        QuickSelect.quickSelect(objs, c, s2, end, e2);
       }
       if(depth + 1 == dims) {
         ret.add(objs.subList(s2, e2));

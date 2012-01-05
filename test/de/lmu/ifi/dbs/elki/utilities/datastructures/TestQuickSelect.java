@@ -96,10 +96,10 @@ public class TestQuickSelect implements JUnit4Test {
   @Test
   public void testPartialArray() {
     double data[] = new double[] { 0.1, 0.2, 1, 2, 3, 0.9, 0.95 };
-    assertEquals("Partial median incorrect.", 1, QuickSelect.median(data, 2, 2), Double.MIN_VALUE);
-    assertEquals("Partial median incorrect.", 3, QuickSelect.median(data, 4, 4), Double.MIN_VALUE);
+    assertEquals("Partial median incorrect.", 1, QuickSelect.median(data, 2, 3), Double.MIN_VALUE);
+    assertEquals("Partial median incorrect.", 3, QuickSelect.median(data, 4, 5), Double.MIN_VALUE);
     // Note: do not change the order, since this modifies the array.
-    assertEquals("Partial median incorrect.", 2, QuickSelect.median(data, 2, 4), Double.MIN_VALUE);
+    assertEquals("Partial median incorrect.", 2, QuickSelect.median(data, 2, 5), Double.MIN_VALUE);
     // Note: do not change the order, since this modifies the array.
     assertEquals("Full median incorrect.", 0.95, QuickSelect.median(data), Double.MIN_VALUE);
   }

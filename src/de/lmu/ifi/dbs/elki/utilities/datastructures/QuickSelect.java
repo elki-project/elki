@@ -53,7 +53,7 @@ public class QuickSelect {
    * @return Value at the given rank
    */
   public static double quickSelect(double[] data, int rank) {
-    quickSelect(data, 0, data.length - 1, rank);
+    quickSelect(data, 0, data.length, rank);
     return data[rank];
   }
 
@@ -66,7 +66,7 @@ public class QuickSelect {
    * @return Median value
    */
   public static double median(double[] data) {
-    return median(data, 0, data.length - 1);
+    return median(data, 0, data.length);
   }
 
   /**
@@ -76,11 +76,11 @@ public class QuickSelect {
    * 
    * @param data Data to process
    * @param begin Begin of valid values
-   * @param end End of valid values (inclusive!)
+   * @param end End of valid values (exclusive!)
    * @return Median value
    */
   public static double median(double[] data, int begin, int end) {
-    final int length = (end + 1) - begin;
+    final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
     final int left = begin + (length - 1) / 2;
@@ -104,7 +104,7 @@ public class QuickSelect {
    * @return Value at quantile
    */
   public static double quantile(double[] data, double quant) {
-    return quantile(data, 0, data.length - 1, quant);
+    return quantile(data, 0, data.length, quant);
   }
 
   /**
@@ -114,12 +114,12 @@ public class QuickSelect {
    * 
    * @param data Data to process
    * @param begin Begin of valid values
-   * @param end End of valid values (inclusive!)
+   * @param end End of valid values (exclusive!)
    * @param quant Quantile to compute
    * @return Value at quantile
    */
   public static double quantile(double[] data, int begin, int end, double quant) {
-    final int length = (end + 1) - begin;
+    final int length = end - begin;
     assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
     final double dleft = begin + (length - 1) * quant;
@@ -144,7 +144,7 @@ public class QuickSelect {
    * 
    * @param data Data to process
    * @param start Interval start
-   * @param end Interval end (inclusive)
+   * @param end Interval end (exclusive)
    * @param rank rank position we are interested in (starting at 0)
    */
   public static void quickSelect(double[] data, int start, int end, int rank) {
@@ -161,21 +161,21 @@ public class QuickSelect {
     if(data[start] > data[middle]) {
       swap(data, start, middle);
     }
-    if(data[start] > data[end]) {
-      swap(data, start, end);
+    if(data[start] > data[end - 1]) {
+      swap(data, start, end - 1);
     }
-    if(data[middle] > data[end]) {
-      swap(data, middle, end);
+    if(data[middle] > data[end - 1]) {
+      swap(data, middle, end - 1);
     }
     // TODO: use more candidates for larger arrays?
 
     final double pivot = data[middle];
     // Move middle element out of the way, just before end
     // (Since we already know that "end" is bigger)
-    swap(data, middle, end - 1);
+    swap(data, middle, end - 2);
 
     // Begin partitioning
-    int i = start + 1, j = end - 2;
+    int i = start + 1, j = end - 3;
     // This is classic quicksort stuff
     while(true) {
       while(data[i] <= pivot && i <= j) {
@@ -191,12 +191,12 @@ public class QuickSelect {
     }
 
     // Move pivot (former middle element) back into the appropriate place
-    swap(data, i, end - 1);
+    swap(data, i, end - 2);
 
     // In contrast to quicksort, we only need to recurse into the half we are
     // interested in.
     if(rank < i) {
-      quickSelect(data, start, i - 1, rank);
+      quickSelect(data, start, i, rank);
     }
     else if(rank > i) {
       quickSelect(data, i + 1, end, rank);
@@ -211,7 +211,7 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static void insertionSort(double[] data, int start, int end) {
-    for(int i = start + 1; i <= end; i++) {
+    for(int i = start + 1; i < end; i++) {
       for(int j = i; j > start && data[j - 1] > data[j]; j--) {
         swap(data, j, j - 1);
       }
@@ -243,7 +243,7 @@ public class QuickSelect {
    * @return Value at the given rank
    */
   public static <T extends Comparable<? super T>> T quickSelect(T[] data, int rank) {
-    quickSelect(data, 0, data.length - 1, rank);
+    quickSelect(data, 0, data.length, rank);
     return data[rank];
   }
 
@@ -256,7 +256,7 @@ public class QuickSelect {
    * @return Median value
    */
   public static <T extends Comparable<? super T>> T median(T[] data) {
-    return median(data, 0, data.length - 1);
+    return median(data, 0, data.length);
   }
 
   /**
@@ -269,11 +269,11 @@ public class QuickSelect {
    * @param <T> object type
    * @param data Data to process
    * @param begin Begin of valid values
-   * @param end End of valid values (inclusive!)
+   * @param end End of valid values (exclusive!)
    * @return Median value
    */
   public static <T extends Comparable<? super T>> T median(T[] data, int begin, int end) {
-    final int length = (end + 1) - begin;
+    final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
     final int left = begin + (length - 1) / 2;
@@ -292,7 +292,7 @@ public class QuickSelect {
    * @return Value at quantile
    */
   public static <T extends Comparable<? super T>> T quantile(T[] data, double quant) {
-    return quantile(data, 0, data.length - 1, quant);
+    return quantile(data, 0, data.length, quant);
   }
 
   /**
@@ -305,12 +305,12 @@ public class QuickSelect {
    * @param <T> object type
    * @param data Data to process
    * @param begin Begin of valid values
-   * @param end End of valid values (inclusive!)
+   * @param end End of valid values (exclusive!)
    * @param quant Quantile to compute
    * @return Value at quantile
    */
   public static <T extends Comparable<? super T>> T quantile(T[] data, int begin, int end, double quant) {
-    final int length = (end + 1) - begin;
+    final int length = end - begin;
     assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
     final double dleft = begin + (length - 1) * quant;
@@ -327,7 +327,7 @@ public class QuickSelect {
    * @param <T> object type
    * @param data Data to process
    * @param start Interval start
-   * @param end Interval end (inclusive)
+   * @param end Interval end (exclusive)
    * @param rank rank position we are interested in (starting at 0)
    */
   public static <T extends Comparable<? super T>> void quickSelect(T[] data, int start, int end, int rank) {
@@ -344,21 +344,21 @@ public class QuickSelect {
     if(data[start].compareTo(data[middle]) > 0) {
       swap(data, start, middle);
     }
-    if(data[start].compareTo(data[end]) > 0) {
-      swap(data, start, end);
+    if(data[start].compareTo(data[end - 1]) > 0) {
+      swap(data, start, end - 1);
     }
-    if(data[middle].compareTo(data[end]) > 0) {
-      swap(data, middle, end);
+    if(data[middle].compareTo(data[end - 1]) > 0) {
+      swap(data, middle, end - 1);
     }
     // TODO: use more candidates for larger arrays?
 
     final T pivot = data[middle];
     // Move middle element out of the way, just before end
     // (Since we already know that "end" is bigger)
-    swap(data, middle, end - 1);
+    swap(data, middle, end - 2);
 
     // Begin partitioning
-    int i = start + 1, j = end - 2;
+    int i = start + 1, j = end - 3;
     // This is classic quicksort stuff
     while(true) {
       while(data[i].compareTo(pivot) <= 0 && i <= j) {
@@ -374,12 +374,12 @@ public class QuickSelect {
     }
 
     // Move pivot (former middle element) back into the appropriate place
-    swap(data, i, end - 1);
+    swap(data, i, end - 2);
 
     // In contrast to quicksort, we only need to recurse into the half we are
     // interested in.
     if(rank < i) {
-      quickSelect(data, start, i - 1, rank);
+      quickSelect(data, start, i, rank);
     }
     else if(rank > i) {
       quickSelect(data, i + 1, end, rank);
@@ -395,7 +395,7 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static <T extends Comparable<? super T>> void insertionSort(T[] data, int start, int end) {
-    for(int i = start + 1; i <= end; i++) {
+    for(int i = start + 1; i < end; i++) {
       for(int j = i; j > start && data[j - 1].compareTo(data[j]) > 0; j--) {
         swap(data, j, j - 1);
       }
@@ -428,7 +428,7 @@ public class QuickSelect {
    * @return Value at the given rank
    */
   public static <T extends Comparable<? super T>> T quickSelect(List<? extends T> data, int rank) {
-    quickSelect(data, 0, data.size() - 1, rank);
+    quickSelect(data, 0, data.size(), rank);
     return data.get(rank);
   }
 
@@ -442,7 +442,7 @@ public class QuickSelect {
    * @return Median value
    */
   public static <T extends Comparable<? super T>> T median(List<? extends T> data) {
-    return median(data, 0, data.size() - 1);
+    return median(data, 0, data.size());
   }
 
   /**
@@ -455,11 +455,11 @@ public class QuickSelect {
    * @param <T> object type
    * @param data Data to process
    * @param begin Begin of valid values
-   * @param end End of valid values (inclusive!)
+   * @param end End of valid values (exclusive!)
    * @return Median value
    */
   public static <T extends Comparable<? super T>> T median(List<? extends T> data, int begin, int end) {
-    final int length = (end + 1) - begin;
+    final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
     final int left = begin + (length - 1) / 2;
@@ -478,7 +478,7 @@ public class QuickSelect {
    * @return Value at quantile
    */
   public static <T extends Comparable<? super T>> T quantile(List<? extends T> data, double quant) {
-    return quantile(data, 0, data.size() - 1, quant);
+    return quantile(data, 0, data.size(), quant);
   }
 
   /**
@@ -491,12 +491,12 @@ public class QuickSelect {
    * @param <T> object type
    * @param data Data to process
    * @param begin Begin of valid values
-   * @param end End of valid values (inclusive!)
+   * @param end End of valid values (exclusive!)
    * @param quant Quantile to compute
    * @return Value at quantile
    */
   public static <T extends Comparable<? super T>> T quantile(List<? extends T> data, int begin, int end, double quant) {
-    final int length = (end + 1) - begin;
+    final int length = end - begin;
     assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
     final double dleft = begin + (length - 1) * quant;
@@ -513,7 +513,7 @@ public class QuickSelect {
    * @param <T> object type
    * @param data Data to process
    * @param start Interval start
-   * @param end Interval end (inclusive)
+   * @param end Interval end (exclusive)
    * @param rank rank position we are interested in (starting at 0)
    */
   public static <T extends Comparable<? super T>> void quickSelect(List<? extends T> data, int start, int end, int rank) {
@@ -530,21 +530,21 @@ public class QuickSelect {
     if(data.get(start).compareTo(data.get(middle)) > 0) {
       swap(data, start, middle);
     }
-    if(data.get(start).compareTo(data.get(end)) > 0) {
-      swap(data, start, end);
+    if(data.get(start).compareTo(data.get(end - 1)) > 0) {
+      swap(data, start, end - 1);
     }
-    if(data.get(middle).compareTo(data.get(end)) > 0) {
-      swap(data, middle, end);
+    if(data.get(middle).compareTo(data.get(end - 1)) > 0) {
+      swap(data, middle, end - 1);
     }
     // TODO: use more candidates for larger arrays?
 
     final T pivot = data.get(middle);
     // Move middle element out of the way, just before end
     // (Since we already know that "end" is bigger)
-    swap(data, middle, end - 1);
+    swap(data, middle, end - 2);
 
     // Begin partitioning
-    int i = start + 1, j = end - 2;
+    int i = start + 1, j = end - 3;
     // This is classic quicksort stuff
     while(true) {
       while(data.get(i).compareTo(pivot) <= 0 && i <= j) {
@@ -560,12 +560,12 @@ public class QuickSelect {
     }
 
     // Move pivot (former middle element) back into the appropriate place
-    swap(data, i, end - 1);
+    swap(data, i, end - 2);
 
     // In contrast to quicksort, we only need to recurse into the half we are
     // interested in.
     if(rank < i) {
-      quickSelect(data, start, i - 1, rank);
+      quickSelect(data, start, i, rank);
     }
     else if(rank > i) {
       quickSelect(data, i + 1, end, rank);
@@ -581,7 +581,7 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static <T extends Comparable<? super T>> void insertionSort(List<T> data, int start, int end) {
-    for(int i = start + 1; i <= end; i++) {
+    for(int i = start + 1; i < end; i++) {
       for(int j = i; j > start && data.get(j - 1).compareTo(data.get(j)) > 0; j--) {
         swap(data, j, j - 1);
       }
@@ -613,7 +613,7 @@ public class QuickSelect {
    * @return Value at the given rank
    */
   public static <T> T quickSelect(List<? extends T> data, Comparator<? super T> comparator, int rank) {
-    quickSelect(data, comparator, 0, data.size() - 1, rank);
+    quickSelect(data, comparator, 0, data.size(), rank);
     return data.get(rank);
   }
 
@@ -628,7 +628,7 @@ public class QuickSelect {
    * @return Median value
    */
   public static <T> T median(List<? extends T> data, Comparator<? super T> comparator) {
-    return median(data, comparator, 0, data.size() - 1);
+    return median(data, comparator, 0, data.size());
   }
 
   /**
@@ -642,11 +642,11 @@ public class QuickSelect {
    * @param data Data to process
    * @param comparator Comparator to use
    * @param begin Begin of valid values
-   * @param end End of valid values (inclusive!)
+   * @param end End of valid values (exclusive!)
    * @return Median value
    */
   public static <T> T median(List<? extends T> data, Comparator<? super T> comparator, int begin, int end) {
-    final int length = (end + 1) - begin;
+    final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
     final int left = begin + (length - 1) / 2;
@@ -666,7 +666,7 @@ public class QuickSelect {
    * @return Value at quantile
    */
   public static <T> T quantile(List<? extends T> data, Comparator<? super T> comparator, double quant) {
-    return quantile(data, comparator, 0, data.size() - 1, quant);
+    return quantile(data, comparator, 0, data.size(), quant);
   }
 
   /**
@@ -685,7 +685,7 @@ public class QuickSelect {
    * @return Value at quantile
    */
   public static <T> T quantile(List<? extends T> data, Comparator<? super T> comparator, int begin, int end, double quant) {
-    final int length = (end + 1) - begin;
+    final int length = end - begin;
     assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
     final double dleft = begin + (length - 1) * quant;
@@ -720,21 +720,21 @@ public class QuickSelect {
     if(comparator.compare(data.get(start), data.get(middle)) > 0) {
       swap(data, start, middle);
     }
-    if(comparator.compare(data.get(start), data.get(end)) > 0) {
-      swap(data, start, end);
+    if(comparator.compare(data.get(start), data.get(end - 1)) > 0) {
+      swap(data, start, end - 1);
     }
-    if(comparator.compare(data.get(middle), data.get(end)) > 0) {
-      swap(data, middle, end);
+    if(comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
+      swap(data, middle, end - 1);
     }
     // TODO: use more candidates for larger arrays?
 
     final T pivot = data.get(middle);
     // Move middle element out of the way, just before end
     // (Since we already know that "end" is bigger)
-    swap(data, middle, end - 1);
+    swap(data, middle, end - 2);
 
     // Begin partitioning
-    int i = start + 1, j = end - 2;
+    int i = start + 1, j = end - 3;
     // This is classic quicksort stuff
     while(true) {
       while(comparator.compare(data.get(i), pivot) <= 0 && i <= j) {
@@ -750,12 +750,12 @@ public class QuickSelect {
     }
 
     // Move pivot (former middle element) back into the appropriate place
-    swap(data, i, end - 1);
+    swap(data, i, end - 2);
 
     // In contrast to quicksort, we only need to recurse into the half we are
     // interested in.
     if(rank < i) {
-      quickSelect(data, comparator, start, i - 1, rank);
+      quickSelect(data, comparator, start, i, rank);
     }
     else if(rank > i) {
       quickSelect(data, comparator, i + 1, end, rank);
@@ -771,7 +771,7 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static <T> void insertionSort(List<T> data, Comparator<? super T> comparator, int start, int end) {
-    for(int i = start + 1; i <= end; i++) {
+    for(int i = start + 1; i < end; i++) {
       for(int j = i; j > start && comparator.compare(data.get(j - 1), data.get(j)) > 0; j--) {
         swap(data, j, j - 1);
       }
