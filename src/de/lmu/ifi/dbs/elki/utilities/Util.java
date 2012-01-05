@@ -112,9 +112,19 @@ public final class Util {
    * @return a new BitSet with randomly set bits
    */
   public static BitSet randomBitSet(int cardinality, int capacity, Random random) {
+    assert (cardinality >= 0) : "Cannot set a negative number of bits!";
+    assert (cardinality < capacity) : "Cannot set " + cardinality + " of " + capacity + " bits!";
     BitSet bitset = new BitSet(capacity);
-    while(bitset.cardinality() < cardinality) {
-      bitset.set(random.nextInt(capacity));
+    if(cardinality < capacity >>> 1) {
+      while(bitset.cardinality() < cardinality) {
+        bitset.set(random.nextInt(capacity));
+      }
+    }
+    else {
+      bitset.flip(0, capacity);
+      while(bitset.cardinality() > cardinality) {
+        bitset.clear(random.nextInt(capacity));
+      }
     }
     return bitset;
   }
