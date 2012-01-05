@@ -78,7 +78,7 @@ public abstract class AbstractStreamConversionFilter<I, O> extends AbstractStrea
           if(getInputTypeRestriction().isAssignableFromType(type)) {
             @SuppressWarnings("unchecked")
             final SimpleTypeInformation<I> castType = (SimpleTypeInformation<I>) type;
-            meta.add(castType);
+            meta.add(convertedType(castType));
             column = i;
             continue;
           }
