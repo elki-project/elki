@@ -54,7 +54,7 @@ public class KDTreeSpatialSorter extends AbstractSpatialSorter {
     final int mid = start + ((end - start) >>> 1);
     // Make invariant
     comp.dim = curdim;
-    QuickSelect.quickSelect(objs, comp, start, end - 1, mid);
+    QuickSelect.quickSelect(objs, comp, start, end, mid);
     // Recurse
     final int nextdim = (curdim % dims) + 1;
     if(start < mid - 1) {

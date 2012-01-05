@@ -110,8 +110,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
         }
 
         if(c > 0) {
-          // Note: only use up to c-1, since we may have used a too big array
-          median = QuickSelect.median(fi, 0, c - 1);
+          median = QuickSelect.median(fi, 0, c);
         }
         else {
           median = relation.get(id).doubleValue(1);
