@@ -178,6 +178,15 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     }
     return sortDims(ret);
   }
+  
+  public double projectScaledToRender(int dim, double d){
+    if (inverted[dim]){
+      return (margin[1] + d * axisHeight);
+    }
+    else {
+      return ((axisHeight + margin[1]) - d * axisHeight);
+    }
+  }
 
   @Override
   public Vector projectRenderToScaled(Vector v) {
