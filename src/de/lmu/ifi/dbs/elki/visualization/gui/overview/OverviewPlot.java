@@ -170,7 +170,11 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     for(Projector p : projectors) {
       Collection<PlotItem> projs = p.arrange();
       for(PlotItem it : projs) {
-        plotmap.put(it.w, it.h, it);
+        if(it.w <= 0.0 || it.h <= 0.0) {
+          logger.warning("Plot item with improper size information: " + it);
+        } else {
+          plotmap.put(it.w, it.h, it);
+        }
       }
     }
 
