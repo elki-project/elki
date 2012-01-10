@@ -56,4 +56,6 @@ public interface ProjectionParallel extends Projection {
   public LinearScale getLinearScale(int dim);
   
   public CanvasSize estimateViewport();
+  
+  public double projectScaledToRender(int dim, double d);
 }
