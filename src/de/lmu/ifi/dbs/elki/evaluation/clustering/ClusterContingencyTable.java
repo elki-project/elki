@@ -269,8 +269,8 @@ public class ClusterContingencyTable {
           double rel = contingency[i1][i2] / cs;
           purity += rel * rel;
         }
+        mv.put(purity, cs);
       }
-      mv.put(purity);
     }
     for(int i2 = 0; i2 < size2; i2++) {
       double purity = 0.0;
@@ -280,8 +280,8 @@ public class ClusterContingencyTable {
           double rel = contingency[i1][i2] / cs;
           purity += rel * rel;
         }
+        mv.put(purity, cs);
       }
-      mv.put(purity);
     }
     return mv;
   }
