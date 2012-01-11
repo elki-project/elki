@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 /*
  This file is part of ELKI:
@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -45,8 +45,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -55,8 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides the k-means algorithm.
@@ -102,6 +99,11 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("kmeans.seed", "The random number generator seed.");
 
   /**
+   * Parameter to specify the initialization method
+   */
+  public static final OptionID INIT_ID = OptionID.getOrCreateOptionID("kmeans.initialization", "Method to choose the initial means.");
+
+  /**
    * Holds the value of {@link #K_ID}.
    */
   private int k;
@@ -112,9 +114,9 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   private int maxiter;
 
   /**
-   * Holds the value of {@link #SEED_ID}.
+   * Method to choose initial means.
    */
-  private Long seed;
+  private KMeansInitialization<V> initializer;
 
   /**
    * Constructor.
@@ -122,13 +124,12 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
-   * @param seed Random generator seed
    */
-  public KMeans(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, Long seed) {
+  public KMeans(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
-    this.seed = seed;
+    this.initializer = initializer;
   }
 
   /**
@@ -140,25 +141,10 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * @throws IllegalStateException
    */
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
-    final Random random = (this.seed != null) ? new Random(this.seed) : new Random();
     if(relation.size() > 0) {
-      final int dim = DatabaseUtil.dimensionality(relation);
-      Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
-      List<V> means = new ArrayList<V>(k);
+      List<V> means = initializer.chooseInitialMeans(relation, k);
+      
       List<V> oldMeans;
-      if(logger.isVerbose()) {
-        logger.verbose("initializing random vectors");
-      }
-      for(int i = 0; i < k; i++) {
-        double[] r = MathUtil.randomDoubleArray(dim, random);
-        // Rescale
-        for (int d = 0; d < dim; d++) {
-          r[d] = minmax.first.doubleValue(d + 1) + (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1)) * r[d];
-        }
-        // Instantiate
-        V randomVector = minmax.first.newNumberVector(r);
-        means.add(randomVector);
-      }
       List<? extends ModifiableDBIDs> clusters;
       clusters = sort(means, relation);
       boolean changed = true;
@@ -277,7 +263,7 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     protected int maxiter;
 
-    protected Long seed;
+    protected KMeansInitialization<V> initializer;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -287,20 +273,22 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         k = kP.getValue();
       }
 
+      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
+      if (config.grab(initialP)) {
+        initializer = initialP.instantiateClass(config);
+      }
+      
       IntParameter maxiterP = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }
 
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
-      }
+      
     }
 
     @Override
     protected KMeans<V, D> makeInstance() {
-      return new KMeans<V, D>(distanceFunction, k, maxiter, seed);
+      return new KMeans<V, D>(distanceFunction, k, maxiter, initializer);
     }
   }
 }
