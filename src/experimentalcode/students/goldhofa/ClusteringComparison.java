@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
@@ -127,7 +128,7 @@ public class ClusteringComparison implements Evaluator {
     
     Segments segments = new Segments(clusterings);
     
-    for (DBID id : db.getDBIDs()) {
+    for (DBID id : db.getRelation(TypeUtil.DBID).iterDBIDs()) {
 
       // tag Object over SegmentID
       segments.addObject(id);
