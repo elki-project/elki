@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  */
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
