@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 /**
  * Visualizer drawing Voronoi cells for k-means clusterings.
  * 
- * See also: {@link de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans KMeans
+ * See also: {@link de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans KMeans
  * clustering}
  * 
  * @author Robert Rödler
