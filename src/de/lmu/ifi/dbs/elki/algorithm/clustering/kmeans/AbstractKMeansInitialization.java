@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  */
 public abstract class AbstractKMeansInitialization<V extends NumberVector<V, ?>> implements KMeansInitialization<V> {
   /**
-   * Holds the value of {@link #SEED_ID}.
+   * Holds the value of {@link KMeans#SEED_ID}.
    */
   protected Long seed;
 
