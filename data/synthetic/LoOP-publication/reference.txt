@@ -1,0 +1,3 @@
+Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek:
+LoOP: Local Outlier Probabilities
+Proc. 18th ACM Conference on Information and Knowledge Management (CIKM 2009), Hong Kong, China, 2009.

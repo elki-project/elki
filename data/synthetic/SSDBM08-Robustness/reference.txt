@@ -1,0 +1,3 @@
+Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek:
+A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms
+Proc. 20th International Conference on Scientific and Statistical Database Management (SSDBM 2008), Hong Kong, China, 2008.
