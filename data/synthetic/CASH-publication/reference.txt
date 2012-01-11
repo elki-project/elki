@@ -1,0 +1,3 @@
+Elke Achtert, Christian Böhm, Jörn David, Peer Kröger, Arthur Zimek:
+Robust Clustering in Arbitrarily Oriented Subspaces
+Proc. 8th SIAM International Conference on Data Mining (SDM 2008), Atlanta, GA, 2008.

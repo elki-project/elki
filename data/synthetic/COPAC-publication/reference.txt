@@ -1,0 +1,3 @@
+Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek:
+Robust, Complete, and Efficient Correlation Clustering
+Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007.
