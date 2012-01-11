@@ -26,6 +26,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 
 /**
  * Interface for initializing K-Means
@@ -40,7 +41,8 @@ public interface KMeansInitialization<V extends NumberVector<V, ?>> {
    * 
    * @param relation Relation
    * @param k Parameter k
+   * @param distanceFunction Distance function 
    * @return List of chosen means for k-means
    */
-  public abstract List<V> chooseInitialMeans(Relation<V> relation, int k);
+  public abstract List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction);
 }

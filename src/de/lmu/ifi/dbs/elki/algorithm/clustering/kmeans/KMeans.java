@@ -142,8 +142,8 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    */
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
     if(relation.size() > 0) {
-      List<V> means = initializer.chooseInitialMeans(relation, k);
-      
+      List<V> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+
       List<V> oldMeans;
       List<? extends ModifiableDBIDs> clusters;
       clusters = sort(means, relation);
