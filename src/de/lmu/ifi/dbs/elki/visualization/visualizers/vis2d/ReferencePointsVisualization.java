@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @apiviz.has ReferencePointsResult oneway - - visualizes
  */
 // TODO: add a result listener for the reference points.
-public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class ReferencePointsVisualization extends P2DVisualization {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -66,7 +66,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
   /**
    * Serves reference points.
    */
-  protected ReferencePointsResult<NV> result;
+  protected ReferencePointsResult<? extends NumberVector<?, ?>> result;
 
   /**
    * Constructor.
@@ -82,11 +82,11 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
   @Override
   public void redraw() {
     setupCSS(svgp);
-    Iterator<NV> iter = result.iterator();
+    Iterator<? extends NumberVector<?, ?>> iter = result.iterator();
 
     final double dotsize = context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS);
     while(iter.hasNext()) {
-      NV v = iter.next();
+      NumberVector<?, ?> v = iter.next();
       double[] projected = proj.fastProjectDataToRenderSpace(v);
       Element dot = svgp.svgCircle(projected[0], projected[1], dotsize);
       SVGUtil.addCSSClass(dot, REFPOINT);
@@ -112,10 +112,8 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses ReferencePointsVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the DatabaseObject being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -126,8 +124,8 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<ReferencePointsResult<NV>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
-      for(ReferencePointsResult<NV> rp : rps) {
+      Collection<ReferencePointsResult<?>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
+      for(ReferencePointsResult<?> rp : rps) {
         Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
           final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), this);
@@ -140,7 +138,7 @@ public class ReferencePointsVisualization<NV extends NumberVector<NV, ?>> extend
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ReferencePointsVisualization<NV>(task);
+      return new ReferencePointsVisualization(task);
     }
   }
 }

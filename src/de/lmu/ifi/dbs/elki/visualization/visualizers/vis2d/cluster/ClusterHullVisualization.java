@@ -33,7 +33,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
@@ -74,10 +73,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has Clustering oneway - - visualizes
  * @apiviz.uses ConvexHull2D
  * @apiviz.uses AlphaShape
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class ClusterHullVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class ClusterHullVisualization extends P2DVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -202,10 +199,8 @@ public class ClusterHullVisualization<NV extends NumberVector<NV, ?>> extends P2
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses ClusterHullVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Alpha value
      */
@@ -223,7 +218,7 @@ public class ClusterHullVisualization<NV extends NumberVector<NV, ?>> extends P2
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusterHullVisualization<NV>(task, alpha);
+      return new ClusterHullVisualization(task, alpha);
     }
 
     @Override
@@ -249,7 +244,7 @@ public class ClusterHullVisualization<NV extends NumberVector<NV, ?>> extends P2
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       /**
        * Alpha-Value for alpha-shapes
        * 
@@ -274,8 +269,8 @@ public class ClusterHullVisualization<NV extends NumberVector<NV, ?>> extends P2
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(alpha);
+      protected Factory makeInstance() {
+        return new Factory(alpha);
       }
     }
   }

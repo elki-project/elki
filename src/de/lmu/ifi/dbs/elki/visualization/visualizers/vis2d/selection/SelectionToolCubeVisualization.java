@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
@@ -70,7 +71,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DragableArea.DragListener {
+public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization implements DragableArea.DragListener {
   /**
    * The logger for this class.
    */
@@ -168,7 +169,10 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
     v2.set(0, x2);
     v2.set(1, y2);
 
-    NV factory = DatabaseUtil.assumeVectorField(rel).getFactory();
+    // TODO: refactor to not require knowing the type?
+    @SuppressWarnings("unchecked")
+    final Relation<NV> nvrel = (Relation<NV>)rel;
+    NV factory = DatabaseUtil.assumeVectorField(nvrel).getFactory();
 
     NV nv1 = proj.projectRenderToDataSpace(v1, factory);
     NV nv2 = proj.projectRenderToDataSpace(v2, factory);
@@ -241,7 +245,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
       selection.clear();
       boolean idIn = true;
       for(DBID id : rel.iterDBIDs()) {
-        NV dbTupel = rel.get(id);
+        NumberVector<?, ?> dbTupel = rel.get(id);
         idIn = true;
         for(int i = 0; i < dim; i++) {
           if(ranges != null && ranges[i] != null) {

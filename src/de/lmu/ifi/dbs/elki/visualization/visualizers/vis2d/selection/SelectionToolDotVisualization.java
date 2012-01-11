@@ -32,7 +32,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -62,10 +61,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * 
  * @apiviz.has SelectionResult oneway - - updates
  * @apiviz.has DBIDSelection oneway - - updates
- * 
- * @param <NV> vector type
  */
-public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DragableArea.DragListener {
+public class SelectionToolDotVisualization extends P2DVisualization implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -256,10 +253,8 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses SelectionToolDotVisualization - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -270,7 +265,7 @@ public class SelectionToolDotVisualization<NV extends NumberVector<NV, ?>> exten
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionToolDotVisualization<NV>(task);
+      return new SelectionToolDotVisualization(task);
     }
 
     @Override

@@ -29,7 +29,6 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -61,10 +60,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements ContextChangeListener, DataStoreListener {
+public class SelectionDotVisualization extends P2DVisualization implements ContextChangeListener, DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -138,10 +135,8 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses SelectionDotVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor
      */
@@ -151,7 +146,7 @@ public class SelectionDotVisualization<NV extends NumberVector<NV, ?>> extends P
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionDotVisualization<NV>(task);
+      return new SelectionDotVisualization(task);
     }
 
     @Override

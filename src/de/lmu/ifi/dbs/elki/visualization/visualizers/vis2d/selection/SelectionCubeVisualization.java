@@ -29,7 +29,6 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -67,10 +66,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has RangeSelection oneway - - visualizes
  * @apiviz.uses SVGHyperCube
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements ContextChangeListener {
+public class SelectionCubeVisualization extends P2DVisualization implements ContextChangeListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -194,10 +191,8 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses SelectionCubeVisualization oneway - - «create»
-   * 
-   * @param <NV> vector type
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Flag for half-transparent filling of selection cubes.
      * 
@@ -224,7 +219,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionCubeVisualization<NV>(task, nofill);
+      return new SelectionCubeVisualization(task, nofill);
     }
 
     @Override
@@ -253,7 +248,7 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       protected boolean nofill;
 
       @Override
@@ -266,8 +261,8 @@ public class SelectionCubeVisualization<NV extends NumberVector<NV, ?>> extends 
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(nofill);
+      protected Factory makeInstance() {
+        return new Factory(nofill);
       }
     }
   }

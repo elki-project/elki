@@ -77,7 +77,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  */
 // TODO: nicer stacking of n-fold hulls
 // TODO: can we find a proper sphere for 3+ dimensions?
-public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization {
   /**
    * A short name characterizing this Visualizer.
    */

@@ -69,11 +69,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @author Erich Schubert
  * 
  * @apiviz.has OutlierResult oneway - - visualizes
- * 
- * @param <NV> Type of the DatabaseObject being visualized.
  */
 @Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", url = "http://dx.doi.org/10.1007%2F978-3-642-12098-5_34")
-public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
+public class BubbleVisualization extends P2DVisualization implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -132,7 +130,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
       for(DBID objId : clus.getIDs()) {
         final Double radius = getScaledForId(objId);
         if(radius > 0.01) {
-          final NV vec = rel.get(objId);
+          final NumberVector<?, ?> vec = rel.get(objId);
           if(vec != null) {
             double[] v = proj.fastProjectDataToRenderSpace(vec);
             Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
@@ -217,10 +215,8 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses BubbleVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the DatabaseObject being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Flag for half-transparent filling of bubbles.
      * 
@@ -267,7 +263,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
         final OutlierResult outlierResult = task.getResult();
         ((OutlierScalingFunction) this.scaling).prepare(outlierResult);
       }
-      return new BubbleVisualization<NV>(task, scaling);
+      return new BubbleVisualization(task, scaling);
     }
 
     @Override
@@ -303,7 +299,7 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       /**
        * Fill parameter.
        */
@@ -329,8 +325,8 @@ public class BubbleVisualization<NV extends NumberVector<NV, ?>> extends P2DVisu
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(fill, scaling);
+      protected Factory makeInstance() {
+        return new Factory(fill, scaling);
       }
     }
   }

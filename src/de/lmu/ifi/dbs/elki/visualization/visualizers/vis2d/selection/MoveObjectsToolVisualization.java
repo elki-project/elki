@@ -30,7 +30,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -59,10 +58,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @author Erich Schubert
  * 
  * @apiviz.has NumberVector oneway - - edits
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DragListener {
+public class MoveObjectsToolVisualization extends P2DVisualization implements DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -201,10 +198,8 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses MoveObjectsToolVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor
      */
@@ -214,7 +209,7 @@ public class MoveObjectsToolVisualization<NV extends NumberVector<NV, ?>> extend
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new MoveObjectsToolVisualization<NV>(task);
+      return new MoveObjectsToolVisualization(task);
     }
 
     @Override

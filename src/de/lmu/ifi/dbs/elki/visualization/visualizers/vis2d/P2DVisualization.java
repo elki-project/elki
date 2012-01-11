@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * @apiviz.landmark
  * @apiviz.has Projection2D
  */
-public abstract class P2DVisualization<NV extends NumberVector<?, ?>> extends AbstractVisualization {
+public abstract class P2DVisualization extends AbstractVisualization {
   /**
    * The current projection
    */
@@ -53,7 +53,7 @@ public abstract class P2DVisualization<NV extends NumberVector<?, ?>> extends Ab
   /**
    * The representation we visualize
    */
-  final protected Relation<NV> rel;
+  final protected Relation<? extends NumberVector<?, ?>> rel;
 
   /**
    * Constructor.

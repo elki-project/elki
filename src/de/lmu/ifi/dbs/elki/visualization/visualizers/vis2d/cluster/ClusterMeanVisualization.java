@@ -61,10 +61,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @author Heidi Kolb
  * 
  * @apiviz.has MeanModel oneway - - visualizes
- * 
- * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class ClusterMeanVisualization extends P2DVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -88,7 +86,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
   /**
    * Clustering to visualize.
    */
-  Clustering<MeanModel<NV>> clustering;
+  Clustering<MeanModel<? extends NumberVector<?, ?>>> clustering;
 
   /**
    * Draw stars
@@ -116,9 +114,9 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
     MarkerLibrary ml = context.getStyleLibrary().markers();
     double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
 
-    Iterator<Cluster<MeanModel<NV>>> ci = clustering.getAllClusters().iterator();
+    Iterator<Cluster<MeanModel<? extends NumberVector<?, ?>>>> ci = clustering.getAllClusters().iterator();
     for(int cnum = 0; ci.hasNext(); cnum++) {
-      Cluster<MeanModel<NV>> clus = ci.next();
+      Cluster<MeanModel<? extends NumberVector<?, ?>>> clus = ci.next();
       double[] mean = proj.fastProjectDataToRenderSpace(clus.getModel().getMean());
 
       // add a greater Marker for the mean
@@ -168,7 +166,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
     if(stars) {
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-      Iterator<Cluster<MeanModel<NV>>> ci = clustering.getAllClusters().iterator();
+      Iterator<Cluster<MeanModel<? extends NumberVector<?, ?>>>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; ci.hasNext(); cnum++) {
         ci.next();
         if(!svgp.getCSSClassManager().contains(CSS_MEAN_STAR + "_" + cnum)) {
@@ -190,10 +188,8 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses ClusterMeanVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Option ID for visualization of cluster means.
      * 
@@ -220,7 +216,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusterMeanVisualization<NV>(task, stars);
+      return new ClusterMeanVisualization(task, stars);
     }
 
     @Override
@@ -230,7 +226,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
       for(Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
           // Does the cluster have a model with cluster means?
-          Clustering<MeanModel<NV>> mcls = findMeanModel(c);
+          Clustering<MeanModel<? extends NumberVector<?, ?>>> mcls = findMeanModel(c);
           if(mcls != null) {
             Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
             for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
@@ -247,14 +243,13 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
     /**
      * Test if the given clustering has a mean model.
      * 
-     * @param <NV> Vector type
      * @param c Clustering to inspect
      * @return the clustering cast to return a mean model, null otherwise.
      */
     @SuppressWarnings("unchecked")
-    private static <NV extends NumberVector<NV, ?>> Clustering<MeanModel<NV>> findMeanModel(Clustering<?> c) {
+    private static  Clustering<MeanModel<? extends NumberVector<?, ?>>> findMeanModel(Clustering<?> c) {
       if(c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
-        return (Clustering<MeanModel<NV>>) c;
+        return (Clustering<MeanModel<? extends NumberVector<?, ?>>>) c;
       }
       return null;
     }
@@ -266,7 +261,7 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       protected boolean stars = false;
 
       @Override
@@ -279,8 +274,8 @@ public class ClusterMeanVisualization<NV extends NumberVector<NV, ?>> extends P2
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(stars);
+      protected Factory makeInstance() {
+        return new Factory(stars);
       }
     }
   }

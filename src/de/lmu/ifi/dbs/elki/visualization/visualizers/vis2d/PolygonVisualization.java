@@ -29,8 +29,6 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -62,7 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @apiviz.has PolygonsObject - - visualizes
  */
-public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisualization<V> implements DataStoreListener {
+public class PolygonVisualization extends P2DVisualization implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -167,7 +165,7 @@ public class PolygonVisualization<V extends NumberVector<?, ?>> extends P2DVisua
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new PolygonVisualization<DoubleVector>(task);
+      return new PolygonVisualization(task);
     }
 
     @Override

@@ -30,7 +30,6 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -44,11 +43,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * General base class for a tooltip visualizer.
  * 
  * @author Erich Schubert
- * 
- * @param <NV> Number Vector
  */
 // TODO: can we improve performance by not adding as many hovers?
-public abstract class AbstractTooltipVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
+public abstract class AbstractTooltipVisualization extends P2DVisualization implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */

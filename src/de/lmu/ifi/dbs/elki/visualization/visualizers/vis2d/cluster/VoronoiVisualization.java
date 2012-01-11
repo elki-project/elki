@@ -70,10 +70,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @author Erich Schubert
  * 
  * @apiviz.has MeanModel oneway - - visualizes
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class VoronoiVisualization extends P2DVisualization {
 
   /**
    * A short name characterizing this Visualizer.
@@ -99,7 +97,7 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
   /**
    * The result we work on
    */
-  Clustering<MeanModel<NV>> clustering;
+  Clustering<MeanModel<? extends NumberVector<?, ?>>> clustering;
 
   /**
    * The Voronoi diagram
@@ -128,7 +126,7 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-    final List<Cluster<MeanModel<NV>>> clusters = clustering.getAllClusters();
+    final List<Cluster<MeanModel<? extends NumberVector<?, ?>>>> clusters = clustering.getAllClusters();
 
     if(clusters.size() < 2) {
       return;
@@ -137,7 +135,7 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
     // Collect cluster means
     ArrayList<Vector> means = new ArrayList<Vector>(clusters.size());
     {
-      for(Cluster<MeanModel<NV>> clus : clusters) {
+      for(Cluster<MeanModel<? extends NumberVector<?, ?>>> clus : clusters) {
         means.add(clus.getModel().getMean().getColumnVector());
       }
     }
@@ -197,10 +195,8 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses VoronoiVisualisation oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Mode for drawing: Voronoi, Delaunay, both
      * 
@@ -227,7 +223,7 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new VoronoiVisualization<NV>(task, mode);
+      return new VoronoiVisualization(task, mode);
     }
 
     @Override
@@ -237,7 +233,7 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
       for(Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
           // Does the cluster have a model with cluster means?
-          Clustering<MeanModel<NV>> mcls = findMeanModel(c);
+          Clustering<MeanModel<? extends NumberVector<?, ?>>> mcls = findMeanModel(c);
           if(mcls != null) {
             Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
             for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
@@ -256,15 +252,14 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
     /**
      * Test if the given clustering has a mean model.
      * 
-     * @param <NV> Vector type
      * @param c Clustering to inspect
      * @return the clustering cast to return a mean model, null otherwise.
      */
     @SuppressWarnings("unchecked")
-    private static <NV extends NumberVector<NV, ?>> Clustering<MeanModel<NV>> findMeanModel(Clustering<?> c) {
+    private static Clustering<MeanModel<? extends NumberVector<?, ?>>> findMeanModel(Clustering<?> c) {
       final Model firstModel = c.getAllClusters().get(0).getModel();
       if(firstModel instanceof MeanModel<?> && !(firstModel instanceof EMModel<?>)) {
-        return (Clustering<MeanModel<NV>>) c;
+        return (Clustering<MeanModel<? extends NumberVector<?, ?>>>) c;
       }
       return null;
     }
@@ -276,7 +271,7 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       protected Mode mode;
 
       @Override
@@ -289,8 +284,8 @@ public class VoronoiVisualization<NV extends NumberVector<NV, ?>> extends P2DVis
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(mode);
+      protected Factory makeInstance() {
+        return new Factory(mode);
       }
     }
   }

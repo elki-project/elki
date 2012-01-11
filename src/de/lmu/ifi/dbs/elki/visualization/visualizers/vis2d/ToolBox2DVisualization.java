@@ -33,7 +33,6 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -58,10 +57,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * @author Heidi Kolb
  * 
  * @apiviz.has VisualizationTask oneway - - visualizes
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class ToolBox2DVisualization extends P2DVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -287,10 +284,8 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses ToolBox2DVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor
      */
@@ -300,7 +295,7 @@ public class ToolBox2DVisualization<NV extends NumberVector<NV, ?>> extends P2DV
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ToolBox2DVisualization<NV>(task);
+      return new ToolBox2DVisualization(task);
     }
 
     @Override
