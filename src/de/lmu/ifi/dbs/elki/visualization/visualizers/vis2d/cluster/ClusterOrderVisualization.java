@@ -28,7 +28,6 @@ import java.util.Iterator;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has ClusterOrderResult oneway - - visualizes
  */
 // TODO: listen for CLUSTER ORDER changes.
-public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
+public class ClusterOrderVisualization extends P2DVisualization implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -120,10 +119,8 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses ClusterOrderVisualization oneway - - «create»
-   * 
-   * @param <NV> object type
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -134,7 +131,7 @@ public class ClusterOrderVisualization<NV extends NumberVector<NV, ?>> extends P
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusterOrderVisualization<NV>(task);
+      return new ClusterOrderVisualization(task);
     }
 
     @Override

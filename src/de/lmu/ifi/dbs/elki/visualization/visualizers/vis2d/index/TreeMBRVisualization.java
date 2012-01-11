@@ -29,7 +29,6 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
@@ -68,12 +67,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has AbstractRStarTree oneway - - visualizes
  * @apiviz.uses SVGHyperCube
  * 
- * @param <NV> Type of the DatabaseObject being visualized.
  * @param <N> Tree node type
  * @param <E> Tree entry type
  */
 // TODO: listen for tree changes instead of data changes?
-public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends P2DVisualization<NV> implements DataStoreListener {
+public class TreeMBRVisualization<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends P2DVisualization implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -191,10 +189,8 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses TreeMBRVisualization oneway - - «create»
-   * 
-   * @param <NV> vector type
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Flag for half-transparent filling of bubbles.
      * 
@@ -221,7 +217,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new TreeMBRVisualization<NV, RStarTreeNode, SpatialEntry>(task, fill);
+      return new TreeMBRVisualization<RStarTreeNode, SpatialEntry>(task, fill);
     }
 
     @Override
@@ -247,7 +243,7 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       protected boolean fill = false;
 
       @Override
@@ -260,8 +256,8 @@ public class TreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends Abst
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(fill);
+      protected Factory makeInstance() {
+        return new Factory(fill);
       }
     }
   }

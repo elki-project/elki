@@ -52,11 +52,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @author Erich Schubert
  * 
  * @apiviz.has Clustering oneway - - visualizes
- * 
- * @param <NV> Type of the DatabaseObject being visualized.
  */
 // TODO: ensure we have the right database for this
-public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
+public class ClusteringVisualization extends P2DVisualization implements DataStoreListener {
   /**
    * The result we visualize
    */
@@ -90,7 +88,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
       Cluster<?> clus = ci.next();
       for(DBID objId : clus.getIDs()) {
         try {
-          final NV vec = rel.get(objId);
+          final NumberVector<?, ?> vec = rel.get(objId);
           double[] v = proj.fastProjectDataToRenderSpace(vec);
           ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
         }
@@ -113,10 +111,8 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses ClusteringVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the DatabaseObject being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * A short name characterizing this Visualizer.
      */
@@ -132,7 +128,7 @@ public class ClusteringVisualization<NV extends NumberVector<NV, ?>> extends P2D
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusteringVisualization<NV>(task);
+      return new ClusteringVisualization(task);
     }
 
     @Override

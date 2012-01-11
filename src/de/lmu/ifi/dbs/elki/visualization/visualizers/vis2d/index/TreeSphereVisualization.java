@@ -71,12 +71,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has AbstractMTree oneway - - visualizes
  * @apiviz.uses SVGHyperSphere
  * 
- * @param <NV> Type of the DatabaseObject being visualized.
  * @param <N> Tree node type
  * @param <E> Tree entry type
  */
 // TODO: listen for tree changes!
-public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<NV, D, N, E>, E extends MTreeEntry<D>> extends P2DVisualization<NV> implements DataStoreListener {
+public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<?, D, N, E>, E extends MTreeEntry<D>> extends P2DVisualization implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -106,7 +105,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
   /**
    * The tree we visualize
    */
-  protected AbstractMTree<NV, D, N, E> tree;
+  protected AbstractMTree<?, D, N, E> tree;
 
   /**
    * Fill parameter.
@@ -209,10 +208,10 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    * @param entry Current entry
    * @param depth Current depth
    */
-  private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<NV, D, N, E> mtree, E entry, int depth) {
+  private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<?, D, N, E> mtree, E entry, int depth) {
     DBID roid = entry.getRoutingObjectID();
     if(roid != null) {
-      NV ro = rel.get(roid);
+      NumberVector<?, ?> ro = rel.get(roid);
       D rad = entry.getCoveringRadius();
 
       final Element r;
@@ -260,10 +259,8 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses TreeSphereVisualization oneway - - «create»
-   * 
-   * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Fill parameter.
      */
@@ -283,8 +280,8 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
-        ArrayList<AbstractMTree<NV, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
-        for(AbstractMTree<NV, DoubleDistance, ?, ?> tree : trees) {
+        ArrayList<AbstractMTree<?, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
+        for(AbstractMTree<?, DoubleDistance, ?, ?> tree : trees) {
           if(canVisualize(tree) && tree instanceof Result) {
             final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
@@ -297,7 +294,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new TreeSphereVisualization<NV, DoubleDistance, MTreeNode<NV, DoubleDistance>, MTreeEntry<DoubleDistance>>(task, fill);
+      return new TreeSphereVisualization<DoubleDistance, MTreeNode<?, DoubleDistance>, MTreeEntry<DoubleDistance>>(task, fill);
     }
 
     /**
@@ -307,7 +304,7 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       protected boolean fill = false;
 
       @Override
@@ -320,8 +317,8 @@ public class TreeSphereVisualization<NV extends NumberVector<NV, ?>, D extends N
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(fill);
+      protected Factory makeInstance() {
+        return new Factory(fill);
       }
     }
   }

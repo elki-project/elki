@@ -50,10 +50,8 @@ import experimentalcode.students.roedler.utils.DistanceFunctionDrawUtils;
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> extends P2DVisualization<NV> implements ContextChangeListener, DataStoreListener {
+public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> extends P2DVisualization implements ContextChangeListener, DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -71,7 +69,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
   /**
    * The selection result we work on
    */
-  private AbstractMaterializeKNNPreprocessor<NV, DoubleDistance, ?> result;
+  private AbstractMaterializeKNNPreprocessor<? extends NumberVector<?, ?>, DoubleDistance, ?> result;
 
   /**
    * p[0] type of a Norm p[1] value of a Lp Norm
@@ -197,7 +195,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
    *         Cosine =-1 -> visualization not implemented so far p[1] the p value
    *         itself
    */
-  public static <NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> double[] getLPNormP(AbstractMaterializeKNNPreprocessor<NV, D, ?> kNN) {
+  public static <D extends NumberDistance<D, ?>> double[] getLPNormP(AbstractMaterializeKNNPreprocessor<?, D, ?> kNN) {
     double[] p = new double[2];
     // Note: we deliberately lose generics here, so the compilers complain less
     // on the next typecheck and cast!
@@ -250,10 +248,8 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses DistanceFunctionVisualisation oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>, D extends NumberDistance<D, ?>> extends AbstractVisFactory {
+  public static class Factory<D extends NumberDistance<D, ?>> extends AbstractVisFactory {
     /**
      * Constructor
      */
@@ -263,7 +259,7 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new DistanceFunctionVisualization<NV, DoubleDistance>(task);
+      return new DistanceFunctionVisualization<DoubleDistance>(task);
     }
 
     @Override
@@ -273,8 +269,8 @@ public class DistanceFunctionVisualization<NV extends NumberVector<NV, ?>, D ext
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final ArrayList<AbstractMaterializeKNNPreprocessor<NV, D, ?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
-      for(AbstractMaterializeKNNPreprocessor<NV, D, ?> kNN : kNNIndex) {
+      final ArrayList<AbstractMaterializeKNNPreprocessor<?, D, ?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
+      for(AbstractMaterializeKNNPreprocessor<?, D, ?> kNN : kNNIndex) {
         Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
           final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), this);

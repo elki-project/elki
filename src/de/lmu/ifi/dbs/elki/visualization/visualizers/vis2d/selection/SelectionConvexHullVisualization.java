@@ -29,7 +29,6 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
@@ -66,10 +65,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
  * @apiviz.uses ConvexHull2D
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements ContextChangeListener, DataStoreListener {
+public class SelectionConvexHullVisualization extends P2DVisualization implements ContextChangeListener, DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -153,10 +150,8 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses SelectionConvexHullVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor
      */
@@ -166,7 +161,7 @@ public class SelectionConvexHullVisualization<NV extends NumberVector<NV, ?>> ex
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionConvexHullVisualization<NV>(task);
+      return new SelectionConvexHullVisualization(task);
     }
 
     @Override

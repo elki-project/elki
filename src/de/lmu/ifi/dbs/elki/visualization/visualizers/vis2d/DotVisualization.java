@@ -29,7 +29,6 @@ import java.util.Iterator;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -52,10 +51,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Remigius Wojdanowski
  * 
  * @apiviz.has NumberVector - - visualizes
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> implements DataStoreListener {
+public class DotVisualization extends P2DVisualization implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -113,10 +110,8 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses DotVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -127,7 +122,7 @@ public class DotVisualization<NV extends NumberVector<NV, ?>> extends P2DVisuali
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new DotVisualization<NV>(task);
+      return new DotVisualization(task);
     }
 
     @Override

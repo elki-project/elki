@@ -32,7 +32,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -56,10 +55,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * 
  * @apiviz.has Relation oneway - - visualizes
- * 
- * @param <NV> Data type visualized.
  */
-public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends AbstractTooltipVisualization<NV> {
+public class TooltipStringVisualization extends AbstractTooltipVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -161,10 +158,8 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses TooltipStringVisualization oneway - - «create»
-   * 
-   * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -175,7 +170,7 @@ public class TooltipStringVisualization<NV extends NumberVector<NV, ?>> extends 
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new TooltipStringVisualization<NV>(task);
+      return new TooltipStringVisualization(task);
     }
 
     @Override

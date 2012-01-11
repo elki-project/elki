@@ -31,7 +31,6 @@ import java.util.Locale;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -59,7 +58,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Remigius Wojdanowski
  */
-public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends AbstractTooltipVisualization<NV> {
+public class TooltipScoreVisualization extends AbstractTooltipVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -142,10 +141,8 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends A
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses TooltipScoreVisualization oneway - - «create»
-   * 
-   * @param <NV> Data type visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Parameter for the gamma-correction.
      * 
@@ -178,7 +175,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends A
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new TooltipScoreVisualization<NV>(task, nf);
+      return new TooltipScoreVisualization(task, nf);
     }
 
     @Override
@@ -204,7 +201,7 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends A
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       protected int digits = 4;
 
       @Override
@@ -218,8 +215,8 @@ public class TooltipScoreVisualization<NV extends NumberVector<NV, ?>> extends A
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(digits);
+      protected Factory makeInstance() {
+        return new Factory(digits);
       }
     }
   }

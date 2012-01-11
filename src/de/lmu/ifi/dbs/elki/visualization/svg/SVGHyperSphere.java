@@ -51,7 +51,6 @@ public class SVGHyperSphere {
   /**
    * Wireframe "manhattan" hypersphere
    * 
-   * @param <V> vector type
    * @param <D> radius
    * @param svgp SVG Plot
    * @param proj Visualization projection
@@ -59,7 +58,7 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawManhattan(SVGPlot svgp, Projection2D proj, V mid, D rad) {
+  public static <D extends NumberDistance<?, ?>> Element drawManhattan(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, D rad) {
     Vector v_mid = mid.getColumnVector();
     BitSet dims = proj.getVisibleDimensions2D();
 
@@ -98,7 +97,6 @@ public class SVGHyperSphere {
   /**
    * Wireframe "euclidean" hypersphere
    * 
-   * @param <V> vector type
    * @param <D> radius
    * @param svgp SVG Plot
    * @param proj Visualization projection
@@ -106,7 +104,7 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawEuclidean(SVGPlot svgp, Projection2D proj, V mid, D rad) {
+  public static <D extends NumberDistance<?, ?>> Element drawEuclidean(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, D rad) {
     Vector v_mid = mid.getColumnVector();
     BitSet dims = proj.getVisibleDimensions2D();
 
@@ -150,7 +148,6 @@ public class SVGHyperSphere {
   /**
    * Wireframe "Lp" hypersphere
    * 
-   * @param <V> vector type
    * @param <D> radius
    * @param svgp SVG Plot
    * @param proj Visualization projection
@@ -159,7 +156,7 @@ public class SVGHyperSphere {
    * @param p L_p value
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawLp(SVGPlot svgp, Projection2D proj, V mid, D rad, double p) {
+  public static <D extends NumberDistance<?, ?>> Element drawLp(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, D rad, double p) {
     Vector v_mid = mid.getColumnVector();
     BitSet dims = proj.getVisibleDimensions2D();
 
@@ -271,7 +268,6 @@ public class SVGHyperSphere {
   /**
    * Wireframe "cross" hypersphere
    * 
-   * @param <V> vector type
    * @param <D> radius
    * @param svgp SVG Plot
    * @param proj Visualization projection
@@ -279,7 +275,7 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <V extends NumberVector<V, ?>, D extends NumberDistance<?, ?>> Element drawCross(SVGPlot svgp, Projection2D proj, V mid, D rad) {
+  public static <D extends NumberDistance<?, ?>> Element drawCross(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, D rad) {
     Vector v_mid = mid.getColumnVector();
     BitSet dims = proj.getVisibleDimensions2D();
 

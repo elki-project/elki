@@ -28,7 +28,6 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -52,10 +51,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Remigius Wojdanowski
  * 
  * @apiviz.uses SVGSimpleLinearAxis
- * 
- * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization<NV> {
+public class AxisVisualization extends P2DVisualization {
   /**
    * Constructor.
    * 
@@ -125,10 +122,8 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses AxisVisualization oneway - - «create»
-   * 
-   * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * A short name characterizing this Visualizer.
      */
@@ -144,7 +139,7 @@ public class AxisVisualization<NV extends NumberVector<NV, ?>> extends P2DVisual
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new AxisVisualization<NV>(task);
+      return new AxisVisualization(task);
     }
 
     @Override
