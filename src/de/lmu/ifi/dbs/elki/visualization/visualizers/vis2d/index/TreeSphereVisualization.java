@@ -294,7 +294,7 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new TreeSphereVisualization<DoubleDistance, MTreeNode<?, DoubleDistance>, MTreeEntry<DoubleDistance>>(task, fill);
+      return new TreeSphereVisualization<DoubleDistance, MTreeNode<Object, DoubleDistance>, MTreeEntry<DoubleDistance>>(task, fill);
     }
 
     /**
