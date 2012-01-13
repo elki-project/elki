@@ -25,9 +25,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyGeneratedInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -42,11 +43,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -58,8 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
@@ -113,6 +113,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
    */
   public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("em.delta", "The termination criterion for maximization of E(M): " + "E(M) - E(M') < em.delta");
 
+  /**
+   * Parameter to specify the initialization method
+   */
+  public static final OptionID INIT_ID = OptionID.getOrCreateOptionID("kmeans.initialization", "Method to choose the initial means.");
+  
   private static final double MIN_LOGLIKELIHOOD = -100000;
 
   /**
@@ -121,32 +126,27 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
   private double delta;
 
   /**
-   * Parameter to specify the random generator seed.
-   */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("em.seed", "The random number generator seed.");
-
-  /**
-   * Holds the value of {@link #SEED_ID}.
-   */
-  private Long seed;
-
-  /**
    * Store the individual probabilities, for use by EMOutlierDetection etc.
    */
   private WritableDataStore<double[]> probClusterIGivenX;
+
+  /**
+   * Class to choose the initial means
+   */
+  private KMeansInitialization<V> initializer;
 
   /**
    * Constructor.
    * 
    * @param k k parameter
    * @param delta delta parameter
-   * @param seed Seed parameter
+   * @param initializer Class to choose the initial means
    */
-  public EM(int k, double delta, Long seed) {
+  public EM(int k, double delta, KMeansInitialization<V> initializer) {
     super();
     this.k = k;
     this.delta = delta;
-    this.seed = seed;
+    this.initializer = initializer;
   }
 
   /**
@@ -169,7 +169,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     if(logger.isVerbose()) {
       logger.verbose("initializing " + k + " models");
     }
-    List<V> means = initialMeans(relation);
+    List<V> means = initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC);
     List<Matrix> covarianceMatrices = new ArrayList<Matrix>(k);
     List<Double> normDistrFactor = new ArrayList<Double>(k);
     List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
@@ -356,48 +356,6 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
   }
 
   /**
-   * Creates {@link #k k} random points distributed uniformly within the
-   * attribute ranges of the given database.
-   * 
-   * @param relation the database must contain enough points in order to
-   *        ascertain the range of attribute values. Less than two points would
-   *        make no sense. The content of the database is not touched otherwise.
-   * @return a list of {@link #k k} random points distributed uniformly within
-   *         the attribute ranges of the given database
-   */
-  protected List<V> initialMeans(Relation<V> relation) {
-    final Random random;
-    if(this.seed != null) {
-      random = new Random(this.seed);
-    }
-    else {
-      random = new Random();
-    }
-    if(relation.size() > 0) {
-      final int dim = DatabaseUtil.dimensionality(relation);
-      Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
-      List<V> means = new ArrayList<V>(k);
-      if(logger.isVerbose()) {
-        logger.verbose("initializing random vectors");
-      }
-      for(int i = 0; i < k; i++) {
-        double[] r = MathUtil.randomDoubleArray(dim, random);
-        // Rescale
-        for (int d = 0; d < dim; d++) {
-          r[d] = minmax.first.doubleValue(d + 1) + (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1)) * r[d];
-        }
-        // Instantiate
-        V randomVector = minmax.first.newNumberVector(r);
-        means.add(randomVector);
-      }
-      return means;
-    }
-    else {
-      return new ArrayList<V>(0);
-    }
-  }
-
-  /**
    * Get the probabilities for a given point.
    * 
    * @param index Point ID
@@ -429,7 +387,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
 
     protected double delta;
 
-    protected Long seed;
+    protected KMeansInitialization<V> initializer;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -439,20 +397,20 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
         k = kP.getValue();
       }
 
+      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
+      if (config.grab(initialP)) {
+        initializer = initialP.instantiateClass(config);
+      }
+
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0.0), 0.0);
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();
-      }
-
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
       }
     }
 
     @Override
     protected EM<V> makeInstance() {
-      return new EM<V>(k, delta, seed);
+      return new EM<V>(k, delta, initializer);
     }
   }
 }
