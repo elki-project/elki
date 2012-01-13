@@ -22,31 +22,39 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
- * Abstract base class for common k-means initializations.
+ * Initialize K-means by using the first k objects as initial means.
  * 
  * @author Erich Schubert
  * 
  * @param <V> Vector type
  */
-public abstract class AbstractKMeansInitialization<V extends NumberVector<V, ?>> implements KMeansInitialization<V> {
-  /**
-   * Holds the value of {@link KMeansLloyd#SEED_ID}.
-   */
-  protected Long seed;
-
+public class FirstKInitialMeans<V extends NumberVector<V, ?>> extends AbstractKMeansInitialization<V> {
   /**
    * Constructor.
-   * 
-   * @param seed Random seed.
    */
-  public AbstractKMeansInitialization(Long seed) {
-    this.seed = seed;
+  public FirstKInitialMeans() {
+    super(null);
+  }
+
+  @Override
+  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+    Iterator<DBID> iter = relation.iterDBIDs();
+    List<V> means = new ArrayList<V>(k);
+    for(int i = 0; i < k && iter.hasNext(); i++) {
+      means.add(relation.get(iter.next()));
+    }
+    return means;
   }
 
   /**
@@ -56,16 +64,10 @@ public abstract class AbstractKMeansInitialization<V extends NumberVector<V, ?>>
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
-    protected Long seed;
-
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      LongParameter seedP = new LongParameter(AbstractKMeans.SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
-      }
+    protected FirstKInitialMeans<V> makeInstance() {
+      return new FirstKInitialMeans<V>();
     }
   }
 }
