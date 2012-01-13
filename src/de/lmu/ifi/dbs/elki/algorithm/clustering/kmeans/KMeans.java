@@ -282,8 +282,6 @@ public class KMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }
-
-      
     }
 
     @Override

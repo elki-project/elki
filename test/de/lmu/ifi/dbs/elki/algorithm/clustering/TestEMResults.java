@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
@@ -56,7 +57,7 @@ public class TestEMResults extends AbstractSimpleAlgorithmTest implements JUnit4
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(EM.SEED_ID, 1);
+    params.addParameter(KMeans.SEED_ID, 1);
     params.addParameter(EM.K_ID, 5);
     EM<DoubleVector> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
     testParameterizationOk(params);
