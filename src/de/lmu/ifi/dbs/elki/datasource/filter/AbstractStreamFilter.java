@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.StreamFromBundle;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2012
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team

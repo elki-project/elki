@@ -4,7 +4,7 @@ package experimentalcode.erich;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2012
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -46,7 +46,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final int dims = mms.length >>> 1;
     // Completed level of hilbert curve?
     final boolean complete = (depth + 1) % dims == 0;
-    //final boolean right = (history & (1 << axis)) != 0;
+    // final boolean right = (history & (1 << axis)) != 0;
     final boolean inv = (inversions & (1 << axis)) != 0;
 
     // Find the splitting point.
@@ -68,7 +68,16 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       }
     }
     // if(complete)
-    LoggingUtil.warning("Depth: " + depth + (complete ? " !" : " ") + " axis: " + (inv ? "-" : "+") + axis + /* (right ? "R" : " ") + */ " history: " + history + " inversions: " + inversions + " " + FormatUtil.format(mms));
+    LoggingUtil.warning("Depth: " + depth + (complete ? " !" : " ") + " axis: " + (inv ? "-" : "+") + axis + /*
+                                                                                                              * (
+                                                                                                              * right
+                                                                                                              * ?
+                                                                                                              * "R"
+                                                                                                              * :
+                                                                                                              * " "
+                                                                                                              * )
+                                                                                                              * +
+                                                                                                              */" history: " + history + " inversions: " + inversions + " " + FormatUtil.format(mms));
     int split = pivotizeList1D(objs, start, end, axis + 1, half, inv);
     // Need to descend?
     if(end - split <= 1 && split - start <= 1) {
@@ -96,23 +105,23 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       int leftaxis = bound(axis - card * (high ? -1 : 1), dims);
       int rightaxis = bound(axis - (card + 1) * (high ? -1 : 1), dims);
       LoggingUtil.warning("History: " + history + " card: " + card + " axis: " + (inv ? "-" : "+") + axis + " left: " + leftaxis + " right: " + rightaxis);
-      LoggingUtil.warning("History gray: "+gray(history)+" inversions gray: "+gray(inversions));
+      LoggingUtil.warning("History igray: " + ungray(history) + " inversions igray: " + ungray(inversions));
       if(start < split - 1) {
-        if ((card % 2) == 1) {
+        if((card % 2) == 1) {
           inversions ^= 1L << axis;
         }
-        LoggingUtil.warning("History gray: "+gray(history<<1)+" inversions gray: "+gray(inversions));
+        LoggingUtil.warning("History igray: " + ungray(history << 1) + " inversions igray: " + ungray(inversions));
         LoggingUtil.warning("LFlip: " + inversions + " ax:" + (inv ? "-" : "+") + axis + " lax:" + leftaxis + " card:" + card);
         mms[2 * axis] = !inv ? min : half;
         mms[2 * axis + 1] = !inv ? half : max;
         hilbertSort(objs, start, split, mms, depth + 1, leftaxis, 0L, inversions);
-        if ((card % 2) == 1) {
+        if((card % 2) == 1) {
           inversions ^= 1L << axis;
         }
       }
       if(split < end - 1) {
-        LoggingUtil.warning("History gray: "+gray(1+(history<<1))+" inversions gray: "+gray(inversions ^ 1L << rightaxis));
-        LoggingUtil.warning("RFlip: " + inversions + " ax:" + (inv ? "-" : "+") + axis + " rax:" + rightaxis + " card:" + (card+1));
+        LoggingUtil.warning("History igray: " + ungray(1 + (history << 1)) + " inversions igray: " + ungray(inversions ^ 1L << rightaxis));
+        LoggingUtil.warning("RFlip: " + inversions + " ax:" + (inv ? "-" : "+") + axis + " rax:" + rightaxis + " card:" + (card + 1));
         // inversions.flip(rightaxis);
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
@@ -128,6 +137,16 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
   private long gray(long v) {
     return v ^ (v >>> 1);
+  }
+
+  private long ungray(long v) {
+    v ^= (v >>> 1);
+    v ^= (v >>> 2);
+    v ^= (v >>> 4);
+    v ^= (v >>> 8);
+    v ^= (v >>> 16);
+    v ^= (v >>> 32);
+    return v;
   }
 
   private int bound(int val, int max) {
