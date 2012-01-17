@@ -1,0 +1,250 @@
+package experimentalcode.erich.approxknn;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
+import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * Simple experiment to estimate the effects of approximating the kNN with space
+ * filling curves.
+ * 
+ * @author Erich Schubert
+ */
+public class SpacefillingKNNExperiment {
+  private static final Logging logger = Logging.getLogger(SpacefillingKNNExperiment.class);
+
+  DistanceFunction<? super NumberVector<?, ?>, DoubleDistance> distanceFunction = ManhattanDistanceFunction.STATIC;
+
+  private void run() {
+    Database database = loadDatabase();
+    Relation<NumberVector<?, ?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    DBIDs ids = rel.getDBIDs();
+
+    List<SpatialRef> zs = new ArrayList<SpatialRef>(ids.size());
+    List<SpatialRef> ps = new ArrayList<SpatialRef>(ids.size());
+    for(DBID id : ids) {
+      SpatialRef ref = new SpatialRef(id, rel.get(id));
+      zs.add(ref);
+      ps.add(ref);
+    }
+    // Sort spatially
+    (new ZCurveSpatialSorter()).sort(zs);
+    (new PeanoSpatialSorter()).sort(ps);
+    // Build index
+    WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
+    {
+      Iterator<SpatialRef> it = zs.iterator();
+      for(int i = 0; it.hasNext(); i++) {
+        SpatialRef r = it.next();
+        positions.put(r.id, new int[] { i, -1 });
+      }
+      it = ps.iterator();
+      for(int i = 0; it.hasNext(); i++) {
+        SpatialRef r = it.next();
+        int[] data = positions.get(r.id);
+        data[1] = i;
+        positions.put(r.id, data);
+      }
+    }
+
+    // True kNN value
+    final int k = 50;
+    final int maxoff = 501;
+    DistanceQuery<NumberVector<?, ?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
+    KNNQuery<NumberVector<?, ?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
+
+    ArrayList<MeanVariance[]> mvs = new ArrayList<MeanVariance[]>();
+    for(int i = 0; i < maxoff; i++) {
+      mvs.add(new MeanVariance[] { new MeanVariance(), new MeanVariance(), new MeanVariance() });
+    }
+    for(DBID id : ids) {
+      DBIDs trueIds = knnq.getKNNForDBID(id, k).asDBIDs();
+      int[] posi = positions.get(id);
+      // Z only
+      {
+        ModifiableDBIDs candz = DBIDUtil.newHashSet();
+        candz.add(zs.get(posi[0]).id);
+        assert (candz.size() == 1);
+        for(int off = 1; off < maxoff; off++) {
+          if(posi[0] - off >= 0) {
+            candz.add(zs.get(posi[0] - off).id);
+          }
+          if(posi[0] + off < ids.size()) {
+            candz.add(zs.get(posi[0] + off).id);
+          }
+
+          final int isize = DBIDUtil.intersection(trueIds, candz).size();
+          mvs.get(off)[0].put(isize);
+        }
+      }
+      // Peano only
+      {
+        ModifiableDBIDs candp = DBIDUtil.newHashSet();
+        candp.add(ps.get(posi[1]).id);
+        assert (candp.size() == 1);
+        for(int off = 1; off < maxoff; off++) {
+          if(posi[1] - off >= 0) {
+            candp.add(ps.get(posi[1] - off).id);
+          }
+          if(posi[1] + off < ids.size()) {
+            candp.add(ps.get(posi[1] + off).id);
+          }
+
+          final int isize = DBIDUtil.intersection(trueIds, candp).size();
+          mvs.get(off)[1].put(isize);
+        }
+      }
+      // Peano and Z
+      {
+        ModifiableDBIDs cands = DBIDUtil.newHashSet();
+        cands.add(zs.get(posi[0]).id);
+        cands.add(ps.get(posi[1]).id);
+        assert (cands.size() == 1);
+        for(int off = 1; off < maxoff; off++) {
+          if(posi[0] - off >= 0) {
+            cands.add(zs.get(posi[0] - off).id);
+          }
+          if(posi[0] + off < ids.size()) {
+            cands.add(zs.get(posi[0] + off).id);
+          }
+          if(posi[1] - off >= 0) {
+            cands.add(ps.get(posi[1] - off).id);
+          }
+          if(posi[1] + off < ids.size()) {
+            cands.add(ps.get(posi[1] + off).id);
+          }
+
+          final int isize = DBIDUtil.intersection(trueIds, cands).size();
+          mvs.get(off)[2].put(isize);
+        }
+      }
+    }
+
+    for(int i = 1; i < maxoff; i++) {
+      MeanVariance[] mv = mvs.get(i);
+      System.out.print(i);
+      System.out.print(" "+mv[0].getMean()+" "+mv[0].getNaiveStddev());
+      System.out.print(" "+mv[1].getMean()+" "+mv[1].getNaiveStddev());
+      System.out.print(" "+mv[2].getMean()+" "+mv[2].getNaiveStddev());
+      System.out.println();
+    }
+  }
+
+  private Database loadDatabase() {
+    try {
+      ListParameterization dbpar = new ListParameterization();
+      // Input file
+      dbpar.addParameter(FileBasedDatabaseConnection.INPUT_ID, "/nfs/multimedia/images/ALOI/ColorHistograms/aloi-hsb-7x2x2.csv.gz");
+      // Index
+      dbpar.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+      dbpar.addParameter(TreeIndexFactory.PAGE_SIZE_ID, "10000");
+      // Instantiate
+      Database db = ClassGenericsUtil.tryInstantiate(Database.class, StaticArrayDatabase.class, dbpar);
+      db.initialize();
+      return db;
+    }
+    catch(Exception e) {
+      throw new RuntimeException("Cannot load database."+e, e);
+    }
+  }
+
+  /**
+   * Object used in spatial sorting, combining the spatial object and the object
+   * ID.
+   * 
+   * @author Erich Schubert
+   */
+  static class SpatialRef implements SpatialComparable {
+    protected DBID id;
+
+    protected NumberVector<?, ?> vec;
+
+    /**
+     * Constructor.
+     * 
+     * @param id
+     * @param vec
+     */
+    protected SpatialRef(DBID id, NumberVector<?, ?> vec) {
+      super();
+      this.id = id;
+      this.vec = vec;
+    }
+
+    @Override
+    public int getDimensionality() {
+      return vec.getDimensionality();
+    }
+
+    @Override
+    public double getMin(int dimension) {
+      return vec.getMin(dimension);
+    }
+
+    @Override
+    public double getMax(int dimension) {
+      return vec.getMax(dimension);
+    }
+  }
+
+  public static void main(String[] args) {
+    // LoggingConfiguration.setDefaultLevel(Level.INFO);
+    // logger.getWrappedLogger().setLevel(Level.INFO);
+    try {
+      new SpacefillingKNNExperiment().run();
+    }
+    catch(Exception e) {
+      logger.exception(e);
+    }
+  }
+}
