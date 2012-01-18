@@ -131,4 +131,9 @@ public class CanvasSize {
     }
     return factor;
   }
+
+  @Override
+  public String toString() {
+    return "CanvasSize[x=" + minx + ":" + maxx + ", y=" + miny + ":" + maxy + "]";
+  }
 }

@@ -336,7 +336,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
     }
   }
 
-  private static final Color getColorForValue(double val) {
+  public static final Color getColorForValue(double val) {
     // Color positions
     double[] pos = new double[] { 0.0, 0.6, 0.8, 1.0 };
     // Colors at these positions
