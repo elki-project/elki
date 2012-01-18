@@ -55,6 +55,11 @@ public final class MathUtil {
   public static final double SQRT2 = Math.sqrt(2);
 
   /**
+   * Square root of 5
+   */
+  public static final double SQRT5 = Math.sqrt(5);
+
+  /**
    * Square root of 0.5 == 1 / Sqrt(2)
    */
   public static final double SQRTHALF = Math.sqrt(.5);
