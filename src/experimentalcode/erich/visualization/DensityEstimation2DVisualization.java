@@ -152,19 +152,19 @@ public class DensityEstimation2DVisualization extends P2DVisualization {
     {
       // TODO: incrementally update the loff/roff values?
       for(int x = 0; x < resolution; x++) {
-        double xmid = min0 + ste0 * x + ste0 / 2;
-        int loff = unflip(Arrays.binarySearch(data, new double[] { xmid - bandwidth[0] }, comp0));
-        int roff = unflip(Arrays.binarySearch(data, new double[] { xmid + bandwidth[0] }, comp0));
+        double xlow = min0 + ste0 * x, xhig = xlow + ste0;
+        int loff = unflip(Arrays.binarySearch(data, new double[] { xlow - bandwidth[0] }, comp0));
+        int roff = unflip(Arrays.binarySearch(data, new double[] { xhig + bandwidth[0] }, comp0));
         // Resort by second component
         Arrays.sort(data, loff, roff, comp1);
         for(int y = 0; y < resolution; y++) {
-          double ymid = min1 + ste1 * y + ste1 / 2;
-          int boff = unflip(Arrays.binarySearch(data, loff, roff, new double[] { 0, ymid - bandwidth[1] }, comp1));
-          int toff = unflip(Arrays.binarySearch(data, loff, roff, new double[] { 0, ymid + bandwidth[1] }, comp1));
+          double ylow = min1 + ste1 * y, yhig = ylow + ste1;
+          int boff = unflip(Arrays.binarySearch(data, loff, roff, new double[] { 0, ylow - bandwidth[1] }, comp1));
+          int toff = unflip(Arrays.binarySearch(data, loff, roff, new double[] { 0, yhig + bandwidth[1] }, comp1));
           for(int pos = boff; pos < toff; pos++) {
             double[] val = data[pos];
-            double d0 = val[0] - xmid;
-            double d1 = val[1] - ymid;
+            double d0 = (val[0] < xlow) ? (xlow - val[0]) : (val[0] > xhig) ? (val[0] - xhig) : 0;
+            double d1 = (val[1] < ylow) ? (ylow - val[1]) : (val[1] > yhig) ? (val[1] - yhig) : 0;
             d0 = d0 / bandwidth[0];
             d1 = d1 / bandwidth[1];
             dens[x][y] += kernf * (1 - d0 * d0) * (1 - d1 * d1);
