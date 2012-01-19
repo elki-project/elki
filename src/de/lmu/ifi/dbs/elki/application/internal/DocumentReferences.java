@@ -25,10 +25,10 @@ package de.lmu.ifi.dbs.elki.application.internal;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,43 +72,48 @@ public class DocumentReferences {
    * @param args Command line arguments
    */
   public static void main(String[] args) {
-    if(args.length != 1) {
-      LoggingUtil.warning("I need exactly one file name to operate!");
+    if(args.length < 1 || args.length > 2) {
+      LoggingUtil.warning("I need exactly one or two file names to operate!");
       System.exit(1);
     }
-    if(!args[0].endsWith(".html")) {
-      LoggingUtil.warning("File name doesn't end with .html!");
+    if(!args[0].endsWith(".html") || (args.length > 1 && !args[1].endsWith(".wiki"))) {
+      LoggingUtil.warning("File name doesn't end in expected extension!");
       System.exit(1);
     }
-    File references = new File(args[0]);
 
-    {
-      FileOutputStream reffo;
-      try {
-        reffo = new FileOutputStream(references);
-      }
-      catch(FileNotFoundException e) {
-        LoggingUtil.exception("Can't create output stream!", e);
-        throw new RuntimeException(e);
-      }
+    List<Pair<Reference, List<Class<?>>>> refs = sortedReferences();
+    try {
+      File references = new File(args[0]);
+      FileOutputStream reffo = new FileOutputStream(references);
+      Document refdoc = documentReferences(refs);
       OutputStream refstream = new BufferedOutputStream(reffo);
-      Document refdoc = documentReferences();
+      HTMLUtil.writeXHTML(refdoc, refstream);
+      refstream.flush();
+      refstream.close();
+      reffo.close();
+    }
+    catch(IOException e) {
+      LoggingUtil.exception("IO Exception writing HTML output.", e);
+      throw new RuntimeException(e);
+    }
+    if(args.length > 1) {
       try {
-        HTMLUtil.writeXHTML(refdoc, refstream);
-        refstream.flush();
-        refstream.close();
-        reffo.close();
+        File refwiki = new File(args[1]);
+        FileOutputStream reffow = new FileOutputStream(refwiki);
+        PrintStream refstreamW = new PrintStream(reffow);
+        documentReferencesWiki(refs, refstreamW);
+        refstreamW.flush();
+        refstreamW.close();
+        reffow.close();
       }
       catch(IOException e) {
-        LoggingUtil.exception("IO Exception writing output.", e);
+        LoggingUtil.exception("IO Exception writing Wiki output.", e);
         throw new RuntimeException(e);
       }
     }
   }
 
-  private static Document documentReferences() {
-    List<Pair<Reference, List<Class<?>>>> refs = sortedReferences();
-
+  private static Document documentReferences(List<Pair<Reference, List<Class<?>>>> refs) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -225,6 +230,49 @@ public class DocumentReferences {
       }
     }
     return htmldoc;
+  }
+
+  private static void documentReferencesWiki(List<Pair<Reference, List<Class<?>>>> refs, PrintStream refstreamW) {
+    for(Pair<Reference, List<Class<?>>> pair : refs) {
+      // JavaDoc links for relevant classes.
+      {
+        boolean first = true;
+        for(Class<?> cls : pair.second) {
+          if(!first) {
+            refstreamW.println(",[[br]]");
+          }
+          refstreamW.print("[[javadoc(");
+          refstreamW.print(cls.getName());
+          refstreamW.print(",");
+          refstreamW.print(cls.getName());
+          refstreamW.print(")]]");
+
+          first = false;
+        }
+      }
+      refstreamW.println("");
+
+      String indent = " ";
+      {
+        Reference ref = pair.first;
+        // Prefix
+        if(ref.prefix().length() > 0) {
+          refstreamW.println(indent + ref.prefix() + " [[br]]");
+        }
+        // Authors
+        refstreamW.println(indent + "By: " + ref.authors() + " [[br]]");
+        // Title
+        refstreamW.println(indent + "'''" + ref.title() + "'''" + " [[br]]");
+        // Booktitle
+        refstreamW.println(indent + "In: " + ref.booktitle() + " [[br]]");
+        // URL
+        if(ref.url().length() > 0) {
+          refstreamW.println(indent + "Online: [" + ref.url() + "][[br]]");
+        }
+      }
+      refstreamW.println("");
+      refstreamW.println("");
+    }
   }
 
   private static List<Pair<Reference, List<Class<?>>>> sortedReferences() {
