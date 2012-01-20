@@ -509,7 +509,7 @@ public class MiniGUI extends JPanel {
 
     @Override
     public Object getElementAt(int index) {
-      return store.getElementAt(index).first;
+      return store.getElementAt(store.size() - 1 - index).first;
     }
 
     @Override
