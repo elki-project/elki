@@ -289,14 +289,14 @@ public class ROC {
     /**
      * Original Iterator
      */
-    private Iterator<DistanceResultPair<D>> iter;
+    private Iterator<? extends DistanceResultPair<D>> iter;
 
     /**
      * Constructor
      * 
      * @param iter Iterator for distance results
      */
-    public DistanceResultAdapter(Iterator<DistanceResultPair<D>> iter) {
+    public DistanceResultAdapter(Iterator<? extends DistanceResultPair<D>> iter) {
       super();
       this.iter = iter;
     }
@@ -408,7 +408,7 @@ public class ROC {
    * @param nei Query result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, Iterable<DistanceResultPair<D>> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, Iterable<? extends DistanceResultPair<D>> nei) {
     // TODO: ensure the collection has efficient "contains".
     return ROC.computeROCAUCDistanceResult(size, clus.getIDs(), nei);
   }
@@ -422,7 +422,7 @@ public class ROC {
    * @param nei Query Result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, Iterable<DistanceResultPair<D>> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, Iterable<? extends DistanceResultPair<D>> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
     List<DoubleDoublePair> roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<D>(nei.iterator()));
     return computeAUC(roc);
