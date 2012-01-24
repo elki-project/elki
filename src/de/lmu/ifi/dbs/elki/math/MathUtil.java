@@ -77,6 +77,31 @@ public final class MathUtil {
   }
 
   /**
+   * Computes the square root of the sum of the squared arguments without under
+   * or overflow.
+   * 
+   * Note: this code is <em>not</em> redundant to {@link Math#hypot}, since the
+   * latter is significantly slower (but has a higher precision).
+   * 
+   * @param a first cathetus
+   * @param b second cathetus
+   * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup>)}
+   */
+  public static double hypotenuse(double a, double b) {
+    if(Math.abs(a) > Math.abs(b)) {
+      final double r = b / a;
+      return Math.abs(a) * Math.sqrt(1 + r * r);
+    }
+    else if(b != 0) {
+      final double r = a / b;
+      return Math.abs(b) * Math.sqrt(1 + r * r);
+    }
+    else {
+      return 0.0;
+    }
+  }
+
+  /**
    * Compute the Mahalanobis distance using the given weight matrix
    * 
    * @param weightMatrix Weight Matrix
