@@ -110,4 +110,9 @@ public class MeanVarianceMinMax extends MeanVariance {
   public double getDiff() {
     return this.getMax() - this.getMin();
   }
+
+  @Override
+  public String toString() {
+    return "MeanVarianceMinMax(mean=" + getMean() + ",var=" + getSampleVariance() + ",min=" + getMin() + ",max=" + getMax() + ")";
+  }
 }
