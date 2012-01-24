@@ -164,8 +164,11 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     calcAxisPositions();
   }
 
-  @Override
-  public Vector projectScaledToRender(Vector v) {
+  public Vector projectScaledToRender(Vector v){
+    return projectScaledToRender(v, true);
+  }
+  
+  public Vector projectScaledToRender(Vector v, boolean sort) {
     Vector ret = new Vector(v.getDimensionality());
     //ret.set(1, v.get(1));
     for (int i = 0; i < v.getDimensionality(); i++) {
@@ -176,7 +179,12 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
         ret.set(i, (axisHeight + margin[1]) - v.get(i) * axisHeight);
       }
     }
-    return sortDims(ret);
+    if (sort){
+      return sortDims(ret);
+    }
+    else {
+      return ret;
+    }
   }
   
   public double projectScaledToRender(int dim, double d){
@@ -243,6 +251,10 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   @Override
   public Vector projectDataToRenderSpace(NumberVector<?, ?> data) {
     return projectScaledToRender(projectDataToScaledSpace(data));
+  }
+  
+  public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort) {
+    return projectScaledToRender(projectDataToScaledSpace(data), sort);
   }
 
   @Override
@@ -329,6 +341,12 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     
   }
 
+  /**
+   * shift a dimension to another position
+   * 
+   * @param dim dimension to shift
+   * @param rn new position
+   */
   @Override
   public void shiftDimension(int dim, int rn) {
     if (dim > rn){
@@ -353,6 +371,15 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   public int getDimensionNumber(int pos) {
     return dimOrder[pos];
   } 
+  
+  public int getDimensionsPosition(int dim){
+    for (int i = 0; i < dimOrder.length; i++){
+      if (dimOrder[i] == dim){
+        return i;
+      }
+    }
+    return -1;
+  }
   
   public Vector sortDims(Vector s){
     Vector ret = new Vector(s.getDimensionality());
