@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
@@ -252,7 +253,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
 
           double g = d[l];
           double p = (d[l + 1] - g) / (2.0 * e[l]);
-          double r = Math.hypot(p, 1.0);
+          double r = MathUtil.hypotenuse(p, 1.0);
           if(p < 0) {
             r = -r;
           }
@@ -280,7 +281,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
             s2 = s;
             g = c * e[i];
             h = c * p;
-            r = Math.hypot(p, e[i]);
+            r = MathUtil.hypotenuse(p, e[i]);
             e[i + 1] = s * r;
             s = e[i] / r;
             c = p / r;
