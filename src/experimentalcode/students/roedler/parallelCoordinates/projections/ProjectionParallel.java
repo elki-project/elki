@@ -1,5 +1,6 @@
 package experimentalcode.students.roedler.parallelCoordinates.projections;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
@@ -58,4 +59,10 @@ public interface ProjectionParallel extends Projection {
   public CanvasSize estimateViewport();
   
   public double projectScaledToRender(int dim, double d);
+  
+  public Vector projectScaledToRender(Vector v, boolean sort);
+  
+  public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort);
+  
+  public int getDimensionsPosition(int dim);
 }
