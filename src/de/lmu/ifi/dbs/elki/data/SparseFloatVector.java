@@ -441,41 +441,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     return values;
   }
 
-  /**
-   * Provides the scalar product (inner product) of this and the given
-   * SparseFloatVector.
-   * 
-   * @param fv the SparseFloatVector to compute the scalar product for
-   * @return the scalar product (inner product) of this and the given
-   *         SparseFloatVector
-   */
-  @Override
-  public Float scalarProduct(SparseFloatVector fv) {
-    if(this.getDimensionality() != fv.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-    float result = 0.0f;
-    int po = 0;
-    int pt = 0;
-    while(po < fv.indexes.length && pt < this.indexes.length) {
-      final int delta = fv.indexes[po] - this.indexes[pt];
-      if(delta == 0) {
-        result += fv.values[po] * this.values[pt];
-        po++;
-        pt++;
-      }
-      else if(delta < 0) {
-        // next index in this bigger than in fv
-        po++;
-      }
-      else {
-        // next index in fv bigger than in this
-        pt++;
-      }
-    }
-    return result;
-  }
-
   @Override
   public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
     int dim = adapter.size(array);

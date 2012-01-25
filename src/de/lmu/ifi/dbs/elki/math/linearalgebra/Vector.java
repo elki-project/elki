@@ -487,8 +487,7 @@ public class Vector implements MatrixLike<Vector>, Serializable {
     checkDimensions(v);
     double scalarProduct = 0.0;
     for(int row = 0; row < elements.length; row++) {
-      final double prod = elements[row] * v.elements[row];
-      scalarProduct += prod;
+      scalarProduct += elements[row] * v.elements[row];
     }
     return scalarProduct;
   }

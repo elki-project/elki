@@ -100,11 +100,6 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
   }
 
   @Override
-  public Double scalarProduct(OneDimensionalDoubleVector fv) {
-    return this.val * fv.val;
-  }
-
-  @Override
   public OneDimensionalDoubleVector multiplicate(double k) {
     return new OneDimensionalDoubleVector(this.val * k);
   }

@@ -229,4 +229,22 @@ public final class VectorUtil {
     }
     return Math.sqrt((s / e1) * (s / e2));
   }
+
+  /**
+   * Provides the scalar product (inner product) of this and the given
+   * DoubleVector.
+   * 
+   * @param d1 the first vector to compute the scalar product for
+   * @param d2 the second vector to compute the scalar product for
+   * @return the scalar product (inner product) of this and the given
+   *         DoubleVector
+   */
+  public static double scalarProduct(NumberVector<?, ?> d1, NumberVector<?, ?> d2) {
+    final int dim = d1.getDimensionality();
+    double result = 0.0;
+    for(int i = 1; i <= dim; i++) {
+      result += d1.doubleValue(i) * d2.doubleValue(i);
+    }
+    return result;
+  }
 }

@@ -197,26 +197,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
     return new IntegerVector(values, true);
   }
 
-  /**
-   * Provides the scalar product (inner product) of this and the given
-   * IntegerVector.
-   * 
-   * @param d the IntegerVector to compute the scalar product for
-   * @return the scalar product (inner product) of this and the given
-   *         IntegerVector
-   */
-  @Override
-  public Integer scalarProduct(IntegerVector d) {
-    if(this.getDimensionality() != d.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + d.getDimensionality() + ".");
-    }
-    double result = 0.0;
-    for(int i = 0; i < this.getDimensionality(); i++) {
-      result += this.values[i] * d.values[i];
-    }
-    return (int) result;
-  }
-
   @Override
   public String toString() {
     StringBuffer featureLine = new StringBuffer();

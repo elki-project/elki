@@ -313,28 +313,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
     }
   }
 
-  /**
-   * Provides the scalar product (inner product) of this BitVector and the given
-   * BitVector.
-   * 
-   * As multiplication of Bits, the logical AND operation is used. The result is
-   * 0 if the number of bits after the AND operation is a multiple of 2,
-   * otherwise the result is 1.
-   * 
-   * @param fv the BitVector to compute the scalar product for
-   * @return the scalar product (inner product) of this and the given BitVector
-   */
-  @Override
-  public Bit scalarProduct(BitVector fv) {
-    if(this.getDimensionality() != fv.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-    BitSet bs = (BitSet) this.bits.clone();
-    bs.and(fv.bits);
-
-    return new Bit(bs.cardinality() % 2 == 1);
-  }
-
   @Override
   public <A> BitVector newFeatureVector(A array, ArrayAdapter<Bit, A> adapter) {
     int dim = adapter.size(array);
