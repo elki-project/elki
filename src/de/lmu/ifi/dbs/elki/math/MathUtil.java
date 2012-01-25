@@ -81,24 +81,52 @@ public final class MathUtil {
    * or overflow.
    * 
    * Note: this code is <em>not</em> redundant to {@link Math#hypot}, since the
-   * latter is significantly slower (but has a higher precision).
+   * latter is significantly slower (but maybe has a higher precision).
    * 
    * @param a first cathetus
    * @param b second cathetus
    * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup>)}
    */
-  public static double hypotenuse(double a, double b) {
-    if(Math.abs(a) > Math.abs(b)) {
+  public static double fastHypot(double a, double b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    if(a > b) {
       final double r = b / a;
-      return Math.abs(a) * Math.sqrt(1 + r * r);
+      return a * Math.sqrt(1 + r * r);
     }
     else if(b != 0) {
       final double r = a / b;
-      return Math.abs(b) * Math.sqrt(1 + r * r);
+      return b * Math.sqrt(1 + r * r);
     }
     else {
       return 0.0;
     }
+  }
+
+  /**
+   * Computes the square root of the sum of the squared arguments without under
+   * or overflow.
+   * 
+   * Note: this code is <em>not</em> redundant to {@link Math#hypot}, since the
+   * latter is significantly slower (but has a higher precision).
+   * 
+   * @param a first cathetus
+   * @param b second cathetus
+   * @param c second cathetus
+   * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup> + c<sup>2</sup>)}
+   */
+  public static double fastHypot3(double a, double b, double c) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    c = Math.abs(c);
+    double m = Math.max(a, Math.max(b, c));
+    if(m <= 0) {
+      return 0.0;
+    }
+    a = a / m;
+    b = b / m;
+    c = c / m;
+    return m * Math.sqrt(a * a + b * b + c * c);
   }
 
   /**

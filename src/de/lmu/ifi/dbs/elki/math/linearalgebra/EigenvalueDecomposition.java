@@ -253,7 +253,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
 
           double g = d[l];
           double p = (d[l + 1] - g) / (2.0 * e[l]);
-          double r = MathUtil.hypotenuse(p, 1.0);
+          double r = MathUtil.fastHypot(p, 1.0);
           if(p < 0) {
             r = -r;
           }
@@ -281,7 +281,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
             s2 = s;
             g = c * e[i];
             h = c * p;
-            r = MathUtil.hypotenuse(p, e[i]);
+            r = MathUtil.fastHypot(p, e[i]);
             e[i + 1] = s * r;
             s = e[i] / r;
             c = p / r;
