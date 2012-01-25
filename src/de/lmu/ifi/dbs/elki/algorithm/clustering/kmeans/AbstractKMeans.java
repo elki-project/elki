@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> {
+public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector<?, ?>, D, Clustering<MeanModel<V>>> {
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.
@@ -94,7 +94,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param k k parameter
    * @param maxiter Maxiter parameter
    */
-  public AbstractKMeans(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public AbstractKMeans(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -111,7 +111,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @return true when the object was reassigned
    */
   protected boolean assignToNearestCluster(Relation<V> relation, List<Vector> means, List<? extends ModifiableDBIDs> clusters) {
-    final PrimitiveDistanceFunction<? super V, D> df = getDistanceFunction();
+    final PrimitiveDistanceFunction<? super NumberVector<?, ?>, D> df = getDistanceFunction();
     boolean changed = false;
 
     for(DBID id : relation.iterDBIDs()) {
@@ -119,8 +119,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
       V fv = relation.get(id);
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
-        // FIXME: this is slow and clumsy.
-        D dist = df.distance(fv, fv.newNumberVector(means.get(i).getArrayRef()));
+        D dist = df.distance(fv, means.get(i));
         if(dist.compareTo(mindist) < 0) {
           minIndex = i;
           mindist = dist;

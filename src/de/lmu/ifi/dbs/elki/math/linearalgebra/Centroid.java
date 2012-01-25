@@ -41,11 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  */
 public class Centroid extends Vector {
   /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
    * The current weight
    */
   protected double wsum;

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  */
 
 import java.io.BufferedReader;
-import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -50,12 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @apiviz.uses Vector
  * @apiviz.landmark
  */
-public class Matrix implements MatrixLike<Matrix>, Serializable {
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
+public class Matrix implements MatrixLike<Matrix> {
   /**
    * A small number to handle numbers near 0 as 0.
    */

@@ -23,10 +23,12 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.Serializable;
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * Provides a vector object that encapsulates an m x 1 - matrix object.
@@ -35,12 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.landmark
  */
-public class Vector implements MatrixLike<Vector>, Serializable {
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
+public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> {
   /**
    * Array for internal storage of elements.
    * 
@@ -657,5 +654,83 @@ public class Vector implements MatrixLike<Vector>, Serializable {
     elements[0] = elements[1];
     elements[1] = -temp;
     return this;
+  }
+
+  // ////// NumberVector API. A bit hackish. :-(
+
+  @Override
+  public double getMin(int dimension) {
+    return elements[dimension - 1];
+  }
+
+  @Override
+  public double getMax(int dimension) {
+    return elements[dimension - 1];
+  }
+
+  @Override
+  public Double getValue(int dimension) {
+    return elements[dimension - 1];
+  }
+
+  @Override
+  public double doubleValue(int dimension) {
+    return elements[dimension - 1];
+  }
+
+  @Override
+  public float floatValue(int dimension) {
+    return (float) elements[dimension - 1];
+  }
+
+  @Override
+  public int intValue(int dimension) {
+    return (int) elements[dimension - 1];
+  }
+
+  @Override
+  public long longValue(int dimension) {
+    return (long) elements[dimension - 1];
+  }
+
+  @Override
+  public short shortValue(int dimension) {
+    return (short) elements[dimension - 1];
+  }
+
+  @Override
+  public byte byteValue(int dimension) {
+    return (byte) elements[dimension - 1];
+  }
+
+  @Override
+  public Vector getColumnVector() {
+    return this;
+  }
+
+  @Override
+  public Vector newNumberVector(double[] values) {
+    return new Vector(values);
+  }
+
+  @Override
+  public <A> Vector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+    double[] raw = new double[adapter.size(array)];
+    for(int i = 0; i < raw.length; i++) {
+      raw[i] = adapter.getDouble(array, i);
+    }
+    return new Vector(raw);
+  }
+
+  @Override
+  public <A> Vector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
+    if(adapter instanceof NumberArrayAdapter) {
+      return newNumberVector(array, (NumberArrayAdapter<?, A>) adapter);
+    }
+    double[] raw = new double[adapter.size(array)];
+    for(int i = 0; i < raw.length; i++) {
+      raw[i] = adapter.get(array, i);
+    }
+    return new Vector(raw);
   }
 }

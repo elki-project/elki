@@ -43,11 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  */
 public class ProjectedCentroid extends Centroid {
   /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
    * The selected dimensions.
    */
   private BitSet dims;
