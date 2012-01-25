@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.elki.math;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /*
  This file is part of ELKI:
@@ -95,25 +95,6 @@ public class TestMathUtil implements JUnit4Test {
       assertTrue("Expected value to round to the same float.", flt == uppf || Double.isNaN(flt));
       assertTrue("Expected value to become smaller, but " + lowd + " > " + dbl, lowd <= dbl || Double.isNaN(dbl));
       assertTrue("Expected value to round to the same float.", flt == lowf || Double.isNaN(flt));
-    }
-  }
-  
-  @Test
-  public void testAngle() {
-    Random r = new Random(1l);
-    int dim = 10;
-    for (int i = 0; i < 10000; i++) {
-      double[] r1 = new double[dim]; 
-      double[] r2 = new double[dim];
-      for (int d = 0; d < dim; d++) {
-        r1[d] = r.nextDouble();
-        r2[d] = r.nextDouble();
-      }
-      Vector v1 = new Vector(r1);
-      Vector v2 = new Vector(r2);
-      double a1 = v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
-      double a2 = MathUtil.angle(v1, v2);
-      assertEquals("Angle computation incorrect.", a1, a2, 1E-10);
     }
   }
 }
