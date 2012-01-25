@@ -471,7 +471,24 @@ public class Vector implements MatrixLike<Vector>, Serializable {
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
     for(int j = 0; j < B.elements.length; j++) {
       for(int i = 0; i < this.elements.length; i++) {
-        X.elements[i][j] = elements[i] * B.elements[0][j];
+        X.elements[i][j] = elements[i] * B.elements[j][0];
+      }
+    }
+    return X;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, A * B^T
+   * 
+   * @param B another matrix
+   * @return Matrix product, A * B^T
+   * @throws IllegalArgumentException Matrix inner dimensions must agree.
+   */
+  public final Matrix timesTranspose(final Vector B) {
+    final Matrix X = new Matrix(this.elements.length, B.elements.length);
+    for(int j = 0; j < B.elements.length; j++) {
+      for(int i = 0; i < this.elements.length; i++) {
+        X.elements[i][j] = elements[i] * B.elements[j];
       }
     }
     return X;

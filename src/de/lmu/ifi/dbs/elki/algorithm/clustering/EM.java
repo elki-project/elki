@@ -243,7 +243,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
         Vector instance = relation.get(id).getColumnVector();
         for(int i = 0; i < k; i++) {
           Vector difference = instance.minus(means.get(i));
-          covarianceMatrices.get(i).plusEquals(difference.times(difference.transpose()).timesEquals(clusterProbabilities[i]));
+          covarianceMatrices.get(i).plusEquals(difference.timesTranspose(difference).timesEquals(clusterProbabilities[i]));
         }
       }
       for(int i = 0; i < k; i++) {
