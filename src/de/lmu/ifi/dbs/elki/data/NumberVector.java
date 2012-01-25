@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.data;
  */
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -130,47 +129,6 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
    *         NumberVector of V
    */
   Vector getColumnVector();
-
-  /**
-   * Returns a Matrix representing in one row and
-   * <code>getDimensionality()</code> columns the values of this NumberVector of
-   * V.
-   * 
-   * @return a Matrix representing in one row and
-   *         <code>getDimensionality()</code> columns the values of this
-   *         NumberVector of V
-   */
-  Matrix getRowVector();
-
-  /**
-   * Returns a new NumberVector of V that is the sum of this NumberVector of V
-   * and the given NumberVector of V.
-   * 
-   * @param fv a NumberVector of V to be added to this NumberVector of V
-   * @return a new NumberVector of V that is the sum of this NumberVector of V
-   *         and the given NumberVector of V
-   */
-  V plus(V fv);
-
-  /**
-   * Returns a new NumberVector of V that is the sum of this NumberVector of V
-   * and the negativeVector() of given NumberVector of V.
-   * 
-   * @param fv a NumberVector of V to be subtracted to this NumberVector of V
-   * @return a new NumberVector of V that is the sum of this NumberVector of V
-   *         and the negative of given NumberVector of V
-   */
-  V minus(V fv);
-
-  /**
-   * Returns a new NumberVector of V that is the result of a scalar
-   * multiplication with the given scalar.
-   * 
-   * @param k a scalar to multiply this NumberVector of V with
-   * @return a new NumberVector of V that is the result of a scalar
-   *         multiplication with the given scalar
-   */
-  V multiplicate(double k);
 
   /**
    * Returns a new NumberVector of N for the given values.

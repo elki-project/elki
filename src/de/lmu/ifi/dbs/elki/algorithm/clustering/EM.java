@@ -170,7 +170,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     if(logger.isVerbose()) {
       logger.verbose("initializing " + k + " models");
     }
-    List<V> means = initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC);
+    List<Vector> means = initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC);
     List<Matrix> covarianceMatrices = new ArrayList<Matrix>(k);
     List<Double> normDistrFactor = new ArrayList<Double>(k);
     List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
@@ -232,19 +232,18 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
         }
       }
       final int n = relation.size();
-      V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
       for(int i = 0; i < k; i++) {
         clusterWeights.set(i, sumOfClusterProbabilities[i] / n);
         Vector newMean = meanSums.get(i).timesEquals(1 / sumOfClusterProbabilities[i]);
-        means.set(i, factory.newNumberVector(newMean.getArrayRef()));
+        means.set(i, newMean);
       }
       // covariance matrices
       for(DBID id : relation.iterDBIDs()) {
         double[] clusterProbabilities = probClusterIGivenX.get(id);
-        V instance = relation.get(id);
+        Vector instance = relation.get(id).getColumnVector();
         for(int i = 0; i < k; i++) {
-          V difference = instance.minus(means.get(i));
-          covarianceMatrices.get(i).plusEquals(difference.getColumnVector().times(difference.getRowVector()).times(clusterProbabilities[i]));
+          Vector difference = instance.minus(means.get(i));
+          covarianceMatrices.get(i).plusEquals(difference.times(difference.transpose()).timesEquals(clusterProbabilities[i]));
         }
       }
       for(int i = 0; i < k; i++) {
@@ -282,13 +281,14 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       }
       hardClusters.get(maxIndex).add(id);
     }
+    final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
     Clustering<EMModel<V>> result = new Clustering<EMModel<V>>("EM Clustering", "em-clustering");
     // provide models within the result
     for(int i = 0; i < k; i++) {
       // TODO: re-do labeling.
       // SimpleClassLabel label = new SimpleClassLabel();
       // label.init(result.canonicalClusterLabel(i));
-      Cluster<EMModel<V>> model = new Cluster<EMModel<V>>(hardClusters.get(i), new EMModel<V>(means.get(i), covarianceMatrices.get(i)));
+      Cluster<EMModel<V>> model = new Cluster<EMModel<V>>(hardClusters.get(i), new EMModel<V>(factory.newNumberVector(means.get(i).getArrayRef()), covarianceMatrices.get(i)));
       result.addCluster(model);
     }
     return result;
@@ -309,24 +309,20 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
    * @param clusterWeights the weights of the current clusters
    * @return the expectation value of the current mixture of distributions
    */
-  protected double assignProbabilitiesToInstances(Relation<V> database, List<Double> normDistrFactor, List<V> means, List<Matrix> invCovMatr, List<Double> clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
+  protected double assignProbabilitiesToInstances(Relation<V> database, List<Double> normDistrFactor, List<Vector> means, List<Matrix> invCovMatr, List<Double> clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
     double emSum = 0.0;
 
     for(DBID id : database.iterDBIDs()) {
-      V x = database.get(id);
+      Vector x = database.get(id).getColumnVector();
       List<Double> probabilities = new ArrayList<Double>(k);
       for(int i = 0; i < k; i++) {
-        V difference = x.minus(means.get(i));
-        Matrix differenceRow = difference.getRowVector();
-        Vector differenceCol = difference.getColumnVector();
-        Matrix rowTimesCov = differenceRow.times(invCovMatr.get(i));
-        Vector rowTimesCovTimesCol = rowTimesCov.times(differenceCol);
+        Vector difference = x.minus(means.get(i));
+        Vector rowTimesCovTimesCol = difference.transposeTimes(invCovMatr.get(i)).times(difference);
         double power = rowTimesCovTimesCol.get(0, 0) / 2.0;
         double prob = normDistrFactor.get(i) * Math.exp(-power);
         if(logger.isDebuggingFinest()) {
-          logger.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " differenceRow:\n" + FormatUtil.format(differenceRow, "    ") + "\n" + " differenceCol:\n" + FormatUtil.format(differenceCol, "    ") + "\n" + " rowTimesCov:\n" + FormatUtil.format(rowTimesCov, "    ") + "\n" + " rowTimesCovTimesCol:\n" + FormatUtil.format(rowTimesCovTimesCol, "    ") + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
+          logger.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + " rowTimesCovTimesCol:\n" + FormatUtil.format(rowTimesCovTimesCol, "    ") + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
         }
-
         probabilities.add(prob);
       }
       double priorProbability = 0.0;

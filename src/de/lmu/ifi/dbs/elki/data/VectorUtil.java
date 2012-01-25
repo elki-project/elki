@@ -179,6 +179,62 @@ public final class VectorUtil {
    * 
    * @param v1 first vector
    * @param v2 second vector
+   * @param o Origin
+   * @return Angle
+   */
+  public static double angle(NumberVector<?, ?> v1, NumberVector<?, ?> v2, NumberVector<?, ?> o) {
+    // Essentially, we want to compute this:
+    // v1' = v1 - o, v2' = v2 - o
+    // v1'.transposeTimes(v2') / (v1'.euclideanLength() *
+    // v2'.euclideanLength());
+    // However, the squares lose numerical precision, and we have some
+    // redundancies. The following is computing all three in parallel.
+    // Compute maximum, for scaling.
+    double max = 0.0;
+    final int dim = v1.getDimensionality();
+    for(int row = 0; row < dim; row++) {
+      final double v1r = v1.doubleValue(row + 1) - o.doubleValue(row + 1);
+      if(v1r < 0) {
+        if(max < -v1r) {
+          max = -v1r;
+        }
+      }
+      else {
+        if(max < v1r) {
+          max = v1r;
+        }
+      }
+      final double v2r = v2.doubleValue(row + 1) - o.doubleValue(row + 1);
+      if(v2r < 0) {
+        if(max < -v2r) {
+          max = -v2r;
+        }
+      }
+      else {
+        if(max < v2r) {
+          max = v2r;
+        }
+      }
+    }
+    if(max <= 0.0) {
+      return 0.0;
+    }
+    double s = 0, e1 = 0, e2 = 0;
+    for(int k = 0; k < dim; k++) {
+      final double r1 = (v1.doubleValue(k + 1) - o.doubleValue(k + 1)) / max;
+      final double r2 = (v2.doubleValue(k + 1) - o.doubleValue(k + 1)) / max;
+      s += r1 * r2;
+      e1 += r1 * r1;
+      e2 += r2 * r2;
+    }
+    return Math.sqrt((s / e1) * (s / e2));
+  }
+
+  /**
+   * Compute the angle between two vectors.
+   * 
+   * @param v1 first vector
+   * @param v2 second vector
    * @return Angle
    */
   public static double angle(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {

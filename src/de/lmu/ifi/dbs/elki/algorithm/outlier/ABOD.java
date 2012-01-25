@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFu
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -550,14 +551,14 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   }
 
   private void generateExplanation(Relation<V> data, DBID key, DBIDs expList) {
-    V vect1 = data.get(key);
+    Vector vect1 = data.get(key).getColumnVector();
     Iterator<DBID> iter = expList.iterator();
     while(iter.hasNext()) {
       System.out.println("Outlier: " + vect1);
-      V exp = data.get(iter.next());
+      Vector exp = data.get(iter.next()).getColumnVector();
       System.out.println("Most common neighbor: " + exp);
       // determine difference Vector
-      V vals = exp.minus(vect1);
+      Vector vals = exp.minus(vect1);
       System.out.println(vals);
       // System.out.println(new FeatureVector(
       // "Diff-"+vect1.getPrimaryKey(),vals ));

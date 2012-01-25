@@ -28,7 +28,6 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
@@ -152,44 +151,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
   @Override
   public Vector getColumnVector() {
     return new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(values,  ArrayLikeUtil.FLOATARRAYADAPTER));
-  }
-
-  @Override
-  public Matrix getRowVector() {
-    return new Matrix(new double[][] { ArrayLikeUtil.toPrimitiveDoubleArray(values,  ArrayLikeUtil.FLOATARRAYADAPTER) });
-  }
-
-  @Override
-  public FloatVector plus(FloatVector fv) {
-    if(fv.getDimensionality() != this.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-    float[] values = new float[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] + fv.getValue(i + 1);
-    }
-    return new FloatVector(values, true);
-  }
-
-  @Override
-  public FloatVector minus(FloatVector fv) {
-    if(fv.getDimensionality() != this.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-    float[] values = new float[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] - fv.getValue(i + 1);
-    }
-    return new FloatVector(values, true);
-  }
-
-  @Override
-  public FloatVector multiplicate(double k) {
-    float[] values = new float[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = (float) (this.values[i] * k);
-    }
-    return new FloatVector(values, true);
   }
 
   @Override

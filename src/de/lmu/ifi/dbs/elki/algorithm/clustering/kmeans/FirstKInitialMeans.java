@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -48,11 +49,11 @@ public class FirstKInitialMeans<V extends NumberVector<V, ?>> extends AbstractKM
   }
 
   @Override
-  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<Vector> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     Iterator<DBID> iter = relation.iterDBIDs();
-    List<V> means = new ArrayList<V>(k);
+    List<Vector> means = new ArrayList<Vector>(k);
     for(int i = 0; i < k && iter.hasNext(); i++) {
-      means.add(relation.get(iter.next()));
+      means.add(relation.get(iter.next()).getColumnVector());
     }
     return means;
   }

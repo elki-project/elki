@@ -521,7 +521,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
   private ParameterizationFunction project(Matrix basis, ParameterizationFunction f) {
     // Matrix m = new Matrix(new
     // double[][]{f.getPointCoordinates()}).times(basis);
-    Matrix m = f.getRowVector().times(basis);
+    Matrix m = f.getColumnVector().transposeTimes(basis);
     ParameterizationFunction f_t = new ParameterizationFunction(m.getColumnPackedCopy());
     return f_t;
   }

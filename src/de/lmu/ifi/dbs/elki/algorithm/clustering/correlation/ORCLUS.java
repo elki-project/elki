@@ -463,7 +463,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
    * @return the projection of double vector o in the subspace of cluster c
    */
   private V projection(ORCLUSCluster c, V o, V factory) {
-    Matrix o_proj = o.getRowVector().times(c.basis);
+    Matrix o_proj = o.getColumnVector().transposeTimes(c.basis);
     double[] values = o_proj.getColumnPackedCopy();
     return factory.newNumberVector(values);
   }

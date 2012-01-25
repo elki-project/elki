@@ -206,7 +206,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
       return 0;
     }
     double prob = 0;
-    V mean = DatabaseUtil.centroid(database, objids);
+    Vector mean = DatabaseUtil.centroid(database, objids).getColumnVector();
     Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, objids);
 
     // test singulaere matrix
@@ -216,10 +216,8 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     double fakt = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, DatabaseUtil.dimensionality(database)) * covarianceDet);
     // for each object compute probability and sum
     for(DBID id : objids) {
-      V x = database.get(id);
-
-      Vector x_minus_mean = x.minus(mean).getColumnVector();
-      double mDist = x_minus_mean.transposeTimes(covInv).times(x_minus_mean).get(0, 0);
+      Vector x = database.get(id).getColumnVector().minusEquals(mean);
+      double mDist = x.transposeTimes(covInv).times(x).get(0, 0);
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
     }
     return prob;

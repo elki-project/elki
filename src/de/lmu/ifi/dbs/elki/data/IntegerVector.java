@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
@@ -153,48 +152,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
       data[i] = values[i];
     }
     return new Vector(data);
-  }
-
-  @Override
-  public Matrix getRowVector() {
-    double[] data = new double[values.length];
-    for(int i = 0; i < values.length; i++) {
-      data[i] = values[i];
-    }
-    return new Matrix(new double[][] { data });
-  }
-
-  @Override
-  public IntegerVector plus(IntegerVector fv) {
-    if(fv.getDimensionality() != this.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-    int[] values = new int[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] + fv.values[i];
-    }
-    return new IntegerVector(values, true);
-  }
-
-  @Override
-  public IntegerVector minus(IntegerVector fv) {
-    if(fv.getDimensionality() != this.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-    int[] values = new int[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] - fv.values[i];
-    }
-    return new IntegerVector(values, true);
-  }
-
-  @Override
-  public IntegerVector multiplicate(double k) {
-    int[] values = new int[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = (int) (this.values[i] * k);
-    }
-    return new IntegerVector(values, true);
   }
 
   @Override
