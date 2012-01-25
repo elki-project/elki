@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @apiviz.uses NumberVector
  * @apiviz.has DoubleDistance
  */
-public abstract class AbstractVectorDoubleDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public abstract class AbstractVectorDoubleDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveDoubleDistanceFunction<NumberVector<?, ?>>, NumberVectorDistance<DoubleDistance> {
   /**
    * Constructor.
    */
