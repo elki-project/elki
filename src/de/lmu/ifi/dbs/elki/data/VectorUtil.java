@@ -28,6 +28,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Utility functions for use with vectors.
@@ -36,17 +37,17 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.data.NumberVector
+ * @apiviz.uses NumberVector
  */
 public final class VectorUtil {
   /**
-   * Return the range across all dimensions. Useful in particular for time series.
+   * Return the range across all dimensions. Useful in particular for time
+   * series.
    * 
    * @param vec Vector to process.
-   * @param <V> Vector type 
    * @return [min, max]
    */
-  public static <V extends NumberVector<?, ?>> DoubleMinMax getRangeDouble(V vec) {
+  public static DoubleMinMax getRangeDouble(NumberVector<?, ?> vec) {
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(int i = 0; i < vec.getDimensionality(); i++) {
@@ -80,21 +81,6 @@ public final class VectorUtil {
   }
 
   /**
-   * Compute the angle between two vectors.
-   * 
-   * @param v1 first vector
-   * @param v2 second vector
-   * @return Angle
-   */
-  public static double angle(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    if(v1 instanceof SparseNumberVector<?, ?> && v2 instanceof SparseNumberVector<?, ?>) {
-      return angleSparse((SparseNumberVector<?, ?>) v1, (SparseNumberVector<?, ?>) v2);
-    }
-    // TODO: implement without creating Vector instances!
-    return MathUtil.angle(v1.getColumnVector(), v2.getColumnVector());
-  }
-
-  /**
    * Compute the angle for sparse vectors.
    * 
    * @param v1 First vector
@@ -106,7 +92,7 @@ public final class VectorUtil {
     BitSet b2 = v2.getNotNullMask();
     BitSet both = (BitSet) b1.clone();
     both.and(b2);
-  
+
     // Length of first vector
     double l1 = 0.0;
     for(int i = b1.nextSetBit(0); i >= 0; i = b1.nextSetBit(i + 1)) {
@@ -114,7 +100,7 @@ public final class VectorUtil {
       l1 += val * val;
     }
     l1 = Math.sqrt(l1);
-  
+
     // Length of second vector
     double l2 = 0.0;
     for(int i = b2.nextSetBit(0); i >= 0; i = b2.nextSetBit(i + 1)) {
@@ -122,12 +108,125 @@ public final class VectorUtil {
       l2 += val * val;
     }
     l2 = Math.sqrt(l2);
-  
+
     // Cross product
     double cross = 0.0;
     for(int i = both.nextSetBit(0); i >= 0; i = both.nextSetBit(i + 1)) {
       cross += v1.doubleValue(i) * v2.doubleValue(i);
     }
     return cross / (l1 * l2);
+  }
+
+  /**
+   * Compute the angle between two vectors.
+   * 
+   * @param v1 first vector
+   * @param v2 second vector
+   * @param o Origin
+   * @return Angle
+   */
+  public static double angle(NumberVector<?, ?> v1, NumberVector<?, ?> v2, Vector o) {
+    // Essentially, we want to compute this:
+    // v1' = v1 - o, v2' = v2 - o
+    // v1'.transposeTimes(v2') / (v1'.euclideanLength() *
+    // v2'.euclideanLength());
+    // However, the squares lose numerical precision, and we have some
+    // redundancies. The following is computing all three in parallel.
+    double[] oe = o.getArrayRef();
+    // Compute maximum, for scaling.
+    double max = 0.0;
+    final int dim = v1.getDimensionality();
+    for(int row = 0; row < dim; row++) {
+      final double v1r = v1.doubleValue(row + 1) - oe[row];
+      if(v1r < 0) {
+        if(max < -v1r) {
+          max = -v1r;
+        }
+      }
+      else {
+        if(max < v1r) {
+          max = v1r;
+        }
+      }
+      final double v2r = v2.doubleValue(row + 1) - oe[row];
+      if(v2r < 0) {
+        if(max < -v2r) {
+          max = -v2r;
+        }
+      }
+      else {
+        if(max < v2r) {
+          max = v2r;
+        }
+      }
+    }
+    if(max <= 0.0) {
+      return 0.0;
+    }
+    double s = 0, e1 = 0, e2 = 0;
+    for(int k = 0; k < dim; k++) {
+      final double r1 = (v1.doubleValue(k + 1) - oe[k]) / max;
+      final double r2 = (v2.doubleValue(k + 1) - oe[k]) / max;
+      s += r1 * r2;
+      e1 += r1 * r1;
+      e2 += r2 * r2;
+    }
+    return Math.sqrt((s / e1) * (s / e2));
+  }
+
+  /**
+   * Compute the angle between two vectors.
+   * 
+   * @param v1 first vector
+   * @param v2 second vector
+   * @return Angle
+   */
+  public static double angle(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+    if(v1 instanceof SparseNumberVector<?, ?> && v2 instanceof SparseNumberVector<?, ?>) {
+      return angleSparse((SparseNumberVector<?, ?>) v1, (SparseNumberVector<?, ?>) v2);
+    }
+    // Essentially, we want to compute this:
+    // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
+    // However, the squares lose numerical precision, and we have some
+    // redundancies. The following is computing all three in parallel.
+    final int dim = v1.getDimensionality();
+    // Compute maximum, for scaling
+    double max = 0.0;
+    for(int row = 0; row < dim; row++) {
+      final double v1r = v1.doubleValue(row + 1);
+      if(v1r < 0) {
+        if(max < -v1r) {
+          max = -v1r;
+        }
+      }
+      else {
+        if(max < v1r) {
+          max = v1r;
+        }
+      }
+      final double v2r = v2.doubleValue(row + 1);
+      if(v2r < 0) {
+        if(max < -v2r) {
+          max = -v2r;
+        }
+      }
+      else {
+        if(max < v2r) {
+          max = v2r;
+        }
+      }
+    }
+    if(max <= 0.0) {
+      return 0.0;
+    }
+    double s = 0, e1 = 0, e2 = 0;
+    for(int k = 0; k < dim; k++) {
+      final double r1 = v1.doubleValue(k + 1) / max;
+      final double r2 = v2.doubleValue(k + 1) / max;
+      s += r1 * r2;
+      e1 += r1 * r1;
+      e2 += r2 * r2;
+    }
+    return Math.sqrt((s / e1) * (s / e2));
   }
 }

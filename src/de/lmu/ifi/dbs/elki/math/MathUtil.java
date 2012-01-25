@@ -88,8 +88,12 @@ public final class MathUtil {
    * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup>)}
    */
   public static double fastHypot(double a, double b) {
-    a = Math.abs(a);
-    b = Math.abs(b);
+    if(a < 0) {
+      a = -a;
+    }
+    if(b < 0) {
+      b = -b;
+    }
     if(a > b) {
       final double r = b / a;
       return a * Math.sqrt(1 + r * r);
@@ -116,10 +120,16 @@ public final class MathUtil {
    * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup> + c<sup>2</sup>)}
    */
   public static double fastHypot3(double a, double b, double c) {
-    a = Math.abs(a);
-    b = Math.abs(b);
-    c = Math.abs(c);
-    double m = Math.max(a, Math.max(b, c));
+    if(a < 0) {
+      a = -a;
+    }
+    if(b < 0) {
+      b = -b;
+    }
+    if(c < 0) {
+      c = -c;
+    }
+    double m = (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
     if(m <= 0) {
       return 0.0;
     }
@@ -466,7 +476,106 @@ public final class MathUtil {
    * @return Angle
    */
   public static double angle(Vector v1, Vector v2) {
-    return v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
+    // Essentially, we want to compute this:
+    // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
+    // However, the squares lose numerical precision, and we have some
+    // redundancies. The following is computing all three in parallel.
+    double[] v1e = v1.getArrayRef();
+    double[] v2e = v2.getArrayRef();
+    // Compute maximum, for scaling
+    double max = 0.0;
+    for(int row = 0; row < v1e.length; row++) {
+      if(v1e[row] < 0) {
+        if(max < -v1e[row]) {
+          max = -v1e[row];
+        }
+      }
+      else {
+        if(max < v1e[row]) {
+          max = v1e[row];
+        }
+      }
+      if(v2e[row] < 0) {
+        if(max < -v2e[row]) {
+          max = -v2e[row];
+        }
+      }
+      else {
+        if(max < v2e[row]) {
+          max = v2e[row];
+        }
+      }
+    }
+    if(max <= 0.0) {
+      return 0.0;
+    }
+    double s = 0, e1 = 0, e2 = 0;
+    for(int k = 0; k < v1e.length; k++) {
+      final double r1 = v1e[k] / max;
+      final double r2 = v2e[k] / max;
+      s += r1 * r2;
+      e1 += r1 * r1;
+      e2 += r2 * r2;
+    }
+    return Math.sqrt((s / e1) * (s / e2));
+  }
+
+  /**
+   * Compute the angle between two vectors.
+   * 
+   * @param v1 first vector
+   * @param v2 second vector
+   * @param o Origin
+   * @return Angle
+   */
+  public static double angle(Vector v1, Vector v2, Vector o) {
+    // Essentially, we want to compute this:
+    // v1' = v1 - o, v2' = v2 - o
+    // v1'.transposeTimes(v2') / (v1'.euclideanLength() *
+    // v2'.euclideanLength());
+    // However, the squares lose numerical precision, and we have some
+    // redundancies. The following is computing all three in parallel.
+    double[] v1e = v1.getArrayRef();
+    double[] v2e = v2.getArrayRef();
+    double[] oe = o.getArrayRef();
+    // Compute maximum, for scaling.
+    double max = 0.0;
+    for(int row = 0; row < v1e.length; row++) {
+      final double v1r = v1e[row] - oe[row];
+      if(v1r < 0) {
+        if(max < -v1r) {
+          max = -v1r;
+        }
+      }
+      else {
+        if(max < v1r) {
+          max = v1r;
+        }
+      }
+      final double v2r = v2e[row] - oe[row];
+      if(v2r < 0) {
+        if(max < -v2r) {
+          max = -v2r;
+        }
+      }
+      else {
+        if(max < v2r) {
+          max = v2r;
+        }
+      }
+    }
+    if(max <= 0.0) {
+      return 0.0;
+    }
+    double s = 0, e1 = 0, e2 = 0;
+    for(int k = 0; k < v1e.length; k++) {
+      final double r1 = (v1e[k] - oe[k]) / max;
+      final double r2 = (v2e[k] - oe[k]) / max;
+      s += r1 * r2;
+      e1 += r1 * r1;
+      e2 += r2 * r2;
+    }
+    return Math.sqrt((s / e1) * (s / e2));
   }
 
   /**
