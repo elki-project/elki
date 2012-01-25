@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -100,7 +102,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
       return new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    List<V> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+    List<Vector> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Initialize cluster and assign objects
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
     for(int i = 0; i < k; i++) {
@@ -125,7 +127,8 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
         V fv = relation.get(id);
         int minIndex = 0;
         for(int i = 0; i < k; i++) {
-          D dist = df.distance(fv, means.get(i));
+          // FIXME: this is slow and clumsy.
+          D dist = df.distance(fv, fv.newNumberVector(means.get(i).getArrayRef()));
           if(dist.compareTo(mindist) < 0) {
             minIndex = i;
             mindist = dist;
@@ -136,12 +139,12 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
           ModifiableDBIDs ci = clusters.get(i);
           if(i == minIndex) {
             if(ci.add(id)) {
-              means.set(i, incrementalUpdateMean(means.get(i), relation.get(id), ci.size(), +1));
+              incrementalUpdateMean(means.get(i), relation.get(id), ci.size(), +1);
               changed = true;
             }
           }
           else if(ci.remove(id)) {
-            means.set(i, incrementalUpdateMean(means.get(i), relation.get(id), ci.size() + 1, -1));
+            incrementalUpdateMean(means.get(i), relation.get(id), ci.size() + 1, -1);
             changed = true;
           }
         }
@@ -150,10 +153,11 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
         break;
       }
     }
+    final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
     Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      MeanModel<V> model = new MeanModel<V>(means.get(i));
+      MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(means.get(i).getArrayRef()));
       result.addCluster(new Cluster<MeanModel<V>>(ids, model));
     }
     return result;

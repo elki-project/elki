@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -68,7 +69,7 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
   }
 
   @Override
-  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<Vector> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     // Get a distance query
     if(!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
       throw new AbortException("K-Means++ initialization can only be used with numerical distances.");
@@ -78,11 +79,11 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
     DistanceQuery<V, D> distQ = relation.getDatabase().getDistanceQuery(relation, distF);
 
     // Chose first mean
-    List<V> means = new ArrayList<V>(k);
+    List<Vector> means = new ArrayList<Vector>(k);
 
     Random random = (seed != null) ? new Random(seed) : new Random();
     DBID first = DBIDUtil.randomSample(relation.getDBIDs(), 1, random.nextLong()).iterator().next();
-    means.add(relation.get(first));
+    means.add(relation.get(first).getColumnVector());
 
     ModifiableDBIDs chosen = DBIDUtil.newHashSet(k);
     chosen.add(first);
@@ -105,7 +106,7 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
       }
       // Add new mean:
       DBID newmean = ids.get(pos);
-      means.add(relation.get(newmean));
+      means.add(relation.get(newmean).getColumnVector());
       chosen.add(newmean);
       // Update weights:
       weights[pos] = 0.0;

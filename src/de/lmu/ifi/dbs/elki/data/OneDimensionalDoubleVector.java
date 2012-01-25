@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -82,26 +81,6 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
   @Override
   public Vector getColumnVector() {
     return new Vector(new double[] { val });
-  }
-
-  @Override
-  public Matrix getRowVector() {
-    return new Matrix(new double[][] { { val } });
-  }
-
-  @Override
-  public OneDimensionalDoubleVector plus(OneDimensionalDoubleVector fv) {
-    return new OneDimensionalDoubleVector(this.val + fv.val);
-  }
-
-  @Override
-  public OneDimensionalDoubleVector minus(OneDimensionalDoubleVector fv) {
-    return new OneDimensionalDoubleVector(this.val - fv.val);
-  }
-
-  @Override
-  public OneDimensionalDoubleVector multiplicate(double k) {
-    return new OneDimensionalDoubleVector(this.val * k);
   }
 
   @Override

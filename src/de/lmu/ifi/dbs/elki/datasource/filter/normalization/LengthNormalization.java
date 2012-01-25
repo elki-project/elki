@@ -61,7 +61,7 @@ public class LengthNormalization<V extends NumberVector<V, ?>> extends AbstractN
   @Override
   protected V filterSingleObject(V featureVector) {
     final double d = norm.doubleNorm(featureVector);
-    return featureVector.multiplicate(1 / d);
+    return featureVector.newNumberVector(featureVector.getColumnVector().timesEquals(1 / d).getArrayRef());
   }
 
   @Override

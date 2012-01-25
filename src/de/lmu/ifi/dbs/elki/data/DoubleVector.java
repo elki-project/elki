@@ -30,7 +30,6 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
@@ -196,44 +195,6 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
     // TODO: can we sometimes save this copy?
     // Is this worth the more complex API?
     return new Vector(values.clone());
-  }
-
-  @Override
-  public Matrix getRowVector() {
-    return new Matrix(new double[][] { values.clone() });
-  }
-
-  @Override
-  public DoubleVector plus(DoubleVector fv) {
-    if(fv.getDimensionality() != this.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-    double[] values = new double[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] + fv.values[i];
-    }
-    return new DoubleVector(values, true);
-  }
-
-  @Override
-  public DoubleVector minus(DoubleVector fv) {
-    if(fv.getDimensionality() != this.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-    double[] values = new double[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] - fv.values[i];
-    }
-    return new DoubleVector(values, true);
-  }
-
-  @Override
-  public DoubleVector multiplicate(double k) {
-    double[] values = new double[this.values.length];
-    for(int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] * k;
-    }
-    return new DoubleVector(values, true);
   }
 
   @Override

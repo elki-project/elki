@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Initialize K-means by randomly choosing k exsiting elements as cluster
@@ -51,11 +52,11 @@ public class RandomlyChosenInitialMeans<V extends NumberVector<V, ?>> extends Ab
   }
 
   @Override
-  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<Vector> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, seed);
-    List<V> means = new ArrayList<V>(k);
+    List<Vector> means = new ArrayList<Vector>(k);
     for(DBID id : ids) {
-      means.add(relation.get(id));
+      means.add(relation.get(id).getColumnVector());
     }
     return means;
   }

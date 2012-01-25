@@ -99,7 +99,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
 
     // Compute mean and covariance Matrix
     CovarianceMatrix temp = CovarianceMatrix.make(relation);
-    V mean = temp.getMeanVector(relation);
+    Vector mean = temp.getMeanVector(relation).getColumnVector();
     // debugFine(mean.toString());
     Matrix covarianceMatrix = temp.destroyToNaiveMatrix();
     // debugFine(covarianceMatrix.toString());
@@ -110,10 +110,9 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
 
     // for each object compute Mahalanobis distance
     for(DBID id : relation.iterDBIDs()) {
-      V x = relation.get(id);
-      Vector x_minus_mean = x.minus(mean).getColumnVector();
+      Vector x = relation.get(id).getColumnVector().minusEquals(mean);
       // Gaussian PDF
-      final double mDist = x_minus_mean.transposeTimes(covarianceTransposed).times(x_minus_mean).get(0, 0);
+      final double mDist = x.transposeTimes(covarianceTransposed).times(x).get(0, 0);
       final double prob = fakt * Math.exp(-mDist / 2.0);
 
       mm.put(prob);

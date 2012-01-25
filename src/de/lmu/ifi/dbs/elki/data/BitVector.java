@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
@@ -166,84 +165,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
       values[i] = bits.get(i) ? 1 : 0;
     }
     return new Vector(values);
-  }
-
-  /**
-   * Returns a Matrix representing in one row and
-   * <code>getDimensionality()</code> columns the values of this BitVector as
-   * double values.
-   * 
-   * @return a Matrix representing in one row and
-   *         <code>getDimensionality()</code> columns the values of this
-   *         BitVector as double values
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getRowVector()
-   */
-  @Override
-  public Matrix getRowVector() {
-    double[] values = new double[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      values[i] = bits.get(i) ? 1 : 0;
-    }
-    return new Matrix(new double[][] { values });
-  }
-
-  /**
-   * Returns a bit vector equal to this bit vector, if k is not 0, a bit vector
-   * with all components equal to zero otherwise.
-   * 
-   * @param k used as multiplier 1 if k &ne; 0, otherwise the resulting bit
-   *        vector will have all values equal to zero
-   * @return a bit vector equal to this bit vector, if k is not 0, a bit vector
-   *         with all components equal to zero otherwise
-   */
-  @Override
-  public BitVector multiplicate(double k) {
-    if(k == 0) {
-      return new BitVector(new BitSet(), dimensionality);
-    }
-    else {
-      return new BitVector(bits, dimensionality);
-    }
-  }
-
-  /**
-   * Returns a bit vector corresponding to an XOR operation on this and the
-   * specified bit vector.
-   * 
-   * @param fv the bit vector to add
-   * @return a new bit vector corresponding to an XOR operation on this and the
-   *         specified bit vector
-   */
-  @Override
-  public BitVector plus(BitVector fv) {
-    if(this.getDimensionality() != fv.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-
-    BitVector bv = new BitVector((BitSet) fv.bits.clone(), this.dimensionality);
-    bv.bits.xor(this.bits);
-    return bv;
-  }
-
-  /**
-   * Returns a bit vector corresponding to an NXOR operation on this and the
-   * specified bit vector.
-   * 
-   * @param fv the bit vector to add
-   * @return a new bit vector corresponding to an NXOR operation on this and the
-   *         specified bit vector
-   */
-  @Override
-  public BitVector minus(BitVector fv) {
-    if(this.getDimensionality() != fv.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
-    }
-
-    BitVector bv = new BitVector((BitSet) fv.bits.clone(), this.dimensionality);
-    bv.bits.flip(0, dimensionality);
-    bv.bits.xor(this.bits);
-    return bv;
   }
 
   /**
