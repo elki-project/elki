@@ -85,7 +85,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
    * @param k k parameter
    * @param maxiter Maxiter parameter
    */
-  public KMeansMacQueen(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMeansMacQueen(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -113,7 +113,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
     means = means(clusters, means, relation);
 
     // Raw distance function
-    final PrimitiveDistanceFunction<? super V, D> df = getDistanceFunction();
+    final PrimitiveDistanceFunction<? super NumberVector<?, ?>, D> df = getDistanceFunction();
 
     // Refine result
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
@@ -127,8 +127,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
         V fv = relation.get(id);
         int minIndex = 0;
         for(int i = 0; i < k; i++) {
-          // FIXME: this is slow and clumsy.
-          D dist = df.distance(fv, fv.newNumberVector(means.get(i).getArrayRef()));
+          D dist = df.distance(fv, means.get(i));
           if(dist.compareTo(mindist) < 0) {
             minIndex = i;
             mindist = dist;
@@ -175,7 +174,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?, ?>, D> {
     protected int k;
 
     protected int maxiter;

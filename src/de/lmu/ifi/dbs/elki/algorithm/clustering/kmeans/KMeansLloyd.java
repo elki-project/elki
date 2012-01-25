@@ -84,7 +84,7 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
    * @param k k parameter
    * @param maxiter Maxiter parameter
    */
-  public KMeansLloyd(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMeansLloyd(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -142,7 +142,7 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?, ?>, D> {
     protected int k;
 
     protected int maxiter;

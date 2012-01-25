@@ -35,6 +35,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  *
  * @param <D> Distance type
  */
-public interface NumberVectorDistance<D extends Distance<D>> extends PrimitiveDistanceFunction<NumberVector<?, ?>, D> {
+public interface NumberVectorDistanceFunction<D extends Distance<D>> extends PrimitiveDistanceFunction<NumberVector<?, ?>, D> {
   // Empty - marker interface
 }
