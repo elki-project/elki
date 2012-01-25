@@ -1241,7 +1241,7 @@ public class Matrix implements MatrixLike<Matrix>, Serializable {
     double f = 0;
     for(int i = 0; i < elements.length; i++) {
       for(int j = 0; j < columndimension; j++) {
-        f = MathUtil.hypotenuse(f, elements[i][j]);
+        f = MathUtil.fastHypot(f, elements[i][j]);
       }
     }
     return f;

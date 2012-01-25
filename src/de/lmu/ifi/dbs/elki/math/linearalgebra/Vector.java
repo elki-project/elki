@@ -502,7 +502,7 @@ public class Vector implements MatrixLike<Vector>, Serializable {
   public final double euclideanLength() {
     double len = elements[0];
     for(int row = 1; row < elements.length; row++) {
-      len = MathUtil.hypotenuse(len, elements[row]);
+      len = MathUtil.fastHypot(len, elements[row]);
     }
     return len;
   }
