@@ -182,7 +182,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
   /**
    * Compute an incremental update for the mean
    * 
-   * @param oldmean Previous mean
+   * @param mean Mean to update
    * @param vec Object vector
    * @param newsize (New) size of cluster
    * @param op Cluster size change / Weight change
