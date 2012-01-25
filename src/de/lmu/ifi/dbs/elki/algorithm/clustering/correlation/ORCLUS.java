@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -420,14 +421,14 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   /**
    * Returns the union of the two specified clusters.
    * 
-   * @param database the database holding the objects
+   * @param relation the database holding the objects
    * @param distFunc the distance function
    * @param c1 the first cluster
    * @param c2 the second cluster
    * @param dim the dimensionality of the union cluster
    * @return the union of the two specified clusters
    */
-  private ORCLUSCluster union(Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, ORCLUSCluster c1, ORCLUSCluster c2, int dim) {
+  private ORCLUSCluster union(Relation<V> relation, DistanceQuery<V, DoubleDistance> distFunc, ORCLUSCluster c1, ORCLUSCluster c2, int dim) {
     ORCLUSCluster c = new ORCLUSCluster();
 
     c.objectIDs = DBIDUtil.newHashSet(c1.objectIDs);
@@ -436,11 +437,13 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     c.objectIDs = DBIDUtil.newArray(c.objectIDs);
 
     if(c.objectIDs.size() > 0) {
-      c.centroid = DatabaseUtil.centroid(database, c.objectIDs);
-      c.basis = findBasis(database, distFunc, c, dim);
+      c.centroid = DatabaseUtil.centroid(relation, c.objectIDs);
+      c.basis = findBasis(relation, distFunc, c, dim);
     }
     else {
-      c.centroid = c1.centroid.plus(c2.centroid).multiplicate(0.5);
+      V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+      Vector cent = c1.centroid.getColumnVector().plusEquals(c2.centroid.getColumnVector()).timesEquals(0.5); 
+      c.centroid = factory.newNumberVector(cent.getArrayRef());
       double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
       for(int i = 0; i < dim; i++) {
         doubles[i][i] = 1;

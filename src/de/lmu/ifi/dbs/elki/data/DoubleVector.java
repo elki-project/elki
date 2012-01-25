@@ -228,16 +228,6 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   }
 
   @Override
-  public DoubleVector nullVector() {
-    return new DoubleVector(new double[this.values.length], true);
-  }
-
-  @Override
-  public DoubleVector negativeVector() {
-    return multiplicate(-1);
-  }
-
-  @Override
   public DoubleVector multiplicate(double k) {
     double[] values = new double[this.values.length];
     for(int i = 0; i < values.length; i++) {

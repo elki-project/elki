@@ -384,16 +384,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   @Override
-  public SparseFloatVector nullVector() {
-    return new SparseFloatVector(new int[] {}, new float[] {}, dimensionality);
-  }
-
-  @Override
-  public SparseFloatVector negativeVector() {
-    return multiplicate(-1);
-  }
-
-  @Override
   public SparseFloatVector multiplicate(double k) {
     int[] newindexes = indexes.clone();
     float[] newvalues = new float[this.values.length];

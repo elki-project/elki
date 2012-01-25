@@ -204,16 +204,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
   }
 
   @Override
-  public FloatVector nullVector() {
-    return new FloatVector(new float[this.values.length], true);
-  }
-
-  @Override
-  public FloatVector negativeVector() {
-    return multiplicate(-1);
-  }
-
-  @Override
   public FloatVector multiplicate(double k) {
     float[] values = new float[this.values.length];
     for(int i = 0; i < values.length; i++) {

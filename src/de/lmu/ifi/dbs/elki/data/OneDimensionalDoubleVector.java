@@ -90,16 +90,6 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
   }
 
   @Override
-  public OneDimensionalDoubleVector nullVector() {
-    return new OneDimensionalDoubleVector(0.0);
-  }
-
-  @Override
-  public OneDimensionalDoubleVector negativeVector() {
-    return new OneDimensionalDoubleVector(-this.val);
-  }
-
-  @Override
   public OneDimensionalDoubleVector plus(OneDimensionalDoubleVector fv) {
     return new OneDimensionalDoubleVector(this.val + fv.val);
   }

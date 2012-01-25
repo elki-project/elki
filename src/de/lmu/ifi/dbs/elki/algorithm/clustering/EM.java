@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -117,7 +118,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
    * Parameter to specify the initialization method
    */
   public static final OptionID INIT_ID = OptionID.getOrCreateOptionID("kmeans.initialization", "Method to choose the initial means.");
-  
+
   private static final double MIN_LOGLIKELIHOOD = -100000;
 
   /**
@@ -176,7 +177,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     List<Double> clusterWeights = new ArrayList<Double>(k);
     probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
-    int dimensionality = means.get(0).getDimensionality();
+    final int dimensionality = means.get(0).getDimensionality();
     for(int i = 0; i < k; i++) {
       Matrix m = Matrix.identity(dimensionality, dimensionality);
       covarianceMatrices.add(m);
@@ -211,12 +212,12 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       em = emNew;
 
       // recompute models
-      List<V> meanSums = new ArrayList<V>(k);
+      List<Vector> meanSums = new ArrayList<Vector>(k);
       double[] sumOfClusterProbabilities = new double[k];
 
       for(int i = 0; i < k; i++) {
         clusterWeights.set(i, 0.0);
-        meanSums.add(means.get(i).nullVector());
+        meanSums.add(new Vector(dimensionality));
         covarianceMatrices.set(i, Matrix.zeroMatrix(dimensionality));
       }
 
@@ -226,16 +227,16 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
 
         for(int i = 0; i < k; i++) {
           sumOfClusterProbabilities[i] += clusterProbabilities[i];
-          V summand = relation.get(id).multiplicate(clusterProbabilities[i]);
-          V currentMeanSum = meanSums.get(i).plus(summand);
-          meanSums.set(i, currentMeanSum);
+          Vector summand = relation.get(id).getColumnVector().timesEquals(clusterProbabilities[i]);
+          meanSums.get(i).plusEquals(summand);
         }
       }
       final int n = relation.size();
+      V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
       for(int i = 0; i < k; i++) {
         clusterWeights.set(i, sumOfClusterProbabilities[i] / n);
-        V newMean = meanSums.get(i).multiplicate(1 / sumOfClusterProbabilities[i]);
-        means.set(i, newMean);
+        Vector newMean = meanSums.get(i).timesEquals(1 / sumOfClusterProbabilities[i]);
+        means.set(i, factory.newNumberVector(newMean.getArrayRef()));
       }
       // covariance matrices
       for(DBID id : relation.iterDBIDs()) {
@@ -398,7 +399,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       }
 
       ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
-      if (config.grab(initialP)) {
+      if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 

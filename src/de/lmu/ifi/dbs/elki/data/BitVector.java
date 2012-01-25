@@ -200,37 +200,11 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   @Override
   public BitVector multiplicate(double k) {
     if(k == 0) {
-      return nullVector();
+      return new BitVector(new BitSet(), dimensionality);
     }
     else {
       return new BitVector(bits, dimensionality);
     }
-  }
-
-  /**
-   * Returns the inverse of the bit vector.
-   * 
-   * The result is the same as obtained by flipping all bits in the underlying
-   * BitSet.
-   * 
-   * @return the inverse of the bit vector
-   * @see BitSet#flip(int,int)
-   */
-  @Override
-  public BitVector negativeVector() {
-    BitSet newBits = (BitSet) bits.clone();
-    newBits.flip(0, dimensionality);
-    return new BitVector(newBits, dimensionality);
-  }
-
-  /**
-   * Returns a bit vector of equal dimensionality but containing 0 only.
-   * 
-   * @return a bit vector of equal dimensionality but containing 0 only
-   */
-  @Override
-  public BitVector nullVector() {
-    return new BitVector(new BitSet(), dimensionality);
   }
 
   /**
