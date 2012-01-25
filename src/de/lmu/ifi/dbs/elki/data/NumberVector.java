@@ -143,22 +143,6 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
   Matrix getRowVector();
 
   /**
-   * Provides a null vector of the same Vector Space as this NumberVector of V
-   * (that is, of the same dimensionality).
-   * 
-   * @return a null vector of the same Vector Space as this NumberVector of V
-   *         (that is, of the same dimensionality)
-   */
-  V nullVector();
-
-  /**
-   * Returns the additive inverse to this NumberVector of V.
-   * 
-   * @return the additive inverse to this NumberVector of V
-   */
-  V negativeVector();
-
-  /**
    * Returns a new NumberVector of V that is the sum of this NumberVector of V
    * and the given NumberVector of V.
    * 

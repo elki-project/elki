@@ -189,16 +189,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   }
 
   @Override
-  public IntegerVector nullVector() {
-    return new IntegerVector(new int[this.values.length], true);
-  }
-
-  @Override
-  public IntegerVector negativeVector() {
-    return multiplicate(-1);
-  }
-
-  @Override
   public IntegerVector multiplicate(double k) {
     int[] values = new int[this.values.length];
     for(int i = 0; i < values.length; i++) {
