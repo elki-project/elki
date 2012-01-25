@@ -478,41 +478,13 @@ public final class MathUtil {
   public static double angle(Vector v1, Vector v2) {
     // Essentially, we want to compute this:
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
-    // However, the squares lose numerical precision, and we have some
-    // redundancies. The following is computing all three in parallel.
+    // We can just compute all three in parallel.
     double[] v1e = v1.getArrayRef();
     double[] v2e = v2.getArrayRef();
-    // Compute maximum, for scaling
-    double max = 0.0;
-    for(int row = 0; row < v1e.length; row++) {
-      if(v1e[row] < 0) {
-        if(max < -v1e[row]) {
-          max = -v1e[row];
-        }
-      }
-      else {
-        if(max < v1e[row]) {
-          max = v1e[row];
-        }
-      }
-      if(v2e[row] < 0) {
-        if(max < -v2e[row]) {
-          max = -v2e[row];
-        }
-      }
-      else {
-        if(max < v2e[row]) {
-          max = v2e[row];
-        }
-      }
-    }
-    if(max <= 0.0) {
-      return 0.0;
-    }
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < v1e.length; k++) {
-      final double r1 = v1e[k] / max;
-      final double r2 = v2e[k] / max;
+      final double r1 = v1e[k];
+      final double r2 = v2e[k];
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
@@ -531,46 +503,15 @@ public final class MathUtil {
   public static double angle(Vector v1, Vector v2, Vector o) {
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
-    // v1'.transposeTimes(v2') / (v1'.euclideanLength() *
-    // v2'.euclideanLength());
-    // However, the squares lose numerical precision, and we have some
-    // redundancies. The following is computing all three in parallel.
+    // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
+    // We can just compute all three in parallel.
     double[] v1e = v1.getArrayRef();
     double[] v2e = v2.getArrayRef();
     double[] oe = o.getArrayRef();
-    // Compute maximum, for scaling.
-    double max = 0.0;
-    for(int row = 0; row < v1e.length; row++) {
-      final double v1r = v1e[row] - oe[row];
-      if(v1r < 0) {
-        if(max < -v1r) {
-          max = -v1r;
-        }
-      }
-      else {
-        if(max < v1r) {
-          max = v1r;
-        }
-      }
-      final double v2r = v2e[row] - oe[row];
-      if(v2r < 0) {
-        if(max < -v2r) {
-          max = -v2r;
-        }
-      }
-      else {
-        if(max < v2r) {
-          max = v2r;
-        }
-      }
-    }
-    if(max <= 0.0) {
-      return 0.0;
-    }
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < v1e.length; k++) {
-      final double r1 = (v1e[k] - oe[k]) / max;
-      final double r2 = (v2e[k] - oe[k]) / max;
+      final double r1 = v1e[k] - oe[k];
+      final double r2 = v2e[k] - oe[k];
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
