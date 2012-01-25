@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -500,11 +499,30 @@ public class Vector implements MatrixLike<Vector>, Serializable {
    * @return the length of this vector
    */
   public final double euclideanLength() {
-    double len = elements[0];
-    for(int row = 1; row < elements.length; row++) {
-      len = MathUtil.fastHypot(len, elements[row]);
+    // Find maximum
+    double max = 0.0;
+    for(int row = 0; row < elements.length; row++) {
+      if(elements[row] < 0) {
+        if(max < -elements[row]) {
+          max = -elements[row];
+        }
+      }
+      else {
+        if(max < elements[row]) {
+          max = elements[row];
+        }
+      }
     }
-    return len;
+    if(max <= 0.0) {
+      return 0.0;
+    }
+    // Accumulate scaled values, for a reduced loss in precision
+    double acc = 0.0;
+    for(int row = 0; row < elements.length; row++) {
+      final double v = elements[row] / max;
+      acc += v * v;
+    }
+    return max * Math.sqrt(acc);
   }
 
   /**
