@@ -183,26 +183,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
     return new FloatVector(values, true);
   }
 
-  /**
-   * Provides the scalar product (inner product) of this and the given
-   * FloatVector.
-   * 
-   * @param f the FloatVector to compute the scalar product for
-   * @return the scalar product (inner product) of this and the given
-   *         FloatVector
-   */
-  @Override
-  public Float scalarProduct(FloatVector f) {
-    if(this.getDimensionality() != f.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + f.getDimensionality() + ".");
-    }
-    float result = 0.0f;
-    for(int i = 0; i < this.getDimensionality(); i++) {
-      result += this.values[i] * f.values[i];
-    }
-    return result;
-  }
-
   @Override
   public FloatVector multiplicate(double k) {
     float[] values = new float[this.values.length];

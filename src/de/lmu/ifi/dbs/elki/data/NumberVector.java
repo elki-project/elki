@@ -163,16 +163,6 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
   V minus(V fv);
 
   /**
-   * Provides the scalar product (inner product) of this NumberVector of V and
-   * the given NumberVector of V.
-   * 
-   * @param fv the NumberVector of V to compute the scalar product for
-   * @return the scalar product (inner product) of this and the given
-   *         NumberVector of V
-   */
-  N scalarProduct(V fv);
-
-  /**
    * Returns a new NumberVector of V that is the result of a scalar
    * multiplication with the given scalar.
    * 
