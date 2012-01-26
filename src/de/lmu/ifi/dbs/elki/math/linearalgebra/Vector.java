@@ -510,9 +510,9 @@ public class Vector implements NumberVector<Vector, Double> {
     assert (elements.length == v.elements.length) : "p and v differ in row dimensionality!";
     Vector sum = new Vector(elements.length);
     for(int i = 0; i < v.columndimension; i++) {
-      // TODO: optimize - copy less.
+      // TODO: optimize - copy less?
       Vector v_i = v.getCol(i);
-      sum.plusEquals(v_i.times(scalarProduct(v_i)));
+      sum.plusTimesEquals(v_i, scalarProduct(v_i));
     }
     return sum;
   }

@@ -625,7 +625,7 @@ public final class VMath {
     for(int i = 0; i < columndimension; i++) {
       // TODO: optimize - copy less.
       double[] v_i = getCol(m2, i);
-      plusEquals(sum, times(v_i, scalarProduct(v1, v_i)));
+      plusTimesEquals(sum, v_i, scalarProduct(v1, v_i));
     }
     return sum;
   }
