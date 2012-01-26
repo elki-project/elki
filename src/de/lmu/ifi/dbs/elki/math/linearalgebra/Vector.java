@@ -167,7 +167,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return the resulting vector
    */
   public final Vector plus(final Vector v) {
-    checkDimensions(v);
+    assert (this.elements.length == v.elements.length) : "Vector dimensions must agree.";
     final Vector result = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
       result.elements[i] = elements[i] + v.elements[i];
@@ -184,7 +184,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return the resulting vector
    */
   public final Vector plusTimes(final Vector v, final double s) {
-    checkDimensions(v);
+    assert (this.elements.length == v.elements.length) : "Vector dimensions must agree.";
     final Vector result = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
       result.elements[i] = elements[i] + v.elements[i] * s;
@@ -199,7 +199,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return A + B in this Matrix
    */
   public final Vector plusEquals(final Vector B) {
-    checkDimensions(B);
+    assert (this.elements.length == B.elements.length) : "Vector dimensions must agree.";
     for(int i = 0; i < elements.length; i++) {
       elements[i] += B.elements[i];
     }
@@ -214,7 +214,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return A + s * B in this Matrix
    */
   public final Vector plusTimesEquals(final Vector B, final double s) {
-    checkDimensions(B);
+    assert (this.elements.length == B.elements.length) : "Vector dimensions must agree.";
     for(int i = 0; i < elements.length; i++) {
       elements[i] += s * B.elements[i];
     }
@@ -270,7 +270,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return A - B in this Matrix
    */
   public final Vector minusEquals(final Vector B) {
-    checkDimensions(B);
+    assert (this.elements.length == B.elements.length) : "Vector dimensions must agree.";
     for(int i = 0; i < elements.length; i++) {
       elements[i] -= B.elements[i];
     }
@@ -285,7 +285,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return A - s * B in this Matrix
    */
   public final Vector minusTimesEquals(final Vector B, final double s) {
-    checkDimensions(B);
+    assert (this.elements.length == B.elements.length) : "Vector dimensions must agree.";
     for(int i = 0; i < elements.length; i++) {
       elements[i] -= s * B.elements[i];
     }
@@ -338,12 +338,9 @@ public class Vector implements NumberVector<Vector, Double> {
    * 
    * @param B another matrix
    * @return Matrix product, A * B
-   * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final Matrix times(final Matrix B) {
-    if(B.elements.length != 1) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
-    }
+    assert (B.elements.length == 1) : "Matrix inner dimensions must agree.";
     final Matrix X = new Matrix(this.elements.length, B.columndimension);
     for(int j = 0; j < B.columndimension; j++) {
       for(int i = 0; i < this.elements.length; i++) {
@@ -358,12 +355,9 @@ public class Vector implements NumberVector<Vector, Double> {
    * 
    * @param B another matrix
    * @return Matrix product, A<sup>T</sup> * B
-   * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final Matrix transposeTimes(final Matrix B) {
-    if(B.elements.length != this.elements.length) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
-    }
+    assert (B.elements.length == this.elements.length) : "Matrix inner dimensions must agree.";
     final Matrix X = new Matrix(1, B.columndimension);
     for(int j = 0; j < B.columndimension; j++) {
       // multiply it with each row from A
@@ -382,12 +376,9 @@ public class Vector implements NumberVector<Vector, Double> {
    * @param B matrix
    * @param c vector on the right
    * @return Matrix product, a<sup>T</sup> * B
-   * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final double transposeTimesTimes(final Matrix B, final Vector c) {
-    if(B.elements.length != this.elements.length) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
-    }
+    assert (B.elements.length == this.elements.length) : "Matrix inner dimensions must agree.";
     double sum = 0.0;
     for(int j = 0; j < B.columndimension; j++) {
       // multiply it with each row from A
@@ -405,12 +396,9 @@ public class Vector implements NumberVector<Vector, Double> {
    * 
    * @param B another vector
    * @return Matrix product, A<sup>T</sup> * B
-   * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final double transposeTimes(final Vector B) {
-    if(B.elements.length != this.elements.length) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
-    }
+    assert (B.elements.length == this.elements.length) : "Matrix inner dimensions must agree.";
     double s = 0;
     for(int k = 0; k < this.elements.length; k++) {
       s += this.elements[k] * B.elements[k];
@@ -423,12 +411,9 @@ public class Vector implements NumberVector<Vector, Double> {
    * 
    * @param B another matrix
    * @return Matrix product, A * B^T
-   * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final Matrix timesTranspose(final Matrix B) {
-    if(B.columndimension != 1) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
-    }
+    assert (B.columndimension == 1) : "Matrix inner dimensions must agree.";
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
     for(int j = 0; j < B.elements.length; j++) {
       for(int i = 0; i < this.elements.length; i++) {
@@ -443,7 +428,6 @@ public class Vector implements NumberVector<Vector, Double> {
    * 
    * @param B another matrix
    * @return Matrix product, A * B^T
-   * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final Matrix timesTranspose(final Vector B) {
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
@@ -462,7 +446,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return double the scalar product of this vector and v
    */
   public final double scalarProduct(final Vector v) {
-    checkDimensions(v);
+    assert (this.elements.length == v.elements.length) : "Vector dimensions must agree.";
     double scalarProduct = 0.0;
     for(int row = 0; row < elements.length; row++) {
       scalarProduct += elements[row] * v.elements[row];
@@ -521,14 +505,9 @@ public class Vector implements NumberVector<Vector, Double> {
    * 
    * @param v the subspace matrix
    * @return the projection of p into the subspace formed by v
-   * @throws IllegalArgumentException if this matrix is no row vector, i.e. this
-   *         matrix has more than one column or this matrix and v have different
-   *         length of rows
    */
   public final Vector projection(final Matrix v) {
-    if(elements.length != v.elements.length) {
-      throw new IllegalArgumentException("p and v differ in row dimensionality!");
-    }
+    assert (elements.length == v.elements.length) : "p and v differ in row dimensionality!";
     Vector sum = new Vector(elements.length);
     for(int i = 0; i < v.columndimension; i++) {
       // TODO: optimize - copy less.
@@ -538,23 +517,9 @@ public class Vector implements NumberVector<Vector, Double> {
     return sum;
   }
 
-  /**
-   * Check if this.getDimensionality() == v.getDimensionality().
-   * 
-   * @throws IllegalArgumentException if the dimensions do not agree
-   */
-  private final void checkDimensions(final Vector v) {
-    if(this.elements.length != v.elements.length) {
-      throw new IllegalArgumentException("Vector dimensions must agree.");
-    }
-  }
-
   @Override
   public int hashCode() {
-    final int PRIME = 31;
-    int result = 1;
-    result = PRIME * result + Arrays.hashCode(this.elements);
-    return result;
+    return Arrays.hashCode(this.elements);
   }
 
   @Override
@@ -572,12 +537,7 @@ public class Vector implements NumberVector<Vector, Double> {
     if(this.elements.length != other.elements.length) {
       return false;
     }
-    for(int i = 0; i < this.elements.length; i++) {
-      if(this.elements[i] != other.elements[i]) {
-        return false;
-      }
-    }
-    return true;
+    return Arrays.equals(this.elements, other.elements);
   }
 
   /**
