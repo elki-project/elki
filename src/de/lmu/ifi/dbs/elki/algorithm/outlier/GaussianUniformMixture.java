@@ -217,7 +217,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     // for each object compute probability and sum
     for(DBID id : objids) {
       Vector x = database.get(id).getColumnVector().minusEquals(mean);
-      double mDist = x.transposeTimes(covInv).times(x).get(0);
+      double mDist = x.transposeTimesTimes(covInv, x);
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
     }
     return prob;

@@ -317,11 +317,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       List<Double> probabilities = new ArrayList<Double>(k);
       for(int i = 0; i < k; i++) {
         Vector difference = x.minus(means.get(i));
-        Vector rowTimesCovTimesCol = difference.transposeTimes(invCovMatr.get(i)).times(difference);
-        double power = rowTimesCovTimesCol.get(0) / 2.0;
+        double rowTimesCovTimesCol = difference.transposeTimesTimes(invCovMatr.get(i), difference);
+        double power = rowTimesCovTimesCol / 2.0;
         double prob = normDistrFactor.get(i) * Math.exp(-power);
         if(logger.isDebuggingFinest()) {
-          logger.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + " rowTimesCovTimesCol:\n" + FormatUtil.format(rowTimesCovTimesCol, "    ") + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
+          logger.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
         }
         probabilities.add(prob);
       }

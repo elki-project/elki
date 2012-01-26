@@ -132,11 +132,11 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
 
       V v1 = relation.get(id1);
       V v2 = relation.get(id2);
-      Vector v1Mv2 = v1.getColumnVector().minus(v2.getColumnVector());
-      Vector v2Mv1 = v2.getColumnVector().minus(v1.getColumnVector());
+      Vector v1Mv2 = v1.getColumnVector().minusEquals(v2.getColumnVector());
+      Vector v2Mv1 = v2.getColumnVector().minusEquals(v1.getColumnVector());
 
-      double dist1 = v1Mv2.transposeTimes(m1).times(v1Mv2).get(0);
-      double dist2 = v2Mv1.transposeTimes(m2).times(v2Mv1).get(0);
+      double dist1 = v1Mv2.transposeTimesTimes(m1, v1Mv2);
+      double dist2 = v2Mv1.transposeTimesTimes(m2, v2Mv1);
 
       if(dist1 < 0) {
         if(-dist1 < 0.000000000001) {
@@ -180,8 +180,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
       }
 
       Matrix m = null; // index.getLocalProjection(v.getID()).similarityMatrix();
-      Vector rv1Mrv2 = v.getColumnVector().minus(new Vector(r));
-      double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0);
+      Vector rv1Mrv2 = v.getColumnVector().minusEquals(new Vector(r));
+      double dist = rv1Mrv2.transposeTimesTimes(m, rv1Mrv2);
 
       return new DoubleDistance(Math.sqrt(dist));
     }
