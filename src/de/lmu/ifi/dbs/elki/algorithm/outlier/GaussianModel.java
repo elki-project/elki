@@ -112,7 +112,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     for(DBID id : relation.iterDBIDs()) {
       Vector x = relation.get(id).getColumnVector().minusEquals(mean);
       // Gaussian PDF
-      final double mDist = x.transposeTimes(covarianceTransposed).times(x).get(0, 0);
+      final double mDist = x.transposeTimes(covarianceTransposed).times(x).get(0);
       final double prob = fakt * Math.exp(-mDist / 2.0);
 
       mm.put(prob);

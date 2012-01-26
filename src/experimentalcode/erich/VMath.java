@@ -34,6 +34,11 @@ import java.util.Arrays;
  */
 public final class VMath {
   /**
+   * A small number to handle numbers near 0 as 0.
+   */
+  public static final double DELTA = 1E-3;
+
+  /**
    * Fake constructor. Static class.
    */
   private VMath() {
@@ -619,25 +624,10 @@ public final class VMath {
     double[] sum = new double[v1.length];
     for(int i = 0; i < columndimension; i++) {
       // TODO: optimize - copy less.
-      double[] v_i = getColumnVector(m2, i);
+      double[] v_i = getCol(m2, i);
       plusEquals(sum, times(v_i, scalarProduct(v1, v_i)));
     }
     return sum;
-  }
-
-  /**
-   * Get a column from a matrix as vector.
-   * 
-   * @param m1 Matrix to extract the column from
-   * @param col Column number
-   * @return Column
-   */
-  public final static double[] getColumnVector(double[][] m1, int col) {
-    double[] ret = new double[m1.length];
-    for(int i = 0; i < ret.length; i++) {
-      ret[i] = m1[i][col];
-    }
-    return ret;
   }
 
   /**
@@ -682,5 +672,839 @@ public final class VMath {
     v1[0] = v1[1];
     v1[1] = -temp;
     return v1;
+  }
+
+  // *********** MATRIX operations
+
+  /**
+   * Returns the unit matrix of the specified dimension.
+   * 
+   * @param dim the dimensionality of the unit matrix
+   * @return the unit matrix of the specified dimension
+   */
+  public final static double[][] unitMatrix(final int dim) {
+    final double[][] e = new double[dim][dim];
+    for(int i = 0; i < dim; i++) {
+      e[i][i] = 1;
+    }
+    return e;
+  }
+
+  /**
+   * Returns the zero matrix of the specified dimension.
+   * 
+   * @param dim the dimensionality of the unit matrix
+   * @return the zero matrix of the specified dimension
+   */
+  public final static double[][] zeroMatrix(final int dim) {
+    final double[][] z = new double[dim][dim];
+    return z;
+  }
+
+  /**
+   * Generate matrix with random elements
+   * 
+   * @param m Number of rows.
+   * @param n Number of columns.
+   * @return An m-by-n matrix with uniformly distributed random elements.
+   */
+  public final static double[][] random(final int m, final int n) {
+    final double[][] A = new double[m][n];
+    for(int i = 0; i < m; i++) {
+      for(int j = 0; j < n; j++) {
+        A[i][j] = Math.random();
+      }
+    }
+    return A;
+  }
+
+  /**
+   * Generate identity matrix
+   * 
+   * @param m Number of rows.
+   * @param n Number of columns.
+   * @return An m-by-n matrix with ones on the diagonal and zeros elsewhere.
+   */
+  public final static double[][] identity(final int m, final int n) {
+    final double[][] A = new double[m][n];
+    for(int i = 0; i < Math.min(m, n); i++) {
+      A[i][i] = 1.0;
+    }
+    return A;
+  }
+
+  /**
+   * Returns a quadratic Matrix consisting of zeros and of the given values on
+   * the diagonal.
+   * 
+   * @param diagonal the values on the diagonal
+   * @return the resulting matrix
+   */
+  public final static double[][] diagonal(final double[] v1) {
+    final double[][] result = new double[v1.length][v1.length];
+    for(int i = 0; i < v1.length; i++) {
+      result[i][i] = v1[i];
+    }
+    return result;
+  }
+
+  /**
+   * Make a deep copy of a matrix.
+   * 
+   * @param m1 Input matrix
+   * @return a new matrix containing the same values as this matrix
+   */
+  public static final double[][] copy(final double[][] m1) {
+    final int columndimension = m1[0].length;
+    final double[][] X = new double[m1.length][columndimension];
+    for(int i = 0; i < m1.length; i++) {
+      System.arraycopy(m1[i], 0, X[i], 0, columndimension);
+    }
+    return X;
+  }
+
+  /**
+   * Make a one-dimensional row packed copy of the internal array.
+   * 
+   * @param m1 Input matrix
+   * @return Matrix elements packed in a one-dimensional array by rows.
+   */
+  public static final double[] rowPackedCopy(final double[][] m1) {
+    final int columndimension = m1[0].length;
+    double[] vals = new double[m1.length * columndimension];
+    for(int i = 0; i < m1.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        vals[i * columndimension + j] = m1[i][j];
+      }
+    }
+    return vals;
+  }
+
+  /**
+   * Make a one-dimensional column packed copy of the internal array.
+   * 
+   * @param m1 Input matrix
+   * @return Matrix elements packed in a one-dimensional array by columns.
+   */
+  public static final double[] columnPackedCopy(final double[][] m1) {
+    final int columndimension = m1[0].length;
+    final double[] vals = new double[m1.length * columndimension];
+    for(int i = 0; i < m1.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        vals[i + j * m1.length] = m1[i][j];
+      }
+    }
+    return vals;
+  }
+
+  /**
+   * Get a submatrix.
+   * 
+   * @param m1 Input matrix
+   * @param r0 Initial row index
+   * @param r1 Final row index
+   * @param c0 Initial column index
+   * @param c1 Final column index
+   * @return m1(r0:r1,c0:c1)
+   */
+  public static final double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1) {
+    final double[][] X = new double[r1 - r0 + 1][c1 - c0 + 1];
+    for(int i = r0; i <= r1; i++) {
+      for(int j = c0; j <= c1; j++) {
+        X[i - r0][j - c0] = m1[i][j];
+      }
+    }
+    return X;
+  }
+
+  /**
+   * Get a submatrix.
+   * 
+   * @param m1 Input matrix
+   * @param r Array of row indices.
+   * @param c Array of column indices.
+   * @return m1(r(:),c(:))
+   */
+  public static final double[][] getMatrix(final double[][] m1, final int[] r, final int[] c) {
+    final double[][] X = new double[r.length][c.length];
+    for(int i = 0; i < r.length; i++) {
+      for(int j = 0; j < c.length; j++) {
+        X[i][j] = m1[r[i]][c[j]];
+      }
+    }
+    return X;
+  }
+
+  /**
+   * Get a submatrix.
+   * 
+   * @param m1 Input matrix
+   * @param r Array of row indices.
+   * @param c0 Initial column index
+   * @param c1 Final column index
+   * @return m1(r(:),c0:c1)
+   */
+  public static final double[][] getMatrix(final double[][] m1, final int[] r, final int c0, final int c1) {
+    final double[][] X = new double[r.length][c1 - c0 + 1];
+    for(int i = 0; i < r.length; i++) {
+      for(int j = c0; j <= c1; j++) {
+        X[i][j - c0] = m1[r[i]][j];
+      }
+    }
+    return X;
+  }
+
+  /**
+   * Get a submatrix.
+   * 
+   * @param m1 Input matrix
+   * @param r0 Initial row index
+   * @param r1 Final row index
+   * @param c Array of column indices.
+   * @return m1(r0:r1,c(:))
+   */
+  public static final double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int[] c) {
+    final double[][] X = new double[r1 - r0 + 1][c.length];
+    for(int i = r0; i <= r1; i++) {
+      for(int j = 0; j < c.length; j++) {
+        X[i - r0][j] = m1[i][c[j]];
+      }
+    }
+    return X;
+  }
+
+  /**
+   * Set a submatrix.
+   * 
+   * @param m1 Original matrix
+   * @param r0 Initial row index
+   * @param r1 Final row index
+   * @param c0 Initial column index
+   * @param c1 Final column index
+   * @param m2 New values for m1(r0:r1,c0:c1)
+   */
+  public static final void setMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1, final double[][] m2) {
+    for(int i = r0; i <= r1; i++) {
+      for(int j = c0; j <= c1; j++) {
+        m1[i][j] = m2[i - r0][j - c0];
+      }
+    }
+  }
+
+  /**
+   * Set a submatrix.
+   * 
+   * @param m1 Original matrix
+   * @param r Array of row indices.
+   * @param c Array of column indices.
+   * @param m2 New values for m1(r(:),c(:))
+   */
+  public static final void setMatrix(final double[][] m1, final int[] r, final int[] c, final double[][] m2) {
+    for(int i = 0; i < r.length; i++) {
+      for(int j = 0; j < c.length; j++) {
+        m1[r[i]][c[j]] = m2[i][j];
+      }
+    }
+  }
+
+  /**
+   * Set a submatrix.
+   * 
+   * @param m1 Input matrix
+   * @param r Array of row indices.
+   * @param c0 Initial column index
+   * @param c1 Final column index
+   * @param m2 New values for m1(r(:),c0:c1)
+   */
+  public static final void setMatrix(final double[][] m1, final int[] r, final int c0, final int c1, final double[][] m2) {
+    for(int i = 0; i < r.length; i++) {
+      for(int j = c0; j <= c1; j++) {
+        m1[r[i]][j] = m2[i][j - c0];
+      }
+    }
+  }
+
+  /**
+   * Set a submatrix.
+   * 
+   * @param m1 Input matrix
+   * @param r0 Initial row index
+   * @param r1 Final row index
+   * @param c Array of column indices.
+   * @param m2 New values for m1(r0:r1,c(:))
+   */
+  public static final void setMatrix(final double[][] m1, final int r0, final int r1, final int[] c, final double[][] m2) {
+    for(int i = r0; i <= r1; i++) {
+      for(int j = 0; j < c.length; j++) {
+        m1[i][c[j]] = m2[i - r0][j];
+      }
+    }
+  }
+
+  /**
+   * Returns the <code>r</code>th row of this matrix as vector.
+   * 
+   * @param m1 Input matrix
+   * @param r the index of the row to be returned
+   * @return the <code>r</code>th row of this matrix
+   */
+  public static final double[] getRow(final double[][] m1, final int r) {
+    return m1[r].clone();
+  }
+
+  /**
+   * Sets the <code>r</code>th row of this matrix to the specified vector.
+   * 
+   * @param m1 Original matrix
+   * @param r the index of the column to be set
+   * @param row the value of the column to be set
+   */
+  public static final void setRow(final double[][] m1, final int r, final double[] row) {
+    final int columndimension = getColumnDimensionality(m1);
+    assert (row.length == columndimension) : "Matrix must consist of the same no of columns!";
+    for(int i = 0; i < columndimension; i++) {
+      m1[r][i] = row[i];
+    }
+  }
+
+  /**
+   * Get a column from a matrix as vector.
+   * 
+   * @param m1 Matrix to extract the column from
+   * @param col Column number
+   * @return Column
+   */
+  public final static double[] getCol(double[][] m1, int col) {
+    double[] ret = new double[m1.length];
+    for(int i = 0; i < ret.length; i++) {
+      ret[i] = m1[i][col];
+    }
+    return ret;
+  }
+
+  /**
+   * Sets the <code>c</code>th column of this matrix to the specified column.
+   * 
+   * @param m1 Input matrix
+   * @param c the index of the column to be set
+   * @param column the value of the column to be set
+   */
+  public static final void setCol(final double[][] m1, final int c, final double[] column) {
+    assert (column.length == m1.length) : "Matrix must consist of the same no of rows!";
+    for(int i = 0; i < m1.length; i++) {
+      m1[i][c] = column[i];
+    }
+  }
+
+  /**
+   * Matrix transpose
+   * 
+   * @param m1 Input matrix
+   * @return m1<sup>T</sup> as copy
+   */
+  public static final double[][] transpose(final double[][] m1) {
+    final int columndimension = getColumnDimensionality(m1);
+    final double[][] re = new double[columndimension][m1.length];
+    for(int i = 0; i < m1.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        re[j][i] = m1[i][j];
+      }
+    }
+    return re;
+  }
+
+  /**
+   * m3 = m1 + m2
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @return m1 + m1 in a new Matrix
+   */
+  public static final double[][] plus(final double[][] m1, final double[][] m2) {
+    return plusEquals(copy(m1), m2);
+  }
+
+  /**
+   * m3 = m1 + s2 * m2
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @param s2 scalar
+   * @return m1 + s2 * m2 in a new Matrix
+   */
+  public static final double[][] plusTimes(final double[][] m1, final double[][] m2, final double s2) {
+    return plusTimesEquals(copy(m1), m2, s2);
+  }
+
+  /**
+   * m1 = m1 + m2, overwriting m1
+   * 
+   * @param m1 input matrix
+   * @param m2 another matrix
+   * @return m1 = m1 + m2
+   */
+  public static final double[][] plusEquals(final double[][] m1, final double[][] m2) {
+    final int columndimension = getColumnDimensionality(m1);
+    assert (getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2)) : "Matrix dimensions must agree.";
+    for(int i = 0; i < m1.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        m1[i][j] += m2[i][j];
+      }
+    }
+    return m1;
+  }
+
+  /**
+   * m1 = m1 + s2 * m2, overwriting m1
+   * 
+   * @param m1 input matrix
+   * @param m2 another matrix
+   * @param s2 scalar for s2
+   * @return m1 = m1 + s2 * m2, overwriting m1
+   */
+  public static final double[][] plusTimesEquals(final double[][] m1, final double[][] m2, final double s2) {
+    final int columndimension = getColumnDimensionality(m1);
+    assert (getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2)) : "Matrix dimensions must agree.";
+    for(int i = 0; i < m1.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        m1[i][j] += s2 * m2[i][j];
+      }
+    }
+    return m1;
+  }
+
+  /**
+   * m3 = m1 - m2
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @return m1 - m2 in a new matrix
+   */
+  public static final double[][] minus(final double[][] m1, final double[][] m2) {
+    return minusEquals(copy(m1), m2);
+  }
+
+  /**
+   * m3 = m1 - s2 * m2
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @param s2 Scalar
+   * @return m1 - s2 * m2 in a new Matrix
+   */
+  public static final double[][] minusTimes(final double[][] m1, final double[][] m2, final double s2) {
+    return minusTimesEquals(copy(m1), m2, s2);
+  }
+
+  /**
+   * m1 = m1 - m2, overwriting m1
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @return m1 - m2, overwriting m1
+   */
+  public static final double[][] minusEquals(final double[][] m1, final double[][] m2) {
+    final int columndimension = getColumnDimensionality(m1);
+    assert (getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2)) : "Matrix dimensions must agree.";
+    for(int i = 0; i < m1.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        m1[i][j] -= m2[i][j];
+      }
+    }
+    return m1;
+  }
+
+  /**
+   * m1 = m1 - s2 * m2, overwriting m1
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @param s2 Scalar
+   * @return m1 = m1 - s2 * m2, overwriting m1
+   */
+  public static final double[][] minusTimesEquals(final double[][] m1, final double[][] m2, final double s2) {
+    assert (getRowDimensionality(m1) == getRowDimensionality(m2) && getColumnDimensionality(m1) == getColumnDimensionality(m2)) : "Matrix dimensions must agree.";
+    for(int i = 0; i < m1.length; i++) {
+      final double[] row1 = m1[i];
+      final double[] row2 = m2[i];
+      for(int j = 0; j < row1.length; j++) {
+        row1[j] -= s2 * row2[j];
+      }
+    }
+    return m1;
+  }
+
+  /**
+   * Multiply a matrix by a scalar, m3 = s1*m1
+   * 
+   * @param m1 Input matrix
+   * @param s1 scalar
+   * @return s1*m1, in a new matrix
+   */
+  public static final double[][] times(final double[][] m1, final double s1) {
+    return timesEquals(copy(m1), s1);
+  }
+
+  /**
+   * Multiply a matrix by a scalar in place, m1 = s1 * m1
+   * 
+   * @param m1 Input matrix
+   * @param s1 scalar
+   * @return m1 = s1 * m1, overwriting m1
+   */
+  public static final double[][] timesEquals(final double[][] m1, final double s1) {
+    for(int i = 0; i < m1.length; i++) {
+      final double[] row = m1[i];
+      for(int j = 0; j < row.length; j++) {
+        row[j] *= s1;
+      }
+    }
+    return m1;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, m1 * m2
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @return Matrix product, m1 * m2
+   */
+  public static final double[][] times(final double[][] m1, final double[][] m2) {
+    final int columndimension = getColumnDimensionality(m1);
+    final int bcolumndimension = getColumnDimensionality(m2);
+    // Optimized implementation, exploiting the storage layout
+    assert (m2.length == columndimension) : "Matrix inner dimensions must agree: " + getRowDimensionality(m1) + "," + getColumnDimensionality(m1) + " * " + getRowDimensionality(m2) + "," + getColumnDimensionality(m2);
+    final double[][] r2 = new double[m1.length][bcolumndimension];
+    // Optimized ala Jama. jik order.
+    final double[] Bcolj = new double[columndimension];
+    for(int j = 0; j < bcolumndimension; j++) {
+      // Make a linear copy of column j from B
+      // TODO: use column getter from B?
+      for(int k = 0; k < columndimension; k++) {
+        Bcolj[k] = m2[k][j];
+      }
+      // multiply it with each row from A
+      for(int i = 0; i < m1.length; i++) {
+        final double[] Arowi = m1[i];
+        double s = 0;
+        for(int k = 0; k < columndimension; k++) {
+          s += Arowi[k] * Bcolj[k];
+        }
+        r2[i][j] = s;
+      }
+    }
+    return r2;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, m1 * v2
+   * 
+   * @param m1 Input matrix
+   * @param v2 a vector
+   * @return Matrix product, m1 * v2
+   */
+  public static final double[] times(final double[][] m1, final double[] v2) {
+    assert (v2.length == getColumnDimensionality(m1)) : "Matrix inner dimensions must agree.";
+    final double[] re = new double[m1.length];
+    // multiply it with each row from A
+    for(int i = 0; i < m1.length; i++) {
+      final double[] Arowi = m1[i];
+      double s = 0;
+      for(int k = 0; k < Arowi.length; k++) {
+        s += Arowi[k] * v2[k];
+      }
+      re[i] = s;
+    }
+    return re;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, m1<sup>T</sup> * v2
+   * 
+   * @param m1 Input matrix
+   * @param v2 another matrix
+   * @return Matrix product, m1<sup>T</sup> * v2
+   */
+  public static final double[] transposeTimes(final double[][] m1, final double[] v2) {
+    final int columndimension = getColumnDimensionality(m1);
+    assert (v2.length == m1.length) : "Matrix inner dimensions must agree.";
+    final double[] re = new double[columndimension];
+    // multiply it with each row from A
+    for(int i = 0; i < columndimension; i++) {
+      double s = 0;
+      for(int k = 0; k < m1.length; k++) {
+        s += m1[k][i] * v2[k];
+      }
+      re[i] = s;
+    }
+    return re;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, m1<sup>T</sup> * m2
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @return Matrix product, m1<sup>T</sup> * m2
+   */
+  public static final double[][] transposeTimes(final double[][] m1, final double[][] m2) {
+    final int coldim1 = getColumnDimensionality(m1);
+    final int coldim2 = getColumnDimensionality(m2);
+    assert (m2.length == m1.length) : "Matrix inner dimensions must agree.";
+    final double[][] re = new double[coldim1][coldim2];
+    final double[] Bcolj = new double[m1.length];
+    for(int j = 0; j < coldim2; j++) {
+      // Make a linear copy of column j from B
+      for(int k = 0; k < m1.length; k++) {
+        Bcolj[k] = m2[k][j];
+      }
+      // multiply it with each row from A
+      for(int i = 0; i < coldim1; i++) {
+        double s = 0;
+        for(int k = 0; k < m1.length; k++) {
+          s += m1[k][i] * Bcolj[k];
+        }
+        re[i][j] = s;
+      }
+    }
+    return re;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, m1 * m2^T
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @return Matrix product, m1 * m2^T
+   */
+  public static final double[][] timesTranspose(final double[][] m1, final double[][] m2) {
+    assert (getColumnDimensionality(m2) == getColumnDimensionality(m1)) : "Matrix inner dimensions must agree.";
+    final double[][] re = new double[m1.length][m2.length];
+    for(int j = 0; j < re.length; j++) {
+      final double[] Browj = m2[j];
+      // multiply it with each row from A
+      for(int i = 0; i < m1.length; i++) {
+        final double[] Arowi = m1[i];
+        double s = 0;
+        for(int k = 0; k < Browj.length; k++) {
+          s += Arowi[k] * Browj[k];
+        }
+        re[i][j] = s;
+      }
+    }
+    return re;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, m1^T * m2^T. Computed as (m2*m1)^T
+   * 
+   * @param m1 Input matrix
+   * @param m2 another matrix
+   * @return Matrix product, m1^T * m2^T
+   */
+  public static final double[][] transposeTimesTranspose(final double[][] m1, final double[][] m2) {
+    // Optimized implementation, exploiting the storage layout
+    assert (m1.length == getColumnDimensionality(m2)) : "Matrix inner dimensions must agree: " + getRowDimensionality(m1) + "," + getColumnDimensionality(m1) + " * " + getRowDimensionality(m2) + "," + getColumnDimensionality(m2);
+    final double[][] re = new double[getColumnDimensionality(m1)][m2.length];
+    // Optimized ala Jama. jik order.
+    final double[] Acolj = new double[m1.length];
+    for(int j = 0; j < re.length; j++) {
+      // Make a linear copy of column j from B
+      for(int k = 0; k < m1.length; k++) {
+        Acolj[k] = m1[k][j];
+      }
+      final double[] Xrow = re[j];
+      // multiply it with each row from A
+      for(int i = 0; i < m2.length; i++) {
+        final double[] Browi = m2[i];
+        double s = 0;
+        for(int k = 0; k < m1.length; k++) {
+          s += Browi[k] * Acolj[k];
+        }
+        Xrow[i] = s;
+      }
+    }
+    return re;
+  }
+
+  /**
+   * getDiagonal returns array of diagonal-elements.
+   * 
+   * @param m1 Input matrix
+   * @return values on the diagonal of the Matrix
+   */
+  public final static double[] getDiagonal(final double[][] m1) {
+    final int dim = Math.min(getColumnDimensionality(m1), m1.length);
+    final double[] diagonal = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      diagonal[i] = m1[i][i];
+    }
+    return diagonal;
+  }
+
+  /**
+   * Normalizes the columns of this matrix to length of 1.0.
+   * 
+   * @param m1 Input matrix
+   */
+  public final static void normalizeColumns(final double[][] m1) {
+    final int columndimension = getColumnDimensionality(m1);
+    for(int col = 0; col < columndimension; col++) {
+      double norm = 0.0;
+      for(int row = 0; row < m1.length; row++) {
+        norm = norm + (m1[row][col] * m1[row][col]);
+      }
+      norm = Math.sqrt(norm);
+      if(norm != 0) {
+        for(int row = 0; row < m1.length; row++) {
+          m1[row][col] /= norm;
+        }
+      }
+      else {
+        // TODO: else: throw an exception?
+      }
+    }
+  }
+
+  /**
+   * Returns a matrix which consists of this matrix and the specified columns.
+   * 
+   * @param m1 Input matrix
+   * @param m2 the columns to be appended
+   * @return the new matrix with the appended columns
+   */
+  public static final double[][] appendColumns(final double[][] m1, final double[][] m2) {
+    final int columndimension = getColumnDimensionality(m1);
+    final int ccolumndimension = getColumnDimensionality(m2);
+    assert (m1.length == m2.length) : "m.getRowDimension() != column.getRowDimension()";
+
+    final int rcolumndimension = columndimension + ccolumndimension;
+    final double[][] result = new double[m1.length][rcolumndimension];
+    for(int i = 0; i < rcolumndimension; i++) {
+      // FIXME: optimize - excess copying!
+      if(i < columndimension) {
+        setCol(result, i, getCol(m1, i));
+      }
+      else {
+        setCol(result, i, getCol(m2, i - columndimension));
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns an orthonormalization of this matrix.
+   * 
+   * @param m1 Input matrix
+   * @return the orthonormalized matrix
+   */
+  public static final double[][] orthonormalize(final double[][] m1) {
+    final int columndimension = getColumnDimensionality(m1);
+    double[][] v = copy(m1);
+
+    // FIXME: optimize - excess copying!
+    for(int i = 1; i < columndimension; i++) {
+      final double[] u_i = getCol(m1, i);
+      final double[] sum = new double[m1.length];
+      for(int j = 0; j < i; j++) {
+        final double[] v_j = getCol(v, j);
+        double scalar = scalarProduct(u_i, v_j) / scalarProduct(v_j, v_j);
+        plusEquals(sum, times(v_j, scalar));
+      }
+      final double[] v_i = minus(u_i, sum);
+      setCol(v, i, v_i);
+    }
+
+    normalizeColumns(v);
+    return v;
+  }
+
+  /**
+   * Compute hash code
+   * 
+   * @param m1 Input matrix
+   * @return Hash code
+   */
+  public static final int hashCode(final double[][] m1) {
+    return Arrays.hashCode(m1);
+  }
+
+  /**
+   * Test for equality
+   * 
+   * @param m1 Input matrix
+   * @param m2 Other matrix
+   * @return Equality
+   */
+  public static final boolean equals(final double[][] m1, final double[][] m2) {
+    return Arrays.equals(m1, m2);
+  }
+
+  /**
+   * Compare two matrices with a delta parameter to take numerical errors into
+   * account.
+   * 
+   * @param m1 Input matrix
+   * @param m2 other matrix to compare with
+   * @param maxdelta maximum delta allowed
+   * @return true if delta smaller than maximum
+   */
+  public static final boolean almostEquals(final double[][] m1, final double[][] m2, final double maxdelta) {
+    if(m1 == m2) {
+      return true;
+    }
+    if(m2 == null) {
+      return false;
+    }
+    if(m1.getClass() != m2.getClass()) {
+      return false;
+    }
+    if(m1.length != m2.length) {
+      return false;
+    }
+    final int columndimension = getColumnDimensionality(m1);
+    if(columndimension != getColumnDimensionality(m2)) {
+      return false;
+    }
+    for(int i = 0; i < m1.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        if(Math.abs(m1[i][j] - m2[i][j]) > maxdelta) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Compare two matrices with a delta parameter to take numerical errors into
+   * account.
+   * 
+   * @param m1 Input matrix
+   * @param m2 other matrix to compare with
+   * @return almost equals with delta {@link #DELTA}
+   */
+  public static final boolean almostEquals(final double[][] m1, final double[][] m2) {
+    return almostEquals(m1, m2, DELTA);
+  }
+
+  /**
+   * Returns the dimensionality of the rows of this matrix.
+   * 
+   * @param m1 Input matrix
+   * @return the number of rows.
+   */
+  public static final int getRowDimensionality(final double[][] m1) {
+    return m1.length;
+  }
+
+  /**
+   * Returns the dimensionality of the columns of this matrix.
+   * 
+   * @param m1 Input matrix
+   * @return the number of columns.
+   */
+  public static final int getColumnDimensionality(final double[][] m1) {
+    return m1[0].length;
   }
 }

@@ -62,7 +62,7 @@ public class PolynomialRegression extends MultipleLinearRegression {
   }
 
   private static Matrix xMatrix(Vector x, int p) {
-    int n = x.getRowDimensionality();
+    int n = x.getDimensionality();
 
     Matrix result = new Matrix(n, p + 1);
     for(int i = 0; i < n; i++) {
@@ -79,7 +79,7 @@ public class PolynomialRegression extends MultipleLinearRegression {
    * @return the adapted coefficient of determination
    */
   public double adaptedCoefficientOfDetermination() {
-    int n = getEstimatedResiduals().getRowDimensionality();
+    int n = getEstimatedResiduals().getDimensionality();
     return 1.0 - ((n - 1.0) / (n * 1.0 - p)) * (1 - coefficientOfDetermination());
   }
 

@@ -197,7 +197,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
       // Note: matrix times ith unit vector = ith column
-      Vector sim = E.getColumnVector(i);
+      Vector sim = E.getCol(i);
       similarityVectors.put(id, sim);
     }
     E = null;

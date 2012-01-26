@@ -125,7 +125,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
    */
   public PCAResult processCovarMatrix(Matrix covarMatrix) {
     // TODO: add support for a different implementation to do EVD?
-    EigenvalueDecomposition evd = covarMatrix.eig();
+    EigenvalueDecomposition evd = new EigenvalueDecomposition(covarMatrix);
     return processEVD(evd);
   }
 

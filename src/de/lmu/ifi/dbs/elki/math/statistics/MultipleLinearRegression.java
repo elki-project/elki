@@ -139,14 +139,10 @@ public class MultipleLinearRegression {
   @Override
   public String toString() {
     StringBuffer msg = new StringBuffer();
-    msg.append("\nx = ");
-    msg.append(FormatUtil.format(x, 9, 4));
-    msg.append("\ny = ");
-    msg.append(FormatUtil.format(y, 9, 4));
-    msg.append("\nb = ");
-    msg.append(FormatUtil.format(b, 9, 4));
-    msg.append("\ne = ");
-    msg.append(FormatUtil.format(e, 9, 4));
+    msg.append("x = ").append(FormatUtil.format(x, 9, 4));
+    msg.append("\ny = ").append(FormatUtil.format(y, 9, 4));
+    msg.append("\nb = ").append(FormatUtil.format(b, 9, 4));
+    msg.append("\ne = ").append(FormatUtil.format(e, 9, 4));
     msg.append("error variance = ").append(FormatUtil.format(variance, 4));
     return msg.toString();
   }
@@ -203,7 +199,7 @@ public class MultipleLinearRegression {
    * @return the estimation of y
    */
   public double estimateY(Matrix x) {
-    return x.times(b).get(0, 0);
+    return x.times(b).get(0);
   }
 
   /**

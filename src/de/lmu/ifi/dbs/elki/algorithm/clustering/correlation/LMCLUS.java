@@ -331,14 +331,14 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     Vector first = vectors.get(0);
     first = first.times(1.0 / first.euclideanLength());
     Matrix ret = new Matrix(first.getDimensionality(), vectors.size());
-    ret.setColumnVector(0, first);
+    ret.setCol(0, first);
     for(int i = 1; i < vectors.size(); i++) {
       // System.out.println("Matrix:" + ret);
       Vector v_i = vectors.get(i);
       Vector u_i = v_i.copy();
       // System.out.println("Vector " + i + ":" + partialSol);
       for(int j = 0; j < i; j++) {
-        Vector v_j = ret.getColumnVector(j);
+        Vector v_j = ret.getCol(j);
         double f = v_i.scalarProduct(v_j) / v_j.scalarProduct(v_j);
         if(Double.isNaN(f)) {
           if(logger.isDebuggingFine()) {
@@ -358,7 +358,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       }
       // System.out.println("Vector " + i + ":" + partialSol);
       u_i.timesEquals(1 / len_u_i);
-      ret.setColumnVector(i, u_i);
+      ret.setCol(i, u_i);
     }
     return ret;
   }

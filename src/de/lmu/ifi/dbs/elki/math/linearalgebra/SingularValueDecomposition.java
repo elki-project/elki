@@ -41,12 +41,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @apiviz.uses Matrix - - transforms
  */
-@SuppressWarnings("serial")
-public class SingularValueDecomposition implements java.io.Serializable {
-  /*
-   * ------------------------ Class variables ------------------------
-   */
-
+public class SingularValueDecomposition {
   /**
    * Arrays for internal storage of U and V.
    * 
@@ -70,23 +65,26 @@ public class SingularValueDecomposition implements java.io.Serializable {
    */
   private int m, n;
 
-  /*
-   * ------------------------ Constructor ------------------------
-   */
-
   /**
    * Construct the singular value decomposition
    * 
    * @param Arg Rectangular matrix
    */
-
   public SingularValueDecomposition(Matrix Arg) {
+    this(Arg.getArrayRef());
+  }
 
+  /**
+   * Constructor.
+   *
+   * @param Arg Rectangular input matrix
+   */
+  public SingularValueDecomposition(double[][] Arg) {
+    double[][] A = new Matrix(Arg).getArrayCopy();
+    this.m = A.length;
+    this.n = A[0].length;
     // Derived from LINPACK code.
     // Initialize.
-    double[][] A = Arg.getArrayCopy();
-    m = Arg.getRowDimensionality();
-    n = Arg.getColumnDimensionality();
     int nu = Math.min(m, n);
     s = new double[Math.min(m + 1, n)];
     U = new double[m][nu];
@@ -103,7 +101,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
     int nrt = Math.max(0, Math.min(n - 2, m));
     for(int k = 0; k < Math.max(nct, nrt); k++) {
       if(k < nct) {
-
         // Compute the transformation for the k-th column and
         // place the k-th diagonal in s[k].
         // Compute 2-norm of k-th column without under/overflow.
@@ -124,9 +121,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
       }
       for(int j = k + 1; j < n; j++) {
         if((k < nct) & (s[k] != 0.0)) {
-
           // Apply the transformation.
-
           double t = 0;
           for(int i = k; i < m; i++) {
             t += A[i][k] * A[i][j];
@@ -143,7 +138,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
         e[j] = A[k][j];
       }
       if(wantu & (k < nct)) {
-
         // Place the transformation in U for subsequent back
         // multiplication.
 
@@ -152,7 +146,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
         }
       }
       if(k < nrt) {
-
         // Compute the k-th row transformation and place the
         // k-th super-diagonal in e[k].
         // Compute 2-norm without under/overflow.
@@ -171,9 +164,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
         }
         e[k] = -e[k];
         if((k + 1 < m) & (e[k] != 0.0)) {
-
           // Apply the transformation.
-
           for(int i = k + 1; i < m; i++) {
             work[i] = 0.0;
           }
@@ -190,10 +181,8 @@ public class SingularValueDecomposition implements java.io.Serializable {
           }
         }
         if(wantv) {
-
           // Place the transformation in V for subsequent
           // back multiplication.
-
           for(int i = k + 1; i < n; i++) {
             V[i][k] = e[i];
           }
@@ -254,7 +243,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
     }
 
     // If required, generate V.
-
     if(wantv) {
       for(int k = n - 1; k >= 0; k--) {
         if((k < nrt) & (e[k] != 0.0)) {
@@ -336,9 +324,8 @@ public class SingularValueDecomposition implements java.io.Serializable {
       // Perform the task indicated by kase.
 
       switch(kase){
-
+      
       // Deflate negligible s(p).
-
       case 1: {
         double f = e[p - 2];
         e[p - 2] = 0.0;
@@ -363,7 +350,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
         break;
 
       // Split at negligible s(k).
-
       case 2: {
         double f = e[k - 1];
         e[k - 1] = 0.0;
@@ -386,11 +372,8 @@ public class SingularValueDecomposition implements java.io.Serializable {
         break;
 
       // Perform one qr step.
-
       case 3: {
-
         // Calculate the shift.
-
         double scale = Math.max(Math.max(Math.max(Math.max(Math.abs(s[p - 1]), Math.abs(s[p - 2])), Math.abs(e[p - 2])), Math.abs(s[k])), Math.abs(e[k]));
         double sp = s[p - 1] / scale;
         double spm1 = s[p - 2] / scale;
@@ -411,7 +394,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
         double g = sk * ek;
 
         // Chase zeros.
-
         for(int j = k; j < p - 1; j++) {
           double t = MathUtil.fastHypot(f, g);
           double cs = f / t;
@@ -452,11 +434,8 @@ public class SingularValueDecomposition implements java.io.Serializable {
         break;
 
       // Convergence.
-
       case 4: {
-
         // Make the singular values positive.
-
         if(s[k] <= 0.0) {
           s[k] = (s[k] < 0.0 ? -s[k] : 0.0);
           if(wantv) {
@@ -467,7 +446,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
         }
 
         // Order the singular values.
-
         while(k < pp) {
           if(s[k] >= s[k + 1]) {
             break;
@@ -499,16 +477,11 @@ public class SingularValueDecomposition implements java.io.Serializable {
     }
   }
 
-  /*
-   * ------------------------ Public Methods ------------------------
-   */
-
   /**
    * Return the left singular vectors
    * 
    * @return U
    */
-
   public Matrix getU() {
     return new Matrix(U);
   }
@@ -518,7 +491,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
    * 
    * @return V
    */
-
   public Matrix getV() {
     return new Matrix(V);
   }
@@ -528,7 +500,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
    * 
    * @return diagonal of S.
    */
-
   public double[] getSingularValues() {
     return s;
   }
@@ -538,7 +509,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
    * 
    * @return S
    */
-
   public Matrix getS() {
     Matrix X = new Matrix(n, n);
     double[][] S = X.getArrayRef();
@@ -556,7 +526,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
    * 
    * @return max(S)
    */
-
   public double norm2() {
     return s[0];
   }
@@ -566,7 +535,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
    * 
    * @return max(S)/min(S)
    */
-
   public double cond() {
     return s[0] / s[Math.min(m, n) - 1];
   }
@@ -576,7 +544,6 @@ public class SingularValueDecomposition implements java.io.Serializable {
    * 
    * @return Number of nonnegligible singular values.
    */
-
   public int rank() {
     double eps = Math.pow(2.0, -52.0);
     double tol = Math.max(m, n) * s[0] * eps;

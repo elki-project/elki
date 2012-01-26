@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * 
  * @apiviz.landmark
  */
-public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> {
+public class Vector implements NumberVector<Vector, Double> {
   /**
    * Array for internal storage of elements.
    * 
@@ -97,7 +97,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * 
    * @return a copy of this vector
    */
-  @Override
   public final Vector copy() {
     return new Vector(elements.clone());
   }
@@ -137,16 +136,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
     return elements.length;
   }
 
-  @Override
-  public final int getRowDimensionality() {
-    return elements.length;
-  }
-
-  @Override
-  public final int getColumnDimensionality() {
-    return 1;
-  }
-
   /**
    * Returns the value at the specified row.
    * 
@@ -154,14 +143,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @return the value at row i
    */
   public final double get(final int i) {
-    return elements[i];
-  }
-
-  @Override
-  public final double get(final int i, final int j) {
-    if(j != 0) {
-      throw new ArrayIndexOutOfBoundsException();
-    }
     return elements[i];
   }
 
@@ -178,37 +159,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
     return this;
   }
 
-  @Override
-  public final Vector set(final int i, final int j, final double s) {
-    if(j != 0) {
-      throw new ArrayIndexOutOfBoundsException();
-    }
-    elements[i] = s;
-    return this;
-  }
-
-  @Override
-  public final Vector increment(final int i, final int j, final double s) {
-    if(j != 0) {
-      throw new ArrayIndexOutOfBoundsException();
-    }
-    elements[i] += s;
-    return this;
-  }
-
-  @Override
-  public final Vector getColumnVector(final int i) {
-    if(i != 0) {
-      throw new ArrayIndexOutOfBoundsException();
-    }
-    return this;
-  }
-
-  @Override
-  public final Matrix transpose() {
-    return new Matrix(this.elements, 1);
-  }
-
   /**
    * Returns a new vector which is the result of this vector plus the specified
    * vector.
@@ -216,7 +166,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param v the vector to be added
    * @return the resulting vector
    */
-  @Override
   public final Vector plus(final Vector v) {
     checkDimensions(v);
     final Vector result = new Vector(elements.length);
@@ -234,7 +183,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param s the scalar
    * @return the resulting vector
    */
-  @Override
   public final Vector plusTimes(final Vector v, final double s) {
     checkDimensions(v);
     final Vector result = new Vector(elements.length);
@@ -250,11 +198,10 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param B another matrix
    * @return A + B in this Matrix
    */
-  @Override
   public final Vector plusEquals(final Vector B) {
     checkDimensions(B);
     for(int i = 0; i < elements.length; i++) {
-      elements[i] += B.get(i, 0);
+      elements[i] += B.elements[i];
     }
     return this;
   }
@@ -266,11 +213,10 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param s Scalar
    * @return A + s * B in this Matrix
    */
-  @Override
   public final Vector plusTimesEquals(final Vector B, final double s) {
     checkDimensions(B);
     for(int i = 0; i < elements.length; i++) {
-      elements[i] += s * B.get(i, 0);
+      elements[i] += s * B.elements[i];
     }
     return this;
   }
@@ -294,7 +240,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param v the vector to be subtracted from this vector
    * @return this vector minus the specified vector v
    */
-  @Override
   public final Vector minus(final Vector v) {
     final Vector sub = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
@@ -310,7 +255,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param s the scaling factor
    * @return this vector minus the specified vector v
    */
-  @Override
   public final Vector minusTimes(final Vector v, final double s) {
     final Vector sub = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
@@ -325,11 +269,10 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param B another matrix
    * @return A - B in this Matrix
    */
-  @Override
   public final Vector minusEquals(final Vector B) {
     checkDimensions(B);
     for(int i = 0; i < elements.length; i++) {
-      elements[i] -= B.get(i, 0);
+      elements[i] -= B.elements[i];
     }
     return this;
   }
@@ -341,11 +284,10 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param s Scalar
    * @return A - s * B in this Matrix
    */
-  @Override
   public final Vector minusTimesEquals(final Vector B, final double s) {
     checkDimensions(B);
     for(int i = 0; i < elements.length; i++) {
-      elements[i] -= s * B.get(i, 0);
+      elements[i] -= s * B.elements[i];
     }
     return this;
   }
@@ -370,7 +312,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param s the scalar to be multiplied
    * @return the resulting vector
    */
-  @Override
   public final Vector times(final double s) {
     final Vector v = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
@@ -385,7 +326,6 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
    * @param s scalar
    * @return replace A by s*A
    */
-  @Override
   public final Vector timesEquals(final double s) {
     for(int i = 0; i < elements.length; i++) {
       elements[i] *= s;
@@ -568,7 +508,7 @@ public class Vector implements MatrixLike<Vector>, NumberVector<Vector, Double> 
     Vector sum = new Vector(elements.length);
     for(int i = 0; i < v.columndimension; i++) {
       // TODO: optimize - copy less.
-      Vector v_i = v.getColumnVector(i);
+      Vector v_i = v.getCol(i);
       sum.plusEquals(v_i.times(scalarProduct(v_i)));
     }
     return sum;

@@ -226,10 +226,10 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
     Vector centered = p.getColumnVector().minus(centroid);
     Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
     for(int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
-      Vector v_i = strongEigenvectors.getColumnVector(i);
+      Vector v_i = strongEigenvectors.getCol(i);
       Vector proj = v_i.times(centered.scalarProduct(v_i));
 
-      sum.setColumnVector(i, proj);
+      sum.setCol(i, proj);
     }
     return sum;
   }

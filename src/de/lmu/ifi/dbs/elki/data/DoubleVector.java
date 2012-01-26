@@ -111,7 +111,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
    * @param columnMatrix a matrix of one column
    */
   public DoubleVector(Vector columnMatrix) {
-    values = new double[columnMatrix.getRowDimensionality()];
+    values = new double[columnMatrix.getDimensionality()];
     for(int i = 0; i < values.length; i++) {
       values[i] = columnMatrix.get(i);
     }

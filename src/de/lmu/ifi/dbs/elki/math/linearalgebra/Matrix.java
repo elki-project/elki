@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @apiviz.uses Vector
  * @apiviz.landmark
  */
-public class Matrix implements MatrixLike<Matrix> {
+public class Matrix {
   /**
    * A small number to handle numbers near 0 as 0.
    */
@@ -272,7 +272,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * 
    * @return a new matrix containing the same values as this matrix
    */
-  @Override
   public final Matrix copy() {
     final Matrix X = new Matrix(elements.length, columndimension);
     for(int i = 0; i < elements.length; i++) {
@@ -318,7 +317,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * 
    * @return m, the number of rows.
    */
-  @Override
   public final int getRowDimensionality() {
     return elements.length;
   }
@@ -328,7 +326,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * 
    * @return n, the number of columns.
    */
-  @Override
   public final int getColumnDimensionality() {
     return columndimension;
   }
@@ -341,7 +338,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @return A(i,j)
    * @throws ArrayIndexOutOfBoundsException on bounds error
    */
-  @Override
   public final double get(final int i, final int j) {
     return elements[i][j];
   }
@@ -355,7 +351,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @return modified matrix
    * @throws ArrayIndexOutOfBoundsException on bounds error
    */
-  @Override
   public final Matrix set(final int i, final int j, final double s) {
     elements[i][j] = s;
     return this;
@@ -370,7 +365,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @return modified matrix
    * @throws ArrayIndexOutOfBoundsException on bounds error
    */
-  @Override
   public final Matrix increment(final int i, final int j, final double s) {
     elements[i][j] += s;
     return this;
@@ -591,40 +585,14 @@ public class Matrix implements MatrixLike<Matrix> {
   }
 
   /**
-   * Returns the <code>i</code>th row of this matrix.
-   * 
-   * @param i the index of the row to be returned
-   * @return the <code>i</code>th row of this matrix
-   */
-  public final Matrix getRow(final int i) {
-    return getMatrix(i, i, 0, columndimension - 1);
-  }
-
-  /**
    * Returns the <code>i</code>th row of this matrix as vector.
    * 
    * @param i the index of the row to be returned
    * @return the <code>i</code>th row of this matrix
    */
-  public final Vector getRowVector(final int i) {
+  public final Vector getRow(final int i) {
     double[] row = elements[i].clone();
     return new Vector(row);
-  }
-
-  /**
-   * Sets the <code>j</code>th row of this matrix to the specified vector.
-   * 
-   * @param j the index of the row to be set
-   * @param row the value of the row to be set
-   */
-  public final void setRow(final int j, final Matrix row) {
-    if(row.columndimension != columndimension) {
-      throw new IllegalArgumentException("Matrix must consist of the same no of columns!");
-    }
-    if(row.elements.length != 1) {
-      throw new IllegalArgumentException("Matrix must consist of one row!");
-    }
-    setMatrix(elements.length - 1, 0, j, j, row);
   }
 
   /**
@@ -633,7 +601,7 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param j the index of the column to be set
    * @param row the value of the column to be set
    */
-  public final void setRowVector(final int j, final Vector row) {
+  public final void setRow(final int j, final Vector row) {
     if(row.elements.length != columndimension) {
       throw new IllegalArgumentException("Matrix must consist of the same no of columns!");
     }
@@ -643,23 +611,12 @@ public class Matrix implements MatrixLike<Matrix> {
   }
 
   /**
-   * Returns the <code>j</code>th column of this matrix.
-   * 
-   * @param j the index of the column to be returned
-   * @return the <code>j</code>th column of this matrix
-   */
-  public final Matrix getColumn(final int j) {
-    return getMatrix(0, elements.length - 1, j, j);
-  }
-
-  /**
    * Returns the <code>j</code>th column of this matrix as vector.
    * 
    * @param j the index of the column to be returned
    * @return the <code>j</code>th column of this matrix
    */
-  @Override
-  public final Vector getColumnVector(final int j) {
+  public final Vector getCol(final int j) {
     final Vector v = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
       v.elements[i] = elements[i][j];
@@ -673,23 +630,7 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param j the index of the column to be set
    * @param column the value of the column to be set
    */
-  public final void setColumn(final int j, final Matrix column) {
-    if(column.elements.length != elements.length) {
-      throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
-    }
-    if(column.columndimension != 1) {
-      throw new IllegalArgumentException("Matrix must consist of one column!");
-    }
-    setMatrix(0, elements.length - 1, j, j, column);
-  }
-
-  /**
-   * Sets the <code>j</code>th column of this matrix to the specified column.
-   * 
-   * @param j the index of the column to be set
-   * @param column the value of the column to be set
-   */
-  public final void setColumnVector(final int j, final Vector column) {
+  public final void setCol(final int j, final Vector column) {
     if(column.elements.length != elements.length) {
       throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
     }
@@ -703,7 +644,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * 
    * @return A<sup>T</sup>
    */
-  @Override
   public final Matrix transpose() {
     final Matrix X = new Matrix(columndimension, elements.length);
     for(int i = 0; i < elements.length; i++) {
@@ -720,7 +660,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param B another matrix
    * @return A + B in a new Matrix
    */
-  @Override
   public final Matrix plus(final Matrix B) {
     return copy().plusEquals(B);
   }
@@ -732,7 +671,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param s scalar
    * @return A + s * B in a new Matrix
    */
-  @Override
   public final Matrix plusTimes(final Matrix B, final double s) {
     return copy().plusTimesEquals(B, s);
   }
@@ -743,7 +681,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param B another matrix
    * @return A + B in this Matrix
    */
-  @Override
   public final Matrix plusEquals(final Matrix B) {
     checkMatrixDimensions(B);
     for(int i = 0; i < elements.length; i++) {
@@ -761,7 +698,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param s Scalar
    * @return A + s * B in this Matrix
    */
-  @Override
   public final Matrix plusTimesEquals(final Matrix B, final double s) {
     checkMatrixDimensions(B);
     for(int i = 0; i < elements.length; i++) {
@@ -778,7 +714,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param B another matrix
    * @return A - B in a new Matrix
    */
-  @Override
   public final Matrix minus(final Matrix B) {
     return copy().minusEquals(B);
   }
@@ -790,7 +725,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param s Scalar
    * @return A - s * B in a new Matrix
    */
-  @Override
   public final Matrix minusTimes(final Matrix B, final double s) {
     return copy().minusTimesEquals(B, s);
   }
@@ -801,7 +735,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param B another matrix
    * @return A - B in this Matrix
    */
-  @Override
   public final Matrix minusEquals(final Matrix B) {
     checkMatrixDimensions(B);
     for(int i = 0; i < elements.length; i++) {
@@ -819,7 +752,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param s Scalar
    * @return A - s * B in this Matrix
    */
-  @Override
   public final Matrix minusTimesEquals(final Matrix B, final double s) {
     checkMatrixDimensions(B);
     for(int i = 0; i < elements.length; i++) {
@@ -836,7 +768,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param s scalar
    * @return s*A
    */
-  @Override
   public final Matrix times(final double s) {
     return copy().timesEquals(s);
   }
@@ -847,7 +778,6 @@ public class Matrix implements MatrixLike<Matrix> {
    * @param s scalar
    * @return replace A by s*A
    */
-  @Override
   public final Matrix timesEquals(final double s) {
     for(int i = 0; i < elements.length; i++) {
       for(int j = 0; j < columndimension; j++) {
@@ -1030,91 +960,6 @@ public class Matrix implements MatrixLike<Matrix> {
   }
 
   /**
-   * Returns the scalar product of the colA column of this and the colB column
-   * of B.
-   * 
-   * @param colA The column of A to compute scalar product for
-   * @param B second Matrix
-   * @param colB The column of B to compute scalar product for
-   * @return double The scalar product of the first column of this and B
-   */
-  public double scalarProduct(int colA, Matrix B, int colB) {
-    double scalarProduct = 0.0;
-    for(int row = 0; row < getRowDimensionality(); row++) {
-      double prod = elements[row][colA] * B.elements[row][colB];
-      scalarProduct += prod;
-    }
-    return scalarProduct;
-  }
-
-  /**
-   * Returns the scalar product of the colA column of this and the colB column
-   * of B.
-   * 
-   * @param colA The column of A to compute scalar product for
-   * @param B Vector
-   * @return double The scalar product of the first column of this and B
-   */
-  public double scalarProduct(int colA, Vector B) {
-    double scalarProduct = 0.0;
-    for(int row = 0; row < getRowDimensionality(); row++) {
-      double prod = elements[row][colA] * B.elements[row];
-      scalarProduct += prod;
-    }
-    return scalarProduct;
-  }
-
-  /**
-   * LU Decomposition
-   * 
-   * @return LUDecomposition
-   * @see LUDecomposition
-   */
-  public final LUDecomposition lu() {
-    return new LUDecomposition(this);
-  }
-
-  /**
-   * QR Decomposition
-   * 
-   * @return QRDecomposition
-   * @see QRDecomposition
-   */
-  public final QRDecomposition qr() {
-    return new QRDecomposition(this);
-  }
-
-  /**
-   * Cholesky Decomposition
-   * 
-   * @return CholeskyDecomposition
-   * @see CholeskyDecomposition
-   */
-  public final CholeskyDecomposition chol() {
-    return new CholeskyDecomposition(this);
-  }
-
-  /**
-   * Singular Value Decomposition
-   * 
-   * @return SingularValueDecomposition
-   * @see SingularValueDecomposition
-   */
-  public final SingularValueDecomposition svd() {
-    return new SingularValueDecomposition(this);
-  }
-
-  /**
-   * Eigenvalue Decomposition
-   * 
-   * @return EigenvalueDecomposition
-   * @see EigenvalueDecomposition
-   */
-  public final EigenvalueDecomposition eig() {
-    return new EigenvalueDecomposition(this);
-  }
-
-  /**
    * Solve A*X = B
    * 
    * @param B right hand side
@@ -1122,16 +967,6 @@ public class Matrix implements MatrixLike<Matrix> {
    */
   public final Matrix solve(final Matrix B) {
     return (elements.length == columndimension ? (new LUDecomposition(this)).solve(B) : (new QRDecomposition(this)).solve(B));
-  }
-
-  /**
-   * Solve X*A = B, which is also A'*X' = B'
-   * 
-   * @param B right hand side
-   * @return solution if A is square, least squares solution otherwise.
-   */
-  public final Matrix solveTranspose(final Matrix B) {
-    return transpose().solve(B.transpose());
   }
 
   /**
@@ -1188,7 +1023,7 @@ public class Matrix implements MatrixLike<Matrix> {
    * 
    * @return maximum column sum.
    */
-  public double norm1() {
+  public final double norm1() {
     double f = 0;
     for(int j = 0; j < columndimension; j++) {
       double s = 0;
@@ -1214,7 +1049,7 @@ public class Matrix implements MatrixLike<Matrix> {
    * 
    * @return maximum row sum.
    */
-  public double normInf() {
+  public final double normInf() {
     double f = 0;
     for(int i = 0; i < elements.length; i++) {
       double s = 0;
@@ -1231,7 +1066,7 @@ public class Matrix implements MatrixLike<Matrix> {
    * 
    * @return sqrt of sum of squares of all elements.
    */
-  public double normF() {
+  public final double normF() {
     double f = 0;
     for(int i = 0; i < elements.length; i++) {
       for(int j = 0; j < columndimension; j++) {
@@ -1242,45 +1077,9 @@ public class Matrix implements MatrixLike<Matrix> {
   }
 
   /**
-   * distanceCov returns distance of two Matrices A and B, i.e. the root of the
-   * sum of the squared distances A<sub>ij</sub>-B<sub>ij</sub>.
-   * 
-   * @param B Matrix to compute distance from this (A)
-   * @return distance of Matrices
-   */
-  // TODO: unused - remove / move into a MatrixDistance helper?
-  public final double distanceCov(final Matrix B) {
-    double distance = 0.0;
-    double distIJ;
-    int row;
-    for(int col = 0; col < columndimension; col++) {
-      for(row = 0; row < elements.length; row++) {
-        distIJ = elements[row][col] - B.elements[row][col];
-        distance += (distIJ * distIJ);
-      }
-    }
-    distance = Math.sqrt(distance);
-    return distance;
-  }
-
-  /**
-   * getDiagonal returns array of diagonal-elements.
-   * 
-   * @return double[] the values on the diagonal of the Matrix
-   */
-  public final double[] getDiagonal() {
-    int n = Math.min(columndimension, elements.length);
-    final double[] diagonal = new double[n];
-    for(int i = 0; i < n; i++) {
-      diagonal[i] = elements[i][i];
-    }
-    return diagonal;
-  }
-
-  /**
    * Normalizes the columns of this matrix to length of 1.0.
    */
-  public void normalizeColumns() {
+  public final void normalizeColumns() {
     for(int col = 0; col < columndimension; col++) {
       double norm = 0.0;
       for(int row = 0; row < elements.length; row++) {
@@ -1586,10 +1385,10 @@ public class Matrix implements MatrixLike<Matrix> {
     for(int i = 0; i < result.columndimension; i++) {
       // FIXME: optimize - excess copying!
       if(i < columndimension) {
-        result.setColumn(i, getColumn(i));
+        result.setCol(i, getCol(i));
       }
       else {
-        result.setColumn(i, columns.getColumn(i - columndimension));
+        result.setCol(i, columns.getCol(i - columndimension));
       }
     }
     return result;
@@ -1601,19 +1400,19 @@ public class Matrix implements MatrixLike<Matrix> {
    * @return the orthonormalized matrix
    */
   public final Matrix orthonormalize() {
-    Matrix v = getColumn(0);
+    Matrix v = copy();
 
     // FIXME: optimize - excess copying!
     for(int i = 1; i < columndimension; i++) {
-      final Matrix u_i = getColumn(i);
-      final Matrix sum = new Matrix(elements.length, 1);
+      final Vector u_i = getCol(i);
+      final Vector sum = new Vector(elements.length);
       for(int j = 0; j < i; j++) {
-        final Matrix v_j = v.getColumn(j);
-        double scalar = u_i.scalarProduct(0, v_j, 0) / v_j.scalarProduct(0, v_j, 0);
+        final Vector v_j = v.getCol(j);
+        double scalar = u_i.scalarProduct(v_j) / v_j.scalarProduct(v_j);
         sum.plusEquals(v_j.times(scalar));
       }
-      final Matrix v_i = u_i.minus(sum);
-      v = v.appendColumns(v_i);
+      final Vector v_i = u_i.minus(sum);
+      v.setCol(i, v_i);
     }
 
     v.normalizeColumns();
@@ -1710,7 +1509,7 @@ public class Matrix implements MatrixLike<Matrix> {
   /**
    * Check if size(A) == size(B)
    */
-  protected void checkMatrixDimensions(MatrixLike<?> B) {
+  protected void checkMatrixDimensions(Matrix B) {
     if(B.getRowDimensionality() != getRowDimensionality() || B.getColumnDimensionality() != getColumnDimensionality()) {
       throw new IllegalArgumentException("Matrix dimensions must agree.");
     }
@@ -1798,15 +1597,6 @@ public class Matrix implements MatrixLike<Matrix> {
    */
   public boolean almostEquals(Object obj) {
     return almostEquals(obj, DELTA);
-  }
-
-  /**
-   * Returns the dimensionality of this matrix as a string.
-   * 
-   * @return the dimensionality of this matrix as a string
-   */
-  public String dimensionInfo() {
-    return getRowDimensionality() + " x " + getColumnDimensionality();
   }
 
   /**
