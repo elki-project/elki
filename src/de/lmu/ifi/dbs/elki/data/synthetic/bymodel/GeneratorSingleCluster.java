@@ -166,23 +166,23 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
    */
   public void setClipping(Vector min, Vector max) throws UnableToComplyException {
     // if only one dimension was given, expand to all dimensions.
-    if(min.getRowDimensionality() == 1 && max.getRowDimensionality() == 1) {
+    if(min.getDimensionality() == 1 && max.getDimensionality() == 1) {
       if(min.get(0) >= max.get(0)) {
         throw new UnableToComplyException("Clipping range empty.");
       }
       clipmin = new Vector(dim);
       clipmax = new Vector(dim);
       for(int i = 0; i < dim; i++) {
-        clipmin.set(i, 0, min.get(0));
-        clipmax.set(i, 0, max.get(0));
+        clipmin.set(i, min.get(0));
+        clipmax.set(i, max.get(0));
       }
       return;
     }
-    if(dim != min.getRowDimensionality()) {
-      throw new UnableToComplyException("Clipping vector dimensionalities do not match: " + dim + " vs. " + min.getRowDimensionality());
+    if(dim != min.getDimensionality()) {
+      throw new UnableToComplyException("Clipping vector dimensionalities do not match: " + dim + " vs. " + min.getDimensionality());
     }
-    if(dim != max.getRowDimensionality()) {
-      throw new UnableToComplyException("Clipping vector dimensionalities do not match: " + dim + " vs. " + max.getRowDimensionality());
+    if(dim != max.getDimensionality()) {
+      throw new UnableToComplyException("Clipping vector dimensionalities do not match: " + dim + " vs. " + max.getDimensionality());
     }
     for(int i = 0; i < dim; i++) {
       if(min.get(i) >= max.get(i)) {
@@ -213,7 +213,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
     if(clipmin == null || clipmax == null) {
       return false;
     }
-    for(int i = 0; i < p.getRowDimensionality(); i++) {
+    for(int i = 0; i < p.getDimensionality(); i++) {
       if(p.get(i) < clipmin.get(i)) {
         return true;
       }

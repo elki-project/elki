@@ -135,8 +135,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
       Vector v1Mv2 = v1.getColumnVector().minus(v2.getColumnVector());
       Vector v2Mv1 = v2.getColumnVector().minus(v1.getColumnVector());
 
-      double dist1 = v1Mv2.transposeTimes(m1).times(v1Mv2).get(0, 0);
-      double dist2 = v2Mv1.transposeTimes(m2).times(v2Mv1).get(0, 0);
+      double dist1 = v1Mv2.transposeTimes(m1).times(v1Mv2).get(0);
+      double dist2 = v2Mv1.transposeTimes(m2).times(v2Mv1).get(0);
 
       if(dist1 < 0) {
         if(-dist1 < 0.000000000001) {
@@ -181,7 +181,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
 
       Matrix m = null; // index.getLocalProjection(v.getID()).similarityMatrix();
       Vector rv1Mrv2 = v.getColumnVector().minus(new Vector(r));
-      double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0, 0);
+      double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0);
 
       return new DoubleDistance(Math.sqrt(dist));
     }

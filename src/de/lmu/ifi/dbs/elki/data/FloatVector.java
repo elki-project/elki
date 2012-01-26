@@ -107,9 +107,9 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> implem
    * @param columnMatrix a matrix of one column
    */
   public FloatVector(Vector columnMatrix) {
-    values = new float[columnMatrix.getRowDimensionality()];
+    values = new float[columnMatrix.getDimensionality()];
     for(int i = 0; i < values.length; i++) {
-      values[i] = (float) columnMatrix.get(i, 0);
+      values[i] = (float) columnMatrix.get(i);
     }
   }
 

@@ -116,7 +116,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
     for(int k = startk; k < results.size(); k++) {
       // sorted eigenpairs, eigenvectors, eigenvalues
       Matrix covMat = covarianceMatrixBuilder.processQueryResults(results, database);
-      EigenvalueDecomposition evd = covMat.eig();
+      EigenvalueDecomposition evd = new EigenvalueDecomposition(covMat);
       SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
       FilteredEigenPairs filteredEigenPairs = getEigenPairFilter().filter(eigenPairs);
 

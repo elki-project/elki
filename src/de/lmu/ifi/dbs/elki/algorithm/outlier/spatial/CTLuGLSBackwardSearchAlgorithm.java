@@ -237,7 +237,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
     double worstscore = Double.NEGATIVE_INFINITY;
     for(int i = 0; i < ids.size(); i++) {
       DBID id = ids.get(i);
-      double err = E.getRowVector(i).euclideanLength();
+      double err = E.getRow(i).euclideanLength();
       // double err = Math.abs(E.get(i, 0));
       if(err > worstscore) {
         worstscore = err;

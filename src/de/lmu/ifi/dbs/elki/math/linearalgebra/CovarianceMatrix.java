@@ -332,7 +332,7 @@ public class CovarianceMatrix {
     int n = mat.getColumnDimensionality();
     for(int i = 0; i < n; i++) {
       // TODO: avoid constructing the vector objects?
-      c.put(mat.getColumnVector(i));
+      c.put(mat.getCol(i));
     }
     return c;
   }

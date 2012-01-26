@@ -65,7 +65,7 @@ public class SortedEigenPairs {
     this.eigenPairs = new EigenPair[eigenvalues.length];
     for(int i = 0; i < eigenvalues.length; i++) {
       double e = java.lang.Math.abs(eigenvalues[i]);
-      Vector v = eigenvectors.getColumnVector(i);
+      Vector v = eigenvectors.getCol(i);
       eigenPairs[i] = new EigenPair(v, e);
     }
 
@@ -124,7 +124,7 @@ public class SortedEigenPairs {
     Matrix eigenVectors = new Matrix(eigenPairs.length, eigenPairs.length);
     for(int i = 0; i < eigenPairs.length; i++) {
       EigenPair eigenPair = eigenPairs[i];
-      eigenVectors.setColumnVector(i, eigenPair.getEigenvector());
+      eigenVectors.setCol(i, eigenPair.getEigenvector());
     }
     return eigenVectors;
   }
@@ -139,7 +139,7 @@ public class SortedEigenPairs {
     Matrix eigenVectors = new Matrix(eigenPairs.length, n);
     for(int i = 0; i < n; i++) {
       EigenPair eigenPair = eigenPairs[i];
-      eigenVectors.setColumnVector(i, eigenPair.getEigenvector());
+      eigenVectors.setCol(i, eigenPair.getEigenvector());
     }
     return eigenVectors;
   }
@@ -154,7 +154,7 @@ public class SortedEigenPairs {
     Matrix eigenVectors = new Matrix(eigenPairs.length, n);
     for(int i = 0; i < n; i++) {
       EigenPair eigenPair = eigenPairs[eigenPairs.length - 1 - i];
-      eigenVectors.setColumnVector(i, eigenPair.getEigenvector());
+      eigenVectors.setCol(i, eigenPair.getEigenvector());
     }
     return eigenVectors;
   }

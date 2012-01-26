@@ -150,7 +150,7 @@ public class AffineTransformation {
    * @param v translation vector
    */
   public void addTranslation(Vector v) {
-    assert (v.getRowDimensionality() == dim);
+    assert (v.getDimensionality() == dim);
 
     // reset inverse transformation - needs recomputation.
     inv = null;
@@ -295,7 +295,7 @@ public class AffineTransformation {
    * @return vector of dim+1, with new column having the value 1.0
    */
   public Vector homogeneVector(Vector v) {
-    assert (v.getRowDimensionality() == dim);
+    assert (v.getDimensionality() == dim);
     double[] dv = new double[dim + 1];
     for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i);
@@ -311,7 +311,7 @@ public class AffineTransformation {
    * @return vector of dim+1, with new column having the value 0.0
    */
   public Vector homogeneRelativeVector(Vector v) {
-    assert (v.getRowDimensionality() == dim);
+    assert (v.getDimensionality() == dim);
     // TODO: this only works properly when trans[dim][dim] == 1.0, right?
     double[] dv = new double[dim + 1];
     for(int i = 0; i < dim; i++) {
@@ -328,7 +328,7 @@ public class AffineTransformation {
    * @return vector of dimension dim
    */
   public Vector unhomogeneVector(Vector v) {
-    assert (v.getRowDimensionality() == dim + 1);
+    assert (v.getDimensionality() == dim + 1);
     // TODO: this only works properly when trans[dim][dim] == 1.0, right?
     double[] dv = new double[dim];
     double scale = v.get(dim);
@@ -346,7 +346,7 @@ public class AffineTransformation {
    * @return vector of dimension dim
    */
   public Vector unhomogeneRelativeVector(Vector v) {
-    assert (v.getRowDimensionality() == dim + 1);
+    assert (v.getDimensionality() == dim + 1);
     double[] dv = new double[dim];
     double scale = v.get(dim);
     assert (Math.abs(scale) == 0.0);

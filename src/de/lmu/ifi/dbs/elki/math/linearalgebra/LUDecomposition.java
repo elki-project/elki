@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 
 /**
  * LU Decomposition.
@@ -78,11 +78,21 @@ public class LUDecomposition implements java.io.Serializable {
    * @param A Rectangular matrix
    */
   public LUDecomposition(Matrix A) {
-    // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
+    this(A.getArrayCopy(), A.getRowDimensionality(), A.getColumnDimensionality());
+  }
 
-    LU = A.getArrayCopy();
-    m = A.getRowDimensionality();
-    n = A.getColumnDimensionality();
+  /**
+   * LU Decomposition
+   * 
+   * @param A Rectangular matrix
+   * @param m row dimensionality
+   * @param n column dimensionality
+   */
+  public LUDecomposition(double[][] LU, int m, int n) {
+    this.LU = LU;
+    this.m = m;
+    this.n = n;
+    // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
     piv = new int[m];
     for(int i = 0; i < m; i++) {
       piv[i] = i;
@@ -273,6 +283,41 @@ public class LUDecomposition implements java.io.Serializable {
     Matrix Xmat = B.getMatrix(piv, 0, nx - 1);
     double[][] X = Xmat.getArrayRef();
 
+    solveInplace(X, nx);
+    return Xmat;
+  }
+
+  /**
+   * Solve A*X = B
+   * 
+   * @param B A Matrix with as many rows as A and any number of columns.
+   * @return X so that L*U*X = B(piv,:)
+   * @exception IllegalArgumentException Matrix row dimensions must agree.
+   * @exception RuntimeException Matrix is singular.
+   */
+  public double[][] solve(double[][] X) {
+    int mx = X.length;
+    int nx = X[0].length;
+    if(mx != m) {
+      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+    }
+    if(!this.isNonsingular()) {
+      throw new RuntimeException("Matrix is singular.");
+    }
+    double[][] Xmat = new Matrix(X).getMatrix(piv, 0, nx - 1).getArrayRef();
+    solveInplace(Xmat, nx);
+    return Xmat;
+  }
+
+  /**
+   * Solve A*X = B
+   * 
+   * @param B A Matrix with as many rows as A and any number of columns.
+   * @return X so that L*U*X = B(piv,:)
+   * @exception IllegalArgumentException Matrix row dimensions must agree.
+   * @exception RuntimeException Matrix is singular.
+   */
+  private void solveInplace(double[][] X, int nx) {
     // Solve L*Y = B(piv,:)
     for(int k = 0; k < n; k++) {
       for(int i = k + 1; i < n; i++) {
@@ -292,6 +337,5 @@ public class LUDecomposition implements java.io.Serializable {
         }
       }
     }
-    return Xmat;
   }
 }

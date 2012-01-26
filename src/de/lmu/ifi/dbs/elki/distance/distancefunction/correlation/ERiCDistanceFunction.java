@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -135,10 +136,10 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     Matrix m1_czech = pca1.dissimilarityMatrix();
     Matrix v2_strong = pca2.adapatedStrongEigenvectors();
     for(int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
-      Matrix v2_i = v2_strong.getColumn(i);
+      Vector v2_i = v2_strong.getCol(i);
       // check, if distance of v2_i to the space of pca_1 > delta
       // (i.e., if v2_i spans up a new dimension)
-      double dist = Math.sqrt(v2_i.transposeTimes(v2_i).get(0, 0) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0, 0));
+      double dist = Math.sqrt(v2_i.transposeTimes(v2_i) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0));
 
       // if so, return false
       if(dist > delta) {

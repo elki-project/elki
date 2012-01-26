@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.MatrixLike;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
@@ -595,7 +594,7 @@ public final class FormatUtil {
    * @return a string representation of this matrix
    */
   // TODO: in use?
-  public static String format(MatrixLike<?> m, int w, int d) {
+  public static String format(Matrix m, int w, int d) {
     DecimalFormat format = new DecimalFormat();
     format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
     format.setMinimumIntegerDigits(1);
@@ -624,13 +623,46 @@ public final class FormatUtil {
   }
 
   /**
+   * Returns a string representation of this matrix.
+   * 
+   * @param w column width
+   * @param d number of digits after the decimal
+   * @return a string representation of this matrix
+   */
+  // TODO: in use?
+  public static String format(Vector v, int w, int d) {
+    DecimalFormat format = new DecimalFormat();
+    format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+    format.setMinimumIntegerDigits(1);
+    format.setMaximumFractionDigits(d);
+    format.setMinimumFractionDigits(d);
+    format.setGroupingUsed(false);
+
+    int width = w + 1;
+    StringBuffer msg = new StringBuffer();
+    msg.append("\n"); // start on new line.
+    for(int i = 0; i < v.getDimensionality(); i++) {
+      String s = format.format(v.get(i)); // format the number
+      int padding = Math.max(1, width - s.length()); // At _least_ 1
+      // space
+      for(int k = 0; k < padding; k++) {
+        msg.append(' ');
+      }
+      msg.append(s);
+    }
+    // msg.append("\n");
+
+    return msg.toString();
+  }
+
+  /**
    * Returns a string representation of this matrix. In each line the specified
    * String <code>pre</code> is prefixed.
    * 
    * @param pre the prefix of each line
    * @return a string representation of this matrix
    */
-  public static String format(MatrixLike<?> m, String pre) {
+  public static String format(Matrix m, String pre) {
     StringBuffer output = new StringBuffer();
     output.append(pre).append("[\n").append(pre);
     for(int i = 0; i < m.getRowDimensionality(); i++) {
@@ -719,13 +751,34 @@ public final class FormatUtil {
 
   /**
    * Returns a string representation of this matrix. In each line the specified
+   * String <code>pre</code> is prefixed.
+   * 
+   * @param pre the prefix of each line
+   * @return a string representation of this matrix
+   */
+  public static String format(Vector v, String pre) {
+    StringBuffer output = new StringBuffer();
+    output.append(pre).append("[\n").append(pre);
+    for(int j = 0; j < v.getDimensionality(); j++) {
+      output.append(" ").append(v.get(j));
+      if(j < v.getDimensionality() - 1) {
+        output.append(",");
+      }
+    }
+    output.append("]\n").append(pre);
+
+    return (output.toString());
+  }
+
+  /**
+   * Returns a string representation of this matrix. In each line the specified
    * String <code>pre<\code> is prefixed.
    * 
    * @param nf number format for output accuracy
    * @param pre the prefix of each line
    * @return a string representation of this matrix
    */
-  public static String format(MatrixLike<?> m, String pre, NumberFormat nf) {
+  public static String format(Matrix m, String pre, NumberFormat nf) {
     if(nf == null) {
       return FormatUtil.format(m, pre);
     }

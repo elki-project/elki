@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -172,10 +173,10 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
       // for all strong eigenvectors of rv2
       Matrix m1_czech = pca1.dissimilarityMatrix();
       for(int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
-        Matrix v2_i = v2_strong.getColumn(i);
+        Vector v2_i = v2_strong.getCol(i);
         // check, if distance of v2_i to the space of rv1 > delta
         // (i.e., if v2_i spans up a new dimension)
-        double dist = Math.sqrt(v2_i.transposeTimes(v2_i).get(0, 0) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0, 0));
+        double dist = Math.sqrt(v2_i.transposeTimes(v2_i) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0));
 
         // if so, insert v2_i into v1 and adjust v1
         // and compute m1_czech new, increase lambda1
@@ -188,10 +189,10 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
       // for all strong eigenvectors of rv1
       Matrix m2_czech = pca2.dissimilarityMatrix();
       for(int i = 0; i < v1_strong.getColumnDimensionality(); i++) {
-        Matrix v1_i = v1_strong.getColumn(i);
+        Vector v1_i = v1_strong.getCol(i);
         // check, if distance of v1_i to the space of rv2 > delta
         // (i.e., if v1_i spans up a new dimension)
-        double dist = Math.sqrt(v1_i.transposeTimes(v1_i).get(0, 0) - v1_i.transposeTimes(m2_czech).times(v1_i).get(0, 0));
+        double dist = Math.sqrt(v1_i.transposeTimes(v1_i) - v1_i.transposeTimes(m2_czech).times(v1_i).get(0));
 
         // if so, insert v1_i into v2 and adjust v2
         // and compute m2_czech new , increase lambda2
@@ -227,22 +228,22 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
      * @param vector the vector to be inserted
      * @param corrDim the column at which the vector should be inserted
      */
-    private void adjust(Matrix v, Matrix e_czech, Matrix vector, int corrDim) {
+    private void adjust(Matrix v, Matrix e_czech, Vector vector, int corrDim) {
       int dim = v.getRowDimensionality();
 
       // set e_czech[corrDim][corrDim] := 1
       e_czech.set(corrDim, corrDim, 1);
 
       // normalize v
-      Matrix v_i = vector.copy();
-      Matrix sum = new Matrix(dim, 1);
+      Vector v_i = vector.copy();
+      Vector sum = new Vector(dim);
       for(int k = 0; k < corrDim; k++) {
-        Matrix v_k = v.getColumn(k);
-        sum.plusEquals(v_k.timesEquals(v_i.scalarProduct(0, v_k, 0)));
+        Vector v_k = v.getCol(k);
+        sum.plusEquals(v_k.timesEquals(v_i.scalarProduct(v_k)));
       }
       v_i.minusEquals(sum);
-      v_i.timesEquals(1.0 / Math.sqrt(v_i.scalarProduct(0, v_i, 0)));
-      v.setColumn(corrDim, v_i);
+      v_i.timesEquals(1.0 / Math.sqrt(v_i.scalarProduct(v_i)));
+      v.setCol(corrDim, v_i);
     }
 
     /**

@@ -118,7 +118,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
       for(Iterator<EigenPair> it = strongEigenPairs.iterator(); it.hasNext(); i++) {
         EigenPair eigenPair = it.next();
         strongEigenvalues[i] = eigenPair.getEigenvalue();
-        strongEigenvectors.setColumnVector(i, eigenPair.getEigenvector());
+        strongEigenvectors.setCol(i, eigenPair.getEigenvector());
         sumStrongEigenvalues += strongEigenvalues[i];
       }
     }
@@ -131,7 +131,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
       for(Iterator<EigenPair> it = weakEigenPairs.iterator(); it.hasNext(); i++) {
         EigenPair eigenPair = it.next();
         weakEigenvalues[i] = eigenPair.getEigenvalue();
-        weakEigenvectors.setColumnVector(i, eigenPair.getEigenvector());
+        weakEigenvectors.setCol(i, eigenPair.getEigenvector());
         sumWeakEigenvalues += weakEigenvalues[i];
       }
     }

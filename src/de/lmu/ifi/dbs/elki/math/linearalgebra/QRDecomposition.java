@@ -74,13 +74,22 @@ public class QRDecomposition implements java.io.Serializable {
    * QR Decomposition, computed by Householder reflections.
    * 
    * @param A Rectangular matrix
-   * 
    */
   public QRDecomposition(Matrix A) {
-    // Initialize.
-    QR = A.getArrayCopy();
-    m = A.getRowDimensionality();
-    n = A.getColumnDimensionality();
+    this(A.getArrayRef(), A.getRowDimensionality(), A.getColumnDimensionality());
+  }
+
+  /**
+   * QR Decomposition, computed by Householder reflections.
+   * 
+   * @param A Rectangular matrix
+   * @param m row dimensionality
+   * @param n column dimensionality
+   */
+  public QRDecomposition(double[][] A, int m, int n) {
+    this.QR = new Matrix(A).getArrayCopy();
+    this.m = QR.length;
+    this.n = QR[0].length;
     Rdiag = new double[n];
 
     // Main loop.
@@ -227,8 +236,38 @@ public class QRDecomposition implements java.io.Serializable {
 
     // Copy right hand side
     int nx = B.getColumnDimensionality();
-    double[][] X = B.getArrayCopy();
+    Matrix X = B.copy();
 
+    solveInplace(X.getArrayRef(), nx);
+    return X.getMatrix(0, n - 1, 0, nx - 1);
+  }
+
+  /**
+   * Least squares solution of A*X = B
+   * 
+   * @param B A Matrix with as many rows as A and any number of columns.
+   * @return X that minimizes the two norm of Q*R*X-B.
+   * @exception IllegalArgumentException Matrix row dimensions must agree.
+   * @exception RuntimeException Matrix is rank deficient.
+   */
+  public double[][] solve(double[][] B) {
+    int rows = B.length;
+    int cols = B[0].length;
+    if(rows != m) {
+      throw new IllegalArgumentException("Matrix row dimensions must agree.");
+    }
+    if(!this.isFullRank()) {
+      throw new RuntimeException("Matrix is rank deficient.");
+    }
+
+    // Copy right hand side
+    Matrix X = new Matrix(B).copy();
+
+    solveInplace(X.getArrayRef(), cols);
+    return X.getMatrix(0, n - 1, 0, cols - 1).getArrayRef();
+  }
+
+  private void solveInplace(double[][] X, int nx) {
     // Compute Y = transpose(Q)*B
     for(int k = 0; k < n; k++) {
       for(int j = 0; j < nx; j++) {
@@ -253,6 +292,5 @@ public class QRDecomposition implements java.io.Serializable {
         }
       }
     }
-    return (new Matrix(X).getMatrix(0, n - 1, 0, nx - 1));
   }
 }
