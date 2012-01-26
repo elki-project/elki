@@ -377,6 +377,30 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
+   * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c
+   * 
+   * @param B matrix
+   * @param c vector on the right
+   * @return Matrix product, a<sup>T</sup> * B
+   * @throws IllegalArgumentException Matrix inner dimensions must agree.
+   */
+  public final double transposeTimesTimes(final Matrix B, final Vector c) {
+    if(B.elements.length != this.elements.length) {
+      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+    }
+    double sum = 0.0;
+    for(int j = 0; j < B.columndimension; j++) {
+      // multiply it with each row from A
+      double s = 0;
+      for(int k = 0; k < this.elements.length; k++) {
+        s += this.elements[k] * B.elements[k][j];
+      }
+      sum += s * c.elements[j];
+    }
+    return sum;
+  }
+
+  /**
    * Linear algebraic matrix multiplication, A<sup>T</sup> * B
    * 
    * @param B another vector

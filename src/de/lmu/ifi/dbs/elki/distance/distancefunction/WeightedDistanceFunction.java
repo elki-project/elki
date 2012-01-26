@@ -59,14 +59,10 @@ public class WeightedDistanceFunction extends AbstractVectorDoubleDistanceFuncti
    */
   @Override
   public double doubleDistance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
-    if(o1.getDimensionality() != o2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
-    }
+    assert (o1.getDimensionality() == o2.getDimensionality()) : "Different dimensionality of FeatureVectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString();
 
-    Vector o1_minus_o2 = o1.getColumnVector().minus(o2.getColumnVector());
-    double dist = MathUtil.mahalanobisDistance(weightMatrix, o1_minus_o2);
-
-    return dist;
+    Vector o1_minus_o2 = o1.getColumnVector().minusEquals(o2.getColumnVector());
+    return MathUtil.mahalanobisDistance(weightMatrix, o1_minus_o2);
   }
 
   @Override

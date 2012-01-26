@@ -119,9 +119,7 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?, ?>> extends
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBID id : attributes.iterDBIDs()) {
       Vector temp = deltas.get(id).minus(mean);
-      final Vector res = temp.transposeTimes(cmati).times(temp);
-      assert (res.getDimensionality() == 1);
-      double score = res.get(0);
+      final double score = temp.transposeTimesTimes(cmati, temp);
       minmax.put(score);
       scores.putDouble(id, score);
     }

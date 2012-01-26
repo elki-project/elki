@@ -176,7 +176,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
         Vector v2_i = v2_strong.getCol(i);
         // check, if distance of v2_i to the space of rv1 > delta
         // (i.e., if v2_i spans up a new dimension)
-        double dist = Math.sqrt(v2_i.transposeTimes(v2_i) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0));
+        double dist = Math.sqrt(v2_i.transposeTimes(v2_i) - v2_i.transposeTimesTimes(m1_czech, v2_i));
 
         // if so, insert v2_i into v1 and adjust v1
         // and compute m1_czech new, increase lambda1
