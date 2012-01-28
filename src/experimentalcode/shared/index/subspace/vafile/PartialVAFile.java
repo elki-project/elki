@@ -496,7 +496,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
         // costs of loading new DA files
         while(candidates2 == null || (getIOCosts(candidates2.size(), currentSubspaceDims) >= getIOCosts(daFiles.get(0), currentSubspaceDims - addition)) && addition < currentSubspaceDims) {
           if(candidates2 != null && logger.isDebuggingFine()) {
-            logger.finer("filter " + filterStep + ": refining costs " + getIOCosts(candidates2.size(), currentSubspaceDims) + " (" + candidates2.size() + "/" + currentSubspaceDims + "), DA file costs " + getIOCosts(daFiles.get(0), currentSubspaceDims - addition) + " (dim " + (addition + 1) + " of " + currentSubspaceDims + ")");
+            logger.fine("filter " + filterStep + ": refining costs " + getIOCosts(candidates2.size(), currentSubspaceDims) + " (" + candidates2.size() + "/" + currentSubspaceDims + "), DA file costs " + getIOCosts(daFiles.get(0), currentSubspaceDims - addition) + " (dim " + (addition + 1) + " of " + currentSubspaceDims + ")");
             // + " (" + daFiles.get(0).getBorders().length + "/" +
             // (currentSubspaceDims - addition) + ")" +
           }
