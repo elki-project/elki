@@ -199,16 +199,26 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
   public long getReadOperations() {
     // Page capacity
     int vacapacity = pageSize / VectorApproximation.byteOnDisk(splitPositions.length, partitions);
-    int vasize = (vectorApprox.size() - 1) / vacapacity + 1;
+    int vasize =(int)Math.ceil( (vectorApprox.size()) / (1.0*vacapacity) );
+    log.debug("scans" + scans+ "vasize "+ vasize +" vecapprox.size"  +vectorApprox.size()+ " vacapacity "+vacapacity+ "readops" +super.getReadOperations()+" byteondisc "+  VectorApproximation.byteOnDisk(splitPositions.length, partitions) + " pagesize "+ pageSize+"spitp.length"+splitPositions.length+" partitions "+ partitions +"zudumm"+(Math.log(partitions) / Math.log(2)));
     return super.getReadOperations() + vasize * scans;
+  }
+  public long getRandomReadOnly() {
+    return super.getReadOperations();
+  }
+  
+  public long getScanedBytes(){
+    int vacapacity = pageSize / VectorApproximation.byteOnDisk(splitPositions.length, partitions);
+    int vasize =(int)Math.ceil( (vectorApprox.size()) /( 1.0*vacapacity ));
+    return vasize*scans;
   }
 
   @Override
   public long getWriteOperations() {
     // Page capacity
     int vacapacity = pageSize / VectorApproximation.byteOnDisk(splitPositions.length, partitions);
-    int vasize = (vectorApprox.size() - 1) / vacapacity + 1;
-    return vasize;
+    int vasize =(int)Math.ceil( (vectorApprox.size()) / 1.0*vacapacity );
+    return super.getReadOperations() + vasize * scans;
   }
 
   @Override

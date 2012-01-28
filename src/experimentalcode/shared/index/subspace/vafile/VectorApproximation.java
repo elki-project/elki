@@ -95,7 +95,9 @@ public class VectorApproximation {
    * @param numberOfPartitions the number of relevant partitions
    * @return the cost values (in bytes)
    */
+  //nicht gleich in bytes umwandeln, sonst rundungsfehler erst nachdem *anzahl objekte
   public static int byteOnDisk(int numberOfDimensions, int numberOfPartitions) {
-    return numberOfDimensions * (int) (Math.ceil((Math.log(numberOfPartitions) / Math.log(2)) / 8));
+    //(partition*dimension+id) alles in Bit 32bit für 4 byte id
+    return (int) (Math.ceil(numberOfDimensions * ((Math.log(numberOfPartitions) / Math.log(2)))+32) /8);
   }
 }
