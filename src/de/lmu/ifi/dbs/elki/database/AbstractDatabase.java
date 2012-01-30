@@ -152,6 +152,14 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         return (Relation<O>) relation;
       }
     }
+    if (getLogger().isDebugging()) {
+      StringBuffer buf = new StringBuffer();
+      buf.append("No matching relation for type ").append(restriction.toString()).append(":\n");
+      for(Relation<?> relation : relations) {
+        buf.append(relation.getDataTypeInformation().toString()).append(",");
+      }
+      getLogger().debug(buf);
+    }
     throw new NoSupportedDataTypeException(restriction);
   }
 
