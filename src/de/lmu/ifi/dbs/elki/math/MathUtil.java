@@ -464,8 +464,9 @@ public final class MathUtil {
    * @param v2 Second vector
    * @return Cosine similarity
    */
+  @Deprecated
   public static double cosineSimilarity(Vector v1, Vector v2) {
-    return v1.scalarProduct(v2) / (v1.euclideanLength() * v2.euclideanLength());
+    return angle(v1, v2);
   }
 
   /**

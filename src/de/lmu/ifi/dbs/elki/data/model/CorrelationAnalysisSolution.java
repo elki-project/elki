@@ -227,9 +227,8 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
     Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
     for(int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
       Vector v_i = strongEigenvectors.getCol(i);
-      Vector proj = v_i.times(centered.scalarProduct(v_i));
-
-      sum.setCol(i, proj);
+      v_i.timesEquals(centered.transposeTimes(v_i));
+      sum.setCol(i, v_i);
     }
     return sum;
   }

@@ -1408,8 +1408,8 @@ public class Matrix {
       final Vector sum = new Vector(elements.length);
       for(int j = 0; j < i; j++) {
         final Vector v_j = v.getCol(j);
-        double scalar = u_i.scalarProduct(v_j) / v_j.scalarProduct(v_j);
-        sum.plusEquals(v_j.times(scalar));
+        double scalar = u_i.transposeTimes(v_j) / v_j.transposeTimes(v_j);
+        sum.plusTimesEquals(v_j, scalar);
       }
       final Vector v_i = u_i.minus(sum);
       v.setCol(i, v_i);
