@@ -239,10 +239,10 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
       Vector sum = new Vector(dim);
       for(int k = 0; k < corrDim; k++) {
         Vector v_k = v.getCol(k);
-        sum.plusEquals(v_k.timesEquals(v_i.scalarProduct(v_k)));
+        sum.plusTimesEquals(v_k, v_i.transposeTimes(v_k));
       }
       v_i.minusEquals(sum);
-      v_i.timesEquals(1.0 / Math.sqrt(v_i.scalarProduct(v_i)));
+      v_i.normalize();
       v.setCol(corrDim, v_i);
     }
 

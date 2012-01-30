@@ -440,50 +440,17 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Returns the scalar product of this vector and the specified vector v.
-   * 
-   * @param v the vector
-   * @return double the scalar product of this vector and v
-   */
-  public final double scalarProduct(final Vector v) {
-    assert (this.elements.length == v.elements.length) : "Vector dimensions must agree.";
-    double scalarProduct = 0.0;
-    for(int row = 0; row < elements.length; row++) {
-      scalarProduct += elements[row] * v.elements[row];
-    }
-    return scalarProduct;
-  }
-
-  /**
    * Returns the length of this vector.
    * 
    * @return the length of this vector
    */
   public final double euclideanLength() {
-    // Find maximum
-    double max = 0.0;
-    for(int row = 0; row < elements.length; row++) {
-      if(elements[row] < 0) {
-        if(max < -elements[row]) {
-          max = -elements[row];
-        }
-      }
-      else {
-        if(max < elements[row]) {
-          max = elements[row];
-        }
-      }
-    }
-    if(max <= 0.0) {
-      return 0.0;
-    }
-    // Accumulate scaled values, for a reduced loss in precision
     double acc = 0.0;
     for(int row = 0; row < elements.length; row++) {
-      final double v = elements[row] / max;
+      final double v = elements[row];
       acc += v * v;
     }
-    return max * Math.sqrt(acc);
+    return Math.sqrt(acc);
   }
 
   /**
@@ -512,7 +479,7 @@ public class Vector implements NumberVector<Vector, Double> {
     for(int i = 0; i < v.columndimension; i++) {
       // TODO: optimize - copy less?
       Vector v_i = v.getCol(i);
-      sum.plusTimesEquals(v_i, scalarProduct(v_i));
+      sum.plusTimesEquals(v_i, this.transposeTimes(v_i));
     }
     return sum;
   }

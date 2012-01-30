@@ -339,7 +339,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       // System.out.println("Vector " + i + ":" + partialSol);
       for(int j = 0; j < i; j++) {
         Vector v_j = ret.getCol(j);
-        double f = v_i.scalarProduct(v_j) / v_j.scalarProduct(v_j);
+        double f = v_i.transposeTimes(v_j) / v_j.transposeTimes(v_j);
         if(Double.isNaN(f)) {
           if(logger.isDebuggingFine()) {
             logger.debugFine("Zero vector encountered? " + v_j);
