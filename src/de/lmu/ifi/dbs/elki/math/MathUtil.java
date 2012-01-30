@@ -458,18 +458,6 @@ public final class MathUtil {
   }
 
   /**
-   * Compute the cosine similarity for two vectors.
-   * 
-   * @param v1 First vector
-   * @param v2 Second vector
-   * @return Cosine similarity
-   */
-  @Deprecated
-  public static double cosineSimilarity(Vector v1, Vector v2) {
-    return angle(v1, v2);
-  }
-
-  /**
    * Compute the angle between two vectors.
    * 
    * @param v1 first vector
