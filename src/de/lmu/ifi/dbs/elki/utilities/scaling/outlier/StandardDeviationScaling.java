@@ -122,6 +122,9 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
       }
       mean = mv.getMean();
       factor = lambda * mv.getSampleStddev() * MathUtil.SQRT2;
+      if (factor == 0.0) {
+        factor = Double.MIN_NORMAL;
+      }
     }
     else {
       mean = fixedmean;
@@ -135,6 +138,9 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
         }
       }
       factor = lambda * Math.sqrt(sqsum / cnt) * MathUtil.SQRT2;
+      if (factor == 0.0) {
+        factor = Double.MIN_NORMAL;
+      }
     }
   }
 

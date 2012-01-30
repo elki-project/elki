@@ -13,9 +13,9 @@
 
 	<!-- for official builds: -->
 	<property name="release.official" value="true" />
-	<property name="release.version" value="0.4.0" />
+	<property name="release.version" value="0.4.1" />
 	<property name="release.extraversion" value="(${now})" />
-	<property name="doc.srcdir" value="doc/release0.4" />
+	<property name="doc.srcdir" value="doc/release0.4.1" />
 
 	<!-- defaults -->
 	<property name="release.version" value="INTERNAL-${now}" />
@@ -191,7 +191,7 @@
 		<property name="javadoc.version" value="true" />
 		<property name="javadoc.header.extra" value="&lt;tr&gt;&lt;td colspan=3 align=center style='font-size: x-small; font-weight: normal;'&gt;Internal Version&lt;/td&gt;&lt;/tr&gt;" />
 		<property name="javadoc.footer.extra" value="&lt;tr&gt;&lt;td align=right&gt;built by&lt;/td&gt;&lt;td align=left&gt;${user.name}&lt;/td&gt;&lt;/tr&gt;" />
-		<javadoc destdir="${javadoc.destdir}" useexternalfile="yes" access="private" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="${javadoc.version}" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/" overview="${doc.srcdir}/overview.html" doctitle="${ELKI_SHORT}" doclet="org.jboss.apiviz.APIviz" docletpath="${build.lib}/apiviz-1.3.1.GA-erich.jar" windowtitle="${ELKI_LONG}" additionalparam="-nopackagediagram -group 'Algorithms' de.lmu.ifi.dbs.elki.algorithm* -group 'Databases and Index Structures' de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.datasource*:de.lmu.ifi.dbs.elki.persistent* -group 'Datatypes and Distance Functions' de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance* -group 'Evaluation' de.lmu.ifi.dbs.elki.evalu* -group 'GUI and Visualization' de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis* -group 'Utilities and Miscellaneous' de.lmu.ifi.dbs.elki* -group 'Shared Experimental Code' experimentalcode:experimentalcode.shared* -group 'User Experimental Code' experimentalcode*">
+		<javadoc destdir="${javadoc.destdir}" useexternalfile="yes" access="private" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="${javadoc.version}" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/" overview="${doc.srcdir}/overview.html" doctitle="${ELKI_SHORT}" doclet="org.jboss.apiviz.APIviz" docletpath="${build.lib}/apiviz-1.3.1.GA+erich2.jar" windowtitle="${ELKI_LONG}" additionalparam="-nopackagediagram -group 'Algorithms' de.lmu.ifi.dbs.elki.algorithm* -group 'Databases and Index Structures' de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.datasource*:de.lmu.ifi.dbs.elki.persistent* -group 'Datatypes and Distance Functions' de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance* -group 'Evaluation' de.lmu.ifi.dbs.elki.evalu* -group 'GUI and Visualization' de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis* -group 'Utilities and Miscellaneous' de.lmu.ifi.dbs.elki* -group 'Shared Experimental Code' experimentalcode:experimentalcode.shared* -group 'User Experimental Code' experimentalcode*">
 			<classpath refid="build.classpath.built" />
 			<packageset dir="${source}">
 				<patternset refid="${build.patternset}" />
@@ -269,7 +269,7 @@
 <!-- Compile all java code -->
 <target name="compile_java">
 	<mkdir dir="${build.output}" />
-	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
+	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" target="1.6" debuglevel="">
 		<compilerarg value="-Xlint:all" />
 		<classpath refid="build.classpath" />
 		<patternset refid="${build.patternset}" />
@@ -280,7 +280,7 @@
 <!-- Compile all java tests -->
 <target name="compile_tests">
 	<mkdir dir="${build.output}" />
-	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
+	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" target="1.6" debuglevel="">
 		<compilerarg value="-Xlint:all" />
 		<classpath refid="build.classpath" />
 		<patternset refid="${build.patternset}" />
@@ -319,7 +319,7 @@
 		</fileset>
 	</copy>
 	<!-- try a build -->
-	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" debuglevel="">
+	<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" includeAntRuntime="false" source="1.6" target="1.6" debuglevel="">
 		<compilerarg value="-Xlint:all" />
 		<classpath>
 			<fileset dir="${build.lib}">

@@ -83,6 +83,7 @@ public class ConvexHull2D {
   public void add(Vector point) {
     if (this.ok) {
       this.points = new LinkedList<Vector>(this.points);
+      this.ok = false;
     }
     this.points.add(point);
     // Update data set extends
@@ -115,7 +116,7 @@ public class ConvexHull2D {
     Collections.sort(this.points, new Comparator<Vector>() {
       @Override
       public int compare(Vector o1, Vector o2) {
-        return isLeft(o1, o2, origin) ? +1 : 0;
+        return isLeft(o1, o2, origin) ? +1 : -1;
       }
     });
 
@@ -125,7 +126,7 @@ public class ConvexHull2D {
 
   /**
    * Find the starting point, and sort it to the beginning of the list. The
-   * starting point must be on the outer hull. Any "skyline" point will do, e.g.
+   * starting point must be on the outer hull. Any "most extreme" point will do, e.g.
    * the one with the lowest Y coordinate and for ties with the lowest X.
    */
   private void findStartingPoint() {

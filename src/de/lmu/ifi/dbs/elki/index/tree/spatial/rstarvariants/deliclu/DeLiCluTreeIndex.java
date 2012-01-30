@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * The common use of the DeLiClu tree: indexing number vectors.
@@ -103,7 +104,7 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
     IndexTreePath<DeLiCluEntry> pathToObject = findPathToObject(getRootPath(), obj, id);
 
     if(pathToObject == null) {
-      return null;
+      throw new AbortException("Object not found in setHandled.");
     }
 
     // set o handled

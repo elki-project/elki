@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -113,7 +114,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
     }
     FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", relation.size(), logger) : null;
 
-    double maxweight = 0;
+    DoubleMinMax minmax = new DoubleMinMax();
 
     // compute distance to the k nearest neighbor. n objects with the highest
     // distance are flagged as outliers
@@ -130,7 +131,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
 
       double doubleSkn = skn.getValue().doubleValue();
       knnw_score.put(id, doubleSkn);
-      maxweight = Math.max(maxweight, doubleSkn);
+      minmax.put(doubleSkn);
 
       if(progressKNNWeight != null) {
         progressKNNWeight.incrementProcessed(logger);
@@ -141,7 +142,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     Relation<Double> res = new MaterializedRelation<Double>("Weighted kNN Outlier Score", "knnw-outlier", TypeUtil.DOUBLE, knnw_score, relation.getDBIDs());
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxweight, 0.0, Double.POSITIVE_INFINITY);
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, res);
   }
 

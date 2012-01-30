@@ -244,12 +244,13 @@ public final class MathUtil {
       double meanX = x[0];
       double meanY = y[0];
       for(int i = 1; i < xdim; i++) {
+        int sumWe = i + 1;
         // Delta to previous mean
         final double deltaX = x[i] - meanX;
         final double deltaY = y[i] - meanY;
         // Update means
-        meanX += deltaX / i;
-        meanY += deltaY / i;
+        meanX += deltaX / sumWe;
+        meanY += deltaY / sumWe;
         // Delta to new mean
         final double neltaX = x[i] - meanX;
         final double neltaY = y[i] - meanY;
