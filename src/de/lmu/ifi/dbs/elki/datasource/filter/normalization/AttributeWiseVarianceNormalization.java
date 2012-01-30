@@ -162,11 +162,21 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
   }
 
   private double normalize(int d, double val) {
-    return (val - mean[d]) / stddev[d];
+    if(mean.length == 1) {
+      return (val - mean[0]) / stddev[0];
+    }
+    else {
+      return (val - mean[d]) / stddev[d];
+    }
   }
 
   private double restore(int d, double val) {
-    return (val * stddev[d]) + mean[d];
+    if(mean.length == 1) {
+      return (val * stddev[0]) + mean[0];
+    }
+    else {
+      return (val * stddev[d]) + mean[d];
+    }
   }
 
   @Override

@@ -212,7 +212,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
         if(id.equals(n)) {
           continue;
         }
-        double sim = MathUtil.cosineSimilarity(similarityVectors.get(id), similarityVectors.get(n));
+        double sim = MathUtil.angle(similarityVectors.get(id), similarityVectors.get(n));
         gmean *= sim;
         cnt++;
       }
