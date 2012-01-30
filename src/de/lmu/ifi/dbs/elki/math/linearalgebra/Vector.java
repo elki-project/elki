@@ -69,13 +69,18 @@ public class Vector implements NumberVector<Vector, Double> {
    * @param dimensionality dimensionality
    * @return the dimensionality of the vector
    */
-  // FIXME: may also return null vector by chance.
   public static final Vector randomNormalizedVector(final int dimensionality) {
     final Vector v = new Vector(dimensionality);
-    for(int i = 0; i < dimensionality; i++) {
-      v.elements[i] = Math.random();
+    double norm = 0;
+    while(norm <= 0) {
+      for(int i = 0; i < dimensionality; i++) {
+        v.elements[i] = Math.random();
+      }
+      norm = v.euclideanLength();
     }
-    v.normalize();
+    for(int row = 0; row < dimensionality; row++) {
+      v.elements[row] /= norm;
+    }
     return v;
   }
 
