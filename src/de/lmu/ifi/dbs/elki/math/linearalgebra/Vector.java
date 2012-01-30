@@ -629,7 +629,7 @@ public class Vector implements NumberVector<Vector, Double> {
 
   @Override
   public Vector getColumnVector() {
-    return this;
+    return copy();
   }
 
   @Override
