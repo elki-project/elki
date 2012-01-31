@@ -1,6 +1,7 @@
 package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -9,6 +10,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -26,6 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
+import experimentalcode.students.roedler.parallelCoordinates.utils.SampledResult;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
 
@@ -62,17 +65,39 @@ public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelV
     SVGPath path;
     Vector yPos;
     
-    for(DBID id : rep.iterDBIDs()) {
-      path = new SVGPath();
-      yPos = proj.projectDataToRenderSpace(rep.get(id));
-      for (int i = 0; i < dim; i++){
-        if (proj.isVisible(i)){
-          path.drawTo(proj.getXpos(i), yPos.get(i));
+    Collection<SampledResult> samples = ResultUtil.filterResults(context.getResult(), SampledResult.class);
+    if (samples.size() > 0){
+      for(SampledResult c : samples) {
+        DBIDs ids = c.getSample();
+        
+        for(DBID id : ids) {
+          path = new SVGPath();
+          yPos = proj.projectDataToRenderSpace(rep.get(id));
+          for (int i = 0; i < dim; i++){
+            if (proj.isVisible(i)){
+              path.drawTo(proj.getXpos(i), yPos.get(i));
+            }
+          }
+          Element line = path.makeElement(svgp);
+          SVGUtil.addCSSClass(line, DATALINE);
+          layer.appendChild(line);
         }
+        
       }
-      Element line = path.makeElement(svgp);
-      SVGUtil.addCSSClass(line, DATALINE);
-      layer.appendChild(line);
+    }
+    else {
+      for(DBID id : rep.iterDBIDs()) {
+        path = new SVGPath();
+        yPos = proj.projectDataToRenderSpace(rep.get(id));
+        for (int i = 0; i < dim; i++){
+          if (proj.isVisible(i)){
+            path.drawTo(proj.getXpos(i), yPos.get(i));
+          }
+        }
+        Element line = path.makeElement(svgp);
+        SVGUtil.addCSSClass(line, DATALINE);
+        layer.appendChild(line);
+      }
     }
   
   }
@@ -88,7 +113,7 @@ public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelV
     if(!svgp.getCSSClassManager().contains(DATALINE)) {
       CSSClass cls = new CSSClass(this, DATALINE);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() /2.));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() * 2.));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
