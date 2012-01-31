@@ -285,7 +285,7 @@ public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> exte
     for(int num = 0; num < clus; num++) {
       items[num] = myMenu.addCheckBoxItem("Cluster " + num, Integer.toString(num), clustervis[num]);
     }
-    myMenu.addCheckBoxItem("rounded", "rounded", rounded);
+ //   myMenu.addCheckBoxItem("rounded", "rounded", rounded);
     
  /*   myMenu.addSeparator();
     
@@ -406,16 +406,16 @@ public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> exte
      */
     public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
       protected List<Integer> p;
-      protected boolean rounded = true;
+      protected boolean rounded = false;
 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        Flag fillF = new Flag(FILL_ID);
-        fillF.setDefaultValue(true);
-        if(config.grab(fillF)) {
-          rounded = fillF.getValue();
-        }
+ //       Flag fillF = new Flag(FILL_ID);
+ //       fillF.setDefaultValue(true);
+ //       if(config.grab(fillF)) {
+ //         rounded = fillF.getValue();
+ //       }
         final IntListParameter visL = new IntListParameter(VISIBLE_ID, true);
         if(config.grab(visL)) {
           p = visL.getValue();
