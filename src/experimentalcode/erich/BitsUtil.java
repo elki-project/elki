@@ -40,12 +40,87 @@ public final class BitsUtil {
   /**
    * Shift factor for a long: 2^6 == 64 == Long.SIZE
    */
-  private static final int LONG_LOG2_SIZE = 5;
+  private static final int LONG_LOG2_SIZE = 6;
 
   /**
    * Masking for long shifts.
    */
   private static final int LONG_LOG2_MASK = 0x3f; // 6 bits
+
+  /**
+   * Long with all bits set
+   */
+  private static final long LONG_ALL_BITS = -1L;
+
+  /**
+   * Allocate a new long[].
+   * 
+   * @param bits Number of bits in storage
+   * @return New array
+   */
+  public static long[] zero(int bits) {
+    return new long[((bits - 1) >>> LONG_LOG2_SIZE) + 1];
+  }
+
+  /**
+   * Allocate a new long[].
+   * 
+   * @param bits Number of bits in storage
+   * @param init Initial value (of at most the size of a long, remaining bits
+   *        will be 0)
+   * @return New array
+   */
+  public static long[] make(int bits, long init) {
+    long[] v = new long[((bits - 1) >>> LONG_LOG2_SIZE) + 1];
+    v[0] = init;
+    return v;
+  }
+
+  /**
+   * Create a vector initialized with "bits" ones.
+   * 
+   * @param bits Size
+   * @return new vector
+   */
+  public static long[] ones(int bits) {
+    long[] v = new long[((bits - 1) >>> LONG_LOG2_SIZE) + 1];
+    final int fillWords = bits >>> LONG_LOG2_SIZE;
+    final int fillBits = bits & LONG_LOG2_MASK;
+    Arrays.fill(v, 0, fillWords, LONG_ALL_BITS);
+    v[v.length - 1] = (1L << fillBits) - 1;
+    return v;
+  }
+
+  /**
+   * Copy a bitset
+   * 
+   * @param v Array to copy
+   * @return Copy
+   */
+  public static long[] copy(long[] v) {
+    return Arrays.copyOf(v, v.length);
+  }
+
+  /**
+   * Copy a bitset.
+   * 
+   * Note: Bits beyond mincap <em>may</em> be retained!
+   * 
+   * @param v Array to copy
+   * @param mincap Target <em>minimum</em> capacity
+   * @return Copy with space for at least "capacity" bits
+   */
+  public static long[] copy(long[] v, int mincap) {
+    int words = ((mincap - 1) >>> LONG_LOG2_SIZE) + 1;
+    if(v.length != words) {
+      return Arrays.copyOf(v, v.length);
+    }
+    else {
+      long[] ret = new long[words];
+      System.arraycopy(v, 0, ret, 0, Math.min(v.length, words));
+      return ret;
+    }
+  }
 
   /**
    * Compute corresponding gray code as v XOR (v >>> 1)
@@ -55,6 +130,20 @@ public final class BitsUtil {
    */
   public static long grayC(long v) {
     return v ^ (v >>> 1);
+  }
+
+  /**
+   * Compute corresponding gray code as v XOR (v >>> 1)
+   * 
+   * @param v Value
+   * @return Gray code
+   */
+  public static long[] grayI(long[] v) {
+    // TODO: copy less
+    long[] t = copy(v);
+    shiftRightI(t, 1);
+    xorI(v, t);
+    return v;
   }
 
   /**
@@ -71,6 +160,38 @@ public final class BitsUtil {
     v ^= (v >>> 16);
     v ^= (v >>> 32);
     return v;
+  }
+
+  /**
+   * Compute the inverted gray code, v XOR (v >>> 1) XOR (v >>> 2) ...
+   * 
+   * @param v Value
+   * @return Inverted gray code
+   */
+  public static long[] invgrayI(long[] v) {
+    long[] t = copy(v);
+    int i = 0;
+    while(!isZero(t)) {
+      shiftRightI(t, i);
+      xorI(v, t);
+      i <<= 1;
+    }
+    return v;
+  }
+
+  /**
+   * Test for the bitstring to be all-zero.
+   * 
+   * @param v Bitstring
+   * @return true when all zero
+   */
+  public static boolean isZero(long[] v) {
+    for(int i = 0; i < v.length; i++) {
+      if(v[i] != 0) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -226,6 +347,23 @@ public final class BitsUtil {
   }
 
   /**
+   * XOR o onto v inplace, i.e. v ^= (o << off)
+   * 
+   * @param v Primary object
+   * @param o data to or
+   * @param off Offset
+   * @return v
+   */
+  public static long[] xorI(long[] v, long[] o, int off) {
+    final int mag = magnitude(o);
+    // TODO: optimize to not copy!
+    long[] tmp = copy(o, mag + off);
+    shiftLeftI(tmp, off);
+    xorI(v, tmp);
+    return v;
+  }
+
+  /**
    * OR o onto v inplace, i.e. v |= o
    * 
    * @param v Primary object
@@ -237,6 +375,23 @@ public final class BitsUtil {
     for(int i = 0; i < o.length; i++) {
       v[i] |= o[i];
     }
+    return v;
+  }
+
+  /**
+   * OR o onto v inplace, i.e. v |= (o << off)
+   * 
+   * @param v Primary object
+   * @param o data to or
+   * @param off Offset
+   * @return v
+   */
+  public static long[] orI(long[] v, long[] o, int off) {
+    final int mag = magnitude(o);
+    // TODO: optimize to not copy!
+    long[] tmp = copy(o, mag + off);
+    shiftLeftI(tmp, off);
+    orI(v, tmp);
     return v;
   }
 
@@ -254,6 +409,23 @@ public final class BitsUtil {
     }
     // Zero higher words
     Arrays.fill(v, i, v.length, 0);
+    return v;
+  }
+
+  /**
+   * AND o onto v inplace, i.e. v &= (o << off)
+   * 
+   * @param v Primary object
+   * @param o data to or
+   * @param off Offset
+   * @return v
+   */
+  public static long[] andI(long[] v, long[] o, int off) {
+    final int mag = magnitude(o);
+    // TODO: optimize to not copy!
+    long[] tmp = copy(o, mag + off);
+    shiftLeftI(tmp, off);
+    andI(v, tmp);
     return v;
   }
 
@@ -379,6 +551,40 @@ public final class BitsUtil {
   }
 
   /**
+   * Cycle a bitstring to the right.
+   * 
+   * @param v Bit string
+   * @param shift Number of steps to cycle
+   * @param len Length
+   */
+  public static long[] cycleRightI(long[] v, int shift, int len) {
+    // TODO: optimize - copy less
+    long[] t = copy(v);
+    shiftRightI(v, shift);
+    shiftLeftI(t, len - shift);
+    truncateI(t, len);
+    orI(v, t);
+    return v;
+  }
+
+  /**
+   * Truncate a bit string to the given length (setting any higher bit to 0).
+   * 
+   * @param v String to process
+   * @param len Length (in bits) to truncate to
+   */
+  public static long[] truncateI(long[] v, int len) {
+    final int zap = (v.length * Long.SIZE) - len;
+    final int zapWords = (zap >>> LONG_LOG2_SIZE);
+    Arrays.fill(v, v.length - zapWords, v.length, 0);
+    final int zapbits = zap & LONG_LOG2_MASK;
+    if(zapbits > 0) {
+      v[v.length - zapWords - 1] &= (LONG_ALL_BITS >>> zapbits);
+    }
+    return v;
+  }
+
+  /**
    * Rotate a long to the left, cyclic with length len
    * 
    * @param v Bits
@@ -395,5 +601,86 @@ public final class BitsUtil {
     }
     final long ones = (1 << len) - 1;
     return (((v) << (shift)) | ((v) >>> ((len) - (shift)))) & ones;
+  }
+
+  /**
+   * Convert bitset to a string consisting of "0" and "1", in high-endian order.
+   * 
+   * @param v Value to process
+   * @return String representation
+   */
+  public static String toString(long[] v) {
+    final int mag = magnitude(v);
+    final int words = ((mag - 1) >>> LONG_LOG2_SIZE) + 1;
+    char[] digits = new char[mag];
+
+    int pos = mag - 1;
+    for(int w = 0; w < words; w++) {
+      long f = 1l;
+      for(int i = 0; i < Long.SIZE; i++) {
+        digits[pos] = ((v[w] & f) == 0) ? '0' : '1';
+        pos--;
+        f <<= 1;
+        if(pos < 0) {
+          break;
+        }
+      }
+    }
+    return new String(digits);
+  }
+
+  /**
+   * Find the number of trailing zeros.
+   * 
+   * @param v Bitset
+   * @return Position of first set bit, -1 if no one was found.
+   */
+  public static int numberOfTrailingZeros(long[] v) {
+    for(int p = 0;; p++) {
+      if(p == v.length) {
+        return -1;
+      }
+      if(v[p] != 0) {
+        return Long.numberOfTrailingZeros(v[p]) + p * Long.SIZE;
+      }
+    }
+  }
+
+  /**
+   * Find the number of leading zeros.
+   * 
+   * @param v Bitset
+   * @return Position of first set bit, -1 if no one was found.
+   */
+  public static int numberOfLeadingZeros(long[] v) {
+    for(int p = 0;; p++) {
+      if(p == v.length) {
+        return -1;
+      }
+      final int ip = v.length - 1 - p;
+      if(v[ip] != 0) {
+        return Long.numberOfLeadingZeros(v[ip]) + p * Long.SIZE;
+      }
+    }
+  }
+
+  /**
+   * The magnitude is the position of the highest bit set
+   * 
+   * @param v Vector v
+   * @return position of highest bit set, or 0.
+   */
+  public static int magnitude(long[] v) {
+    return capacity(v) - numberOfLeadingZeros(v);
+  }
+
+  /**
+   * Capacity of the vector v.
+   * 
+   * @param v Vector v
+   * @return Capacity
+   */
+  public static int capacity(long[] v) {
+    return v.length * Long.SIZE;
   }
 }
