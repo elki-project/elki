@@ -211,6 +211,66 @@ public final class BitsUtil {
   }
 
   /**
+   * XOR o onto v inplace, i.e. v ^= o
+   * 
+   * @param v Primary object
+   * @param o data to xor
+   * @return v
+   */
+  public static long[] xorI(long[] v, long[] o) {
+    assert (o.length <= v.length) : "Bit set sizes do not agree.";
+    for(int i = 0; i < o.length; i++) {
+      v[i] ^= o[i];
+    }
+    return v;
+  }
+
+  /**
+   * OR o onto v inplace, i.e. v |= o
+   * 
+   * @param v Primary object
+   * @param o data to or
+   * @return v
+   */
+  public static long[] orI(long[] v, long[] o) {
+    assert (o.length <= v.length) : "Bit set sizes do not agree.";
+    for(int i = 0; i < o.length; i++) {
+      v[i] |= o[i];
+    }
+    return v;
+  }
+
+  /**
+   * AND o onto v inplace, i.e. v &= o
+   * 
+   * @param v Primary object
+   * @param o data to and
+   * @return v
+   */
+  public static long[] andI(long[] v, long[] o) {
+    int i = 0;
+    for(; i < o.length; i++) {
+      v[i] |= o[i];
+    }
+    // Zero higher words
+    Arrays.fill(v, i, v.length, 0);
+    return v;
+  }
+
+  /**
+   * Invert v inplace.
+   * 
+   * @param v Object to invert
+   * @return v
+   */
+  public static long[] invertI(long[] v) {
+    for(int i = 0; i < v.length; i++) {
+      v[i] = ~v[i];
+    }
+    return v;
+  }
+
+  /**
    * Shift a long[] bitset inplace.
    * 
    * Low-endian layout for the array.
