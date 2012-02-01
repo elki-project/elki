@@ -22,6 +22,7 @@ package experimentalcode.erich;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
@@ -39,15 +40,15 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
-    hilbertSort(objs, start, end, minmax, 0, 0, 0L, 0L);
+    hilbertSort(objs, start, end, minmax, 0, 0, new BitSet(0), false);
   }
 
-  private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int axis, long history, long inversions) {
+  private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int rotation, BitSet history, boolean inv) {
     final int dims = mms.length >>> 1;
     // Completed level of hilbert curve?
     final boolean complete = (depth + 1) % dims == 0;
-    // final boolean right = (history & (1 << axis)) != 0;
-    final boolean inv = (inversions & (1 << axis)) != 0;
+    final int axis = (depth + rotation) % dims;
+    inv ^= history.get(axis);
 
     // Find the splitting point.
     final double min = mms[2 * axis], max = mms[2 * axis + 1];
@@ -68,16 +69,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       }
     }
     // if(complete)
-    LoggingUtil.warning("Depth: " + depth + (complete ? " !" : " ") + " axis: " + (inv ? "-" : "+") + axis + /*
-                                                                                                              * (
-                                                                                                              * right
-                                                                                                              * ?
-                                                                                                              * "R"
-                                                                                                              * :
-                                                                                                              * " "
-                                                                                                              * )
-                                                                                                              * +
-                                                                                                              */" history: " + history + " inversions: " + inversions + " " + FormatUtil.format(mms));
+    LoggingUtil.warning("Depth: " + depth + (complete ? "!" : " ") + " axis: " + (inv ? "-" : "+") + axis + " history: " + history + " " + FormatUtil.format(mms));
     int split = pivotizeList1D(objs, start, end, axis + 1, half, inv);
     // Need to descend?
     if(end - split <= 1 && split - start <= 1) {
@@ -85,48 +77,47 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     }
 
     if(!complete) {
-      int nextaxis = (axis + 1) % dims;
+      if(inv) {
+        history.flip(axis);
+      }
       if(start < split - 1) {
         mms[2 * axis] = !inv ? min : half;
         mms[2 * axis + 1] = !inv ? half : max;
-        hilbertSort(objs, start, split, mms, depth + 1, nextaxis, history << 1, inversions);
+        hilbertSort(objs, start, split, mms, depth + 1, rotation, history, inv);
       }
+      history.flip(axis);
       if(split < end - 1) {
-        inversions ^= 1L << nextaxis;
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
-        hilbertSort(objs, split, end, mms, depth + 1, nextaxis, history << 1 ^ 1, inversions);
-        inversions ^= 1L << nextaxis;
+        hilbertSort(objs, split, end, mms, depth + 1, rotation, history, !inv);
+      }
+      if(!inv) {
+        history.flip(axis);
       }
     }
     else {
-      int card = cardinality(history);
-      boolean high = (history >> (dims - 2)) == 1;
-      int leftaxis = bound(axis - card * (high ? -1 : 1), dims);
-      int rightaxis = bound(axis - (card + 1) * (high ? -1 : 1), dims);
-      LoggingUtil.warning("History: " + history + " card: " + card + " axis: " + (inv ? "-" : "+") + axis + " left: " + leftaxis + " right: " + rightaxis);
-      LoggingUtil.warning("History igray: " + ungray(history) + " inversions igray: " + ungray(inversions));
+      if(inv) {
+        history.flip(axis);
+      }
       if(start < split - 1) {
-        if((card % 2) == 1) {
-          inversions ^= 1L << axis;
-        }
-        LoggingUtil.warning("History igray: " + ungray(history << 1) + " inversions igray: " + ungray(inversions));
-        LoggingUtil.warning("LFlip: " + inversions + " ax:" + (inv ? "-" : "+") + axis + " lax:" + leftaxis + " card:" + card);
+        int rot = firstSetBit(history, rotation, dims);
+        final int nextrot = (rotation - rot + 1 + dims) % dims;
+        LoggingUtil.warning("Rotation old: " + rotation + " " + history + " ffs: " + rot + " new: " + nextrot);
         mms[2 * axis] = !inv ? min : half;
         mms[2 * axis + 1] = !inv ? half : max;
-        hilbertSort(objs, start, split, mms, depth + 1, leftaxis, 0L, inversions);
-        if((card % 2) == 1) {
-          inversions ^= 1L << axis;
-        }
+        hilbertSort(objs, start, split, mms, depth + 1, nextrot, history, (nextrot == rotation) ^ inv);
       }
+      history.flip(axis);
       if(split < end - 1) {
-        LoggingUtil.warning("History igray: " + ungray(1 + (history << 1)) + " inversions igray: " + ungray(inversions ^ 1L << rightaxis));
-        LoggingUtil.warning("RFlip: " + inversions + " ax:" + (inv ? "-" : "+") + axis + " rax:" + rightaxis + " card:" + (card + 1));
-        // inversions.flip(rightaxis);
+        int rot = firstSetBit(history, rotation, dims);
+        final int nextrot = (rotation - rot + 1 + dims) % dims;
+        LoggingUtil.warning("Rotation old: " + rotation + " " + history + " ffs: " + rot + " new: " + nextrot);
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
-        hilbertSort(objs, split, end, mms, depth + 1, rightaxis, 1L, inversions);
-        // inversions.flip(rightaxis);
+        hilbertSort(objs, split, end, mms, depth + 1, nextrot, history, (nextrot == rotation) ^ !inv);
+      }
+      if(!inv) {
+        history.flip(axis);
       }
     }
     // Restore ranges
@@ -135,21 +126,19 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     // FIXME: implement completely and test.
   }
 
-  private long gray(long v) {
-    return v ^ (v >>> 1);
+  private int firstSetBit(BitSet bitset, int start, int dims) {
+    int l = bitset.previousSetBit(start);
+    if(l >= 0) {
+      return start - l;
+    }
+    l = bitset.previousSetBit(dims - 1);
+    if(l >= 0) {
+      return (dims - 1) - l + start;
+    }
+    return -1;
   }
 
-  private long ungray(long v) {
-    v ^= (v >>> 1);
-    v ^= (v >>> 2);
-    v ^= (v >>> 4);
-    v ^= (v >>> 8);
-    v ^= (v >>> 16);
-    v ^= (v >>> 32);
-    return v;
-  }
-
-  private int bound(int val, int max) {
+  public static int bound(int val, int max) {
     while(val >= max) {
       val -= max;
     }
@@ -157,17 +146,6 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       val += max;
     }
     return val;
-  }
-
-  private int cardinality(long history) {
-    int set = 0;
-    while(history > 0) {
-      if((history & 1) == 1) {
-        set++;
-      }
-      history >>>= 1;
-    }
-    return set;
   }
 
   static long getIEEEBits(int nDims, double[] c, int y) {
@@ -225,7 +203,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
   private static int adjust_rotation(int rotation, int nDims, long bits) {
     final long nd1Ones = (1 << (nDims - 1)) - 1;
-    bits &= -bits & nd1Ones;
+    bits &= -bits & nd1Ones; // first set bit (0 if none or last)
     while(bits != 0) {
       bits >>>= 1;
       ++rotation;
