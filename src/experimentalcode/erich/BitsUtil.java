@@ -683,4 +683,48 @@ public final class BitsUtil {
   public static int capacity(long[] v) {
     return v.length * Long.SIZE;
   }
+
+  /**
+   * Compare two bitsets.
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return Comparison result
+   */
+  public static int compare(long[] x, long[] y) {
+    int p = Math.min(x.length, y.length) - 1;
+    for(int i = x.length - 1; i > p; i--) {
+      if(x[i] != 0) {
+        return +1;
+      }
+    }
+    for(int i = y.length - 1; i > p; i--) {
+      if(y[i] != 0) {
+        return -1;
+      }
+    }
+    for(; p >= 0; p--) {
+      final long xp = x[p];
+      final long yp = y[p];
+      if(xp != yp) {
+        if(xp < 0) {
+          if(yp < 0) {
+            return -Long.compare(xp, yp);
+          }
+          else {
+            return +1;
+          }
+        }
+        else {
+          if(yp < 0) {
+            return -1;
+          }
+          else {
+            return Long.compare(xp, yp);
+          }
+        }
+      }
+    }
+    return 0;
+  }
 }
