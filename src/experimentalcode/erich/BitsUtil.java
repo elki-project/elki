@@ -739,14 +739,14 @@ public final class BitsUtil {
     }
     int wordindex = start >>> LONG_LOG2_SIZE;
     if(wordindex >= v.length) {
-      return magnitude(v);
+      return magnitude(v) - 1;
     }
     // Initial word
-    final int off = Long.SIZE + 1 - (start & LONG_LOG2_MASK);
+    final int off = Long.SIZE - 1 - (start & LONG_LOG2_MASK);
     long cur = v[wordindex] & (LONG_ALL_BITS >>> off);
     for(;;) {
       if(cur != 0) {
-        return (wordindex + 1) * Long.SIZE - 1 - Long.numberOfTrailingZeros(cur);
+        return (wordindex + 1) * Long.SIZE - 1 - Long.numberOfLeadingZeros(cur);
       }
       if(wordindex == 0) {
         return -1;

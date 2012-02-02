@@ -124,13 +124,19 @@ public class TestBitsUtil {
     long[] bituti = BitsUtil.zero(Long.SIZE);
     assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
-    bitset.set(13);
-    BitsUtil.setI(bituti, 13);
+    bitset.set(4);
+    BitsUtil.setI(bituti, 4);
     assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     bitset.set(15);
     BitsUtil.setI(bituti, 15);
     assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
-  }
 
+    assertEquals(bitset.nextSetBit(0), BitsUtil.nextSetBit(bituti, 0));
+    assertEquals(bitset.nextSetBit(4), BitsUtil.nextSetBit(bituti, 4));
+    assertEquals(bitset.nextSetBit(5), BitsUtil.nextSetBit(bituti, 5));
+    assertEquals(bitset.previousSetBit(64), BitsUtil.previousSetBit(bituti, 64));
+    assertEquals(bitset.previousSetBit(15), BitsUtil.previousSetBit(bituti, 15));
+    assertEquals(bitset.previousSetBit(14), BitsUtil.previousSetBit(bituti, 14));
+  }
 }
