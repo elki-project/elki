@@ -138,7 +138,10 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(filename));
         out.putNextEntry(new ZipEntry("doc.kml"));
-        writeKMLData(factory.createXMLStreamWriter(out), ors.get(0), database);
+        final XMLStreamWriter xmlw = factory.createXMLStreamWriter(out);
+        writeKMLData(xmlw, ors.get(0), database);
+        xmlw.flush();
+        xmlw.close();
         out.closeEntry();
         out.flush();
         out.close();
