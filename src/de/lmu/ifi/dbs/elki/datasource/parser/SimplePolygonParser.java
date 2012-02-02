@@ -87,14 +87,22 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     int lineNumber = 1;
 
     List<PolygonsObject> polys = new ArrayList<PolygonsObject>();
-    List<LabelList> labels = new ArrayList<LabelList>();
+    List<LabelList> labels = null;
     List<ExternalID> eids = new ArrayList<ExternalID>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           Object[] objs = parseLine(line);
           polys.add((PolygonsObject) objs[0]);
-          labels.add((LabelList) objs[1]);
+          if(objs[1] != null) {
+            if(labels == null) {
+              labels = new ArrayList<LabelList>();
+              for(int i = 0; i < polys.size() - 1; i++) {
+                labels.add(null);
+              }
+            }
+            labels.add((LabelList) objs[1]);
+          }
           eids.add((ExternalID) objs[2]);
         }
       }
@@ -103,7 +111,12 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.LABELLIST, labels, TypeUtil.EXTERNALID, eids);
+    if(labels != null) {
+      return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.LABELLIST, labels, TypeUtil.EXTERNALID, eids);
+    }
+    else {
+      return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.EXTERNALID, eids);
+    }
   }
 
   /**
