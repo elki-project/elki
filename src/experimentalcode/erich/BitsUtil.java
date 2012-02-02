@@ -240,7 +240,7 @@ public final class BitsUtil {
    * @param off Offset to flip
    */
   public static long[] flipI(long[] v, int off) {
-    int wordindex = off >>> LONG_LOG2_SIZE;
+    final int wordindex = off >>> LONG_LOG2_SIZE;
     v[wordindex] ^= (1L << off);
     return v;
   }
@@ -265,7 +265,7 @@ public final class BitsUtil {
    * @param off Offset to set
    */
   public static long[] setI(long[] v, int off) {
-    int wordindex = off >>> LONG_LOG2_SIZE;
+    final int wordindex = off >>> LONG_LOG2_SIZE;
     v[wordindex] |= (1L << off);
     return v;
   }
@@ -290,7 +290,7 @@ public final class BitsUtil {
    * @param off Offset to clear
    */
   public static long[] clearI(long[] v, int off) {
-    int wordindex = off >>> LONG_LOG2_SIZE;
+    final int wordindex = off >>> LONG_LOG2_SIZE;
     v[wordindex] &= ~(1L << off);
     return v;
   }
@@ -314,7 +314,7 @@ public final class BitsUtil {
    * @param off Offset to set
    */
   public static boolean get(long[] v, int off) {
-    int wordindex = off >>> LONG_LOG2_SIZE;
+    final int wordindex = off >>> LONG_LOG2_SIZE;
     return (v[wordindex] & (1L << off)) != 0;
   }
 
@@ -628,6 +628,9 @@ public final class BitsUtil {
    */
   public static String toString(long[] v) {
     final int mag = magnitude(v);
+    if(v.length == 0 || mag == 0) {
+      return "0";
+    }
     final int words = ((mag - 1) >>> LONG_LOG2_SIZE) + 1;
     char[] digits = new char[mag];
 
@@ -641,6 +644,32 @@ public final class BitsUtil {
         if(pos < 0) {
           break;
         }
+      }
+    }
+    return new String(digits);
+  }
+
+  /**
+   * Convert bitset to a string consisting of "0" and "1", in high-endian order.
+   * 
+   * @param v Value to process
+   * @return String representation
+   */
+  public static String toString(long v) {
+    final int mag = magnitude(v);
+    if(mag == 0) {
+      return "0";
+    }
+    char[] digits = new char[mag];
+
+    int pos = mag - 1;
+    long f = 1l;
+    for(int i = 0; i < Long.SIZE; i++) {
+      digits[pos] = ((v & f) == 0) ? '0' : '1';
+      pos--;
+      f <<= 1;
+      if(pos < 0) {
+        break;
       }
     }
     return new String(digits);
@@ -682,13 +711,157 @@ public final class BitsUtil {
   }
 
   /**
+   * Find the number of leading zeros.
+   * 
+   * Note: this has different semantics to {@link Long.numberOfLeadingZeros}
+   * when the number is 0.
+   * 
+   * @param v Bitset
+   * @return Position of first set bit, -1 if no one was found.
+   */
+  public static int numberOfLeadingZeros(long v) {
+    if(v == 0) {
+      return -1;
+    }
+    return Long.numberOfLeadingZeros(v);
+  }
+
+  /**
+   * Find the previous set bit.
+   * 
+   * @param v Values to process
+   * @param start Start position (inclusive)
+   * @return Position of previous set bit, or 0.
+   */
+  public static int previousSetBit(long[] v, int start) {
+    if(start == -1) {
+      return -1;
+    }
+    int wordindex = start >>> LONG_LOG2_SIZE;
+    if(wordindex >= v.length) {
+      return magnitude(v);
+    }
+    // Initial word
+    final int off = Long.SIZE + 1 - (start & LONG_LOG2_MASK);
+    long cur = v[wordindex] & (LONG_ALL_BITS >>> off);
+    for(;;) {
+      if(cur != 0) {
+        return (wordindex + 1) * Long.SIZE - 1 - Long.numberOfTrailingZeros(cur);
+      }
+      if(wordindex == 0) {
+        return -1;
+      }
+      wordindex--;
+      cur = v[wordindex];
+    }
+  }
+
+  /**
+   * Find the previous clear bit.
+   * 
+   * @param v Values to process
+   * @param start Start position (inclusive)
+   * @return Position of previous clear bit, or 0.
+   */
+  public static int previousClearBit(long[] v, int start) {
+    if(start == -1) {
+      return -1;
+    }
+    int wordindex = start >>> LONG_LOG2_SIZE;
+    if(wordindex >= v.length) {
+      return magnitude(v);
+    }
+    final int off = Long.SIZE + 1 - (start & LONG_LOG2_MASK);
+    // Initial word
+    long cur = ~v[wordindex] & (LONG_ALL_BITS >>> off);
+    for(;;) {
+      if(cur != 0) {
+        return (wordindex + 1) * Long.SIZE - 1 - Long.numberOfTrailingZeros(cur);
+      }
+      if(wordindex == 0) {
+        return -1;
+      }
+      wordindex--;
+      cur = ~v[wordindex];
+    }
+  }
+
+  /**
+   * Find the next set bit.
+   * 
+   * @param v Value to process
+   * @param start Start position (inclusive)
+   * @return Position of next set bit, or 0.
+   */
+  public static int nextSetBit(long[] v, int start) {
+    int wordindex = start >>> LONG_LOG2_SIZE;
+    if(wordindex >= v.length) {
+      return -1;
+    }
+
+    // Initial word
+    long cur = v[wordindex] & (LONG_ALL_BITS << start);
+    for(; wordindex < v.length;) {
+      if(cur != 0) {
+        return (wordindex * Long.SIZE) + Long.numberOfTrailingZeros(cur);
+      }
+      wordindex++;
+      cur = v[wordindex];
+    }
+    return -1;
+  }
+
+  /**
+   * Find the next clear bit.
+   * 
+   * @param v Value to process
+   * @param start Start position (inclusive)
+   * @return Position of next clear bit, or 0.
+   */
+  public static int nextClearBit(long[] v, int start) {
+    int wordindex = start >>> LONG_LOG2_SIZE;
+    if(wordindex >= v.length) {
+      return -1;
+    }
+
+    // Initial word
+    long cur = ~v[wordindex] & (LONG_ALL_BITS << start);
+    for(; wordindex < v.length;) {
+      if(cur != 0) {
+        return (wordindex * Long.SIZE) + Long.numberOfTrailingZeros(cur);
+      }
+      wordindex++;
+      cur = ~v[wordindex];
+    }
+    return -1;
+  }
+
+  /**
    * The magnitude is the position of the highest bit set
    * 
    * @param v Vector v
    * @return position of highest bit set, or 0.
    */
   public static int magnitude(long[] v) {
-    return capacity(v) - numberOfLeadingZeros(v);
+    final int l = numberOfLeadingZeros(v);
+    if(l < 0) {
+      return 0;
+    }
+    return capacity(v) - l;
+  }
+
+  /**
+   * The magnitude is the position of the highest bit set
+   * 
+   * @param v Vector v
+   * @return position of highest bit set, or 0.
+   */
+  public static int magnitude(long v) {
+    final int l = numberOfLeadingZeros(v);
+    if(l < 0) {
+      return 0;
+    }
+    return Long.SIZE - l;
   }
 
   /**

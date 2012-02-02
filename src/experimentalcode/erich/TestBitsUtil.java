@@ -26,6 +26,7 @@ package experimentalcode.erich;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
+import java.util.BitSet;
 import java.util.Random;
 
 import org.junit.Test;
@@ -62,7 +63,7 @@ public class TestBitsUtil {
     BitsUtil.cycleRightI(test, 6, 8);
     assertEquals(BitsUtil.toString(test), "10000010");
     assertEquals(BitsUtil.numberOfTrailingZeros(test), 1);
-    
+
     BitsUtil.zeroI(test);
     BitsUtil.setI(test, 125);
     BitsUtil.setI(test, 60);
@@ -116,4 +117,20 @@ public class TestBitsUtil {
       }
     }
   }
+
+  @Test
+  public void testAgainstBitSet() {
+    BitSet bitset = new BitSet();
+    long[] bituti = BitsUtil.zero(Long.SIZE);
+    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+
+    bitset.set(13);
+    BitsUtil.setI(bituti, 13);
+    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+
+    bitset.set(15);
+    BitsUtil.setI(bituti, 15);
+    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+  }
+
 }
