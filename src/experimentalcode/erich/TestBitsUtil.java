@@ -62,6 +62,18 @@ public class TestBitsUtil {
     BitsUtil.cycleRightI(test, 6, 8);
     assertEquals(BitsUtil.toString(test), "10000010");
     assertEquals(BitsUtil.numberOfTrailingZeros(test), 1);
+    
+    BitsUtil.zeroI(test);
+    BitsUtil.setI(test, 125);
+    BitsUtil.setI(test, 60);
+    BitsUtil.cycleRightI(test, 70, 128);
+    assertTrue(BitsUtil.get(test, 55));
+    assertTrue(BitsUtil.get(test, 118));
+    assertEquals(BitsUtil.cardinality(test), 2);
+    BitsUtil.cycleLeftI(test, 70, 128);
+    assertTrue(BitsUtil.get(test, 125));
+    assertTrue(BitsUtil.get(test, 60));
+    assertEquals(BitsUtil.cardinality(test), 2);
   }
 
   @Test

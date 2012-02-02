@@ -604,6 +604,23 @@ public final class BitsUtil {
   }
 
   /**
+   * Cycle a bitstring to the right.
+   * 
+   * @param v Bit string
+   * @param shift Number of steps to cycle
+   * @param len Length
+   */
+  public static long[] cycleLeftI(long[] v, int shift, int len) {
+    // TODO: optimize - copy less
+    long[] t = copy(v);
+    shiftLeftI(v, shift);
+    truncateI(v, len);
+    shiftRightI(t, len - shift);
+    orI(v, t);
+    return v;
+  }
+
+  /**
    * Convert bitset to a string consisting of "0" and "1", in high-endian order.
    * 
    * @param v Value to process
