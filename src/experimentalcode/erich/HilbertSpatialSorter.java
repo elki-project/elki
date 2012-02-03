@@ -85,18 +85,18 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         BitsUtil.flipI(reflections, axis);
       }
       if(start < split - 1) {
-        int rot = firstSetBit(coords, rotation, dims);
+        int rot = cyclicTrailingZeros(coords, rotation, dims);
         final int nextrot = (rotation - rot + 1 + dims) % dims;
-        LoggingUtil.warning("Rotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot + " refl: " + BitsUtil.toString(reflections));
+        LoggingUtil.warning("ARotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot + " refl: " + BitsUtil.toString(reflections));
         mms[2 * axis] = !inv ? min : half;
         mms[2 * axis + 1] = !inv ? half : max;
         hilbertSort(objs, start, split, mms, depth + 1, nextrot, BitsUtil.zero(dims), reflections);
       }
       BitsUtil.flipI(coords, axis);
       if(split < end - 1) {
-        int rot = firstSetBit(coords, rotation, dims);
+        int rot = cyclicTrailingZeros(coords, rotation, dims);
         final int nextrot = (rotation - rot + 1 + dims) % dims;
-        LoggingUtil.warning("Rotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot + " refl: " + BitsUtil.toString(reflections));
+        LoggingUtil.warning("BRotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot + " refl: " + BitsUtil.toString(reflections));
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
         hilbertSort(objs, split, end, mms, depth + 1, nextrot, BitsUtil.zero(dims), reflections);
@@ -139,96 +139,30 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     // FIXME: implement completely and test.
   }
 
-  private int firstSetBit(long[] bitset, int start, int dims) {
+  private static int cyclicTrailingZeros(long[] bitset, int start, int dims) {
+    start -= 1;
     int l = BitsUtil.previousSetBit(bitset, start);
     if(l >= 0) {
       return start - l;
     }
     l = BitsUtil.previousSetBit(bitset, dims - 1);
     if(l >= 0) {
-      return (dims - 1) - l + start;
+      return dims - l + start;
     }
     return -1;
   }
 
-  public static int bound(int val, int max) {
-    while(val >= max) {
-      val -= max;
+  public static void main(String[] args) {
+    long[] n = BitsUtil.zero(20);
+    BitsUtil.setI(n, 2);
+    BitsUtil.setI(n, 5);
+    for(int i = 0; i < 10; i++) {
+      System.out.print(cyclicTrailingZeros(n, i, 10)+" ");
     }
-    while(val < 0) {
-      val += max;
+    System.out.println();
+    for(int i = 0; i <= 10; i++) {
+      System.out.print(BitsUtil.previousSetBit(n, i)+" ");
     }
-    return val;
-  }
-
-  static long getIEEEBits(int nDims, double[] c, int y) {
-    int d;
-    long bits = 0L;
-    for(double x = c[d = 0]; d < nDims; x = c[++d]) {
-      // Disassemble, according to Java documentation:
-      final long rawdouble = Double.doubleToRawLongBits(x);
-      final int exponent = (int) ((rawdouble >> 52) & 0x7ffL);
-      final long mantissa = (exponent == 0) ? (rawdouble & 0xfffffffffffffL) << 1 : (rawdouble & 0xfffffffffffffL) | 0x10000000000000L;
-      boolean bit = (rawdouble >> 63) != 0; // negative
-      boolean normalized = (exponent != 0);
-      int diff = y - (exponent - (normalized ? 1 : 0));
-      if(diff < 52) {
-        bit ^= (1 & (mantissa >> diff)) == 1;
-      }
-      else if(diff == 52) {
-        bit ^= normalized;
-      }
-      else {
-        bit ^= (y == (1 << 11 + 51));
-      }
-      if(bit) {
-        bits |= 1L << d;
-      }
-    }
-    return bits;
-  }
-
-  static int hilbert_cmp_work(int nDims, int nBits, int max, int y, double[] c1, double[] c2, int rotation, long bits, long index) {
-    while(y-- > max) {
-      long reflection = getIEEEBits(nDims, c1, y);
-      long diff = reflection ^ getIEEEBits(nDims, c2, y);
-      bits ^= reflection;
-      bits = cycleRight(bits, rotation, nDims);
-      if(diff == 0) {
-        diff = cycleRight(diff, rotation, nDims);
-        // Gray-to-integer
-        for(int d = 1; d < nDims; d *= 2) {
-          index ^= index >> d;
-          bits ^= bits >> d;
-          diff ^= diff >> d;
-        }
-        final boolean foo = ((index ^ y ^ nBits) & 1) == 1;
-        final boolean bar = bits < (bits ^ diff);
-        return (foo == bar) ? -1 : 1;
-      }
-      index ^= bits;
-      reflection ^= 1L << rotation;
-      rotation = adjust_rotation(rotation, nDims, bits);
-      bits = reflection;
-    }
-    return 0;
-  }
-
-  private static int adjust_rotation(int rotation, int nDims, long bits) {
-    final long nd1Ones = (1 << (nDims - 1)) - 1;
-    bits &= -bits & nd1Ones; // first set bit (0 if none or last)
-    while(bits != 0) {
-      bits >>>= 1;
-      ++rotation;
-    }
-    if(++rotation >= nDims) {
-      rotation -= nDims;
-    }
-    return rotation;
-  }
-
-  private static long cycleRight(long bits, int rotation, int nDims) {
-    final long ones = (1 << nDims) - 1;
-    return (((bits) >> (rotation)) | ((bits) << ((nDims) - (rotation)))) & ones;
+    System.out.println();
   }
 }

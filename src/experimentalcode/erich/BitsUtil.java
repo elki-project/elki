@@ -731,7 +731,7 @@ public final class BitsUtil {
    * 
    * @param v Values to process
    * @param start Start position (inclusive)
-   * @return Position of previous set bit, or 0.
+   * @return Position of previous set bit, or -1.
    */
   public static int previousSetBit(long[] v, int start) {
     if(start == -1) {
@@ -761,7 +761,7 @@ public final class BitsUtil {
    * 
    * @param v Values to process
    * @param start Start position (inclusive)
-   * @return Position of previous clear bit, or 0.
+   * @return Position of previous clear bit, or -1.
    */
   public static int previousClearBit(long[] v, int start) {
     if(start == -1) {
@@ -791,7 +791,7 @@ public final class BitsUtil {
    * 
    * @param v Value to process
    * @param start Start position (inclusive)
-   * @return Position of next set bit, or 0.
+   * @return Position of next set bit, or -1.
    */
   public static int nextSetBit(long[] v, int start) {
     int wordindex = start >>> LONG_LOG2_SIZE;
@@ -801,14 +801,16 @@ public final class BitsUtil {
 
     // Initial word
     long cur = v[wordindex] & (LONG_ALL_BITS << start);
-    for(; wordindex < v.length;) {
+    for(;;) {
       if(cur != 0) {
         return (wordindex * Long.SIZE) + Long.numberOfTrailingZeros(cur);
       }
       wordindex++;
+      if(wordindex == v.length) {
+        return -1;
+      }
       cur = v[wordindex];
     }
-    return -1;
   }
 
   /**
@@ -816,7 +818,7 @@ public final class BitsUtil {
    * 
    * @param v Value to process
    * @param start Start position (inclusive)
-   * @return Position of next clear bit, or 0.
+   * @return Position of next clear bit, or -1.
    */
   public static int nextClearBit(long[] v, int start) {
     int wordindex = start >>> LONG_LOG2_SIZE;
