@@ -40,15 +40,15 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
     final int dims = minmax.length >>> 1;
-    hilbertSort(objs, start, end, minmax, 0, 0, BitsUtil.zero(dims), BitsUtil.zero(dims));
+    hilbertSort(objs, start, end, minmax, 0, 0, true, BitsUtil.zero(dims), BitsUtil.make(dims, 1));
   }
 
-  private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int rotation, long[] coords, long[] reflections) {
+  private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int rotation, boolean inv, long[] coords, long[] reflections) {
     final int dims = mms.length >>> 1;
     // Completed level of hilbert curve?
     final boolean complete = (depth + 1) % dims == 0;
     final int axis = (depth + rotation) % dims;
-    final boolean inv = BitsUtil.get(reflections, axis);
+    inv ^= BitsUtil.get(reflections, axis);
 
     // Find the splitting point.
     final double min = mms[2 * axis], max = mms[2 * axis + 1];
@@ -68,8 +68,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         return;
       }
     }
-    // if(complete)
-    LoggingUtil.warning("Depth: " + depth + (complete ? "!" : " ") + " axis: " + (inv ? "-" : "+") + axis + " coords: " + BitsUtil.toString(coords) + " " + " refl: " + BitsUtil.toString(reflections) + " " + FormatUtil.format(mms));
+    LoggingUtil.warning("Depth: " + depth + (complete ? "!" : " ") + " axis: " + (inv ? "-" : "+") + axis + " refl: " + BitsUtil.toString(reflections) + " coords: " + BitsUtil.toString(coords) + " " + FormatUtil.format(mms));
     int split = pivotizeList1D(objs, start, end, axis + 1, half, inv);
     // Need to descend?
     if(end - split <= 1 && split - start <= 1) {
@@ -77,39 +76,33 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     }
 
     if(complete) {
-      BitsUtil.flipI(reflections, rotation);
-      BitsUtil.flipI(reflections, 0);
-      BitsUtil.xorI(coords, reflections);
       if(inv) {
         BitsUtil.flipI(coords, axis);
-        BitsUtil.flipI(reflections, axis);
       }
       if(start < split - 1) {
         int rot = cyclicTrailingZeros(coords, rotation, dims);
         final int nextrot = (rotation - rot + 1 + dims) % dims;
-        LoggingUtil.warning("ARotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot + " refl: " + BitsUtil.toString(reflections));
+        LoggingUtil.warning("ARotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot);
         mms[2 * axis] = !inv ? min : half;
         mms[2 * axis + 1] = !inv ? half : max;
-        hilbertSort(objs, start, split, mms, depth + 1, nextrot, BitsUtil.zero(dims), reflections);
+        BitsUtil.flipI(reflections, rotation);
+        hilbertSort(objs, start, split, mms, depth + 1, nextrot, false, BitsUtil.zero(dims), reflections);
+        BitsUtil.flipI(reflections, rotation);
       }
       BitsUtil.flipI(coords, axis);
       if(split < end - 1) {
         int rot = cyclicTrailingZeros(coords, rotation, dims);
         final int nextrot = (rotation - rot + 1 + dims) % dims;
-        LoggingUtil.warning("BRotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot + " refl: " + BitsUtil.toString(reflections));
+        LoggingUtil.warning("BRotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot);
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
-        hilbertSort(objs, split, end, mms, depth + 1, nextrot, BitsUtil.zero(dims), reflections);
+        BitsUtil.flipI(reflections, rotation);
+        hilbertSort(objs, split, end, mms, depth + 1, nextrot, true, BitsUtil.zero(dims), reflections);
+        BitsUtil.flipI(reflections, rotation);
       }
       if(!inv) {
         BitsUtil.flipI(coords, axis);
       }
-      if(inv) {
-        BitsUtil.flipI(reflections, axis);
-      }
-      BitsUtil.xorI(coords, reflections);
-      BitsUtil.flipI(reflections, rotation);
-      BitsUtil.flipI(reflections, 0);
     }
     else {
       if(inv) {
@@ -118,16 +111,13 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       if(start < split - 1) {
         mms[2 * axis] = !inv ? min : half;
         mms[2 * axis + 1] = !inv ? half : max;
-        hilbertSort(objs, start, split, mms, depth + 1, rotation, coords, reflections);
+        hilbertSort(objs, start, split, mms, depth + 1, rotation, false, coords, reflections);
       }
       BitsUtil.flipI(coords, axis);
       if(split < end - 1) {
-        final int nextaxis = (axis + 1) % dims;
-        BitsUtil.flipI(reflections, nextaxis);
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
-        hilbertSort(objs, split, end, mms, depth + 1, rotation, coords, reflections);
-        BitsUtil.flipI(reflections, nextaxis);
+        hilbertSort(objs, split, end, mms, depth + 1, rotation, true, coords, reflections);
       }
       if(!inv) {
         BitsUtil.flipI(coords, axis);
@@ -150,19 +140,5 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       return dims - l + start;
     }
     return -1;
-  }
-
-  public static void main(String[] args) {
-    long[] n = BitsUtil.zero(20);
-    BitsUtil.setI(n, 2);
-    BitsUtil.setI(n, 5);
-    for(int i = 0; i < 10; i++) {
-      System.out.print(cyclicTrailingZeros(n, i, 10)+" ");
-    }
-    System.out.println();
-    for(int i = 0; i <= 10; i++) {
-      System.out.print(BitsUtil.previousSetBit(n, i)+" ");
-    }
-    System.out.println();
   }
 }
