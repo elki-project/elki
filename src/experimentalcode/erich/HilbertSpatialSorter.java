@@ -40,7 +40,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
     final int dims = minmax.length >>> 1;
-    hilbertSort(objs, start, end, minmax, 0, 0, true, BitsUtil.zero(dims), BitsUtil.make(dims, 1));
+    hilbertSort(objs, start, end, minmax, 0, 0, false, BitsUtil.zero(dims), BitsUtil.zero(dims));
   }
 
   private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int rotation, boolean inv, long[] coords, long[] reflections) {
@@ -85,23 +85,25 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         LoggingUtil.warning("ARotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot);
         mms[2 * axis] = !inv ? min : half;
         mms[2 * axis + 1] = !inv ? half : max;
-        BitsUtil.flipI(reflections, rotation);
         hilbertSort(objs, start, split, mms, depth + 1, nextrot, false, BitsUtil.zero(dims), reflections);
-        BitsUtil.flipI(reflections, rotation);
       }
       BitsUtil.flipI(coords, axis);
+      if(rotation > 0) {
+        BitsUtil.flipI(reflections, rotation);
+      }
       if(split < end - 1) {
         int rot = cyclicTrailingZeros(coords, rotation, dims);
         final int nextrot = (rotation - rot + 1 + dims) % dims;
         LoggingUtil.warning("BRotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot);
         mms[2 * axis] = !inv ? half : min;
         mms[2 * axis + 1] = !inv ? max : half;
-        BitsUtil.flipI(reflections, rotation);
-        hilbertSort(objs, split, end, mms, depth + 1, nextrot, true, BitsUtil.zero(dims), reflections);
-        BitsUtil.flipI(reflections, rotation);
+        hilbertSort(objs, split, end, mms, depth + 1, nextrot, false, BitsUtil.zero(dims), reflections);
       }
       if(!inv) {
         BitsUtil.flipI(coords, axis);
+      }
+      if(rotation > 0) {
+        BitsUtil.flipI(reflections, rotation);
       }
     }
     else {
