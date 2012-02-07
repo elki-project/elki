@@ -30,8 +30,11 @@ import java.util.regex.Pattern;
 import javax.swing.event.EventListenerList;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -217,9 +220,17 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * @return generated clustering
    */
   private Clustering<Model> generateDefaultClustering() {
-    // Cluster by labels
-    ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
-    Clustering<Model> c = split.run(ResultUtil.findDatabase(getResult()));
+    final Database db = ResultUtil.findDatabase(getResult());
+    Clustering<Model> c = null;
+    try {
+      // Try to cluster by labels
+      ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
+      c = split.run(db);
+    }
+    catch(NoSupportedDataTypeException e) {
+      // Put everything into one
+      c = new TrivialAllInOne().run(db);
+    }
     // store.
     put(CLUSTERING_FALLBACK, c);
     return c;
