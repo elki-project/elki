@@ -7,8 +7,10 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -65,24 +67,26 @@ public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelV
     SVGPath path;
     Vector yPos;
     
-    Collection<SampledResult> samples = ResultUtil.filterResults(context.getResult(), SampledResult.class);
+    Collection<SampledResult<Model>> samples = ResultUtil.filterResults(context.getResult(), SampledResult.class);
     if (samples.size() > 0){
-      for(SampledResult c : samples) {
-        DBIDs ids = c.getSample();
-        
-        for(DBID id : ids) {
-          path = new SVGPath();
-          yPos = proj.projectDataToRenderSpace(rep.get(id));
-          for (int i = 0; i < dim; i++){
-            if (proj.isVisible(i)){
-              path.drawTo(proj.getXpos(i), yPos.get(i));
+      for(SampledResult<Model> c : samples) {
+        Iterator<Cluster<Model>> ci = c.getAllClusters().iterator();
+        for(int cnum = 0; cnum < c.getAllClusters().size(); cnum++) {
+          Cluster<?> clus = ci.next();
+          
+          for(DBID id : clus.getIDs()) {
+            path = new SVGPath();
+            yPos = proj.projectDataToRenderSpace(rep.get(id));
+            for (int i = 0; i < dim; i++){
+              if (proj.isVisible(i)){
+                path.drawTo(proj.getXpos(i), yPos.get(i));
+              }
             }
+            Element line = path.makeElement(svgp);
+            SVGUtil.addCSSClass(line, DATALINE);
+            layer.appendChild(line);
           }
-          Element line = path.makeElement(svgp);
-          SVGUtil.addCSSClass(line, DATALINE);
-          layer.appendChild(line);
         }
-        
       }
     }
     else {
@@ -164,7 +168,7 @@ public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelV
       Iterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(result, ParallelPlotProjector.class);
       for(ParallelPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
         final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 12);
         if(hasClustering) {
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
         }
