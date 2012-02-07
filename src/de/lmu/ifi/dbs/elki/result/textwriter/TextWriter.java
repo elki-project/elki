@@ -283,16 +283,18 @@ public class TextWriter {
     // Write database element itself.
     for(int i = 0; i < bundle.metaLength(); i++) {
       Object obj = bundle.data(i);
-      TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
-      if(owriter == null) {
-        throw new UnableToComplyException("No handler for database object itself: " + obj.getClass().getSimpleName());
+      if(obj != null) {
+        TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
+        if(owriter == null) {
+          throw new UnableToComplyException("No handler for database object itself: " + obj.getClass().getSimpleName());
+        }
+        String lbl = null;
+        // TODO: ugly compatibility hack...
+        if(TypeUtil.DBID.isAssignableFromType(bundle.meta(i))) {
+          lbl = "ID";
+        }
+        owriter.writeObject(out, lbl, obj);
       }
-      String lbl = null;
-      // TODO: ugly compatibility hack...
-      if(TypeUtil.DBID.isAssignableFromType(bundle.meta(i))) {
-        lbl = "ID";
-      }
-      owriter.writeObject(out, lbl, obj);
     }
 
     Collection<Relation<?>> dbrels = db.getRelations();
