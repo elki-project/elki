@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -176,6 +177,13 @@ public abstract class AbstractTooltipVisualization extends P2DVisualization impl
    */
   abstract protected void setupCSS(SVGPlot svgp);
 
+  @Override
+  public void resultChanged(Result current) {
+    if(sample == current) {
+      synchronizedRedraw();
+    }
+  }
+  
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
