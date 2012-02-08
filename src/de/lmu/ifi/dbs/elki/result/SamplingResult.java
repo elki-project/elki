@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,49 +26,48 @@ package de.lmu.ifi.dbs.elki.result;
  */
 
 /**
- * Selection result wrapper.
- * 
- * Note: we did not make the DBIDSelection a result in itself. Instead, the
- * DBIDSelection object should be seen as static contents of this result.
+ * Wrapper for storing the current database sample.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf DBIDSelection
+ * @apiviz.composedOf DBIDs
  */
-public class SelectionResult implements Result {
+public class SamplingResult implements Result {
   /**
    * The actual selection
    */
-  DBIDSelection selection = null;
+  DBIDs sample = null;
 
   /**
    * Constructor.
    */
-  public SelectionResult() {
+  public SamplingResult() {
     super();
   }
 
   /**
-   * @return the selection
+   * @return the current sample
    */
-  public DBIDSelection getSelection() {
-    return selection;
+  public DBIDs getSample() {
+    return sample;
   }
 
   /**
-   * @param selection the selection to set
+   * Note: trigger a resultchanged event!
+   * 
+   * @param sample the new sample
    */
-  public void setSelection(DBIDSelection selection) {
-    this.selection = selection;
+  public void setSample(DBIDs sample) {
+    this.sample = sample;
   }
 
   @Override
   public String getLongName() {
-    return "Selection";
+    return "Sample";
   }
 
   @Override
   public String getShortName() {
-    return "selection";
+    return "sample";
   }
 }
