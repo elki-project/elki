@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.goldhofa.CCConstants;
 import experimentalcode.students.goldhofa.ClusteringComparison;
 import experimentalcode.students.goldhofa.ClusteringComparisonResult;
@@ -205,12 +204,9 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     selection.reselect();
     
     // notify parent
-    context.fireContextChange(new ContextChangedEvent(context){}); 
+    // FIXME: signal 
   }
 
-  //@Override
-  //public void contextChanged(ContextChangedEvent e) {}
-  
   /**
    * Create the segments
    */
