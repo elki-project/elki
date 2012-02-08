@@ -26,16 +26,21 @@ package de.lmu.ifi.dbs.elki.visualization;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -44,8 +49,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
@@ -93,10 +100,19 @@ public class VisualizerParameterizer implements Parameterizable {
    * <p>
    * Key: -vis.hide
    * 
-   * Default: default properties file
+   * Default: experimental code
    * </p>
    */
   public final static OptionID HIDEVIS_ID = OptionID.getOrCreateOptionID("vis.hide", "Visualizers to not show by default. Use 'none' to not hide any by default.");
+
+  /**
+   * Parameter to set the sampling level
+   * 
+   * <p>
+   * Key: -vis.sampling
+   * </p>
+   */
+  public final static OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
 
   /**
    * Style library to use.
@@ -119,15 +135,29 @@ public class VisualizerParameterizer implements Parameterizable {
   private Collection<ProjectorFactory> projectors;
 
   /**
+   * Sample size
+   */
+  private int samplesize = -1;
+
+  /**
+   * Random seed for sampling.
+   * 
+   * FIXME: make parameterizable.
+   */
+  private long seed = new Random().nextLong();
+
+  /**
    * Constructor.
    * 
+   * @param samplesize
    * @param stylelib Style library
    * @param projectors Projectors
    * @param factories Factories to use
    * @param hideVisualizers Visualizer hiding pattern
    */
-  public VisualizerParameterizer(StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories, Pattern hideVisualizers) {
     super();
+    this.samplesize = samplesize;
     this.stylelib = stylelib;
     this.projectors = projectors;
     this.factories = factories;
@@ -142,6 +172,21 @@ public class VisualizerParameterizer implements Parameterizable {
    */
   public VisualizerContext newContext(HierarchicalResult result) {
     VisualizerContext context = new VisualizerContext(result, stylelib, projectors, factories, hideVisualizers);
+    if(samplesize > 0) {
+      Iterator<Relation<?>> iter = ResultUtil.filteredResults(result, Relation.class);
+      while(iter.hasNext()) {
+        Relation<?> rel = iter.next();
+        if(ResultUtil.filteredResults(rel, SamplingResult.class).hasNext()) {
+          continue;
+        }
+        int size = rel.size();
+        if(size > samplesize) {
+          SamplingResult sample = new SamplingResult(rel);
+          sample.setSample(DBIDUtil.randomSample(sample.getSample(), samplesize, seed));
+          ResultUtil.addChildResult(rel, sample);
+        }
+      }
+    }
     return context;
   }
 
@@ -222,9 +267,15 @@ public class VisualizerParameterizer implements Parameterizable {
 
     protected Collection<ProjectorFactory> projectors = null;
 
+    protected int samplesize = -1;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      IntParameter samplingP = new IntParameter(SAMPLING_ID, new GreaterEqualConstraint(-1), 10000);
+      if(config.grab(samplingP)) {
+        samplesize = samplingP.getValue();
+      }
       StringParameter stylelibP = new StringParameter(STYLELIB_ID, PropertiesBasedStyleLibrary.DEFAULT_SCHEME_FILENAME);
       if(config.grab(stylelibP)) {
         String filename = stylelibP.getValue();
@@ -282,10 +333,11 @@ public class VisualizerParameterizer implements Parameterizable {
           factories.add(a);
         }
         catch(Throwable e) {
-          if (logger.isDebugging()) {
+          if(logger.isDebugging()) {
             logger.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
-          } else {
-            logger.warning("Error instantiating visualization factory " + c.getName()+": "+e.getCause().toString());
+          }
+          else {
+            logger.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getCause().toString());
           }
         }
       }
@@ -294,7 +346,7 @@ public class VisualizerParameterizer implements Parameterizable {
 
     @Override
     protected VisualizerParameterizer makeInstance() {
-      return new VisualizerParameterizer(stylelib, projectors, factories, hideVisualizers);
+      return new VisualizerParameterizer(samplesize, stylelib, projectors, factories, hideVisualizers);
     }
   }
 }
