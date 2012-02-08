@@ -278,6 +278,22 @@ public class ResultUtil {
   }
 
   /**
+   * Get the sampling result attached to a relation
+   * 
+   * @param rel Relation
+   * @return Sampling result.
+   */
+  public static SamplingResult getSamplingResult(final Relation<?> rel) {
+    Collection<SamplingResult> selections = ResultUtil.filterResults(rel, SamplingResult.class);
+    if(selections.size() == 0) {
+      final SamplingResult newsam = new SamplingResult(rel);
+      addChildResult(rel, newsam);
+      return newsam;
+    }
+    return selections.iterator().next();
+  }
+
+  /**
    * Add a child result.
    * 
    * @param parent Parent

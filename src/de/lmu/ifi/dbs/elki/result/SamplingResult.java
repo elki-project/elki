@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /*
  This file is part of ELKI:
@@ -40,9 +41,12 @@ public class SamplingResult implements Result {
 
   /**
    * Constructor.
+   * 
+   * @param rel Relation
    */
-  public SamplingResult() {
+  public SamplingResult(Relation<?> rel) {
     super();
+    sample = rel.getDBIDs();
   }
 
   /**
