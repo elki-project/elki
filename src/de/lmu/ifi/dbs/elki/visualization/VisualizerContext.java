@@ -45,10 +45,11 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
+import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
@@ -60,7 +61,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Erich Schubert
  * 
- * TODO: remove this class
+ *         TODO: remove this class
  * 
  * @apiviz.landmark
  * @apiviz.uses ContextChangedEvent oneway - - «emit»
@@ -111,9 +112,9 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
   private SelectionResult selection;
 
   /**
-   * Default clustering
+   * Styling result
    */
-  private Clustering<? extends Model> defaultClustering;
+  private StyleResult styleresult;
 
   /**
    * Constructor. We currently require a Database and a Result.
@@ -133,10 +134,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
 
     this.hideVisualizers = hideVisualizers;
 
-    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
-    if(clusterings.size() > 0) {
-      this.defaultClustering = clusterings.get(0);
-    }
     List<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
     if(selections.size() > 0) {
       this.selection = selections.get(0);
@@ -184,16 +181,23 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
   }
 
   /**
-   * Convenience method to get the clustering to use, and fall back to a default
-   * "clustering".
+   * Get the style result.
    * 
-   * @return Clustering to use
+   * @return Style result
    */
-  public Clustering<?> getOrCreateDefaultClustering() {
-    if(defaultClustering == null) {
-      defaultClustering = generateDefaultClustering();
+  public StyleResult getStyleResult() {
+    if(styleresult == null) {
+      styleresult = new StyleResult();
+      List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
+      if(clusterings.size() > 0) {
+        styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0)));
+        return styleresult;
+      }
+      Clustering<Model> c = generateDefaultClustering();
+      styleresult.setStylingPolicy(new ClusterStylingPolicy(c));
+      return styleresult;
     }
-    return defaultClustering;
+    return styleresult;
   }
 
   /**
@@ -213,8 +217,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
       // Put everything into one
       c = new TrivialAllInOne().run(db);
     }
-    // store.
-    defaultClustering = c;
     return c;
   }
 

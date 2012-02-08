@@ -24,34 +24,35 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  */
 
 import java.awt.Color;
-import java.util.HashMap;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
- * Adapter that uses an existing clustering to colorize the OPTICS plot.
+ * Adapter that uses a styling policy to colorize the OPTICS plot.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.uses ColorLibrary
  */
-public class OPTICSColorFromClustering implements OPTICSColorAdapter {
+public class OPTICSColorFromStylingPolicy implements OPTICSColorAdapter {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(OPTICSColorFromClustering.class);
-  
+  private static final Logging logger = Logging.getLogger(OPTICSColorFromStylingPolicy.class);
+
   /**
-   * The final mapping of object IDs to colors.
+   * The styling policy
    */
-  private final HashMap<DBID, Integer> idToColor;
+  private StylingPolicy policy;
+
+  /**
+   * The colors assigned to the individual objects
+   */
+  private int[] cols;
 
   /**
    * Constructor.
@@ -59,11 +60,12 @@ public class OPTICSColorFromClustering implements OPTICSColorAdapter {
    * @param colors Color library to use
    * @param refc Clustering to use
    */
-  public OPTICSColorFromClustering(ColorLibrary colors, Clustering<?> refc) {
-    final List<?> allClusters = refc.getAllClusters();
-    // Build a list of colors 
-    int[] cols = new int[allClusters.size()];
-    for(int i = 0; i < allClusters.size(); i++) {
+  public OPTICSColorFromStylingPolicy(ColorLibrary colors, StylingPolicy policy) {
+    super();
+    this.policy = policy;
+    // Build a list of colors
+    cols = new int[policy.getMaxStyle() + 1];
+    for(int i = 0; i <= policy.getMaxStyle(); i++) {
       Color color = SVGUtil.stringToColor(colors.getColor(i));
       if(color != null) {
         cols[i] = color.getRGB();
@@ -73,25 +75,10 @@ public class OPTICSColorFromClustering implements OPTICSColorAdapter {
         cols[i] = 0x7F7F7F7F;
       }
     }
-
-    idToColor = new HashMap<DBID, Integer>();
-    int cnum = 0;
-    for(Cluster<?> clus : refc.getAllClusters()) {
-      Color color = SVGUtil.stringToColor(colors.getColor(cnum));
-      if (color == null) {
-        logger.warning("Could not parse color: "+colors.getColor(cnum));
-        color = Color.BLACK;
-      }
-      int rgb = color.getRGB();
-      for(DBID id : clus.getIDs()) {
-        idToColor.put(id, rgb);
-      }
-      cnum++;
-    }
   }
 
   @Override
   public int getColorForEntry(ClusterOrderEntry<?> coe) {
-    return idToColor.get(coe.getID());
+    return cols[policy.getStyleForDBID(coe.getID())];
   }
 }
