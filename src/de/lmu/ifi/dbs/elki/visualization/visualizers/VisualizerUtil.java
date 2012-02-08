@@ -53,9 +53,10 @@ public final class VisualizerUtil {
    */
   public static VisualizerContext getContext(HierarchicalResult baseResult) {
     IterableIterator<VisualizerContext> iter = ResultUtil.filteredResults(baseResult, VisualizerContext.class);
-    if (iter.hasNext()) {
+    if(iter.hasNext()) {
       return iter.next();
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -76,6 +77,28 @@ public final class VisualizerUtil {
       enabled = true;
     }
     return enabled;
+  }
+
+  /**
+   * Utility function to change Visualizer visibility.
+   * 
+   * @param task Visualization task
+   * @param visibility Visibility value
+   */
+  public static void setVisible(VisualizationTask task, boolean visibility) {
+    VisualizerContext context = task.getContext();
+    // Hide other tools
+    if(visibility && VisualizerUtil.isTool(task)) {
+      final Iterable<VisualizationTask> visualizers = ResultUtil.filteredResults(context.getResult(), VisualizationTask.class);
+      for(VisualizationTask other : visualizers) {
+        if(other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
+          other.put(VisualizationTask.META_VISIBLE, false);
+          context.getHierarchy().resultChanged(other);
+        }
+      }
+    }
+    task.put(VisualizationTask.META_VISIBLE, visibility);
+    context.getHierarchy().resultChanged(task);
   }
 
   /**

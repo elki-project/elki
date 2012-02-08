@@ -425,7 +425,7 @@ public class ResultWindow extends JFrame implements ResultListener {
             SwingUtilities.invokeLater(new Runnable() {
               @Override
               public void run() {
-                context.setVisualizationVisibility(v, visItem.getState());
+                VisualizerUtil.setVisible(v, visItem.getState());
               }
             });
           }
@@ -441,7 +441,7 @@ public class ResultWindow extends JFrame implements ResultListener {
             SwingUtilities.invokeLater(new Runnable() {
               @Override
               public void run() {
-                context.setVisualizationVisibility(v, visItem.isSelected());
+                VisualizerUtil.setVisible(v, visItem.isSelected());
               }
             });
           }
