@@ -29,10 +29,7 @@ import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -54,6 +51,7 @@ import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -119,24 +117,20 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
 
   @Override
   public void redraw() {
-    Clustering<?> clustering = context.getOrCreateDefaultClustering();
-    setupCSS(svgp, clustering);
+    StylingPolicy colors = context.getStyleResult().getStylingPolicy();
+    setupCSS(svgp, colors);
     // bubble size
     double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
     // draw data
-    Iterator<? extends Cluster<?>> ci = clustering.getAllClusters().iterator();
-    for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-      Cluster<?> clus = ci.next();
-      for(DBID objId : clus.getIDs()) {
-        final Double radius = getScaledForId(objId);
-        if(radius > 0.01) {
-          final NumberVector<?, ?> vec = rel.get(objId);
-          if(vec != null) {
-            double[] v = proj.fastProjectDataToRenderSpace(vec);
-            Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
-            SVGUtil.addCSSClass(circle, BUBBLE + cnum);
-            layer.appendChild(circle);
-          }
+    for(DBID objId : sample.getSample()) {
+      final Double radius = getScaledForId(objId);
+      if(radius > 0.01) {
+        final NumberVector<?, ?> vec = rel.get(objId);
+        if(vec != null) {
+          double[] v = proj.fastProjectDataToRenderSpace(vec);
+          Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
+          SVGUtil.addCSSClass(circle, BUBBLE + colors.getStyleForDBID(objId));
+          layer.appendChild(circle);
         }
       }
     }
@@ -148,7 +142,7 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
       synchronizedRedraw();
     }
   }
-  
+
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
@@ -158,22 +152,19 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
    * Registers the Bubble-CSS-Class at a SVGPlot.
    * 
    * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
-   * @param clustering Clustering to use
+   * @param policy Clustering to use
    */
-  private void setupCSS(SVGPlot svgp, Clustering<? extends Model> clustering) {
+  private void setupCSS(SVGPlot svgp, StylingPolicy policy) {
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
     // creating IDs manually because cluster often return a null-ID.
-    int clusterID = 0;
-
-    for(@SuppressWarnings("unused")
-    Cluster<?> cluster : clustering.getAllClusters()) {
+    for(int clusterID = 0; clusterID < policy.getMaxStyle(); clusterID++) {
       CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
 
       String color;
 
-      if(clustering.getAllClusters().size() == 1) {
+      if(policy.getMaxStyle() == 1) {
         color = "black";
       }
       else {
@@ -191,7 +182,6 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
       }
 
       svgp.addCSSClassOrLogError(bubble);
-      clusterID += 1;
     }
   }
 

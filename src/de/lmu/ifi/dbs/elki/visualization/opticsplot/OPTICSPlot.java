@@ -27,7 +27,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -41,6 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 
 /**
  * Class to produce an OPTICS plot image.
@@ -348,8 +348,8 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
       return null;
     }
     final ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-    final Clustering<?> refc = context.getOrCreateDefaultClustering();
-    final OPTICSColorAdapter opcolor = new OPTICSColorFromClustering(colors, refc);
+    final StylingPolicy policy = context.getStyleResult().getStylingPolicy();
+    final OPTICSColorAdapter opcolor = new OPTICSColorFromStylingPolicy(colors, policy);
 
     OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor);
     // co.addChildResult(opticsplot);
