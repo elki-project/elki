@@ -84,7 +84,7 @@ public class DotVisualization extends P2DVisualization implements DataStoreListe
   public void redraw() {
     // draw data
     double dot_size = context.getStyleLibrary().getSize(StyleLibrary.DOTPLOT);
-    for(DBID id : rel.iterDBIDs()) {
+    for(DBID id : sample.getSample()) {
       try {
         double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));
         Element dot = svgp.svgCircle(v[0], v[1], dot_size);
