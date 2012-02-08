@@ -119,7 +119,6 @@ public class VoronoiVisualization extends P2DVisualization {
     super(task);
     this.clustering = task.getResult();
     this.mode = mode;
-    context.addContextChangeListener(this);
     incrementalRedraw();
   }
 

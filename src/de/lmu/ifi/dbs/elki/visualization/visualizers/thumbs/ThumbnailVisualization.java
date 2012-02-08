@@ -41,8 +41,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
 
 /**
  * Thumbnail visualization.
@@ -112,8 +110,6 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     if((mask & ON_DATA) == ON_DATA) {
       context.addDataStoreListener(this);
     }
-    // Always listen for context changes, in particular resize.
-    context.addContextChangeListener(this);
     // Listen for result changes, including the one we monitor
     context.addResultListener(this);
   }
@@ -125,7 +121,6 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     }
     // TODO: remove image from registry?
     context.removeResultListener(this);
-    context.removeContextChangeListener(this);
     context.removeDataStoreListener(this);
   }
 
@@ -135,27 +130,6 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       synchronizedRedraw();
     }
     return layer;
-  }
-
-  @Override
-  public void contextChanged(ContextChangedEvent e) {
-    if(testRedraw(e)) {
-      refreshThumbnail();
-    }
-  }
-
-  /**
-   * Override this method to add additional redraw triggers!
-   * 
-   * @param e Event
-   * @return Test result
-   */
-  @Override
-  protected boolean testRedraw(ContextChangedEvent e) {
-    if(e instanceof ResizedEvent) {
-      return true;
-    }
-    return false;
   }
 
   @Override

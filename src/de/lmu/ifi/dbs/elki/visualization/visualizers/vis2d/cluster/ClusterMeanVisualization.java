@@ -103,7 +103,6 @@ public class ClusterMeanVisualization extends P2DVisualization {
     super(task);
     this.clustering = task.getResult();
     this.stars = stars;
-    context.addContextChangeListener(this);
     incrementalRedraw();
   }
 

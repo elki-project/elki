@@ -290,6 +290,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @param listener
    */
+  @Deprecated
   public void addContextChangeListener(ContextChangeListener listener) {
     listenerList.add(ContextChangeListener.class, listener);
   }
@@ -299,6 +300,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @param listener
    */
+  @Deprecated
   public void removeContextChangeListener(ContextChangeListener listener) {
     listenerList.remove(ContextChangeListener.class, listener);
   }
@@ -308,6 +310,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @param e Event
    */
+  @Deprecated
   public void fireContextChange(ContextChangedEvent e) {
     for(ContextChangeListener listener : listenerList.getListeners(ContextChangeListener.class)) {
       listener.contextChanged(e);

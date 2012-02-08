@@ -105,7 +105,6 @@ public class ClusterHullVisualization extends P2DVisualization {
     super(task);
     this.clustering = task.getResult();
     this.alpha = alpha;
-    context.addContextChangeListener(this);
     incrementalRedraw();
   }
 

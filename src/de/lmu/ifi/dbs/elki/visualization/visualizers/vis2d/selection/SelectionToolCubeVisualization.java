@@ -58,7 +58,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
 /**
@@ -110,19 +109,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
   public SelectionToolCubeVisualization(VisualizationTask task) {
     super(task);
     this.dim = DatabaseUtil.dimensionality(rel);
-    context.addContextChangeListener(this);
     incrementalRedraw();
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    context.removeContextChangeListener(this);
-  }
-
-  @Override
-  public void contextChanged(ContextChangedEvent e) {
-    synchronizedRedraw();
   }
 
   @Override

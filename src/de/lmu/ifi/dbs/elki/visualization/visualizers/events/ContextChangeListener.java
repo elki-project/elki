@@ -30,12 +30,14 @@ import java.util.EventListener;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent oneway - - listens
+ * @apiviz.uses ContextChangedEvent oneway - - listens
+ * @deprecated Listen for ResultChanged events of the context object!
  */
+@Deprecated
 public interface ContextChangeListener extends EventListener {
   /**
-   * Method called on context changes (e.g. projection changes).
-   * Usually, this should trigger a redraw!
+   * Method called on context changes (e.g. projection changes). Usually, this
+   * should trigger a redraw!
    * 
    * @param e Change event
    */
