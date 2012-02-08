@@ -60,6 +60,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * 
  * @author Erich Schubert
  * 
+ * TODO: remove this class
+ * 
  * @apiviz.landmark
  * @apiviz.uses ContextChangedEvent oneway - - «emit»
  * @apiviz.composedOf StyleLibrary
@@ -113,26 +115,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
    */
   private Clustering<? extends Model> defaultClustering;
 
-  /**
-   * Identifier for the primary clustering to use.
-   */
-  public static final String CLUSTERING = "clustering";
-
-  /**
-   * Identifier for a fallback (default) clustering.
-   */
-  public static final String CLUSTERING_FALLBACK = "clustering-fallback";
-
-  /**
-   * Identifier for the visualizer list
-   */
-  public static final String VISUALIZER_LIST = "visualizers";
-
-  /**
-   * Identifier for the selection
-   */
-  public static final String SELECTION = "selection";
-  
   /**
    * Constructor. We currently require a Database and a Result.
    * 
@@ -264,20 +246,12 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
    * 
    * @param task Visualization task
    * @param visibility new visibility
+   * 
+   * @deprecated Use {@link VisualizerUtil#setVisible}
    */
+  @Deprecated
   public void setVisualizationVisibility(VisualizationTask task, boolean visibility) {
-    // Hide other tools
-    if(visibility && VisualizerUtil.isTool(task)) {
-      final Iterable<VisualizationTask> visualizers = ResultUtil.filteredResults(getResult(), VisualizationTask.class);
-      for(VisualizationTask other : visualizers) {
-        if(other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
-          other.put(VisualizationTask.META_VISIBLE, false);
-          getHierarchy().resultChanged(other);
-        }
-      }
-    }
-    task.put(VisualizationTask.META_VISIBLE, visibility);
-    getHierarchy().resultChanged(task);
+    VisualizerUtil.setVisible(task, visibility);
   }
 
   /**
@@ -373,18 +347,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
         logger.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);
       }
     }
-  }
-
-  /**
-   * Get an iterator over all visualizers.
-   * 
-   * @return Iterator
-   * 
-   * @deprecated Odd semantics: contains duplicates!
-   */
-  @Deprecated
-  public IterableIterator<VisualizationTask> iterVisualizers() {
-    return ResultUtil.filteredResults(getResult(), VisualizationTask.class);
   }
 
   /**
