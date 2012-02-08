@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -87,6 +88,22 @@ public final class VisualizerUtil {
    */
   public static void setVisible(VisualizationTask task, boolean visibility) {
     VisualizerContext context = task.getContext();
+    if(context != null) {
+      setVisible(context, task, visibility);
+    }
+    else {
+      LoggingUtil.warning("setVisible called without context in task.", new Throwable());
+    }
+  }
+
+  /**
+   * Utility function to change Visualizer visibility.
+   * 
+   * @param context Visualization context
+   * @param task Visualization task
+   * @param visibility Visibility value
+   */
+  public static void setVisible(VisualizerContext context, VisualizationTask task, boolean visibility) {
     // Hide other tools
     if(visibility && VisualizerUtil.isTool(task)) {
       final Iterable<VisualizationTask> visualizers = ResultUtil.filteredResults(context.getResult(), VisualizationTask.class);

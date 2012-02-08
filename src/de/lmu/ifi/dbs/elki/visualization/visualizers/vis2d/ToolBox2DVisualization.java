@@ -237,7 +237,7 @@ public class ToolBox2DVisualization extends P2DVisualization {
     if(VisualizerUtil.isVisible(tool)) {
       context.setSelection(null);
     }
-    VisualizerUtil.setVisible(tool, true);
+    VisualizerUtil.setVisible(context, tool, true);
   }
 
   @Override

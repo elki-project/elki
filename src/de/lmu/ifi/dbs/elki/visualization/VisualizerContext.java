@@ -251,7 +251,7 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
    */
   @Deprecated
   public void setVisualizationVisibility(VisualizationTask task, boolean visibility) {
-    VisualizerUtil.setVisible(task, visibility);
+    VisualizerUtil.setVisible(this, task, visibility);
   }
 
   /**
