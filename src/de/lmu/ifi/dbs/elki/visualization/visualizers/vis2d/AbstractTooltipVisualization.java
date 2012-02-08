@@ -98,7 +98,7 @@ public abstract class AbstractTooltipVisualization extends P2DVisualization impl
 
     double dotsize = context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
 
-    for(DBID id : rel.iterDBIDs()) {
+    for(DBID id : sample.getSample()) {
       double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));
       Element tooltip = makeTooltip(id, v[0], v[1], dotsize);
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);

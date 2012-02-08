@@ -28,6 +28,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
@@ -54,6 +56,11 @@ public abstract class P2DVisualization extends AbstractVisualization {
    * The representation we visualize
    */
   final protected Relation<? extends NumberVector<?, ?>> rel;
+  
+  /**
+   * The DBID sample
+   */
+  final protected SamplingResult sample;
 
   /**
    * Constructor.
@@ -64,6 +71,7 @@ public abstract class P2DVisualization extends AbstractVisualization {
     super(task);
     this.proj = task.getProj();
     this.rel = task.getRelation();
+    this.sample = ResultUtil.getSamplingResult(rel);
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
   }
