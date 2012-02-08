@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -45,7 +44,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
@@ -130,11 +128,6 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * Identifier for the selection
    */
   public static final String SELECTION = "selection";
-
-  /**
-   * Identifier for the sample
-   */
-  public static final String SAMPLE = "sample";
 
   /**
    * Constructor. We currently require a Database and a Result.
@@ -266,30 +259,6 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   public void setSelection(DBIDSelection sel) {
     SelectionResult selres = getGenerics(SELECTION, SelectionResult.class);
     selres.setSelection(sel);
-    getHierarchy().resultChanged(selres);
-  }
-
-  /**
-   * Get the current sample.
-   * 
-   * @return sample
-   */
-  public DBIDs getSample() {
-    SamplingResult res = getGenerics(SAMPLE, SamplingResult.class);
-    if(res != null) {
-      return res.getSample();
-    }
-    return null;
-  }
-
-  /**
-   * Set a new sample.
-   * 
-   * @param sel Sample
-   */
-  public void setSample(DBIDs sel) {
-    SamplingResult selres = getGenerics(SELECTION, SamplingResult.class);
-    selres.setSample(sel);
     getHierarchy().resultChanged(selres);
   }
 
