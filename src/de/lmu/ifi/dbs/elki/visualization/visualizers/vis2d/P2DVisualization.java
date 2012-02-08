@@ -56,7 +56,7 @@ public abstract class P2DVisualization extends AbstractVisualization {
    * The representation we visualize
    */
   final protected Relation<? extends NumberVector<?, ?>> rel;
-  
+
   /**
    * The DBID sample
    */

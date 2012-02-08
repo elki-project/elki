@@ -99,6 +99,13 @@ public class DotVisualization extends P2DVisualization implements DataStoreListe
   }
 
   @Override
+  public void resultChanged(Result current) {
+    if(sample == current) {
+      synchronizedRedraw();
+    }
+  }
+
+  @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
