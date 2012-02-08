@@ -119,12 +119,12 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
 
   @Override
   public void redraw() {
-    Clustering<Model> clustering = context.getOrCreateDefaultClustering();
+    Clustering<?> clustering = context.getOrCreateDefaultClustering();
     setupCSS(svgp, clustering);
     // bubble size
     double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
     // draw data
-    Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
+    Iterator<? extends Cluster<?>> ci = clustering.getAllClusters().iterator();
     for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
       Cluster<?> clus = ci.next();
       for(DBID objId : clus.getIDs()) {

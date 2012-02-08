@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
@@ -68,12 +67,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  * @apiviz.composedOf ResultHierarchy
  * @apiviz.composedOf EventListenerList
  */
-public class VisualizerContext extends AnyMap<String> implements DataStoreListener, ResultListener, Result {
-  /**
-   * Serial version.
-   */
-  private static final long serialVersionUID = 1L;
-
+public class VisualizerContext implements DataStoreListener, ResultListener, Result {
   /**
    * Logger.
    */
@@ -110,6 +104,16 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
   private Pattern hideVisualizers;
 
   /**
+   * Selection result
+   */
+  private SelectionResult selection;
+
+  /**
+   * Default clustering
+   */
+  private Clustering<? extends Model> defaultClustering;
+
+  /**
    * Identifier for the primary clustering to use.
    */
   public static final String CLUSTERING = "clustering";
@@ -128,7 +132,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * Identifier for the selection
    */
   public static final String SELECTION = "selection";
-
+  
   /**
    * Constructor. We currently require a Database and a Result.
    * 
@@ -149,11 +153,11 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
 
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
     if(clusterings.size() > 0) {
-      this.put(CLUSTERING, clusterings.get(0));
+      this.defaultClustering = clusterings.get(0);
     }
     List<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
     if(selections.size() > 0) {
-      this.put(SELECTION, selections.get(0));
+      this.selection = selections.get(0);
     }
 
     result.getHierarchy().add(result, this);
@@ -203,15 +207,11 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * 
    * @return Clustering to use
    */
-  public Clustering<Model> getOrCreateDefaultClustering() {
-    Clustering<Model> c = getGenerics(CLUSTERING, Clustering.class);
-    if(c == null) {
-      c = getGenerics(CLUSTERING_FALLBACK, Clustering.class);
+  public Clustering<?> getOrCreateDefaultClustering() {
+    if(defaultClustering == null) {
+      defaultClustering = generateDefaultClustering();
     }
-    if(c == null) {
-      c = generateDefaultClustering();
-    }
-    return c;
+    return defaultClustering;
   }
 
   /**
@@ -232,7 +232,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
       c = new TrivialAllInOne().run(db);
     }
     // store.
-    put(CLUSTERING_FALLBACK, c);
+    defaultClustering = c;
     return c;
   }
 
@@ -244,11 +244,7 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * @return selection
    */
   public DBIDSelection getSelection() {
-    SelectionResult res = getGenerics(SELECTION, SelectionResult.class);
-    if(res != null) {
-      return res.getSelection();
-    }
-    return null;
+    return selection.getSelection();
   }
 
   /**
@@ -257,9 +253,8 @@ public class VisualizerContext extends AnyMap<String> implements DataStoreListen
    * @param sel Selection
    */
   public void setSelection(DBIDSelection sel) {
-    SelectionResult selres = getGenerics(SELECTION, SelectionResult.class);
-    selres.setSelection(sel);
-    getHierarchy().resultChanged(selres);
+    selection.setSelection(sel);
+    getHierarchy().resultChanged(selection);
   }
 
   /**
