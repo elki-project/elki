@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
@@ -61,7 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
  */
-public class SelectionDotVisualization extends P2DVisualization implements ContextChangeListener, DataStoreListener {
+public class SelectionDotVisualization extends P2DVisualization implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -79,7 +78,6 @@ public class SelectionDotVisualization extends P2DVisualization implements Conte
    */
   public SelectionDotVisualization(VisualizationTask task) {
     super(task);
-    context.addContextChangeListener(this);
     context.addResultListener(this);
     context.addDataStoreListener(this);
     incrementalRedraw();

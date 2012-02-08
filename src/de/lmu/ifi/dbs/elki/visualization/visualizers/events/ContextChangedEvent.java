@@ -33,7 +33,10 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype event
+ * 
+ * @deprecated Listen for ResultChanged events of the context object!
  */
+@Deprecated
 public abstract class ContextChangedEvent extends EventObject {
   /**
    * Serial version

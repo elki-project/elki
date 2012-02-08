@@ -116,7 +116,6 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   public EMClusterVisualization(VisualizationTask task) {
     super(task);
     this.clustering = task.getResult();
-    context.addContextChangeListener(this);
     incrementalRedraw();
   }
 

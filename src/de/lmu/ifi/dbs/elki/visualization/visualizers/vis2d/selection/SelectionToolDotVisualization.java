@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
 /**
@@ -99,19 +98,7 @@ public class SelectionToolDotVisualization extends P2DVisualization implements D
    */
   public SelectionToolDotVisualization(VisualizationTask task) {
     super(task);
-    context.addContextChangeListener(this);
     incrementalRedraw();
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    context.removeContextChangeListener(this);
-  }
-
-  @Override
-  public void contextChanged(ContextChangedEvent e) {
-    synchronizedRedraw();
   }
 
   @Override

@@ -143,6 +143,13 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
   }
 
   @Override
+  public void resultChanged(Result current) {
+    if(sample == current) {
+      synchronizedRedraw();
+    }
+  }
+  
+  @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }

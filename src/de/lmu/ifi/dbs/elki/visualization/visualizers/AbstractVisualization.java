@@ -30,16 +30,13 @@ import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ResizedEvent;
 
 /**
  * Abstract base class for visualizations.
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractVisualization implements Visualization, ContextChangeListener, ResultListener {
+public abstract class AbstractVisualization implements Visualization, ResultListener {
   /**
    * The visualization task we do.
    */
@@ -80,7 +77,6 @@ public abstract class AbstractVisualization implements Visualization, ContextCha
 
   @Override
   public void destroy() {
-    context.removeContextChangeListener(this);
     context.removeResultListener(this);
   }
 
@@ -108,26 +104,6 @@ public abstract class AbstractVisualization implements Visualization, ContextCha
    */
   protected double getHeight() {
     return task.getHeight();
-  }
-
-  @Override
-  public void contextChanged(ContextChangedEvent e) {
-    if(testRedraw(e)) {
-      synchronizedRedraw();
-    }
-  }
-
-  /**
-   * Override this method to add additional redraw triggers!
-   * 
-   * @param e Event
-   * @return Test result
-   */
-  protected boolean testRedraw(ContextChangedEvent e) {
-    if(e instanceof ResizedEvent) {
-      return true;
-    }
-    return false;
   }
 
   /**

@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
 /**
  * Renders a tool box on the left of the 2D visualization
@@ -97,14 +96,8 @@ public class ToolBox2DVisualization extends P2DVisualization {
   public ToolBox2DVisualization(VisualizationTask task) {
     super(task);
     // TODO: which result do we best attach to?
-    context.addContextChangeListener(this);
     context.addResultListener(this);
     incrementalRedraw();
-  }
-
-  @Override
-  public void contextChanged(ContextChangedEvent e) {
-    synchronizedRedraw();
   }
 
   @Override

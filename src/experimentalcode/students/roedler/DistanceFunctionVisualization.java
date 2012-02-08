@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 import experimentalcode.students.roedler.utils.DistanceFunctionDrawUtils;
@@ -51,7 +50,7 @@ import experimentalcode.students.roedler.utils.DistanceFunctionDrawUtils;
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
  */
-public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> extends P2DVisualization implements ContextChangeListener, DataStoreListener {
+public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> extends P2DVisualization implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -84,7 +83,6 @@ public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> exten
   public DistanceFunctionVisualization(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
-    context.addContextChangeListener(this);
     context.addDataStoreListener(this);
     context.addResultListener(this);
     incrementalRedraw();
@@ -236,7 +234,6 @@ public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> exten
   @Override
   public void destroy() {
     super.destroy();
-    context.removeContextChangeListener(this);
     context.removeDataStoreListener(this);
   }
 

@@ -53,7 +53,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
@@ -67,7 +66,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has RangeSelection oneway - - visualizes
  * @apiviz.uses SVGHyperCube
  */
-public class SelectionCubeVisualization extends P2DVisualization implements ContextChangeListener {
+public class SelectionCubeVisualization extends P2DVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -97,7 +96,6 @@ public class SelectionCubeVisualization extends P2DVisualization implements Cont
     super(task);
     this.nofill = nofill;
     addCSSClasses(svgp);
-    context.addContextChangeListener(this);
     context.addResultListener(this);
     incrementalRedraw();
   }
