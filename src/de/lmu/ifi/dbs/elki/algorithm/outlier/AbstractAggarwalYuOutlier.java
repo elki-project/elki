@@ -54,8 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * 
  * <p>
  * Reference: <br />
- * Outlier detection for high dimensional data Outlier detection for high
- * dimensional data <br />
+ * Outlier detection for high dimensional data<br />
  * C.C. Aggarwal, P. S. Yu<br />
  * International Conference on Management of Data Proceedings of the 2001 ACM
  * SIGMOD international conference on Management of data 2001, Santa Barbara,

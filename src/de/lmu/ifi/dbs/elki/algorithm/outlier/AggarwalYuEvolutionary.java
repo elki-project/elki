@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,8 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * detect outliers for high dimensional data.
  * <p>
  * Reference: <br />
- * Outlier detection for high dimensional data Outlier detection for high
- * dimensional data <br />
+ * Outlier detection for high dimensional data<br />
  * C.C. Aggarwal, P. S. Yu <br />
  * Proceedings of the 2001 ACM SIGMOD international conference on Management of
  * data 2001, Santa Barbara, California, United States
@@ -224,9 +224,10 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
       this.m = m;
       this.dbsize = database.size();
       this.dim = DatabaseUtil.dimensionality(database);
-      if (seed != null) {
+      if(seed != null) {
         this.random = new Random(seed);
-      } else {
+      }
+      else {
         this.random = new Random();
       }
     }
@@ -274,7 +275,6 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
 
     /**
      * check the termination criterion
-     * 
      */
     private boolean checkConvergence(Collection<Individuum> pop) {
       if(pop.size() == 0) {
@@ -684,14 +684,14 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier.Parameterizer {
     protected int m = 0;
-    
+
     protected Long seed = null;
 
     @Override
