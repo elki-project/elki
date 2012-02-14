@@ -100,7 +100,7 @@ public class LeastOverlapInsertionStrategy implements InsertionStrategy {
         }
       }
     }
-    assert (best > -1) : "Least overlap didn't have a candidate at all?";
+    assert (best > -1) : "No split found? Volume outside of double precision?";
     return best;
   }
 

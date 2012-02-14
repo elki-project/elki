@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,8 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * A slight modification of the default R-Tree insertion strategy: find rectangle with least volume
- * enlargement, but choose least area on ties.
+ * A slight modification of the default R-Tree insertion strategy: find
+ * rectangle with least volume enlargement, but choose least area on ties.
  * 
  * Proposed for non-leaf entries in:
  * <p>
@@ -66,17 +67,19 @@ public class LeastEnlargementWithAreaInsertionStrategy implements InsertionStrat
     int best = -1;
     for(int i = 0; i < size; i++) {
       SpatialComparable entry = getter.get(options, i);
-      final double area = SpatialUtil.volume(entry);
-      double enlargement = SpatialUtil.volumeUnion(entry, obj) - area;
+      double enlargement = SpatialUtil.enlargement(entry, obj);
       if(enlargement < leastEnlargement) {
         leastEnlargement = enlargement;
         best = i;
-        minArea = area;
+        minArea = SpatialUtil.volume(entry);
       }
-      else if(enlargement == leastEnlargement && area < minArea) {
-        // Tie handling proposed by R*:
-        best = i;
-        minArea = area;
+      else if(enlargement == leastEnlargement) {
+        final double area = SpatialUtil.volume(entry);
+        if(area < minArea) {
+          // Tie handling proposed by R*:
+          best = i;
+          minArea = area;
+        }
       }
     }
     assert (best > -1);
