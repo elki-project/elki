@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -140,6 +141,14 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
     }
 
     result.getHierarchy().add(result, this);
+
+    // Ensure a sampling result exists already, as this can cause reentrance
+    // errors (visualizers being added twice)!
+    // FIXME: avoid these errors properly - e.g. do not create a sampling result
+    // in getSamplingResult at all!
+    for(Relation<?> rel : ResultUtil.getRelations(result)) {
+      ResultUtil.getSamplingResult(rel);
+    }
 
     // Add visualizers.
     processNewResult(result, result);
