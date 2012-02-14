@@ -9,6 +9,8 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -21,8 +23,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
@@ -36,7 +36,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements ContextChangeListener {
+public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -78,7 +78,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
   public SelectionAxisVisibility(VisualizationTask task) {
     super(task);
     incrementalRedraw();
-    context.addContextChangeListener(this);
+    context.addDataStoreListener(this);
   }
   
   @Override
@@ -207,14 +207,16 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
         if (proj.getVisibleDimensions() > 2 || !proj.isVisible(i)){
           proj.setVisible(!proj.isVisible(i), i);
           incrementalRedraw();
-          context.fireContextChange(null);
+          context.contentChanged(null);
         }
       }
     }, false);
   }
   
-  public void contextChanged(ContextChangedEvent e){
+  @Override
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
+    
   }
   
   /**

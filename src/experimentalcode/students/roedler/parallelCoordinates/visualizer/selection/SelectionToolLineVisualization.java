@@ -34,6 +34,8 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -53,7 +55,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
@@ -61,14 +62,14 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
 /**
  * Tool-Visualization for the tool to select objects
  * 
- * @author Heidi Kolb
+ * @author Robert Rödler
  * 
  * @apiviz.has SelectionResult oneway - - updates
  * @apiviz.has DBIDSelection oneway - - updates
  * 
  * @param <NV> vector type
  */
-public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DragableArea.DragListener {
+public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DragableArea.DragListener, DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -107,7 +108,7 @@ public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> exte
    */
   public SelectionToolLineVisualization(VisualizationTask task) {
     super(task);
-    context.addContextChangeListener(this);
+    context.addDataStoreListener(this);
     incrementalRedraw();
     dim = DatabaseUtil.dimensionality(rep);
   }
@@ -115,11 +116,11 @@ public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> exte
   @Override
   public void destroy() {
     super.destroy();
-    context.removeContextChangeListener(this);
+    context.removeDataStoreListener(this);
   }
 
   @Override
-  public void contextChanged(ContextChangedEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
 

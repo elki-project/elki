@@ -32,6 +32,8 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -55,21 +57,20 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
 /**
  * Tool-Visualization for the tool to select axis ranges
  * 
- * @author Heidi Kolb
+ * @author Robert Rödler
  * 
  * @apiviz.has SelectionResult oneway - - updates
  * @apiviz.has RangeSelection oneway - - updates
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DragableArea.DragListener {
+public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DragableArea.DragListener, DataStoreListener {
   /**
    * The logger for this class.
    */
@@ -108,19 +109,20 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
   public SelectionToolAxisRangeVisualization(VisualizationTask task) {
     super(task);
     this.dim = DatabaseUtil.dimensionality(rep);
-    context.addContextChangeListener(this);
+    context.addDataStoreListener(this);
     incrementalRedraw();
   }
 
   @Override
   public void destroy() {
     super.destroy();
-    context.removeContextChangeListener(this);
+    context.removeDataStoreListener(this);
   }
 
   @Override
-  public void contextChanged(ContextChangedEvent e) {
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
+    
   }
 
   @Override
