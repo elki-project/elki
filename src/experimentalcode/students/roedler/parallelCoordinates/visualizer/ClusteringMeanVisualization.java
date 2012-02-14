@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JCheckBoxMenuItem;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -13,6 +11,8 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -33,14 +33,11 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
 import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMenuItem;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
-import experimentalcode.students.roedler.parallelCoordinates.visualizer.ClusteringVisualization.Factory;
 
 
 /**
@@ -50,7 +47,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Clusteri
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements ContextChangeListener, MenuOwner {
+public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener, MenuOwner {
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -82,7 +79,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
   public ClusteringMeanVisualization(VisualizationTask task, List<Integer> list) {
     super(task);
     this.clustering = task.getResult();
-    context.addContextChangeListener(this);
+    context.addDataStoreListener(this);
     this.list = list;
     init();
     incrementalRedraw();
@@ -192,8 +189,10 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
     }
   }
   
-  public void contextChanged(ContextChangedEvent e){
-    incrementalRedraw();
+  @Override
+  public void contentChanged(DataStoreEvent e) {
+    synchronizedRedraw();
+    
   }
   
   @Override

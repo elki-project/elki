@@ -24,7 +24,7 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
  import java.util.ArrayList;
  import java.util.Iterator;
-import java.util.List;
+ import java.util.List;
 
  import org.apache.batik.util.SVGConstants;
  import org.w3c.dom.Element;
@@ -41,11 +41,11 @@ import java.util.List;
  import de.lmu.ifi.dbs.elki.result.ResultUtil;
  import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
+ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
  import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
  import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -55,12 +55,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
  import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
- import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
- import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
  import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
  import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
  import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
+ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
  /**
   * Visualize the  of an R-Tree based index.
@@ -74,7 +72,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
   * @param <E> Tree entry type
   */
  // TODO: listen for tree changes instead of data changes?
- public class PTreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NV> implements MenuOwner, ContextChangeListener, DataStoreListener {
+ public class PTreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NV> implements MenuOwner, DataStoreListener {
    /**
     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
     */
@@ -117,7 +115,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
      this.tree = AbstractRStarTree.class.cast(task.getResult());
      this.fill = fill;
      context.addDataStoreListener(this);
-     context.addContextChangeListener(this);
      init();
      incrementalRedraw();
    }
@@ -266,10 +263,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
    public void destroy() {
      super.destroy();
      context.removeDataStoreListener(this);
-   }
-
-   public void contextChanged(ContextChangedEvent e){
-     synchronizedRedraw();
    }
    
    @Override

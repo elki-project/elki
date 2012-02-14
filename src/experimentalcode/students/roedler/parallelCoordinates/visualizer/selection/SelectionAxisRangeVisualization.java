@@ -30,6 +30,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
@@ -46,8 +48,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
@@ -63,7 +63,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionAxisRangeVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements ContextChangeListener {
+public class SelectionAxisRangeVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -77,7 +77,7 @@ public class SelectionAxisRangeVisualization<NV extends NumberVector<NV, ?>> ext
   public SelectionAxisRangeVisualization(VisualizationTask task) {
     super(task);
     addCSSClasses(svgp);
-    context.addContextChangeListener(this);
+    context.addDataStoreListener(this);
     context.addResultListener(this);
     incrementalRedraw();
   }
@@ -129,8 +129,8 @@ public class SelectionAxisRangeVisualization<NV extends NumberVector<NV, ?>> ext
   }
   
   @Override
-  public void contextChanged(ContextChangedEvent e) {
-    incrementalRedraw();
+  public void contentChanged(DataStoreEvent e) {
+    synchronizedRedraw();
     
   }
 

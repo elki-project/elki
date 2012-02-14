@@ -3,6 +3,8 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -12,8 +14,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.svg.SVGParallelLinearAxis;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
@@ -28,7 +28,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements ContextChangeListener {
+public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
   
   /**
    * Constructor.
@@ -37,7 +37,7 @@ public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends P
    */
   public ParallelAxisVisualization(VisualizationTask task) {
     super(task);
-    context.addContextChangeListener(this);
+    context.addDataStoreListener(this);
     incrementalRedraw();
   }
   
@@ -56,9 +56,12 @@ public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends P
     catch(CSSNamingConflict e) {
       throw new RuntimeException("Conflict in CSS naming for axes.", e);
     }
-}
-  public void contextChanged(ContextChangedEvent e){
+  }
+  
+  @Override
+  public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
+    
   }
   
   /**

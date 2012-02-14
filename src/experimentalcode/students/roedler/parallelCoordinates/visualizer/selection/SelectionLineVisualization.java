@@ -30,6 +30,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -64,7 +66,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements ContextChangeListener {
+public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -78,7 +80,7 @@ public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends 
   public SelectionLineVisualization(VisualizationTask task) {
     super(task);
     addCSSClasses(svgp);
-    context.addContextChangeListener(this);
+    context.addDataStoreListener(this);
     context.addResultListener(this);
     incrementalRedraw();
   }
@@ -128,8 +130,9 @@ public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends 
   }
   
   @Override
-  public void contextChanged(ContextChangedEvent e) {
-    incrementalRedraw();  
+  public void contentChanged(DataStoreEvent e) {
+    synchronizedRedraw();
+    
   }
 
   /**
