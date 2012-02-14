@@ -62,6 +62,7 @@ public class TopologicalSplitter implements SplitStrategy {
     split.chooseSplitAxis(minEntries);
     split.chooseSplitPoint(minEntries);
 
+    assert (split.splitPoint < split.size) : "Invalid split produced. Size: " + getter.size(entries) + " minEntries: " + minEntries + " split.size: " + split.size;
     BitSet assignment = new BitSet(split.size);
     for(int i = split.splitPoint; i < split.size; i++) {
       assignment.set(split.bestSorting[i].second);
@@ -219,13 +220,14 @@ public class TopologicalSplitter implements SplitStrategy {
       // the split point (first set to minimum entries in the node)
       splitPoint = size;
       // best value for the overlap
-      double minOverlap = Double.MAX_VALUE;
+      double minOverlap = Double.POSITIVE_INFINITY;
       // the volume of mbr1 and mbr2
-      double volume = 0.0;
+      double volume = Double.POSITIVE_INFINITY;
       // indicates whether the sorting according to maximal or to minimal value
       // is best for the split axis
       bestSorting = null;
 
+      assert (size - 2 * minEntries > 0) : "Cannot split underfull nodes.";
       // test the sorting with respect to the minimal values
       {
         ModifiableHyperBoundingBox mbr1 = mbr(minSorting, 0, minEntries - 1);
@@ -261,6 +263,13 @@ public class TopologicalSplitter implements SplitStrategy {
             }
           }
         }
+      }
+      // assert(splitPoint < size) :
+      // "No split found? minOverlap:"+minOverlap+" volume:"+volume;
+      if(splitPoint == size) {
+        // Fall back to essentially a random split, unfortunately.
+        splitPoint = size >>> 1;
+        bestSorting = minSorting;
       }
     }
 

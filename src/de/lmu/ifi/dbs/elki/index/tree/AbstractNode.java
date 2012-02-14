@@ -35,9 +35,9 @@ import java.util.NoSuchElementException;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract superclass for nodes in an tree based index structure.
@@ -405,8 +405,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
     assert (isLeaf() == newNode.isLeaf());
     int dest = assignment.nextSetBit(0);
     if(dest < 0) {
-      LoggingUtil.warning("Split with no bits set?!?");
-      return;
+      throw new AbortException("No bits set in splitting mask.");
     }
     int pos = dest;
     while(pos < numEntries) {
