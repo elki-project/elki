@@ -53,8 +53,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangeListener;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.events.ContextChangedEvent;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -263,38 +261,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
   @Deprecated
   public void setVisualizationVisibility(VisualizationTask task, boolean visibility) {
     VisualizerUtil.setVisible(this, task, visibility);
-  }
-
-  /**
-   * Add a context change listener.
-   * 
-   * @param listener
-   */
-  @Deprecated
-  public void addContextChangeListener(ContextChangeListener listener) {
-    listenerList.add(ContextChangeListener.class, listener);
-  }
-
-  /**
-   * Remove a context change listener.
-   * 
-   * @param listener
-   */
-  @Deprecated
-  public void removeContextChangeListener(ContextChangeListener listener) {
-    listenerList.remove(ContextChangeListener.class, listener);
-  }
-
-  /**
-   * Trigger a context change event.
-   * 
-   * @param e Event
-   */
-  @Deprecated
-  public void fireContextChange(ContextChangedEvent e) {
-    for(ContextChangeListener listener : listenerList.getListeners(ContextChangeListener.class)) {
-      listener.contextChanged(e);
-    }
   }
 
   /**
