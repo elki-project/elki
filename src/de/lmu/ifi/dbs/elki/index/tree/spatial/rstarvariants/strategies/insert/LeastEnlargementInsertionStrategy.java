@@ -63,7 +63,7 @@ public class LeastEnlargementInsertionStrategy implements InsertionStrategy {
     int best = -1;
     for(int i = 0; i < size; i++) {
       SpatialComparable entry = getter.get(options, i);
-      double enlargement = SpatialUtil.volumeUnion(entry, obj) - SpatialUtil.volume(entry);
+      double enlargement = SpatialUtil.enlargement(entry, obj);
       if(enlargement < leastEnlargement) {
         leastEnlargement = enlargement;
         best = i;

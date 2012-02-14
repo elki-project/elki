@@ -264,13 +264,7 @@ public class TopologicalSplitter implements SplitStrategy {
           }
         }
       }
-      // assert(splitPoint < size) :
-      // "No split found? minOverlap:"+minOverlap+" volume:"+volume;
-      if(splitPoint == size) {
-        // Fall back to essentially a random split, unfortunately.
-        splitPoint = size >>> 1;
-        bestSorting = minSorting;
-      }
+      assert (splitPoint < size) : "No split found? Volume outside of double precision?";
     }
 
     private E get(int off) {

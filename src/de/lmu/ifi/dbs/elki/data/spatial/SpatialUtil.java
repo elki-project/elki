@@ -42,26 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 // numbers start at 1 or 0 depending on the context!
 public final class SpatialUtil {
   /**
-   * Compute the volume (area) of the union of two MBRs
-   * 
-   * @param r1 First object
-   * @param r2 Second object
-   * @return Volume of union
-   */
-  public static double volumeUnion(SpatialComparable r1, SpatialComparable r2) {
-    final int dim1 = r1.getDimensionality();
-    final int dim2 = r2.getDimensionality();
-    assert (!LoggingConfiguration.DEBUG || dim1 == dim2) : "Computing union with different dimensionality: " + dim1 + " vs. " + dim2;
-    double volume = 1.0;
-    for(int i = 1; i <= dim1; i++) {
-      final double min = Math.min(r1.getMin(i), r2.getMin(i));
-      final double max = Math.max(r1.getMax(i), r2.getMax(i));
-      volume *= (max - min);
-    }
-    return volume;
-  }
-
-  /**
    * Returns a clone of the minimum hyper point.
    * 
    * @return the minimum hyper point
@@ -176,6 +156,121 @@ public final class SpatialUtil {
       vol *= delta;
     }
     return vol;
+  }
+
+  /**
+   * Compute the volume (area) of the union of two MBRs
+   * 
+   * @param r1 First object
+   * @param r2 Second object
+   * @return Volume of union
+   */
+  public static double volumeUnion(SpatialComparable r1, SpatialComparable r2) {
+    final int dim1 = r1.getDimensionality();
+    final int dim2 = r2.getDimensionality();
+    assert (!LoggingConfiguration.DEBUG || dim1 == dim2) : "Computing union with different dimensionality: " + dim1 + " vs. " + dim2;
+    double volume = 1.0;
+    for(int i = 1; i <= dim1; i++) {
+      final double min = Math.min(r1.getMin(i), r2.getMin(i));
+      final double max = Math.max(r1.getMax(i), r2.getMax(i));
+      volume *= (max - min);
+    }
+    return volume;
+  }
+
+  /**
+   * Computes the volume of this SpatialComparable
+   * 
+   * @param scale Scaling factor
+   * @return the volume of this SpatialComparable
+   */
+  public static double volumeScaled(SpatialComparable box, double scale) {
+    double vol = 1;
+    final int dim = box.getDimensionality();
+    for(int i = 1; i <= dim; i++) {
+      double delta = box.getMax(i) - box.getMin(i);
+      if(delta == 0.0) {
+        return 0.0;
+      }
+      vol *= delta * scale;
+    }
+    return vol;
+  }
+
+  /**
+   * Compute the volume (area) of the union of two MBRs
+   * 
+   * @param r1 First object
+   * @param r2 Second object
+   * @param scale Scaling factor
+   * @return Volume of union
+   */
+  public static double volumeUnionScaled(SpatialComparable r1, SpatialComparable r2, double scale) {
+    final int dim1 = r1.getDimensionality();
+    final int dim2 = r2.getDimensionality();
+    assert (!LoggingConfiguration.DEBUG || dim1 == dim2) : "Computing union with different dimensionality: " + dim1 + " vs. " + dim2;
+    double volume = 1.0;
+    for(int i = 1; i <= dim1; i++) {
+      final double min = Math.min(r1.getMin(i), r2.getMin(i));
+      final double max = Math.max(r1.getMax(i), r2.getMax(i));
+      volume *= (max - min) * scale;
+    }
+    return volume;
+  }
+
+  /**
+   * Compute the enlargement obtained by adding an object to an existing object.
+   * 
+   * @param exist Existing rectangle
+   * @param addit Additional rectangle
+   * @return Enlargement factor
+   */
+  public static double enlargement(SpatialComparable exist, SpatialComparable addit) {
+    final int dim1 = exist.getDimensionality();
+    final int dim2 = addit.getDimensionality();
+    assert (!LoggingConfiguration.DEBUG || dim1 == dim2) : "Computing union with different dimensionality: " + dim1 + " vs. " + dim2;
+    double v1 = 1.0;
+    double v2 = 1.0;
+    for(int i = 1; i <= dim1; i++) {
+      final double emin = exist.getMin(i);
+      final double emax = exist.getMax(i);
+      final double amin = addit.getMin(i);
+      final double amax = addit.getMax(i);
+
+      final double min = Math.min(emin, amin);
+      final double max = Math.max(emax, amax);
+      v1 *= (max - min);
+      v2 *= (emax - emin);
+    }
+    return v2 - v1;
+  }
+
+  /**
+   * Compute the enlargement obtained by adding an object to an existing object.
+   * 
+   * @param exist Existing rectangle
+   * @param addit Additional rectangle
+   * @param scale Scaling helper
+   * @return Enlargement factor
+   */
+  public static double enlargementScaled(SpatialComparable exist, SpatialComparable addit, double scale) {
+    final int dim1 = exist.getDimensionality();
+    final int dim2 = addit.getDimensionality();
+    assert (!LoggingConfiguration.DEBUG || dim1 == dim2) : "Computing union with different dimensionality: " + dim1 + " vs. " + dim2;
+    double v1 = 1.0;
+    double v2 = 1.0;
+    for(int i = 1; i <= dim1; i++) {
+      final double emin = exist.getMin(i);
+      final double emax = exist.getMax(i);
+      final double amin = addit.getMin(i);
+      final double amax = addit.getMax(i);
+
+      final double min = Math.min(emin, amin);
+      final double max = Math.max(emax, amax);
+      v1 *= (max - min) * scale;
+      v2 *= (emax - emin) * scale;
+    }
+    return v2 - v1;
   }
 
   /**

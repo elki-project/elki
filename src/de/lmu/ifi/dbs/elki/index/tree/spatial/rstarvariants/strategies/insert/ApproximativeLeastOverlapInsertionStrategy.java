@@ -129,7 +129,7 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
         }
       }
     }
-    assert (best > -1);
+    assert (best > -1) : "No split found? Volume outside of double precision?";
     return best;
   }
 
