@@ -312,7 +312,12 @@ public class VisualizerParameterizer implements Parameterizable {
           factories.add(a);
         }
         catch(Throwable e) {
-          logger.exception("Error instantiating visualization factory " + c.getName(), e);
+          if(logger.isDebugging()) {
+            logger.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
+          }
+          else {
+            logger.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
+          }
         }
       }
       return factories;
@@ -337,7 +342,7 @@ public class VisualizerParameterizer implements Parameterizable {
             logger.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
           }
           else {
-            logger.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getCause().toString());
+            logger.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
           }
         }
       }
