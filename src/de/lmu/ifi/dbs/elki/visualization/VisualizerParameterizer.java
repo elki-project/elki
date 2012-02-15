@@ -293,19 +293,23 @@ public class VisualizerParameterizer implements Parameterizable {
         }
       }
       MergedParameterization merged = new MergedParameterization(config);
-      projectors = collectProjectorFactorys(merged);
-      factories = collectVisFactorys(merged);
+      projectors = collectProjectorFactorys(merged, hideVisualizers);
+      factories = collectVisFactorys(merged, hideVisualizers);
     }
 
     /**
      * Collect and instantiate all projector factories.
      * 
      * @param config Parameterization
+     * @param filter Filter
      * @return List of all adapters found.
      */
-    private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config) {
+    private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<ProjectorFactory> factories = new ArrayList<ProjectorFactory>();
       for(Class<?> c : InspectionUtil.cachedFindAllImplementations(ProjectorFactory.class)) {
+        if(filter != null && filter.matcher(c.getCanonicalName()).find()) {
+          continue;
+        }
         try {
           config.rewind();
           ProjectorFactory a = ClassGenericsUtil.tryInstantiate(ProjectorFactory.class, c, config);
@@ -327,11 +331,15 @@ public class VisualizerParameterizer implements Parameterizable {
      * Collect and instantiate all visualizer factories.
      * 
      * @param config Parameterization
+     * @param filter Filter
      * @return List of all adapters found.
      */
-    private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config) {
+    private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<VisFactory> factories = new ArrayList<VisFactory>();
       for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
+        if(filter != null && filter.matcher(c.getCanonicalName()).find()) {
+          continue;
+        }
         try {
           config.rewind();
           VisFactory a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
