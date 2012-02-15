@@ -172,7 +172,8 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
       for(PlotItem it : projs) {
         if(it.w <= 0.0 || it.h <= 0.0) {
           logger.warning("Plot item with improper size information: " + it);
-        } else {
+        }
+        else {
           plotmap.put(it.w, it.h, it);
         }
       }
@@ -188,15 +189,16 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
           break;
         }
       }
-      if(!isprojected) {
-        if(task.getWidth() <= 0.0 || task.getHeight() <= 0.0) {
-          logger.warning("Task with improper size information: " + task);
-        }
-        else {
-          PlotItem it = new PlotItem(task.getWidth(), task.getHeight(), null);
-          it.visualizations.add(task);
-          plotmap.put(it.w, it.h, it);
-        }
+      if(isprojected) {
+        continue;
+      }
+      if(task.getWidth() <= 0.0 || task.getHeight() <= 0.0) {
+        logger.warning("Task with improper size information: " + task);
+      }
+      else {
+        PlotItem it = new PlotItem(task.getWidth(), task.getHeight(), null);
+        it.visualizations.add(task);
+        plotmap.put(it.w, it.h, it);
       }
     }
   }
