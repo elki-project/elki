@@ -92,7 +92,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         return;
       }
     }
-    LoggingUtil.warning("Depth: " + depth + " axis: " + (reverse_sort ? "-" : "+") + axis + " refl: " + BitsUtil.toString(refl, dims) + " hist: " + BitsUtil.toString(hist, dims) + " " + (rev ? "r+" : "r-" ) + " " + (gray ? "g+" : "g-") + " " + FormatUtil.format(mms));
+    LoggingUtil.warning("Depth: " + depth + " axis: " + (reverse_sort ? "-" : "+") + axis + " refl: " + BitsUtil.toString(refl, dims) + " hist: " + BitsUtil.toString(hist, dims) + " " + (rev ? "r1" : "r0" ) + " " + (gray ? "g1" : "g0") + " " + FormatUtil.format(mms));
     int split = pivotizeList1D(objs, start, end, axis + 1, half, reverse_sort);
     // Need to descend at all?
     if(end - split <= 1 && split - start <= 1) {
@@ -130,13 +130,15 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // nextgray + " nextfirs: " + nextfirs);
 
       if(nextdepth > 0) {
-        hilbertSort(objs, lstart, lend, mms, nextdepth, rotation, refl, hist, rev, nextgray, nextlast);
+        hilbertSort(objs, lstart, lend, mms, depth + 1, rotation, refl, hist, rev, nextgray, nextlast);
       }
       else {
-        final int nextrot = (rotation + nextlast + 1) % dims;
+        final int nextrot = (rotation + nextlast - 1 + dims) % dims;
         final boolean nrev = rev ^ nextgray;
         LoggingUtil.warning("A old: " + rotation + " r: " + BitsUtil.toString(refl, dims) + " h: " + BitsUtil.toString(hist, dims) + " ffs: " + nextlast + " new: " + nextrot + " " + nrev);
-        hilbertSort(objs, lstart, lend, mms, nextdepth, nextrot, hist, BitsUtil.zero(dims), nrev, false, dims);
+        // BitsUtil.flipI(hist, dims - 1 - rotation);
+        hilbertSort(objs, lstart, lend, mms, depth + 1, nextrot, hist, BitsUtil.zero(dims), nrev, false, dims);
+        // BitsUtil.flipI(hist, dims - 1 - rotation);
       }
     }
     BitsUtil.flipI(hist, axis);
@@ -152,14 +154,14 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // nextgray + " nextfirs: " + nextfirs);
 
       if(nextdepth > 0) {
-        hilbertSort(objs, hstart, hend, mms, nextdepth, rotation, refl, hist, rev, nextgray, nextlast);
+        hilbertSort(objs, hstart, hend, mms, depth + 1, rotation, refl, hist, rev, nextgray, nextlast);
       }
       else {
-        final int nextrot = (rotation + nextlast + 1) % dims;
+        final int nextrot = (rotation + nextlast - 1 + dims) % dims;
         final boolean nrev = rev ^ !nextgray;
         LoggingUtil.warning("B old: " + rotation + " r: " + BitsUtil.toString(refl, dims) + " h: " + BitsUtil.toString(hist, dims) + " ffs: " + nextlast + " new: " + nextrot + " " + nrev);
         BitsUtil.flipI(hist, dims - 1 - rotation);
-        hilbertSort(objs, hstart, hend, mms, nextdepth, nextrot, hist, BitsUtil.zero(dims), nrev, false, dims);
+        hilbertSort(objs, hstart, hend, mms, depth + 1, nextrot, hist, BitsUtil.zero(dims), nrev, false, dims);
         BitsUtil.flipI(hist, dims - 1 - rotation);
       }
     }
