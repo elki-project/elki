@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
+// FIXME: implement completely and test.
 public class HilbertSpatialSorter extends AbstractSpatialSorter {
   /**
    * Constructor.
@@ -40,15 +41,38 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
     final int dims = minmax.length >>> 1;
-    hilbertSort(objs, start, end, minmax, 0, 0, false, BitsUtil.zero(dims), BitsUtil.zero(dims));
+    final long[] refl = BitsUtil.zero(dims);
+    // BitsUtil.flipI(refl, dims - 1);
+    boolean inv = (dims == 1);
+    hilbertSort(objs, start, end, minmax, 0, 0, refl, BitsUtil.zero(dims), inv, false, dims);
   }
 
-  private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, final int depth, final int rotation, boolean inv, long[] coords, long[] reflections) {
+  /**
+   * Sort objects according to their hilbert order (without transforming them to
+   * their full bit representation!)
+   * 
+   * @param objs List to sort
+   * @param start Sublist start (inclusive)
+   * @param end Sublist end (exclusive)
+   * @param mms Current MinMax values
+   * @param depth Recursion depth
+   * @param rotation Current rotation
+   * @param refl Reflection bitmask
+   * @param hist Raw bits in effect, describing the hypercube
+   * @param rev Reversion flag
+   * @param gray Gray code carry over for (bits ^ refl)
+   * @param last Last bit that was set in (bits ^ refl)
+   */
+  private <T extends SpatialComparable> void hilbertSort(List<T> objs, final int start, final int end, double[] mms, int depth, final int rotation, long[] refl, long[] hist, boolean rev, boolean gray, int last) {
+    // Dimensionality, from minmax array
     final int dims = mms.length >>> 1;
-    // Completed level of hilbert curve?
-    final boolean complete = (depth + 1) % dims == 0;
-    final int axis = (depth + rotation) % dims;
-    inv ^= BitsUtil.get(reflections, axis);
+    // Current axis
+    final int axis = (rotation + depth) % dims;
+    // Current axis reflection bit.
+    final boolean is_reflected = BitsUtil.get(refl, axis);
+    // Effective sort order. Based on current gray code, preceding gray code,
+    // and reversion flag
+    final boolean reverse_sort = gray ^ is_reflected ^ rev;
 
     // Find the splitting point.
     final double min = mms[2 * axis], max = mms[2 * axis + 1];
@@ -68,79 +92,86 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         return;
       }
     }
-    LoggingUtil.warning("Depth: " + depth + (complete ? "!" : " ") + " axis: " + (inv ? "-" : "+") + axis + " refl: " + BitsUtil.toString(reflections) + " coords: " + BitsUtil.toString(coords) + " " + FormatUtil.format(mms));
-    int split = pivotizeList1D(objs, start, end, axis + 1, half, inv);
-    // Need to descend?
+    LoggingUtil.warning("Depth: " + depth + " axis: " + (reverse_sort ? "-" : "+") + axis + " refl: " + BitsUtil.toString(refl, dims) + " hist: " + BitsUtil.toString(hist, dims) + " " + (rev ? "r+" : "r-" ) + " " + (gray ? "g+" : "g-") + " " + FormatUtil.format(mms));
+    int split = pivotizeList1D(objs, start, end, axis + 1, half, reverse_sort);
+    // Need to descend at all?
     if(end - split <= 1 && split - start <= 1) {
       return;
     }
 
-    if(complete) {
-      if(inv) {
-        BitsUtil.flipI(coords, axis);
+    final int nextdepth = (depth + 1) % dims;
+    // Compute array intervals.
+    final int lstart, lend, hstart, hend;
+    {
+      if(!reverse_sort) {
+        lstart = start;
+        lend = split;
+        hstart = split;
+        hend = end;
       }
-      if(start < split - 1) {
-        int rot = cyclicTrailingZeros(coords, rotation, dims);
-        final int nextrot = (rotation - rot + 1 + dims) % dims;
-        LoggingUtil.warning("ARotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot);
-        mms[2 * axis] = !inv ? min : half;
-        mms[2 * axis + 1] = !inv ? half : max;
-        hilbertSort(objs, start, split, mms, depth + 1, nextrot, false, BitsUtil.zero(dims), reflections);
-      }
-      BitsUtil.flipI(coords, axis);
-      if(rotation > 0) {
-        BitsUtil.flipI(reflections, rotation);
-      }
-      if(split < end - 1) {
-        int rot = cyclicTrailingZeros(coords, rotation, dims);
-        final int nextrot = (rotation - rot + 1 + dims) % dims;
-        LoggingUtil.warning("BRotation old: " + rotation + " c: " + BitsUtil.toString(coords) + " ffs: " + rot + " new: " + nextrot);
-        mms[2 * axis] = !inv ? half : min;
-        mms[2 * axis + 1] = !inv ? max : half;
-        hilbertSort(objs, split, end, mms, depth + 1, nextrot, false, BitsUtil.zero(dims), reflections);
-      }
-      if(!inv) {
-        BitsUtil.flipI(coords, axis);
-      }
-      if(rotation > 0) {
-        BitsUtil.flipI(reflections, rotation);
+      else {
+        hstart = start;
+        hend = split;
+        lstart = split;
+        lend = end;
       }
     }
-    else {
-      if(inv) {
-        BitsUtil.flipI(coords, axis);
+    if(is_reflected) {
+      BitsUtil.flipI(hist, axis);
+    }
+    // Process "lower" half (if nontrivial)
+    if(lend - lstart > 1) {
+      updateMinMax(mms, axis, min, half);
+      // Compute gray code carry for (hist ^ refl)
+      final boolean nextgray = gray ^ is_reflected;
+      // Update "first set bit in (hist ^ refl)"
+      final int nextlast = is_reflected ? depth : last;
+      // LoggingUtil.warning("Low : " + FormatUtil.format(mms) + " nextgray: " +
+      // nextgray + " nextfirs: " + nextfirs);
+
+      if(nextdepth > 0) {
+        hilbertSort(objs, lstart, lend, mms, nextdepth, rotation, refl, hist, rev, nextgray, nextlast);
       }
-      if(start < split - 1) {
-        mms[2 * axis] = !inv ? min : half;
-        mms[2 * axis + 1] = !inv ? half : max;
-        hilbertSort(objs, start, split, mms, depth + 1, rotation, false, coords, reflections);
-      }
-      BitsUtil.flipI(coords, axis);
-      if(split < end - 1) {
-        mms[2 * axis] = !inv ? half : min;
-        mms[2 * axis + 1] = !inv ? max : half;
-        hilbertSort(objs, split, end, mms, depth + 1, rotation, true, coords, reflections);
-      }
-      if(!inv) {
-        BitsUtil.flipI(coords, axis);
+      else {
+        final int nextrot = (rotation + nextlast + 1) % dims;
+        final boolean nrev = rev ^ nextgray;
+        LoggingUtil.warning("A old: " + rotation + " r: " + BitsUtil.toString(refl, dims) + " h: " + BitsUtil.toString(hist, dims) + " ffs: " + nextlast + " new: " + nextrot + " " + nrev);
+        hilbertSort(objs, lstart, lend, mms, nextdepth, nextrot, hist, BitsUtil.zero(dims), nrev, false, dims);
       }
     }
-    // Restore ranges
-    mms[2 * axis] = min;
-    mms[2 * axis + 1] = max;
-    // FIXME: implement completely and test.
+    BitsUtil.flipI(hist, axis);
+    // Process "higher" half (if nontrivial)
+    if(hend - hstart > 1) {
+      updateMinMax(mms, axis, half, max);
+
+      // Compute gray code carry for (hist ^ refl)
+      final boolean nextgray = gray ^ !is_reflected;
+      // Update "first set bit in (hist ^ refl)"
+      final int nextlast = !is_reflected ? depth : last;
+      // LoggingUtil.warning("High: " + FormatUtil.format(mms) + " nextgray: " +
+      // nextgray + " nextfirs: " + nextfirs);
+
+      if(nextdepth > 0) {
+        hilbertSort(objs, hstart, hend, mms, nextdepth, rotation, refl, hist, rev, nextgray, nextlast);
+      }
+      else {
+        final int nextrot = (rotation + nextlast + 1) % dims;
+        final boolean nrev = rev ^ !nextgray;
+        LoggingUtil.warning("B old: " + rotation + " r: " + BitsUtil.toString(refl, dims) + " h: " + BitsUtil.toString(hist, dims) + " ffs: " + nextlast + " new: " + nextrot + " " + nrev);
+        BitsUtil.flipI(hist, dims - 1 - rotation);
+        hilbertSort(objs, hstart, hend, mms, nextdepth, nextrot, hist, BitsUtil.zero(dims), nrev, false, dims);
+        BitsUtil.flipI(hist, dims - 1 - rotation);
+      }
+    }
+    if(!is_reflected) {
+      BitsUtil.flipI(hist, axis);
+    }
+    // Restore interval
+    updateMinMax(mms, axis, min, max);
   }
 
-  private static int cyclicTrailingZeros(long[] bitset, int start, int dims) {
-    start -= 1;
-    int l = BitsUtil.previousSetBit(bitset, start);
-    if(l >= 0) {
-      return start - l;
-    }
-    l = BitsUtil.previousSetBit(bitset, dims - 1);
-    if(l >= 0) {
-      return dims - l + start;
-    }
-    return -1;
+  private void updateMinMax(double[] mms, int axis, double min, double max) {
+    mms[2 * axis] = min;
+    mms[2 * axis + 1] = max;
   }
 }

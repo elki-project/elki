@@ -653,6 +653,36 @@ public final class BitsUtil {
    * Convert bitset to a string consisting of "0" and "1", in high-endian order.
    * 
    * @param v Value to process
+   * @param minw Minimum width
+   * @return String representation
+   */
+  public static String toString(long[] v, int minw) {
+    final int mag = Math.max(magnitude(v), minw);
+    if(v.length == 0 || mag == 0) {
+      return "0";
+    }
+    final int words = ((mag - 1) >>> LONG_LOG2_SIZE) + 1;
+    char[] digits = new char[mag];
+
+    int pos = mag - 1;
+    for(int w = 0; w < words; w++) {
+      long f = 1l;
+      for(int i = 0; i < Long.SIZE; i++) {
+        digits[pos] = ((v[w] & f) == 0) ? '0' : '1';
+        pos--;
+        f <<= 1;
+        if(pos < 0) {
+          break;
+        }
+      }
+    }
+    return new String(digits);
+  }
+
+  /**
+   * Convert bitset to a string consisting of "0" and "1", in high-endian order.
+   * 
+   * @param v Value to process
    * @return String representation
    */
   public static String toString(long v) {
