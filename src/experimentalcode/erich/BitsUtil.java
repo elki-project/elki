@@ -169,12 +169,20 @@ public final class BitsUtil {
    * @return Inverted gray code
    */
   public static long[] invgrayI(long[] v) {
-    long[] t = copy(v);
-    int i = 0;
-    while(!isZero(t)) {
-      shiftRightI(t, i);
-      xorI(v, t);
-      i <<= 1;
+    final int last = v.length - 1;
+    int o;
+    // Sub word level:
+    for (o = 1; o < Long.SIZE; o <<= 1) {
+      for (int i = 0; i < last; i++) {
+        v[i] ^= (v[i] >>> o) ^ (v[i+1] << (Long.SIZE - o));
+      }
+      v[last] ^= (v[last] >>> o);
+    }
+    // Super word level:
+    for (o = 1; o < v.length; o <<= 1) {
+      for (int i = 0; i < v.length - o; i++) {
+        v[i] ^= v[i + o];
+      }
     }
     return v;
   }

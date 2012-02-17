@@ -139,4 +139,18 @@ public class TestBitsUtil {
     assertEquals(bitset.previousSetBit(15), BitsUtil.previousSetBit(bituti, 15));
     assertEquals(bitset.previousSetBit(14), BitsUtil.previousSetBit(bituti, 14));
   }
+  
+  @Test
+  public void testGrayCoding() {
+    long[] bits = BitsUtil.zero(123);
+    long[] ones = BitsUtil.ones(123);
+    BitsUtil.flipI(bits, 122);
+    BitsUtil.invgrayI(bits);
+    BitsUtil.xorI(bits, ones);
+    assertTrue(BitsUtil.isZero(bits));
+    BitsUtil.xorI(bits, ones);
+    BitsUtil.grayI(bits);
+    assertTrue(BitsUtil.get(bits, 122));
+    assertEquals(1, BitsUtil.cardinality(bits));
+  }
 }
