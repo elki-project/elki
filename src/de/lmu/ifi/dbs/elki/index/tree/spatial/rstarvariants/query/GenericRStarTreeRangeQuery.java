@@ -41,16 +41,25 @@ import de.lmu.ifi.dbs.elki.index.tree.query.GenericDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Instance of a range query for a particular spatial index.
+ * 
+ * Reference:
+ * <p>
+ * J. Kuan, P. Lewis<br />
+ * Fast k nearest neighbour search for R-tree family<br />
+ * In Proc. Int. Conf Information, Communications and Signal Processing, ICICS
+ * 1997
+ * </p>
  * 
  * @author Erich Schubert
  * 
  * @apiviz.uses AbstractRStarTree
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  */
-// TODO: add bulk range queries.
+@Reference(authors = "J. Kuan, P. Lewis", title = "Fast k nearest neighbour search for R-tree family", booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", url = "http://dx.doi.org/10.1109/ICICS.1997.652114")
 public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
   /**
    * The index to use
@@ -69,7 +78,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
    * @param distanceQuery Distance query to use
    */
   public GenericRStarTreeRangeQuery(AbstractRStarTree<?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery) {
-    super( distanceQuery);
+    super(distanceQuery);
     this.tree = tree;
     this.distanceFunction = distanceQuery.getDistanceFunction();
   }

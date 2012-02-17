@@ -51,15 +51,24 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Instance of a KNN query for a particular spatial index.
+ * 
+ * Reference:
+ * <p>
+ * G. R. Hjaltason, H. Samet<br />
+ * Ranking in spatial databases<br />
+ * In: 4th Symposium on Advances in Spatial Databases, SSD'95
+ * </p>
  * 
  * @author Erich Schubert
  * 
  * @apiviz.uses AbstractRStarTree
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  */
+@Reference(authors = "G. R. Hjaltason, H. Samet", title = "Ranking in spatial databases", booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", url = "http://dx.doi.org/10.1007/3-540-60159-7_6")
 public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
   /**
    * The index to use
