@@ -115,11 +115,45 @@ public final class BitsUtil {
     if(v.length == words) {
       return Arrays.copyOf(v, v.length);
     }
-    else {
-      long[] ret = new long[words];
-      System.arraycopy(v, 0, ret, 0, Math.min(v.length, words));
+    long[] ret = new long[words];
+    System.arraycopy(v, 0, ret, 0, Math.min(v.length, words));
+    return ret;
+  }
+
+  /**
+   * Copy a bitset.
+   * 
+   * Note: Bits beyond mincap <em>may</em> be retained!
+   * 
+   * @param v Array to copy
+   * @param mincap Target <em>minimum</em> capacity
+   * @param shift Number of bits to shift left
+   * @return Copy with space for at least "capacity" bits
+   */
+  public static long[] copy(long[] v, int mincap, int shift) {
+    int words = ((mincap - 1) >>> LONG_LOG2_SIZE) + 1;
+    if(v.length == words && shift == 0) {
+      return Arrays.copyOf(v, v.length);
+    }
+    long[] ret = new long[words];
+    final int shiftWords = shift >>> LONG_LOG2_SIZE;
+    final int shiftBits = shift & LONG_LOG2_MASK;
+    // Simple case - multiple of word size
+    if(shiftBits == 0) {
+      for(int i = shiftWords; i < ret.length; i++) {
+        ret[i] |= v[i - shiftWords];
+      }
       return ret;
     }
+    // Overlapping case
+    final int unshiftBits = Long.SIZE - shiftBits;
+    final int end = Math.min(ret.length, v.length + shiftWords) - 1;
+    for(int i = end; i > shiftWords; i--) {
+      final int src = i - shiftWords;
+      ret[i] |= (v[src] << shiftBits) | (v[src - 1] >>> unshiftBits);
+    }
+    ret[shiftWords] |= v[0] << shiftBits;
+    return ret;
   }
 
   /**
@@ -178,10 +212,10 @@ public final class BitsUtil {
       }
       v[last] ^= (v[last] >>> o);
     }
-    // Super word level:
-    for(o = 1; o < v.length; o <<= 1) {
-      for(int i = 0; i < v.length - o; i++) {
-        v[i] ^= v[i + o];
+    // Word level:
+    for(o = 1; o <= last; o <<= 1) {
+      for(int i = o; i <= last; i++) {
+        v[i - o] ^= v[i];
       }
     }
     return v;
@@ -643,11 +677,9 @@ public final class BitsUtil {
    * @param len Length
    */
   public static long[] cycleRightI(long[] v, int shift, int len) {
-    // TODO: optimize - copy less
-    long[] t = copy(v);
-    shiftRightI(v, shift);
-    shiftLeftI(t, len - shift);
+    long[] t = copy(v, len, len - shift);
     truncateI(t, len);
+    shiftRightI(v, shift);
     orI(v, t);
     return v;
   }
@@ -661,8 +693,8 @@ public final class BitsUtil {
   public static long[] truncateI(long[] v, int len) {
     final int zap = (v.length * Long.SIZE) - len;
     final int zapWords = (zap >>> LONG_LOG2_SIZE);
-    Arrays.fill(v, v.length - zapWords, v.length, 0);
     final int zapbits = zap & LONG_LOG2_MASK;
+    Arrays.fill(v, v.length - zapWords, v.length, 0);
     if(zapbits > 0) {
       v[v.length - zapWords - 1] &= (LONG_ALL_BITS >>> zapbits);
     }
@@ -696,11 +728,9 @@ public final class BitsUtil {
    * @param len Length
    */
   public static long[] cycleLeftI(long[] v, int shift, int len) {
-    // TODO: optimize - copy less
-    long[] t = copy(v);
-    shiftLeftI(v, shift);
-    truncateI(v, len);
-    shiftRightI(t, len - shift);
+    long[] t = copy(v, len, shift);
+    truncateI(t, len);
+    shiftRightI(v, len - shift);
     orI(v, t);
     return v;
   }
