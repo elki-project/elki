@@ -1,12 +1,10 @@
 package experimentalcode.erich;
 
-import java.util.Arrays;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2012
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +22,8 @@ import java.util.Arrays;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Arrays;
 
 /**
  * Utilities for bit operations.
@@ -172,15 +172,15 @@ public final class BitsUtil {
     final int last = v.length - 1;
     int o;
     // Sub word level:
-    for (o = 1; o < Long.SIZE; o <<= 1) {
-      for (int i = 0; i < last; i++) {
-        v[i] ^= (v[i] >>> o) ^ (v[i+1] << (Long.SIZE - o));
+    for(o = 1; o < Long.SIZE; o <<= 1) {
+      for(int i = 0; i < last; i++) {
+        v[i] ^= (v[i] >>> o) ^ (v[i + 1] << (Long.SIZE - o));
       }
       v[last] ^= (v[last] >>> o);
     }
     // Super word level:
-    for (o = 1; o < v.length; o <<= 1) {
-      for (int i = 0; i < v.length - o; i++) {
+    for(o = 1; o < v.length; o <<= 1) {
+      for(int i = 0; i < v.length - o; i++) {
         v[i] ^= v[i + o];
       }
     }
@@ -363,11 +363,34 @@ public final class BitsUtil {
    * @return v
    */
   public static long[] xorI(long[] v, long[] o, int off) {
-    final int mag = magnitude(o);
-    // TODO: optimize to not copy!
-    long[] tmp = copy(o, mag + off);
-    shiftLeftI(tmp, off);
-    xorI(v, tmp);
+    if(off == 0) {
+      return xorI(v, o);
+    }
+    if(off < 0) {
+      throw new UnsupportedOperationException("Negative shifts are not supported.");
+    }
+    // Break shift into integers to shift and bits to shift
+    final int shiftWords = off >>> LONG_LOG2_SIZE;
+    final int shiftBits = off & LONG_LOG2_MASK;
+
+    if(shiftWords >= v.length) {
+      return v;
+    }
+    // Simple case - multiple of word size
+    if(shiftBits == 0) {
+      for(int i = shiftWords; i < v.length; i++) {
+        v[i] ^= o[i - shiftWords];
+      }
+      return v;
+    }
+    // Overlapping case
+    final int unshiftBits = Long.SIZE - shiftBits;
+    final int end = Math.min(v.length, o.length + shiftWords) - 1;
+    for(int i = end; i > shiftWords; i--) {
+      final int src = i - shiftWords;
+      v[i] ^= (o[src] << shiftBits) | (o[src - 1] >>> unshiftBits);
+    }
+    v[shiftWords] ^= o[0] << shiftBits;
     return v;
   }
 
@@ -380,7 +403,8 @@ public final class BitsUtil {
    */
   public static long[] orI(long[] v, long[] o) {
     assert (o.length <= v.length) : "Bit set sizes do not agree.";
-    for(int i = 0; i < o.length; i++) {
+    final int max = Math.min(v.length, o.length);
+    for(int i = 0; i < max; i++) {
       v[i] |= o[i];
     }
     return v;
@@ -389,17 +413,42 @@ public final class BitsUtil {
   /**
    * OR o onto v inplace, i.e. v |= (o << off)
    * 
+   * Note: Bits that are shifted outside of the size of v are discarded.
+   * 
    * @param v Primary object
    * @param o data to or
    * @param off Offset
    * @return v
    */
   public static long[] orI(long[] v, long[] o, int off) {
-    final int mag = magnitude(o);
-    // TODO: optimize to not copy!
-    long[] tmp = copy(o, mag + off);
-    shiftLeftI(tmp, off);
-    orI(v, tmp);
+    if(off == 0) {
+      return orI(v, o);
+    }
+    if(off < 0) {
+      throw new UnsupportedOperationException("Negative shifts are not supported.");
+    }
+    // Break shift into integers to shift and bits to shift
+    final int shiftWords = off >>> LONG_LOG2_SIZE;
+    final int shiftBits = off & LONG_LOG2_MASK;
+
+    if(shiftWords >= v.length) {
+      return v;
+    }
+    // Simple case - multiple of word size
+    if(shiftBits == 0) {
+      for(int i = shiftWords; i < v.length; i++) {
+        v[i] |= o[i - shiftWords];
+      }
+      return v;
+    }
+    // Overlapping case
+    final int unshiftBits = Long.SIZE - shiftBits;
+    final int end = Math.min(v.length, o.length + shiftWords) - 1;
+    for(int i = end; i > shiftWords; i--) {
+      final int src = i - shiftWords;
+      v[i] |= (o[src] << shiftBits) | (o[src - 1] >>> unshiftBits);
+    }
+    v[shiftWords] |= o[0] << shiftBits;
     return v;
   }
 
@@ -429,11 +478,39 @@ public final class BitsUtil {
    * @return v
    */
   public static long[] andI(long[] v, long[] o, int off) {
-    final int mag = magnitude(o);
-    // TODO: optimize to not copy!
-    long[] tmp = copy(o, mag + off);
-    shiftLeftI(tmp, off);
-    andI(v, tmp);
+    if(off == 0) {
+      return andI(v, o);
+    }
+    if(off < 0) {
+      throw new UnsupportedOperationException("Negative shifts are not supported.");
+    }
+    // Break shift into integers to shift and bits to shift
+    final int shiftWords = off >>> LONG_LOG2_SIZE;
+    final int shiftBits = off & LONG_LOG2_MASK;
+
+    if(shiftWords >= v.length) {
+      return v;
+    }
+    // Simple case - multiple of word size
+    if(shiftBits == 0) {
+      for(int i = shiftWords; i < v.length; i++) {
+        v[i] &= o[i - shiftWords];
+      }
+      // Clear bottom words
+      Arrays.fill(v, 0, shiftWords, 0);
+      return v;
+    }
+    // Overlapping case
+    final int unshiftBits = Long.SIZE - shiftBits;
+    final int end = Math.min(v.length, o.length + shiftWords) - 1;
+    Arrays.fill(v, end + 1, v.length, 0);
+    for(int i = end; i > shiftWords; i--) {
+      final int src = i - shiftWords;
+      v[i] &= (o[src] << shiftBits) | (o[src - 1] >>> unshiftBits);
+    }
+    v[shiftWords] &= o[0] << shiftBits;
+    // Clear bottom words
+    Arrays.fill(v, 0, shiftWords, 0);
     return v;
   }
 
