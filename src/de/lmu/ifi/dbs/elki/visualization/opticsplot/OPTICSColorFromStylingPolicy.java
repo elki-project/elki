@@ -23,13 +23,9 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.awt.Color;
-
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Adapter that uses a styling policy to colorize the OPTICS plot.
@@ -40,19 +36,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  */
 public class OPTICSColorFromStylingPolicy implements OPTICSColorAdapter {
   /**
-   * Logger
-   */
-  private static final Logging logger = Logging.getLogger(OPTICSColorFromStylingPolicy.class);
-
-  /**
    * The styling policy
    */
   private StylingPolicy policy;
-
-  /**
-   * The colors assigned to the individual objects
-   */
-  private int[] cols;
 
   /**
    * Constructor.
@@ -63,22 +49,10 @@ public class OPTICSColorFromStylingPolicy implements OPTICSColorAdapter {
   public OPTICSColorFromStylingPolicy(ColorLibrary colors, StylingPolicy policy) {
     super();
     this.policy = policy;
-    // Build a list of colors
-    cols = new int[policy.getMaxStyle() + 1];
-    for(int i = 0; i <= policy.getMaxStyle(); i++) {
-      Color color = SVGUtil.stringToColor(colors.getColor(i));
-      if(color != null) {
-        cols[i] = color.getRGB();
-      }
-      else {
-        logger.warning("Could not parse color: " + colors.getColor(i));
-        cols[i] = 0x7F7F7F7F;
-      }
-    }
   }
 
   @Override
   public int getColorForEntry(ClusterOrderEntry<?> coe) {
-    return cols[policy.getStyleForDBID(coe.getID())];
+    return policy.getColorForDBID(coe.getID());
   }
 }

@@ -23,7 +23,10 @@ package de.lmu.ifi.dbs.elki.visualization.style;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -31,6 +34,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Styling policy based on cluster membership.
@@ -39,23 +44,34 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  */
 // TODO: fast enough? Some other kind of mapping we can use?
-public class ClusterStylingPolicy implements StylingPolicy {
+public class ClusterStylingPolicy implements ClassStylingPolicy {
   /**
    * Object IDs
    */
   ArrayList<DBIDs> ids;
 
   /**
+   * Colors
+   */
+  TIntArrayList colors;
+
+  /**
    * Constructor.
    * 
    * @param clustering Clustering to use.
    */
-  public ClusterStylingPolicy(Clustering<?> clustering) {
+  public ClusterStylingPolicy(Clustering<?> clustering, StyleLibrary style) {
     super();
+    ColorLibrary colorset = style.getColorSet(StyleLibrary.PLOT);
     List<? extends Cluster<?>> clusters = clustering.getAllClusters();
-    ids = new ArrayList<DBIDs>();
-    for(Cluster<?> c : clusters) {
+    ids = new ArrayList<DBIDs>(clusters.size());
+    colors = new TIntArrayList(clusters.size());
+
+    Iterator<? extends Cluster<?>> ci = clusters.iterator();
+    for(int i = 0;; i++) {
+      Cluster<?> c = ci.next();
       ids.add(DBIDUtil.ensureSet(c.getIDs()));
+      colors.add(SVGUtil.stringToColor(colorset.getColor(i)).getRGB());
     }
   }
 
@@ -63,14 +79,34 @@ public class ClusterStylingPolicy implements StylingPolicy {
   public int getStyleForDBID(DBID id) {
     for(int i = 0; i < ids.size(); i++) {
       if(ids.get(i).contains(id)) {
-        return i + 1;
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  @Override
+  public int getColorForDBID(DBID id) {
+    for(int i = 0; i < ids.size(); i++) {
+      if(ids.get(i).contains(id)) {
+        return colors.get(i);
       }
     }
     return 0;
   }
 
   @Override
+  public int getMinStyle() {
+    return 0;
+  }
+
+  @Override
   public int getMaxStyle() {
     return ids.size() + 1;
+  }
+
+  @Override
+  public Iterator<DBID> iterateClass(int cnum) {
+    return ids.get(cnum).iterator();
   }
 }

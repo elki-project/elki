@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.style;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,23 +23,45 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Iterator;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+
 /**
- * Styling policy.
- * 
- * Implementations <em>must</em> implement either {@link ClassStylingPolicy} or
- * {@link SingleObjectsStyling} interfaces, as most visualizers will only
- * support these known interfaces.
+ * Styling policy that is based on <em>classes</em>, for example clusters or
+ * labels. This allows for certain optimizations such as marker reuse, and thus
+ * is preferred when possible.
  * 
  * @author Erich Schubert
  */
-public interface StylingPolicy {
+public interface ClassStylingPolicy extends StylingPolicy {
   /**
-   * Get the color for an individual object.
-   * 
-   * Note: if possible, use a class styling policy which can optimize better.
+   * Get the style number for a particular object
    * 
    * @param id Object ID
-   * @return Color value
+   * @return Style number
    */
-  public int getColorForDBID(DBID id);
+  public int getStyleForDBID(DBID id);
+
+  /**
+   * Get the minimum style in use.
+   * 
+   * @return Style number
+   */
+  public int getMinStyle();
+
+  /**
+   * Get the maximum style in use.
+   * 
+   * @return Style number
+   */
+  public int getMaxStyle();
+  
+  /**
+   * Iterate over all objects from a given class.
+   * 
+   * @param cnum Class number
+   * @return Iterator over object IDs
+   */
+  public Iterator<DBID> iterateClass(int cnum);
 }

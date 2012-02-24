@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
+import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -117,20 +118,48 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
 
   @Override
   public void redraw() {
-    StylingPolicy colors = context.getStyleResult().getStylingPolicy();
-    setupCSS(svgp, colors);
+    StylingPolicy stylepolicy = context.getStyleResult().getStylingPolicy();
     // bubble size
-    double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
-    // draw data
-    for(DBID objId : sample.getSample()) {
-      final Double radius = getScaledForId(objId);
-      if(radius > 0.01) {
-        final NumberVector<?, ?> vec = rel.get(objId);
-        if(vec != null) {
-          double[] v = proj.fastProjectDataToRenderSpace(vec);
-          Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
-          SVGUtil.addCSSClass(circle, BUBBLE + colors.getStyleForDBID(objId));
-          layer.appendChild(circle);
+    final double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
+    if(stylepolicy instanceof ClassStylingPolicy) {
+      ClassStylingPolicy colors = (ClassStylingPolicy) stylepolicy;
+      setupCSS(svgp, colors);
+      // draw data
+      for(DBID objId : sample.getSample()) {
+        final Double radius = getScaledForId(objId);
+        if(radius > 0.01) {
+          final NumberVector<?, ?> vec = rel.get(objId);
+          if(vec != null) {
+            double[] v = proj.fastProjectDataToRenderSpace(vec);
+            Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
+            SVGUtil.addCSSClass(circle, BUBBLE + colors.getStyleForDBID(objId));
+            layer.appendChild(circle);
+          }
+        }
+      }
+    }
+    else {
+      // draw data
+      for(DBID objId : sample.getSample()) {
+        final Double radius = getScaledForId(objId);
+        if(radius > 0.01) {
+          final NumberVector<?, ?> vec = rel.get(objId);
+          if(vec != null) {
+            double[] v = proj.fastProjectDataToRenderSpace(vec);
+            Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
+            int color = stylepolicy.getColorForDBID(objId);
+            final StringBuffer style = new StringBuffer();
+            if(fill) {
+              style.append(SVGConstants.CSS_FILL_PROPERTY + ":").append(SVGUtil.colorToString(color));
+              style.append(SVGConstants.CSS_FILL_OPACITY_PROPERTY + ":0.5");
+            }
+            else {
+              style.append(SVGConstants.CSS_STROKE_VALUE + ":").append(SVGUtil.colorToString(color));
+              style.append(SVGConstants.CSS_FILL_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
+            }
+            SVGUtil.setAtt(circle, SVGConstants.SVG_STYLE_ATTRIBUTE, style.toString());
+            layer.appendChild(circle);
+          }
         }
       }
     }
@@ -154,22 +183,15 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
    * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
    * @param policy Clustering to use
    */
-  private void setupCSS(SVGPlot svgp, StylingPolicy policy) {
+  private void setupCSS(SVGPlot svgp, ClassStylingPolicy policy) {
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
     // creating IDs manually because cluster often return a null-ID.
-    for(int clusterID = 0; clusterID < policy.getMaxStyle(); clusterID++) {
+    for(int clusterID = policy.getMinStyle(); clusterID < policy.getMaxStyle(); clusterID++) {
       CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
 
-      String color;
-
-      if(policy.getMaxStyle() == 1) {
-        color = "black";
-      }
-      else {
-        color = colors.getColor(clusterID);
-      }
+      String color = colors.getColor(clusterID);
 
       if(fill) {
         bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
