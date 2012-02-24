@@ -112,7 +112,7 @@ public final class BitsUtil {
    */
   public static long[] copy(long[] v, int mincap) {
     int words = ((mincap - 1) >>> LONG_LOG2_SIZE) + 1;
-    if(v.length != words) {
+    if(v.length == words) {
       return Arrays.copyOf(v, v.length);
     }
     else {
