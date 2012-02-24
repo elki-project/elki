@@ -197,11 +197,11 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
       styleresult = new StyleResult();
       List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
       if(clusterings.size() > 0) {
-        styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0)));
+        styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), stylelib));
         return styleresult;
       }
       Clustering<Model> c = generateDefaultClustering();
-      styleresult.setStylingPolicy(new ClusterStylingPolicy(c));
+      styleresult.setStylingPolicy(new ClusterStylingPolicy(c, stylelib));
       return styleresult;
     }
     return styleresult;

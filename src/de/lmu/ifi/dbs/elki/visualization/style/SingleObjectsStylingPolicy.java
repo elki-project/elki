@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.style;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,22 +24,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  */
 
 /**
- * Styling policy.
- * 
- * Implementations <em>must</em> implement either {@link ClassStylingPolicy} or
- * {@link SingleObjectsStyling} interfaces, as most visualizers will only
- * support these known interfaces.
+ * Styling policy based on assigning objects individual colors.
  * 
  * @author Erich Schubert
  */
-public interface StylingPolicy {
-  /**
-   * Get the color for an individual object.
-   * 
-   * Note: if possible, use a class styling policy which can optimize better.
-   * 
-   * @param id Object ID
-   * @return Color value
-   */
-  public int getColorForDBID(DBID id);
+public interface SingleObjectsStylingPolicy extends StylingPolicy {
+  // TODO: finish and use, e.g. for outliers and density visualization
+  // TODO: do we need anything here beyond "not a class styling policy"?
 }

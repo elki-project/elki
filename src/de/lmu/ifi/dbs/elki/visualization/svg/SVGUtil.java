@@ -478,11 +478,25 @@ public final class SVGUtil {
   /**
    * Convert a color name from an AWT color object to CSS syntax
    * 
+   * Note: currently only RGB (from ARGB order) are supported.
+   * 
    * @param col Color value
    * @return Color string
    */
   public static String colorToString(Color col) {
     return String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
+  }
+
+  /**
+   * Convert a color name from an AWT color object to CSS syntax
+   * 
+   * Note: currently only RGB (from ARGB order) are supported.
+   * 
+   * @param col Color value
+   * @return Color string
+   */
+  public static String colorToString(int col) {
+    return String.format("#%02x%02x%02x", (col >>> 16) & 0xFF, (col >>> 8) & 0xFF, col & 0xFF);
   }
 
   /**
