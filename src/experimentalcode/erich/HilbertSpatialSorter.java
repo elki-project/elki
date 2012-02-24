@@ -191,6 +191,34 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     mms[2 * axis + 1] = max;
   }
 
+  public static long[] coordinatesToHilbert(byte[] coords) {
+    final int numdim = coords.length;
+    final int numbits = numdim * Byte.SIZE;
+    final long[] output = BitsUtil.zero(numbits);
+
+    int rotation = 0;
+    long[] refl = BitsUtil.zero(numdim);
+    for(int i = 0; i < Byte.SIZE; i++) {
+      final long[] hist = interleaveBits(coords, i);
+      // System.err.println(BitsUtil.toString(hist, numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
+      final long[] bits = BitsUtil.copy(hist);
+      BitsUtil.xorI(bits, refl);
+      BitsUtil.cycleRightI(bits, rotation, numdim);
+      final int nextrot = (rotation + BitsUtil.numberOfTrailingZeros(bits) + 2) % numdim;
+      BitsUtil.invgrayI(bits);
+      BitsUtil.orI(output, bits, numbits - (i + 1) * numdim);
+      // System.err.println(BitsUtil.toString(output, numbits)+" bits: "+BitsUtil.toString(bits, numdim));
+      refl = hist;
+      BitsUtil.flipI(refl, rotation);
+      if(!BitsUtil.get(bits, 0)) {
+        BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
+      }
+      rotation = nextrot;
+    }
+
+    return output;
+  }
+
   public static long[] coordinatesToHilbert(long[] coords) {
     final int numdim = coords.length;
     final int numbits = numdim * Long.SIZE;
@@ -200,17 +228,18 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     long[] refl = BitsUtil.zero(numdim);
     for(int i = 0; i < Long.SIZE; i++) {
       final long[] hist = interleaveBits(coords, i);
-      System.err.println(BitsUtil.toString(hist, numdim));
+      // System.err.println(BitsUtil.toString(hist, numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
       final long[] bits = BitsUtil.copy(hist);
       BitsUtil.xorI(bits, refl);
       BitsUtil.cycleRightI(bits, rotation, numdim);
-      final int nextrot = (rotation + BitsUtil.numberOfLeadingZeros(bits) + 1) % numdim;
-      BitsUtil.grayI(bits);
+      final int nextrot = (rotation + BitsUtil.numberOfTrailingZeros(bits) + 2) % numdim;
+      BitsUtil.invgrayI(bits);
       BitsUtil.orI(output, bits, numbits - (i + 1) * numdim);
+      // System.err.println(BitsUtil.toString(output, numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if(BitsUtil.get(bits, 0)) {
-        BitsUtil.flipI(refl, (rotation - 1 + numdim) % numdim);
+      if(!BitsUtil.get(bits, 0)) {
+        BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
     }
@@ -218,14 +247,42 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     return output;
   }
 
-  public static long[] coordinatesToHilbert(byte[] coords) {
+  public static long[] coordinatesToHilbert(int[] coords) {
     final int numdim = coords.length;
-    final int numbits = numdim * Byte.SIZE;
+    final int numbits = numdim * Integer.SIZE;
     final long[] output = BitsUtil.zero(numbits);
 
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for(int i = 0; i < Byte.SIZE; i++) {
+    for(int i = 0; i < Integer.SIZE; i++) {
+      final long[] hist = interleaveBits(coords, i);
+      // System.err.println(BitsUtil.toString(hist, numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
+      final long[] bits = BitsUtil.copy(hist);
+      BitsUtil.xorI(bits, refl);
+      BitsUtil.cycleRightI(bits, rotation, numdim);
+      final int nextrot = (rotation + BitsUtil.numberOfTrailingZeros(bits) + 2) % numdim;
+      BitsUtil.invgrayI(bits);
+      BitsUtil.orI(output, bits, numbits - (i + 1) * numdim);
+      // System.err.println(BitsUtil.toString(output, numbits)+" bits: "+BitsUtil.toString(bits, numdim));
+      refl = hist;
+      BitsUtil.flipI(refl, rotation);
+      if(!BitsUtil.get(bits, 0)) {
+        BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
+      }
+      rotation = nextrot;
+    }
+
+    return output;
+  }
+
+  public static long[] coordinatesToHilbert(short[] coords) {
+    final int numdim = coords.length;
+    final int numbits = numdim * Short.SIZE;
+    final long[] output = BitsUtil.zero(numbits);
+
+    int rotation = 0;
+    long[] refl = BitsUtil.zero(numdim);
+    for(int i = 0; i < Short.SIZE; i++) {
       final long[] hist = interleaveBits(coords, i);
       // System.err.println(BitsUtil.toString(hist, numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
       final long[] bits = BitsUtil.copy(hist);
