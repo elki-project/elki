@@ -72,6 +72,9 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
       Cluster<?> c = ci.next();
       ids.add(DBIDUtil.ensureSet(c.getIDs()));
       colors.add(SVGUtil.stringToColor(colorset.getColor(i)).getRGB());
+      if(!ci.hasNext()) {
+        break;
+      }
     }
   }
 
