@@ -127,7 +127,7 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
       // draw data
       for(DBID objId : sample.getSample()) {
         final Double radius = getScaledForId(objId);
-        if(radius > 0.01) {
+        if(radius > 0.01 && !Double.isInfinite(radius)) {
           final NumberVector<?, ?> vec = rel.get(objId);
           if(vec != null) {
             double[] v = proj.fastProjectDataToRenderSpace(vec);
@@ -142,7 +142,7 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
       // draw data
       for(DBID objId : sample.getSample()) {
         final Double radius = getScaledForId(objId);
-        if(radius > 0.01) {
+        if(radius > 0.01 && !Double.isInfinite(radius)) {
           final NumberVector<?, ?> vec = rel.get(objId);
           if(vec != null) {
             double[] v = proj.fastProjectDataToRenderSpace(vec);
@@ -214,9 +214,9 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
    * @return a Double representing a outlierness-score, after it has modified by
    *         the given scales.
    */
-  protected Double getScaledForId(DBID id) {
-    Double d = result.getScores().get(id).doubleValue();
-    if(d == null) {
+  protected double getScaledForId(DBID id) {
+    double d = result.getScores().get(id).doubleValue();
+    if(Double.isNaN(d) || Double.isInfinite(d)) {
       return 0.0;
     }
     if(scaling == null) {
