@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import experimentalcode.students.muellerjo.index.ALOCIQuadTree;
 import experimentalcode.students.muellerjo.index.AbstractALOCIQuadTreeNode;
@@ -159,7 +160,7 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     for(DBID id : relation.iterDBIDs()) {
       AbstractALOCIQuadTreeNode<O> cg = qt.getCountingGrid(relation.get(id));
       int level = cg.getLevel() - alpha;
-      Pair<Double, Integer> res =  calculate_MDEF_norm(qt, cg, level);
+      DoubleIntPair res =  calculate_MDEF_norm(qt, cg, level);
       double maxmdefnorm = res.first;
       double radius = res.second;
       while(level > 0){
@@ -189,7 +190,7 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     return result;
   }
   
-  private Pair<Double, Integer> calculate_MDEF_norm(ALOCIQuadTree<O> qt, AbstractALOCIQuadTreeNode<O> cg, int level){
+  private DoubleIntPair calculate_MDEF_norm(ALOCIQuadTree<O> qt, AbstractALOCIQuadTreeNode<O> cg, int level){
     AbstractALOCIQuadTreeNode<O> sn = qt.getSamplingNode(cg.getCenter(), level);
     long sq = sn.getBoxCountSquareSum(alpha, qt);
     double mdef_norm;
@@ -199,11 +200,11 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     else{
       long cb = sn.getBoxCountCubicSum(alpha, qt);
       double n_hat = new Double(sq) / new Double(sn.getBucketCount());
-      double sig_n_hat = java.lang.Math.sqrt(new Double(cb*sn.getBucketCount() - (sq*sq)))/sn.getBucketCount();
-      double mdef = n_hat - new Double(cg.getBucketCount());
+      double sig_n_hat = java.lang.Math.sqrt(cb*sn.getBucketCount() - (sq*sq))/sn.getBucketCount();
+      double mdef = n_hat - cg.getBucketCount();
       mdef_norm = mdef / sig_n_hat;
     }
-    return new Pair<Double, Integer> (mdef_norm, sn.getLevel());
+    return new DoubleIntPair (mdef_norm, sn.getLevel());
   }
 
   @Override
