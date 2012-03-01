@@ -31,6 +31,7 @@ import java.util.Locale;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -63,6 +64,11 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
    * A short name characterizing this Visualizer.
    */
   public static final String NAME = "Outlier Score Tooltips";
+
+  /**
+   * A short name characterizing this Visualizer.
+   */
+  public static final String NAME_GEN = "Score Tooltips";
 
   /**
    * Number format.
@@ -190,6 +196,30 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           baseResult.getHierarchy().add(o.getScores(), task);
           baseResult.getHierarchy().add(p, task);
+        }
+      }
+      List<Relation<?>> rrs = ResultUtil.filterResults(result, Relation.class);
+      for(Relation<?> r : rrs) {
+        if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation())) {
+          continue;
+        }
+        // Skip if we already considered it above
+        boolean add = true;
+        for(Result p : baseResult.getHierarchy().getChildren(r)) {
+          if(p instanceof VisualizationTask && ((VisualizationTask) p).getFactory() instanceof Factory) {
+            add = false;
+            break;
+          }
+        }
+        if(add) {
+          Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+            final VisualizationTask task = new VisualizationTask(NAME_GEN, r, p.getRelation(), this);
+            task.put(VisualizationTask.META_TOOL, true);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+            baseResult.getHierarchy().add(r, task);
+            baseResult.getHierarchy().add(p, task);
+          }
         }
       }
     }
