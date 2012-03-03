@@ -23,6 +23,9 @@ package experimentalcode.students.muellerjo.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -44,6 +47,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -113,6 +117,8 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
    */
   private int g;
   
+  private DistanceQuery<O, D> distFunc;
+  
   /**
    * Constructor.
    * 
@@ -135,11 +141,11 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {    
     Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("aLOCI preprocessing", relation.size(), logger) : null;
-    ALOCIQuadTree<O> qt = new ALOCIQuadTree<O>(relation, nmin);
     
-    
+    List<ALOCIQuadTree<O>> qts = new ArrayList<ALOCIQuadTree<O>>(g);
+    ALOCIQuadTree<O> qt = new ALOCIQuadTree<O>(relation, nmin, 0);
     for(DBID id : relation.iterDBIDs()) {
       qt.insert(relation.get(id));
       if(progressPreproc != null) {
@@ -147,26 +153,62 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
       }
     }
     qt.addLevel(alpha);
+    qts.add(qt);
+    
+    Pair<O,O> hbbb = qt.getMinMax();
+    int dim = DatabaseUtil.dimensionality(relation);
+    double[] shiftVec = new double[dim];
+    int shift = 1;
+    while(g > shift){
+      int mult = 0;
+      if ((shift % dim) == (dim-1)){
+        mult++;
+      }
+      for(int i= 0; i < dim; i++){ 
+         shiftVec[i] = (((shift % dim) == i)? -1 : 1)*(hbbb.second.doubleValue(i+1) - hbbb.first.doubleValue(i+1)) / (1 << (alpha-mult));
+      }
+      O factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+      
+      qt = new ALOCIQuadTree<O>(relation, nmin, factory.newNumberVector(shiftVec), shift);
+      {
+        for(DBID id : relation.iterDBIDs()) {
+          qt.insert(relation.get(id));
+          if(progressPreproc != null) {
+            progressPreproc.incrementProcessed(logger);
+          }
+        }
+        qt.addLevel(alpha);
+      }
+      shift++;
+      qts.add(qt);
+    }
     if(progressPreproc != null) {
       progressPreproc.ensureCompleted(logger);
     }
-    Pair<O,O> hbbb = qt.getMinMax();
-    D r = distFunc.distance(hbbb.first, hbbb.second);
     FiniteProgress progressLOCI = logger.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), logger) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore mdef_level = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(DBID id : relation.iterDBIDs()) {
-      AbstractALOCIQuadTreeNode<O> cg = qt.getCountingGrid(relation.get(id));
+      AbstractALOCIQuadTreeNode<O> cg = qts.get(0).getCountingGrid(relation.get(id));
+      for (int i = 1; i < g; i++){
+        AbstractALOCIQuadTreeNode<O> cg2 = qts.get(i).getCountingGrid(relation.get(id));
+        if (distFunc.distance(cg.getCenter(), relation.get(id)).doubleValue() > distFunc.distance(cg2.getCenter(), relation.get(id)).doubleValue()){
+          cg = cg2;
+        }
+      }
       int level = cg.getLevel() - alpha;
-      DoubleIntPair res =  calculate_MDEF_norm(qt, cg, level);
+      if (level < 0){
+        logger.error("Initial SamplingNode Level < 0");
+      }
+      DoubleIntPair res =  calculate_MDEF_norm(qts, cg, level);
       double maxmdefnorm = res.first;
       double radius = res.second;
       while(level > 0){
         level--;
-        cg = cg.getParent();
-        res =  calculate_MDEF_norm(qt, cg, level);
+        cg = getBestCountingNode(qts, relation.get(id), cg.getLevel()-1);
+        res =  calculate_MDEF_norm(qts, cg, level);
         if(maxmdefnorm < res.first){
           maxmdefnorm = res.first;
           radius = res.second;
@@ -190,21 +232,64 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     return result;
   }
   
-  private DoubleIntPair calculate_MDEF_norm(ALOCIQuadTree<O> qt, AbstractALOCIQuadTreeNode<O> cg, int level){
-    AbstractALOCIQuadTreeNode<O> sn = qt.getSamplingNode(cg.getCenter(), level);
-    long sq = sn.getBoxCountSquareSum(alpha, qt);
+  private DoubleIntPair calculate_MDEF_norm(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, int level){
+    AbstractALOCIQuadTreeNode<O> sn = getBestSamplingNode(qts, cg.getCenter(), level); 
+    long sq = sn.getBoxCountSquareSum(alpha, qts.get(sn.getQTIndex()));
     double mdef_norm;
     if (sq == sn.getBucketCount()){
       mdef_norm = 0.0;
     }
     else{
-      long cb = sn.getBoxCountCubicSum(alpha, qt);
+      long cb = sn.getBoxCountCubicSum(alpha, qts.get(sn.getQTIndex()));
       double n_hat = new Double(sq) / new Double(sn.getBucketCount());
       double sig_n_hat = java.lang.Math.sqrt(cb*sn.getBucketCount() - (sq*sq))/sn.getBucketCount();
       double mdef = n_hat - cg.getBucketCount();
       mdef_norm = mdef / sig_n_hat;
     }
     return new DoubleIntPair (mdef_norm, sn.getLevel());
+  }
+  
+  
+  private AbstractALOCIQuadTreeNode<O> getBestSamplingNode(List<ALOCIQuadTree<O>> qts, O center, int level){
+    int qti = 0;
+    AbstractALOCIQuadTreeNode<O> sn = qts.get(qti).getSamplingNode(center, level);
+    qti++;
+    while (sn == null && qti < g){
+      sn = qts.get(qti).getSamplingNode(center, level);
+      qti++;
+    }
+    for (int i = qti; i < g; i++){
+      AbstractALOCIQuadTreeNode<O> sn2 = qts.get(i).getSamplingNode(center, level);
+      if (sn2 == null)
+        continue;
+      if (distFunc.distance(center, sn.getCenter()).doubleValue() > distFunc.distance(center, sn2.getCenter()).doubleValue()){
+        sn = sn2;
+      }
+    }
+    if (sn == null)
+      logger.error("No Samplingnode at Level: "+level+" found");
+    return sn;
+  }
+  
+  private AbstractALOCIQuadTreeNode<O> getBestCountingNode(List<ALOCIQuadTree<O>> qts, O center, int level){
+    int qti = 0;
+    AbstractALOCIQuadTreeNode<O> cn = qts.get(qti).getCountingNode(center, level);
+    qti++;
+    while (cn == null && qti < g){
+      cn = qts.get(qti).getCountingNode(center, level);
+      qti++;
+    }
+    for (int i = qti; i < g; i++){
+      AbstractALOCIQuadTreeNode<O> cn2 = qts.get(i).getCountingNode(center, level);
+      if (cn2 == null)
+        continue;
+      if (distFunc.distance(center, cn.getCenter()).doubleValue() > distFunc.distance(center, cn2.getCenter()).doubleValue()){
+        cn = cn2;
+      }
+    }
+    if (cn == null)
+      logger.error("No Countingnode at Level: "+level+" found");
+    return cn;
   }
 
   @Override
