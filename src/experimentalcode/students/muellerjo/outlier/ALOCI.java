@@ -199,15 +199,12 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
         }
       }
       int level = cg.getLevel() - alpha;
-      if (level < 0){
-        logger.error("Initial SamplingNode Level < 0");
-      }
       DoubleIntPair res =  calculate_MDEF_norm(qts, cg, level);
       double maxmdefnorm = res.first;
       double radius = res.second;
       while(level > 0){
         level--;
-        cg = getBestCountingNode(qts, relation.get(id), cg.getLevel()-1);
+        cg = getBestCountingNode(qts, cg, relation.get(id), cg.getLevel()-1);
         res =  calculate_MDEF_norm(qts, cg, level);
         if(maxmdefnorm < res.first){
           maxmdefnorm = res.first;
@@ -233,7 +230,7 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
   }
   
   private DoubleIntPair calculate_MDEF_norm(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, int level){
-    AbstractALOCIQuadTreeNode<O> sn = getBestSamplingNode(qts, cg.getCenter(), level);
+    AbstractALOCIQuadTreeNode<O> sn = getBestSamplingNode(qts, cg, level);
     if (sn == null){
       sn = cg.getParent();
       for(int i=1; i < alpha; i++){
@@ -256,15 +253,16 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
   }
   
   
-  private AbstractALOCIQuadTreeNode<O> getBestSamplingNode(List<ALOCIQuadTree<O>> qts, O center, int level){
+  private AbstractALOCIQuadTreeNode<O> getBestSamplingNode(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, int level){
     int qti = 0;
-    AbstractALOCIQuadTreeNode<O> sn = qts.get(qti).getSamplingNode(center, level);
-    qti++;
-    while (sn == null && qti < g){
-      sn = qts.get(qti).getSamplingNode(center, level);
-      qti++;
+    O center = cg.getCenter();
+    AbstractALOCIQuadTreeNode<O> sn = cg.getParent();
+    while(sn.getLevel() != level){
+      sn = sn.getParent();
     }
-    for (int i = qti; i < g; i++){
+    for (int i = 0; i < g; i++){
+      if (i == qti)
+        continue;
       AbstractALOCIQuadTreeNode<O> sn2 = qts.get(i).getSamplingNode(center, level);
       if (sn2 == null)
         continue;
@@ -272,20 +270,19 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
         sn = sn2;
       }
     }
-    if (sn == null)
-      logger.error("No Samplingnode at Level: "+level+" found");
     return sn;
   }
   
-  private AbstractALOCIQuadTreeNode<O> getBestCountingNode(List<ALOCIQuadTree<O>> qts, O center, int level){
+  private AbstractALOCIQuadTreeNode<O> getBestCountingNode(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, O center, int level){
     int qti = 0;
-    AbstractALOCIQuadTreeNode<O> cn = qts.get(qti).getCountingNode(center, level);
-    qti++;
-    while (cn == null && qti < g){
-      cn = qts.get(qti).getCountingNode(center, level);
-      qti++;
+    AbstractALOCIQuadTreeNode<O> cn = cg.getParent();
+    while(cn.getLevel() != level){
+      cn = cn.getParent();
     }
-    for (int i = qti; i < g; i++){
+    qti = cn.getQTIndex();
+    for (int i = 0; i < g; i++){
+      if (i == qti)
+        continue;
       AbstractALOCIQuadTreeNode<O> cn2 = qts.get(i).getCountingNode(center, level);
       if (cn2 == null)
         continue;
@@ -293,8 +290,6 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
         cn = cn2;
       }
     }
-    if (cn == null)
-      logger.error("No Countingnode at Level: "+level+" found");
     return cn;
   }
 
