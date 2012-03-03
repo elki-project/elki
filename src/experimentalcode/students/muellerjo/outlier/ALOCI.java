@@ -233,7 +233,13 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
   }
   
   private DoubleIntPair calculate_MDEF_norm(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, int level){
-    AbstractALOCIQuadTreeNode<O> sn = getBestSamplingNode(qts, cg.getCenter(), level); 
+    AbstractALOCIQuadTreeNode<O> sn = getBestSamplingNode(qts, cg.getCenter(), level);
+    if (sn == null){
+      sn = cg.getParent();
+      for(int i=1; i < alpha; i++){
+        sn = sn.getParent();
+      }
+    }
     long sq = sn.getBoxCountSquareSum(alpha, qts.get(sn.getQTIndex()));
     double mdef_norm;
     if (sq == sn.getBucketCount()){
