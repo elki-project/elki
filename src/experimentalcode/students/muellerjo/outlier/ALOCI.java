@@ -73,8 +73,6 @@ import experimentalcode.students.muellerjo.index.AbstractALOCIQuadTreeNode;
  * 
  * @author Jonathan von Bruenken
  * 
- * @apiviz.has RangeQuery
- * 
  * @param <O> Object type
  * @param <D> Distance type
  */
@@ -244,7 +242,7 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     }
     else{
       long cb = sn.getBoxCountCubicSum(alpha, qts.get(sn.getQTIndex()));
-      double n_hat = new Double(sq) / new Double(sn.getBucketCount());
+      double n_hat = (double)sq / (double)sn.getBucketCount();
       double sig_n_hat = java.lang.Math.sqrt(cb*sn.getBucketCount() - (sq*sq))/sn.getBucketCount();
       double mdef = n_hat - cg.getBucketCount();
       mdef_norm = mdef / sig_n_hat;
