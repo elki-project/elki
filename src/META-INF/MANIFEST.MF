@@ -167,31 +167,6 @@ Implementation-Version: 1.1
 Implementation-Vendor: World Wide Web Consortium
 Implementation-URL: http://www.w3.org/TR/SVG11/java.html
 
-Name: org/apache/avalon
-Comment: Apache Avalon from FOP PDF Transcoder package
-Implementation-Title: Apache Avalon
-Implementation-Vendor: Apache Software Foundation
-Implementation-URL: http://avalon.apache.org/
-
-Name: org/apache/fop
-Comment: FOP PDF Transcoder package for Apache Batik
-Implementation-Title: FOP PDF Transcoder package
-Implementation-Version: 1.0beta2
-Implementation-Vendor: Apache Software Foundation
-Implementation-URL: http://xmlgraphics.apache.org/fop/
-
-Name: org/apache/commons/io
-Comment: Apache Commons IO from FOP Transcoder package
-Implementation-Title: Apache Commons IO
-Implementation-Vendor: Apache Software Foundation
-Implementation-URL: http://commons.apache.org/io/
-
-Name: org/apache/commons/logging
-Comment: Apache Commons Logging from FOP Transcoder package
-Implementation-Title: Apache Commons Logging
-Implementation-Vendor: Apache Software Foundation
-Implementation-URL: http://commons.apache.org/logging/
-
 Name: gnu/trove
 Comment: GNU Trove
 Implementation-Title: Trove

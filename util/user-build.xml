@@ -23,8 +23,7 @@
 				<pathelement path="lib/batik-all-1.7.jar" />
 				<pathelement path="lib/xml-commons-external-1.4.01.jar" />
 				<pathelement path="lib/xml-commons-external-1.4.01-ext.jar" />
-				<pathelement path="lib/pdf-transcoder.jar" />
-				<pathelement path="lib/trove-3.0.1.jar" />
+				<pathelement path="lib/trove-3.0.2.jar" />
 			</classpath>
 			<include name="de/lmu/ifi/dbs/elki/**/*.java" />
 			<include name="tutorial/**/*.java" />
@@ -56,7 +55,7 @@
 				<attribute name="Implementation-Title" value="${title}" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Implementation-URL" value="${url}" />
-				<attribute name="Class-Path" value="lib/batik-all-1.7.jar lib/xml-commons-external-1.4.01.jar lib/xml-commons-external-1.4.01-ext.jar lib/pdf-transcoder.jar lib/trove-3.0.1.jar" />
+				<attribute name="Class-Path" value="lib/batik-all-1.7.jar lib/xml-commons-external-1.4.01.jar lib/xml-commons-external-1.4.01-ext.jar lib/trove-3.0.2.jar" />
 			</manifest>
 		</jar>
 	</target>
