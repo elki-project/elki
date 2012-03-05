@@ -48,9 +48,6 @@ import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.util.SVGConstants;
-import org.apache.fop.render.ps.EPSTranscoder;
-import org.apache.fop.render.ps.PSTranscoder;
-import org.apache.fop.svg.PDFTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -376,9 +373,19 @@ public class SVGPlot {
    * @param file Output filename
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
+   * @throws ClassNotFoundException PDF transcoder not installed
    */
-  public void saveAsPDF(File file) throws IOException, TranscoderException {
-    transcode(file, new PDFTranscoder());
+  public void saveAsPDF(File file) throws IOException, TranscoderException, ClassNotFoundException {
+    try {
+      Object t = Class.forName("org.apache.fop.svg.PDFTranscoder").newInstance();
+      transcode(file, (Transcoder) t);
+    }
+    catch(InstantiationException e) {
+      throw new ClassNotFoundException("Could not instantiate PDF transcoder - is Apache FOP installed?", e);
+    }
+    catch(IllegalAccessException e) {
+      throw new ClassNotFoundException("Could not instantiate PDF transcoder - is Apache FOP installed?", e);
+    }
   }
 
   /**
@@ -387,9 +394,19 @@ public class SVGPlot {
    * @param file Output filename
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
+   * @throws ClassNotFoundException PS transcoder not installed
    */
-  public void saveAsPS(File file) throws IOException, TranscoderException {
-    transcode(file, new PSTranscoder());
+  public void saveAsPS(File file) throws IOException, TranscoderException, ClassNotFoundException {
+    try {
+      Object t = Class.forName("org.apache.fop.render.ps.PSTranscoder").newInstance();
+      transcode(file, (Transcoder) t);
+    }
+    catch(InstantiationException e) {
+      throw new ClassNotFoundException("Could not instantiate PS transcoder - is Apache FOP installed?", e);
+    }
+    catch(IllegalAccessException e) {
+      throw new ClassNotFoundException("Could not instantiate PS transcoder - is Apache FOP installed?", e);
+    }
   }
 
   /**
@@ -398,9 +415,36 @@ public class SVGPlot {
    * @param file Output filename
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
+   * @throws ClassNotFoundException EPS transcoder not installed
    */
-  public void saveAsEPS(File file) throws IOException, TranscoderException {
-    transcode(file, new EPSTranscoder());
+  public void saveAsEPS(File file) throws IOException, TranscoderException, ClassNotFoundException {
+    try {
+      Object t = Class.forName("org.apache.fop.render.ps.EPSTranscoder").newInstance();
+      transcode(file, (Transcoder) t);
+    }
+    catch(InstantiationException e) {
+      throw new ClassNotFoundException("Could not instantiate EPS transcoder - is Apache FOP installed?", e);
+    }
+    catch(IllegalAccessException e) {
+      throw new ClassNotFoundException("Could not instantiate EPS transcoder - is Apache FOP installed?", e);
+    }
+  }
+
+  /**
+   * Test whether FOP were installed (for PDF, PS and EPS output support).
+   * 
+   * @return true when FOP is available.
+   */
+  public static boolean hasFOPInstalled() {
+    try {
+      Class<?> c1 = Class.forName("org.apache.fop.svg.PDFTranscoder");
+      Class<?> c2 = Class.forName("org.apache.fop.render.ps.PSTranscoder");
+      Class<?> c3 = Class.forName("org.apache.fop.render.ps.EPSTranscoder");
+      return (c1 != null) && (c2 != null) && (c3 != null);
+    }
+    catch(ClassNotFoundException e) {
+      return false;
+    }
   }
 
   /**
@@ -461,8 +505,9 @@ public class SVGPlot {
    * @throws TranscoderException on transcoding errors
    * @throws TransformerFactoryConfigurationError on transcoding errors
    * @throws TransformerException on transcoding errors
+   * @throws ClassNotFoundException when the transcoder was not installed
    */
-  public void saveAsANY(File file, int width, int height, double quality) throws IOException, TranscoderException, TransformerFactoryConfigurationError, TransformerException {
+  public void saveAsANY(File file, int width, int height, double quality) throws IOException, TranscoderException, TransformerFactoryConfigurationError, TransformerException, ClassNotFoundException {
     String extension = FileUtil.getFilenameExtension(file);
     if(extension.equals("svg")) {
       saveAsSVG(file);

@@ -56,112 +56,142 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * @apiviz.composedOf SaveOptionsPanel
  */
 public class SVGSaveDialog {
-	/** The default title. "Save as ...". */
-	public final static String DEFAULT_TITLE = "Save as ...";
-	
-	/** Static logger reference */
-	private final static Logging logger = Logging.getLogger(SVGSaveDialog.class);
-	
-	/** Automagic file format */
-	final static String automagic_format = "automatic";
+  /** The default title. "Save as ...". */
+  public final static String DEFAULT_TITLE = "Save as ...";
 
-	/** Supported file format (extensions) */
-  final static String[] formats = { "svg", "png", "jpeg", "jpg", "pdf", "ps", "eps" };
+  /** Static logger reference */
+  private final static Logging logger = Logging.getLogger(SVGSaveDialog.class);
+
+  /** Automagic file format */
+  final static String automagic_format = "automatic";
+
+  /** Supported file format (extensions) */
+  final static String[] formats;
 
   /** Visible file formats */
-  final static String[] visibleformats = { automagic_format, "svg", "png", "jpeg", "pdf", "ps", "eps" };
-	
-	/**
-	 * Show a "Save as" dialog.
-	 * 
+  final static String[] visibleformats;
+
+  static {
+    // FOP installed?
+    if(SVGPlot.hasFOPInstalled()) {
+      formats = new String[] { "svg", "png", "jpeg", "jpg", "pdf", "ps", "eps" };
+      visibleformats = new String[] { automagic_format, "svg", "png", "jpeg", "pdf", "ps", "eps" };
+    }
+    else {
+      formats = new String[] { "svg", "png", "jpeg", "jpg" };
+      visibleformats = new String[] { automagic_format, "svg", "png", "jpeg" };
+    }
+  }
+
+  /**
+   * Show a "Save as" dialog.
+   * 
    * @param plot The plot to be exported.
    * @param width The width of the exported image (when export to JPEG/PNG).
    * @param height The height of the exported image (when export to JPEG/PNG).
    * @return Result from {@link JFileChooser#showSaveDialog}
-	 */
-	public static int showSaveDialog(SVGPlot plot, int width, int height) {
-	  double quality = 1.0;
-	  int ret = -1;
+   */
+  public static int showSaveDialog(SVGPlot plot, int width, int height) {
+    double quality = 1.0;
+    int ret = -1;
 
-	  JFileChooser fc = new JFileChooser();
-		fc.setDialogTitle(DEFAULT_TITLE);
-		//fc.setFileFilter(new ImageFilter());
-		SaveOptionsPanel optionsPanel = new SaveOptionsPanel(fc, width, height);
-		fc.setAccessory(optionsPanel);
+    JFileChooser fc = new JFileChooser();
+    fc.setDialogTitle(DEFAULT_TITLE);
+    // fc.setFileFilter(new ImageFilter());
+    SaveOptionsPanel optionsPanel = new SaveOptionsPanel(fc, width, height);
+    fc.setAccessory(optionsPanel);
 
-		ret = fc.showSaveDialog(null);
-		fc.setDialogTitle("Saving... Please wait.");
-		if (ret == JFileChooser.APPROVE_OPTION) {
+    ret = fc.showSaveDialog(null);
+    fc.setDialogTitle("Saving... Please wait.");
+    if(ret == JFileChooser.APPROVE_OPTION) {
       File file = fc.getSelectedFile();
-			String format = optionsPanel.getSelectedFormat();
-			if (format == null || format == automagic_format) {
-			  format = guessFormat(file.getName());
-			}
-			try {
-			  if (format == null) {
+      String format = optionsPanel.getSelectedFormat();
+      if(format == null || format == automagic_format) {
+        format = guessFormat(file.getName());
+      }
+      try {
+        if(format == null) {
           showError(fc, "Error saving image.", "File format not recognized.");
-			  } else if (format.equals("jpeg") || format.equals("jpg")) {
-					quality = optionsPanel.getJPEGQuality();
-					plot.saveAsJPEG(file, width, height, quality);
-				} else if (format.equals("png")) {
-					plot.saveAsPNG(file, width, height);
-				} else if (format.equals("ps")) {
-					plot.saveAsPS(file);
-				} else if (format.equals("eps")) {
-					plot.saveAsEPS(file);
-				} else if (format.equals("pdf")) {
-					plot.saveAsPDF(file);
-				} else if (format.equals("svg")) {
-					plot.saveAsSVG(file);
-				} else {
-					showError(fc, "Error saving image.", "Unsupported format: " + format);
-				}
-			} catch (java.lang.IncompatibleClassChangeError e) {
+        }
+        else if(format.equals("jpeg") || format.equals("jpg")) {
+          quality = optionsPanel.getJPEGQuality();
+          plot.saveAsJPEG(file, width, height, quality);
+        }
+        else if(format.equals("png")) {
+          plot.saveAsPNG(file, width, height);
+        }
+        else if(format.equals("ps")) {
+          plot.saveAsPS(file);
+        }
+        else if(format.equals("eps")) {
+          plot.saveAsEPS(file);
+        }
+        else if(format.equals("pdf")) {
+          plot.saveAsPDF(file);
+        }
+        else if(format.equals("svg")) {
+          plot.saveAsSVG(file);
+        }
+        else {
+          showError(fc, "Error saving image.", "Unsupported format: " + format);
+        }
+      }
+      catch(java.lang.IncompatibleClassChangeError e) {
         showError(fc, "Error saving image.", "It seems that your Java version is incompatible with this version of Batik and Jpeg writing. Sorry.");
-			} catch (IOException e) {
-				logger.exception(e);
-				showError(fc, "Error saving image.", e.toString());
-			} catch (TranscoderException e) {
-        logger.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-			} catch (TransformerFactoryConfigurationError e) {
-        logger.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-			} catch (TransformerException e) {
-        logger.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      } catch (Exception e) {
+      }
+      catch(ClassNotFoundException e) {
+        showError(fc, "Error saving image.", "A class was not found when saving this image. Maybe installing Apache FOP will help (for PDF, PS and EPS output).\n" + e.toString());
+      }
+      catch(IOException e) {
         logger.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
-		} else if (ret == JFileChooser.ERROR_OPTION) {
-			showError(fc, "Error in file dialog.", "Unknown Error.");
-		} else if (ret == JFileChooser.CANCEL_OPTION) {
-		  // do nothing - except return result
-		}	
-		return ret;
-	}
-	
-	/**
-	 * Guess a supported format from the file name. For "auto" format handling.
-	 * 
-	 * @param name File name
-	 * @return format or "null"
-	 */
-	public static String guessFormat(String name) {
+      catch(TranscoderException e) {
+        logger.exception(e);
+        showError(fc, "Error saving image.", e.toString());
+      }
+      catch(TransformerFactoryConfigurationError e) {
+        logger.exception(e);
+        showError(fc, "Error saving image.", e.toString());
+      }
+      catch(TransformerException e) {
+        logger.exception(e);
+        showError(fc, "Error saving image.", e.toString());
+      }
+      catch(Exception e) {
+        logger.exception(e);
+        showError(fc, "Error saving image.", e.toString());
+      }
+    }
+    else if(ret == JFileChooser.ERROR_OPTION) {
+      showError(fc, "Error in file dialog.", "Unknown Error.");
+    }
+    else if(ret == JFileChooser.CANCEL_OPTION) {
+      // do nothing - except return result
+    }
+    return ret;
+  }
+
+  /**
+   * Guess a supported format from the file name. For "auto" format handling.
+   * 
+   * @param name File name
+   * @return format or "null"
+   */
+  public static String guessFormat(String name) {
     String ext = FileUtil.getFilenameExtension(name);
-    for (String format : formats) {
-      if (format.equals(ext)) {
+    for(String format : formats) {
+      if(format.equals(ext)) {
         return ext;
       }
     }
     return null;
-	}
+  }
 
   /**
    * @return the formats
    */
-	public static String[] getFormats() {
+  public static String[] getFormats() {
     return formats;
   }
 
@@ -172,14 +202,14 @@ public class SVGSaveDialog {
     return visibleformats;
   }
 
-	/**
-	 * Helper method to show a error message as "popup".
-	 * Calls {@link JOptionPane#showMessageDialog(java.awt.Component, Object)}.
-	 * 
-	 * @param parent The parent component for the popup.
-	 * @param msg The message to be displayed.
-	 * */
-	private static void showError(Component parent, String title, String msg) {
-		JOptionPane.showMessageDialog(parent, msg, title, JOptionPane.ERROR_MESSAGE);
-	}	
+  /**
+   * Helper method to show a error message as "popup". Calls
+   * {@link JOptionPane#showMessageDialog(java.awt.Component, Object)}.
+   * 
+   * @param parent The parent component for the popup.
+   * @param msg The message to be displayed.
+   * */
+  private static void showError(Component parent, String title, String msg) {
+    JOptionPane.showMessageDialog(parent, msg, title, JOptionPane.ERROR_MESSAGE);
+  }
 }
