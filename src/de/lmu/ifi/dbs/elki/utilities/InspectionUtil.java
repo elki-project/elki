@@ -27,11 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -39,8 +37,10 @@ import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A collection of inspection-related utility functions.
@@ -50,6 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
  * @apiviz.uses InspectionUtilFrequentlyScanned
  */
 public class InspectionUtil {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(InspectionUtil.class);
+
   /**
    * Default package ignores.
    */
@@ -120,8 +125,7 @@ public class InspectionUtil {
     }
     else {
       // Need to scan - not cached.
-      // LoggingUtil.logExpensive(Level.FINE,
-      // "Slow scan for implementations: "+c.getName());
+      logger.finest("Slow scan for implementations: " + c.getName());
       return findAllImplementations(c, false);
     }
   }
@@ -155,22 +159,17 @@ public class InspectionUtil {
     for(String path : classpath) {
       File p = new File(path);
       if(path.endsWith(".jar")) {
-        iters.add(new JarClassIterator(path));
+        iters.add(new JarClassIterator(path, ignorepackages));
       }
       else if(p.isDirectory()) {
-        iters.add(new DirClassIterator(p));
+        iters.add(new DirClassIterator(p, ignorepackages));
       }
     }
 
     ArrayList<Class<?>> res = new ArrayList<Class<?>>();
     ClassLoader cl = ClassLoader.getSystemClassLoader();
     for(Iterable<String> iter : iters) {
-      nextclass: for(String classname : iter) {
-        for(String pkg : ignorepackages) {
-          if(classname.startsWith(pkg)) {
-            continue nextclass;
-          }
-        }
+      for(String classname : iter) {
         try {
           Class<?> cls = cl.loadClass(classname);
           // skip abstract / private classes.
@@ -212,12 +211,15 @@ public class InspectionUtil {
 
     private String ne;
 
+    private String[] ignorepackages;
+
     /**
      * Constructor from Jar file.
      * 
      * @param path Jar file entries to iterate over.
      */
-    public JarClassIterator(String path) {
+    public JarClassIterator(String path, String[] ignorepackages) {
+      this.ignorepackages = ignorepackages;
       try {
         JarFile jf = new JarFile(path);
         this.jarentries = jf.entries();
@@ -242,11 +244,16 @@ public class InspectionUtil {
      * @return next entry or null
      */
     private String findNext() {
-      while(jarentries.hasMoreElements()) {
+      nextfile: while(jarentries.hasMoreElements()) {
         JarEntry je = jarentries.nextElement();
         String name = je.getName();
         if(name.endsWith(".class")) {
-          String classname = name.substring(0, name.length() - ".class".length());
+          String classname = name.substring(0, name.length() - ".class".length()).replace('/', '.');
+          for(String pkg : ignorepackages) {
+            if(classname.startsWith(pkg)) {
+              continue nextfile;
+            }
+          }
           if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
             return classname.replace('/', '.');
           }
@@ -282,73 +289,91 @@ public class InspectionUtil {
    * @apiviz.exclude
    */
   static class DirClassIterator implements Iterator<String>, Iterable<String> {
-    private static final int CLASS_EXT_LENGTH = ".class".length();
+    private static final String CLASS_EXT = ".class";
+
+    private static final String FACTORY_FILE_EXT = ClassParameter.FACTORY_POSTFIX + CLASS_EXT;
+
+    private static final int CLASS_EXT_LENGTH = CLASS_EXT.length();
 
     private String prefix;
 
-    private Deque<File> set = new ArrayDeque<File>();
+    private ArrayList<String> files = new ArrayList<String>(100);
 
-    private String cur;
+    private ArrayList<Pair<File, String>> folders = new ArrayList<Pair<File, String>>(100);
+
+    private String[] ignorepackages;
 
     /**
      * Constructor from Directory
      * 
      * @param path Directory to iterate over
      */
-    public DirClassIterator(File path) {
+    public DirClassIterator(File path, String[] ignorepackages) {
+      this.ignorepackages = ignorepackages;
       this.prefix = path.getAbsolutePath();
       if(prefix.charAt(prefix.length() - 1) != File.separatorChar) {
         prefix = prefix + File.separatorChar;
       }
 
-      this.set.push(path);
-      this.cur = findNext();
+      this.folders.add(new Pair<File, String>(path, ""));
     }
 
     @Override
     public boolean hasNext() {
-      // Do we have a next entry?
-      return (cur != null);
+      if(files.size() == 0) {
+        findNext();
+      }
+      return (files.size() > 0);
     }
 
     /**
-     * Find the next entry, since we need to skip some jar file entries.
-     * 
-     * @return next entry or null
+     * Find the next entry, since we need to skip some directories.
      */
-    private String findNext() {
-      while(set.size() > 0) {
-        File f = set.pop();
-        // Classes
-        if(f.getName().endsWith(".class")) {
-          String name = f.getAbsolutePath();
-          String classname = name.substring(prefix.length(), name.length() - CLASS_EXT_LENGTH);
-          if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
-            return classname.replace(File.separatorChar, '.');
-          }
-          continue;
-        }
+    private void findNext() {
+      while(folders.size() > 0) {
+        Pair<File, String> pair = folders.remove(folders.size() - 1);
         // recurse into directories
-        if(f.isDirectory()) {
-          for(File newf : f.listFiles()) {
-            // TODO: do not recurse into ignored packages!.
+        if(pair.first.isDirectory()) {
+          nextfile: for(String localname : pair.first.list()) {
             // Ignore unix-hidden files/dirs
-            if(newf.getName().charAt(0) != '.') {
-              set.push(newf);
+            if(localname.charAt(0) == '.') {
+              continue;
+            }
+            // Classes
+            if(localname.endsWith(CLASS_EXT)) {
+              if(localname.indexOf('$') >= 0) {
+                if(!localname.endsWith(FACTORY_FILE_EXT)) {
+                  continue;
+                }
+              }
+              files.add(pair.second + localname.substring(0, localname.length() - CLASS_EXT_LENGTH));
+              continue;
+            }
+            // Recurse into directories
+            File newf = new File(pair.first, localname);
+            if(newf.isDirectory()) {
+              String newpref = pair.second + localname + '.';
+              for(String ignore : ignorepackages) {
+                if(ignore.equals(newpref)) {
+                  continue nextfile;
+                }
+              }
+              folders.add(new Pair<File, String>(newf, newpref));
             }
           }
-          continue;
         }
       }
-      return null;
     }
 
     @Override
     public String next() {
-      // Return the previously stored entry.
-      String ret = this.cur;
-      this.cur = findNext();
-      return ret;
+      if(files.size() == 0) {
+        findNext();
+      }
+      if(files.size() > 0) {
+        return files.remove(files.size() - 1);
+      }
+      return null;
     }
 
     @Override
