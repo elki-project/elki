@@ -170,6 +170,11 @@ public class InspectionUtil {
     ClassLoader cl = ClassLoader.getSystemClassLoader();
     for(Iterable<String> iter : iters) {
       for(String classname : iter) {
+        if (logger.isDebuggingFinest()) {
+          if (!classname.startsWith("de.lmu.ifi.dbs.elki.") && !classname.startsWith("experimentalcode.")  && !classname.startsWith("tutorial.")  && !classname.startsWith("project.")) {
+            logger.finest("Exclude? " + classname);
+          }
+        }
         try {
           Class<?> cls = cl.loadClass(classname);
           // skip abstract / private classes.
