@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -112,42 +111,12 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
     // Initial recomputation of the means.
     means = means(clusters, means, relation);
 
-    // Raw distance function
-    final PrimitiveDistanceFunction<? super NumberVector<?, ?>, D> df = getDistanceFunction();
-
     // Refine result
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       if(logger.isVerbose()) {
         logger.verbose("K-Means iteration " + (iteration + 1));
       }
-      boolean changed = false;
-      // Incremental update
-      for(DBID id : relation.iterDBIDs()) {
-        D mindist = df.getDistanceFactory().infiniteDistance();
-        V fv = relation.get(id);
-        int minIndex = 0;
-        for(int i = 0; i < k; i++) {
-          D dist = df.distance(fv, means.get(i));
-          if(dist.compareTo(mindist) < 0) {
-            minIndex = i;
-            mindist = dist;
-          }
-        }
-        // Update the cluster mean incrementally:
-        for(int i = 0; i < k; i++) {
-          ModifiableDBIDs ci = clusters.get(i);
-          if(i == minIndex) {
-            if(ci.add(id)) {
-              incrementalUpdateMean(means.get(i), relation.get(id), ci.size(), +1);
-              changed = true;
-            }
-          }
-          else if(ci.remove(id)) {
-            incrementalUpdateMean(means.get(i), relation.get(id), ci.size() + 1, -1);
-            changed = true;
-          }
-        }
-      }
+      boolean changed = macQueenIterate(relation, means, clusters);
       if(!changed) {
         break;
       }
