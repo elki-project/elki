@@ -45,6 +45,7 @@ import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.XMLAbstractTranscoder;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.util.SVGConstants;
@@ -345,6 +346,8 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors
    */
   protected void transcode(File file, Transcoder transcoder) throws IOException, TranscoderException {
+    // Disable validation, performance is more important here (thumbnails!)
+    transcoder.addTranscodingHint(XMLAbstractTranscoder.KEY_XML_PARSER_VALIDATING, Boolean.FALSE);
     SVGDocument doc = cloneDocument();
     TranscoderInput input = new TranscoderInput(doc);
     OutputStream out = new FileOutputStream(file);
