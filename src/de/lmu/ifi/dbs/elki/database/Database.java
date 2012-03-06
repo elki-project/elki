@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
 
 /**
  * Database specifies the requirements for any database implementation. Note
@@ -59,7 +60,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * @apiviz.has Index oneway - - manages
  * @apiviz.uses DataStoreListener oneway - - invokes
  */
-public interface Database extends HierarchicalResult {
+public interface Database extends HierarchicalResult, InspectionUtilFrequentlyScanned {
   /**
    * Initialize the database, for example by loading the input data. (Since this
    * should NOT be done on construction time!)
