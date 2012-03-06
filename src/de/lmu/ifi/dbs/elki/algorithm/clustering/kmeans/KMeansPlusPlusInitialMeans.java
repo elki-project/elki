@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -110,7 +111,14 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
       chosen.add(newmean);
       // Update weights:
       weights[pos] = 0.0;
-      weightsum = updateWeights(weights, ids, newmean, distQ);
+      // Choose optimized version for double distances, if applicable.
+      if (distF instanceof PrimitiveDoubleDistanceFunction) {
+        @SuppressWarnings("unchecked")
+        PrimitiveDoubleDistanceFunction<V> ddist = (PrimitiveDoubleDistanceFunction<V>) distF;
+        weightsum = updateWeights(weights, ids, newmean, ddist, relation);
+      } else {
+        weightsum = updateWeights(weights, ids, newmean, distQ);
+      }
     }
 
     return means;
@@ -158,6 +166,30 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
       DBID id = it.getDBID();
       if(weights[i] > 0.0) {
         double d = distQ.distance(latest, id).doubleValue();
+        weights[i] = Math.min(weights[i], d * d);
+        weightsum += weights[i];
+      }
+    }
+    return weightsum;
+  }
+
+  /**
+   * Update the weight list.
+   * 
+   * @param weights Weight list
+   * @param ids IDs
+   * @param latest Added ID
+   * @param distQ Distance query
+   * @return Weight sum
+   */
+  protected double updateWeights(double[] weights, ArrayDBIDs ids, DBID latest, PrimitiveDoubleDistanceFunction<V> distF, Relation<V> rel) {
+    final V lv = rel.get(latest);
+    double weightsum = 0.0;
+    DBIDIter it = ids.iter();
+    for(int i = 0; i < weights.length; i++, it.advance()) {
+      DBID id = it.getDBID();
+      if(weights[i] > 0.0) {
+        double d = distF.doubleDistance(lv, rel.get(id));
         weights[i] = Math.min(weights[i], d * d);
         weightsum += weights[i];
       }
