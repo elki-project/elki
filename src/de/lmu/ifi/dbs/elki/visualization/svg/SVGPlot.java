@@ -546,8 +546,8 @@ public class SVGPlot {
     ThumbnailTranscoder t = new ThumbnailTranscoder();
     t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(width));
     t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(height));
-    SVGDocument doc = cloneDocument();
-    TranscoderInput input = new TranscoderInput(doc);
+    // Don't clone. Assume this is used safely.
+    TranscoderInput input = new TranscoderInput(document);
     t.transcode(input, null);
     return t.getLastImage();
   }
