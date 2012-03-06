@@ -191,19 +191,13 @@ public class ResultUtil {
   @SuppressWarnings("unchecked")
   public static <C> ArrayList<C> filterResults(Result r, Class<?> restrictionClass) {
     ArrayList<C> res = new ArrayList<C>();
-    try {
+    if(restrictionClass.isInstance(r)) {
       res.add((C) restrictionClass.cast(r));
-    }
-    catch(ClassCastException e) {
-      // ignore
     }
     if(r instanceof HierarchicalResult) {
       for(Result result : ((HierarchicalResult) r).getHierarchy().iterDescendants(r)) {
-        try {
+        if(restrictionClass.isInstance(result)) {
           res.add((C) restrictionClass.cast(result));
-        }
-        catch(ClassCastException e) {
-          // ignore
         }
       }
     }
@@ -215,10 +209,10 @@ public class ResultUtil {
     final Class<C> rc = (Class<C>) restrictionClass;
     // Include the current item
     IterableIterator<C> curIter;
-    try {
+    if(rc.isInstance(r)) {
       curIter = new OneItemIterator<C>(rc.cast(r));
     }
-    catch(ClassCastException e) {
+    else {
       curIter = null;
     }
     if(r instanceof HierarchicalResult) {
