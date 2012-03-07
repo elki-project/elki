@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 
 /**
@@ -94,26 +95,31 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
   @Override
   public boolean offerAt(int pos, E e) {
     if(pos == IN_TIES) {
-      for(E e2 : ties) {
+      for(Iterator<E> i = ties.iterator(); i.hasNext();) {
+        E e2 = i.next();
         if(e.equals(e2)) {
           if(compare(e, e2) <= 0) {
-            // while we did not change, this still was "successful".
-            return true;
+            i.remove();
+            index.remove(e2);
           }
+          // while we did not change, this still was "successful".
+          return true;
         }
       }
+      throw new AbortException("Heap corrupt - should not be reached");
     }
     // Updated object will be worse than the current ties
-    if (pos > 0 && ties.size() > 0 && compare(e, ties.get(0)) < 0) {
-      removeObject(e);
+    if(pos >= 0 && ties.size() > 0 && compare(e, ties.get(0)) < 0) {
+      removeAt(pos);
+      index.remove(e);
+      // assert(checkHeap() == null) : "removeObject broke heap: "+ checkHeap();
       // Move one object back from ties
       final E e2 = ties.remove(ties.size() - 1);
-      index.remove(e2);
+      // index.remove(e2);
       super.offerAt(NO_VALUE, e2);
       return true;
     }
-    boolean result = super.offerAt(pos, e);
-    return result;
+    return super.offerAt(pos, e);
   }
 
   @Override
