@@ -75,7 +75,7 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
         // while we did not change, this still was "successful".
         return true;
       }
-      pos = index.get(e);
+      // pos = index.get(e); // Should not be needed.
     }
     boolean result = super.offerAt(pos, e);
     // purge unneeded entry(s)
@@ -110,7 +110,7 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
    * @param e Overflowing element.
    */
   protected void handleOverflow(E e) {
-    index.remove(e);
+    // index.remove(e); // Should not be needed.
   }
 
   /**

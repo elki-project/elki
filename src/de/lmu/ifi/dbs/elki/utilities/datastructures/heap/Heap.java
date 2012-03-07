@@ -140,7 +140,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     this.queue[size] = e;
     this.size += 1;
     heapifyUp(size - 1, e);
-    validSize +=1;
+    validSize += 1;
     // We have changed - return true according to {@link Collection#put}
     modCount++;
     return true;
@@ -272,7 +272,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * @param elem Element to insert
    */
   @SuppressWarnings("unchecked")
-  protected void heapifyUpComparable(int pos, E elem) {
+  protected void heapifyUpComparable(int pos, Object elem) {
     final Comparable<Object> cur = (Comparable<Object>) elem; // queue[pos];
     while(pos > 0) {
       final int parent = (pos - 1) >>> 1;
@@ -293,7 +293,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * @param pos insertion position
    * @param cur Element to insert
    */
-  protected void heapifyUpComparator(int pos, E cur) {
+  protected void heapifyUpComparator(int pos, Object cur) {
     while(pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
@@ -529,5 +529,35 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       ret.add(poll());
     }
     return ret;
+  }
+
+  /**
+   * Test whether the heap is still valid.
+   * 
+   * Debug method.
+   * 
+   * @return {@code null} when the heap is correct
+   */
+  protected String checkHeap() {
+    ensureValid();
+    if(comparator == null) {
+      for(int i = 1; i < size; i++) {
+        final int parent = (i - 1) >>> 1;
+        @SuppressWarnings("unchecked")
+        Comparable<Object> po = (Comparable<Object>) queue[parent];
+        if(po.compareTo(queue[i]) > 0) {
+          return "@" + parent + ": " + queue[parent] + " < @" + i + ": " + queue[i];
+        }
+      }
+    }
+    else {
+      for(int i = 1; i < size; i++) {
+        final int parent = (i - 1) >>> 1;
+        if(comparator.compare(queue[parent], queue[i]) > 0) {
+          return "@" + parent + ": " + queue[parent] + " < @" + i + ": " + queue[i];
+        }
+      }
+    }
+    return null;
   }
 }

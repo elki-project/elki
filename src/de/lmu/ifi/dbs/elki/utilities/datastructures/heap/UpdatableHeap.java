@@ -112,15 +112,15 @@ public class UpdatableHeap<O> extends Heap<O> {
       // final int pos = size;
       this.queue[size] = e;
       index.put(e, size);
-      this.size += 1;
+      size += 1;
       // We do NOT YET update the heap. This is done lazily.
       // We have changed - return true according to {@link Collection#put}
       modCount++;
       return true;
     }
     else {
-      assert(pos >= 0) : "Unexpected negative position.";
-      assert(queue[pos].equals(e));
+      assert (pos >= 0) : "Unexpected negative position.";
+      assert (queue[pos].equals(e));
       // Did the value improve?
       if(comparator == null) {
         @SuppressWarnings("unchecked")
@@ -163,7 +163,24 @@ public class UpdatableHeap<O> extends Heap<O> {
     if(validSize == size) {
       size -= 1;
       validSize -= 1;
-      heapifyDown(pos, reinsert);
+      if(comparator != null) {
+        if(comparator.compare(ret, reinsert) > 0) {
+          heapifyUpComparator(pos, reinsert);
+        }
+        else {
+          heapifyDownComparator(pos, reinsert);
+        }
+      }
+      else {
+        @SuppressWarnings("unchecked")
+        Comparable<Object> comp = (Comparable<Object>) ret;
+        if(comp.compareTo(reinsert) > 0) {
+          heapifyUpComparable(pos, reinsert);
+        }
+        else {
+          heapifyDownComparable(pos, reinsert);
+        }
+      }
     }
     else {
       size -= 1;
@@ -207,7 +224,7 @@ public class UpdatableHeap<O> extends Heap<O> {
    * @param elem Element to insert
    */
   @SuppressWarnings("unchecked")
-  protected void heapifyUpComparable(int pos, O elem) {
+  protected void heapifyUpComparable(int pos, Object elem) {
     final Comparable<Object> cur = (Comparable<Object>) elem; // queue[pos];
     while(pos > 0) {
       final int parent = (pos - 1) >>> 1;
@@ -230,7 +247,7 @@ public class UpdatableHeap<O> extends Heap<O> {
    * @param pos insertion position
    * @param cur Element to insert
    */
-  protected void heapifyUpComparator(int pos, O cur) {
+  protected void heapifyUpComparator(int pos, Object cur) {
     while(pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
