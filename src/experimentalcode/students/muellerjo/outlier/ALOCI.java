@@ -219,8 +219,8 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(logger);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("aLOCI normalized MDEF", "loci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
-    Relation<Double> levelResult = new MaterializedRelation<Double>("aLOCI Sampling Level radius", "aLOCI-sampling-radius", TypeUtil.DOUBLE, mdef_level, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("aLOCI normalized MDEF", "aloci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
+    Relation<Double> levelResult = new MaterializedRelation<Double>("aLOCI Sampling Level", "aloci-sampling-level", TypeUtil.DOUBLE, mdef_level, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     result.addChildResult(levelResult);
