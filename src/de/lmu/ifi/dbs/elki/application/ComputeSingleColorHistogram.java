@@ -58,8 +58,15 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
    * Key: {@code -colorhist.in}
    * </p>
    */
+  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("colorhist.in", "Input image file for color histogram.");
 
-  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("colorhist.in", "Input image for color histograms.");
+  /**
+   * Parameter that specifies the name of the mask input file.
+   * <p>
+   * Key: {@code -colorhist.mask}
+   * </p>
+   */
+  public static final OptionID MASK_ID = OptionID.getOrCreateOptionID("colorhist.mask", "Input mask image file.");
 
   /**
    * Class that will compute the actual histogram
@@ -72,23 +79,30 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
   private File inputFile;
 
   /**
+   * Mask file.
+   */
+  private File maskFile;
+
+  /**
    * Constructor.
    * 
    * @param verbose Verbose flag
    * @param histogrammaker Class to compute histograms with
    * @param inputFile Input file
+   * @param maskFile Mask file
    */
-  public ComputeSingleColorHistogram(boolean verbose, ComputeColorHistogram histogrammaker, File inputFile) {
+  public ComputeSingleColorHistogram(boolean verbose, ComputeColorHistogram histogrammaker, File inputFile, File maskFile) {
     super(verbose);
     this.histogrammaker = histogrammaker;
     this.inputFile = inputFile;
+    this.maskFile = maskFile;
   }
 
   @Override
   public void run() throws UnableToComplyException {
     double[] hist;
     try {
-      hist = histogrammaker.computeColorHistogram(inputFile);
+      hist = histogrammaker.computeColorHistogram(inputFile, maskFile);
     }
     catch(IOException e) {
       throw new UnableToComplyException(e);
@@ -114,6 +128,11 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
      */
     private File inputFile;
 
+    /**
+     * Mask file.
+     */
+    private File maskFile;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -125,11 +144,15 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
       if(config.grab(inputP)) {
         inputFile = inputP.getValue();
       }
+      final FileParameter maskP = new FileParameter(MASK_ID, FileParameter.FileType.INPUT_FILE, true);
+      if(config.grab(maskP)) {
+        maskFile = maskP.getValue();
+      }
     }
 
     @Override
     protected ComputeSingleColorHistogram makeInstance() {
-      return new ComputeSingleColorHistogram(verbose, histogrammaker, inputFile);
+      return new ComputeSingleColorHistogram(verbose, histogrammaker, inputFile, maskFile);
     }
   }
 

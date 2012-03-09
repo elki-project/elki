@@ -27,30 +27,57 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+
 /**
  * Abstract class for color histogram computation.
- *  
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.uses ImageUtil
  */
 public abstract class AbstractComputeColorHistogram implements ComputeColorHistogram {
   @Override
-  public double[] computeColorHistogram(File file) throws IOException {
+  public double[] computeColorHistogram(File file, File mask) throws IOException {
     BufferedImage image = ImageUtil.loadImage(file);
     int height = image.getHeight();
     int width = image.getWidth();
+
+    BufferedImage maski = null;
+    if(mask != null) {
+      maski = ImageUtil.loadImage(mask);
+      if(maski.getHeight() != height || maski.getWidth() != width) {
+        throw new AbortException("Input image and mask do not agree on the image size!");
+      }
+    }
+
     double[] bins = new double[getNumBins()];
+    long valid = 0;
 
     for(int x = 0; x < width; x++) {
       for(int y = 0; y < height; y++) {
+        if(maski != null) {
+          int col = maski.getRGB(x, y);
+          // More transparent than covering
+          if((col >>> 24) < 127) {
+            continue;
+          }
+          // More black than white: (R+G+B) > 1.5 * 255
+          if(((col >>> 16) & 0xFF) + ((col >>> 8) & 0xFF) + (col & 0xFF) < 382) {
+            continue;
+          }
+        }
         int bin = getBinForColor(image.getRGB(x, y));
-        assert(bin < bins.length);
+        assert (bin < bins.length);
         bins[bin] += 1;
+        valid += 1;
       }
     }
-    for (int i = 0; i < bins.length; i++) {
-      bins[i] /= height * width;
+    if (valid == 0) {
+      throw new AbortException("Mask apparently was all-black.");
+    }
+    for(int i = 0; i < bins.length; i++) {
+      bins[i] /= valid;
     }
     return bins;
   }
