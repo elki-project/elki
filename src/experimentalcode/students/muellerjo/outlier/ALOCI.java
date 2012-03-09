@@ -167,7 +167,7 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
       }
       O factory = DatabaseUtil.assumeVectorField(relation).getFactory();
       
-      qt = new ALOCIQuadTree<O>(relation, nmin, factory.newNumberVector(shiftVec), shift);
+      qt = new ALOCIQuadTree<O>(relation, nmin, factory.newNumberVector(shiftVec), shift+1);
       {
         for(DBID id : relation.iterDBIDs()) {
           qt.insert(relation.get(id));
