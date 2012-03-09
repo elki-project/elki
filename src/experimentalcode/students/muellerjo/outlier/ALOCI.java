@@ -156,14 +156,14 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     Pair<O,O> hbbb = qt.getMinMax();
     int dim = DatabaseUtil.dimensionality(relation);
     double[] shiftVec = new double[dim];
-    int shift = 1;
-    while(g > shift){
-      int mult = 0;
-      if ((shift % dim) == (dim-1)){
+    int shift = 0;
+    int mult = -1;
+    while((g-1) > shift){
+      if ((shift % dim) == 0){
         mult++;
       }
       for(int i= 0; i < dim; i++){ 
-         shiftVec[i] = (((shift % dim) == i)? -1 : 1)*(hbbb.second.doubleValue(i+1) - hbbb.first.doubleValue(i+1)) / (1 << (alpha-mult));
+         shiftVec[i] = (((shift % dim) <= i)? 1.0 : 0.0)*(hbbb.second.doubleValue(i+1) - hbbb.first.doubleValue(i+1)) / (1 << (alpha+mult));
       }
       O factory = DatabaseUtil.assumeVectorField(relation).getFactory();
       
