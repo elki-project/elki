@@ -39,9 +39,14 @@ public interface ComputeColorHistogram extends Parameterizable {
   /**
    * Compute a color histogram given a file name.
    * 
+   * The mask file (which may be null) is expected to use >50% transparent or
+   * black to mask pixels, Non-transparent white to keep pixels. Alpha values
+   * are not used.
+   * 
    * @param file File name
+   * @param mask Mask file (optional)
    * @return Color histogram
    * @throws IOException on file read errors.
    */
-  public double[] computeColorHistogram(File file) throws IOException;
+  public double[] computeColorHistogram(File file, File mask) throws IOException;
 }
