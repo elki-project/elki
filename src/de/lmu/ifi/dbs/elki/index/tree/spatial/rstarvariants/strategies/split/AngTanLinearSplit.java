@@ -24,12 +24,16 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
  */
 
 import java.util.BitSet;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -49,6 +53,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Reference(authors = "C. H. Ang and T. C. Tan", title = "New linear node splitting algorithm for R-trees", booktitle = "Proceedings of the 5th International Symposium on Advances in Spatial Databases", url = "http://dx.doi.org/10.1007/3-540-63238-7_38")
 public class AngTanLinearSplit implements SplitStrategy {
+  /**
+   * Logger class
+   */
+  private static final Logging logger = Logging.getLogger(AngTanLinearSplit.class);
+
   /**
    * Static instance.
    */
@@ -92,6 +101,9 @@ public class AngTanLinearSplit implements SplitStrategy {
         BitSet cand = closer[d];
         int card = cand.cardinality();
         card = Math.max(card, num - card);
+        if(card == num) {
+          continue;
+        }
         if(card < bestcard) {
           axis = d + 1;
           bestcard = card;
@@ -122,10 +134,22 @@ public class AngTanLinearSplit implements SplitStrategy {
           }
         }
       }
+      if(bestset == null) {
+        logger.warning("No Ang-Tan-Split found. Probably all points are the same? Returning random split.");
+        return Util.randomBitSet(num / 2, num, new Random());
+      }
       return bestset;
     }
   }
 
+  /**
+   * Compute overlap of assignment
+   * 
+   * @param entries Entries
+   * @param getter Entry accessor
+   * @param assign Assignment
+   * @return Overlap amount
+   */
   protected <E extends SpatialComparable, A> double computeOverlap(A entries, ArrayAdapter<E, A> getter, BitSet assign) {
     ModifiableHyperBoundingBox mbr1 = null, mbr2 = null;
     for(int i = 0; i < getter.size(entries); i++) {
@@ -146,6 +170,9 @@ public class AngTanLinearSplit implements SplitStrategy {
           mbr2.extend(e);
         }
       }
+    }
+    if(mbr1 == null || mbr2 == null) {
+      throw new AbortException("Invalid state in split: one of the sets is empty.");
     }
     return SpatialUtil.overlap(mbr1, mbr2);
   }
