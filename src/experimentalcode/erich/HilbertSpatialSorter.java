@@ -65,7 +65,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final int numdim = mms.length >>> 1;
     final int lastdim = numdim - 1;
     // Current axis
-    final int axis = (rotation - depth + numdim) % numdim;
+    final int axis = (rotation + depth) % numdim;
     // Current axis reflection bit.
     final boolean xor = BitsUtil.get(refl, axis);
     // Effective bit after invgray-coding.
@@ -131,13 +131,13 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         LoggingUtil.warning("A rot: " + rotation + " -> " + nextrot + " r: " + BitsUtil.toString(refl, numdim) + " h: " + BitsUtil.toString(hist, numdim) + " ffs: " + nextlast + " gray: " + gray);
         BitsUtil.flipI(hist, lastdim - rotation);
         if(!invgrayed) {
-          BitsUtil.flipI(hist, wrap(lastdim - (nextrot - 1), numdim));
+          BitsUtil.flipI(hist, wrap(lastdim - (nextrot + 1), numdim));
         }
         hilbertSort(objs, lstart, lend, mms, 0, nextrot, hist, BitsUtil.zero(numdim), false, numdim);
         // restore hist
         BitsUtil.flipI(hist, lastdim - rotation);
         if(!invgrayed) {
-          BitsUtil.flipI(hist, wrap(lastdim - (nextrot - 1), numdim));
+          BitsUtil.flipI(hist, wrap(lastdim - (nextrot + 1), numdim));
         }
       }
     }
@@ -157,13 +157,13 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         LoggingUtil.warning("B rot: " + rotation + " -> " + nextrot + " r: " + BitsUtil.toString(refl, numdim) + " h: " + BitsUtil.toString(hist, numdim) + " ffs: " + nextlast + " !gray: " + !gray);
         BitsUtil.flipI(hist, lastdim - rotation);
         if(!!invgrayed) {
-          BitsUtil.flipI(hist, wrap(lastdim - (nextrot - 1), numdim));
+          BitsUtil.flipI(hist, wrap(lastdim - (nextrot + 1), numdim));
         }
         hilbertSort(objs, hstart, hend, mms, 0, nextrot, hist, BitsUtil.zero(numdim), false, numdim);
         // restore hist
         BitsUtil.flipI(hist, lastdim - rotation);
         if(!!invgrayed) {
-          BitsUtil.flipI(hist, wrap(lastdim - (nextrot - 1), numdim));
+          BitsUtil.flipI(hist, wrap(lastdim - (nextrot + 1), numdim));
         }
       }
     }
