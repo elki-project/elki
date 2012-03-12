@@ -65,12 +65,11 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final int numdim = mms.length >>> 1;
     final int lastdim = numdim - 1;
     // Current axis
-    final int axis = (rotation + depth) % numdim;
+    final int axis = (rotation - depth + numdim) % numdim;
     // Current axis reflection bit.
-    final boolean is_reflected = BitsUtil.get(refl, lastdim - axis);
-    // Effective sort order. Based on current gray code, preceding gray code,
-    // and reversion flag
-    final boolean reverse_sort = gray ^ is_reflected;
+    final boolean xor = BitsUtil.get(refl, axis);
+    // Effective bit after invgray-coding.
+    final boolean invgrayed = gray ^ xor;
 
     // Find the splitting point.
     final double min = mms[2 * axis], max = mms[2 * axis + 1];
@@ -90,18 +89,16 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         return;
       }
     }
-    LoggingUtil.warning("Depth: " + depth + " axis: " + (reverse_sort ? "-" : "+") + axis + " refl: " + BitsUtil.toString(refl, numdim) + " hist: " + BitsUtil.toString(hist, numdim) + " " + (gray ? "g1" : "g0") + " " + FormatUtil.format(mms));
-    int split = pivotizeList1D(objs, start, end, axis + 1, half, reverse_sort);
-    // Need to descend at all?
-    if(end - split <= 1 && split - start <= 1) {
-      return;
-    }
-
-    final int nextdepth = (depth + 1) % numdim;
+    LoggingUtil.warning("Depth: " + depth + " axis: " + (invgrayed ? "-" : "+") + axis + " refl: " + BitsUtil.toString(refl, numdim) + " hist: " + BitsUtil.toString(hist, numdim) + " " + (gray ? "g1" : "g0") + " " + FormatUtil.format(mms));
     // Compute array intervals.
     final int lstart, lend, hstart, hend;
     {
-      if(!reverse_sort) {
+      final int split = pivotizeList1D(objs, start, end, axis + 1, half, invgrayed);
+      // Need to descend at all?
+      if(end - split <= 1 && split - start <= 1) {
+        return;
+      }
+      if(!invgrayed) {
         lstart = start;
         lend = split;
         hstart = split;
@@ -114,66 +111,64 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         lend = end;
       }
     }
-    // if(is_reflected) {
+
+    final int nextdepth = depth + 1;
+    // The order here is a bit tricky. We always process the half < pivot first.
+    // if(invgrayed) {
     // BitsUtil.flipI(hist, axis);
     // }
-    // Process "lower" half (if nontrivial). Value: is_reflected
+    // Process "lower" half (if nontrivial). "Hist" value: false
     if(lend - lstart > 1) {
       updateMinMax(mms, axis, min, half);
-
-      // Compute gray code carry for (hist ^ refl)
-      final boolean nextgray = gray ^ is_reflected;
       // Update "first set bit in (hist ^ refl)"
-      final int nextlast = !is_reflected ? last : depth;
+      final int nextlast = !xor ? last : depth;
 
-      if(nextdepth > 0) {
-        hilbertSort(objs, lstart, lend, mms, depth + 1, rotation, refl, hist, nextgray, nextlast);
+      if(nextdepth < numdim) {
+        hilbertSort(objs, lstart, lend, mms, nextdepth, rotation, refl, hist, invgrayed, nextlast);
       }
       else {
         final int nextrot = wrap(rotation + nextlast - 1, numdim);
-        LoggingUtil.warning("A rot: " + rotation + " -> " + nextrot + " r: " + BitsUtil.toString(refl, numdim) + " h: " + BitsUtil.toString(hist, numdim) + " ffs: " + nextlast + " nextgray: " + nextgray);
-        BitsUtil.flipI(hist, rotation);
-        if(!nextgray) {
-          BitsUtil.flipI(hist, wrap(nextrot - 1, numdim));
+        LoggingUtil.warning("A rot: " + rotation + " -> " + nextrot + " r: " + BitsUtil.toString(refl, numdim) + " h: " + BitsUtil.toString(hist, numdim) + " ffs: " + nextlast + " gray: " + gray);
+        BitsUtil.flipI(hist, lastdim - rotation);
+        if(!invgrayed) {
+          BitsUtil.flipI(hist, wrap(lastdim - (nextrot - 1), numdim));
         }
-        hilbertSort(objs, lstart, lend, mms, depth + 1, nextrot, hist, BitsUtil.zero(numdim), false, numdim);
+        hilbertSort(objs, lstart, lend, mms, 0, nextrot, hist, BitsUtil.zero(numdim), false, numdim);
         // restore hist
-        BitsUtil.flipI(hist, rotation);
-        if(!nextgray) {
-          BitsUtil.flipI(hist, wrap(nextrot - 1, numdim));
+        BitsUtil.flipI(hist, lastdim - rotation);
+        if(!invgrayed) {
+          BitsUtil.flipI(hist, wrap(lastdim - (nextrot - 1), numdim));
         }
       }
     }
-    BitsUtil.flipI(hist, lastdim - axis);
-    // Process "higher" half (if nontrivial). Value: !is_reflected
+    BitsUtil.flipI(hist, axis);
+    // Process "higher" half (if nontrivial). "Hist" value: true
     if(hend - hstart > 1) {
       updateMinMax(mms, axis, half, max);
 
-      // Compute gray code carry for (hist ^ refl)
-      final boolean nextgray = gray ^ !is_reflected;
       // Update "first set bit in (hist ^ refl)"
-      final int nextlast = is_reflected ? last : depth;
+      final int nextlast = xor ? last : depth;
 
-      if(nextdepth > 0) {
-        hilbertSort(objs, hstart, hend, mms, depth + 1, rotation, refl, hist, nextgray, nextlast);
+      if(nextdepth < numdim) {
+        hilbertSort(objs, hstart, hend, mms, nextdepth, rotation, refl, hist, !invgrayed, nextlast);
       }
       else {
         final int nextrot = wrap(rotation + nextlast - 1, numdim);
-        LoggingUtil.warning("B rot: " + rotation + " -> " + nextrot + " r: " + BitsUtil.toString(refl, numdim) + " h: " + BitsUtil.toString(hist, numdim) + " ffs: " + nextlast + " nextgray: " + nextgray);
-        BitsUtil.flipI(hist, rotation);
-        if(!nextgray) {
-          BitsUtil.flipI(hist, wrap(nextrot - 1, numdim));
+        LoggingUtil.warning("B rot: " + rotation + " -> " + nextrot + " r: " + BitsUtil.toString(refl, numdim) + " h: " + BitsUtil.toString(hist, numdim) + " ffs: " + nextlast + " !gray: " + !gray);
+        BitsUtil.flipI(hist, lastdim - rotation);
+        if(!!invgrayed) {
+          BitsUtil.flipI(hist, wrap(lastdim - (nextrot - 1), numdim));
         }
-        hilbertSort(objs, hstart, hend, mms, depth + 1, nextrot, hist, BitsUtil.zero(numdim), false, numdim);
+        hilbertSort(objs, hstart, hend, mms, 0, nextrot, hist, BitsUtil.zero(numdim), false, numdim);
         // restore hist
-        BitsUtil.flipI(hist, rotation);
-        if(!nextgray) {
-          BitsUtil.flipI(hist, wrap(nextrot - 1, numdim));
+        BitsUtil.flipI(hist, lastdim - rotation);
+        if(!!invgrayed) {
+          BitsUtil.flipI(hist, wrap(lastdim - (nextrot - 1), numdim));
         }
       }
     }
-    // if(!is_reflected) {
-    BitsUtil.flipI(hist, lastdim - axis);
+    // if(!invgrayed) {
+    BitsUtil.flipI(hist, axis);
     // }
     // Restore interval
     updateMinMax(mms, axis, min, max);
