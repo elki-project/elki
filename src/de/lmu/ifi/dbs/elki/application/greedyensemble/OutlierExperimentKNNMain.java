@@ -1,4 +1,4 @@
-package experimentalcode.shared.outlier.ensemble;
+package de.lmu.ifi.dbs.elki.application.greedyensemble;
 
 /*
  This file is part of ELKI:
@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -73,10 +74,21 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 import experimentalcode.shared.Base64;
 
 /**
- * Application that runs a series of algorithms on a data set.
+ * Application that runs a series of kNN-based algorithms on a data set, for
+ * building an ensemble in a second step. The output file consists of a label
+ * and one score value for each object.
+ * 
+ * Reference:
+ * <p>
+ * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
+ * On Evaluation of Outlier Rankings and Outlier Scores<br/>
+ * In Proceedings of the 12th SIAM International Conference on Data Mining
+ * (SDM), Anaheim, CA, 2012.
+ * </p>
  * 
  * @author Erich Schubert
  */
+@Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
 public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends AbstractApplication {
   /**
    * Our logger class.
@@ -117,7 +129,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * By label outlier detection - reference
    */
   ByLabelOutlier bylabel;
-  
+
   /**
    * Include ABOD in the experiments.
    */
@@ -344,6 +356,8 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * Run an algorithm for a given k.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private interface AlgRunner {
     public void run(int k, String kstr);

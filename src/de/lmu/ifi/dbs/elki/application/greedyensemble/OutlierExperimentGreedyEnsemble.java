@@ -1,4 +1,4 @@
-package experimentalcode.shared.outlier.ensemble;
+package de.lmu.ifi.dbs.elki.application.greedyensemble;
 
 /*
  This file is part of ELKI:
@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
@@ -54,12 +55,31 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Class to load an outlier detection summary file, as produced by
- * {@link OutlierExperimentKNNMain}, and compute an ensemble over it. In the
- * first step, the full ensemble is built, then 20% of ensemble members are
- * dropped.
+ * {@link OutlierExperimentKNNMain}, and compute a naive ensemble for it. Based
+ * on this initial estimation, and optimized ensemble is built using a greedy
+ * strategy. Starting with the best candidate only as initial ensemble, the most
+ * diverse candidate is investigated at each step. If it improves towards the
+ * (estimated) target vector, it is added, otherwise it is discarded.
+ * 
+ * This approach is naive, and it may be surprising that it can improve results.
+ * The reason is probably that diversity will result in a comparable ensemble,
+ * while the reduced ensemble size is actually responsible for the improvements,
+ * by being more decisive and less noisy due to dropping "unhelpful" members.
+ * 
+ * This still leaves quite a bit of room for improvement. If you built upon this
+ * basic approach, please acknowledge our proof of concept work.
+ * 
+ * Reference:
+ * <p>
+ * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
+ * On Evaluation of Outlier Rankings and Outlier Scores<br/>
+ * In Proceedings of the 12th SIAM International Conference on Data Mining
+ * (SDM), Anaheim, CA, 2012.
+ * </p>
  * 
  * @author Erich Schubert
  */
+@Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
 public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
   /**
    * Get static logger
@@ -89,7 +109,8 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
 
   @Override
   public void run() {
-    // Note: the database contains the *result vectors*, not the original data points.
+    // Note: the database contains the *result vectors*, not the original data
+    // points.
     final Database database = inputstep.getDatabase();
     final Relation<NumberVector<?, ?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
