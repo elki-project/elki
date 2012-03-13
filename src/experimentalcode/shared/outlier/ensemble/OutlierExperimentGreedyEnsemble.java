@@ -71,6 +71,9 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
    */
   private InputStep inputstep;
 
+  /**
+   * Variant, where the truth vector is also updated.
+   */
   boolean refine_truth = false;
 
   /**
@@ -86,6 +89,7 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
 
   @Override
   public void run() {
+    // Note: the database contains the *result vectors*, not the original data points.
     final Database database = inputstep.getDatabase();
     final Relation<NumberVector<?, ?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
@@ -371,16 +375,6 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
     }
     Arrays.sort(scores, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
     return ROC.computeAUC(ROC.materializeROC(dim, positive, Arrays.asList(scores).iterator()));
-  }
-
-  protected DoubleIntPair[] makeDoubleIntArray(final int dim) {
-    final DoubleIntPair[] combined = new DoubleIntPair[dim];
-    {
-      for(int d = 0; d < dim; d++) {
-        combined[d] = new DoubleIntPair(0, d);
-      }
-    }
-    return combined;
   }
 
   double gain(double score, double ref, double optimal) {

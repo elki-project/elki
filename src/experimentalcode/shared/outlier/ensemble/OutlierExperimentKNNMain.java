@@ -119,7 +119,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
   ByLabelOutlier bylabel;
   
   /**
-   * Include ABOD
+   * Include ABOD in the experiments.
    */
   boolean runabod = false;
 
