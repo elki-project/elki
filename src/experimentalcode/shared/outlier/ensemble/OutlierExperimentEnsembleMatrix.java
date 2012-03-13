@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.application.greedyensemble.OutlierExperimentKNNMain;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
