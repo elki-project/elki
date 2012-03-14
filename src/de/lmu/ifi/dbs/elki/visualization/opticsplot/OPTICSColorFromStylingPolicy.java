@@ -43,10 +43,10 @@ public class OPTICSColorFromStylingPolicy implements OPTICSColorAdapter {
   /**
    * Constructor.
    * 
-   * @param colors Color library to use
+   * @param policy Styling policy
    * @param refc Clustering to use
    */
-  public OPTICSColorFromStylingPolicy(ColorLibrary colors, StylingPolicy policy) {
+  public OPTICSColorFromStylingPolicy(StylingPolicy policy) {
     super();
     this.policy = policy;
   }

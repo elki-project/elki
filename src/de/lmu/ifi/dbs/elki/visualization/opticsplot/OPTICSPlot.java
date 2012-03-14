@@ -38,8 +38,6 @@ import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
-import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 
 /**
@@ -347,9 +345,8 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
     if(!OPTICSPlot.canPlot(co)) {
       return null;
     }
-    final ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
     final StylingPolicy policy = context.getStyleResult().getStylingPolicy();
-    final OPTICSColorAdapter opcolor = new OPTICSColorFromStylingPolicy(colors, policy);
+    final OPTICSColorAdapter opcolor = new OPTICSColorFromStylingPolicy(policy);
 
     OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor);
     // co.addChildResult(opticsplot);
