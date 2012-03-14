@@ -141,7 +141,9 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("aLOCI preprocessing", relation.size(), logger) : null;
-    
+    /* Initialization part
+     * Generate a list for the g QuadTrees and insert the first unshifted Tree.
+     */
     List<ALOCIQuadTree<O>> qts = new ArrayList<ALOCIQuadTree<O>>(g);
     ALOCIQuadTree<O> qt = new ALOCIQuadTree<O>(relation, nmin, 0);
     for(DBID id : relation.iterDBIDs()) {
@@ -150,24 +152,36 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
         progressPreproc.incrementProcessed(logger);
       }
     }
+    /* Add alpha Level to the QuadTree (Sampling Neighborhood holds atLeast nmin items. Therefore another alpha-1 levels are needed to reach the lowest Counting Neighborhood)
+     * The addLevel method adds these alpha-1 level.
+     */
     qt.addLevel(alpha);
     qts.add(qt);
-    
-    Pair<O,O> hbbb = qt.getMinMax();
+    // Get the scale of Data from the generated QuadTree
+    Pair<O,O> hbbs = qt.getMinMax();
     int dim = DatabaseUtil.dimensionality(relation);
     double[] shiftVec = new double[dim];
     int shift = 0;
     int mult = -1;
+    /* create the remaining g-1 shifted QuadTrees.
+     * This not clearly described in the paper and therefore implemented achieving good results on the data tested.
+     */
     while((g-1) > shift){
+      //Everytime d (# of Dimensions of the data) QuadTrees where added the length of the shift vector is halved.
       if ((shift % dim) == 0){
         mult++;
       }
-      for(int i= 0; i < dim; i++){ 
-         shiftVec[i] = (((shift % dim) <= i)? 1.0 : 0.0)*(hbbb.second.doubleValue(i+1) - hbbb.first.doubleValue(i+1)) / (1 << (alpha+mult));
+      for(int i=0; i < dim; i++){ 
+         /* shift vector is calculated
+          * Starting with a shift on the main diagonal of the data, the next d-1 shifts replace the the lowest dimension not yet replaced with zero.
+          * i.e. : 3 Dimensions - Shifts along: (1,1,1)'; (0,1,1)'; (0,0,1)'
+          * These shifts are multiplied with the length of the datas main diagonal and diveded by 2^(alpha+mult)
+          */
+         shiftVec[i] = (((shift % dim) <= i)? 1.0 : 0.0)*(hbbs.second.doubleValue(i+1) - hbbs.first.doubleValue(i+1)) / (1 << (alpha+mult));
       }
       O factory = DatabaseUtil.assumeVectorField(relation).getFactory();
-      
-      qt = new ALOCIQuadTree<O>(relation, nmin, factory.newNumberVector(shiftVec), shift+1);
+      shift++;
+      qt = new ALOCIQuadTree<O>(relation, nmin, factory.newNumberVector(shiftVec), shift);
       {
         for(DBID id : relation.iterDBIDs()) {
           qt.insert(relation.get(id));
@@ -177,18 +191,24 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
         }
         qt.addLevel(alpha);
       }
-      shift++;
       qts.add(qt);
     }
     if(progressPreproc != null) {
       progressPreproc.ensureCompleted(logger);
     }
+    /*
+     * aLoci Main Part
+     */
+    
     FiniteProgress progressLOCI = logger.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), logger) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore mdef_level = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
-
+    
     for(DBID id : relation.iterDBIDs()) {
+      /* Get the lowest Counting Neighborhood whose center is closest to the Object
+       * getBestCountingNode can not be used in this case, as the the lowest level is not necessarily the same across the different QuadTrees. 
+       */
       AbstractALOCIQuadTreeNode<O> cg = qts.get(0).getCountingGrid(relation.get(id));
       for (int i = 1; i < g; i++){
         AbstractALOCIQuadTreeNode<O> cg2 = qts.get(i).getCountingGrid(relation.get(id));
@@ -196,13 +216,19 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
           cg = cg2;
         }
       }
+      /* Calculate the MDEF value for the Counting Neighborhood cg and the best matching Sampling Neighborhood alpha levels over cg. 
+       * 
+       */
       int level = cg.getLevel() - alpha;
       DoubleIntPair res =  calculate_MDEF_norm(qts, cg, level);
       double maxmdefnorm = res.first;
       double radius = res.second;
+      /*
+       * While the Sampling Neighborhood has not reached the root level calculate MDEF for these levels 
+       */
       while(level > 0){
         level--;
-        cg = getBestCountingNode(qts, cg, relation.get(id), cg.getLevel()-1);
+        cg = getBestCountingNode(qts, cg.getParent(), relation.get(id));
         res =  calculate_MDEF_norm(qts, cg, level);
         if(maxmdefnorm < res.first){
           maxmdefnorm = res.first;
@@ -227,19 +253,30 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     return result;
   }
   
+  /* Method for the MDEF calculation
+   * Parameters:
+   * qts - List of (shifted) QuadTrees
+   * cg - Node containing the counting Neighborhood fount to fit best for the Object
+   * level - Level of the Sampling Neighborhood (depending on the level of cg and alpha)
+   */
+  
   private DoubleIntPair calculate_MDEF_norm(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, int level){
+    // find the best Sampling Neighborhood for cg on the right level in qts 
     AbstractALOCIQuadTreeNode<O> sn = getBestSamplingNode(qts, cg, level);
-    if (sn == null){
-      sn = cg.getParent();
-      for(int i=1; i < alpha; i++){
-        sn = sn.getParent();
-      }
-    }
+    // get the square sum of the counting neighborhoods box counts
     long sq = sn.getBoxCountSquareSum(alpha, qts.get(sn.getQTIndex()));
     double mdef_norm;
+    /* if the square sum is equal to box count of the sampling Neighborhood than is n_hat equal one and as
+     * cg needs to have at least one Element mdef would get 0 or lower than zero.
+     * This is the case when all of the counting Neighborhoods contain one or zero Objects.
+     * Therefore in addition also the cubic sum is equal the square sum and sampling Neighborhood box count, which leads
+     * to sig_n_hat being zero and therefore mdef_norm either negative infinity or undefined. As the distribution of the Objects
+     * seam quite uniform an mdef_norm of zero ( = no outlier) is appropriate an circumvents the problem of undefined values.
+     */ 
     if (sq == sn.getBucketCount()){
       mdef_norm = 0.0;
     }
+    // calculation of mdef according to the paper and standardization as done in LOCI  
     else{
       long cb = sn.getBoxCountCubicSum(alpha, qts.get(sn.getQTIndex()));
       double n_hat = (double)sq / (double)sn.getBucketCount();
@@ -250,17 +287,27 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     return new DoubleIntPair (mdef_norm, sn.getLevel());
   }
   
-  
+  /* Method for retrieving the best matching Sampling Node
+   * Parameters:
+   * qts - List of (shifted) QuadTrees
+   * cg - Node containing the counting Neighborhood fount to fit best for the Object
+   * level - Level of the Sampling Neighborhood (depending on the level of cg and alpha)
+   */
   private AbstractALOCIQuadTreeNode<O> getBestSamplingNode(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, int level){
-    int qti = 0;
+    int qti = cg.getQTIndex();
     O center = cg.getCenter();
+    /* get the Sampling Node of cg in the same QuadTree as a base case
+     * This choice is usually quit bad, but is always present.  
+     */
     AbstractALOCIQuadTreeNode<O> sn = cg.getParent();
     while(sn.getLevel() != level){
       sn = sn.getParent();
     }
+    // look through the other QuadTrees and choose the one with the lowest distance to the counting Neighborhoods center.
     for (int i = 0; i < g; i++){
       if (i == qti)
         continue;
+      // getSamplingNode(O int) returns null if there is no node containing the coordinates given or if the node does not have at least nmin Elements.
       AbstractALOCIQuadTreeNode<O> sn2 = qts.get(i).getSamplingNode(center, level);
       if (sn2 == null)
         continue;
@@ -271,17 +318,21 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
     return sn;
   }
   
-  private AbstractALOCIQuadTreeNode<O> getBestCountingNode(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, O center, int level){
-    int qti = 0;
-    AbstractALOCIQuadTreeNode<O> cn = cg.getParent();
-    while(cn.getLevel() != level){
-      cn = cn.getParent();
-    }
-    qti = cn.getQTIndex();
+  /* Method for retrieving the best matching counting Node
+   * Parameters:
+   * qts - List of (shifted) QuadTrees
+   * cg - Node containing a possible counting Neighborhood
+   * center - location of the Object and therefore best possible center of the counting node
+   */
+  private AbstractALOCIQuadTreeNode<O> getBestCountingNode(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, O center){
+    AbstractALOCIQuadTreeNode<O> cn = cg;
+    int qti = cn.getQTIndex();
+    // compare the other counting nodes at the right level in the QuadTrees and choose the one closest to center.  
     for (int i = 0; i < g; i++){
       if (i == qti)
         continue;
-      AbstractALOCIQuadTreeNode<O> cn2 = qts.get(i).getCountingNode(center, level);
+      // getCountingNode(O, int) returns null if the Object has not reached the right level in the Tree
+      AbstractALOCIQuadTreeNode<O> cn2 = qts.get(i).getCountingNode(center, cn.getLevel());
       if (cn2 == null)
         continue;
       if (distFunc.distance(center, cn.getCenter()).doubleValue() > distFunc.distance(center, cn2.getCenter()).doubleValue()){
