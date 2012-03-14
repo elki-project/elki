@@ -71,7 +71,6 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MinusLogStandardDeviationScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.StandardDeviationScaling;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
-import experimentalcode.shared.Base64;
 
 /**
  * Application that runs a series of kNN-based algorithms on a data set, for
@@ -183,20 +182,20 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
     }
     // Control: print the DBIDs in case we are seeing an odd iteration
     {
-      fout.append("# DBID-series MD5:");
-      MessageDigest md;
       try {
-        md = MessageDigest.getInstance("MD5");
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        for(DBID id : ids) {
+          md.update(" ".getBytes());
+          md.update(id.toString().getBytes());
+        }
+        // FIXME: include Base64 in ELKI release.
+        // fout.append("# DBID-series MD5:");
+        // fout.append(Base64.encodeBase64(md.digest()));
+        // fout.append(FormatUtil.NEWLINE);
       }
       catch(NoSuchAlgorithmException e) {
         throw new AbortException("MD5 not found.");
       }
-      for(DBID id : ids) {
-        md.update(" ".getBytes());
-        md.update(id.toString().getBytes());
-      }
-      fout.append(Base64.encodeBase64(md.digest()));
-      fout.append(FormatUtil.NEWLINE);
     }
 
     // Label outlier result (reference)
