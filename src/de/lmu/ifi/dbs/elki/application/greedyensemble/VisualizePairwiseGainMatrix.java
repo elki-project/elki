@@ -1,26 +1,27 @@
-package experimentalcode.shared.outlier.ensemble;
+package de.lmu.ifi.dbs.elki.application.greedyensemble;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -32,7 +33,6 @@ import java.util.TreeSet;
 import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.application.greedyensemble.OutlierExperimentKNNMain;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
@@ -62,15 +63,29 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Class to load an outlier detection summary file, as produced by
- * {@link OutlierExperimentKNNMain}, and compute a fake ensemble over it.
+ * {@link ComputeKNNOutlierScores}, and compute a matrix with the pairwise
+ * gains. It will have one column / row obtained for each combination.
+ * 
+ * The gain is always computed in relation to the better of the two input
+ * methods. Green colors indicate the result has improved, red indicate it
+ * became worse.
+ * 
+ * Reference:
+ * <p>
+ * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
+ * On Evaluation of Outlier Rankings and Outlier Scores<br/>
+ * In Proceedings of the 12th SIAM International Conference on Data Mining
+ * (SDM), Anaheim, CA, 2012.
+ * </p>
  * 
  * @author Erich Schubert
  */
-public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
+@Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
+public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Get static logger
    */
-  private static final Logging logger = Logging.getLogger(OutlierExperimentEnsembleMatrix.class);
+  private static final Logging logger = Logging.getLogger(VisualizePairwiseGainMatrix.class);
 
   /**
    * The data input part.
@@ -89,7 +104,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
    * @param inputstep Input step
    * @param vispar Visualizer parameterizer
    */
-  public OutlierExperimentEnsembleMatrix(boolean verbose, InputStep inputstep, VisualizerParameterizer vispar) {
+  public VisualizePairwiseGainMatrix(boolean verbose, InputStep inputstep, VisualizerParameterizer vispar) {
     super(verbose);
     this.inputstep = inputstep;
     this.vispar = vispar;
@@ -141,7 +156,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
         double auc = ROC.computeAUC(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
         data[a][a] = auc;
         // minmax.put(auc);
-        //logger.verbose(auc + " " + labels.get(ids.get(a)));
+        // logger.verbose(auc + " " + labels.get(ids.get(a)));
       }
       // Compare to others, exploiting symmetry
       for(int b = a + 1; b < size; b++) {
@@ -152,7 +167,8 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
         }
         Arrays.sort(combined, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
         double auc = ROC.computeAUC(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
-        //logger.verbose(auc + " " + labels.get(ids.get(a)) + " " + labels.get(ids.get(b)));
+        // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
+        // labels.get(ids.get(b)));
         data[a][b] = auc;
         data[b][a] = auc;
         // minmax.put(auc);
@@ -163,7 +179,8 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
         double ref = Math.max(data[a][a], data[b][b]);
         data[a][b] = (data[a][b] - ref) / (1 - ref);
         data[b][a] = (data[b][a] - ref) / (1 - ref);
-        //logger.verbose(data[a][b] + " " + labels.get(ids.get(a)) + " " + labels.get(ids.get(b)));
+        // logger.verbose(data[a][b] + " " + labels.get(ids.get(a)) + " " +
+        // labels.get(ids.get(b)));
         minmax.put(data[a][b]);
       }
     }
@@ -187,19 +204,22 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
       for(int y = x; y < size; y++) {
         double val = data[x][y];
         val = scale.getScaled(val);
-        int col;
-        if(!hasneg) {
-          int ival = 0xFF & (int) (255 * Math.max(0, val));
-          col = 0xff000000 | (ival << 16) | (ival << 8) | ival;
-        }
-        else {
-          if(val >= 0) {
-            int ival = 0xFF & (int) (255 * val);
-            col = 0xff000000 | (ival << 8);
+        // Compute color:
+        final int col;
+        {
+          if(!hasneg) {
+            int ival = 0xFF & (int) (255 * Math.max(0, val));
+            col = 0xff000000 | (ival << 16) | (ival << 8) | ival;
           }
           else {
-            int ival = 0xFF & (int) (255 * -val);
-            col = 0xff000000 | (ival << 16);
+            if(val >= 0) {
+              int ival = 0xFF & (int) (255 * val);
+              col = 0xff000000 | (ival << 8);
+            }
+            else {
+              int ival = 0xFF & (int) (255 * -val);
+              col = 0xff000000 | (ival << 16);
+            }
           }
         }
         img.setRGB(x, y, col);
@@ -225,7 +245,8 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
 
   /**
    * Show a single visualization.
-   * @param context 
+   * 
+   * @param context
    * 
    * @param factory
    * @param task
@@ -271,7 +292,7 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
 
     @Override
     protected AbstractApplication makeInstance() {
-      return new OutlierExperimentEnsembleMatrix(verbose, inputstep, vispar);
+      return new VisualizePairwiseGainMatrix(verbose, inputstep, vispar);
     }
   }
 
@@ -281,6 +302,6 @@ public class OutlierExperimentEnsembleMatrix extends AbstractApplication {
    * @param args Command line parameters.
    */
   public static void main(String[] args) {
-    OutlierExperimentEnsembleMatrix.runCLIApplication(OutlierExperimentEnsembleMatrix.class, args);
+    VisualizePairwiseGainMatrix.runCLIApplication(VisualizePairwiseGainMatrix.class, args);
   }
 }

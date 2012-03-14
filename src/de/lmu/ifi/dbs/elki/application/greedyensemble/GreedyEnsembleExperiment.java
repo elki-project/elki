@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Class to load an outlier detection summary file, as produced by
- * {@link OutlierExperimentKNNMain}, and compute a naive ensemble for it. Based
+ * {@link ComputeKNNOutlierScores}, and compute a naive ensemble for it. Based
  * on this initial estimation, and optimized ensemble is built using a greedy
  * strategy. Starting with the best candidate only as initial ensemble, the most
  * diverse candidate is investigated at each step. If it improves towards the
@@ -80,11 +80,11 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * @author Erich Schubert
  */
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
-public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
+public class GreedyEnsembleExperiment extends AbstractApplication {
   /**
    * Get static logger
    */
-  private static final Logging logger = Logging.getLogger(OutlierExperimentGreedyEnsemble.class);
+  private static final Logging logger = Logging.getLogger(GreedyEnsembleExperiment.class);
 
   /**
    * The data input part.
@@ -102,7 +102,7 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
    * @param verbose Verbosity
    * @param inputstep Input step
    */
-  public OutlierExperimentGreedyEnsemble(boolean verbose, InputStep inputstep) {
+  public GreedyEnsembleExperiment(boolean verbose, InputStep inputstep) {
     super(verbose);
     this.inputstep = inputstep;
   }
@@ -424,7 +424,7 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
 
     @Override
     protected AbstractApplication makeInstance() {
-      return new OutlierExperimentGreedyEnsemble(verbose, inputstep);
+      return new GreedyEnsembleExperiment(verbose, inputstep);
     }
   }
 
@@ -434,6 +434,6 @@ public class OutlierExperimentGreedyEnsemble extends AbstractApplication {
    * @param args Command line parameters.
    */
   public static void main(String[] args) {
-    OutlierExperimentGreedyEnsemble.runCLIApplication(OutlierExperimentGreedyEnsemble.class, args);
+    GreedyEnsembleExperiment.runCLIApplication(GreedyEnsembleExperiment.class, args);
   }
 }
