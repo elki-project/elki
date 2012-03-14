@@ -1,10 +1,15 @@
-package experimentalcode.shared;
+package de.lmu.ifi.dbs.elki.utilities;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
  * Class to wrap various Base64 encoders that could be available.
+ * 
+ * This is a rather ugly hack; it would maybe have been sensible to just import
+ * one of the publicly available (and fast) Base64 encoders. The expectation was
+ * that at some point, Oracle will acutally include a public and fast Base64
+ * encoder in Java.
  * 
  * @author Erich Schubert
  */

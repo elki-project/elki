@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.Base64;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -188,10 +189,9 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
           md.update(" ".getBytes());
           md.update(id.toString().getBytes());
         }
-        // FIXME: include Base64 in ELKI release.
-        // fout.append("# DBID-series MD5:");
-        // fout.append(Base64.encodeBase64(md.digest()));
-        // fout.append(FormatUtil.NEWLINE);
+        fout.append("# DBID-series MD5:");
+        fout.append(Base64.encodeBase64(md.digest()));
+        fout.append(FormatUtil.NEWLINE);
       }
       catch(NoSuchAlgorithmException e) {
         throw new AbortException("MD5 not found.");
