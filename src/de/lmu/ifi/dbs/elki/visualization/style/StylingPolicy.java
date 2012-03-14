@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * Styling policy.
  * 
  * Implementations <em>must</em> implement either {@link ClassStylingPolicy} or
- * {@link SingleObjectsStyling} interfaces, as most visualizers will only
+ * {@link SingleObjectsStylingPolicy} interfaces, as most visualizers will only
  * support these known interfaces.
  * 
  * @author Erich Schubert
