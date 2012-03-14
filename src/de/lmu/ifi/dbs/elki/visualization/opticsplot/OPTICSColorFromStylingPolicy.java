@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  */
 
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 
 /**
@@ -32,7 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ColorLibrary
+ * @apiviz.uses StylingPolicy
  */
 public class OPTICSColorFromStylingPolicy implements OPTICSColorAdapter {
   /**
