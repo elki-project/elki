@@ -280,8 +280,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @param ps the second data page
    * @param pr_heaps the knn lists for each data object in pr
    * @param ps_heaps the knn lists for each data object in ps (if ps != pr)
-   * @param pr_knn_distance the current knn distance of data page pr
-   * @return the k-nearest neighbor distance of pr in ps
    */
   private void processDataPagesOptimize(SpatialPrimitiveDistanceFunction<V, D> distFunction, final boolean doubleOptimize, List<KNNHeap<D>> pr_heaps, List<KNNHeap<D>> ps_heaps, N pr, N ps) {
     if(doubleOptimize) {
@@ -309,13 +307,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * Processes the two data pages pr and ps and determines the k-nearest
    * neighbors of pr in ps.
    * 
-   * @param distQ the distance to use
+   * @param df the distance function to use
    * @param pr the first data page
    * @param ps the second data page
    * @param pr_heaps the knn lists for each data object
    * @param ps_heaps the knn lists for each data object in ps
-   * @param pr_knn_distance the current knn distance of data page pr
-   * @return the k-nearest neighbor distance of pr in ps
    */
   private void processDataPagesDouble(SpatialPrimitiveDoubleDistanceFunction<? super V> df, N pr, N ps, List<KNNHeap<DoubleDistance>> pr_heaps, List<KNNHeap<DoubleDistance>> ps_heaps) {
     // Compare pairwise
@@ -369,7 +365,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.hide
+   * @apiviz.exclude
    */
   private class Task implements Comparable<Task> {
     final D mindist;

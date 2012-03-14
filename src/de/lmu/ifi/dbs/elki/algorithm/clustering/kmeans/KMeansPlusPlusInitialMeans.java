@@ -179,7 +179,7 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
    * @param weights Weight list
    * @param ids IDs
    * @param latest Added ID
-   * @param distQ Distance query
+   * @param distF Distance function
    * @return Weight sum
    */
   protected double updateWeights(double[] weights, ArrayDBIDs ids, DBID latest, PrimitiveDoubleDistanceFunction<V> distF, Relation<V> rel) {
