@@ -84,7 +84,7 @@ public class LUDecomposition implements java.io.Serializable {
   /**
    * LU Decomposition
    * 
-   * @param A Rectangular matrix
+   * @param LU Rectangular matrix
    * @param m row dimensionality
    * @param n column dimensionality
    */
@@ -295,16 +295,16 @@ public class LUDecomposition implements java.io.Serializable {
    * @exception IllegalArgumentException Matrix row dimensions must agree.
    * @exception RuntimeException Matrix is singular.
    */
-  public double[][] solve(double[][] X) {
-    int mx = X.length;
-    int nx = X[0].length;
+  public double[][] solve(double[][] B) {
+    int mx = B.length;
+    int nx = B[0].length;
     if(mx != m) {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
     if(!this.isNonsingular()) {
       throw new RuntimeException("Matrix is singular.");
     }
-    double[][] Xmat = new Matrix(X).getMatrix(piv, 0, nx - 1).getArrayRef();
+    double[][] Xmat = new Matrix(B).getMatrix(piv, 0, nx - 1).getArrayRef();
     solveInplace(Xmat, nx);
     return Xmat;
   }
@@ -313,27 +313,28 @@ public class LUDecomposition implements java.io.Serializable {
    * Solve A*X = B
    * 
    * @param B A Matrix with as many rows as A and any number of columns.
+   * @param nx Number of columns
    * @return X so that L*U*X = B(piv,:)
    * @exception IllegalArgumentException Matrix row dimensions must agree.
    * @exception RuntimeException Matrix is singular.
    */
-  private void solveInplace(double[][] X, int nx) {
+  private void solveInplace(double[][] B, int nx) {
     // Solve L*Y = B(piv,:)
     for(int k = 0; k < n; k++) {
       for(int i = k + 1; i < n; i++) {
         for(int j = 0; j < nx; j++) {
-          X[i][j] -= X[k][j] * LU[i][k];
+          B[i][j] -= B[k][j] * LU[i][k];
         }
       }
     }
     // Solve U*X = Y;
     for(int k = n - 1; k >= 0; k--) {
       for(int j = 0; j < nx; j++) {
-        X[k][j] /= LU[k][k];
+        B[k][j] /= LU[k][k];
       }
       for(int i = 0; i < k; i++) {
         for(int j = 0; j < nx; j++) {
-          X[i][j] -= X[k][j] * LU[i][k];
+          B[i][j] -= B[k][j] * LU[i][k];
         }
       }
     }
