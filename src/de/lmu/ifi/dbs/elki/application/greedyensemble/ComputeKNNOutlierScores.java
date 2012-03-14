@@ -89,11 +89,11 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * @author Erich Schubert
  */
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
-public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends AbstractApplication {
+public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends AbstractApplication {
   /**
    * Our logger class.
    */
-  private static final Logging logger = Logging.getLogger(OutlierExperimentKNNMain.class);
+  private static final Logging logger = Logging.getLogger(ComputeKNNOutlierScores.class);
 
   /**
    * Input step
@@ -147,7 +147,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * @param bylabel By label outlier (reference)
    * @param outfile Output file
    */
-  public OutlierExperimentKNNMain(boolean verbose, InputStep inputstep, DistanceFunction<? super O, D> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile) {
+  public ComputeKNNOutlierScores(boolean verbose, InputStep inputstep, DistanceFunction<? super O, D> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile) {
     super(verbose);
     this.distf = distf;
     this.startk = startk;
@@ -453,7 +453,7 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
 
     @Override
     protected AbstractApplication makeInstance() {
-      return new OutlierExperimentKNNMain<O, D>(verbose, inputstep, distf, startk, stepk, maxk, bylabel, outfile);
+      return new ComputeKNNOutlierScores<O, D>(verbose, inputstep, distf, startk, stepk, maxk, bylabel, outfile);
     }
   }
 
@@ -463,6 +463,6 @@ public class OutlierExperimentKNNMain<O, D extends NumberDistance<D, ?>> extends
    * @param args Command line parameters.
    */
   public static void main(String[] args) {
-    OutlierExperimentKNNMain.runCLIApplication(OutlierExperimentKNNMain.class, args);
+    ComputeKNNOutlierScores.runCLIApplication(ComputeKNNOutlierScores.class, args);
   }
 }
