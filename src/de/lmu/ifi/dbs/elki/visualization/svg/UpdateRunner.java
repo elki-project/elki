@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -52,7 +51,7 @@ public class UpdateRunner {
   /**
    * Synchronizer that can block events from being executed right away.
    */
-  private Collection<UpdateSynchronizer> synchronizer = new java.util.Vector<UpdateSynchronizer>();
+  private UpdateSynchronizer synchronizer = null;
 
   /**
    * Construct a new update handler
@@ -70,13 +69,11 @@ public class UpdateRunner {
    */
   public void invokeLater(Runnable r) {
     queue.add(r);
-    if(synchronizer.size() > 0) {
-      for(UpdateSynchronizer s : synchronizer) {
-        s.activate();
-      }
+    if(synchronizer == null) {
+      runQueue();
     }
     else {
-      runQueue();
+      synchronizer.activate();
     }
   }
 
@@ -128,14 +125,18 @@ public class UpdateRunner {
    * @param newsync Update synchronizer
    */
   public synchronized void synchronizeWith(UpdateSynchronizer newsync) {
-    //LoggingUtil.warning("Synchronizing: " + sync + " " + newsync);
-    if(synchronizer.contains(newsync)) {
+    // LoggingUtil.warning("Synchronizing: " + sync + " " + newsync);
+    if(synchronizer == newsync) {
       LoggingUtil.warning("Double-synced to the same plot!");
+      return;
     }
-    else {
-      synchronizer.add(newsync);
-      newsync.addUpdateRunner(this);
+    if(synchronizer != null) {
+      LoggingUtil.warning("Attempting to synchronize to more than one synchronizer.");
+      return;
     }
+    synchronizer = newsync;
+    newsync.addUpdateRunner(this);
+
   }
 
   /**
@@ -144,10 +145,17 @@ public class UpdateRunner {
    * @param oldsync Update synchronizer to remove
    */
   public synchronized void unsynchronizeWith(UpdateSynchronizer oldsync) {
-    //LoggingUtil.warning("Unsynchronizing: " + sync + " " + oldsync);
-    synchronizer.remove(oldsync);
-    if(synchronizer.size() == 0) {
-      runQueue();
+    if(synchronizer == null) {
+      LoggingUtil.warning("Warning: was not synchronized.");
     }
+    else {
+      if(synchronizer != oldsync) {
+        LoggingUtil.warning("Warning: was synchronized differently!");
+        return;
+      }
+    }
+    // LoggingUtil.warning("Unsynchronizing: " + sync + " " + oldsync);
+    synchronizer = null;
+    runQueue();
   }
 }

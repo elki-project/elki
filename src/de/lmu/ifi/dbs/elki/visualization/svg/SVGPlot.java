@@ -161,7 +161,7 @@ public class SVGPlot {
    * Clean up the plot.
    */
   public void dispose() {
-    getUpdateRunner().clear();
+    runner.clear();
   }
 
   /**
@@ -598,21 +598,12 @@ public class SVGPlot {
   }
 
   /**
-   * Get the plots update runner.
-   * 
-   * @return update runner
-   */
-  private UpdateRunner getUpdateRunner() {
-    return runner;
-  }
-
-  /**
    * Schedule an update.
    * 
    * @param runnable Runnable to schedule
    */
   public void scheduleUpdate(Runnable runnable) {
-    getUpdateRunner().invokeLater(runnable);
+    runner.invokeLater(runnable);
   }
 
   /**
@@ -621,7 +612,7 @@ public class SVGPlot {
    * @param sync Update synchronizer
    */
   public void synchronizeWith(UpdateSynchronizer sync) {
-    getUpdateRunner().synchronizeWith(sync);
+    runner.synchronizeWith(sync);
   }
 
   /**
@@ -630,7 +621,7 @@ public class SVGPlot {
    * @param sync Update synchronizer to detach from.
    */
   public void unsynchronizeWith(UpdateSynchronizer sync) {
-    getUpdateRunner().unsynchronizeWith(sync);
+    runner.unsynchronizeWith(sync);
   }
 
   /**
