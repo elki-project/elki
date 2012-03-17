@@ -109,7 +109,7 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
   private int alpha;
   
   /**
-   * 
+   * Holds the value of {@link #GRIDS_ID}.
    */
   private int g;
   
