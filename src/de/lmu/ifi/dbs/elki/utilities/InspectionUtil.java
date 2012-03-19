@@ -203,7 +203,7 @@ public class InspectionUtil {
     Collections.sort(res, new ClassSorter());
     return res;
   }
-
+  
   /**
    * Class to iterate over a Jar file.
    * 

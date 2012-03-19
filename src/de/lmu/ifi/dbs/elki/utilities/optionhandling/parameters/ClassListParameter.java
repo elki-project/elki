@@ -26,9 +26,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.properties.IterateKnownImplementations;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
@@ -204,20 +203,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     if(InspectionUtil.NONSTATIC_CLASSPATH) {
       return IterableUtil.fromIterable(InspectionUtil.cachedFindAllImplementations(getRestrictionClass()));
     }
-    return new IterateKnownImplementations(getRestrictionClass());
-  }
-
-  /**
-   * Returns the class names allowed according to the restriction class of this
-   * parameter.
-   * 
-   * @return class names allowed according to the restriction class defined.
-   */
-  public String[] getRestrictionClasses() {
-    if(restrictionClass != null) {
-      return Properties.ELKI_PROPERTIES.getProperty(restrictionClass.getName());
-    }
-    return new String[] {};
+    return IterableUtil.fromIterator(new ELKIServiceLoader(getRestrictionClass()));
   }
 
   /**

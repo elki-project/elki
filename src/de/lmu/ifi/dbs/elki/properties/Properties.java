@@ -63,7 +63,7 @@ public final class Properties {
   /**
    * Stores the properties as defined by a property-file.
    */
-  private final java.util.Properties properties;
+  protected final java.util.Properties properties;
   
   /**
    * Provides the properties as defined in the designated file.

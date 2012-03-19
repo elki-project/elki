@@ -23,21 +23,29 @@ package de.lmu.ifi.dbs.elki.application.internal;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
- * Helper application to test the ELKI properties file for "missing" implementations.
+ * Helper application to test the ELKI properties file for "missing"
+ * implementations.
  * 
  * @author Erich Schubert
  * 
@@ -48,11 +56,11 @@ public class CheckELKIProperties {
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(CheckELKIProperties.class);
-  
+
   /**
    * Pattern to strip comments, while keeping commented class names.
    */
-  private Pattern strip = Pattern.compile("^[\\s#]*(.*?)[\\s,]*$");
+  private Pattern strip = Pattern.compile("^[\\s#]*(.*?)[\\s]*$");
 
   /**
    * Package to skip matches in - unreleased code.
@@ -67,14 +75,22 @@ public class CheckELKIProperties {
   public static void main(String[] argv) {
     new CheckELKIProperties().checkProperties();
   }
-  
+
   /**
    * Retrieve all properties and check them.
    */
   public void checkProperties() {
-    Set<String> props = Properties.ELKI_PROPERTIES.getPropertyNames();
-    for(String prop : props) {
-      checkProperty(prop);
+    URL u = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX);
+    try {
+      for(String prop : new File(u.toURI()).list()) {
+        if (logger.isVerbose()) {
+          logger.verbose("Checking property: "+prop);
+        }
+        checkProperty(prop);
+      }
+    }
+    catch(URISyntaxException e) {
+      throw new AbortException("Cannot check all properties, as some are not in a file: URL.");
     }
   }
 
@@ -108,23 +124,34 @@ public class CheckELKIProperties {
       names.add(c2.getName());
     }
 
-    String[] known = Properties.ELKI_PROPERTIES.getProperty(cls.getName());
-    for(String k : known) {
-      Matcher m = strip.matcher(k);
-      if(m.matches()) {
-        String stripped = m.group(1);
-        if(stripped.length() > 0) {
-          if(names.contains(stripped)) {
-            names.remove(stripped);
-          }
-          else {
-            logger.warning("Name " + stripped + " found for property " + prop + " but no class discovered (or referenced twice?).");
+    try {
+      InputStream is = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX + cls.getName()).openStream();
+      BufferedReader r = new BufferedReader(new InputStreamReader(is, "utf-8"));
+      for(String line;;) {
+        line = r.readLine();
+        // End of stream:
+        if(line == null) {
+          break;
+        }
+        Matcher m = strip.matcher(line);
+        if(m.matches()) {
+          String stripped = m.group(1);
+          if(stripped.length() > 0) {
+            if(names.contains(stripped)) {
+              names.remove(stripped);
+            }
+            else {
+              logger.warning("Name " + stripped + " found for property " + prop + " but no class discovered (or referenced twice?).");
+            }
           }
         }
+        else {
+          logger.warning("Line: " + line + " didn't match regexp.");
+        }
       }
-      else {
-        logger.warning("Line: " + k + " didn't match regexp.");
-      }
+    }
+    catch(IOException e) {
+      logger.exception(e);
     }
     if(names.size() > 0) {
       StringBuffer message = new StringBuffer();
@@ -134,7 +161,7 @@ public class CheckELKIProperties {
       // TODO: sort by package, then classname
       Collections.sort(sorted);
       for(String remaining : sorted) {
-        message.append("# " + remaining + ",\\" + FormatUtil.NEWLINE);
+        message.append("# " + remaining + FormatUtil.NEWLINE);
       }
       logger.warning(message.toString());
     }
