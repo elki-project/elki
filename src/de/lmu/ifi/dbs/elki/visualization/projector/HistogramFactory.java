@@ -23,9 +23,10 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -40,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Produce one-dimensional projections.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.has HistogramProjector
  */
 public class HistogramFactory implements ProjectorFactory {
@@ -51,6 +52,7 @@ public class HistogramFactory implements ProjectorFactory {
 
   /**
    * Constructor.
+   * 
    * @param maxdim Maximum dimensionality
    */
   public HistogramFactory(int maxdim) {
@@ -60,16 +62,14 @@ public class HistogramFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Database db = ResultUtil.findDatabase(newResult);
-    if(db != null) {
-      for(Relation<?> rel : db.getRelations()) {
-        if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          @SuppressWarnings("unchecked")
-          Relation<NumberVector<?, ?>> vrel = (Relation<NumberVector<?, ?>>) rel;
-          final int dim = DatabaseUtil.dimensionality(vrel);
-          HistogramProjector<NumberVector<?, ?>> proj = new HistogramProjector<NumberVector<?, ?>>(vrel, Math.min(dim, maxdim));
-          baseResult.getHierarchy().add(vrel, proj);
-        }
+    ArrayList<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
+    for(Relation<?> rel : rels) {
+      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        @SuppressWarnings("unchecked")
+        Relation<NumberVector<?, ?>> vrel = (Relation<NumberVector<?, ?>>) rel;
+        final int dim = DatabaseUtil.dimensionality(vrel);
+        HistogramProjector<NumberVector<?, ?>> proj = new HistogramProjector<NumberVector<?, ?>>(vrel, Math.min(dim, maxdim));
+        baseResult.getHierarchy().add(vrel, proj);
       }
     }
   }
@@ -78,7 +78,7 @@ public class HistogramFactory implements ProjectorFactory {
    * Parameterization class.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

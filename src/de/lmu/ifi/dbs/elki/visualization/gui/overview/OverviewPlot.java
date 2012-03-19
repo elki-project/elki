@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @apiviz.uses DetailView
  * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.projections.Projection
  */
+// FIXME: there still is a synchronization issue, that causes the initialization to be run twice in parallel.
 public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Our logging class
@@ -163,11 +164,13 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * Recompute the layout of visualizations.
    */
   private void arrangeVisualizations() {
-    plotmap = new RectangleArranger<PlotItem>(ratio);
+    RectangleArranger<PlotItem> plotmap = new RectangleArranger<PlotItem>(ratio);
 
     ArrayList<Projector> projectors = ResultUtil.filterResults(result, Projector.class);
+    logger.warning(projectors.size()+" projectors.");
     // Rectangle layout
     for(Projector p : projectors) {
+      logger.warning("Projector: "+p, new Throwable());
       Collection<PlotItem> projs = p.arrange();
       for(PlotItem it : projs) {
         if(it.w <= 0.0 || it.h <= 0.0) {
@@ -181,16 +184,11 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
 
     ResultHierarchy hier = result.getHierarchy();
     ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(result, VisualizationTask.class);
-    for(VisualizationTask task : tasks) {
-      boolean isprojected = false;
+    nextTask: for(VisualizationTask task : tasks) {
       for(Result parent : hier.getParents(task)) {
         if(parent instanceof Projector) {
-          isprojected = true;
-          break;
+          continue nextTask;
         }
-      }
-      if(isprojected) {
-        continue;
       }
       if(task.getWidth() <= 0.0 || task.getHeight() <= 0.0) {
         logger.warning("Task with improper size information: " + task);
@@ -201,6 +199,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         plotmap.put(it.w, it.h, it);
       }
     }
+    this.plotmap = plotmap;
   }
 
   /**
