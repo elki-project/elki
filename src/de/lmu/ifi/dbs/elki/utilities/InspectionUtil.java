@@ -25,20 +25,21 @@ package de.lmu.ifi.dbs.elki.utilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
+import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -96,7 +97,15 @@ public class InspectionUtil {
     NONSTATIC_CLASSPATH = hasnonstatic;
   }
 
-  private static WeakReference<List<Class<?>>> CLASS_CACHE = new WeakReference<List<Class<?>>>(null);
+  /**
+   * Weak hash map for class lookups
+   */
+  private static WeakHashMap<Class<?>, List<Class<?>>> CLASS_CACHE = new WeakHashMap<Class<?>, List<Class<?>>>();
+
+  /**
+   * (Non-weak) cache for all "frequently scanned" classes.
+   */
+  private static List<Class<?>> MASTER_CACHE = null;
 
   /**
    * Cached version of "findAllImplementations". For Parameterizable classes
@@ -109,25 +118,12 @@ public class InspectionUtil {
     if(c == null) {
       return Collections.emptyList();
     }
-    if(InspectionUtilFrequentlyScanned.class.isAssignableFrom(c)) {
-      List<Class<?>> cache = CLASS_CACHE.get();
-      if(cache == null) {
-        cache = findAllImplementations(InspectionUtilFrequentlyScanned.class, false);
-        CLASS_CACHE = new WeakReference<List<Class<?>>>(cache);
-      }
-      ArrayList<Class<?>> list = new ArrayList<Class<?>>();
-      for(Class<?> cls : cache) {
-        if(c.isAssignableFrom(cls)) {
-          list.add(cls);
-        }
-      }
-      return list;
+    List<Class<?>> res = CLASS_CACHE.get(c);
+    if(res == null) {
+      res = findAllImplementations(c, false);
+      CLASS_CACHE.put(c, res);
     }
-    else {
-      // Need to scan - not cached.
-      logger.finest("Slow scan for implementations: " + c.getName());
-      return findAllImplementations(c, false);
-    }
+    return res;
   }
 
   /**
@@ -140,78 +136,103 @@ public class InspectionUtil {
    * @return List of found classes.
    */
   public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything) {
-    if(!InspectionUtil.NONSTATIC_CLASSPATH) {
+    ArrayList<Class<?>> list = new ArrayList<Class<?>>();
+    // Add all from service files (i.e. jars)
+    {
       Iterator<Class<?>> iter = new ELKIServiceLoader(c);
-      if(iter.hasNext()) {
-        ArrayList<Class<?>> list = new ArrayList<Class<?>>();
-        while(iter.hasNext()) {
-          list.add(iter.next());
-        }
-        return list;
-      }
-      else {
-        logger.warning("Doing a dir scan for class " + c.getName() + " as no implementations were found using index files.");
+      while(iter.hasNext()) {
+        list.add(iter.next());
       }
     }
-    String[] classpath = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
-    return findAllImplementations(classpath, c, DEFAULT_IGNORES, everything);
+    if(!InspectionUtil.NONSTATIC_CLASSPATH) {
+      if(list.size() == 0) {
+        logger.warning("No implementations for " + c.getName() + " were found using index files.");
+      }
+    }
+    else {
+      // Scan for additional ones in class path
+      Iterator<Class<?>> iter;
+      if(InspectionUtilFrequentlyScanned.class.isAssignableFrom(c)) {
+        iter = getFrequentScan();
+      }
+      else {
+        iter = slowScan(c).iterator();
+      }
+      while(iter.hasNext()) {
+        Class<?> cls = iter.next();
+        // skip abstract / private classes.
+        if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+          continue;
+        }
+        // skip classes where we can't get a full name.
+        if(cls.getCanonicalName() == null) {
+          continue;
+        }
+        if(c.isAssignableFrom(cls)) {
+          list.add(cls);
+        }
+      }
+    }
+    return list;
   }
 
   /**
-   * Find all implementations of a given class.
+   * Get (or create) the result of a scan for any "frequent scanned" class.
    * 
-   * @param classpath Classpath to use (JARs and folders supported)
-   * @param c Class restriction
-   * @param ignorepackages List of packages to ignore
-   * @param everything include interfaces, abstract and private classes
-   * @return List of found classes.
+   * @return Scan result
    */
-  public static List<Class<?>> findAllImplementations(String[] classpath, Class<?> c, String[] ignorepackages, boolean everything) {
-    // Collect iterators
-    Vector<Iterable<String>> iters = new Vector<Iterable<String>>(classpath.length);
-    for(String path : classpath) {
-      File p = new File(path);
-      if(path.endsWith(".jar")) {
-        iters.add(new JarClassIterator(path, ignorepackages));
-      }
-      else if(p.isDirectory()) {
-        iters.add(new DirClassIterator(p, ignorepackages));
+  private static Iterator<Class<?>> getFrequentScan() {
+    if(MASTER_CACHE == null) {
+      MASTER_CACHE = slowScan(InspectionUtilFrequentlyScanned.class);
+    }
+    return MASTER_CACHE.iterator();
+  }
+
+  /**
+   * Perform a full (slow) scan for classes.
+   * 
+   * @param cond Class to include
+   * @return List with the scan result
+   */
+  private static List<Class<?>> slowScan(Class<?> cond) {
+    ArrayList<Class<?>> res = new ArrayList<Class<?>>();
+    try {
+      ClassLoader cl = ClassLoader.getSystemClassLoader();
+      Enumeration<URL> cps = cl.getResources("");
+      while(cps.hasMoreElements()) {
+        URL u = cps.nextElement();
+        // Scan file sources only.
+        if(u.getProtocol() == "file") {
+          Iterator<String> it = new DirClassIterator(new File(u.getFile()), DEFAULT_IGNORES);
+          while(it.hasNext()) {
+            String classname = it.next();
+            try {
+              Class<?> cls = cl.loadClass(classname);
+              // skip classes where we can't get a full name.
+              if(cls.getCanonicalName() == null) {
+                continue;
+              }
+              // Implements the right interface?
+              if(cond != null && !cond.isAssignableFrom(cls)) {
+                continue;
+              }
+              res.add(cls);
+            }
+            catch(ClassNotFoundException e) {
+              continue;
+            }
+            catch(NoClassDefFoundError e) {
+              continue;
+            }
+            catch(Exception e) {
+              continue;
+            }
+          }
+        }
       }
     }
-
-    ArrayList<Class<?>> res = new ArrayList<Class<?>>();
-    ClassLoader cl = ClassLoader.getSystemClassLoader();
-    for(Iterable<String> iter : iters) {
-      for(String classname : iter) {
-        if(logger.isDebuggingFinest()) {
-          if(!classname.startsWith("de.lmu.ifi.dbs.elki.") && !classname.startsWith("experimentalcode.") && !classname.startsWith("tutorial.") && !classname.startsWith("project.")) {
-            logger.finest("Exclude? " + classname);
-          }
-        }
-        try {
-          Class<?> cls = cl.loadClass(classname);
-          // skip abstract / private classes.
-          if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
-            continue;
-          }
-          // skip classes where we can't get a full name.
-          if(cls.getCanonicalName() == null) {
-            continue;
-          }
-          if(c.isAssignableFrom(cls)) {
-            res.add(cls);
-          }
-        }
-        catch(ClassNotFoundException e) {
-          continue;
-        }
-        catch(NoClassDefFoundError e) {
-          continue;
-        }
-        catch(Exception e) {
-          continue;
-        }
-      }
+    catch(IOException e) {
+      logger.exception(e);
     }
     Collections.sort(res, new ClassSorter());
     return res;
@@ -224,7 +245,7 @@ public class InspectionUtil {
    * 
    * @apiviz.exclude
    */
-  static class JarClassIterator implements Iterator<String>, Iterable<String> {
+  static class JarClassIterator implements IterableIterator<String> {
     private Enumeration<JarEntry> jarentries;
 
     private String ne;
@@ -306,7 +327,7 @@ public class InspectionUtil {
    * 
    * @apiviz.exclude
    */
-  static class DirClassIterator implements Iterator<String>, Iterable<String> {
+  static class DirClassIterator implements IterableIterator<String> {
     private static final String CLASS_EXT = ".class";
 
     private static final String FACTORY_FILE_EXT = ClassParameter.FACTORY_POSTFIX + CLASS_EXT;
