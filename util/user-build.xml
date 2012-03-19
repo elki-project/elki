@@ -41,6 +41,7 @@
 		<copy todir="${build}">
 			<fileset dir="${src}">
 				<include name="de/**/*" />
+				<include name="META-INF/elki/*" />
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
