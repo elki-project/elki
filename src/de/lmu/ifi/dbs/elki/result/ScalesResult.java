@@ -74,4 +74,13 @@ public class ScalesResult extends BasicResult {
   public void setScale(int dim, LinearScale scale) {
     scales[dim - 1] = scale;
   }
+
+  /**
+   * Get all scales. Note: you must not modify the array.
+   * 
+   * @return Scales array.
+   */
+  public LinearScale[] getScales() {
+    return scales;
+  }
 }

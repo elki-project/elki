@@ -29,10 +29,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.math.scales.Scales;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
@@ -62,11 +61,6 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
   int dmax;
 
   /**
-   * Axis scales
-   */
-  LinearScale[] scales;
-
-  /**
    * Constructor.
    * 
    * @param rel Relation
@@ -76,7 +70,6 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
     super();
     this.rel = rel;
     this.dmax = maxdim;
-    this.scales = Scales.calcScales(rel);
     assert (maxdim <= DatabaseUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
   }
 
@@ -89,8 +82,9 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
       final double hheight = .5;
       final double lheight = .1;
       PlotItem master = new PlotItem(dmax + xoff, hheight + lheight, null);
+      ScalesResult scales = ResultUtil.getScalesResult(rel);
       for(int d1 = 0; d1 < dmax; d1++) {
-        Projection1D proj = new Simple1D(scales, d1 + 1);
+        Projection1D proj = new Simple1D(scales.getScales(), d1 + 1);
         final PlotItem it = new PlotItem(d1 + xoff, lheight, 1., hheight, proj);
         it.visualizations = tasks;
         master.subitems.add(it);

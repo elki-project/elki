@@ -29,10 +29,10 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.math.scales.Scales;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.ScalesResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
@@ -47,17 +47,11 @@ import experimentalcode.students.roedler.parallelCoordinates.projections.SimpleP
  * 
  * @param <V> Vector type
  */
-
 public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends AbstractHierarchicalResult implements Projector {
   /**
    * Relation we project
    */
   Relation<V> rel;
-
-  /**
-   * Axis scales
-   */
-  LinearScale[] scales;
 
   /**
    * Constructor.
@@ -67,16 +61,16 @@ public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends Abstrac
   public ParallelPlotProjector(Relation<V> rel) {
     super();
     this.rel = rel;
-    this.scales = Scales.calcScales(rel);
   }
 
   @Override
   public Collection<PlotItem> arrange() {
     List<PlotItem> col = new ArrayList<PlotItem>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
-    if (tasks.size() > 0) {
-      ProjectionParallel proj = new SimpleParallel(scales, scales.length, new double[]{0.071, 0.071}, new double[]{1.8, 1.}, 0.71, 100.);
-      
+    if(tasks.size() > 0) {
+      ScalesResult scales = ResultUtil.getScalesResult(rel);
+      ProjectionParallel proj = new SimpleParallel(scales.getScales(), DatabaseUtil.dimensionality(rel), new double[] { 0.071, 0.071 }, new double[] { 1.8, 1. }, 0.71, 100.);
+
       final PlotItem it = new PlotItem(2, 1., proj);
       it.visualizations = tasks;
       col.add(it);
