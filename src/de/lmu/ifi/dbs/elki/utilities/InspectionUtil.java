@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.set.hash.THashSet;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -150,8 +152,11 @@ public class InspectionUtil {
       }
     }
     else {
+      // Duplicate checking
+      THashSet<Class<?>> dupes = new THashSet<Class<?>>(list);
       // Scan for additional ones in class path
       Iterator<Class<?>> iter;
+      // If possible, reuse an existing scan result
       if(InspectionUtilFrequentlyScanned.class.isAssignableFrom(c)) {
         iter = getFrequentScan();
       }
@@ -164,12 +169,9 @@ public class InspectionUtil {
         if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
           continue;
         }
-        // skip classes where we can't get a full name.
-        if(cls.getCanonicalName() == null) {
-          continue;
-        }
-        if(c.isAssignableFrom(cls)) {
+        if(c.isAssignableFrom(cls) && !dupes.contains(cls)) {
           list.add(cls);
+          dupes.add(cls);
         }
       }
     }
