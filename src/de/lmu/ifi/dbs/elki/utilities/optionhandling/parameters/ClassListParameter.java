@@ -42,8 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Steffi Wanka
  * @author Erich Schubert
  * 
- * @apiviz.uses Properties
- * @apiviz.uses IterateKnownImplementations
+ * @apiviz.uses InspectionUtil
  * 
  * @param <C> Class type
  */

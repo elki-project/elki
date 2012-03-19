@@ -49,13 +49,13 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses Properties
+ * @apiviz.uses ELKIServiceLoader
  */
-public class CheckELKIProperties {
+public class CheckELKIServices {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(CheckELKIProperties.class);
+  private static final Logging logger = Logging.getLogger(CheckELKIServices.class);
 
   /**
    * Pattern to strip comments, while keeping commented class names.
@@ -73,20 +73,20 @@ public class CheckELKIProperties {
    * @param argv Command line arguments
    */
   public static void main(String[] argv) {
-    new CheckELKIProperties().checkProperties();
+    new CheckELKIServices().checkServices();
   }
 
   /**
    * Retrieve all properties and check them.
    */
-  public void checkProperties() {
+  public void checkServices() {
     URL u = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX);
     try {
       for(String prop : new File(u.toURI()).list()) {
         if (logger.isVerbose()) {
           logger.verbose("Checking property: "+prop);
         }
-        checkProperty(prop);
+        checkService(prop);
       }
     }
     catch(URISyntaxException e) {
@@ -95,11 +95,11 @@ public class CheckELKIProperties {
   }
 
   /**
-   * Check a single property
+   * Check a single service class
    * 
-   * @param prop Property = Class name.
+   * @param prop Class name.
    */
-  private void checkProperty(String prop) {
+  private void checkService(String prop) {
     Class<?> cls;
     try {
       cls = Class.forName(prop);
