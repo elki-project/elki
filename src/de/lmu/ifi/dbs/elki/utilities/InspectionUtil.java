@@ -243,6 +243,9 @@ public class InspectionUtil {
   /**
    * Class to iterate over a Jar file.
    * 
+   * Note: this is currently unused, as we now require all jar files to include
+   * an index in the form of service-style files in META-INF/elki/
+   * 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
