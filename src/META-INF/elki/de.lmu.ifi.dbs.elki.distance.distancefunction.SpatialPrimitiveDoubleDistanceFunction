@@ -1,0 +1,10 @@
+de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.MinimumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction

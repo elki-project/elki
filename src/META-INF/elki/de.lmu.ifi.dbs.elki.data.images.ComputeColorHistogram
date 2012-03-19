@@ -1,0 +1,3 @@
+de.lmu.ifi.dbs.elki.data.images.ComputeHSBColorHistogram
+de.lmu.ifi.dbs.elki.data.images.ComputeNaiveHSBColorHistogram
+de.lmu.ifi.dbs.elki.data.images.ComputeNaiveRGBColorHistogram

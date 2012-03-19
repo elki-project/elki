@@ -1,0 +1,6 @@
+de.lmu.ifi.dbs.elki.utilities.referencepoints.GridBasedReferencePoints
+de.lmu.ifi.dbs.elki.utilities.referencepoints.AxisBasedReferencePoints
+de.lmu.ifi.dbs.elki.utilities.referencepoints.FullDatabaseReferencePoints
+de.lmu.ifi.dbs.elki.utilities.referencepoints.RandomGeneratedReferencePoints
+de.lmu.ifi.dbs.elki.utilities.referencepoints.RandomSampleReferencePoints
+de.lmu.ifi.dbs.elki.utilities.referencepoints.StarBasedReferencePoints

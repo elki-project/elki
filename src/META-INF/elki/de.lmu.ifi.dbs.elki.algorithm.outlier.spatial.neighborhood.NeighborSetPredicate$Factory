@@ -1,0 +1,3 @@
+de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.ExtendedNeighborhood$Factory
+de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.ExternalNeighborhood$Factory
+de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.PrecomputedKNearestNeighborNeighborhood$Factory

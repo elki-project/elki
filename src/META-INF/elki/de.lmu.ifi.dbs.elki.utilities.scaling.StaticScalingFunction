@@ -1,0 +1,5 @@
+de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling
+de.lmu.ifi.dbs.elki.utilities.scaling.ClipScaling
+de.lmu.ifi.dbs.elki.utilities.scaling.GammaScaling
+de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling
+de.lmu.ifi.dbs.elki.utilities.scaling.MinusLogScaling

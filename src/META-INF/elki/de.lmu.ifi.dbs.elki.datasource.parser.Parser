@@ -1,0 +1,10 @@
+de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser
+de.lmu.ifi.dbs.elki.datasource.parser.ArffParser
+de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser
+de.lmu.ifi.dbs.elki.datasource.parser.FloatVectorLabelParser
+de.lmu.ifi.dbs.elki.datasource.parser.SparseBitVectorLabelParser
+de.lmu.ifi.dbs.elki.datasource.parser.SparseFloatVectorLabelParser
+de.lmu.ifi.dbs.elki.datasource.parser.TermFrequencyParser
+de.lmu.ifi.dbs.elki.datasource.parser.BitVectorLabelParser
+de.lmu.ifi.dbs.elki.datasource.parser.ParameterizationFunctionLabelParser
+de.lmu.ifi.dbs.elki.datasource.parser.SimplePolygonParser

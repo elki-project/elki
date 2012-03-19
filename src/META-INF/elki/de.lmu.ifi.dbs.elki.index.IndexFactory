@@ -1,0 +1,23 @@
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat.FlatRStarTreeFactory
+# de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTreeFactory
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeFactory
+# de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop.MkCopTreeFactory
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeFactory
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTreeFactory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MetricalIndexApproximationMaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.PartitionApproximationMaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpatialApproximationMaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.localpca.RangeQueryFilteredPCAIndex$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.FourCSubspaceIndex$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex$Factory
