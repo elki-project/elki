@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -44,11 +45,12 @@ public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends P
   @Override
   protected void redraw() {
     int dim = DatabaseUtil.dimensionality(rep);
+    final double scale = StyleLibrary.SCALE;
     
     try {
       for(int i = 0; i < dim; i++){
         if (proj.isVisible(i)){
-          SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(proj.getDimensionNumber(i)), proj.getXpos(i), proj.getMarginY(), proj.getXpos(i), proj.getMarginY() + proj.getAxisHeight(), true, context.getStyleLibrary(), proj.isInverted(i), proj.getScale());
+          SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(proj.getDimensionNumber(i)), proj.getXpos(i), 0, proj.getXpos(i), scale, true, context.getStyleLibrary(), proj.isInverted(i), scale);
         }
       }
       
@@ -61,7 +63,6 @@ public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends P
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
-    
   }
   
   /**

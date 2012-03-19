@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
@@ -70,9 +69,7 @@ public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends Abstrac
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
-      double[] margin = new double[] { 0.071, 0.071 };
-      double[] size = new double[] { 1.8, 1. };
-      ProjectionParallel proj = new SimpleParallel(scales.getScales(), DatabaseUtil.dimensionality(rel), margin, size, 0.71, 100.);
+      ProjectionParallel proj = new SimpleParallel(scales.getScales());
 
       final PlotItem it = new PlotItem(2, 1., proj);
       it.visualizations = tasks;

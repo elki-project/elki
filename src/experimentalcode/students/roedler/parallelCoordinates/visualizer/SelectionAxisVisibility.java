@@ -63,12 +63,12 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
   private Element[] rect;
   private int c;
   
-  double hs = proj.getSizeY() / 35.;
+  double hs = getSizeY() / 35.;
   double qs = hs / 2.;
   double cs = hs / 8.;
-  double bhs = (proj.getSizeY() / 35.) * 0.75;
+  double bhs = (getSizeY() / 35.) * 0.75;
   double hbs = bhs / 2.;
-  double ypos = proj.getMarginY() * 1.5 + proj.getAxisHeight() + hs / 8;
+  double ypos = getMarginY() * 1.5 + getAxisHeight() + hs / 8;
   
   /**
    * Constructor.
@@ -86,7 +86,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(rep);
 
-    Element back = svgp.svgRect(0.0, (proj.getMarginY() * 1.5 + proj.getAxisHeight()), proj.getSizeX(), proj.getSizeY() / 35.);
+    Element back = svgp.svgRect(0.0, (getMarginY() * 1.5 + getAxisHeight()), getSizeX(), getSizeY() / 35.);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
     layer.appendChild(back);
     
@@ -176,8 +176,8 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     else {
       double xpos = proj.getXpos(last);
       if (xpos < 0.){xpos = 0.;}
-      if (vis == dim) { dist = proj.getMarginX() / (notvis + 1.); } 
-      else { dist = (proj.getXpos(vis) - xpos) / ((double)notvis + 1.0); }
+      if (vis == dim) { dist = getMarginX() / (notvis + 1.); } 
+      else { dist = (proj.getXpos(vis) - xpos) / (notvis + 1.); }
       
       for (int j = 0; j < notvis; j++){
         border = svgp.svgRect(xpos + (1 + j) * dist - hbs, ypos, bhs, bhs);
@@ -235,7 +235,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     if(!svgp.getCSSClassManager().contains(SAV_BORDER)) {
       CSSClass cls = new CSSClass(this, SAV_BORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() * 2.));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE * 2.));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
@@ -248,7 +248,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
     if(!svgp.getCSSClassManager().contains(SAV_CROSS)) {
       CSSClass cls = new CSSClass(this, SAV_CROSS);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() * 1.5));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE * 1.5));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }

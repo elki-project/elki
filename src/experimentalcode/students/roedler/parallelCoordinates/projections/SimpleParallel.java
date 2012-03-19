@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projections.AbstractProjection;
-import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 
 /**
  * Simple parallel projection
@@ -41,34 +40,9 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   final protected int dims;
 
   /**
-   * margin
-   */
-  final double[] margin;
-
-  /**
-   * space between two axis
-   */
-  double dist;
-
-  /**
-   * viewbox size
-   */
-  final double[] size;
-
-  /**
-   * axis size
-   */
-  final double axisHeight;
-
-  /**
    * visible dimensions
    */
   int visDims;
-
-  /**
-   * Scale
-   */
-  final double Scale;
 
   /**
    * which dimensions are visible
@@ -90,19 +64,10 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
    * 
    * @param scales Scales to use
    */
-  public SimpleParallel(LinearScale[] scales, int dims, double[] margin, double[] size, double axisHeight) {
-    this(scales, dims, margin, size, axisHeight, 100.0);
-  }
-
-  public SimpleParallel(LinearScale[] scales, int dims, double[] margin, double[] size, double axisHeight, double Scale) {
+  public SimpleParallel(LinearScale[] scales) {
     super(scales);
-    this.dims = dims;
-    dist = (size[0] - 2 * margin[0]) / (dims - 1.);
-    this.margin = margin;
-    this.size = size;
-    this.axisHeight = axisHeight;
+    this.dims = scales.length;
     this.visDims = dims;
-    this.Scale = Scale;
     isVisible = new boolean[dims];
     for(int i = 0; i < isVisible.length; i++) {
       isVisible[i] = true;
@@ -129,22 +94,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public double getSizeX() {
-    return size[0];
-  }
-
-  @Override
-  public double getSizeY() {
-    return size[1];
-  }
-
-  @Override
   public int getVisibleDimensions() {
     return visDims;
-  }
-
-  private void calcAxisPositions() {
-    dist = (size[0] - 2 * margin[0]) / -(visDims - 1.);
   }
 
   @Override
@@ -153,45 +104,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public double getAxisHeight() {
-    return axisHeight;
-  }
-
-  @Override
-  public double getDist() {
-    return dist;
-  }
-
-  @Override
-  public double getXpos(int dim) {
-    if(dim < 0 || dim > dims) {
-      return -1;
-    }
-    int notvis = 0;
-    if(isVisible[dimOrder[dim]] == false) {
-      return -1.0;
-    }
-    for(int i = 0; i < dim; i++) {
-      if(isVisible[dimOrder[i]] == false) {
-        notvis++;
-      }
-    }
-    return (margin[0] + (dim - notvis) * dist);
-  }
-
-  @Override
   public boolean isVisible(int dim) {
     return isVisible[dimOrder[dim]];
-  }
-
-  @Override
-  public double getMarginX() {
-    return margin[0];
-  }
-
-  @Override
-  public double getMarginY() {
-    return margin[1];
   }
 
   @Override
@@ -203,7 +117,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     else {
       visDims++;
     }
-    calcAxisPositions();
+    // calcAxisPositions();
   }
 
   @Override
@@ -214,13 +128,12 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   @Override
   public Vector projectScaledToRender(Vector v, boolean sort) {
     Vector ret = new Vector(v.getDimensionality());
-    // ret.set(1, v.get(1));
     for(int i = 0; i < v.getDimensionality(); i++) {
       if(inverted[i]) {
-        ret.set(i, margin[1] + v.get(i) * axisHeight);
+        ret.set(i, v.get(i));
       }
       else {
-        ret.set(i, (axisHeight + margin[1]) - v.get(i) * axisHeight);
+        ret.set(i, 1 - v.get(i));
       }
     }
     if(sort) {
@@ -234,10 +147,10 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   @Override
   public double projectScaledToRender(int dim, double d) {
     if(inverted[dim]) {
-      return (margin[1] + d * axisHeight);
+      return d;
     }
     else {
-      return ((axisHeight + margin[1]) - d * axisHeight);
+      return 1 - d;
     }
   }
 
@@ -246,10 +159,10 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
       if(inverted[i]) {
-        ret.set(i, (v.get(i) - margin[1]) / axisHeight);
+        ret.set(i, v.get(i));
       }
       else {
-        ret.set(i, Math.abs((v.get(i) - margin[1]) - axisHeight) / axisHeight);
+        ret.set(i, 1 - v.get(i));
       }
     }
     return sortDims(ret);
@@ -259,7 +172,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   public Vector projectRelativeScaledToRender(Vector v) {
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
-      ret.set(i, -v.get(i) * axisHeight);
+      ret.set(i, -v.get(i));
     }
     return sortDims(ret);
   }
@@ -268,7 +181,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   public Vector projectRelativeRenderToScaled(Vector v) {
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
-      ret.set(i, v.get(i) / axisHeight);
+      ret.set(i, v.get(i));
     }
     return sortDims(ret);
   }
@@ -333,9 +246,26 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   public double projectDimension(int dim, double value) {
     double temp = scales[dimOrder[dim]].getScaled(value);
     if(inverted[dimOrder[dim]]) {
-      return margin[1] + temp * axisHeight;
+      return temp;
     }
-    return ((axisHeight + margin[1]) - temp * axisHeight);
+    return 1 - temp;
+  }
+  
+  @Override
+  public double getXpos(int dim) {
+    if(dim < 0 || dim > dims) {
+      return -1;
+    }
+    int notvis = 0;
+    if(isVisible[dimOrder[dim]] == false) {
+      return -1.0;
+    }
+    for(int i = 0; i < dim; i++) {
+      if(isVisible[dimOrder[i]] == false) {
+        notvis++;
+      }
+    }
+    return (dim - notvis) / (double) dims;
   }
 
   @Override
@@ -438,18 +368,12 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public double getScale() {
-    return Scale;
-  }
-
-  @Override
   public LinearScale getLinearScale(int dim) {
     return scales[dim];
   }
 
   @Override
-  public CanvasSize estimateViewport() {
-    return new CanvasSize(0., 0., getSizeX(), getSizeY());
+  public double getDimensions() {
+    return dims;
   }
-
 }

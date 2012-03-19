@@ -171,7 +171,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
       for(@SuppressWarnings("unused")
       Cluster<?> cluster : clustering.getAllClusters()) {
         CSSClass cls = new CSSClass(this, CLUSTERMEAN + clusterID);
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / (proj.getScale() / 2.));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE / 2.));
 
         if(clustering.getAllClusters().size() == 1) {
           color = "black";
