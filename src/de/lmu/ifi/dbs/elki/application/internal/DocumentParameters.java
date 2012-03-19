@@ -33,6 +33,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,8 +51,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
@@ -652,7 +653,8 @@ public class DocumentParameters {
         elemdd.appendChild(ul);
       }
       // Report when not in properties file.
-      if(Properties.ELKI_PROPERTIES.getProperty(opt.getRestrictionClass().getName()).length == 0) {
+      Iterator<Class<?>> clss = new ELKIServiceLoader(opt.getRestrictionClass());
+      if (!clss.hasNext()) {
         logger.warning(opt.getRestrictionClass().getName() + " not in properties. No autocompletion available in release GUI.");
       }
     }
