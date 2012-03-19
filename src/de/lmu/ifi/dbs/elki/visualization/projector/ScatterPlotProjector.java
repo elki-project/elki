@@ -30,10 +30,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
-import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.math.scales.Scales;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
@@ -64,11 +63,6 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
   int dmax;
 
   /**
-   * Axis scales
-   */
-  LinearScale[] scales;
-
-  /**
    * Constructor.
    * 
    * @param rel Relation
@@ -78,7 +72,6 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
     super();
     this.rel = rel;
     this.dmax = maxdim;
-    this.scales = Scales.calcScales(rel);
     assert (maxdim <= DatabaseUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
   }
 
@@ -87,12 +80,13 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
     List<PlotItem> layout = new ArrayList<PlotItem>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if(tasks.size() > 0) {
+      ScalesResult scales = ResultUtil.getScalesResult(rel);
       final PlotItem master;
       if(dmax == 2) {
         // In 2d, make the plot twice as big.
         master = new PlotItem(2 + .1, 2 + .1, null);
         {
-          Projection2D proj = new Simple2D(scales, 1, 2);
+          Projection2D proj = new Simple2D(scales.getScales(), 1, 2);
           PlotItem it = new PlotItem(.1, 0, 2., 2., proj);
           it.visualizations = tasks;
           master.subitems.add(it);
@@ -124,7 +118,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
 
         for(int d1 = 1; d1 < dmax; d1++) {
           for(int d2 = d1 + 1; d2 <= dmax; d2++) {
-            Projection2D proj = new Simple2D(scales, d1, d2);
+            Projection2D proj = new Simple2D(scales.getScales(), d1, d2);
             PlotItem it = new PlotItem(d1 - 1 + .1, d2 - 2, 1., 1., proj);
             it.visualizations = tasks;
             master.subitems.add(it);
@@ -137,7 +131,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
           // Wanna try 4d? go ahead:
           // p.addRotation(0, 3, Math.PI / 180 * -20.);
           // p.addRotation(1, 3, Math.PI / 180 * 30.);
-          Projection2D proj = new AffineProjection(scales, p);
+          Projection2D proj = new AffineProjection(scales.getScales(), p);
           PlotItem it = new PlotItem(sizeh + .1, 0, sizeh, sizeh, proj);
           it.visualizations = tasks;
           master.subitems.add(it);
