@@ -167,10 +167,8 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     RectangleArranger<PlotItem> plotmap = new RectangleArranger<PlotItem>(ratio);
 
     ArrayList<Projector> projectors = ResultUtil.filterResults(result, Projector.class);
-    logger.warning(projectors.size()+" projectors.");
     // Rectangle layout
     for(Projector p : projectors) {
-      logger.warning("Projector: "+p, new Throwable());
       Collection<PlotItem> projs = p.arrange();
       for(PlotItem it : projs) {
         if(it.w <= 0.0 || it.h <= 0.0) {
