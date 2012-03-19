@@ -1,0 +1,9 @@
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeIndex
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeIndex
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat.FlatRStarTreeIndex
+# de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTree
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeIndex
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeIndex
+# de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop.MkCoPTreeIndex
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeIndex
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTreeIndex

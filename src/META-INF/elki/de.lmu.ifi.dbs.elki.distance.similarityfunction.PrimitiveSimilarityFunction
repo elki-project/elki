@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.FooKernelFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.InvertedDistanceSimilarityFunction

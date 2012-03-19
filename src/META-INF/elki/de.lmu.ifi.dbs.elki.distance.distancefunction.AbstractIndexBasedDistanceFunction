@@ -1,0 +1,7 @@
+de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.SharedNearestNeighborJaccardDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PCABasedCorrelationDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.LocalSubspaceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.HiSCDistanceFunction

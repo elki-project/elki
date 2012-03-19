@@ -1,0 +1,6 @@
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeIndex
+# de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop.MkCoPTreeIndex
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeIndex
+de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTreeIndex
+# de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTree

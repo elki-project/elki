@@ -1,0 +1,5 @@
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.CombinedInsertionStrategy
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastEnlargementWithAreaInsertionStrategy
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastEnlargementInsertionStrategy
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastOverlapInsertionStrategy

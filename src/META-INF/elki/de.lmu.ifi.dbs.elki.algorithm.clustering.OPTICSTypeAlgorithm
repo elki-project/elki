@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS
+de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
+de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.HiCO
+de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC

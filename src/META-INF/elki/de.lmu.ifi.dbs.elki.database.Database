@@ -1,0 +1,3 @@
+de.lmu.ifi.dbs.elki.database.StaticArrayDatabase
+de.lmu.ifi.dbs.elki.database.HashmapDatabase
+# de.lmu.ifi.dbs.elki.database.ProxyDatabase
