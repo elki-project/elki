@@ -279,7 +279,7 @@ public class DocumentReferences {
     List<Pair<Reference, List<Class<?>>>> refs = new ArrayList<Pair<Reference, List<Class<?>>>>();
     Map<Reference, List<Class<?>>> map = new HashMap<Reference, List<Class<?>>>();
 
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true)) {
       inspectClass(cls, refs, map);
     }
     return refs;
@@ -336,7 +336,7 @@ public class DocumentReferences {
    */
   public static ArrayList<Class<?>> findAllClassesWithReferences() {
     ArrayList<Class<?>> references = new ArrayList<Class<?>>();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true)) {
       if(cls.isAnnotationPresent(Reference.class)) {
         references.add(cls);
       }
