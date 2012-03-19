@@ -81,14 +81,14 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     Element button;
     double last = -1.;
     
-    double as = proj.getSizeY() / 70.;
+    double as = getSizeY() / 70.;
     double bs = as * 1.5;
     double hbs = bs / 2.;
     double qas = as / 4.;
-    double ypos = proj.getMarginY() * 2. + proj.getAxisHeight();
+    double ypos = getMarginY() * 2. + getAxisHeight();
     double dist = 2.5 * as; 
 
-      Element back = svgp.svgRect(0.0, (proj.getMarginY() * 2. + proj.getAxisHeight()), proj.getSizeX(), proj.getSizeY() / 35.);
+      Element back = svgp.svgRect(0.0, (getMarginY() * 2. + getAxisHeight()), getSizeX(), getSizeY() / 35.);
       SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
       layer.appendChild(back);
       
@@ -240,7 +240,7 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     if(!svgp.getCSSClassManager().contains(SDO_BORDER)) {
       CSSClass cls = new CSSClass(this, SDO_BORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() *2.0));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE *2.0));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
@@ -253,7 +253,7 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
     if(!svgp.getCSSClassManager().contains(SDO_ARROW)) {
       CSSClass cls = new CSSClass(this, SDO_ARROW);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_DARKGREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (proj.getScale() * 1.5));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE * 1.5));
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }

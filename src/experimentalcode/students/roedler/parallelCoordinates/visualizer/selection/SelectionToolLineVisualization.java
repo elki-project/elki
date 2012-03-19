@@ -134,7 +134,7 @@ public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> exte
     layer.appendChild(rtag);
 
     // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, 0.0, proj.getMarginY() / 2., proj.getSizeX(), proj.getMarginY() * 1.5 + proj.getAxisHeight(), this);
+    DragableArea drag = new DragableArea(svgp, 0.0, getMarginY() / 2., getSizeX(), getMarginY() * 1.5 + getAxisHeight(), this);
     etag = drag.getElement();
     layer.appendChild(etag);
   }

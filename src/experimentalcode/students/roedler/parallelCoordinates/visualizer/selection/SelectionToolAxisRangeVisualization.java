@@ -135,7 +135,7 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
     layer.appendChild(rtag);
 
     // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, 0.0, proj.getMarginY() / 2., proj.getSizeX(), proj.getMarginY() * 1.5 + proj.getAxisHeight(), this);
+    DragableArea drag = new DragableArea(svgp, 0.0, getMarginY() / 2., getSizeX(), getMarginY() * 1.5 + getAxisHeight(), this);
     etag = drag.getElement();
     layer.appendChild(etag);
   }
@@ -185,9 +185,9 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
     for (int i = minaxis; i <= maxaxis; i++){
       if (proj.isVisible(i)){
         Vector min = new Vector(1);
-        min.set(0, Math.min(proj.getMarginY() + proj.getAxisHeight(), y1));
+        min.set(0, Math.min(getMarginY() + getAxisHeight(), y1));
         Vector max = new Vector(1);
-        max.set(0, Math.max(proj.getMarginY(), y2));
+        max.set(0, Math.max(getMarginY(), y2));
         ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(min).get(0)), proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(max).get(0)));
       }
     }

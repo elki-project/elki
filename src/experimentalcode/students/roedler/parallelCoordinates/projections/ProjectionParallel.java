@@ -26,7 +26,6 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
 /**
@@ -35,17 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
  * @author Robert Rödler
  */
 public interface ProjectionParallel extends Projection {
-  public double getAxisHeight();
-
-  public double getDist();
-
-  public double getXpos(int dim);
-
   public boolean isVisible(int dim);
-
-  public double getMarginX();
-
-  public double getMarginY();
 
   public void setVisible(boolean vis, int dim);
 
@@ -75,24 +64,13 @@ public interface ProjectionParallel extends Projection {
 
   public Vector sortDims(Vector s);
 
-  public double getSizeX();
-
-  public double getSizeY();
-
   public void setInverted(int dim);
 
   public void setInverted(int dim, boolean bool);
 
   public boolean isInverted(int dim);
 
-  /**
-   * returns the scale factor
-   */
-  public double getScale();
-
   public LinearScale getLinearScale(int dim);
-
-  public CanvasSize estimateViewport();
 
   public double projectScaledToRender(int dim, double d);
 
@@ -101,4 +79,8 @@ public interface ProjectionParallel extends Projection {
   public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort);
 
   public int getDimensionsPosition(int dim);
+
+  double getXpos(int dim);
+
+  public double getDimensions();
 }
