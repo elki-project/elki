@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.visualization;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.swing.event.EventListenerList;
 
@@ -101,11 +100,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
   private Collection<VisFactory> factories;
 
   /**
-   * Visualizers to hide by default
-   */
-  private Pattern hideVisualizers;
-
-  /**
    * Selection result
    */
   private SelectionResult selection;
@@ -122,16 +116,13 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
    * @param stylelib Style library
    * @param projectors Projectors to use
    * @param factories Visualizer Factories to use
-   * @param hideVisualizers Pattern to hide visualizers
    */
-  public VisualizerContext(HierarchicalResult result, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerContext(HierarchicalResult result, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
     super();
     this.result = result;
     this.stylelib = stylelib;
     this.projectors = projectors;
     this.factories = factories;
-
-    this.hideVisualizers = hideVisualizers;
 
     List<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
     if(selections.size() > 0) {
@@ -302,9 +293,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
    */
   private void processNewResult(HierarchicalResult baseResult, Result newResult) {
     for(ProjectorFactory p : projectors) {
-      if(hideVisualizers != null && hideVisualizers.matcher(p.getClass().getName()).find()) {
-        continue;
-      }
       try {
         p.processNewResult(baseResult, newResult);
       }
@@ -314,9 +302,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
     }
     // Collect all visualizers.
     for(VisFactory f : factories) {
-      if(hideVisualizers != null && hideVisualizers.matcher(f.getClass().getName()).find()) {
-        continue;
-      }
       try {
         f.processNewResult(baseResult, newResult);
       }

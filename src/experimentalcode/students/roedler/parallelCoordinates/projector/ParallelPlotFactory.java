@@ -23,9 +23,10 @@ package experimentalcode.students.roedler.parallelCoordinates.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -49,15 +50,13 @@ public class ParallelPlotFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Database db = ResultUtil.findDatabase(newResult);
-    if(db != null) {
-      for(Relation<?> rel : db.getRelations()) {
-        if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          @SuppressWarnings("unchecked")
-          Relation<NumberVector<?, ?>> vrel = (Relation<NumberVector<?, ?>>) rel;
-          ParallelPlotProjector<NumberVector<?, ?>> proj = new ParallelPlotProjector<NumberVector<?, ?>>(vrel);
-          baseResult.getHierarchy().add(vrel, proj);
-        }
+    ArrayList<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
+    for(Relation<?> rel : rels) {
+      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        @SuppressWarnings("unchecked")
+        Relation<NumberVector<?, ?>> vrel = (Relation<NumberVector<?, ?>>) rel;
+        ParallelPlotProjector<NumberVector<?, ?>> proj = new ParallelPlotProjector<NumberVector<?, ?>>(vrel);
+        baseResult.getHierarchy().add(vrel, proj);
       }
     }
   }

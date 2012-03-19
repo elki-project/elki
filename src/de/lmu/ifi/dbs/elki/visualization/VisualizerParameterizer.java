@@ -125,11 +125,6 @@ public class VisualizerParameterizer implements Parameterizable {
   private Collection<VisFactory> factories;
 
   /**
-   * Visualizer disabling pattern
-   */
-  private Pattern hideVisualizers = null;
-
-  /**
    * Projectors to use.
    */
   private Collection<ProjectorFactory> projectors;
@@ -161,7 +156,6 @@ public class VisualizerParameterizer implements Parameterizable {
     this.stylelib = stylelib;
     this.projectors = projectors;
     this.factories = factories;
-    this.hideVisualizers = hideVisualizers;
   }
 
   /**
@@ -171,7 +165,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * @return New context
    */
   public VisualizerContext newContext(HierarchicalResult result) {
-    VisualizerContext context = new VisualizerContext(result, stylelib, projectors, factories, hideVisualizers);
+    VisualizerContext context = new VisualizerContext(result, stylelib, projectors, factories);
     if(samplesize > 0) {
       Iterator<Relation<?>> iter = ResultUtil.filteredResults(result, Relation.class);
       while(iter.hasNext()) {
