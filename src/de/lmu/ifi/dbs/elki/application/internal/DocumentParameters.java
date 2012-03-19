@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.HashMapList;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
@@ -636,8 +635,8 @@ public class DocumentParameters {
 
   private static void appendKnownImplementationsIfNonempty(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
     if(opt.getRestrictionClass() != Object.class) {
-      IterableIterator<Class<?>> iter = opt.getKnownImplementations();
-      if(iter.hasNext()) {
+      List<Class<?>> iter = opt.getKnownImplementations();
+      if(!iter.isEmpty()) {
         Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
         p.appendChild(htmldoc.createTextNode(HEADER_KNOWN_IMPLEMENTATIONS));
         elemdd.appendChild(p);

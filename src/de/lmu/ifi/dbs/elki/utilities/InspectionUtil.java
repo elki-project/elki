@@ -140,6 +140,19 @@ public class InspectionUtil {
    * @return List of found classes.
    */
   public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything) {
+    if(!InspectionUtil.NONSTATIC_CLASSPATH) {
+      Iterator<Class<?>> iter = new ELKIServiceLoader(c);
+      if(iter.hasNext()) {
+        ArrayList<Class<?>> list = new ArrayList<Class<?>>();
+        while(iter.hasNext()) {
+          list.add(iter.next());
+        }
+        return list;
+      }
+      else {
+        logger.warning("Doing a dir scan for class " + c.getName() + " as no implementations were found using index files.");
+      }
+    }
     String[] classpath = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
     return findAllImplementations(classpath, c, DEFAULT_IGNORES, everything);
   }
@@ -170,8 +183,8 @@ public class InspectionUtil {
     ClassLoader cl = ClassLoader.getSystemClassLoader();
     for(Iterable<String> iter : iters) {
       for(String classname : iter) {
-        if (logger.isDebuggingFinest()) {
-          if (!classname.startsWith("de.lmu.ifi.dbs.elki.") && !classname.startsWith("experimentalcode.")  && !classname.startsWith("tutorial.")  && !classname.startsWith("project.")) {
+        if(logger.isDebuggingFinest()) {
+          if(!classname.startsWith("de.lmu.ifi.dbs.elki.") && !classname.startsWith("experimentalcode.") && !classname.startsWith("tutorial.") && !classname.startsWith("project.")) {
             logger.finest("Exclude? " + classname);
           }
         }
@@ -203,7 +216,7 @@ public class InspectionUtil {
     Collections.sort(res, new ClassSorter());
     return res;
   }
-  
+
   /**
    * Class to iterate over a Jar file.
    * 

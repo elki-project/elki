@@ -27,11 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -196,14 +193,10 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   /**
    * Get an iterator over all known implementations of the class restriction.
    * 
-   * @return {@link java.lang.Iterable Iterable} and {@link java.util.Iterator
-   *         Iterator} object
+   * @return List object
    */
-  public IterableIterator<Class<?>> getKnownImplementations() {
-    if(InspectionUtil.NONSTATIC_CLASSPATH) {
-      return IterableUtil.fromIterable(InspectionUtil.cachedFindAllImplementations(getRestrictionClass()));
-    }
-    return IterableUtil.fromIterator(new ELKIServiceLoader(getRestrictionClass()));
+  public List<Class<?>> getKnownImplementations() {
+    return InspectionUtil.cachedFindAllImplementations(getRestrictionClass());
   }
 
   /**
@@ -268,8 +261,8 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     info.append(restrictionClass.getName());
     info.append(FormatUtil.NEWLINE);
 
-    IterableIterator<Class<?>> known = getKnownImplementations();
-    if(known.hasNext()) {
+    List<Class<?>> known = getKnownImplementations();
+    if(!known.isEmpty()) {
       info.append("Known classes (default package " + prefix + "):");
       info.append(FormatUtil.NEWLINE);
       for(Class<?> c : known) {
