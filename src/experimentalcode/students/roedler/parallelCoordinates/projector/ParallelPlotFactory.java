@@ -4,7 +4,7 @@ package experimentalcode.students.roedler.parallelCoordinates.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2012
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,13 +34,13 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 
 /**
- * Produce parallel plot projections.
+ * Produce parallel axes projections.
  * 
  * @author Robert Rödler
+ * 
+ * @apiviz.has ParallelPlotProjector
  */
-
 public class ParallelPlotFactory implements ProjectorFactory {
-
   /**
    * Constructor.
    */

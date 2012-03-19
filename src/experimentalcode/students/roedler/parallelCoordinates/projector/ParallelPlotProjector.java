@@ -4,7 +4,7 @@ package experimentalcode.students.roedler.parallelCoordinates.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2012
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -40,13 +40,14 @@ import experimentalcode.students.roedler.parallelCoordinates.projections.Project
 import experimentalcode.students.roedler.parallelCoordinates.projections.SimpleParallel;
 
 /**
- * ParallelPlotProjector is responsible for producing a parallelplot
+ * ParallelPlotProjector is responsible for producing a parallel axes
  * visualization.
  * 
  * @author Robert Rödler
  * 
  * @param <V> Vector type
  */
+// TODO: support categorical features, too
 public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends AbstractHierarchicalResult implements Projector {
   /**
    * Relation we project
@@ -69,7 +70,9 @@ public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends Abstrac
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
-      ProjectionParallel proj = new SimpleParallel(scales.getScales(), DatabaseUtil.dimensionality(rel), new double[] { 0.071, 0.071 }, new double[] { 1.8, 1. }, 0.71, 100.);
+      double[] margin = new double[] { 0.071, 0.071 };
+      double[] size = new double[] { 1.8, 1. };
+      ProjectionParallel proj = new SimpleParallel(scales.getScales(), DatabaseUtil.dimensionality(rel), margin, size, 0.71, 100.);
 
       final PlotItem it = new PlotItem(2, 1., proj);
       it.visualizations = tasks;
