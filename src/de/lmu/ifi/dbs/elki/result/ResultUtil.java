@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -285,6 +286,22 @@ public class ResultUtil {
       return newsam;
     }
     return selections.iterator().next();
+  }
+  
+  /**
+   * Get (or create) a scales result for a relation.
+   * 
+   * @param rel Relation
+   * @return associated scales result
+   */
+  public static ScalesResult getScalesResult(final Relation<? extends NumberVector<?, ?>> rel) {
+    Collection<ScalesResult> scas = ResultUtil.filterResults(rel, ScalesResult.class);
+    if(scas.size() == 0) {
+      final ScalesResult newsca = new ScalesResult(rel);
+      addChildResult(rel, newsca);
+      return newsca;
+    }
+    return scas.iterator().next();
   }
 
   /**
