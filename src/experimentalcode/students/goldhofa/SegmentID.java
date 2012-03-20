@@ -75,6 +75,21 @@ public class SegmentID implements Comparable<SegmentID> {
   }
   
   /**
+   * Check if this segment contains the pairs that are never
+   * clustered by any of the clusterings (all 0).
+   * 
+   * @return
+   */
+  public boolean isNone() {
+    
+    for (int id: ids) {
+      if (id != 0) return false;
+    }
+    
+    return true;
+  }
+  
+  /**
    * Returns the index of the first clustering having an unpaired cluster,
    * or -1 no unpaired cluster exists.  
    * 
