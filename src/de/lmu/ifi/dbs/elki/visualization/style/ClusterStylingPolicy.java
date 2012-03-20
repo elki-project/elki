@@ -105,7 +105,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public int getMaxStyle() {
-    return ids.size() + 1;
+    return ids.size();
   }
 
   @Override
