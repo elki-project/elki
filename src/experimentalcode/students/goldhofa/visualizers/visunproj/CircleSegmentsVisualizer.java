@@ -28,12 +28,14 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import experimentalcode.students.goldhofa.CCConstants;
 import experimentalcode.students.goldhofa.ClusteringComparison;
 import experimentalcode.students.goldhofa.ClusteringComparisonResult;
@@ -46,6 +48,7 @@ import experimentalcode.students.goldhofa.visualization.batikutil.CheckBox;
 import experimentalcode.students.goldhofa.visualization.batikutil.CheckBoxListener;
 import experimentalcode.students.goldhofa.visualization.batikutil.SwitchEvent;
 import experimentalcode.students.goldhofa.visualization.batikutil.UnorderedList;
+import experimentalcode.students.goldhofa.visualization.style.CSStylingPolicy;
 
 
 /**
@@ -111,6 +114,9 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   
   protected CSSClass[] cssClr;
   
+  protected CSStylingPolicy policy;
+  protected StyleResult styleResult;
+  
   /**
    * context
    */
@@ -170,7 +176,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   /**
    * Show unclustered Pairs in CircleSegments
    */
-  boolean showUnclusteredPairs = false;
+  boolean showUnclusteredPairs = true;
   
   UnorderedList selectionInfo;
   
@@ -304,13 +310,35 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
+    
     // If no comparison result found abort
     List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
     if (ccr.size() != 1) return;
     
+    // 
+    System.out.println("CSStylepolicySet");
+    // create custom styling policy
+    this.policy = new CSStylingPolicy();
+    
+    /*
+    ArrayList<StyleResult> styleResults =  ResultUtil.filterResults(result, StyleResult.class);
+    if (styleResults.size() >= 1) this.styleResult = styleResults.get(0);
+    else System.out.println("No style result found");
+    */
+    
+    // create task fopr visualization
     final VisualizationTask task = new VisualizationTask(NAME, ccr.get(0), null, this);
+    // set vis dimensions
+    task.width  = 4.0;
+    task.height = 4.0;
+    
     task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
     baseResult.getHierarchy().add(ccr.get(0), task);
+  }
+  
+  @Override
+  public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
+    return makeVisualization(task);
   }
 
   @Override
@@ -319,14 +347,17 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     context = task.getContext();
     svgp    = task.getPlot();
     ccr     = task.getResult();
+    
+    this.styleResult = context.getStyleResult();
 
+    
     this.segments   = ccr.getSegments();
     this.layer      = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     this.visLayer   = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     this.ctrlLayer  = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     
     this.selectionInfo = new UnorderedList(svgp);
-    this.selection  = new SegmentSelection(svgp, visLayer, segments, selectionInfo);
+    this.selection    = new SegmentSelection(task, policy, visLayer, segments, selectionInfo);
     
     // Listen for context changes
     //context.addContextChangeListener(this);
@@ -785,6 +816,9 @@ class MouseOverSegmentCluster implements EventListener {
     // SegmentID
     String thisSegment = thisSegmentCluster.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
     SegmentID thisSegmentID = new SegmentID(thisSegment);
+    
+    // abort if this are the unclustered pairs
+    if (thisSegmentID.isNone()) return;
 
     
     //
@@ -907,6 +941,6 @@ class MouseClickSegmentCluster implements EventListener {
     // clicked segment cluster
     Element thisSegmentElement = (Element) evt.getTarget();
     
-   selection.select(thisSegmentElement, ctrl);
+    selection.select(thisSegmentElement, ctrl);
   }
 }
