@@ -27,7 +27,9 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -84,7 +86,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     this.margin = 0; //context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     
     margins = new double[] { 0.071, 0.071 };
-    size = new double[] { 1.8, 1. };
+    size = new double[] { task.width, task.height };
     dist = (size[0] - 2 * margins[0]) / (proj.getDimensions() - 1.);
     
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
@@ -108,31 +110,38 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   }
   
 
-  public double getSizeX() {
+  protected double getSizeX() {
     return size[0];
   }
 
-  public double getSizeY() {
+  protected double getSizeY() {
     return size[1];
   }
 
-  public double getDist() {
+  protected double getDist() {
     return dist;
   }
 
-  public double getMarginX() {
+  protected double getMarginX() {
     return margins[0];
   }
 
-  public double getMarginY() {
+  protected double getMarginY() {
     return margins[1];
   }
 
-  public void calcAxisPositions() {
+  protected void calcAxisPositions() {
     dist = (size[0] - 2 * margins[0]) / -(proj.getVisibleDimensions() - 1.);
   }
   
-  public double getAxisHeight() {
+  protected double getAxisHeight() {
     return 0.71;
+  }
+
+  protected Vector getYPositions(DBID objId) {
+    Vector vec = proj.projectDataToRenderSpace(rep.get(objId));
+    vec.plusEquals(margins[1]);
+    vec.timesEquals(getAxisHeight());
+    return vec;
   }
 }

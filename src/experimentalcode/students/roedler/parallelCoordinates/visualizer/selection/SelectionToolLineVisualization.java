@@ -97,7 +97,7 @@ public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> exte
    * Element for the rectangle to add listeners
    */
   Element etag;
-  
+
   int dim;
 
   /**
@@ -210,7 +210,7 @@ public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> exte
   private void updateSelection(Mode mode, ProjectionParallel proj, SVGPoint p1, SVGPoint p2) {
     DBIDSelection selContext = context.getSelection();
     // Note: we rely on SET semantics below!
-    HashSetModifiableDBIDs selection;
+    final HashSetModifiableDBIDs selection;
     if(selContext == null || mode == Mode.REPLACE) {
       selection = DBIDUtil.newHashSet();
     }
@@ -218,79 +218,82 @@ public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> exte
       selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
     }
     int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
-    Vector yPos;
-    for(DBID id : rep.iterDBIDs()) {
-      yPos = proj.projectDataToRenderSpace(rep.get(id));
-      if (checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))){
+    for(DBID objId : rep.iterDBIDs()) {
+      Vector yPos = getYPositions(objId);
+      if(checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))) {
         if(mode == Mode.INVERT) {
-          if(!selection.contains(id)) {
-            selection.add(id);
+          if(!selection.contains(objId)) {
+            selection.add(objId);
           }
           else {
-            selection.remove(id);
+            selection.remove(objId);
           }
         }
         else {
           // In REPLACE and ADD, add objects.
           // The difference was done before by not re-using the selection.
           // Since we are using a set, we can just add in any case.
-          selection.add(id);
+          selection.add(objId);
         }
       }
     }
     context.setSelection(new DBIDSelection(selection));
   }
-  
-  private int[] getAxisRange(double x1, double x2){
+
+  private int[] getAxisRange(double x1, double x2) {
     double dim = DatabaseUtil.dimensionality(rep);
     int minaxis = 0;
     int maxaxis = 0;
     boolean minx = true;
     boolean maxx = false;
     int count = -1;
-    for (int i = 0; i < dim; i++){
-      if (proj.isVisible(i)){ 
-        if (minx && proj.getXpos(i) > x1){
+    for(int i = 0; i < dim; i++) {
+      if(proj.isVisible(i)) {
+        if(minx && proj.getXpos(i) > x1) {
           minaxis = count;
           minx = false;
           maxx = true;
         }
-        if (maxx && (proj.getXpos(i) > x2 || i == dim - 1)){
+        if(maxx && (proj.getXpos(i) > x2 || i == dim - 1)) {
           maxaxis = count + 1;
-          if (i == dim - 1 && proj.getXpos(i) <= x2) { maxaxis++; }
+          if(i == dim - 1 && proj.getXpos(i) <= x2) {
+            maxaxis++;
+          }
           break;
         }
       }
       count = i;
     }
-    return new int[]{minaxis, maxaxis};
+    return new int[] { minaxis, maxaxis };
   }
 
-  private boolean checkSelected(int[] ar, Vector yPos, double x1, double x2, double y1, double y2){
-    if (ar[1] >= dim){ ar[1] = dim - 1; }
-    for (int i = ar[0] + 1; i <= ar[1] - 1; i++){
-     if (proj.isVisible(i)){  
-       if (yPos.get(i) <= y1 && yPos.get(i) >= y2){
-         return true;
-       }
-       
-     }
-   }
+  private boolean checkSelected(int[] ar, Vector yPos, double x1, double x2, double y1, double y2) {
+    if(ar[1] >= dim) {
+      ar[1] = dim - 1;
+    }
+    for(int i = ar[0] + 1; i <= ar[1] - 1; i++) {
+      if(proj.isVisible(i)) {
+        if(yPos.get(i) <= y1 && yPos.get(i) >= y2) {
+          return true;
+        }
+
+      }
+    }
     Line2D.Double idline1 = new Line2D.Double(proj.getXpos(ar[0]), yPos.get(ar[0]), proj.getXpos(ar[0] + 1), yPos.get(ar[0] + 1));
     Line2D.Double idline2 = new Line2D.Double(proj.getXpos(ar[1] - 1), yPos.get(ar[1] - 1), proj.getXpos(ar[1]), yPos.get(ar[1]));
     Line2D.Double rectline1 = new Line2D.Double(x2, y1, x1, y1);
     Line2D.Double rectline2 = new Line2D.Double(x2, y1, x2, y2);
     Line2D.Double rectline3 = new Line2D.Double(x2, y2, x1, y2);
     Line2D.Double rectline4 = new Line2D.Double(x1, y1, x1, y2);
-    if (idline1.intersectsLine(rectline1) || idline1.intersectsLine(rectline2) || idline1.intersectsLine(rectline3)){
+    if(idline1.intersectsLine(rectline1) || idline1.intersectsLine(rectline2) || idline1.intersectsLine(rectline3)) {
       return true;
     }
-    if (idline2.intersectsLine(rectline1) || idline2.intersectsLine(rectline4) || idline2.intersectsLine(rectline3)){
+    if(idline2.intersectsLine(rectline1) || idline2.intersectsLine(rectline4) || idline2.intersectsLine(rectline3)) {
       return true;
     }
     return false;
   }
-  
+
   /**
    * Adds the required CSS-Classes
    * 

@@ -103,11 +103,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(rep);
     
-    SVGPath path;
-    Vector yPos;
-    
     double[][] mean = new double[dim][2];
-    double count;
     
 //    if (clustervis == null) {init(); }
     
@@ -115,14 +111,13 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
 
     for (int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++){
     //  ci.next();
-      count = 0.0;
+      double count = 0.0;
       Cluster<?> clus = ci.next();
       
       if(!clustervis[cnum]){continue; }
-        
         for(DBID objId : clus.getIDs()) {
           count += 1.0;
-          yPos = proj.projectDataToRenderSpace(rep.get(objId));
+          Vector yPos = getYPositions(objId);
            
           for (int i = 0; i < dim; i++){
             if (proj.isVisible(i)){
@@ -136,7 +131,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
           mean[i][1] = mean[i][1] / count;
         }
         
-        path = new SVGPath();
+        SVGPath path = new SVGPath();
         for (int i = 0; i < mean.length; i++){
           if (proj.isVisible(i)){
             path.drawTo(mean[i][0], mean[i][1]);

@@ -54,8 +54,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
 /**
- * Visualizer for generating SVG-Elements
- * representing the selected objects
+ * Visualizer for generating SVG-Elements representing the selected objects
  * 
  * @author Robert Rödler
  * 
@@ -81,27 +80,25 @@ public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends 
     context.addResultListener(this);
     incrementalRedraw();
   }
-  
+
   @Override
   protected void redraw() {
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
-      
-      SVGPath path;
-      Vector yPos;
-      for(DBID id : selection) {
-          path = new SVGPath();
-          yPos = proj.projectDataToRenderSpace(rep.get(id));
 
-          for (int i = 0; i < (DatabaseUtil.dimensionality(rep)); i++){
-            if (proj.isVisible(i)){
-              path.drawTo(proj.getXpos(i), yPos.get(i));
-            }
+      for(DBID objId : selection) {
+        SVGPath path = new SVGPath();
+        Vector yPos = getYPositions(objId);
+
+        for(int i = 0; i < (DatabaseUtil.dimensionality(rep)); i++) {
+          if(proj.isVisible(i)) {
+            path.drawTo(proj.getXpos(i), yPos.get(i));
           }
-          Element marker = path.makeElement(svgp);
-          SVGUtil.addCSSClass(marker, MARKER);
-          layer.appendChild(marker);
+        }
+        Element marker = path.makeElement(svgp);
+        SVGUtil.addCSSClass(marker, MARKER);
+        layer.appendChild(marker);
       }
     }
   }
@@ -125,11 +122,11 @@ public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends 
       svgp.addCSSClassOrLogError(cls);
     }
   }
-  
+
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
-    
+
   }
 
   /**
@@ -143,7 +140,7 @@ public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends 
    * @param <NV> vector type
    */
   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
- 
+
     /**
      * Constructor.
      */
@@ -176,4 +173,3 @@ public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends 
     }
   }
 }
-
