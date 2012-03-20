@@ -126,7 +126,7 @@ public class EditDistance {
 
   /**
    * Get the editing distance to transform second clustering to first
-   * clustering (normalized, 1=equal)
+   * clustering (normalized, 0 = unequal)
    * 
    * @return Editing distance first into second clustering
    */
@@ -136,7 +136,7 @@ public class EditDistance {
 
   /**
    * Get the editing distance to transform second clustering to first
-   * clustering (normalized, 1=equal)
+   * clustering (normalized, 0 = unequal)
    * 
    * @return Editing distance second into first clustering
    */
