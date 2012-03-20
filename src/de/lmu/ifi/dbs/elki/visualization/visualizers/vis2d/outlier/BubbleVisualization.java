@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -289,7 +288,7 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+        IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
         boolean vis = true;
         // Quick and dirty hack: hide if parent result is also an outlier result
         // Since that probably is already visible and we're redundant.
@@ -299,7 +298,7 @@ public class BubbleVisualization extends P2DVisualization implements DataStoreLi
             break;
           }
         }
-        for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+        for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, o, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           if(!vis) {

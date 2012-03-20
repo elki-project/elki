@@ -23,42 +23,41 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
   */
 
  import java.util.ArrayList;
- import java.util.Iterator;
- import java.util.List;
+import java.util.List;
 
- import org.apache.batik.util.SVGConstants;
- import org.w3c.dom.Element;
+import org.apache.batik.util.SVGConstants;
+import org.w3c.dom.Element;
 
- import de.lmu.ifi.dbs.elki.data.NumberVector;
- import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
- import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
- import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
- import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
- import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
- import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
- import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
- import de.lmu.ifi.dbs.elki.result.Result;
- import de.lmu.ifi.dbs.elki.result.ResultUtil;
- import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
- import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
- import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
- import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
- import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
- import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
- import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
- import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
- import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
- import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
- import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
- import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
- import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
- import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
- import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
- import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
- import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
- import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
- import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
- import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
+import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
+import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
+import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
  /**
   * Visualize the  of an R-Tree based index.
@@ -325,8 +324,8 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
        ArrayList<AbstractRStarTree<RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
        for(AbstractRStarTree<RStarTreeNode, SpatialEntry> tree : trees) {
          if(tree instanceof Result) {
-           Iterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
-           for(ParallelPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+           IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
+           for(ParallelPlotProjector<?> p : ps) {
              final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
              task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 2);
              baseResult.getHierarchy().add((Result) tree, task);

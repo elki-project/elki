@@ -25,7 +25,6 @@ package experimentalcode.erich.visualization;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.result.KMLOutputHandler;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -221,8 +220,8 @@ public class DensityEstimation2DVisualization extends P2DVisualization {
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(result, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+      IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(result, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
         task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);

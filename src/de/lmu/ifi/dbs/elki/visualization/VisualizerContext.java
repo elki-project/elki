@@ -124,20 +124,15 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
     this.projectors = projectors;
     this.factories = factories;
 
-    List<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
-    if(selections.size() > 0) {
-      this.selection = selections.get(0);
-    }
-
-    result.getHierarchy().add(result, this);
-
-    // Ensure a sampling result exists already, as this can cause reentrance
-    // errors (visualizers being added twice)!
-    // FIXME: avoid these errors properly - e.g. do not create a sampling result
-    // in getSamplingResult at all!
+    // Ensure that various common results needed by visualizers are automatically created
+    final Database db = ResultUtil.findDatabase(result);
+    ResultUtil.ensureClusteringResult(db, result);
+    this.selection = ResultUtil.ensureSelectionResult(db);
     for(Relation<?> rel : ResultUtil.getRelations(result)) {
       ResultUtil.getSamplingResult(rel);
     }
+
+    // result.getHierarchy().add(result, this);
 
     // Add visualizers.
     processNewResult(result, result);

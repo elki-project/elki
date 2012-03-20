@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -227,8 +227,8 @@ public class ClusterMeanVisualization extends P2DVisualization {
           // Does the cluster have a model with cluster means?
           Clustering<MeanModel<? extends NumberVector<?, ?>>> mcls = findMeanModel(c);
           if(mcls != null) {
-            Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-            for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+            IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+            for(ScatterPlotProjector<?> p : ps) {
               final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
               task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
               baseResult.getHierarchy().add(c, task);

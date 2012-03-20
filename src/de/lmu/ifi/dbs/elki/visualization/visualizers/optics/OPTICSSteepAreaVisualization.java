@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  */
 
 import java.awt.Color;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSDistanceAdapter;
@@ -196,8 +195,8 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<OPTICSProjector<?>> ops = ResultUtil.filteredResults(result, OPTICSProjector.class);
-      for(OPTICSProjector<?> p : IterableUtil.fromIterator(ops)) {
+      IterableIterator<OPTICSProjector<?>> ops = ResultUtil.filteredResults(result, OPTICSProjector.class);
+      for(OPTICSProjector<?> p : ops) {
         final SteepAreaResult steep = findSteepAreaResult(p.getResult());
         if(steep != null) {
           final VisualizationTask task = new VisualizationTask(NAME, p, null, this);

@@ -37,7 +37,7 @@ import java.util.Iterator;
  *
  * @param <E> Entry type
  */
-public class MergedIterator<E> implements Iterator<E> {
+public class MergedIterator<E> implements IterableIterator<E> {
   /**
    * All the iterators we process
    */
@@ -109,5 +109,10 @@ public class MergedIterator<E> implements Iterator<E> {
       throw new RuntimeException("Iterator.remove() called without next()");
     }
     last.remove();
+  }
+
+  @Override
+  public Iterator<E> iterator() {
+    return this;
   }
 }

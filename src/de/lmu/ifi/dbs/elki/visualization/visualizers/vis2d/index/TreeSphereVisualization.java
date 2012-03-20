@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.index;
  */
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -278,8 +277,8 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+      IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
         ArrayList<AbstractMTree<?, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
         for(AbstractMTree<?, DoubleDistance, ?, ?> tree : trees) {
           if(canVisualize(tree) && tree instanceof Result) {
