@@ -56,6 +56,16 @@ public class PrettyMarkers implements MarkerLibrary {
   private String prefix;
 
   /**
+   * Color of "uncolored" dots
+   */
+  private String dotcolor;
+
+  /**
+   * Color of "greyed out" dots
+   */
+  private String greycolor;
+
+  /**
    * Constructor
    * 
    * @param prefix prefix to use.
@@ -63,7 +73,9 @@ public class PrettyMarkers implements MarkerLibrary {
    */
   public PrettyMarkers(String prefix, StyleLibrary style) {
     this.prefix = prefix;
-    this.colors = style.getColorSet(StyleLibrary.PLOT);
+    this.colors = style.getColorSet(StyleLibrary.MARKERPLOT);
+    this.dotcolor = style.getColor(StyleLibrary.MARKERPLOT);
+    this.greycolor = style.getColor(StyleLibrary.PLOTGREY);
   }
 
   /**
@@ -90,6 +102,14 @@ public class PrettyMarkers implements MarkerLibrary {
    */
   public void plotMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
     assert (parent != null);
+    if (style == -1) {
+      plotUncolored(plot, parent, x, y, size);
+      return;
+    }
+    if (style == -2) {
+      plotGray(plot, parent, x, y, size);
+      return;
+    }
     // TODO: add more styles.
     String colorstr = colors.getColor(style);
     String strokestyle = SVGConstants.CSS_STROKE_PROPERTY + ":" + colorstr + ";" + SVGConstants.CSS_STROKE_WIDTH_PROPERTY + ":" + SVGUtil.fmt(size / 6);
@@ -160,6 +180,36 @@ public class PrettyMarkers implements MarkerLibrary {
       break;
     }
     }
+  }
+
+  /**
+   * Plot a replacement marker when an object is to be plotted as "disabled", usually gray.
+   * 
+   * @param plot Plot to draw to
+   * @param parent Parent element
+   * @param x X position
+   * @param y Y position
+   * @param size Size
+   */
+  protected void plotGray(SVGPlot plot, Element parent, double x, double y, double size) {
+    Element marker = plot.svgCircle(x, y, size / 2);
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + greycolor);
+    parent.appendChild(marker);
+  }
+
+  /**
+   * Plot a replacement marker when no color is set; usually black
+   * 
+   * @param plot Plot to draw to
+   * @param parent Parent element
+   * @param x X position
+   * @param y Y position
+   * @param size Size
+   */
+  protected void plotUncolored(SVGPlot plot, Element parent, double x, double y, double size) {
+    Element marker = plot.svgCircle(x, y, size / 2);
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + dotcolor);
+    parent.appendChild(marker);
   }
 
   @Override

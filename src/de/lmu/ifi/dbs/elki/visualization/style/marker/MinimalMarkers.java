@@ -46,13 +46,25 @@ public class MinimalMarkers implements MarkerLibrary {
   private ColorLibrary colors;
 
   /**
+   * Color of "uncolored" dots
+   */
+  private String dotcolor = "black";
+
+  /**
+   * Color of "greyed out" dots
+   */
+  private String greycolor = "gray";
+
+  /**
    * Constructor
    * 
    * @param style Style library to use
    */
   public MinimalMarkers(StyleLibrary style) {
     super();
-    this.colors = style.getColorSet(StyleLibrary.PLOT);
+    this.colors = style.getColorSet(StyleLibrary.MARKERPLOT);
+    this.dotcolor = style.getColor(StyleLibrary.MARKERPLOT);
+    this.greycolor = style.getColor(StyleLibrary.PLOTGREY);
   }
 
   /**
@@ -61,7 +73,17 @@ public class MinimalMarkers implements MarkerLibrary {
   @Override
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
     Element marker = plot.svgRect(x - size / 2, y - size / 2, size, size);
-    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + colors.getColor(stylenr));
+    final String col;
+    if(stylenr == -1) {
+      col = dotcolor;
+    }
+    else if(stylenr == -2) {
+      col = greycolor;
+    }
+    else {
+      col = colors.getColor(stylenr);
+    }
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + col);
     parent.appendChild(marker);
     return marker;
   }
