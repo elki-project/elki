@@ -319,6 +319,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     System.out.println("CSStylepolicySet");
     // create custom styling policy
     this.policy = new CSStylingPolicy();
+    //this.context.getStyleResult().setStylingPolicy(this.policy);
     
     /*
     ArrayList<StyleResult> styleResults =  ResultUtil.filterResults(result, StyleResult.class);
@@ -329,8 +330,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     // create task fopr visualization
     final VisualizationTask task = new VisualizationTask(NAME, ccr.get(0), null, this);
     // set vis dimensions
-    task.width  = 4.0;
-    task.height = 4.0;
+    task.width  = 1.0;
+    task.height = 1.0;
     
     task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
     baseResult.getHierarchy().add(ccr.get(0), task);
@@ -356,8 +357,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     this.visLayer   = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     this.ctrlLayer  = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     
-    this.selectionInfo = new UnorderedList(svgp);
-    this.selection    = new SegmentSelection(task, policy, visLayer, segments, selectionInfo);
+    this.selectionInfo  = new UnorderedList(svgp);
+    this.selection      = new SegmentSelection(task, policy, visLayer, segments, selectionInfo);
     
     // Listen for context changes
     //context.addContextChangeListener(this);
@@ -675,7 +676,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   }
   
   @Override
-  public void resultAdded(Result child, Result parent) {}
+  public void resultAdded(Result child, Result parent) {
+  }
 
   @Override
   public void resultChanged(Result currentResult) {
@@ -942,5 +944,8 @@ class MouseClickSegmentCluster implements EventListener {
     Element thisSegmentElement = (Element) evt.getTarget();
     
     selection.select(thisSegmentElement, ctrl);
+    
+    // update stylePolicy
+    selection.update();
   }
 }
