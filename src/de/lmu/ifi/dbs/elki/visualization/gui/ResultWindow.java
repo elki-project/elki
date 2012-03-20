@@ -63,6 +63,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 /**
  * Swing window to manage a particular result visualization.
  * 
+ * Yes, this is very basic and ad-hoc. Feel free to contribute something more
+ * advanced to ELKI!
+ * 
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * 
@@ -137,16 +140,23 @@ public class ResultWindow extends JFrame implements ResultListener {
   private HierarchicalResult result;
 
   /**
+   * Single view mode. No overview / detail view split
+   */
+  private boolean single = false;
+
+  /**
    * Constructor.
    * 
    * @param title Window title
    * @param result Result to visualize
    * @param context Visualizer context
+   * @param single Single visualization mode
    */
-  public ResultWindow(String title, HierarchicalResult result, VisualizerContext context) {
+  public ResultWindow(String title, HierarchicalResult result, VisualizerContext context, boolean single) {
     super(title);
     this.context = context;
     this.result = result;
+    this.single = single;
 
     // close handler
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -159,6 +169,13 @@ public class ResultWindow extends JFrame implements ResultListener {
       // Ignore - icon not found is not fatal.
     }
 
+    // Create a panel and add the button, status label and the SVG canvas.
+    final JPanel panel = new JPanel(new BorderLayout());
+
+    JMenuBar menubar = new JMenuBar();
+    JMenu filemenu = new JMenu("File");
+    filemenu.setMnemonic(KeyEvent.VK_F);
+    
     // setup buttons
     exportItem = new JMenuItem("Export");
     exportItem.setMnemonic(KeyEvent.VK_E);
@@ -169,6 +186,31 @@ public class ResultWindow extends JFrame implements ResultListener {
         saveCurrentPlot();
       }
     });
+    filemenu.add(exportItem);
+    
+    if(!single) {
+      overviewItem = new JMenuItem("Overview");
+      overviewItem.setMnemonic(KeyEvent.VK_O);
+      overviewItem.setEnabled(false);
+      overviewItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+          showOverview();
+        }
+      });
+      filemenu.add(overviewItem);
+    }
+
+    editItem = new JMenuItem("Table View/Edit");
+    editItem.setMnemonic(KeyEvent.VK_T);
+    editItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent ae) {
+        showTableView();
+      }
+    });
+    // FIXME: re-add when it is working again.
+    // filemenu.add(editItem);
 
     quitItem = new JMenuItem("Quit");
     quitItem.setMnemonic(KeyEvent.VK_Q);
@@ -179,35 +221,6 @@ public class ResultWindow extends JFrame implements ResultListener {
       }
     });
 
-    overviewItem = new JMenuItem("Overview");
-    overviewItem.setMnemonic(KeyEvent.VK_O);
-    overviewItem.setEnabled(false);
-    overviewItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        showOverview();
-      }
-    });
-
-    editItem = new JMenuItem("Table View/Edit");
-    editItem.setMnemonic(KeyEvent.VK_T);
-    editItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        showTableView();
-      }
-    });
-
-    // Create a panel and add the button, status label and the SVG canvas.
-    final JPanel panel = new JPanel(new BorderLayout());
-
-    JMenuBar menubar = new JMenuBar();
-    JMenu filemenu = new JMenu("File");
-    filemenu.setMnemonic(KeyEvent.VK_F);
-    filemenu.add(overviewItem);
-    filemenu.add(exportItem);
-    // FIXME: re-add when it is working again.
-    // filemenu.add(editItem);
     filemenu.add(quitItem);
     menubar.add(filemenu);
 
@@ -222,7 +235,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot(result, context);
+    this.overview = new OverviewPlot(result, context, single);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override
@@ -303,8 +316,10 @@ public class ResultWindow extends JFrame implements ResultListener {
    * @param e
    */
   protected void showSubplot(DetailViewSelectedEvent e) {
-    currentSubplot = e.makeDetailView();
-    showPlot(currentSubplot);
+    if(!single) {
+      currentSubplot = e.makeDetailView();
+      showPlot(currentSubplot);
+    }
   }
 
   /**
@@ -317,7 +332,9 @@ public class ResultWindow extends JFrame implements ResultListener {
       ((DetailView) svgCanvas.getPlot()).destroy();
     }
     svgCanvas.setPlot(plot);
-    overviewItem.setEnabled(plot != overview);
+    if (overviewItem != null) {
+      overviewItem.setEnabled(plot != overview);
+    }
     exportItem.setEnabled(plot != null);
   }
 

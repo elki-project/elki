@@ -69,7 +69,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @apiviz.uses DetailView
  * @apiviz.uses de.lmu.ifi.dbs.elki.visualization.projections.Projection
  */
-// FIXME: there still is a synchronization issue, that causes the initialization to be run twice in parallel.
+// FIXME: there still is a synchronization issue, that causes the initialization
+// to be run twice in parallel.
 public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Our logging class
@@ -97,15 +98,22 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   private java.util.Vector<ActionListener> actionListeners = new java.util.Vector<ActionListener>();
 
   /**
+   * Single view mode
+   */
+  private boolean single;
+
+  /**
    * Constructor.
    * 
    * @param result Result to visualize
    * @param context Visualizer context
+   * @param single Single view mode
    */
-  public OverviewPlot(HierarchicalResult result, VisualizerContext context) {
+  public OverviewPlot(HierarchicalResult result, VisualizerContext context, boolean single) {
     super();
     this.result = result;
     this.context = context;
+    this.single = single;
     // register context listener
     context.addResultListener(this);
   }
@@ -240,15 +248,17 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         for(VisualizationTask task : it.visualizations) {
           Element parent = this.svgElement(SVGConstants.SVG_G_TAG);
           g.appendChild(parent);
-          makeThumbnail(thumbsize, it, task, parent);
+          if(VisualizerUtil.isVisible(task)) {
+            makeThumbnail(thumbsize, it, task, parent);
+          }
           vistoelem.put(new Pair<PlotItem, VisualizationTask>(it, task), parent);
-
           if(VisualizerUtil.detailsEnabled(task)) {
-            hasDetails = true;
+            hasDetails = true; // TODO: move inside ifVisible, once we
+                               // reinitialize this on visibility changes!
           }
         }
         plotlayer.appendChild(g);
-        if(hasDetails) {
+        if(hasDetails && !single) {
           Element hover = this.svgRect(basex + it.x, basey + it.y, it.w, it.h);
           SVGUtil.addCSSClass(hover, selcss.getName());
           // link hoverer.
@@ -276,11 +286,21 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * @param parent Parent element to draw to
    */
   private void makeThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
-    if(VisualizerUtil.isVisible(task) && VisualizerUtil.thumbnailEnabled(task)) {
+    if(single) {
+      VisualizationTask thumbtask = task.clone(this, context, it.proj, it.w, it.h);
+      final Visualization vis = thumbtask.getFactory().makeVisualization(thumbtask);
+      if(vis.getLayer() == null) {
+        LoggingUtil.warning("Visualization returned empty layer: " + vis);
+      }
+      else {
+        parent.appendChild(vis.getLayer());
+      }
+    }
+    else if(VisualizerUtil.thumbnailEnabled(task)) {
       VisualizationTask thumbtask = task.clone(this, context, it.proj, it.w, it.h);
       thumbtask.put(VisualizationTask.THUMBNAIL, true);
       thumbtask.put(VisualizationTask.THUMBNAIL_RESOLUTION, thumbsize);
-      Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
+      final Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
       if(vis.getLayer() == null) {
         LoggingUtil.warning("Visualization returned empty layer: " + vis);
       }
@@ -312,7 +332,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
               LoggingUtil.warning("No container element found for " + task);
               continue;
             }
-            if(VisualizerUtil.thumbnailEnabled(task) && VisualizerUtil.isVisible(task)) {
+            if((single || VisualizerUtil.thumbnailEnabled(task)) && VisualizerUtil.isVisible(task)) {
               // unhide when hidden.
               if(parent.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
                 parent.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
