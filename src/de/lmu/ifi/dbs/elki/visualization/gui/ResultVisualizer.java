@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
@@ -47,8 +48,6 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
  * @apiviz.uses ResultWindow oneway
  */
 public class ResultVisualizer implements ResultHandler {
-  // TODO: move title/maxdim parameters into a layouter class.
-  
   /**
    * Get a logger for this class.
    */
@@ -66,6 +65,15 @@ public class ResultVisualizer implements ResultHandler {
   public static final OptionID WINDOW_TITLE_ID = OptionID.getOrCreateOptionID("vis.window.title", "Title to use for visualization window.");
 
   /**
+   * Flag to set single display
+   * 
+   * <p>
+   * Key: -vis.single
+   * </p>
+   */
+  public final static OptionID SINGLE_ID = OptionID.getOrCreateOptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
+  
+  /**
    * Stores the set title.
    */
   String title;
@@ -81,15 +89,22 @@ public class ResultVisualizer implements ResultHandler {
   VisualizerParameterizer manager;
 
   /**
+   * Single view mode
+   */
+  boolean single;
+
+  /**
    * Constructor.
    * 
-   * @param title
-   * @param manager
+   * @param title Window title
+   * @param manager Parameterization manager for visualizers
+   * @param single Flag to indicat single-view mode.
    */
-  public ResultVisualizer(String title, VisualizerParameterizer manager) {
+  public ResultVisualizer(String title, VisualizerParameterizer manager, boolean single) {
     super();
     this.title = title;
     this.manager = manager;
+    this.single = single;
   }
 
   @Override
@@ -109,7 +124,7 @@ public class ResultVisualizer implements ResultHandler {
       @Override
       public void run() {
         try {
-          ResultWindow window = new ResultWindow(title, top, context);
+          ResultWindow window = new ResultWindow(title, top, context, single);
           window.setVisible(true);
           window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
           window.showOverview();
@@ -138,6 +153,11 @@ public class ResultVisualizer implements ResultHandler {
      * Visualization manager.
      */
     VisualizerParameterizer manager;
+    
+    /**
+     * Single view mode.
+     */
+    boolean single = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -146,13 +166,16 @@ public class ResultVisualizer implements ResultHandler {
       if(config.grab(titleP)) {
         title = titleP.getValue();
       }
-
+      Flag singleF = new Flag(SINGLE_ID);
+      if (config.grab(singleF)) {
+        single = singleF.getValue();
+      }
       manager = config.tryInstantiate(VisualizerParameterizer.class);
     }
 
     @Override
     protected ResultVisualizer makeInstance() {
-      return new ResultVisualizer(title, manager);
+      return new ResultVisualizer(title, manager, single);
     }
   }
 }

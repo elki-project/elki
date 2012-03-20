@@ -262,7 +262,7 @@ public class VisualizerParameterizer implements Parameterizable {
     protected Collection<ProjectorFactory> projectors = null;
 
     protected int samplesize = -1;
-
+    
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
