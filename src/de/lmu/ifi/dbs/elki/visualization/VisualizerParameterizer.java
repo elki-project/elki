@@ -90,20 +90,20 @@ public class VisualizerParameterizer implements Parameterizable {
   public final static OptionID STYLELIB_ID = OptionID.getOrCreateOptionID("visualizer.stylesheet", "Style properties file to use");
 
   /**
-   * Default pattern for visualizer disabling.
+   * Default pattern for visualizer enabling.
    */
-  public final static String DEFAULT_HIDEVIS = "^experimentalcode\\..*";
+  public final static String DEFAULT_ENABLEVIS = "^" + Pattern.quote(VisualizerParameterizer.class.getPackage().getName()) + "\\..*";
 
   /**
-   * Parameter to disable visualizers
+   * Parameter to enable visualizers
    * 
    * <p>
-   * Key: -vis.hide
+   * Key: -vis.enable
    * 
-   * Default: experimental code
+   * Default: ELKI core
    * </p>
    */
-  public final static OptionID HIDEVIS_ID = OptionID.getOrCreateOptionID("vis.hide", "Visualizers to not show by default. Use 'none' to not hide any by default.");
+  public final static OptionID ENABLEVIS_ID = OptionID.getOrCreateOptionID("vis.enable", "Visualizers to enable by default.");
 
   /**
    * Parameter to set the sampling level
@@ -255,7 +255,7 @@ public class VisualizerParameterizer implements Parameterizable {
   public static class Parameterizer extends AbstractParameterizer {
     protected StyleLibrary stylelib = null;
 
-    protected Pattern hideVisualizers = null;
+    protected Pattern enableVisualizers = null;
 
     protected Collection<VisFactory> factories = null;
 
@@ -280,15 +280,15 @@ public class VisualizerParameterizer implements Parameterizable {
           config.reportError(new WrongParameterValueException(stylelibP, filename, e));
         }
       }
-      PatternParameter hidevisP = new PatternParameter(HIDEVIS_ID, DEFAULT_HIDEVIS);
-      if(config.grab(hidevisP)) {
-        if(!"none".equals(hidevisP.getValueAsString())) {
-          hideVisualizers = hidevisP.getValue();
+      PatternParameter enablevisP = new PatternParameter(ENABLEVIS_ID, DEFAULT_ENABLEVIS);
+      if(config.grab(enablevisP)) {
+        if(!"all".equals(enablevisP.getValueAsString())) {
+          enableVisualizers = enablevisP.getValue();
         }
       }
       MergedParameterization merged = new MergedParameterization(config);
-      projectors = collectProjectorFactorys(merged, hideVisualizers);
-      factories = collectVisFactorys(merged, hideVisualizers);
+      projectors = collectProjectorFactorys(merged, enableVisualizers);
+      factories = collectVisFactorys(merged, enableVisualizers);
     }
 
     /**
@@ -301,7 +301,7 @@ public class VisualizerParameterizer implements Parameterizable {
     private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<ProjectorFactory> factories = new ArrayList<ProjectorFactory>();
       for(Class<?> c : InspectionUtil.cachedFindAllImplementations(ProjectorFactory.class)) {
-        if(filter != null && filter.matcher(c.getCanonicalName()).find()) {
+        if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
         }
         try {
@@ -331,7 +331,7 @@ public class VisualizerParameterizer implements Parameterizable {
     private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<VisFactory> factories = new ArrayList<VisFactory>();
       for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
-        if(filter != null && filter.matcher(c.getCanonicalName()).find()) {
+        if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
         }
         try {
@@ -353,7 +353,7 @@ public class VisualizerParameterizer implements Parameterizable {
 
     @Override
     protected VisualizerParameterizer makeInstance() {
-      return new VisualizerParameterizer(samplesize, stylelib, projectors, factories, hideVisualizers);
+      return new VisualizerParameterizer(samplesize, stylelib, projectors, factories, enableVisualizers);
     }
   }
 }
