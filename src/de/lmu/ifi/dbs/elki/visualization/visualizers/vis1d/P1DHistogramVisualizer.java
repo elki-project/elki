@@ -122,6 +122,13 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     this.bins = bins;
     this.relation = task.getRelation();
     this.style = task.getResult();
+    context.addResultListener(this);
+  }
+
+  @Override
+  public void destroy() {
+    context.removeResultListener(this);
+    super.destroy();
   }
 
   @Override
