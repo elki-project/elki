@@ -96,7 +96,7 @@ public class Entropy {
 
   /**
    * Get the entropy of the first clustering using Log_2. (not normalized, 0 =
-   * unequal)
+   * equal)
    * 
    * @return Entropy of first clustering
    */
@@ -106,7 +106,7 @@ public class Entropy {
 
   /**
    * Get the entropy of the second clustering using Log_2. (not normalized, 0
-   * = unequal)
+   * = equal)
    * 
    * @return Entropy of second clustering
    */
@@ -115,7 +115,7 @@ public class Entropy {
   }
 
   /**
-   * Get the joint entropy of both clusterings (not normalized, 0 = unequal)
+   * Get the joint entropy of both clusterings (not normalized, 0 = equal)
    * 
    * @return Joint entropy of both clusterings
    */
@@ -144,16 +144,17 @@ public class Entropy {
   }
 
   /**
-   * Get Powers entropy (not normalized, 0 = unequal)
+   * Get Powers entropy  (normalized, 0 = equal)
+   * Powers = 1 - NMI_Sum
    * 
    * @return Powers
    */
   public double entropyPowers() {
-    return (2 * entropyJoint() / (entropyFirst() + entropySecond()));
+    return (2 * entropyJoint() / (entropyFirst() + entropySecond()) - 1);
   }
 
   /**
-   * Get the mutual information (not normalized, 0 = unequal)
+   * Get the mutual information (not normalized, 0 = equal)
    * 
    * @return Mutual information
    */
@@ -162,7 +163,7 @@ public class Entropy {
   }
 
   /**
-   * Get the joint-normalized mutual information
+   * Get the joint-normalized mutual information (normalized, 0 = unequal)
    * 
    * @return Joint Normalized Mutual information
    */
@@ -171,7 +172,7 @@ public class Entropy {
   }
 
   /**
-   * Get the min-normalized mutual information
+   * Get the min-normalized mutual information (normalized, 0 = unequal)
    * 
    * @return Min Normalized Mutual information
    */
@@ -180,7 +181,7 @@ public class Entropy {
   }
 
   /**
-   * Get the max-normalized mutual information
+   * Get the max-normalized mutual information (normalized, 0 = unequal)
    * 
    * @return Max Normalized Mutual information
    */
@@ -189,7 +190,7 @@ public class Entropy {
   }
 
   /**
-   * Get the sum-normalized mutual information
+   * Get the sum-normalized mutual information (normalized, 0 = unequal)
    * 
    * @return Sum Normalized Mutual information
    */
@@ -198,7 +199,7 @@ public class Entropy {
   }
 
   /**
-   * Get the sqrt-normalized mutual information
+   * Get the sqrt-normalized mutual information (normalized, 0 = unequal)
    * 
    * @return Sqrt Normalized Mutual information
    */
@@ -217,6 +218,7 @@ public class Entropy {
 
   /**
    * Get the normalized variation of information (normalized, 0 = equal)
+   * NVI = 1 - NMI_Joint
    * 
    * <p>
    * Vinh, N.X. and Epps, J. and Bailey, J.<br />

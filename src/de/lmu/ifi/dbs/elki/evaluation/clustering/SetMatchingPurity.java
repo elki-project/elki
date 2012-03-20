@@ -53,7 +53,7 @@ public class SetMatchingPurity {
   /**
    * Result cache
    */
-  protected double smPurity = -1.0, smInversePurity = -1.0;
+  protected double smPurity = -1.0, smInversePurity = -1.0, smFFirst = -1.0, smFSecond = - 1.0;
 
   /**
    * Constructor.
@@ -65,27 +65,35 @@ public class SetMatchingPurity {
     int numobj = table.contingency[table.size1][table.size2];
     {
       smPurity = 0.0;
+      smFFirst = 0.0;
       // iterate first clustering
       for(int i1 = 0; i1 < table.size1; i1++) {
         double precisionMax = 0.0;
+        double fMax = 0.0;
         for(int i2 = 0; i2 < table.size2; i2++) {
           precisionMax = Math.max(precisionMax, (1.0 * table.contingency[i1][i2]));
+          fMax = Math.max(fMax, (2.0 * table.contingency[i1][i2]) / (table.contingency[i1][table.size2] + table.contingency[table.size1][i2]));
           // / numobj));
         }
         smPurity += (precisionMax / numobj);
+        smFFirst += (table.contingency[i1][table.size2] / table.contingency[table.size1][table.size2]) * fMax;
         // * contingency[i1][size2]/numobj;
       }
     }
     {
       smInversePurity = 0.0;
+      smFSecond = 0.0;
       // iterate second clustering
       for(int i2 = 0; i2 < table.size2; i2++) {
         double recallMax = 0.0;
+        double fMax = 0.0;
         for(int i1 = 0; i1 < table.size1; i1++) {
           recallMax = Math.max(recallMax, (1.0 * table.contingency[i1][i2]));
+          fMax = Math.max(fMax, (2.0 * table.contingency[i1][i2]) / (table.contingency[i1][table.size2] + table.contingency[table.size1][i2]));
           // / numobj));
         }
         smInversePurity += (recallMax / numobj);
+        smFSecond += (table.contingency[table.size1][i2] / table.contingency[table.size1][table.size2]) * fMax;
         // * contingency[i1][size2]/numobj;
       }
     }
@@ -126,5 +134,35 @@ public class SetMatchingPurity {
   @Reference(authors = "Steinbach, M. and Karypis, G. and Kumar, V. and others", title = "A comparison of document clustering techniques", booktitle = "KDD workshop on text mining, 2000", url = "http://www-users.itlabs.umn.edu/~karypis/publications/Papers/PDF/doccluster.pdf")
   public double f1Measure() {
     return Util.f1Measure(purity(), inversePurity());
+  }
+  
+  /**
+   * Get the Van Rijsbergen’s F measure (asymmetric) for first clustering
+   * 
+   * <p>
+   * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo <br />
+   * A comparison of extrinsic clustering evaluation metrics based on formal constraints<br />
+   * Inf. Retrieval, vol. 12, no. 5, pp. 461–486, 2009
+   * </p>
+   * 
+   * @return Set Matching F-Measure of first clustering
+   */
+  public double fMeasureFirst() {
+    return smFFirst;
+  }
+  
+  /**
+   * Get the Van Rijsbergen’s F measure (asymmetric) for second clustering
+   * 
+   * <p>
+   * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo <br />
+   * A comparison of extrinsic clustering evaluation metrics based on formal constraints<br />
+   * Inf. Retrieval, vol. 12, no. 5, pp. 461–486, 2009
+   * </p>
+   * 
+   * @return Set Matching F-Measure of second clustering
+   */
+  public double fMeasureSecond() {
+    return smFSecond;
   }
 }
