@@ -56,12 +56,18 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   TIntArrayList colors;
 
   /**
+   * Clustering in use.
+   */
+  Clustering<?> clustering;
+
+  /**
    * Constructor.
    * 
    * @param clustering Clustering to use.
    */
   public ClusterStylingPolicy(Clustering<?> clustering, StyleLibrary style) {
     super();
+    this.clustering = clustering;
     ColorLibrary colorset = style.getColorSet(StyleLibrary.PLOT);
     List<? extends Cluster<?>> clusters = clustering.getAllClusters();
     ids = new ArrayList<DBIDs>(clusters.size());
@@ -111,5 +117,14 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   @Override
   public Iterator<DBID> iterateClass(int cnum) {
     return ids.get(cnum).iterator();
+  }
+
+  /**
+   * Get the clustering used by this styling policy
+   * 
+   * @return Clustering in use
+   */
+  public Clustering<?> getClustering() {
+    return clustering;
   }
 }
