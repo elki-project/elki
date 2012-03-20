@@ -23,16 +23,12 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -59,7 +55,10 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.HistogramProjector;
+import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -83,12 +82,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "Histogram";
-
-  /**
-   * Name for this visualizer.
-   */
-  private static final String CNAME = "Cluster Histograms";
+  private static final String CNAME = "Histograms";
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -111,9 +105,9 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
   private Relation<NV> relation;
 
   /**
-   * The clustering we visualize
+   * The style policy
    */
-  private Clustering<Model> clustering;
+  private StyleResult style;
 
   /**
    * Constructor.
@@ -127,7 +121,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     this.curves = curves;
     this.bins = bins;
     this.relation = task.getRelation();
-    this.clustering = task.getResult();
+    this.style = task.getResult();
   }
 
   @Override
@@ -140,14 +134,23 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), xsize, ysize, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    final List<Cluster<Model>> allClusters = clustering != null ? clustering.getAllClusters() : null;
-    final int numc = allClusters != null ? allClusters.size() : 0;
+    // Styling policy
+    final StylingPolicy spol = style.getStylingPolicy();
+    final ClassStylingPolicy cspol;
+    if(spol instanceof ClassStylingPolicy) {
+      cspol = (ClassStylingPolicy) spol;
+    }
+    else {
+      cspol = null;
+    }
+    // TODO also use min style?
+    setupCSS(svgp, (cspol != null) ? cspol.getMaxStyle() : 0);
 
-    setupCSS(svgp, numc);
-
-    // Creating histograms
+    // Create histograms
+    final int off = (cspol != null) ? cspol.getMinStyle() : 0;
+    final int numc = (cspol != null) ? (cspol.getMaxStyle() - cspol.getMinStyle()) : 0;
     DoubleMinMax minmax = new DoubleMinMax();
-    final double frac = 1. / relation.size();
+    final double frac = 1. / relation.size(); // TODO: sampling?
     final int cols = numc + 1;
     AggregatingHistogram<double[], double[]> histogram = new AggregatingHistogram<double[], double[]>(bins, -.5, .5, new AggregatingHistogram.Adapter<double[], double[]>() {
       @Override
@@ -164,12 +167,13 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       }
     });
 
-    if(allClusters != null) {
-      int clusterID = 0;
-      for(Cluster<Model> cluster : allClusters) {
+    if(cspol != null) {
+      for(int snum = 0; snum < numc; snum++) {
         double[] inc = new double[cols];
-        inc[clusterID + 1] = frac;
-        for(DBID id : cluster.getIDs()) {
+        inc[0] = frac;
+        inc[snum + 1] = frac;
+        for(Iterator<DBID> iter = cspol.iterateClass(snum + off); iter.hasNext();) {
+          DBID id = iter.next();
           try {
             double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
             histogram.aggregate(pos, inc);
@@ -178,15 +182,16 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
             // Ignore. The object was probably deleted from the database
           }
         }
-        clusterID += 1;
       }
     }
-    // Actual data distribution.
-    double[] inc = new double[cols];
-    inc[0] = frac;
-    for(DBID id : relation.iterDBIDs()) {
-      double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
-      histogram.aggregate(pos, inc);
+    else {
+      // Actual data distribution.
+      double[] inc = new double[cols];
+      inc[0] = frac;
+      for(DBID id : relation.iterDBIDs()) {
+        double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
+        histogram.aggregate(pos, inc);
+      }
     }
     // for scaling, get the maximum occurring value in the bins:
     for(DoubleObjPair<double[]> bin : histogram) {
@@ -198,7 +203,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     LinearScale yscale = new LinearScale(0, minmax.getMax());
     LinearScale xscale = new LinearScale(histogram.getCoverMinimum(), histogram.getCoverMaximum());
 
-    // Axis. TODO: Use AxisVisualizer for this?
+    // Axis. TODO: Add an AxisVisualizer for this?
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, true, false, context.getStyleLibrary());
 
@@ -233,7 +238,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
           double val = yscale.getScaled(bin.getSecond()[key]);
           Element row = SVGUtil.svgRect(svgp.getDocument(), xsize * lpos, ysize * (1 - (val + stack)), xsize * (rpos - lpos), ysize * val);
           stack = stack + val;
-          SVGUtil.addCSSClass(row, BIN + (key - 1));
+          SVGUtil.addCSSClass(row, BIN + (off + key - 1));
           layer.appendChild(row);
         }
       }
@@ -270,7 +275,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
         }
         paths[i].lineTo(xsize * right, ysize * 1);
         Element elem = paths[i].makeElement(svgp);
-        SVGUtil.addCSSClass(elem, BIN + (i - 1));
+        SVGUtil.addCSSClass(elem, BIN + (off + i - 1));
         layer.appendChild(elem);
       }
     }
@@ -376,29 +381,15 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      // Cluster histograms
-      ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-      for(Clustering<?> c : clusterings) {
+      // Find a style result to visualize:
+      IterableIterator<StyleResult> clusterings = ResultUtil.filteredResults(result, StyleResult.class);
+      for(StyleResult c : clusterings) {
         IterableIterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(baseResult, HistogramProjector.class);
         for(HistogramProjector<?> p : ps) {
           // register self
           final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
           baseResult.getHierarchy().add(c, task);
-          baseResult.getHierarchy().add(p, task);
-        }
-      }
-      // General data distribution
-      {
-        IterableIterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(result, HistogramProjector.class);
-        for(HistogramProjector<?> p : ps) {
-          // register self
-          final VisualizationTask task = new VisualizationTask(NAME, null, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          if(clusterings.size() > 0) {
-            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          }
-          // baseResult.getHierarchy().add(p.getRelation(), task);
           baseResult.getHierarchy().add(p, task);
         }
       }
