@@ -177,17 +177,6 @@ public class ResultWindow extends JFrame implements ResultListener {
     filemenu.setMnemonic(KeyEvent.VK_F);
     
     // setup buttons
-    exportItem = new JMenuItem("Export");
-    exportItem.setMnemonic(KeyEvent.VK_E);
-    exportItem.setEnabled(false);
-    exportItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        saveCurrentPlot();
-      }
-    });
-    filemenu.add(exportItem);
-    
     if(!single) {
       overviewItem = new JMenuItem("Overview");
       overviewItem.setMnemonic(KeyEvent.VK_O);
@@ -201,6 +190,17 @@ public class ResultWindow extends JFrame implements ResultListener {
       filemenu.add(overviewItem);
     }
 
+    exportItem = new JMenuItem("Export");
+    exportItem.setMnemonic(KeyEvent.VK_E);
+    exportItem.setEnabled(false);
+    exportItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent ae) {
+        saveCurrentPlot();
+      }
+    });
+    filemenu.add(exportItem);
+    
     editItem = new JMenuItem("Table View/Edit");
     editItem.setMnemonic(KeyEvent.VK_T);
     editItem.addActionListener(new ActionListener() {
