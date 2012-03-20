@@ -77,6 +77,7 @@ public class MarkerVisualization extends P2DVisualization implements DataStoreLi
     super(task);
     this.style = task.getResult();
     context.addDataStoreListener(this);
+    context.addResultListener(this);
     incrementalRedraw();
   }
 
@@ -84,6 +85,7 @@ public class MarkerVisualization extends P2DVisualization implements DataStoreLi
   public void destroy() {
     super.destroy();
     context.removeDataStoreListener(this);
+    context.removeResultListener(this);
   }
 
   @Override
