@@ -248,7 +248,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         for(VisualizationTask task : it.visualizations) {
           Element parent = this.svgElement(SVGConstants.SVG_G_TAG);
           g.appendChild(parent);
-          if(VisualizerUtil.isVisible(task)) {
+          if(visibleInOverview(task)) {
             makeThumbnail(thumbsize, it, task, parent);
           }
           vistoelem.put(new Pair<PlotItem, VisualizationTask>(it, task), parent);
@@ -296,7 +296,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         parent.appendChild(vis.getLayer());
       }
     }
-    else if(VisualizerUtil.thumbnailEnabled(task)) {
+    else {
       VisualizationTask thumbtask = task.clone(this, context, it.proj, it.w, it.h);
       thumbtask.put(VisualizationTask.THUMBNAIL, true);
       thumbtask.put(VisualizationTask.THUMBNAIL_RESOLUTION, thumbsize);
@@ -332,7 +332,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
               LoggingUtil.warning("No container element found for " + task);
               continue;
             }
-            if((single || VisualizerUtil.thumbnailEnabled(task)) && VisualizerUtil.isVisible(task)) {
+            if(visibleInOverview(task)) {
               // unhide when hidden.
               if(parent.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
                 parent.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
@@ -356,6 +356,19 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
       if(refreshcss) {
         updateStyleElement();
       }
+    }
+  }
+
+  protected boolean visibleInOverview(VisualizationTask task) {
+    if(!VisualizerUtil.isVisible(task)) {
+      return false;
+    }
+    if(single) {
+      Boolean nothumb = task.getGenerics(VisualizationTask.META_NOEMBED, Boolean.class);
+      return (nothumb == null) || !nothumb;
+    }
+    else {
+      return VisualizerUtil.thumbnailEnabled(task);
     }
   }
 

@@ -95,6 +95,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   public final static String META_NOEXPORT = "no-export";
 
   /**
+   * Flag to signal the visualizer should not be embed. Type: Boolean
+   */
+  public final static String META_NOEMBED = "no-embed";
+
+  /**
    * Flag to signal default visibility of a visualizer. Type: Boolean
    */
   public static final String META_VISIBLE_DEFAULT = "visible-default";
