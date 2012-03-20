@@ -298,6 +298,7 @@ public class ToolBox2DVisualization extends P2DVisualization {
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_NOTHUMB, true);
         task.put(VisualizationTask.META_NOEXPORT, true);
+        task.put(VisualizationTask.META_NOEMBED, true);
         baseResult.getHierarchy().add(p, task);
       }
     }
