@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.svg.SVGParallelLinearAxis;
 
-
 /**
  * Generates a SVG-Element containing axes, including labeling.
  * 
@@ -27,7 +26,7 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.SVGParallelLine
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
-  
+
   /**
    * Constructor.
    * 
@@ -38,30 +37,29 @@ public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends P
     context.addDataStoreListener(this);
     incrementalRedraw();
   }
-  
+
   @Override
   protected void redraw() {
     int dim = DatabaseUtil.dimensionality(rep);
     final double scale = StyleLibrary.SCALE;
-    
+
     try {
-      for(int i = 0; i < dim; i++){
-        if (proj.isVisible(i)){
-          SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(proj.getDimensionNumber(i)), proj.getXpos(i), 0, proj.getXpos(i), scale, true, context.getStyleLibrary(), proj.isInverted(i), scale);
+      for(int i = 0; i < dim; i++) {
+        if(proj.isVisible(i)) {
+          SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(proj.getDimensionNumber(i)), proj.getXpos(i), margins[1], proj.getXpos(i), margins[1] + getAxisHeight(), true, context.getStyleLibrary(), proj.isInverted(i), scale);
         }
       }
-      
     }
     catch(CSSNamingConflict e) {
       throw new RuntimeException("Conflict in CSS naming for axes.", e);
     }
   }
-  
+
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
-  
+
   /**
    * Factory for axis visualizations
    * 

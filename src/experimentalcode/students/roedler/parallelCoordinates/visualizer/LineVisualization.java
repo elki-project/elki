@@ -62,9 +62,6 @@ public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelV
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(rep);
     
-    SVGPath path;
-    Vector yPos;
-    
     Collection<SampledResult<Model>> samples = ResultUtil.filterResults(context.getResult(), SampledResult.class);
     if (samples.size() > 0){
       for(SampledResult<Model> c : samples) {
@@ -72,9 +69,9 @@ public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelV
         for(int cnum = 0; cnum < c.getAllClusters().size(); cnum++) {
           Cluster<?> clus = ci.next();
           
-          for(DBID id : clus.getIDs()) {
-            path = new SVGPath();
-            yPos = proj.projectDataToRenderSpace(rep.get(id));
+          for(DBID objId : clus.getIDs()) {
+            SVGPath path = new SVGPath();
+            Vector yPos = getYPositions(objId);
             for (int i = 0; i < dim; i++){
               if (proj.isVisible(i)){
                 path.drawTo(proj.getXpos(i), yPos.get(i));
@@ -88,9 +85,9 @@ public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelV
       }
     }
     else {
-      for(DBID id : rep.iterDBIDs()) {
-        path = new SVGPath();
-        yPos = proj.projectDataToRenderSpace(rep.get(id));
+      for(DBID objId : rep.iterDBIDs()) {
+        SVGPath path = new SVGPath();
+        Vector yPos = getYPositions(objId);
         for (int i = 0; i < dim; i++){
           if (proj.isVisible(i)){
             path.drawTo(proj.getXpos(i), yPos.get(i));

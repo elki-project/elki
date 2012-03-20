@@ -109,9 +109,6 @@ public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> exte
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(rep);
     
-    SVGPath path;
-    Vector yPos;
-    
     double[][] max = new double[dim][2];
     double[][] min = new double[dim][2];
     double[][]midmax = new double[dim-1][2];
@@ -125,16 +122,13 @@ public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> exte
 
     for (int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++){
     //  ci.next();
-
       Cluster<?> clus = ci.next();
       
       if(!clustervis[cnum]){continue; }
-      
         boolean firstRun = true;
         
         for(DBID objId : clus.getIDs()) {
-          
-          yPos = proj.projectDataToRenderSpace(rep.get(objId));
+          Vector yPos = getYPositions(objId);
            
           for (int i = 0; i < dim; i++){
             if (proj.isVisible(i)){
@@ -176,7 +170,7 @@ public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> exte
           firstRun = false;
         }
         
-        path = new SVGPath();
+        SVGPath path = new SVGPath();
         boolean first = true;
         if (rounded){
           for (int i = 0; i < min.length; i++){
