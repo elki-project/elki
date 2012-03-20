@@ -131,6 +131,7 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
     for(Relation<?> rel : ResultUtil.getRelations(result)) {
       ResultUtil.getSamplingResult(rel);
     }
+    getStyleResult();
 
     // result.getHierarchy().add(result, this);
 
@@ -184,10 +185,12 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
       List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
       if(clusterings.size() > 0) {
         styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), stylelib));
+        result.getHierarchy().add(result, styleresult);
         return styleresult;
       }
       Clustering<Model> c = generateDefaultClustering();
       styleresult.setStylingPolicy(new ClusterStylingPolicy(c, stylelib));
+      result.getHierarchy().add(result, styleresult);
       return styleresult;
     }
     return styleresult;
