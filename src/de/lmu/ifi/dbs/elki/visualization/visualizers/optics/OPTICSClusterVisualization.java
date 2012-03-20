@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
@@ -190,8 +190,8 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<OPTICSProjector<?>> ops = ResultUtil.filteredResults(result, OPTICSProjector.class);
-      for(OPTICSProjector<?> p : IterableUtil.fromIterator(ops)) {
+      IterableIterator<OPTICSProjector<?>> ops = ResultUtil.filteredResults(result, OPTICSProjector.class);
+      for(OPTICSProjector<?> p : ops) {
         final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
         if(ocl != null) {
           final VisualizationTask task = new VisualizationTask(NAME, p, null, this);

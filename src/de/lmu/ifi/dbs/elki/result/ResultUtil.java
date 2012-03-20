@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.OneItemIterator;
 import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
@@ -219,12 +218,12 @@ public class ResultUtil {
     if(r instanceof HierarchicalResult) {
       ResultHierarchy hier = ((HierarchicalResult) r).getHierarchy();
       final Iterable<Result> iterDescendants = hier.iterDescendants(r);
-      final Iterator<C> others = new TypeFilterIterator<Result, C>(rc, iterDescendants);
+      final IterableIterator<C> others = new TypeFilterIterator<Result, C>(rc, iterDescendants);
       if(curIter != null) {
-        return IterableUtil.fromIterator(new MergedIterator<C>(curIter, others));
+        return new MergedIterator<C>(curIter, others);
       }
       else {
-        return IterableUtil.fromIterator(others);
+        return others;
       }
     }
     else {
@@ -263,13 +262,16 @@ public class ResultUtil {
    * Ensure that there also is a selection container object.
    * 
    * @param db Database
-   * @param result Result
+   * @return selection result
    */
-  public static void ensureSelectionResult(final Database db, final Result result) {
-    Collection<SelectionResult> selections = ResultUtil.filterResults(result, SelectionResult.class);
-    if(selections.size() == 0) {
-      addChildResult(db, new SelectionResult());
+  public static SelectionResult ensureSelectionResult(final Database db) {
+    Iterator<SelectionResult> selections = ResultUtil.filteredResults(db, SelectionResult.class);
+    if(selections.hasNext()) {
+      return selections.next();
     }
+    SelectionResult sel = new SelectionResult();
+    addChildResult(db, sel);
+    return sel;
   }
 
   /**
@@ -287,7 +289,7 @@ public class ResultUtil {
     }
     return selections.iterator().next();
   }
-  
+
   /**
    * Get (or create) a scales result for a relation.
    * 

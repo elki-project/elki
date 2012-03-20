@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
  */
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.w3c.dom.Element;
 
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -137,8 +136,8 @@ public class DotVisualization extends P2DVisualization implements DataStoreListe
       ArrayList<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
       boolean hasClustering = (cs.size() > 0);
 
-      Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(result, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+      IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(result, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
         if(hasClustering) {

@@ -149,28 +149,50 @@ public final class VisualizerUtil {
    * @return Iterator over suitable representations
    */
   // TODO: move to DatabaseUtil?
-  public static Iterator<Relation<? extends NumberVector<?, ?>>> iterateVectorFieldRepresentations(final Result result) {
-    final Iterator<Relation<?>> parent = ResultUtil.filteredResults(result, Relation.class);
-    return new AbstractFilteredIterator<Relation<?>, Relation<? extends NumberVector<?, ?>>>() {
-      @Override
-      protected Iterator<Relation<?>> getParentIterator() {
-        return parent;
-      }
-
-      @SuppressWarnings("unchecked")
-      @Override
-      protected Relation<? extends NumberVector<?, ?>> testFilter(Relation<?> nextobj) {
-        final SimpleTypeInformation<?> type = nextobj.getDataTypeInformation();
-        if(!NumberVector.class.isAssignableFrom(type.getRestrictionClass())) {
-          return null;
-        }
-        if(!(type instanceof VectorFieldTypeInformation)) {
-          return null;
-        }
-        return (Relation<? extends NumberVector<?, ?>>) nextobj;
-      }
-    };
+  public static IterableIterator<Relation<? extends NumberVector<?, ?>>> iterateVectorFieldRepresentations(final Result result) {
+    Iterator<Relation<?>> parent = ResultUtil.filteredResults(result, Relation.class);
+    return new VectorspaceIterator(parent);
   }
+  
+  /**
+   * Iterate over vectorspace
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private static class VectorspaceIterator extends AbstractFilteredIterator<Relation<?>, Relation<? extends NumberVector<?, ?>>> implements IterableIterator<Relation<? extends NumberVector<?, ?>>> {
+    /** Parent iterator */
+    private Iterator<Relation<?>> parent;
+
+    public VectorspaceIterator(Iterator<Relation<?>> parent) {
+      super();
+      this.parent = parent;
+    }
+
+    @Override
+    protected Iterator<Relation<?>> getParentIterator() {
+      return parent;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Relation<? extends NumberVector<?, ?>> testFilter(Relation<?> nextobj) {
+      final SimpleTypeInformation<?> type = nextobj.getDataTypeInformation();
+      if(!NumberVector.class.isAssignableFrom(type.getRestrictionClass())) {
+        return null;
+      }
+      if(!(type instanceof VectorFieldTypeInformation)) {
+        return null;
+      }
+      return (Relation<? extends NumberVector<?, ?>>) nextobj;
+    }
+
+    @Override
+    public Iterator<Relation<? extends NumberVector<?, ?>>> iterator() {
+      return this;
+    }
+  };
 
   /**
    * Test whether a thumbnail is enabled for this visualizer.

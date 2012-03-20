@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.cluster;
  */
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.w3c.dom.Element;
 
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -99,6 +98,10 @@ public class ClusterOrderVisualization extends P2DVisualization implements DataS
       }
       double[] thisVec = proj.fastProjectDataToRenderSpace(rel.get(thisId));
       double[] prevVec = proj.fastProjectDataToRenderSpace(rel.get(prevId));
+      
+      // FIXME: DO NOT COMMIT
+      thisVec[0] = thisVec[0] * 0.95 + prevVec[0] * 0.05;
+      thisVec[1] = thisVec[1] * 0.95 + prevVec[1] * 0.05;
 
       Element arrow = svgp.svgLine(prevVec[0], prevVec[1], thisVec[0], thisVec[1]);
       SVGUtil.setCSSClass(arrow, cls.getName());
@@ -138,8 +141,8 @@ public class ClusterOrderVisualization extends P2DVisualization implements DataS
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
       for(ClusterOrderResult<DoubleDistance> co : cos) {
-        Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+        IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+        for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, co, p.getRelation(), this);
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);

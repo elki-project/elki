@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
  */
 
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -189,8 +188,8 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
       // TODO: we can also visualize other scores!
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+        IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+        for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), this);
           task.put(VisualizationTask.META_TOOL, true);
           task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
@@ -212,8 +211,8 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
           }
         }
         if(add) {
-          Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-          for(ScatterPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          for(ScatterPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME_GEN, r, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
             task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);

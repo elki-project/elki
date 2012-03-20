@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
  */
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -380,8 +379,8 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       // Cluster histograms
       ArrayList<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
-        Iterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(baseResult, HistogramProjector.class);
-        for(HistogramProjector<?> p : IterableUtil.fromIterator(ps)) {
+        IterableIterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(baseResult, HistogramProjector.class);
+        for(HistogramProjector<?> p : ps) {
           // register self
           final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
@@ -391,8 +390,8 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       }
       // General data distribution
       {
-        Iterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(result, HistogramProjector.class);
-        for(HistogramProjector<?> p : IterableUtil.fromIterator(ps)) {
+        IterableIterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(result, HistogramProjector.class);
+        for(HistogramProjector<?> p : ps) {
           // register self
           final VisualizationTask task = new VisualizationTask(NAME, null, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);

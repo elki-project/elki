@@ -29,7 +29,6 @@ import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -142,10 +141,6 @@ public class ExportVisualizations implements ResultHandler {
       context = null;
       counter = 0;
       logger.verbose("Note: Reusing visualization exporter for more than one result is untested.");
-
-      final Database db = ResultUtil.findDatabase(baseResult);
-      ResultUtil.ensureClusteringResult(db, baseResult);
-      ResultUtil.ensureSelectionResult(db, db);
     }
     if(context == null) {
       context = manager.newContext(baseResult);

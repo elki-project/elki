@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import javax.swing.JFrame;
 
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -95,15 +94,11 @@ public class ResultVisualizer implements ResultHandler {
 
   @Override
   public void processNewResult(final HierarchicalResult top, final Result result) {
-    final Database db = ResultUtil.findDatabase(top);
-    ResultUtil.ensureClusteringResult(db, top);
-    ResultUtil.ensureSelectionResult(db, db);
-
     // FIXME: not really re-entrant to generate new contexts...
     final VisualizerContext context = manager.newContext(top);
 
     if(title == null) {
-      title = VisualizerParameterizer.getTitle(db, result);
+      title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(top), result);
     }
 
     if(title == null) {

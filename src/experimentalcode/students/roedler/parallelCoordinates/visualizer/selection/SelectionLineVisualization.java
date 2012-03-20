@@ -24,7 +24,6 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer.selecti
  */
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -161,8 +160,8 @@ public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends 
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       final ArrayList<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
       for(SelectionResult selres : selectionResults) {
-        Iterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
-        for(ParallelPlotProjector<?> p : IterableUtil.fromIterator(ps)) {
+        IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
+        for(ParallelPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 10);
           baseResult.getHierarchy().add(selres, task);
