@@ -90,7 +90,7 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
         SVGPath path = new SVGPath();
         Vector yPos = getYPositions(objId);
 
-        for(int i = 0; i < (DatabaseUtil.dimensionality(rep)); i++) {
+        for(int i = 0; i < (DatabaseUtil.dimensionality(relation)); i++) {
           if(proj.isVisible(i)) {
             path.drawTo(proj.getXpos(i), yPos.get(i));
           }

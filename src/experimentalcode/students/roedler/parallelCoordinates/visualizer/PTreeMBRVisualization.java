@@ -201,7 +201,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
     */
    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth, int step) {
      if (pagevis[step] == true){
-       final int dim = DatabaseUtil.dimensionality(rep);
+       final int dim = DatabaseUtil.dimensionality(relation);
        SVGPath path = new SVGPath();
        for (int i = 0; i < dim; i++){
          if (proj.isVisible(i)){

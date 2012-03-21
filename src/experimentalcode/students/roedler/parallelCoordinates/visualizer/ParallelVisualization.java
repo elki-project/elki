@@ -52,7 +52,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   /**
    * The representation we visualize
    */
-  final protected Relation<NV> rep;
+  final protected Relation<NV> relation;
 
   /**
    * Margin
@@ -82,7 +82,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   public ParallelVisualization(VisualizationTask task) {
     super(task);
     this.proj = task.getProj();
-    this.rep = task.getRelation();
+    this.relation = task.getRelation();
     this.margin = 0; //context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     
     margins = new double[] { 0.071, 0.071 };
@@ -139,7 +139,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   }
 
   protected Vector getYPositions(DBID objId) {
-    Vector vec = proj.projectDataToRenderSpace(rep.get(objId));
+    Vector vec = proj.projectDataToRenderSpace(relation.get(objId));
     vec.plusEquals(margins[1]);
     vec.timesEquals(getAxisHeight());
     return vec;

@@ -106,7 +106,7 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-    int dim = DatabaseUtil.dimensionality(rep);
+    int dim = DatabaseUtil.dimensionality(relation);
     
     double[][] max = new double[dim][2];
     double[][] min = new double[dim][2];
@@ -331,7 +331,6 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
    * @apiviz.stereotype factory
    * @apiviz.uses AxisVisualization oneway - - «create»
    * 
-   * @param <NV>
    */
   public static class Factory extends AbstractVisFactory {
     /**

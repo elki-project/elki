@@ -39,7 +39,7 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
 
   @Override
   protected void redraw() {
-    int dim = DatabaseUtil.dimensionality(rep);
+    int dim = DatabaseUtil.dimensionality(relation);
     final double scale = StyleLibrary.SCALE;
 
     try {
@@ -67,7 +67,6 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
    * @apiviz.stereotype factory
    * @apiviz.uses AxisVisualization oneway - - «create»
    * 
-   * @param <NV>
    */
   public static class Factory extends AbstractVisFactory {
     /**

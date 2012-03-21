@@ -108,7 +108,7 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
     DBIDSelection selContext = context.getSelection();
     if(selContext != null && selContext instanceof RangeSelection) {
       DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-      int dim = DatabaseUtil.dimensionality(rep);
+      int dim = DatabaseUtil.dimensionality(relation);
 
       double[] min = new double[dim];
       double[] max = new double[dim];

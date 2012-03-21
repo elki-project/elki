@@ -106,7 +106,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
    */
   public SelectionToolAxisRangeVisualization(VisualizationTask task) {
     super(task);
-    this.dim = DatabaseUtil.dimensionality(rep);
+    this.dim = DatabaseUtil.dimensionality(relation);
     context.addDataStoreListener(this);
     incrementalRedraw();
   }
@@ -255,8 +255,8 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
 
       selection.clear();
       boolean idIn = true;
-      for(DBID id : rep.iterDBIDs()) {
-        NumberVector<?, ?> dbTupel = rep.get(id);
+      for(DBID id : relation.iterDBIDs()) {
+        NumberVector<?, ?> dbTupel = relation.get(id);
         idIn = true;
         for(int i = 0; i < dim; i++) {
           if(ranges != null && ranges[i] != null) {
