@@ -31,16 +31,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.utils.SampledResult;
 
-
 /**
  * Generates data lines.
  * 
  * @author Robert Rödler
  * 
- * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
-
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -124,20 +121,18 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }
-  
- 
-  
+
   /**
    * Factory for axis visualizations
    * 
-   * @author Erich Schubert
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses AxisVisualization oneway - - «create»
+   * @apiviz.uses LineVisualization oneway - - «create»
    * 
    * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * A short name characterizing this Visualizer.
      */
@@ -172,7 +167,6 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
         baseResult.getHierarchy().add(p, task);
       }
     }
-  
 
     @Override
     public boolean allowThumbnails(VisualizationTask task) {

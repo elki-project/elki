@@ -66,7 +66,6 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * @apiviz.has SelectionResult oneway - - updates
  * @apiviz.has DBIDSelection oneway - - updates
  * 
- * @param <NV> vector type
  */
 public class SelectionToolLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener, DataStoreListener {
   /**
@@ -318,9 +317,8 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
    * @apiviz.stereotype factory
    * @apiviz.uses SelectionToolDotVisualization - - «create»
    * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}

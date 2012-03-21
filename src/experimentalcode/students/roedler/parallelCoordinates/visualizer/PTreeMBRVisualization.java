@@ -66,12 +66,11 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
   * 
   * @apiviz.has AbstractRStarTree oneway - - visualizes
   * 
-  * @param <NV> Type of the DatabaseObject being visualized.
   * @param <N> Tree node type
   * @param <E> Tree entry type
   */
  // TODO: listen for tree changes instead of data changes?
- public class PTreeMBRVisualization<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NV> implements MenuOwner, DataStoreListener {
+ public class PTreeMBRVisualization<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NumberVector<?, ?>> implements MenuOwner, DataStoreListener {
    /**
     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
     */
@@ -277,9 +276,8 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
     * @apiviz.stereotype factory
     * @apiviz.uses PTreeMBRVisualization oneway - - «create»
     * 
-    * @param <NV> vector type
     */
-   public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+   public static class Factory extends AbstractVisFactory {
 
      /**
       * Flag for half-transparent filling of pages.
@@ -316,7 +314,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
 
      @Override
      public Visualization makeVisualization(VisualizationTask task) {
-       return new PTreeMBRVisualization<NV, RStarTreeNode, SpatialEntry>(task, fill, list);
+       return new PTreeMBRVisualization<RStarTreeNode, SpatialEntry>(task, fill, list);
      }
 
      @Override

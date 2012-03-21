@@ -41,9 +41,9 @@ import experimentalcode.students.roedler.parallelCoordinates.projections.Project
  * 
  * @author Robert Rödler
  * 
+ * @param <NV> Vector type in relation
  */
 public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> extends AbstractVisualization {
-
   /**
    * The current projection
    */

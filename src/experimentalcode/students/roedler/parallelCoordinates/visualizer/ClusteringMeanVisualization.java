@@ -44,7 +44,6 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMe
  * 
  * @author Robert Rödler
  * 
- * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class ClusteringMeanVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
 
@@ -251,7 +250,7 @@ public class ClusteringMeanVisualization extends ParallelVisualization<NumberVec
    * 
    * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * A short name characterizing this Visualizer.
      */
