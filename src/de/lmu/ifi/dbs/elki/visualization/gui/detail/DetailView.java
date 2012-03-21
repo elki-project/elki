@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.AttributeModifier;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -105,6 +106,8 @@ public class DetailView extends SVGPlot implements ResultListener {
     // TODO: only do this when there is an interactive visualizer?
     setDisableInteractions(true);
     addBackground(context);
+    SVGEffects.addShadowFilter(this);
+    SVGEffects.addLightGradient(this);
 
     redraw();
     context.addResultListener(this);
@@ -129,7 +132,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     SVGUtil.setCSSClass(bg, cls.getName());
 
     // Note that we rely on this being called before any other drawing routines.
-    getDocument().getRootElement().appendChild(bg);
+    getRoot().appendChild(bg);
   }
 
   protected void redraw() {

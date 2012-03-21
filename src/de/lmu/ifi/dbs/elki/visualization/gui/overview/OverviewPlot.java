@@ -49,8 +49,11 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -103,22 +106,6 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   private boolean single;
 
   /**
-   * Constructor.
-   * 
-   * @param result Result to visualize
-   * @param context Visualizer context
-   * @param single Single view mode
-   */
-  public OverviewPlot(HierarchicalResult result, VisualizerContext context, boolean single) {
-    super();
-    this.result = result;
-    this.context = context;
-    this.single = single;
-    // register context listener
-    context.addResultListener(this);
-  }
-
-  /**
    * Screen size (used for thumbnail sizing)
    */
   public int screenwidth = 2000;
@@ -167,6 +154,48 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * Reinitialize on refresh
    */
   private boolean reinitOnRefresh = true;
+
+  /**
+   * Constructor.
+   * 
+   * @param result Result to visualize
+   * @param context Visualizer context
+   * @param single Single view mode
+   */
+  public OverviewPlot(HierarchicalResult result, VisualizerContext context, boolean single) {
+    super();
+    this.result = result;
+    this.context = context;
+    this.single = single;
+
+    // Add a background element:
+    {
+      CSSClass cls = new CSSClass(this, "background");
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
+      try {
+        getCSSClassManager().addClass(cls);
+      }
+      catch(CSSNamingConflict e) {
+        logger.warning("Could not set background css style.");
+      }
+      Element background = this.svgElement(SVGConstants.SVG_RECT_TAG);
+      background.setAttribute(SVGConstants.SVG_X_ATTRIBUTE, "0");
+      background.setAttribute(SVGConstants.SVG_Y_ATTRIBUTE, "0");
+      background.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "100%");
+      background.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "100%");
+      SVGUtil.setCSSClass(background, cls.getName());
+      getRoot().appendChild(background);
+    }
+
+    if(single) {
+      setDisableInteractions(true);
+    }
+    SVGEffects.addShadowFilter(this);
+    SVGEffects.addLightGradient(this);
+
+    // register context listener
+    context.addResultListener(this);
+  }
 
   /**
    * Recompute the layout of visualizations.
