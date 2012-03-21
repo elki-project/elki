@@ -127,7 +127,7 @@ public class SVGButton {
         SVGUtil.setAtt(light, SVGConstants.SVG_RX_ATTRIBUTE, r);
         SVGUtil.setAtt(light, SVGConstants.SVG_RY_ATTRIBUTE, r);
       }
-      SVGUtil.setAtt(light, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:url(#"+SVGEffects.LIGHT_GRADIENT_ID+");fill-opacity:.2");
+      SVGUtil.setAtt(light, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:url(#"+SVGEffects.LIGHT_GRADIENT_ID+");fill-opacity:.5");
       tag.appendChild(light);
     }
 
