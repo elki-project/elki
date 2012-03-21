@@ -17,12 +17,14 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MouseEvent;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -116,6 +118,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   
   protected CSStylingPolicy policy;
   protected StyleResult styleResult;
+  protected ResultHierarchy hierarchy;
   
   /**
    * context
@@ -315,24 +318,12 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
     if (ccr.size() != 1) return;
     
-    // 
-    System.out.println("CSStylepolicySet");
-    // create custom styling policy
-    this.policy = new CSStylingPolicy();
-    //this.context.getStyleResult().setStylingPolicy(this.policy);
-    
-    /*
-    ArrayList<StyleResult> styleResults =  ResultUtil.filterResults(result, StyleResult.class);
-    if (styleResults.size() >= 1) this.styleResult = styleResults.get(0);
-    else System.out.println("No style result found");
-    */
-    
-    // create task fopr visualization
-    final VisualizationTask task = new VisualizationTask(NAME, ccr.get(0), null, this);
-    // set vis dimensions
-    task.width  = 1.0;
-    task.height = 1.0;
-    
+    ClusteringComparisonResult ccResult = ccr.get(0);
+
+    // create task for visualization
+    final VisualizationTask task = new VisualizationTask(NAME, ccResult, null, this);
+    task.width  = 2.0;
+    task.height = 2.0;
     task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
     baseResult.getHierarchy().add(ccr.get(0), task);
   }
@@ -349,9 +340,6 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     svgp    = task.getPlot();
     ccr     = task.getResult();
     
-    this.styleResult = context.getStyleResult();
-
-    
     this.segments   = ccr.getSegments();
     this.layer      = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     this.visLayer   = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
@@ -359,6 +347,11 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     
     this.selectionInfo  = new UnorderedList(svgp);
     this.selection      = new SegmentSelection(task, policy, visLayer, segments, selectionInfo);
+
+    // create custom styling policy
+    this.policy = new CSStylingPolicy(ccr.getReference(), task.getContext().getStyleLibrary(), segments);
+    this.styleResult = context.getStyleResult();
+
     
     // Listen for context changes
     //context.addContextChangeListener(this);
@@ -944,7 +937,6 @@ class MouseClickSegmentCluster implements EventListener {
     Element thisSegmentElement = (Element) evt.getTarget();
     
     selection.select(thisSegmentElement, ctrl);
-    
     // update stylePolicy
     selection.update();
   }
