@@ -80,7 +80,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-    int dim = DatabaseUtil.dimensionality(rep);
+    int dim = DatabaseUtil.dimensionality(relation);
 
     Element back = svgp.svgRect(0.0, (getMarginY() * 1.5 + getAxisHeight()), getSizeX(), getSizeY() / 35.);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
@@ -258,7 +258,6 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
    * @apiviz.stereotype factory
    * @apiviz.uses AxisVisualization oneway - - «create»
    * 
-   * @param <NV>
    */
   public static class Factory extends AbstractVisFactory {
     /**

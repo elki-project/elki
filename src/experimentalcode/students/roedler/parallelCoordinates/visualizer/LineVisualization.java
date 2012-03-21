@@ -1,16 +1,11 @@
 package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -18,31 +13,38 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
+import de.lmu.ifi.dbs.elki.visualization.style.lines.LineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
-import experimentalcode.students.roedler.parallelCoordinates.utils.SampledResult;
 
 /**
  * Generates data lines.
  * 
  * @author Robert Rödler
- * 
  */
 public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
   public static final String DATALINE = "Dataline";
-  
+
+  /**
+   * Sample we visualize.
+   */
+  private SamplingResult sample;
+
   /**
    * Constructor.
    * 
@@ -50,73 +52,106 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
    */
   public LineVisualization(VisualizationTask task) {
     super(task);
+    this.sample = ResultUtil.getSamplingResult(relation);
+
     incrementalRedraw();
+    context.addResultListener(this);
     context.addDataStoreListener(this);
   }
-  
+
+  @Override
+  public void resultChanged(Result current) {
+    super.resultChanged(current);
+    if(current == sample || current == context.getStyleResult()) {
+      synchronizedRedraw();
+    }
+  }
+
   @Override
   protected void redraw() {
-    addCSSClasses(svgp);
-    int dim = DatabaseUtil.dimensionality(rep);
-    
-    Collection<SampledResult<Model>> samples = ResultUtil.filterResults(context.getResult(), SampledResult.class);
-    if (samples.size() > 0){
-      for(SampledResult<Model> c : samples) {
-        Iterator<Cluster<Model>> ci = c.getAllClusters().iterator();
-        for(int cnum = 0; cnum < c.getAllClusters().size(); cnum++) {
-          Cluster<?> clus = ci.next();
-          
-          for(DBID objId : clus.getIDs()) {
-            SVGPath path = new SVGPath();
-            Vector yPos = getYPositions(objId);
-            for (int i = 0; i < dim; i++){
-              if (proj.isVisible(i)){
-                path.drawTo(proj.getXpos(i), yPos.get(i));
-              }
+    int dim = DatabaseUtil.dimensionality(relation);
+    StylingPolicy sp = context.getStyleResult().getStylingPolicy();
+    addCSSClasses(svgp, sp);
+
+    Iterator<DBID> ids = sample.getSample().iterator();
+    if(ids == null || !ids.hasNext()) {
+      ids = relation.iterDBIDs();
+    }
+    if(sp instanceof ClassStylingPolicy) {
+      // FIXME: doesn't use sampling yet.
+      ClassStylingPolicy csp = (ClassStylingPolicy) sp;
+      for (int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
+        String key = DATALINE+"_"+c;
+        for (Iterator<DBID> iter = csp.iterateClass(c); iter.hasNext(); ) {
+          DBID id = iter.next();
+          SVGPath path = new SVGPath();
+          Vector yPos = getYPositions(id);
+          for(int i = 0; i < dim; i++) {
+            if(proj.isVisible(i)) {
+              path.drawTo(proj.getXpos(i), yPos.get(i));
             }
-            Element line = path.makeElement(svgp);
-            SVGUtil.addCSSClass(line, DATALINE);
-            layer.appendChild(line);
           }
+          Element line = path.makeElement(svgp);
+          SVGUtil.addCSSClass(line, key);
+          layer.appendChild(line);
         }
       }
     }
     else {
-      for(DBID objId : rep.iterDBIDs()) {
+      while(ids.hasNext()) {
+        DBID id = ids.next();
         SVGPath path = new SVGPath();
-        Vector yPos = getYPositions(objId);
-        for (int i = 0; i < dim; i++){
-          if (proj.isVisible(i)){
+        Vector yPos = getYPositions(id);
+        for(int i = 0; i < dim; i++) {
+          if(proj.isVisible(i)) {
             path.drawTo(proj.getXpos(i), yPos.get(i));
           }
         }
         Element line = path.makeElement(svgp);
         SVGUtil.addCSSClass(line, DATALINE);
+        // assign color
+        line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(id)));
         layer.appendChild(line);
       }
     }
-  
   }
-  
+
   /**
    * Adds the required CSS-Classes
    * 
    * @param svgp SVG-Plot
    */
-  private void addCSSClasses(SVGPlot svgp) {
+  private void addCSSClasses(SVGPlot svgp, StylingPolicy sp) {
     final StyleLibrary style = context.getStyleLibrary();
-    // Class for the distance function
-    if(!svgp.getCSSClassManager().contains(DATALINE)) {
-      CSSClass cls = new CSSClass(this, DATALINE);
-      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE * 2.));
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      svgp.addCSSClassOrLogError(cls);
+    final LineStyleLibrary lines = style.lines();
+    final double width = .5 * style.getLineWidth(StyleLibrary.PLOT) / StyleLibrary.SCALE;
+    if(sp instanceof ClassStylingPolicy) {
+      ClassStylingPolicy csp = (ClassStylingPolicy) sp;
+      for (int i = csp.getMinStyle(); i < csp.getMaxStyle(); i++) {
+        String key = DATALINE+"_"+i;
+        if(!svgp.getCSSClassManager().contains(key)) {
+          CSSClass cls = new CSSClass(this, key);
+          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+          lines.formatCSSClass(cls, i, width);
+          svgp.addCSSClassOrLogError(cls);
+        }
+      }
+    }
+    else {
+      // Class for the distance function
+      if(!svgp.getCSSClassManager().contains(DATALINE)) {
+        CSSClass cls = new CSSClass(this, DATALINE);
+        cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        lines.formatCSSClass(cls, -1, width);
+        svgp.addCSSClassOrLogError(cls);
+      }
     }
   }
-  
+
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
@@ -129,8 +164,6 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses LineVisualization oneway - - «create»
-   * 
-   * @param <NV>
    */
   public static class Factory extends AbstractVisFactory {
     /**
@@ -150,28 +183,15 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
     public Visualization makeVisualization(VisualizationTask task) {
       return new LineVisualization(task);
     }
-    
+
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      ArrayList<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
-      boolean hasClustering = (cs.size() > 0);
-
       IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(result, ParallelPlotProjector.class);
       for(ParallelPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 12);
-        if(hasClustering) {
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-        }
-        // baseResult.getHierarchy().add(p.getRelation(), task);
         baseResult.getHierarchy().add(p, task);
       }
-    }
-
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
     }
   }
 }

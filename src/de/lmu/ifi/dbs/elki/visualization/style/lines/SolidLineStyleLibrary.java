@@ -52,6 +52,16 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
   private ColorLibrary colors;
 
   /**
+   * Color of "uncolored" dots
+   */
+  private String dotcolor;
+
+  /**
+   * Color of "greyed out" dots
+   */
+  private String greycolor;
+
+  /**
    * Constructor.
    * 
    * @param style Style library to use.
@@ -59,11 +69,21 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
   public SolidLineStyleLibrary(StyleLibrary style) {
     super();
     this.colors = style.getColorSet(StyleLibrary.PLOT);
+    this.dotcolor = style.getColor(StyleLibrary.MARKERPLOT);
+    this.greycolor = style.getColor(StyleLibrary.PLOTGREY);
   }
 
   @Override
   public void formatCSSClass(CSSClass cls, int style, double width, Object... flags) {
-    cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, colors.getColor(style));
+    if(style == -2) {
+      cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, greycolor);
+    }
+    else if(style == -1) {
+      cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, dotcolor);
+    }
+    else {
+      cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, colors.getColor(style));
+    }
     boolean interpolated = false;
     // process flavoring flags
     for(Object flag : flags) {

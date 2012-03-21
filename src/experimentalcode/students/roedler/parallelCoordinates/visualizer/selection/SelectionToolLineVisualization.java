@@ -108,7 +108,7 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
     super(task);
     context.addDataStoreListener(this);
     incrementalRedraw();
-    dim = DatabaseUtil.dimensionality(rep);
+    dim = DatabaseUtil.dimensionality(relation);
   }
 
   @Override
@@ -217,7 +217,7 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
       selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
     }
     int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
-    for(DBID objId : rep.iterDBIDs()) {
+    for(DBID objId : relation.iterDBIDs()) {
       Vector yPos = getYPositions(objId);
       if(checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))) {
         if(mode == Mode.INVERT) {
@@ -240,7 +240,7 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
   }
 
   private int[] getAxisRange(double x1, double x2) {
-    double dim = DatabaseUtil.dimensionality(rep);
+    double dim = DatabaseUtil.dimensionality(relation);
     int minaxis = 0;
     int maxaxis = 0;
     boolean minx = true;
