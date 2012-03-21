@@ -157,4 +157,12 @@ public class Mean {
   public String toString() {
     return "Mean(" + getMean() + ")";
   }
+
+  /**
+   * Reset the value.
+   */
+  public void reset() {
+    mean = 0;
+    wsum = 0;
+  }
 }

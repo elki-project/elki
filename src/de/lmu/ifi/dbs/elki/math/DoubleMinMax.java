@@ -165,4 +165,12 @@ public class DoubleMinMax extends DoubleDoublePair {
     }
     return ret;
   }
+
+  /**
+   * Reset statistics.
+   */
+  public void reset() {
+    first = Double.POSITIVE_INFINITY;
+    second = Double.NEGATIVE_INFINITY;
+  }
 }
