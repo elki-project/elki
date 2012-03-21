@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -22,10 +21,8 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.SVGParallelLine
  * @author Robert Rödler
  * 
  * @apiviz.uses SVGSimpleLinearAxis
- * 
  */
 public class ParallelAxisVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
-
   /**
    * Constructor.
    * 
@@ -39,14 +36,13 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
 
   @Override
   protected void redraw() {
-    int dim = DatabaseUtil.dimensionality(relation);
+    int dim = proj.getVisibleDimensions();
     final double scale = StyleLibrary.SCALE;
+    calcAxisPositions();
 
     try {
       for(int i = 0; i < dim; i++) {
-        if(proj.isVisible(i)) {
-          SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(proj.getDimensionNumber(i)), proj.getXpos(i), margins[1], proj.getXpos(i), margins[1] + getAxisHeight(), true, context.getStyleLibrary(), proj.isInverted(i), scale);
-        }
+        SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(i), i * dist, margins[1], i * dist, margins[1] + getAxisHeight(), true, context.getStyleLibrary(), proj.isInverted(i), scale);
       }
     }
     catch(CSSNamingConflict e) {

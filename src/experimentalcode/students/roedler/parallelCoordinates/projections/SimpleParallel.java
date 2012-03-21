@@ -26,14 +26,17 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.projections.AbstractProjection;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 
 /**
  * Simple parallel projection
  * 
+ * Scaled space: reordered, scaled and inverted. Lower dimensionality! [0:1]
+ * Render space: not used here; no recentering needed.
+ * 
  * @author Robert Rödler
  */
-public class SimpleParallel extends AbstractProjection implements ProjectionParallel {
+public class SimpleParallel extends BasicResult implements ProjectionParallel {
   /**
    * Number of dimensions
    */
@@ -55,6 +58,11 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   int[] dimOrder;
 
   /**
+   * Scales
+   */
+  private LinearScale[] scales;
+
+  /**
    * Flag for visibility
    */
   final static byte FLAG_HIDDEN = 1;
@@ -72,7 +80,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
    * @param scales Scales to use
    */
   public SimpleParallel(LinearScale[] scales) {
-    super(scales);
+    super("Parallel projection", "parallel-projection");
+    this.scales = scales;
     dims = scales.length;
     visDims = dims;
     flags = new byte[dims];
@@ -83,28 +92,36 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public int getFirstVisibleDimension() {
-    for(int i = 0; i < dims; i++) {
-      if(isVisible(dimOrder[i])) {
-        return i;
-      }
-    }
-    return 0;
-  }
-
-  @Override
-  public int getVisibleDimensions() {
-    return visDims;
-  }
-
-  @Override
   public LinearScale getScale(int d) {
-    return scales[d];
+    return scales[dimOrder[d]];
+  }
+
+  protected boolean inverted(int rawdim) {
+    return (flags[rawdim] & FLAG_INVERTED) != FLAG_INVERTED;
+  }
+
+  @Override
+  public boolean isInverted(int dim) {
+    return inverted(dimOrder[dim]);
+  }
+
+  @Override
+  public void setInverted(int dim, boolean bool) {
+    if(bool) {
+      flags[dimOrder[dim]] |= FLAG_INVERTED;
+    }
+    else {
+      flags[dimOrder[dim]] &= ~FLAG_INVERTED;
+    }
+  }
+
+  protected boolean hidden(int truedim) {
+    return (flags[truedim] & FLAG_HIDDEN) == FLAG_HIDDEN;
   }
 
   @Override
   public boolean isVisible(int dim) {
-    return (flags[dimOrder[dim]] & FLAG_HIDDEN) != FLAG_HIDDEN;
+    return !hidden(dimOrder[dim]);
   }
 
   @Override
@@ -125,18 +142,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public boolean isInverted(int dim) {
-    return (flags[dimOrder[dim]] & FLAG_INVERTED) != FLAG_INVERTED;
-  }
-
-  @Override
-  public void setInverted(int dim, boolean bool) {
-    if(bool) {
-      flags[dimOrder[dim]] |= FLAG_INVERTED;
-    }
-    else {
-      flags[dimOrder[dim]] &= ~FLAG_INVERTED;
-    }
+  public int getVisibleDimensions() {
+    return visDims;
   }
 
   @Override
@@ -145,11 +152,106 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public Vector projectScaledToRender(Vector v) {
-    return projectScaledToRender(v, true);
+  public int getFirstVisibleDimension() {
+    for(int i = 0; i < dims; i++) {
+      if(!hidden(dimOrder[i])) {
+        return i;
+      }
+    }
+    return 0;
   }
 
-  public Vector projectScaledToRender(Vector v, boolean sort) {
+  @Override
+  public int getLastVisibleDimension() {
+    for(int i = dims - 1; i >= 0; i--) {
+      if(!hidden(dimOrder[i])) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  @Override
+  public int getPrevVisibleDimension(int dim) {
+    for(int i = dim - 1; i >= 0; i--) {
+      if(!hidden(dimOrder[i])) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  @Override
+  public int getNextVisibleDimension(int dim) {
+    for(int i = dim + 1; i < dims; i++) {
+      if(!hidden(dimOrder[i])) {
+        return i;
+      }
+    }
+    return dim;
+  }
+
+  @Override
+  public void swapDimensions(int a, int b) {
+    int temp = dimOrder[a];
+    dimOrder[a] = dimOrder[b];
+    dimOrder[b] = temp;
+  }
+
+  @Override
+  public void shiftDimension(int src, int dest) {
+    if(src > dest) {
+      int temp = dimOrder[src];
+      System.arraycopy(dimOrder, src - 1, dimOrder, src, src - dest);
+      dimOrder[dest] = temp;
+    }
+    else if(src < dest) {
+      int temp = dimOrder[src];
+      System.arraycopy(dimOrder, src + 1, dimOrder, src, dest - src);
+      dimOrder[dest - 1] = temp;
+    }
+  }
+
+  @Override
+  public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
+    double[] v = new double[visDims];
+    for(int j = 0, o = 0; j < dims; j++) {
+      if(hidden(j)) {
+        continue;
+      }
+      int i = dimOrder[j];
+      v[o] = scales[i].getScaled(data.doubleValue(i + 1));
+      if(inverted(i)) {
+        v[o] = 1 - v[o];
+      }
+      o++;
+    }
+    return v;
+  }
+
+  @Override
+  public double[] fastProjectDataToRenderSpace(Vector data) {
+    double[] v = new double[visDims];
+    for(int j = 0, o = 0; j < dims; j++) {
+      if(hidden(j)) {
+        continue;
+      }
+      int i = dimOrder[j];
+      v[o] = scales[i].getScaled(data.get(i));
+      if(inverted(i)) {
+        v[o] = 1 - v[o];
+      }
+      o++;
+    }
+    return v;
+  }
+
+  // @Override
+  public Vector XXprojectScaledToRender(Vector v) {
+    return YYprojectScaledToRender(v, true);
+  }
+
+  public Vector YYprojectScaledToRender(Vector v, boolean sort) {
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
       if(isInverted(i)) {
@@ -167,8 +269,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     }
   }
 
-  @Override
-  public double projectScaledToRender(int dim, double d) {
+  // @Override
+  public double XXprojectScaledToRender(int dim, double d) {
     if(isInverted(dim)) {
       return d;
     }
@@ -177,8 +279,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     }
   }
 
-  @Override
-  public Vector projectRenderToScaled(Vector v) {
+  // @Override
+  public Vector XXprojectRenderToScaled(Vector v) {
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
       if(isInverted(i)) {
@@ -191,8 +293,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return sortDims(ret);
   }
 
-  @Override
-  public Vector projectRelativeScaledToRender(Vector v) {
+  // @Override
+  public Vector XXprojectRelativeScaledToRender(Vector v) {
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
       ret.set(i, -v.get(i));
@@ -200,8 +302,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return sortDims(ret);
   }
 
-  @Override
-  public Vector projectRelativeRenderToScaled(Vector v) {
+  // @Override
+  public Vector XXprojectRelativeRenderToScaled(Vector v) {
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
       ret.set(i, v.get(i));
@@ -209,23 +311,23 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return sortDims(ret);
   }
 
-  @Override
-  public Vector projectDataToRenderSpace(NumberVector<?, ?> data) {
+  // @Override
+  public Vector XXprojectDataToRenderSpace(NumberVector<?, ?> data) {
     return projectScaledToRender(projectDataToScaledSpace(data));
   }
 
-  @Override
-  public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort) {
-    return projectScaledToRender(projectDataToScaledSpace(data), sort);
+  // @Override
+  public Vector XXprojectDataToRenderSpace(NumberVector<?, ?> data, boolean sort) {
+    return YYprojectScaledToRender(projectDataToScaledSpace(data), sort);
   }
 
-  @Override
-  public Vector projectDataToRenderSpace(Vector data) {
+  // @Override
+  public Vector XXprojectDataToRenderSpace(Vector data) {
     return projectScaledToRender(projectDataToScaledSpace(data));
   }
 
-  @Override
-  public <NV extends NumberVector<NV, ?>> NV projectRenderToDataSpace(Vector v, NV prototype) {
+  // @Override
+  public <NV extends NumberVector<NV, ?>> NV XXprojectRenderToDataSpace(Vector v, NV prototype) {
     final int dim = v.getDimensionality();
     Vector vec = projectRenderToScaled(v);
     double[] ds = vec.getArrayRef();
@@ -237,13 +339,13 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return prototype.newNumberVector(vec.getArrayRef());
   }
 
-  @Override
-  public Vector projectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
+  // @Override
+  public Vector XXprojectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
     return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
   }
 
-  @Override
-  public Vector projectRelativeDataToRenderSpace(Vector data) {
+  // @Override
+  public Vector XXprojectRelativeDataToRenderSpace(Vector data) {
     return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
   }
 
@@ -252,8 +354,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
    * projectRelativeScaledToDataSpace(Vector v, NV prototype) { return null; }
    */
 
-  @Override
-  public <NV extends NumberVector<NV, ?>> NV projectRelativeRenderToDataSpace(Vector v, NV prototype) {
+  // @Override
+  public <NV extends NumberVector<NV, ?>> NV XXprojectRelativeRenderToDataSpace(Vector v, NV prototype) {
     final int dim = v.getDimensionality();
     Vector vec = projectRelativeRenderToScaled(v);
     double[] ds = vec.getArrayRef();
@@ -292,54 +394,6 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public int getLastVisibleDimension() {
-    for(int i = dims - 1; i >= 0; i--) {
-      if(isVisible(dimOrder[i]) == true) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  @Override
-  public int getPrevVisibleDimension(int dim) {
-    for(int i = dim - 1; i >= 0; i--) {
-      if(isVisible(dimOrder[i]) == true) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  @Override
-  public void swapDimensions(int a, int b) {
-    int temp = dimOrder[a];
-    dimOrder[a] = dimOrder[b];
-    dimOrder[b] = temp;
-
-  }
-
-  @Override
-  public void shiftDimension(int dim, int rn) {
-    if(dim > rn) {
-      int temp = dimOrder[dim];
-
-      for(int i = dim; i > rn; i--) {
-        dimOrder[i] = dimOrder[i - 1];
-      }
-      dimOrder[rn] = temp;
-    }
-    else if(dim < rn) {
-      int temp = dimOrder[dim];
-
-      for(int i = dim; i < rn - 1; i++) {
-        dimOrder[i] = dimOrder[i + 1];
-      }
-      dimOrder[rn - 1] = temp;
-    }
-  }
-
-  @Override
   public int getDimensionNumber(int pos) {
     return dimOrder[pos];
   }
@@ -354,8 +408,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return -1;
   }
 
-  @Override
-  public Vector sortDims(Vector s) {
+  protected Vector sortDims(Vector s) {
     Vector ret = new Vector(s.getDimensionality());
     for(int i = 0; i < s.getDimensionality(); i++) {
       ret.set(i, s.get(dimOrder[i]));
@@ -364,27 +417,87 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public int getNextVisibleDimension(int dim) {
-    for(int i = dim + 1; i < dims; i++) {
-      if(isVisible(dimOrder[i]) == true) {
-        return i;
-      }
-    }
-    return dim;
-  }
-
-  @Override
-  public LinearScale getLinearScale(int dim) {
-    return scales[dim];
-  }
-
-  @Override
-  public double getDimensions() {
-    return dims;
-  }
-
-  @Override
   public int getInputDimensionality() {
     return dims;
+  }
+
+  @Override
+  public Vector projectScaledToRender(Vector v) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectRenderToScaled(Vector v) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectRelativeScaledToRender(Vector v) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectRelativeRenderToScaled(Vector v) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectDataToScaledSpace(NumberVector<?, ?> data) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectDataToScaledSpace(Vector data) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectRelativeDataToScaledSpace(NumberVector<?, ?> data) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectRelativeDataToScaledSpace(Vector data) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectDataToRenderSpace(NumberVector<?, ?> data) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectDataToRenderSpace(Vector data) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public <NV extends NumberVector<NV, ?>> NV projectScaledToDataSpace(Vector v, NV factory) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public <NV extends NumberVector<NV, ?>> NV projectRenderToDataSpace(Vector v, NV prototype) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public Vector projectRelativeDataToRenderSpace(Vector data) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public <NV extends NumberVector<NV, ?>> NV projectRelativeScaledToDataSpace(Vector v, NV prototype) {
+    throw new UnsupportedOperationException("not yet implemented.");
+  }
+
+  @Override
+  public <NV extends NumberVector<NV, ?>> NV projectRelativeRenderToDataSpace(Vector v, NV prototype) {
+    throw new UnsupportedOperationException("not yet implemented.");
   }
 }

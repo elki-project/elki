@@ -23,17 +23,14 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
-
 /**
  * interactive SVG-Element for selecting visible axis.
  * 
  * @author Robert Rödler
  * 
  * @apiviz.uses SVGSimpleLinearAxis
- * 
  */
 public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
-
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -81,12 +78,11 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(relation);
+    calcAxisPositions();
 
     Element back = svgp.svgRect(0.0, (getMarginY() * 1.5 + getAxisHeight()), getSizeX(), getSizeY() / 35.);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
     layer.appendChild(back);
-    
-    
     
     int notvis = 0;
     int lastvis = 0;
@@ -95,7 +91,6 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
     rect = new Element[dim];
     
     for (int i = 0; i <= dim; i++){
-
       if (i == dim || proj.isVisible(i)) {
         if (notvis != 0){
           addEmptyButton(lastvis, i, notvis, dim, ls);
@@ -103,7 +98,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
 
         if (i == dim) { break; }
         
-        double xpos = proj.getXpos(i) - bhs / 2.;        
+        double xpos = i * dist - bhs / 2.;        
         
         border = svgp.svgRect(xpos, ypos, bhs, bhs);
         SVGUtil.addCSSClass(border, SAV_BORDER);
