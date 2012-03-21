@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -172,12 +171,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     {
       CSSClass cls = new CSSClass(this, "background");
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
-      try {
-        getCSSClassManager().addClass(cls);
-      }
-      catch(CSSNamingConflict e) {
-        logger.warning("Could not set background css style.");
-      }
+      addCSSClassOrLogError(cls);
       Element background = this.svgElement(SVGConstants.SVG_RECT_TAG);
       background.setAttribute(SVGConstants.SVG_X_ATTRIBUTE, "0");
       background.setAttribute(SVGConstants.SVG_Y_ATTRIBUTE, "0");

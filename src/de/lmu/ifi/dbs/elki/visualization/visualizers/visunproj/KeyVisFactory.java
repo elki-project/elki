@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -159,18 +159,27 @@ public class KeyVisFactory extends AbstractVisualization {
     context.getHierarchy().resultChanged(context.getStyleResult());
   }
 
+  /**
+   * Visualization factory
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.stereotype factory
+   * @apiviz.uses KeyVisualization oneway - - «create»
+   */
   public static class Factory extends AbstractVisFactory {
-
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result newResult) {
       // Find clusterings we can visualize:
-      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
-      for(Clustering<?> c : clusterings) {
+      Iterator<Clustering<?>> clusterings = ResultUtil.filteredResults(newResult, Clustering.class);
+      while(clusterings.hasNext()) {
+        Clustering<?> c = clusterings.next();
         if(c.getAllClusters().size() > 0) {
           final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
           task.width = 1.0;
           task.height = 1.0;
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+          task.put(VisualizationTask.META_NODETAIL, true);
           baseResult.getHierarchy().add(c, task);
         }
       }
