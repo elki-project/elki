@@ -39,7 +39,7 @@ import experimentalcode.students.roedler.parallelCoordinates.utils.SampledResult
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
+public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -153,7 +153,7 @@ public class LineVisualization<NV extends NumberVector<NV, ?>> extends ParallelV
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new LineVisualization<NV>(task);
+      return new LineVisualization(task);
     }
     
     @Override

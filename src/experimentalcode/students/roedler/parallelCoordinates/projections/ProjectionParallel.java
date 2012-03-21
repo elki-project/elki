@@ -46,7 +46,7 @@ public interface ProjectionParallel extends Projection {
 
   public int getLastVisibleDimension();
 
-  public int getLastVisibleDimension(int dim);
+  public int getPrevVisibleDimension(int dim);
 
   public int getNextVisibleDimension(int dim);
 
@@ -64,7 +64,7 @@ public interface ProjectionParallel extends Projection {
 
   public Vector sortDims(Vector s);
 
-  public void setInverted(int dim);
+  public void toggleInverted(int dim);
 
   public void setInverted(int dim, boolean bool);
 
@@ -73,8 +73,6 @@ public interface ProjectionParallel extends Projection {
   public LinearScale getLinearScale(int dim);
 
   public double projectScaledToRender(int dim, double d);
-
-  public Vector projectScaledToRender(Vector v, boolean sort);
 
   public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort);
 

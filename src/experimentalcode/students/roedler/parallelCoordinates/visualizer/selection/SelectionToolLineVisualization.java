@@ -68,7 +68,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @param <NV> vector type
  */
-public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DragableArea.DragListener, DataStoreListener {
+public class SelectionToolLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener, DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -331,7 +331,7 @@ public class SelectionToolLineVisualization<NV extends NumberVector<NV, ?>> exte
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionToolLineVisualization<NV>(task);
+      return new SelectionToolLineVisualization(task);
     }
 
     @Override

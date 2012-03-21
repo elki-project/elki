@@ -69,7 +69,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DragableArea.DragListener, DataStoreListener {
+public class SelectionToolAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener, DataStoreListener {
   /**
    * The logger for this class.
    */
@@ -121,7 +121,7 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
-    
+
   }
 
   @Override
@@ -154,35 +154,37 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
    * Set the selected ranges and the mask for the actual dimensions in the
    * context
    * 
-   * @param x1 min x-value 
-   * @param x2 max x-value 
-   * @param y1 min y-value 
-   * @param y2 max y-value 
+   * @param x1 min x-value
+   * @param x2 max x-value
+   * @param y1 min y-value
+   * @param y2 max y-value
    */
   private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
-    
+
     int minaxis = 0;
     int maxaxis = 0;
     boolean minx = true;
     boolean maxx = false;
     int count = -1;
-    for (int i = 0; i < dim; i++){
-      if (proj.isVisible(i)){ 
-        if (minx && proj.getXpos(i) > x1){
+    for(int i = 0; i < dim; i++) {
+      if(proj.isVisible(i)) {
+        if(minx && proj.getXpos(i) > x1) {
           minaxis = count + 1;
           minx = false;
           maxx = true;
         }
-        if (maxx && (proj.getXpos(i) > x2 || i == dim - 1)){
+        if(maxx && (proj.getXpos(i) > x2 || i == dim - 1)) {
           maxaxis = count;
-          if (i == dim - 1 && proj.getXpos(i) <= x2) { maxaxis++; }
+          if(i == dim - 1 && proj.getXpos(i) <= x2) {
+            maxaxis++;
+          }
           break;
         }
       }
       count = i;
     }
-    for (int i = minaxis; i <= maxaxis; i++){
-      if (proj.isVisible(i)){
+    for(int i = minaxis; i <= maxaxis; i++) {
+      if(proj.isVisible(i)) {
         Vector min = new Vector(1);
         min.set(0, Math.min(getMarginY() + getAxisHeight(), y1));
         Vector max = new Vector(1);
@@ -255,7 +257,7 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
       selection.clear();
       boolean idIn = true;
       for(DBID id : rep.iterDBIDs()) {
-        NV dbTupel = rep.get(id);
+        NumberVector<?, ?> dbTupel = rep.get(id);
         idIn = true;
         for(int i = 0; i < dim; i++) {
           if(ranges != null && ranges[i] != null) {
@@ -311,7 +313,7 @@ public class SelectionToolAxisRangeVisualization<NV extends NumberVector<NV, ?>>
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionToolAxisRangeVisualization<NV>(task);
+      return new SelectionToolAxisRangeVisualization(task);
     }
 
     @Override

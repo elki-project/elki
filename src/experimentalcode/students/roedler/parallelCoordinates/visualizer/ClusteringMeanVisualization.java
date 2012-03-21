@@ -46,7 +46,7 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMe
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener, MenuOwner {
+public class ClusteringMeanVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -276,7 +276,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusteringMeanVisualization<NV>(task, list);
+      return new ClusteringMeanVisualization(task, list);
     }
 
     @Override
@@ -309,7 +309,7 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       protected List<Integer> p;
 
       @Override
@@ -322,8 +322,8 @@ public class ClusteringMeanVisualization<NV extends NumberVector<NV, ?>> extends
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(p);
+      protected Factory makeInstance() {
+        return new Factory(p);
       }
     }
   }

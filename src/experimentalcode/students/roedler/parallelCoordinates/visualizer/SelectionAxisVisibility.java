@@ -33,7 +33,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
+public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -276,7 +276,7 @@ public class SelectionAxisVisibility<NV extends NumberVector<NV, ?>> extends Par
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionAxisVisibility<NV>(task);
+      return new SelectionAxisVisibility(task);
     }
 
     @Override

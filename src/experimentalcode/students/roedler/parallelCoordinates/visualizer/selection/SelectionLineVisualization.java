@@ -62,7 +62,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
+public class SelectionLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -150,7 +150,7 @@ public class SelectionLineVisualization<NV extends NumberVector<NV, ?>> extends 
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionLineVisualization<NV>(task);
+      return new SelectionLineVisualization(task);
     }
 
     @Override

@@ -37,27 +37,34 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   /**
    * Number of dimensions
    */
-  final protected int dims;
+  final int dims;
 
   /**
-   * visible dimensions
+   * Number of visible dimensions
    */
   int visDims;
 
   /**
-   * which dimensions are visible
+   * Flags for the dimensions
    */
-  boolean[] isVisible;
+  byte[] flags;
 
   /**
-   * dimension order
+   * Ordering of dimensions
    */
   int[] dimOrder;
 
   /**
-   * dimension inverted?
+   * Flag for visibility
    */
-  boolean[] inverted;
+  final static byte FLAG_HIDDEN = 1;
+
+  /**
+   * Flag for inverted dimensions
+   * 
+   * TODO: handle inversions via scales?
+   */
+  final static byte FLAG_INVERTED = 2;
 
   /**
    * Constructor.
@@ -66,21 +73,13 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
    */
   public SimpleParallel(LinearScale[] scales) {
     super(scales);
-    this.dims = scales.length;
-    this.visDims = dims;
-    isVisible = new boolean[dims];
-    for(int i = 0; i < isVisible.length; i++) {
-      isVisible[i] = true;
-    }
+    dims = scales.length;
+    visDims = dims;
+    flags = new byte[dims];
     dimOrder = new int[dims];
     for(int i = 0; i < dimOrder.length; i++) {
       dimOrder[i] = i;
     }
-    inverted = new boolean[dims];
-    for(int i = 0; i < inverted.length; i++) {
-      inverted[i] = false;
-    }
-
   }
 
   @Override
@@ -105,19 +104,44 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
 
   @Override
   public boolean isVisible(int dim) {
-    return isVisible[dimOrder[dim]];
+    return (flags[dimOrder[dim]] & FLAG_HIDDEN) != FLAG_HIDDEN;
   }
 
   @Override
   public void setVisible(boolean vis, int dim) {
-    isVisible[dimOrder[dim]] = vis;
-    if(vis == false) {
-      visDims--;
+    boolean prev = isVisible(dim);
+    if(prev == vis) {
+      return;
     }
-    else {
+    if(vis) {
+      flags[dimOrder[dim]] &= ~FLAG_HIDDEN;
       visDims++;
     }
-    // calcAxisPositions();
+    else {
+      flags[dimOrder[dim]] |= FLAG_HIDDEN;
+      visDims--;
+    }
+    // TODO: signal change?
+  }
+
+  @Override
+  public boolean isInverted(int dim) {
+    return (flags[dimOrder[dim]] & FLAG_INVERTED) != FLAG_INVERTED;
+  }
+
+  @Override
+  public void setInverted(int dim, boolean bool) {
+    if(bool) {
+      flags[dimOrder[dim]] |= FLAG_INVERTED;
+    }
+    else {
+      flags[dimOrder[dim]] &= ~FLAG_INVERTED;
+    }
+  }
+
+  @Override
+  public void toggleInverted(int dim) {
+    flags[dimOrder[dim]] ^= FLAG_INVERTED;
   }
 
   @Override
@@ -125,11 +149,10 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
     return projectScaledToRender(v, true);
   }
 
-  @Override
   public Vector projectScaledToRender(Vector v, boolean sort) {
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
-      if(inverted[i]) {
+      if(isInverted(i)) {
         ret.set(i, v.get(i));
       }
       else {
@@ -146,7 +169,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
 
   @Override
   public double projectScaledToRender(int dim, double d) {
-    if(inverted[dim]) {
+    if(isInverted(dim)) {
       return d;
     }
     else {
@@ -158,7 +181,7 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   public Vector projectRenderToScaled(Vector v) {
     Vector ret = new Vector(v.getDimensionality());
     for(int i = 0; i < v.getDimensionality(); i++) {
-      if(inverted[i]) {
+      if(isInverted(i)) {
         ret.set(i, v.get(i));
       }
       else {
@@ -245,23 +268,23 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   @Override
   public double projectDimension(int dim, double value) {
     double temp = scales[dimOrder[dim]].getScaled(value);
-    if(inverted[dimOrder[dim]]) {
+    if(isInverted(dimOrder[dim])) {
       return temp;
     }
     return 1 - temp;
   }
-  
+
   @Override
   public double getXpos(int dim) {
     if(dim < 0 || dim > dims) {
       return -1;
     }
     int notvis = 0;
-    if(isVisible[dimOrder[dim]] == false) {
+    if(isVisible(dimOrder[dim]) == false) {
       return -1.0;
     }
     for(int i = 0; i < dim; i++) {
-      if(isVisible[dimOrder[i]] == false) {
+      if(isVisible(dimOrder[i]) == false) {
         notvis++;
       }
     }
@@ -270,8 +293,8 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
 
   @Override
   public int getLastVisibleDimension() {
-    for(int i = (isVisible.length - 1); i >= 0; i--) {
-      if(isVisible[dimOrder[i]] == true) {
+    for(int i = dims - 1; i >= 0; i--) {
+      if(isVisible(dimOrder[i]) == true) {
         return i;
       }
     }
@@ -279,9 +302,9 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   }
 
   @Override
-  public int getLastVisibleDimension(int dim) {
+  public int getPrevVisibleDimension(int dim) {
     for(int i = dim - 1; i >= 0; i--) {
-      if(isVisible[dimOrder[i]] == true) {
+      if(isVisible(dimOrder[i]) == true) {
         return i;
       }
     }
@@ -343,28 +366,11 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
   @Override
   public int getNextVisibleDimension(int dim) {
     for(int i = dim + 1; i < dims; i++) {
-      if(isVisible[dimOrder[i]] == true) {
+      if(isVisible(dimOrder[i]) == true) {
         return i;
       }
     }
     return dim;
-  }
-
-  @Override
-  public void setInverted(int dim) {
-    inverted[dimOrder[dim]] = !inverted[dimOrder[dim]];
-
-  }
-
-  @Override
-  public void setInverted(int dim, boolean bool) {
-    inverted[dimOrder[dim]] = bool;
-
-  }
-
-  @Override
-  public boolean isInverted(int dim) {
-    return inverted[dimOrder[dim]];
   }
 
   @Override
@@ -374,6 +380,11 @@ public class SimpleParallel extends AbstractProjection implements ProjectionPara
 
   @Override
   public double getDimensions() {
+    return dims;
+  }
+
+  @Override
+  public int getInputDimensionality() {
     return dims;
   }
 }

@@ -47,7 +47,7 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMe
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener, MenuOwner {
+public class ClusteringOutlineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -362,7 +362,7 @@ public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> exte
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusteringOutlineVisualization<NV>(task, list, rounded);
+      return new ClusteringOutlineVisualization(task, list, rounded);
     }
 
     @Override
@@ -395,7 +395,7 @@ public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> exte
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractParameterizer {
       protected List<Integer> p;
       protected boolean rounded = false;
 
@@ -414,8 +414,8 @@ public class ClusteringOutlineVisualization<NV extends NumberVector<NV, ?>> exte
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
-        return new Factory<NV>(p, rounded);
+      protected Factory makeInstance() {
+        return new Factory(p, rounded);
       }
     }
   }
