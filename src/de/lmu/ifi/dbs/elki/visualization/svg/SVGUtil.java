@@ -23,9 +23,10 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.awt.Color;
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Locale;
 
 import javax.swing.text.html.StyleSheet;
@@ -77,9 +78,16 @@ public final class SVGUtil {
   /**
    * SVG color names conversion.
    */
-  final private static HashMap<String, Integer> SVG_COLOR_NAMES = new HashMap<String, Integer>();
+  final private static TObjectIntHashMap<String> SVG_COLOR_NAMES;
+  
+  /**
+   * Key not found value. Not a reasonable color, fully transparent!
+   */
+  final private static int NO_VALUE = 0x00123456;
 
   static {
+    // Build a reasonably sized hashmap. Use 0
+    SVG_COLOR_NAMES = new TObjectIntHashMap<String>(90, .8f, NO_VALUE);
     // List taken from SVG specification:
     // http://www.w3.org/TR/SVG/types.html#ColorKeywords
     SVG_COLOR_NAMES.put("aliceblue", 0xFFF0F8FF);
@@ -468,8 +476,8 @@ public final class SVGUtil {
    * @return Color value
    */
   public static Color stringToColor(String str) {
-    Integer icol = SVG_COLOR_NAMES.get(str.toLowerCase());
-    if(icol != null) {
+    int icol = SVG_COLOR_NAMES.get(str.toLowerCase());
+    if(icol != NO_VALUE) {
       return new Color(icol, false);
     }
     return colorLookupStylesheet.stringToColor(str);

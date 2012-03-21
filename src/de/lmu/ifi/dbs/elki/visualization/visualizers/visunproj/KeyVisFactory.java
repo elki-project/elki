@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGButton;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -101,20 +102,19 @@ public class KeyVisFactory extends AbstractVisualization {
 
     MarkerLibrary ml = context.getStyleLibrary().markers();
     layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    int i = 0;
 
     // Add a label for the clustering.
     {
-      Element label = svgp.svgText(0.1, i + 0.7, clustering.getLongName());
-      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.3");
+      Element label = svgp.svgText(0.1, 0.7, clustering.getLongName());
+      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.2");
       layer.appendChild(label);
-      i++;
     }
 
     // TODO: multi-column layout!
+    int i = 0;
     for(Cluster<Model> c : allcs) {
-      ml.useMarker(svgp, layer, 0.3, i + 0.5, i, 0.3);
-      Element label = svgp.svgText(0.7, i + 0.7, c.getNameAutomatic());
+      ml.useMarker(svgp, layer, 0.3, i + 1.5, i, 0.3);
+      Element label = svgp.svgText(0.7, i + 1.7, c.getNameAutomatic());
       label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(label);
       i++;
@@ -124,33 +124,28 @@ public class KeyVisFactory extends AbstractVisualization {
     {
       StylingPolicy sp = context.getStyleResult().getStylingPolicy();
       if(sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
-        Element button = svgp.svgRect(.1, i + .1, 3.8, .9);
-        SVGUtil.setAtt(button, SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_FILL_PROPERTY + ": silver");
-        layer.appendChild(button);
-        Element label = svgp.svgText(.2, i + .7, "Active style");
-        label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-color: darkgray");
-        layer.appendChild(label);
+        SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
+        button.setTitle("Active style", "darkgray");
+        layer.appendChild(button.render(svgp));
       }
       else {
-        Element button = svgp.svgRect(.1, i + .1, 3.8, .9);
-        SVGUtil.setAtt(button, SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_FILL_PROPERTY + ": silver");
-        layer.appendChild(button);
-        Element label = svgp.svgText(.2, i + .7, "Set style");
-        label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
-        EventTarget etr = (EventTarget) button;
+        SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
+        button.setTitle("Set style", "black");
+        Element elem = button.render(svgp);
+        // Attach listener
+        EventTarget etr = (EventTarget) elem;
         etr.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new EventListener() {
           @Override
           public void handleEvent(Event evt) {
             setStylePolicy();
           }
         }, false);
-        layer.appendChild(label);
+        layer.appendChild(elem);
       }
-      i++;
     }
 
-    int cols = Math.max(6, (int) (i * task.getHeight() / task.getWidth()));
-    int rows = i;
+    int rows = i + 2;
+    int cols = Math.max(6, (int) (rows * task.getHeight() / task.getWidth()));
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
