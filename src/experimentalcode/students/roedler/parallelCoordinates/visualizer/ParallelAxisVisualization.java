@@ -25,7 +25,7 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.SVGParallelLine
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
+public class ParallelAxisVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
 
   /**
    * Constructor.
@@ -86,7 +86,7 @@ public class ParallelAxisVisualization<NV extends NumberVector<NV, ?>> extends P
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ParallelAxisVisualization<NV>(task);
+      return new ParallelAxisVisualization(task);
     }
 
     @Override

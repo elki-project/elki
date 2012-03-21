@@ -32,7 +32,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends ParallelVisualization<NV> implements DataStoreListener {
+public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
 
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -163,7 +163,7 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
         }
         if (j == 0 || j == 2){
           if (j == 0){
-            proj.swapDimensions(i, proj.getLastVisibleDimension(i));
+            proj.swapDimensions(i, proj.getPrevVisibleDimension(i));
           }
           else {
             proj.swapDimensions(i, proj.getNextVisibleDimension(i));
@@ -281,7 +281,7 @@ public class SelectionDimensionOrder<NV extends NumberVector<NV, ?>> extends Par
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionDimensionOrder<NV>(task);
+      return new SelectionDimensionOrder(task);
     }
 
     @Override

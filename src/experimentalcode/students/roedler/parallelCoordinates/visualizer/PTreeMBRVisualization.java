@@ -342,7 +342,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
       * 
       * @apiviz.exclude
       */
-     public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractParameterizer {
+     public static class Parameterizer extends AbstractParameterizer {
        protected boolean fill = true;
        protected List<Integer> p;
 
@@ -361,8 +361,8 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
        }
 
        @Override
-       protected Factory<NV> makeInstance() {
-         return new Factory<NV>(fill, p);
+       protected Factory makeInstance() {
+         return new Factory(fill, p);
        }
      }
    }
