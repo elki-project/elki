@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -18,8 +19,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
  * Creates segments of two or more clusterings. Segments are the equally paired database
- * objects of all given (2+) clusterings. Objects are combined by a string (segmentID),
- * so no database objects are saved.
+ * objects of all given (2+) clusterings.
+ * 
+ * Objects are combined by a string (segmentID), so no database objects are saved. <br />
+ * edit: now they are saved additionally, else all objects must be iterated for each selection
  * 
  * Segments are created by adding each db object via the addObject() method and afterwards
  * converted to pairs by convertToPairSegments().
@@ -49,29 +52,24 @@ public class Segments {
   private int[] clusters;
   
   /**
-   * Number of Clusters for each clustering
-   */
-  //private int[] noiseclusters;
-  //private int[] noiseindex;
-  
-  /**
    * Total number of pairs
    */
   private int pairs;
   
   /**
-   * List of object based segments
+   * List of object based segments (segment, size)
    */
   private TreeMap<SegmentID, Integer> objectSegments;
+  // store (segments, dbids) TODO: use objectSegments instead
+  private TreeMap<SegmentID, ArrayModifiableDBIDs> segmentDBIDs;
   
   /**
-   * List of pair based segments and their paircount
+   * List of pair based segments and their paircount (segment, paircount)
    */
   private TreeMap<SegmentID, Integer> pairSegments;
   
   // TODO: flag noise clusters by clustering-cluster
-  
-  
+
   /**
    * List of pair segments and their involved object segments (helper)
    */
@@ -91,10 +89,11 @@ public class Segments {
   public Segments(List<Clustering<?>> clusterings) {
     
     this.clusterings    = clusterings;
-    
+    //DBIDUtil.newArray()
     objectSegments      = new TreeMap<SegmentID, Integer>();
     fragmentedSegments  = new TreeMap<SegmentID, SortedSet<SegmentID>>();
     pairSegments        = new TreeMap<SegmentID, Integer>();
+    segmentDBIDs        = new TreeMap<SegmentID, ArrayModifiableDBIDs>();
     
     clusteringsCount    = clusterings.size();
     clusters            = new int[clusteringsCount];
@@ -120,7 +119,7 @@ public class Segments {
   }
   
   /**
-   * Add a database object.
+   * Add a database object to its segment.
    * 
    * @param tag   occurrence in clusterings
    * @param id    object id in DB
@@ -132,15 +131,27 @@ public class Segments {
     if (objectSegments.containsKey(tag)) {
       
       objectSegments.put(tag, objectSegments.get(tag)+1);
-      
+      ArrayModifiableDBIDs dbids = segmentDBIDs.get(tag);
+      dbids.add(objectID);
+     
+    // first segment created
     } else {
       
+      // assign an index
+      tag.setIndex(objectSegments.size());
+      // add to list
       objectSegments.put(tag, 1);
+      ArrayModifiableDBIDs dbids = DBIDUtil.newArray();
+      dbids.add(objectID);
+      segmentDBIDs.put(tag, dbids);
     }
   }
   
+  public TreeMap<SegmentID, ArrayModifiableDBIDs> getSegmentDBIDs() {
+    return segmentDBIDs;
+  }
+   
   public String getClusteringDescription(int clusteringID) {
-    
     return clusterings.get(clusteringID).getLongName();
   }
   
@@ -699,13 +710,20 @@ public class Segments {
   }
   
   public int getClusterings() {
-    
     return clusteringsCount;
   }
   
   public int[] getClusters() {
-    
     return clusters;
+  }
+  
+  public int getSegmentIndex(String segmentID) {
+    
+    for (SegmentID segment : pairSegments.keySet()) {
+      if (segment.toString().compareTo(segmentID) == 0) return segment.getIndex();
+    }
+    
+    return -1;
   }
   
   /**

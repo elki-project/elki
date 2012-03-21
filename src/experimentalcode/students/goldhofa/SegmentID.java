@@ -15,13 +15,22 @@ import java.lang.Comparable;
  */
 public class SegmentID implements Comparable<SegmentID> {
   
-  private static final String SEPARATOR = "-"; 
+  private static final String SEPARATOR = "-";
+  private int index = 0;
   
   public ArrayList<Integer> ids;
   
   public SegmentID() {
     
     ids = new ArrayList<Integer>(2);
+  }
+  
+  public void setIndex(int index) {
+    this.index = index;
+  }
+  
+  public int getIndex() {
+    return index;
   }
   
   public SegmentID(int clusterings) {

@@ -131,31 +131,13 @@ public class ClusteringComparison implements Evaluator {
     //
     
     Segments segments = new Segments(clusterings);
-/*    
-<<<<<<< .mine
-    // TODO: iterate over DBIDs
-    // TEMP: DBIDs may be added multiple times
-    Clustering<?> tmpCli = clusterings.get(0);
-    for(Cluster<?> tmpClr : tmpCli.getAllClusters()) {
-      for(DBID id : tmpClr.getIDs()) {
-        segments.addObject(id);
-      }
-=======
-*/
+    
     for (DBID id : db.getRelation(TypeUtil.DBID).iterDBIDs()) {
-
       // tag Object over SegmentID
       segments.addObject(id);
-/*
- * >>>>>>> .r8932
- */
     }
     
-    // Better this way?
-    
     List<Relation<?>> relations = ResultUtil.getRelations(baseResult);
-    DBIDs ids = relations.get(0).getDBIDs();
-    System.out.println("DBIDs: "+ids.size());
 
     // convert segments
     segments.convertToPairSegments();
