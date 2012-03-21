@@ -23,7 +23,6 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.SVGParallelLine
  * 
  * @apiviz.uses SVGSimpleLinearAxis
  * 
- * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class ParallelAxisVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
 
@@ -70,7 +69,7 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
    * 
    * @param <NV>
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * A short name characterizing this Visualizer.
      */

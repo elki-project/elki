@@ -60,7 +60,6 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
  * 
- * @param <NV> Type of the NumberVector being visualized.
  */
 public class SelectionLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
@@ -137,9 +136,8 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
    * 
    * @apiviz.stereotype factory
    * 
-   * @param <NV> vector type
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
 
     /**
      * Constructor.
