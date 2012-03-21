@@ -99,25 +99,25 @@ public class SVGEffects {
 
       Element stop0 = svgp.svgElement(SVGConstants.SVG_STOP_TAG);
       stop0.setAttribute(SVGConstants.SVG_STOP_COLOR_ATTRIBUTE, "white");
-      // stop0.setAttribute(SVGConstants.SVG_STOP_OPACITY_ATTRIBUTE, "0");
+      stop0.setAttribute(SVGConstants.SVG_STOP_OPACITY_ATTRIBUTE, "1");
       stop0.setAttribute(SVGConstants.SVG_OFFSET_ATTRIBUTE, "0");
       gradient.appendChild(stop0);
 
       Element stop04 = svgp.svgElement(SVGConstants.SVG_STOP_TAG);
       stop04.setAttribute(SVGConstants.SVG_STOP_COLOR_ATTRIBUTE, "white");
-      stop04.setAttribute(SVGConstants.SVG_STOP_OPACITY_ATTRIBUTE, "1");
+      stop04.setAttribute(SVGConstants.SVG_STOP_OPACITY_ATTRIBUTE, "0");
       stop04.setAttribute(SVGConstants.SVG_OFFSET_ATTRIBUTE, ".4");
       gradient.appendChild(stop04);
       
       Element stop06 = svgp.svgElement(SVGConstants.SVG_STOP_TAG);
       stop06.setAttribute(SVGConstants.SVG_STOP_COLOR_ATTRIBUTE, "black");
-      stop06.setAttribute(SVGConstants.SVG_STOP_OPACITY_ATTRIBUTE, "1");
+      stop06.setAttribute(SVGConstants.SVG_STOP_OPACITY_ATTRIBUTE, "0");
       stop06.setAttribute(SVGConstants.SVG_OFFSET_ATTRIBUTE, ".6");
       gradient.appendChild(stop06);
 
       Element stop1 = svgp.svgElement(SVGConstants.SVG_STOP_TAG);
-      stop1.setAttribute(SVGConstants.SVG_STOP_COLOR_ATTRIBUTE, "white");
-      // stop1.setAttribute(SVGConstants.SVG_STOP_OPACITY_ATTRIBUTE, "0");
+      stop1.setAttribute(SVGConstants.SVG_STOP_COLOR_ATTRIBUTE, "black");
+      stop1.setAttribute(SVGConstants.SVG_STOP_OPACITY_ATTRIBUTE, ".5");
       stop1.setAttribute(SVGConstants.SVG_OFFSET_ATTRIBUTE, "1");
       gradient.appendChild(stop1);
 

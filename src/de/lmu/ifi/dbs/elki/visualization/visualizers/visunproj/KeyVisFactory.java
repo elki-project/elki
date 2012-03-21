@@ -106,7 +106,7 @@ public class KeyVisFactory extends AbstractVisualization {
     // Add a label for the clustering.
     {
       Element label = svgp.svgText(0.1, 0.7, clustering.getLongName());
-      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.2");
+      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.4");
       layer.appendChild(label);
     }
 
