@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -72,6 +71,7 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
     int dim = DatabaseUtil.dimensionality(relation);
     StylingPolicy sp = context.getStyleResult().getStylingPolicy();
     addCSSClasses(svgp, sp);
+    calcAxisPositions();
 
     Iterator<DBID> ids = sample.getSample().iterator();
     if(ids == null || !ids.hasNext()) {
@@ -85,11 +85,9 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
         for (Iterator<DBID> iter = csp.iterateClass(c); iter.hasNext(); ) {
           DBID id = iter.next();
           SVGPath path = new SVGPath();
-          Vector yPos = getYPositions(id);
+          double[] yPos = getYPositions(id);
           for(int i = 0; i < dim; i++) {
-            if(proj.isVisible(i)) {
-              path.drawTo(proj.getXpos(i), yPos.get(i));
-            }
+            path.drawTo(i * dist, yPos[i]);
           }
           Element line = path.makeElement(svgp);
           SVGUtil.addCSSClass(line, key);
@@ -101,11 +99,9 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
       while(ids.hasNext()) {
         DBID id = ids.next();
         SVGPath path = new SVGPath();
-        Vector yPos = getYPositions(id);
+        double[] yPos = getYPositions(id);
         for(int i = 0; i < dim; i++) {
-          if(proj.isVisible(i)) {
-            path.drawTo(proj.getXpos(i), yPos.get(i));
-          }
+          path.drawTo(i * dist, yPos[i]);
         }
         Element line = path.makeElement(svgp);
         SVGUtil.addCSSClass(line, DATALINE);

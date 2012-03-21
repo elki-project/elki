@@ -33,13 +33,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -59,7 +57,6 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * @author Robert Rödler
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
- * 
  */
 public class SelectionLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
@@ -84,16 +81,15 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
   protected void redraw() {
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
+      calcAxisPositions();
       DBIDs selection = selContext.getSelectedIds();
 
       for(DBID objId : selection) {
-        SVGPath path = new SVGPath();
-        Vector yPos = getYPositions(objId);
+        double[] yPos = getYPositions(objId);
 
-        for(int i = 0; i < (DatabaseUtil.dimensionality(relation)); i++) {
-          if(proj.isVisible(i)) {
-            path.drawTo(proj.getXpos(i), yPos.get(i));
-          }
+        SVGPath path = new SVGPath();
+        for(int i = 0; i < proj.getVisibleDimensions(); i++) {
+          path.drawTo(i * dist, yPos[i]);
         }
         Element marker = path.makeElement(svgp);
         SVGUtil.addCSSClass(marker, MARKER);

@@ -62,23 +62,21 @@ public interface ProjectionParallel extends Projection {
 
   public int getDimensionNumber(int pos);
 
-  public Vector sortDims(Vector s);
-
   public void toggleInverted(int dim);
 
   public void setInverted(int dim, boolean bool);
 
   public boolean isInverted(int dim);
+  
+  public double[] fastProjectDataToRenderSpace(Vector v);
 
-  public LinearScale getLinearScale(int dim);
+  public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> v);
 
-  public double projectScaledToRender(int dim, double d);
+  //public double projectScaledToRender(int dim, double d);
 
-  public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort);
+  //public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort);
 
   public int getDimensionsPosition(int dim);
 
   double getXpos(int dim);
-
-  public double getDimensions();
 }

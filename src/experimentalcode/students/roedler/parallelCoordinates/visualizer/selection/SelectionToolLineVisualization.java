@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -54,7 +53,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
@@ -169,7 +167,7 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
     Mode mode = getInputMode(evt);
     deleteChildren(rtag);
     if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
-      updateSelection(mode, proj, startPoint, dragPoint);
+      updateSelection(mode, startPoint, dragPoint);
     }
     return true;
   }
@@ -202,11 +200,11 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
    * Updates the selection in the context.<br>
    * 
    * @param mode Input mode
-   * @param proj
    * @param p1 first point of the selected rectangle
    * @param p2 second point of the selected rectangle
    */
-  private void updateSelection(Mode mode, ProjectionParallel proj, SVGPoint p1, SVGPoint p2) {
+  private void updateSelection(Mode mode, SVGPoint p1, SVGPoint p2) {
+    calcAxisPositions();
     DBIDSelection selContext = context.getSelection();
     // Note: we rely on SET semantics below!
     final HashSetModifiableDBIDs selection;
@@ -218,7 +216,7 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
     }
     int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
     for(DBID objId : relation.iterDBIDs()) {
-      Vector yPos = getYPositions(objId);
+      double[] yPos = getYPositions(objId);
       if(checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))) {
         if(mode == Mode.INVERT) {
           if(!selection.contains(objId)) {
@@ -266,20 +264,20 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
     return new int[] { minaxis, maxaxis };
   }
 
-  private boolean checkSelected(int[] ar, Vector yPos, double x1, double x2, double y1, double y2) {
+  private boolean checkSelected(int[] ar, double[] yPos, double x1, double x2, double y1, double y2) {
     if(ar[1] >= dim) {
       ar[1] = dim - 1;
     }
     for(int i = ar[0] + 1; i <= ar[1] - 1; i++) {
       if(proj.isVisible(i)) {
-        if(yPos.get(i) <= y1 && yPos.get(i) >= y2) {
+        if(yPos[i] <= y1 && yPos[i] >= y2) {
           return true;
         }
 
       }
     }
-    Line2D.Double idline1 = new Line2D.Double(proj.getXpos(ar[0]), yPos.get(ar[0]), proj.getXpos(ar[0] + 1), yPos.get(ar[0] + 1));
-    Line2D.Double idline2 = new Line2D.Double(proj.getXpos(ar[1] - 1), yPos.get(ar[1] - 1), proj.getXpos(ar[1]), yPos.get(ar[1]));
+    Line2D.Double idline1 = new Line2D.Double(dist * ar[0], yPos[ar[0]], dist * (ar[0] + 1), yPos[ar[0] + 1]);
+    Line2D.Double idline2 = new Line2D.Double(dist * (ar[1] - 1), yPos[ar[1] - 1], dist * ar[1], yPos[ar[1]]);
     Line2D.Double rectline1 = new Line2D.Double(x2, y1, x1, y1);
     Line2D.Double rectline2 = new Line2D.Double(x2, y1, x2, y2);
     Line2D.Double rectline3 = new Line2D.Double(x2, y2, x1, y2);

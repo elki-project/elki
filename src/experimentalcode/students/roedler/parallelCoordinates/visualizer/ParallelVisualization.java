@@ -67,7 +67,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   /**
    * space between two axis
    */
-  double dist;
+  protected double dist;
 
   /**
    * viewbox size
@@ -87,7 +87,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     
     margins = new double[] { 0.071, 0.071 };
     size = new double[] { task.width, task.height };
-    dist = (size[0] - 2 * margins[0]) / (proj.getDimensions() - 1.);
+    dist = (size[0] - 2 * margins[0]) / (proj.getInputDimensionality() - 1.);
     
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
   }
@@ -131,17 +131,17 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   }
 
   protected void calcAxisPositions() {
-    dist = (size[0] - 2 * margins[0]) / -(proj.getVisibleDimensions() - 1.);
+    dist = (size[0] - 2 * margins[0]) / (proj.getVisibleDimensions() - 1.);
   }
   
   protected double getAxisHeight() {
     return 0.71;
   }
 
-  protected Vector getYPositions(DBID objId) {
-    Vector vec = proj.projectDataToRenderSpace(relation.get(objId));
-    vec.plusEquals(margins[1]);
-    vec.timesEquals(getAxisHeight());
-    return vec;
+  protected double[] getYPositions(DBID objId) {
+    double[] v = proj.fastProjectDataToRenderSpace(relation.get(objId));
+    Vector vec = new Vector(v);
+    vec.plusEquals(margins[1]).timesEquals(getAxisHeight());
+    return v;
   }
 }

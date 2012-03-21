@@ -188,7 +188,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
         min.set(0, Math.min(getMarginY() + getAxisHeight(), y1));
         Vector max = new Vector(1);
         max.set(0, Math.max(getMarginY(), y2));
-        ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(min).get(0)), proj.getLinearScale(i).getUnscaled(proj.projectRenderToScaled(max).get(0)));
+        ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(proj.getScale(i).getUnscaled(proj.projectRenderToScaled(min).get(0)), proj.getScale(i).getUnscaled(proj.projectRenderToScaled(max).get(0)));
       }
     }
   }
