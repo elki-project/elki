@@ -115,4 +115,11 @@ public class MeanVarianceMinMax extends MeanVariance {
   public String toString() {
     return "MeanVarianceMinMax(mean=" + getMean() + ",var=" + getSampleVariance() + ",min=" + getMin() + ",max=" + getMax() + ")";
   }
+
+  @Override
+  public void reset() {
+    super.reset();
+    min = Double.POSITIVE_INFINITY;
+    max = Double.NEGATIVE_INFINITY;
+  }
 }

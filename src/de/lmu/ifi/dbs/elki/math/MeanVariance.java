@@ -240,4 +240,10 @@ public class MeanVariance extends Mean {
   public String toString() {
     return "MeanVariance(mean=" + getMean() + ",var=" + getSampleVariance() + ")";
   }
+
+  @Override
+  public void reset() {
+    super.reset();
+    nvar = 0;
+  }
 }
