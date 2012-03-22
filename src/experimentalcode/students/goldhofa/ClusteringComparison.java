@@ -97,6 +97,8 @@ public class ClusteringComparison implements Evaluator {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
 
+    List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
+    if (ccr.size() > 0) return;
     
     // get all clustering
     List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
@@ -106,6 +108,8 @@ public class ClusteringComparison implements Evaluator {
     
     // db
     final Database db = ResultUtil.findDatabase(baseResult);
+    
+    
     
 
     // result to save evaluations

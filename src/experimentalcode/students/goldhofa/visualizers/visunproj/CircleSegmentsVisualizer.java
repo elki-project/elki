@@ -26,16 +26,20 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ToolBox2DVisualization;
 import experimentalcode.students.goldhofa.CCConstants;
 import experimentalcode.students.goldhofa.ClusteringComparison;
 import experimentalcode.students.goldhofa.ClusteringComparisonResult;
@@ -61,7 +65,7 @@ import experimentalcode.students.goldhofa.visualization.style.CSStylingPolicy;
  * 
  * @author Sascha Goldhofer
  */
-public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*ContextChangeListener,*/ ResultListener {
+public class CircleSegmentsVisualizer extends AbstractVisualization implements /*ContextChangeListener,*/ ResultListener {
   /**
    * CircleSegments visualizer name
    */
@@ -182,8 +186,9 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   /**
    * Constructor
    */
-  public CircleSegmentsVisualizer() {
-    super();
+  public CircleSegmentsVisualizer(VisualizationTask task) {
+    super(task);
+    buildSegments();
   }
   
   public void showUnclusteredPairs(boolean show) {
@@ -304,30 +309,9 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
       offsetAngle += alpha+Properties.CLUSTER_DISTANCE.getValue();
     }
   }
-  
-  @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    // If no comparison result found abort
-    List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
-    if (ccr.size() != 1) return;
+
+  public void buildSegments() {
     
-    ClusteringComparisonResult ccResult = ccr.get(0);
-
-    // create task for visualization
-    final VisualizationTask task = new VisualizationTask(NAME, ccResult, null, this);
-    task.width  = 2.0;
-    task.height = 2.0;
-    task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-    baseResult.getHierarchy().add(ccr.get(0), task);
-  }
-  
-  @Override
-  public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-    return makeVisualization(task);
-  }
-
-  @Override
-  public Visualization makeVisualization(VisualizationTask task) {
     context = task.getContext();
     svgp    = task.getPlot();
     ccr     = task.getResult();
@@ -421,7 +405,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     layer.appendChild(ctrlLayer);
     layer.appendChild(visLayer);
 
-    return new StaticVisualization(task, layer);
+    //return new StaticVisualization(task, layer);
   }
   
   /**
@@ -456,7 +440,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
    * 
    * @param svgp
    */
-  private void addCSSClasses(SVGPlot svgp) {
+  protected void addCSSClasses(SVGPlot svgp) {
     
     // CLUSTER BORDER
     CSSClass cssReferenceBorder = new CSSClass(this, CCConstants.CLR_BORDER_CLASS);
@@ -535,7 +519,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
    * @param colors  colors for the gradient
    * @return        array of colors for css: "rgb(red, green, blue)"
    */
-  private String[] getGradient(int shades, int[][] colors) {
+  protected String[] getGradient(int shades, int[][] colors) {
     
     // only even shades
     shades += shades%2;
@@ -733,6 +717,43 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
 
   @Override
   public void resultRemoved(Result child, Result parent) {}
+  
+  /**
+   * Factory for visualizers for a circle segment
+   * @apiviz.stereotype factory
+   * @apiviz.uses CircleSegmentsVisualizer oneway - - «create»
+   */
+  public static class Factory extends AbstractVisFactory {
+    /**
+     * Constructor
+     */
+    public Factory() {
+      super();
+    }
+
+    @Override
+    public Visualization makeVisualization(VisualizationTask task) {
+      System.out.println("CREATING CS VIS");
+      return new CircleSegmentsVisualizer(task);
+    }
+
+    @Override
+    public void processNewResult(HierarchicalResult baseResult, Result result) {
+
+      // If no comparison result found abort
+      List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
+      if (ccr.size() != 1) return;
+      
+      ClusteringComparisonResult ccResult = ccr.get(0);
+
+      // create task for visualization
+      final VisualizationTask task = new VisualizationTask(NAME, ccResult, null, this);
+      task.width  = 2.0;
+      task.height = 2.0;
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+      baseResult.getHierarchy().add(ccr.get(0), task);
+    }
+  }
 }
 
 // TODO Ghost und Liste animieren
