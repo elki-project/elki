@@ -65,9 +65,9 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   final double[] margins;
 
   /**
-   * space between two axis
+   * Space between two axes
    */
-  protected double dist;
+  protected double axsep;
 
   /**
    * viewbox size
@@ -87,7 +87,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     
     margins = new double[] { 0.071, 0.071 };
     size = new double[] { task.width, task.height };
-    dist = (size[0] - 2 * margins[0]) / (proj.getInputDimensionality() - 1.);
+    axsep = size[0] / (proj.getInputDimensionality() - 1.);
     
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
   }
@@ -104,11 +104,10 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
    */
   public Element setupCanvas(SVGPlot svgp, ProjectionParallel proj, double margin, double width, double height) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(width, height, getSizeX(), getSizeY(), 0.);
+    final String transform = SVGUtil.makeMarginTransform(width, height, size[0], size[1], margins[0], margins[1], margins[0], margins[1]);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     return layer;
   }
-  
 
   protected double getSizeX() {
     return size[0];
@@ -116,10 +115,6 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
 
   protected double getSizeY() {
     return size[1];
-  }
-
-  protected double getDist() {
-    return dist;
   }
 
   protected double getMarginX() {
@@ -130,12 +125,16 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     return margins[1];
   }
 
-  protected void calcAxisPositions() {
-    dist = (size[0] - 2 * margins[0]) / (proj.getVisibleDimensions() - 1.);
+  protected void recalcAxisPositions() {
+    axsep = size[0] / (proj.getVisibleDimensions() - 1.);
   }
   
   protected double getAxisHeight() {
     return 0.71;
+  }
+  
+  protected double getAxisX(double d) {
+    return d * axsep;
   }
 
   protected double[] getYPositions(DBID objId) {

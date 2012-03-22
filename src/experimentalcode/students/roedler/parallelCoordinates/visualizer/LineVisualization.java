@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -68,10 +67,9 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
 
   @Override
   protected void redraw() {
-    int dim = DatabaseUtil.dimensionality(relation);
     StylingPolicy sp = context.getStyleResult().getStylingPolicy();
     addCSSClasses(svgp, sp);
-    calcAxisPositions();
+    recalcAxisPositions();
 
     Iterator<DBID> ids = sample.getSample().iterator();
     if(ids == null || !ids.hasNext()) {
@@ -86,8 +84,8 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
           DBID id = iter.next();
           SVGPath path = new SVGPath();
           double[] yPos = getYPositions(id);
-          for(int i = 0; i < dim; i++) {
-            path.drawTo(i * dist, yPos[i]);
+          for(int i = 0; i < yPos.length; i++) {
+            path.drawTo(getAxisX(i), yPos[i]);
           }
           Element line = path.makeElement(svgp);
           SVGUtil.addCSSClass(line, key);
@@ -100,8 +98,8 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
         DBID id = ids.next();
         SVGPath path = new SVGPath();
         double[] yPos = getYPositions(id);
-        for(int i = 0; i < dim; i++) {
-          path.drawTo(i * dist, yPos[i]);
+        for(int i = 0; i < yPos.length; i++) {
+          path.drawTo(getAxisX(i), yPos[i]);
         }
         Element line = path.makeElement(svgp);
         SVGUtil.addCSSClass(line, DATALINE);

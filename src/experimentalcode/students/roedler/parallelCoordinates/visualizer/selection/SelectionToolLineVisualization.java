@@ -204,7 +204,7 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
    * @param p2 second point of the selected rectangle
    */
   private void updateSelection(Mode mode, SVGPoint p1, SVGPoint p2) {
-    calcAxisPositions();
+    recalcAxisPositions();
     DBIDSelection selContext = context.getSelection();
     // Note: we rely on SET semantics below!
     final HashSetModifiableDBIDs selection;
@@ -269,15 +269,15 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
       ar[1] = dim - 1;
     }
     for(int i = ar[0] + 1; i <= ar[1] - 1; i++) {
+      // FIXME: inconsistent axis numbering
       if(proj.isVisible(i)) {
         if(yPos[i] <= y1 && yPos[i] >= y2) {
           return true;
         }
-
       }
     }
-    Line2D.Double idline1 = new Line2D.Double(dist * ar[0], yPos[ar[0]], dist * (ar[0] + 1), yPos[ar[0] + 1]);
-    Line2D.Double idline2 = new Line2D.Double(dist * (ar[1] - 1), yPos[ar[1] - 1], dist * ar[1], yPos[ar[1]]);
+    Line2D.Double idline1 = new Line2D.Double(getAxisX(ar[0]), yPos[ar[0]], getAxisX(ar[0] + 1), yPos[ar[0] + 1]);
+    Line2D.Double idline2 = new Line2D.Double(getAxisX(ar[1] - 1), yPos[ar[1] - 1], getAxisX(ar[1]), yPos[ar[1]]);
     Line2D.Double rectline1 = new Line2D.Double(x2, y1, x1, y1);
     Line2D.Double rectline2 = new Line2D.Double(x2, y1, x2, y2);
     Line2D.Double rectline3 = new Line2D.Double(x2, y2, x1, y2);

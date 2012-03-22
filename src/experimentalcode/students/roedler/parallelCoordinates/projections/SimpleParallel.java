@@ -97,7 +97,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   }
 
   protected boolean inverted(int rawdim) {
-    return (flags[rawdim] & FLAG_INVERTED) != FLAG_INVERTED;
+    return (flags[rawdim] & FLAG_INVERTED) == FLAG_INVERTED;
   }
 
   @Override

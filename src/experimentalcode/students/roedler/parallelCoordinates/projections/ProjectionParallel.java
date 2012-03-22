@@ -25,7 +25,6 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
 /**
