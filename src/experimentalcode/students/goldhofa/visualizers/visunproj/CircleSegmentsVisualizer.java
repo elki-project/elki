@@ -17,7 +17,6 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MouseEvent;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -37,7 +36,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import experimentalcode.students.goldhofa.CCConstants;
 import experimentalcode.students.goldhofa.ClusteringComparison;
 import experimentalcode.students.goldhofa.ClusteringComparisonResult;
@@ -64,7 +62,6 @@ import experimentalcode.students.goldhofa.visualization.style.CSStylingPolicy;
  * @author Sascha Goldhofer
  */
 public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*ContextChangeListener,*/ ResultListener {
-  
   /**
    * CircleSegments visualizer name
    */
@@ -139,7 +136,6 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
    * Properties of a Segment
    */
   private static enum Properties {
-    
     // Constant values
     CLUSTERING_DISTANCE(0.01),    // Margin between two rings
     CLUSTER_MIN_WIDTH(0.01),      // Minimum width (radian) of Segment
@@ -205,7 +201,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
     
     // add new node to draw
     visLayer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    visLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, attTranslate);
+    //visLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, attTranslate);
     parent.appendChild(visLayer);
     
     redraw();
@@ -220,7 +216,6 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
    * Create the segments
    */
   public void redraw() {
-
     int refClustering   = 0;
     int refSegment      = 0;
     double offsetAngle  = 0.0;
@@ -289,7 +284,6 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
         // if its an unpaired cluster set color to white 
         else segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.CLR_UNPAIRED_CLASS);
         
-        
         visLayer.appendChild(segment);
       }
       
@@ -313,7 +307,6 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
   
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    
     // If no comparison result found abort
     List<ClusteringComparisonResult> ccr = ResultUtil.filterResults(result, ClusteringComparisonResult.class);
     if (ccr.size() != 1) return;
@@ -335,15 +328,14 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    
     context = task.getContext();
     svgp    = task.getPlot();
     ccr     = task.getResult();
     
     this.segments   = ccr.getSegments();
-    this.layer      = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    this.visLayer   = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    this.ctrlLayer  = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    this.layer      = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    this.visLayer   = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    this.ctrlLayer  = svgp.svgElement(SVGConstants.SVG_G_TAG);
     
     this.selectionInfo  = new UnorderedList(svgp);
     this.selection      = new SegmentSelection(task, policy, visLayer, segments, selectionInfo);
@@ -437,7 +429,6 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory implements /*Co
    * only with "showUnclusteredPairs".
    */
   protected void calculateSegmentProperties() {
-    
     pairSegments = segments.getSegments(showUnclusteredPairs);
     
     clusterSize = segments.getHighestClusterCount();

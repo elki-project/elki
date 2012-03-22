@@ -1,12 +1,7 @@
 package experimentalcode.students.goldhofa.visualization.batikutil;
 
-import javax.swing.event.EventListenerList;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -34,12 +29,11 @@ public class BarChart implements UIInterfaceElement {
 
   
   public BarChart(SVGPlot svgp, double width, double height, boolean isHorizontal) {
-    
     this.svgp = svgp;
     horizontal = isHorizontal;
-    barchart = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    barchart = svgp.svgElement(SVGConstants.SVG_G_TAG);
     
-    bar = SVGUtil.svgRect(svgp.getDocument(), 0.0, 0.0, width, height);
+    bar = svgp.svgRect(0.0, 0.0, width, height);
     bar.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#a0a0a0");
     bar.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
     bar.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.5");
@@ -47,11 +41,11 @@ public class BarChart implements UIInterfaceElement {
     if (isHorizontal) {
       length  = width;
       this.width = height;
-      chart   = SVGUtil.svgRect(svgp.getDocument(), 1, 1, 0, height-2);
+      chart   = svgp.svgRect(1, 1, 0, height-2);
     } else {
       length = height;
       this.width = width;
-      chart   = SVGUtil.svgRect(svgp.getDocument(), 1, 1, width-2, 0);
+      chart   = svgp.svgRect(1, 1, width-2, 0);
     }   
 
     chart.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#d4e4f1");
@@ -72,7 +66,6 @@ public class BarChart implements UIInterfaceElement {
   }
   
   public void addLabel(String text) {
-
     if (horizontal) {
       label = svgp.svgText(length+5, width/2 + 5, text);
     } else {
