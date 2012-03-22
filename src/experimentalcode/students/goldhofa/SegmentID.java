@@ -16,12 +16,15 @@ import java.lang.Comparable;
 public class SegmentID implements Comparable<SegmentID> {
   
   private static final String SEPARATOR = "-";
-  private int index = 0;
   
+  // number of segment. if -1 this segment id is a unclustered pair segment, having no
+  // corresponding object segment
+  private int index = -1;
+  
+  // 
   public ArrayList<Integer> ids;
   
   public SegmentID() {
-    
     ids = new ArrayList<Integer>(2);
   }
   

@@ -37,6 +37,18 @@ public class CSStylingPolicy implements ClassStylingPolicy {
   // unselected objects
   ArrayModifiableDBIDs unselected;
   ArrayList<ArrayModifiableDBIDs> selected;
+
+  // all segments
+  Segments segments;
+  
+  // selection
+  protected ArrayList<SegmentID> selectedSegments;
+  protected ArrayList<SegmentID> unselectedSegments;
+  protected ArrayModifiableDBIDs unselectedObjects;
+  protected boolean changed = false;
+  
+  // unselected segments
+  
   
   /**
    * Object IDs
@@ -56,106 +68,106 @@ public class CSStylingPolicy implements ClassStylingPolicy {
   public CSStylingPolicy(Clustering<?> clustering, StyleLibrary style, Segments segments) {
     super();
     
+    this.segments = segments;
     
-    int segmentSize = segments.getSegments(false).size();
-    System.out.println("segment count: "+segmentSize);
-    
-    unselected    = DBIDUtil.newArray();
-    selected      = new ArrayList<ArrayModifiableDBIDs>(segmentSize);
-    
-    for (int i=0; i<segmentSize; ++i) {
-      selected.add(DBIDUtil.newArray());
-    }
-    
-    //TreeMap<SegmentID, ArrayModifiableDBIDs> segmentToIDs = segments.getSegmentDBIDs();
-
-    ColorLibrary colorset = style.getColorSet(StyleLibrary.PLOT);
-    List<? extends Cluster<?>> clusters = clustering.getAllClusters();
-    ids = new ArrayList<DBIDs>(clusters.size());
-    colors = new TIntArrayList(clusters.size());
-
-    Iterator<? extends Cluster<?>> ci = clusters.iterator();
-    for(int i = 0;; i++) {
-
-      Cluster<?> c = ci.next();
-      
-      unselected.addDBIDs(DBIDUtil.ensureSet(c.getIDs()));
-      
-      ids.add(DBIDUtil.ensureSet(c.getIDs()));
-      colors.add(SVGUtil.stringToColor(colorset.getColor(i)).getRGB());
-      
-      if(!ci.hasNext()) {
-        break;
+    // get all selectable segments
+    TreeMap<SegmentID, Integer> allObjectSegments = segments.getSegments(false);
+    unselectedSegments = new ArrayList<SegmentID>(allObjectSegments.size());
+    unselectedObjects = DBIDUtil.newArray();
+    for (SegmentID segmentID : allObjectSegments.keySet()) {
+      // store segmentID
+      if ( ! segmentID.isUnpaired()) {
+        unselectedSegments.add(segmentID);
+        // and store their get all objects
+        unselectedObjects.addDBIDs(segments.getSegmentDBIDs(segmentID));
       }
     }
-  }
-  
-  public void deselectObject(DBID id, int index) {
-    //System.out.println("removing object "+id.toString());
-    this.selected.get(index).remove(id);
-    this.unselected.add(id);
-  }
-  
-  public void selectObject(DBID id, int index) {
-    this.selected.get(index).add(id);
-    this.unselected.remove(id);
-  }
-  
-  public void setSelectedDBIDs(TreeMap<String, DBIDs> objectSelection) {}
-  
-/*
-  @Override
-  public int getColorForDBID(DBID id) {
     
-    if (this.selection.containsKey(id)) {
-      System.out.println("CSStylingPolicy distributing color: "+this.selection.get(id));
-      return this.selection.get(id);
-    }
-    System.out.println("CSStylingPolicy distributing default color");
-    return 0;
+    selectedSegments = new ArrayList<SegmentID>();
   }
-*/
+  
+  public void selectObjects(SegmentID segment) {
+    if (selectedSegments.contains(segment)) return;
+    selectedSegments.add(segment);
+    unselectedSegments.remove(segment);
+    unselectedObjects.removeDBIDs(segments.getSegmentDBIDs(segment));
+  }
+  
+  public boolean hasSegmentSelected(SegmentID segment) {
+    return selectedSegments.contains(segment);
+    /*
+    for (int i = 0; i < selectedSegments.size(); ++i) {
+      if (selectedSegments.get(i).compareTo(segment) == 0) return true;
+    }
+    return false;
+    */
+  }
+  
+  public ArrayList<SegmentID> getSelectedSegments() {
+    return selectedSegments;
+  }
+  
+  public void deselectObjects(SegmentID segment) {
+    if (unselectedSegments.contains(segment)) return;
+    selectedSegments.remove(segment);
+    unselectedSegments.add(segment);
+    unselectedObjects.addDBIDs(segments.getSegmentDBIDs(segment));
+  }
+  
+  public void deselectAllObjects() {
+    
+    for (int i = 0; i < selectedSegments.size(); ++i) {
+      SegmentID id = selectedSegments.get(i);
+      unselectedSegments.add(id);
+      unselectedObjects.addDBIDs(segments.getSegmentDBIDs(id));
+    }
+    selectedSegments.clear();
+  }
 
   @Override
   public int getStyleForDBID(DBID id) {
+    /*
     System.out.println("policy: serving style");
     for(int i = 0; i < ids.size(); i++) {
       if(ids.get(i).contains(id)) {
         return i;
       }
     }
-    return -1;
+    */
+    return -2;
   }
 
   @Override
   public int getColorForDBID(DBID id) {
+    /*
     System.out.println("policy: serving color");
     for(int i = 0; i < ids.size(); i++) {
       if(ids.get(i).contains(id)) {
         return colors.get(i);
       }
     }
+    */
     return 0;
   }
 
   @Override
   //-2=grau, -1=schwarz, 0+=farben
   public int getMinStyle() {
-    System.out.println("policy: serving min-style");
-    return -1;
+    return -2;
   }
 
   @Override
   public int getMaxStyle() {
-    return selected.size();//ids.size();
+    return selectedSegments.size();//ids.size();
   }
 
   @Override
   public Iterator<DBID> iterateClass(int cnum) {
-    
+
     // unselected
-    if (cnum == -1) return unselected.iterator();
-    // else colors
-    return selected.get(cnum).iterator();
+    if (cnum == -2) return unselectedObjects.iterator();
+    else if (cnum == -1) return DBIDUtil.newArray().iterator();
+    // colors
+    return segments.getSegmentDBIDs(selectedSegments.get(cnum)).iterator();
   }
 }
