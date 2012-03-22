@@ -237,6 +237,8 @@ public final class SVGUtil {
     SVG_COLOR_NAMES.put("whitesmoke", 0xFFF5F5F5);
     SVG_COLOR_NAMES.put("yellow", 0xFFFFFF00);
     SVG_COLOR_NAMES.put("yellowgreen", 0xFF9ACD32);
+    // Nonstandard:
+    SVG_COLOR_NAMES.put("transparent", 0xFFFFFFFF);
   }
 
   /**

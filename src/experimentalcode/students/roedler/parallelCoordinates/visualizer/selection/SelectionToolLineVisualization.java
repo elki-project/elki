@@ -130,7 +130,7 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
     layer.appendChild(rtag);
 
     // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, 0.0, getMarginY() / 2., getSizeX(), getMarginY() * 1.5 + getAxisHeight(), this);
+    DragableArea drag = new DragableArea(svgp, 0.0, -.5 * getMarginY(), getSizeX(), getMarginY() * 1.5 + getAxisHeight(), this);
     etag = drag.getElement();
     layer.appendChild(etag);
   }
