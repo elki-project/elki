@@ -898,7 +898,7 @@ class MouseOutSegmentCluster implements EventListener {
 class MouseClickSegmentCluster implements EventListener {
   
   private SegmentSelection selection;
-  //private long lastClick = 0;
+  private long lastClick = 0;
   
   MouseClickSegmentCluster(SegmentSelection selection) {
     
@@ -910,12 +910,10 @@ class MouseClickSegmentCluster implements EventListener {
     MouseEvent mouse = (MouseEvent) evt;
     
     // Check Double Click
-    /*
     boolean dblClick = false;
     long time = java.util.Calendar.getInstance().getTimeInMillis();
     if (time-lastClick <= CCConstants.EVT_DBLCLICK_DELAY) dblClick = true;
     lastClick = time;
-    */
     
     // CTRL (add) pressed?
     boolean ctrl = false;
@@ -926,7 +924,6 @@ class MouseClickSegmentCluster implements EventListener {
     
     // clicked segment cluster
     Element thisSegmentElement = (Element) evt.getTarget();
-    
     selection.select(thisSegmentElement, ctrl);
     // update stylePolicy
     selection.update();

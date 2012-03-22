@@ -96,25 +96,23 @@ public class ClusteringComparison implements Evaluator {
    */
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    final Database db = ResultUtil.findDatabase(baseResult);
+
     
     // get all clustering
     List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
-    
     // Abort if no clusterings to compare
     if (clusterings.size() < 2)
       return;
     
-    System.out.println("CC processing clusterings");
+    // db
+    final Database db = ResultUtil.findDatabase(baseResult);
+    
 
     // result to save evaluations
     ClusteringComparisonResult thisResult = new ClusteringComparisonResult("ClusteringComparison", "cc", clusterings.get(0));
     
     
-    //
-    // build clustering sets
-    //
-    
+    // build clustering sets (for evaluation. obsolete...)    
     ArrayList<ClusteringInfo> clrsExt = new ArrayList<ClusteringInfo>();
     
     int index = 1;
@@ -123,33 +121,9 @@ public class ClusteringComparison implements Evaluator {
       index++;
     }
     
-    // 
-    // Build Segments
-    //
-    // collects all Objects into Segments and
-    // converts ObjectSegments into PairSegments
-    //
-    
-    Segments segments = new Segments(clusterings);
-    
-    for (DBID id : db.getRelation(TypeUtil.DBID).iterDBIDs()) {
-      // tag Object over SegmentID
-      segments.addObject(id);
-    }
-    
-    List<Relation<?>> relations = ResultUtil.getRelations(baseResult);
 
-    // convert segments
-    segments.convertToPairSegments();
-    
-    
-    //
-    // calculate measure values through cluster segmentation
-    //
-    
-    //
-    // Test contigency table
-    //
+    // create segments
+    Segments segments = new Segments(clusterings, baseResult);
     
 /*
 

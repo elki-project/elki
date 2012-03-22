@@ -9,25 +9,43 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
- * Creates segments of two or more clusterings. Segments are the equally paired database
- * objects of all given (2+) clusterings.
+ * <h2>Creates segments of two or more clusterings.</h2>
  * 
- * Objects are combined by a string (segmentID), so no database objects are saved. <br />
- * edit: now they are saved additionally, else all objects must be iterated for each selection
+ * <p> Segments are the equally paired database
+ * objects of all given (2+) clusterings. Given a contingency table, an object Segment
+ * represents the table's cells where an intersection of classes and labels are given. Pair
+ * Segments are created by converting an object Segment into its pair representation. Converting
+ * all object Segments into pair Segments results in a larger number of pair Segments, if any
+ * fragmentation (no perfect match of clusters) within the contingency table has occurred (multiple
+ * cells on one row or column). Thus for ever object Segment exists a corresponding pair Segment.
+ * Additionally pair Segments represent pairs that are only in one Clustering which occurs for each
+ * split of a clusterings cluster by another clustering. Here, these pair Segments are referenced as
+ * fragmented Segments. Within the visualization they describe (at least two) pair Segments
+ * that have a corresponding object Segment. </p>
+ * <p>
+ * Objects are combined by a string (segmentID), so no database objects have to be saved. <br />
+ * EDIT: extending the visualization now stores all DBIDs decribed by their objectSegment for a faster
+ * selection of objects on the cost of memory.
+ * </p>
+ * <p>
+ * Segments are created by adding each DB object via the <i>addObject()</i> method and afterwards
+ * converted to pairs by <i>convertToPairSegments()</i>.
+ * </p>
  * 
- * Segments are created by adding each db object via the addObject() method and afterwards
- * converted to pairs by convertToPairSegments().
- * 
- * @author goldhofer
+ * @author Sascha Goldhofer
  */
 public class Segments {
   
@@ -61,7 +79,7 @@ public class Segments {
    */
   private TreeMap<SegmentID, Integer> objectSegments;
   // store (segments, dbids) TODO: use objectSegments instead
-  private TreeMap<SegmentID, ArrayModifiableDBIDs> segmentDBIDs;
+  private TreeMap<SegmentID, ModifiableDBIDs> segmentDBIDs;
   
   /**
    * List of pair based segments and their paircount (segment, paircount)
@@ -82,18 +100,19 @@ public class Segments {
   
   
   /**
-   * Initialize segments. Add db objects via addObject method.
+   * Initialize segments. Add DB objects via addObject method.
    * 
    * @param clusterings   List of clusterings in comparison
+   * @param baseResult    used to retrieve db objects
    */
-  public Segments(List<Clustering<?>> clusterings) {
+  public Segments(List<Clustering<?>> clusterings, HierarchicalResult baseResult) {
     
     this.clusterings    = clusterings;
     //DBIDUtil.newArray()
     objectSegments      = new TreeMap<SegmentID, Integer>();
     fragmentedSegments  = new TreeMap<SegmentID, SortedSet<SegmentID>>();
     pairSegments        = new TreeMap<SegmentID, Integer>();
-    segmentDBIDs        = new TreeMap<SegmentID, ArrayModifiableDBIDs>();
+    segmentDBIDs        = new TreeMap<SegmentID, ModifiableDBIDs>();
     
     clusteringsCount    = clusterings.size();
     clusters            = new int[clusteringsCount];
@@ -116,39 +135,52 @@ public class Segments {
       
       clusteringIndex++;
     }
+    
+    createSegments(baseResult);
+  }
+  
+  protected void createSegments(HierarchicalResult baseResult) {
+    final Database db = ResultUtil.findDatabase(baseResult);
+    for (DBID id : db.getRelation(TypeUtil.DBID).iterDBIDs()) {
+      addObject(id);
+    }
+    convertToPairSegments();
   }
   
   /**
-   * Add a database object to its segment.
+   * Add a database object to its segment. Creates a new segmentID if required.
    * 
    * @param tag   occurrence in clusterings
-   * @param id    object id in DB
    */
-  public void addObject(DBID objectID) {
+  protected void addObject(DBID objectID) {
     
     SegmentID tag = getSegmentID(objectID);
     
     if (objectSegments.containsKey(tag)) {
       
       objectSegments.put(tag, objectSegments.get(tag)+1);
-      ArrayModifiableDBIDs dbids = segmentDBIDs.get(tag);
+      ModifiableDBIDs dbids = segmentDBIDs.get(tag);
       dbids.add(objectID);
-     
+      
     // first segment created
     } else {
       
-      // assign an index
+      // assign an index (temporary)
       tag.setIndex(objectSegments.size());
       // add to list
       objectSegments.put(tag, 1);
-      ArrayModifiableDBIDs dbids = DBIDUtil.newArray();
+      ModifiableDBIDs dbids = DBIDUtil.newHashSet();
       dbids.add(objectID);
       segmentDBIDs.put(tag, dbids);
     }
   }
   
-  public TreeMap<SegmentID, ArrayModifiableDBIDs> getSegmentDBIDs() {
-    return segmentDBIDs;
+  public boolean hasSegmentIDs(SegmentID id) {
+    return segmentDBIDs.containsKey(id);
+  }
+  
+  public DBIDs getSegmentDBIDs(SegmentID id) {
+    return segmentDBIDs.get(id);
   }
    
   public String getClusteringDescription(int clusteringID) {
@@ -215,6 +247,9 @@ public class Segments {
    */
   public DBIDs getDBIDs(SegmentID id) {
     
+    //return segmentDBIDs.get(id);
+    
+    //*
     ModifiableDBIDs objectIDs = DBIDUtil.newHashSet();
     DBIDs currentIDs;
     
@@ -250,6 +285,7 @@ public class Segments {
     
     // and return selection
     return objectIDs;
+    //*/
   }
   
   /**
@@ -294,6 +330,22 @@ public class Segments {
     getSegment(objectID, result, 0);
     
     return result;
+  }
+  
+  /**
+   * @param segmentIDString string representation of the segmentID
+   * @return the segmentID given by its string representation
+   */
+  public SegmentID getSegmentID(String segmentIDString) {
+    
+    // get already created segmentID in case any additional info was used
+    // (temp: index)
+    SegmentID temp = new SegmentID(segmentIDString);
+    for (SegmentID segment : pairSegments.keySet()) {
+      if (segment.compareTo(temp) == 0) return segment;
+    }
+    
+    return temp;
   }
   
   /**
@@ -349,7 +401,7 @@ public class Segments {
   }
   
   /**
-   * Converts segments of added objects into pair segmentation
+   * Converts the created objectSegments into pairSegments
    */
   public void convertToPairSegments() {
     
@@ -366,7 +418,6 @@ public class Segments {
     for (SegmentID segment : objectSegments.keySet()) {
       
       int pairs = asPairs(objectSegments.get(segment));
-      
       
       // FIXME: Ein Objekt geclustered => Fehlende Paarbezüge
       if (pairs != 0) {
@@ -534,7 +585,7 @@ public class Segments {
         
         if (commonSegments.size() > 1) {
           
-          SegmentID tag = getFragmentedSegment(commonSegments);          
+          SegmentID tag = getFragmentedSegment(commonSegments);      
           fragmentedSegments.put(tag, commonSegments);
           
           // find segments that have more cluster in common
@@ -646,6 +697,11 @@ public class Segments {
     if (isPairSegments) return pairSegments.size();
     else return objectSegments.size();
   }
+  /*
+  public ArrayModifiableDBIDs getObjects(SegmentID segment) {
+    
+  }
+  */
   
   /**
    * Get total number of pairs with or without the unclustered pairs.
