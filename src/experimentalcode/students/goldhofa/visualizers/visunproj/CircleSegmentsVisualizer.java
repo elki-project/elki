@@ -26,20 +26,18 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
+import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ToolBox2DVisualization;
 import experimentalcode.students.goldhofa.CCConstants;
 import experimentalcode.students.goldhofa.ClusteringComparison;
 import experimentalcode.students.goldhofa.ClusteringComparisonResult;
@@ -99,7 +97,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
   /**
    * 
    */
-  private Element layer, visLayer, ctrlLayer;
+  private Element visLayer, ctrlLayer;
   
   /**
    * CSS class name for the clusterings.
@@ -125,11 +123,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
    * context
    */
   public VisualizerContext context;
-  
-  /**
-   * The plot
-   */
-  public SVGPlot svgp;
   
   /**
    * Segment selection manager
@@ -188,7 +181,17 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
    */
   public CircleSegmentsVisualizer(VisualizationTask task) {
     super(task);
+
+    // init required helpers
+    init();
+    
     buildSegments();
+  }
+  
+  protected void init() {
+    
+    // add css
+    //addCSSClasses();    
   }
   
   public void showUnclusteredPairs(boolean show) {
@@ -312,21 +315,49 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
 
   public void buildSegments() {
     
-    context = task.getContext();
-    svgp    = task.getPlot();
+    //context = task.getContext();
+    //svgp    = task.getPlot();
     ccr     = task.getResult();
     
+    VisualizationTask task = this.task;
+    VisualizerContext context = task.getContext();
+    
     this.segments   = ccr.getSegments();
+    
+/* TODO: P2DVisualization.setupCanvas:
+    final CanvasSize canvas = proj.estimateViewport();
+    final double sizex = canvas.getDiffX();
+    final double sizey = canvas.getDiffY();
+    String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";
+
+    final Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
+    return layer;
+*/
     this.layer      = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    
     this.visLayer   = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.ctrlLayer  = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    
+    // create custom styling policy
+    this.policy = new CSStylingPolicy(ccr.getReference(), task.getContext().getStyleLibrary(), segments);
+    this.styleResult = context.getStyleResult();
+    
+    // correct scaling for svg
+/*
+    double scale = StyleLibrary.SCALE;
+    final double sizex = scale;
+    final double sizey = scale * task.getHeight() / task.getWidth();
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
+*/
     
     this.selectionInfo  = new UnorderedList(svgp);
     this.selection      = new SegmentSelection(task, policy, visLayer, segments, selectionInfo);
 
-    // create custom styling policy
-    this.policy = new CSStylingPolicy(ccr.getReference(), task.getContext().getStyleLibrary(), segments);
-    this.styleResult = context.getStyleResult();
+
 
     
     // Listen for context changes
@@ -337,9 +368,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     
     // calculate properties for drawing
     calculateSegmentProperties();  
-    
-    // add css
-    addCSSClasses(svgp);
     
     // create Color shades for clusters
     // TODO: Auskommentieren falls Probleme mit Beamer
@@ -362,6 +390,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     mouseOver   = new MouseOverSegmentCluster(this);
     mouseOut    = new MouseOutSegmentCluster();
     mouseClick  = new MouseClickSegmentCluster(selection);
+    
+    addCSSClasses();
     
     // and create svg elements
     redraw();
@@ -404,8 +434,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     
     layer.appendChild(ctrlLayer);
     layer.appendChild(visLayer);
-
-    //return new StaticVisualization(task, layer);
   }
   
   /**
@@ -440,7 +468,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
    * 
    * @param svgp
    */
-  protected void addCSSClasses(SVGPlot svgp) {
+  protected void addCSSClasses() {
+    
+    System.out.println("adding css classes");
     
     // CLUSTER BORDER
     CSSClass cssReferenceBorder = new CSSClass(this, CCConstants.CLR_BORDER_CLASS);
@@ -724,6 +754,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
    * @apiviz.uses CircleSegmentsVisualizer oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
+    
     /**
      * Constructor
      */
@@ -733,7 +764,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      System.out.println("CREATING CS VIS");
       return new CircleSegmentsVisualizer(task);
     }
 
