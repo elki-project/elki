@@ -31,8 +31,10 @@ import javax.swing.event.EventListenerList;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
@@ -45,6 +47,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
@@ -130,6 +133,12 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
     this.selection = ResultUtil.ensureSelectionResult(db);
     for(Relation<?> rel : ResultUtil.getRelations(result)) {
       ResultUtil.getSamplingResult(rel);
+      // FIXME: this is a really ugly workaround. :-(
+      if (TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        @SuppressWarnings("unchecked")
+        Relation<? extends NumberVector<?, ?>> vrel = (Relation<? extends NumberVector<?, ?>>) rel;
+        ResultUtil.getScalesResult(vrel);
+      }
     }
     getStyleResult();
 
