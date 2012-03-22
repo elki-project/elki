@@ -81,7 +81,7 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
   protected void redraw() {
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
-      calcAxisPositions();
+      recalcAxisPositions();
       DBIDs selection = selContext.getSelectedIds();
 
       for(DBID objId : selection) {
@@ -89,7 +89,7 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
 
         SVGPath path = new SVGPath();
         for(int i = 0; i < proj.getVisibleDimensions(); i++) {
-          path.drawTo(i * dist, yPos[i]);
+          path.drawTo(getAxisX(i), yPos[i]);
         }
         Element marker = path.makeElement(svgp);
         SVGUtil.addCSSClass(marker, MARKER);

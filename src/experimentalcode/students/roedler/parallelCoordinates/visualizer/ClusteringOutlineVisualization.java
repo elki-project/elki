@@ -103,7 +103,7 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = proj.getVisibleDimensions();
-    calcAxisPositions();
+    recalcAxisPositions();
 
     DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
     DoubleMinMax[] midmm = DoubleMinMax.newArray(dim - 1);
@@ -137,13 +137,13 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
       if(rounded) {
         for(int i = 0; i < dim; i++) {
           if(first) {
-            path.drawTo(i * dist, mms[i].getMax());
+            path.drawTo(getAxisX(i), mms[i].getMax());
             first = false;
           }
           else {
-            double lx = (i - 1) * dist;
-            double mx = (i - .5) * dist;
-            double rx = i * dist;
+            double lx = getAxisX(i - 1);
+            double mx = getAxisX(i - .5);
+            double rx = getAxisX(i);
             double lef = mms[i - 1].getMax();
             double mid = midmm[i - 1].getMax();
             double rig = mms[i].getMax();
@@ -154,13 +154,13 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
         first = true;
         for(int i = dim - 1; i > 0; i--) {
           if(first) {
-            path.drawTo(i * dist, mms[i].getMin());
+            path.drawTo(getAxisX(i), mms[i].getMin());
             first = false;
           }
           else {
-            double lx = (i - 1) * dist;
-            double mx = (i - .5) * dist;
-            double rx = i * dist;
+            double lx = getAxisX(i - 1);
+            double mx = getAxisX(i - .5);
+            double rx = getAxisX(i);
             double lef = mms[i - 1].getMin();
             double mid = midmm[i - 1].getMin();
             double rig = mms[i].getMin();
@@ -171,16 +171,16 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
       }
       else {
         for(int i = 0; i < dim; i++) {
-          path.drawTo(i * dist, mms[i].getMax());
+          path.drawTo(getAxisX(i), mms[i].getMax());
           if(i < dim - 1) {
-            path.drawTo((i + .5) * dist, midmm[i].getMax());
+            path.drawTo(getAxisX(i + .5), midmm[i].getMax());
           }
         }
         for(int i = dim - 1; i >= 0; i--) {
           if(i < dim - 1) {
-            path.drawTo((i + .5) * dist, midmm[i].getMin());
+            path.drawTo(getAxisX(i + .5), midmm[i].getMin());
           }
-          path.drawTo(i * dist, mms[i].getMin());
+          path.drawTo(getAxisX(i), mms[i].getMin());
         }
       }
       path.close();

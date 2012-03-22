@@ -98,7 +98,7 @@ public class ClusteringMeanVisualization extends ParallelVisualization<NumberVec
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = proj.getVisibleDimensions();
-    calcAxisPositions();
+    recalcAxisPositions();
 
     Mean[] mean = new Mean[dim];
     for(int i = 0; i < dim; i++) {
@@ -126,7 +126,7 @@ public class ClusteringMeanVisualization extends ParallelVisualization<NumberVec
 
       SVGPath path = new SVGPath();
       for(int i = 0; i < mean.length; i++) {
-        path.drawTo(i * dist, mean[i].getMean());
+        path.drawTo(getAxisX(i), mean[i].getMean());
       }
 
       Element meanline = path.makeElement(svgp);

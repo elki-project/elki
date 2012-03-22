@@ -38,11 +38,11 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
   protected void redraw() {
     int dim = proj.getVisibleDimensions();
     final double scale = StyleLibrary.SCALE;
-    calcAxisPositions();
+    recalcAxisPositions();
 
     try {
       for(int i = 0; i < dim; i++) {
-        SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(i), i * dist, margins[1], i * dist, margins[1] + getAxisHeight(), true, context.getStyleLibrary(), proj.isInverted(i), scale);
+        SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), margins[1], getAxisX(i), margins[1] + getAxisHeight(), true, context.getStyleLibrary(), proj.isInverted(i), scale);
       }
     }
     catch(CSSNamingConflict e) {
