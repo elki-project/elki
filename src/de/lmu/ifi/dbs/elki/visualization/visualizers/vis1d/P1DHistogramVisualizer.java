@@ -212,7 +212,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
     // Axis. TODO: Add an AxisVisualizer for this?
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, true, false, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
 
       // draw axes that are non-trivial
       final int dimensionality = DatabaseUtil.dimensionality(relation);
@@ -225,7 +225,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
         if(ax != orig) {
           final double left = (orig / Projection.SCALE + 0.5) * xsize;
           final double right = (ax / Projection.SCALE + 0.5) * xsize;
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), left, ysize, right, ysize, true, true, context.getStyleLibrary());
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), left, ysize, right, ysize, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
         }
       }
     }

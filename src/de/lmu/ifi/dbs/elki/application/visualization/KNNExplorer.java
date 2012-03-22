@@ -392,7 +392,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       try {
         StyleLibrary style = new PropertiesBasedStyleLibrary();
-        SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, StyleLibrary.SCALE, 0.0, 0.0, true, false, style);
+        SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, StyleLibrary.SCALE, 0.0, 0.0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
       }
       catch(CSSNamingConflict e) {
         LoggingUtil.exception(e);

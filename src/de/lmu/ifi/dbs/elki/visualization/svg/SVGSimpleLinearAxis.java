@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @apiviz.uses CSSClassManager
  * @apiviz.uses LinearScale
  * @apiviz.uses StyleLibrary
+ * @apiviz.uses STYLE
  * @apiviz.uses Element oneway - - «create»
  */
 public class SVGSimpleLinearAxis {
@@ -52,6 +53,15 @@ public class SVGSimpleLinearAxis {
    */
   private enum ALIGNMENT {
     LL, RL, LC, RC, LR, RR
+  }
+
+  /**
+   * Labeling style: left-handed, right-handed, no ticks.
+   * 
+   * @author Erich Schubert
+   */
+  public enum LabelStyle {
+    LEFTHAND, RIGHTHAND, NOLABELS, NOTHING
   }
 
   /**
@@ -93,8 +103,6 @@ public class SVGSimpleLinearAxis {
       CSSClass label = new CSSClass(owner, CSS_AXIS_LABEL);
       label.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
       label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
-      // label.setStatement(SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE,
-      // SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
       label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, style.getTextSize(StyleLibrary.AXIS_LABEL));
       manager.addClass(label);
     }
@@ -110,13 +118,11 @@ public class SVGSimpleLinearAxis {
    * @param y1 starting coordinate
    * @param x2 ending coordinate
    * @param y2 ending coordinate
-   * @param labels control whether labels are printed.
-   * @param righthanded control whether to print labels on the right hand side
-   *        or left hand side
+   * @param labelstyle Style for placing the labels
    * @param style Style library
    * @throws CSSNamingConflict when a conflict occurs in CSS
    */
-  public static void drawAxis(SVGPlot plot, Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels, boolean righthanded, StyleLibrary style) throws CSSNamingConflict {
+  public static void drawAxis(SVGPlot plot, Element parent, LinearScale scale, double x1, double y1, double x2, double y2, LabelStyle labelstyle, StyleLibrary style) throws CSSNamingConflict {
     assert (parent != null);
     Element line = plot.svgLine(x1, y1, x2, y2);
     SVGUtil.setCSSClass(line, CSS_AXIS);
@@ -129,24 +135,40 @@ public class SVGSimpleLinearAxis {
     double th = -tx * 0.01;
 
     // choose where to print labels.
+    final boolean labels, ticks;
+    switch(labelstyle){
+    case LEFTHAND:
+    case RIGHTHAND:
+      labels = true;
+      ticks = true;
+      break;
+    case NOLABELS:
+      labels = false;
+      ticks = true;
+      break;
+    case NOTHING:
+    default:
+      labels = false;
+      ticks = false;
+    }
     ALIGNMENT pos = ALIGNMENT.LL;
     if(labels) {
       double angle = Math.atan2(ty, tx);
       // System.err.println(tx + " " + (-ty) + " " + angle);
       if(angle > 2.6) { // pi .. 2.6 = 180 .. 150
-        pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RC : ALIGNMENT.LC;
       }
       else if(angle > 0.5) { // 2.3 .. 0.7 = 130 .. 40
-        pos = righthanded ? ALIGNMENT.RR : ALIGNMENT.LL;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RR : ALIGNMENT.LL;
       }
       else if(angle > -0.5) { // 0.5 .. -0.5 = 30 .. -30
-        pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RC : ALIGNMENT.LC;
       }
       else if(angle > -2.6) { // -0.5 .. -2.6 = -30 .. -150
-        pos = righthanded ? ALIGNMENT.RL : ALIGNMENT.LR;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RL : ALIGNMENT.LR;
       }
       else { // -2.6 .. -pi = -150 .. -180
-        pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RC : ALIGNMENT.LC;
       }
     }
     // vertical text offset; align approximately with middle instead of
@@ -154,47 +176,51 @@ public class SVGSimpleLinearAxis {
     double textvoff = 0.015;
 
     // draw ticks on x axis
-    for(double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += scale.getRes()) {
-      double x = x1 + tx * scale.getScaled(tick);
-      double y = y1 + ty * scale.getScaled(tick);
-      // This is correct. Vectors: (vec - tvec) to (vec + tvec)
-      Element tickline = plot.svgLine(x - tw, y - th, x + tw, y + th);
-      SVGUtil.setAtt(tickline, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_TICK);
-      parent.appendChild(tickline);
-      // draw labels
-      if(labels) {
-        double tex = x;
-        double tey = y;
-        switch(pos){
-        case LL:
-        case LC:
-        case LR:
-          tex = x + tw * 2.5;
-          tey = y + th * 2.5 + textvoff;
-          break;
-        case RL:
-        case RC:
-        case RR:
-          tex = x - tw * 2.5;
-          tey = y - th * 2.5 + textvoff;
+    if(ticks || labels) {
+      for(double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += scale.getRes()) {
+        double x = x1 + tx * scale.getScaled(tick);
+        double y = y1 + ty * scale.getScaled(tick);
+        if(ticks) {
+          // This is correct. Vectors: (vec - tvec) to (vec + tvec)
+          Element tickline = plot.svgLine(x - tw, y - th, x + tw, y + th);
+          SVGUtil.setAtt(tickline, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_TICK);
+          parent.appendChild(tickline);
         }
-        Element text = plot.svgText(tex, tey, scale.formatValue(tick));
-        SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
-        switch(pos){
-        case LL:
-        case RL:
-          SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_START_VALUE);
-          break;
-        case LC:
-        case RC:
-          SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
-          break;
-        case LR:
-        case RR:
-          SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
-          break;
+        // draw labels
+        if(labels) {
+          double tex = x;
+          double tey = y;
+          switch(pos){
+          case LL:
+          case LC:
+          case LR:
+            tex = x + tw * 2.5;
+            tey = y + th * 2.5 + textvoff;
+            break;
+          case RL:
+          case RC:
+          case RR:
+            tex = x - tw * 2.5;
+            tey = y - th * 2.5 + textvoff;
+          }
+          Element text = plot.svgText(tex, tey, scale.formatValue(tick));
+          SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
+          switch(pos){
+          case LL:
+          case RL:
+            SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_START_VALUE);
+            break;
+          case LC:
+          case RC:
+            SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
+            break;
+          case LR:
+          case RR:
+            SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
+            break;
+          }
+          parent.appendChild(text);
         }
-        parent.appendChild(text);
       }
     }
     setupCSSClasses(plot, plot.getCSSClassManager(), style);

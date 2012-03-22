@@ -228,7 +228,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
     if(!svgp.getCSSClassManager().contains(SAV_BORDER)) {
       CSSClass cls = new CSSClass(this, SAV_BORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE * 2.));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 2.);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
@@ -241,7 +241,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
     if(!svgp.getCSSClassManager().contains(SAV_CROSS)) {
       CSSClass cls = new CSSClass(this, SAV_CROSS);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE * 1.5));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 1.5);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }

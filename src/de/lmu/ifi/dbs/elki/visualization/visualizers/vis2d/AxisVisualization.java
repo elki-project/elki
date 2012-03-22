@@ -97,7 +97,7 @@ public class AxisVisualization extends P2DVisualization {
       // " "+(axa*180/Math.PI)+" "+(diaga*180/Math.PI));
       if(ax[0] != orig[0] || ax[1] != orig[1]) {
         try {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig[0], orig[1], ax[0], ax[1], true, righthand, context.getStyleLibrary());
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig[0], orig[1], ax[0], ax[1], righthand ? SVGSimpleLinearAxis.LabelStyle.RIGHTHAND : SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
           // TODO: move axis labeling into drawAxis function.
           double offx = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
           double offy = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;

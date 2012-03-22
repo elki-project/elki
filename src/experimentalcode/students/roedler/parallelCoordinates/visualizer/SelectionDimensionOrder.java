@@ -236,7 +236,7 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     if(!svgp.getCSSClassManager().contains(SDO_BORDER)) {
       CSSClass cls = new CSSClass(this, SDO_BORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE *2.0));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 2.0);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
@@ -249,7 +249,7 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     if(!svgp.getCSSClassManager().contains(SDO_ARROW)) {
       CSSClass cls = new CSSClass(this, SDO_ARROW);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_DARKGREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / (StyleLibrary.SCALE * 1.5));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 1.5);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }

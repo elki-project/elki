@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -55,11 +56,6 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   final protected Relation<NV> relation;
 
   /**
-   * Margin
-   */
-  protected double margin;
-  
-  /**
    * margin
    */
   final double[] margins;
@@ -83,13 +79,12 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     super(task);
     this.proj = task.getProj();
     this.relation = task.getRelation();
-    this.margin = 0; //context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    
-    margins = new double[] { 0.071, 0.071 };
-    size = new double[] { task.width, task.height };
+
+    margins = new double[] { 0.1 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.4  * StyleLibrary.SCALE};
+    size = new double[] { task.width * StyleLibrary.SCALE, task.height * StyleLibrary.SCALE };
     axsep = size[0] / (proj.getInputDimensionality() - 1.);
-    
-    this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
+
+    this.layer = setupCanvas(svgp, proj, task.getWidth(), task.getHeight());
   }
 
   /**
@@ -97,14 +92,13 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
    * 
    * @param svgp Plot element
    * @param proj Projection to use
-   * @param margin Margin to use
    * @param width Width
    * @param height Height
    * @return wrapper element with appropriate view box.
    */
-  public Element setupCanvas(SVGPlot svgp, ProjectionParallel proj, double margin, double width, double height) {
+  public Element setupCanvas(SVGPlot svgp, ProjectionParallel proj, double width, double height) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(width, height, size[0], size[1], margins[0], margins[1], margins[0], margins[1]);
+    final String transform = SVGUtil.makeMarginTransform(width, height, size[0], size[1], margins[0], margins[1], margins[2], margins[3]);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     return layer;
   }
@@ -128,11 +122,11 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   protected void recalcAxisPositions() {
     axsep = size[0] / (proj.getVisibleDimensions() - 1.);
   }
-  
+
   protected double getAxisHeight() {
-    return 0.71;
+    return StyleLibrary.SCALE;
   }
-  
+
   protected double getAxisX(double d) {
     return d * axsep;
   }
@@ -140,7 +134,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   protected double[] getYPositions(DBID objId) {
     double[] v = proj.fastProjectDataToRenderSpace(relation.get(objId));
     Vector vec = new Vector(v);
-    vec.plusEquals(margins[1]).timesEquals(getAxisHeight());
+    vec.timesEquals(getAxisHeight());
     return v;
   }
 }

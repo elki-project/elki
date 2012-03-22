@@ -51,10 +51,9 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
   public LineVisualization(VisualizationTask task) {
     super(task);
     this.sample = ResultUtil.getSamplingResult(relation);
-
-    incrementalRedraw();
     context.addResultListener(this);
     context.addDataStoreListener(this);
+    incrementalRedraw();
   }
 
   @Override
@@ -118,7 +117,7 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
   private void addCSSClasses(SVGPlot svgp, StylingPolicy sp) {
     final StyleLibrary style = context.getStyleLibrary();
     final LineStyleLibrary lines = style.lines();
-    final double width = .5 * style.getLineWidth(StyleLibrary.PLOT) / StyleLibrary.SCALE;
+    final double width = .5 * style.getLineWidth(StyleLibrary.PLOT);
     if(sp instanceof ClassStylingPolicy) {
       ClassStylingPolicy csp = (ClassStylingPolicy) sp;
       for (int i = csp.getMinStyle(); i < csp.getMaxStyle(); i++) {
