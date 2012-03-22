@@ -83,8 +83,8 @@ public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractOPTICSV
     layer.appendChild(itag);
 
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), 0, plotheight, 0, 0, true, false, context.getStyleLibrary());
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), plotwidth, plotheight, plotwidth, 0, true, true, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), 0, plotheight, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), plotwidth, plotheight, plotwidth, 0, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
       LoggingUtil.exception("CSS naming conflict for axes on OPTICS plot", e);

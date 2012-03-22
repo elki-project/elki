@@ -9,11 +9,10 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
-import experimentalcode.students.roedler.parallelCoordinates.svg.SVGParallelLinearAxis;
 
 /**
  * Generates a SVG-Element containing axes, including labeling.
@@ -37,12 +36,18 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
   @Override
   protected void redraw() {
     int dim = proj.getVisibleDimensions();
-    final double scale = StyleLibrary.SCALE;
     recalcAxisPositions();
 
     try {
       for(int i = 0; i < dim; i++) {
-        SVGParallelLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), margins[1], getAxisX(i), margins[1] + getAxisHeight(), true, context.getStyleLibrary(), proj.isInverted(i), scale);
+        boolean inv = proj.isInverted(i);
+        // FIXME: re-add labels. Maybe here, or add a style "endlabels"?
+        if(!inv) {
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), getAxisHeight(), getAxisX(i), 0, SVGSimpleLinearAxis.LabelStyle.NOTHING, context.getStyleLibrary());
+        }
+        else {
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), 0, getAxisX(i), getAxisHeight(), SVGSimpleLinearAxis.LabelStyle.NOTHING, context.getStyleLibrary());
+        }
       }
     }
     catch(CSSNamingConflict e) {
@@ -58,11 +63,10 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
   /**
    * Factory for axis visualizations
    * 
-   * @author Erich Schubert
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses AxisVisualization oneway - - «create»
-   * 
+   * @apiviz.uses ParallelAxisVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**
@@ -98,6 +102,5 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
       // Don't use thumbnails
       return true;
     }
-
   }
 }
