@@ -72,6 +72,7 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(relation);
+    recalcAxisPositions();
 
     Element arrow;
     Element button;
@@ -81,10 +82,10 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     double bs = as * 1.5;
     double hbs = bs / 2.;
     double qas = as / 4.;
-    double ypos = getMarginY() * 2. + getAxisHeight();
+    double ypos = -getMarginY() * 2. + getAxisHeight();
     double dist = 2.5 * as; 
 
-      Element back = svgp.svgRect(0.0, (getMarginY() * 2. + getAxisHeight()), getSizeX(), getSizeY() / 35.);
+      Element back = svgp.svgRect(0.0, (-getMarginY() * 2. + getAxisHeight()), getSizeX(), getSizeY() / 35.);
       SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
       layer.appendChild(back);
       

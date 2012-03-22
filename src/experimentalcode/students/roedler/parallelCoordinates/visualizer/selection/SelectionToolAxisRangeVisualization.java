@@ -133,7 +133,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
     layer.appendChild(rtag);
 
     // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, 0.0, getMarginY() / 2., getSizeX(), getMarginY() * 1.5 + getAxisHeight(), this);
+    DragableArea drag = new DragableArea(svgp, 0.0, -.5 * getMarginY(), getSizeX(), getMarginY() * 1.5 + getAxisHeight(), this);
     etag = drag.getElement();
     layer.appendChild(etag);
   }
@@ -185,9 +185,9 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
     for(int i = minaxis; i <= maxaxis; i++) {
       if(proj.isVisible(i)) {
         Vector min = new Vector(1);
-        min.set(0, Math.min(getMarginY() + getAxisHeight(), y1));
+        min.set(0, Math.min(-getMarginY() + getAxisHeight(), y1));
         Vector max = new Vector(1);
-        max.set(0, Math.max(getMarginY(), y2));
+        max.set(0, Math.max(-getMarginY(), y2));
         ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(proj.getScale(i).getUnscaled(proj.projectRenderToScaled(min).get(0)), proj.getScale(i).getUnscaled(proj.projectRenderToScaled(max).get(0)));
       }
     }
