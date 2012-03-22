@@ -65,7 +65,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
 
   double hbs = bhs / 2.;
 
-  double ypos = -getMarginY() * 1.5 + getAxisHeight() + hs / 8;
+  double ypos = getAxisHeight() + getMarginY() * 1.5 + hs / 8;
 
   /**
    * Constructor.
@@ -83,7 +83,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
     int dim = DatabaseUtil.dimensionality(relation);
     recalcAxisPositions();
 
-    Element back = svgp.svgRect(0.0, (-getMarginY() * 1.5 + getAxisHeight()), getSizeX(), getSizeY() / 35.);
+    Element back = svgp.svgRect(0.0, getAxisHeight() + getMarginY() * 1.5, getSizeX(), getSizeY() / 35.);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
     layer.appendChild(back);
 
@@ -139,11 +139,11 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
 
       if(vis == dim) {
         for(int j = 0; j < notvis; j++) {
-          border = svgp.svgRect(proj.getXpos(last) + dist - hbs, ypos - j * dist, bhs, bhs);
+          border = svgp.svgRect(getAxisX(last) + dist - hbs, ypos - j * dist, bhs, bhs);
           SVGUtil.addCSSClass(border, SAV_BORDER);
           layer.appendChild(border);
 
-          rect[c] = svgp.svgRect(proj.getXpos(last) + dist - hbs, ypos - j * dist, bhs, bhs);
+          rect[c] = svgp.svgRect(getAxisX(last) + dist - hbs, ypos - j * dist, bhs, bhs);
           SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
           addEventListener(rect[c], c);
           layer.appendChild(rect[c]);
@@ -166,7 +166,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
       }
     }
     else {
-      double xpos = proj.getXpos(last);
+      double xpos = getAxisX(last);
       if(xpos < 0.) {
         xpos = 0.;
       }
@@ -175,7 +175,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
         dist = getMarginX() / (notvis + 1.);
       }
       else {
-        dist = (proj.getXpos(vis) - xpos) / (notvis + 1.);
+        dist = (getAxisX(vis) - xpos) / (notvis + 1.);
       }
 
       for(int j = 0; j < notvis; j++) {

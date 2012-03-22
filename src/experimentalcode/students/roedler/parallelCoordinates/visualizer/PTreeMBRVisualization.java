@@ -203,15 +203,12 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
      if (pagevis[step] == true){
        final int dim = DatabaseUtil.dimensionality(relation);
        SVGPath path = new SVGPath();
+       // FIXME dimension indexes. Project min/max vectors instead.
        for (int i = 0; i < dim; i++){
-         if (proj.isVisible(i)){
-           path.drawTo(proj.getXpos(i), proj.projectDimension(i, entry.getMax(proj.getDimensionNumber(i) + 1)));
-         }
+         path.drawTo(getAxisX(i), proj.projectDimension(i, entry.getMax(proj.getDimensionNumber(i) + 1)));
        }
        for (int i = dim - 1; i >= 0; i--){
-         if (proj.isVisible(i)){
-           path.drawTo(proj.getXpos(i), proj.projectDimension(i, entry.getMin(proj.getDimensionNumber(i) + 1)));
-         }
+         path.drawTo(getAxisX(i), proj.projectDimension(i, entry.getMin(proj.getDimensionNumber(i) + 1)));
        }
        path.close();
        
