@@ -51,15 +51,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
- * Pseudo-Visualizer, that gives the key for a clustering.
+ * Visualizer, displaying the key for a clustering.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.stereotype factory
- * @apiviz.uses StaticVisualization oneway - - «create»
  * @apiviz.has Clustering oneway - - visualizes
  */
-public class KeyVisFactory extends AbstractVisualization {
+public class KeyVisualization extends AbstractVisualization {
   /**
    * Name for this visualizer.
    */
@@ -75,7 +73,7 @@ public class KeyVisFactory extends AbstractVisualization {
    * 
    * @param task Visualization task
    */
-  public KeyVisFactory(VisualizationTask task) {
+  public KeyVisualization(VisualizationTask task) {
     super(task);
     this.clustering = task.getResult();
     context.addResultListener(this);
@@ -124,9 +122,11 @@ public class KeyVisFactory extends AbstractVisualization {
     {
       StylingPolicy sp = context.getStyleResult().getStylingPolicy();
       if(sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
-        SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
-        button.setTitle("Active style", "darkgray");
-        layer.appendChild(button.render(svgp));
+        // Don't show the button when active. May confuse people more than the disappearing button
+        
+        // SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
+        // button.setTitle("Active style", "darkgray");
+        // layer.appendChild(button.render(svgp));
       }
       else {
         SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
@@ -187,7 +187,7 @@ public class KeyVisFactory extends AbstractVisualization {
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new KeyVisFactory(task);
+      return new KeyVisualization(task);
     }
 
     @Override
