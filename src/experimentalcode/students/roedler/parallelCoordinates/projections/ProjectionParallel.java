@@ -77,5 +77,6 @@ public interface ProjectionParallel extends Projection {
 
   public int getDimensionsPosition(int dim);
 
+  @Deprecated
   double getXpos(int dim);
 }

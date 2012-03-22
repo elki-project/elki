@@ -295,7 +295,7 @@ public class SVGPlot {
       cssman.addClass(cls);
     }
     catch(CSSNamingConflict e) {
-      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+      //de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
     }
   }
 

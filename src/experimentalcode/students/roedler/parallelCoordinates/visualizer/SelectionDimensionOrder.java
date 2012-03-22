@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -23,7 +22,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
-
 
 /**
  * interactive SVG-Element for selecting visible axis.
@@ -37,26 +35,26 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
   public static final String SELECTDIMENSIONORDER = "SelectDimensionOrder";
-  
 
   /**
    * CSS class for a tool button
    */
   public static final String SDO_BUTTON = "SDObutton";
-  
+
   /**
    * CSS class for a button border
    */
   public static final String SDO_BORDER = "SDOborder";
-  
+
   /**
    * CSS class for a button cross
    */
   public static final String SDO_ARROW = "SDOarrow";
-  
+
   private int selecteddim = -1;
+
   private boolean selected = false;
-  
+
   /**
    * Constructor.
    * 
@@ -67,69 +65,72 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     incrementalRedraw();
     context.addDataStoreListener(this);
   }
-  
+
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-    int dim = DatabaseUtil.dimensionality(relation);
+    int dim = proj.getVisibleDimensions();
     recalcAxisPositions();
 
-    Element arrow;
-    Element button;
     double last = -1.;
-    
+
     double as = getSizeY() / 70.;
     double bs = as * 1.5;
     double hbs = bs / 2.;
     double qas = as / 4.;
-    double ypos = -getMarginY() * 2. + getAxisHeight();
-    double dist = 2.5 * as; 
+    double ypos = getAxisHeight() + getMarginY() * 2.;
+    double dist = 2.5 * as;
 
-      Element back = svgp.svgRect(0.0, (-getMarginY() * 2. + getAxisHeight()), getSizeX(), getSizeY() / 35.);
-      SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
-      layer.appendChild(back);
-      
-    for (int i = 0; i < dim; i++){
-      if (proj.isVisible(i)){
-        if (!selected){
-          int j = 0;
-          int end = 3;
-          if(i == 0 || i == proj.getFirstVisibleDimension()){j = 1; }
-          if (i == proj.getLastVisibleDimension()){end = 2; }
-          for (; j < end; j++){
-            arrow = getArrow(j, (proj.getXpos(i) - dist) + j * dist, ypos + as, as);
-            SVGUtil.addCSSClass(arrow, SDO_ARROW);
-            layer.appendChild(arrow);
-            button = svgp.svgRect((proj.getXpos(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
-            SVGUtil.addCSSClass(button, SDO_BUTTON);
-            addEventListener(button, i, j);
-            layer.appendChild(button);
-          }
+    Element back = svgp.svgRect(0.0, getAxisHeight() + getMarginY() * 2., getSizeX(), getSizeY() / 35.);
+    SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
+    layer.appendChild(back);
+
+    for(int i = 0; i < dim; i++) {
+      if(!selected) {
+        int j = 0;
+        int end = 3;
+        if(i == 0 || i == proj.getFirstVisibleDimension()) {
+          j = 1;
         }
-        else{
-          arrow = getArrow(3, proj.getXpos(i), ypos + as, as);
+        if(i == proj.getLastVisibleDimension()) {
+          end = 2;
+        }
+        for(; j < end; j++) {
+          Element arrow = getArrow(j, (getAxisX(i) - dist) + j * dist, ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
-          button = svgp.svgRect((proj.getXpos(i) - hbs) , ypos + qas, bs, bs);
+          Element button = svgp.svgRect((getAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
+          SVGUtil.addCSSClass(button, SDO_BUTTON);
+          addEventListener(button, i, j);
+          layer.appendChild(button);
+        }
+      }
+      else {
+        {
+          Element arrow = getArrow(3, getAxisX(i), ypos + as, as);
+          SVGUtil.addCSSClass(arrow, SDO_ARROW);
+          layer.appendChild(arrow);
+          Element button = svgp.svgRect(getAxisX(i) - hbs, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
           addEventListener(button, i, 3);
           layer.appendChild(button);
-          
-          if (last > 0.){
-            arrow = getArrow(3, last + ((proj.getXpos(i)) - last) / 2., ypos + as, as);
-            SVGUtil.addCSSClass(arrow, SDO_ARROW);
-            layer.appendChild(arrow);
-            button = svgp.svgRect(last + (((proj.getXpos(i)) - last) / 2.) - hbs, ypos + qas, bs, bs);
-            SVGUtil.addCSSClass(button, SDO_BUTTON);
-            addEventListener(button, i, 4);
-            layer.appendChild(button);
-          }
-          last = proj.getXpos(i);
         }
+
+        if(last > 0.) {
+          Element arrow = getArrow(3, last + (getAxisX(i) - last) / 2., ypos + as, as);
+          SVGUtil.addCSSClass(arrow, SDO_ARROW);
+          layer.appendChild(arrow);
+          Element button = svgp.svgRect(last + ((getAxisX(i) - last) / 2.) - hbs, ypos + qas, bs, bs);
+          SVGUtil.addCSSClass(button, SDO_BUTTON);
+          addEventListener(button, i, 4);
+          layer.appendChild(button);
+        }
+        last = getAxisX(i);
       }
+
     }
   }
-  
+
   /**
    * Add an event listener to the Element
    * 
@@ -141,86 +142,86 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
       @Override
       public void handleEvent(Event evt) {
-   
- /*       if (i == -1){
-          hide = !hide;
-        }*/
-        if (j == 1){
+
+        /*
+         * if (i == -1){ hide = !hide; }
+         */
+        if(j == 1) {
           selected = true;
           selecteddim = i;
         }
-        if (j == 3 || j == 4){
-          if (j == 3){
+        if(j == 3 || j == 4) {
+          if(j == 3) {
             proj.swapDimensions(selecteddim, i);
           }
           else {
-            if (selecteddim != i) {
+            if(selecteddim != i) {
               proj.shiftDimension(selecteddim, i);
             }
           }
           selected = false;
           selecteddim = -1;
         }
-        if (j == 0 || j == 2){
-          if (j == 0){
+        if(j == 0 || j == 2) {
+          if(j == 0) {
             proj.swapDimensions(i, proj.getPrevVisibleDimension(i));
           }
           else {
             proj.swapDimensions(i, proj.getNextVisibleDimension(i));
           }
         }
-        
+
         incrementalRedraw();
         context.contentChanged(null);
       }
     }, false);
   }
-  
-  private Element getArrow(int dir, double x, double y, double size){
+
+  private Element getArrow(int dir, double x, double y, double size) {
     SVGPath path = new SVGPath();
     double hs = size / 2.;
-    
-    switch (dir) {
-      case 0: {
-        path.drawTo(x + hs, y + hs);
-        path.drawTo(x - hs, y);
-        path.drawTo(x + hs, y - hs);
-        path.drawTo(x + hs, y + hs);
-        break;
-      }
-      case 1: {
-        path.drawTo(x - hs, y - hs);
-        path.drawTo(x + hs, y - hs);
-        path.drawTo(x, y + hs);
-        path.drawTo(x - hs, y - hs);
-        break;
-      }
-      case 2: {
-        path.drawTo(x - hs, y - hs);
-        path.drawTo(x + hs, y);
-        path.drawTo(x - hs, y + hs);
-        path.drawTo(x - hs, y - hs);
-        break;
-      }
-      case 3: {
-        
-        path.drawTo(x - hs, y + hs);
-        path.drawTo(x, y - hs);
-        path.drawTo(x + hs, y + hs);
-        path.drawTo(x - hs, y + hs);
-      }
+
+    switch(dir){
+    case 0: {
+      path.drawTo(x + hs, y + hs);
+      path.drawTo(x - hs, y);
+      path.drawTo(x + hs, y - hs);
+      path.drawTo(x + hs, y + hs);
+      break;
     }
-    
+    case 1: {
+      path.drawTo(x - hs, y - hs);
+      path.drawTo(x + hs, y - hs);
+      path.drawTo(x, y + hs);
+      path.drawTo(x - hs, y - hs);
+      break;
+    }
+    case 2: {
+      path.drawTo(x - hs, y - hs);
+      path.drawTo(x + hs, y);
+      path.drawTo(x - hs, y + hs);
+      path.drawTo(x - hs, y - hs);
+      break;
+    }
+    case 3: {
+
+      path.drawTo(x - hs, y + hs);
+      path.drawTo(x, y - hs);
+      path.drawTo(x + hs, y + hs);
+      path.drawTo(x - hs, y + hs);
+    }
+    }
+
     path.close();
     return path.makeElement(svgp);
   }
-  
+
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
-    
+
   }
-  
+
   /**
    * Adds the required CSS-Classes
    * 
@@ -237,7 +238,7 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     if(!svgp.getCSSClassManager().contains(SDO_BORDER)) {
       CSSClass cls = new CSSClass(this, SDO_BORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 2.0);
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 2.0);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
@@ -250,12 +251,12 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     if(!svgp.getCSSClassManager().contains(SDO_ARROW)) {
       CSSClass cls = new CSSClass(this, SDO_ARROW);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_DARKGREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 1.5);
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 1.5);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
   }
-  
+
   /**
    * Factory for dimension selection visualizer
    * 
