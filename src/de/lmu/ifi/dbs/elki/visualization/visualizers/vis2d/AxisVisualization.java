@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -66,13 +65,13 @@ public class AxisVisualization extends P2DVisualization {
     int dim = DatabaseUtil.dimensionality(rel);
 
     // origin
-    double[] orig = proj.fastProjectScaledToRender(new Vector(dim));
+    double[] orig = proj.fastProjectScaledToRenderSpace(new double[dim]);
     // diagonal point opposite to origin
     double[] diag = new double[dim];
     for(int d2 = 0; d2 < dim; d2++) {
       diag[d2] = 1;
     }
-    diag = proj.fastProjectScaledToRender(new Vector(diag));
+    diag = proj.fastProjectScaledToRenderSpace(diag);
     // compute angle to diagonal line, used for axis labeling.
     double diaga = Math.atan2(diag[1] - orig[1], diag[0] - orig[0]);
 
@@ -84,10 +83,10 @@ public class AxisVisualization extends P2DVisualization {
 
     // draw axes
     for(int d = 0; d < dim; d++) {
-      Vector v = new Vector(dim);
-      v.set(d, 1);
+      double[] v = new double[dim];
+      v[d] = 1;
       // projected endpoint of axis
-      double[] ax = proj.fastProjectScaledToRender(v);
+      double[] ax = proj.fastProjectScaledToRenderSpace(v);
       boolean righthand = false;
       double axa = Math.atan2(ax[1] - orig[1], ax[0] - orig[0]);
       if(axa > diaga || (diaga > 0 && axa > diaga + Math.PI)) {

@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Projections that have specialized methods to only compute the first two
@@ -43,7 +42,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double[] fastProjectDataToRenderSpace(Vector data);
+  public double[] fastProjectDataToRenderSpace(double[] data);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -54,12 +53,53 @@ public interface Projection2D extends Projection {
   public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data);
 
   /**
+   * Project a data vector from data space to scaled space.
+   * 
+   * @param data vector in data space
+   * @return vector in scaled space
+   */
+  public double[] fastProjectDataToScaledSpace(double[] data);
+
+  /**
+   * Project a data vector from data space to scaled space.
+   * 
+   * @param data vector in data space
+   * @return vector in scaled space
+   */
+  public double[] fastProjectDataToScaledSpace(NumberVector<?, ?> data);
+
+  /**
    * Project a vector from scaled space to rendering space.
    * 
    * @param v vector in scaled space
    * @return vector in rendering space
    */
-  public double[] fastProjectScaledToRender(Vector v);
+  public double[] fastProjectScaledToRenderSpace(double[] v);
+
+  /**
+   * Project a data vector from rendering space to data space.
+   * 
+   * @param data vector in rendering space
+   * @return vector in data space
+   */
+  public double[] fastProjectRenderToDataSpace(double[] data);
+
+  /**
+   * Project a data vector from rendering space to data space.
+   * 
+   * @param data vector in rendering space
+   * @param prototype Prototype to create vector from
+   * @return vector in data space
+   */
+  // public <V extends NumberVector<V, ?>> V fastProjectRenderToDataSpace(double[] data, V prototype);
+
+  /**
+   * Project a vector from rendering space to scaled space.
+   * 
+   * @param v vector in rendering space
+   * @return vector in scaled space
+   */
+  public double[] fastProjectRenderToScaledSpace(double[] v);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -67,7 +107,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double[] fastProjectRelativeDataToRenderSpace(Vector data);
+  public double[] fastProjectRelativeDataToRenderSpace(double[] data);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -83,8 +123,10 @@ public interface Projection2D extends Projection {
    * @param v vector in scaled space
    * @return vector in rendering space
    */
-  public double[] fastProjectRelativeScaledToRender(Vector v);
+  public double[] fastProjectRelativeScaledToRenderSpace(double[] v);
 
+  // FIXME: add missing relative projection functions
+  
   /**
    * Estimate the viewport requirements
    * 

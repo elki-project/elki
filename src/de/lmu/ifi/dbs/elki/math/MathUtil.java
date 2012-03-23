@@ -465,15 +465,24 @@ public final class MathUtil {
    * @return Angle
    */
   public static double angle(Vector v1, Vector v2) {
+    return angle(v1.getArrayRef(), v2.getArrayRef());
+  }
+
+  /**
+   * Compute the angle between two vectors.
+   * 
+   * @param v1 first vector
+   * @param v2 second vector
+   * @return Angle
+   */
+  public static double angle(double[] v1, double[] v2) {
     // Essentially, we want to compute this:
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
     // We can just compute all three in parallel.
-    double[] v1e = v1.getArrayRef();
-    double[] v2e = v2.getArrayRef();
     double s = 0, e1 = 0, e2 = 0;
-    for(int k = 0; k < v1e.length; k++) {
-      final double r1 = v1e[k];
-      final double r2 = v2e[k];
+    for(int k = 0; k < v1.length; k++) {
+      final double r1 = v1[k];
+      final double r2 = v2[k];
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
@@ -490,17 +499,26 @@ public final class MathUtil {
    * @return Angle
    */
   public static double angle(Vector v1, Vector v2, Vector o) {
+    return angle(v1.getArrayRef(), v2.getArrayRef(), o.getArrayRef());
+  }
+
+  /**
+   * Compute the angle between two vectors.
+   * 
+   * @param v1 first vector
+   * @param v2 second vector
+   * @param o Origin
+   * @return Angle
+   */
+  public static double angle(double[] v1, double[] v2, double[] o) {
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
     // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
     // We can just compute all three in parallel.
-    double[] v1e = v1.getArrayRef();
-    double[] v2e = v2.getArrayRef();
-    double[] oe = o.getArrayRef();
     double s = 0, e1 = 0, e2 = 0;
-    for(int k = 0; k < v1e.length; k++) {
-      final double r1 = v1e[k] - oe[k];
-      final double r2 = v2e[k] - oe[k];
+    for(int k = 0; k < v1.length; k++) {
+      final double r1 = v1[k] - o[k];
+      final double r2 = v2[k] - o[k];
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;

@@ -59,9 +59,9 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public double[] fastProjectDataToRenderSpace(Vector data) {
-    double x = (scales[dim1].getScaled(data.get(dim1)) - 0.5) * SCALE;
-    double y = (scales[dim2].getScaled(data.get(dim2)) - 0.5) * -SCALE;
+  public double[] fastProjectDataToRenderSpace(double[] data) {
+    double x = (scales[dim1].getScaled(data[dim1]) - 0.5) * SCALE;
+    double y = (scales[dim2].getScaled(data[dim2]) - 0.5) * -SCALE;
     return new double[] { x, y };
   }
 
@@ -73,16 +73,70 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public double[] fastProjectScaledToRender(Vector v) {
-    double x = (v.get(dim1) - 0.5) * SCALE;
-    double y = (v.get(dim2) - 0.5) * -SCALE;
+  public double[] fastProjectDataToScaledSpace(double[] data) {
+    final int dim = data.length;
+    double[] ds = new double[dim];
+    for(int d = 0; d < dim; d++) {
+      ds[d] = scales[d].getScaled(data[d]);
+    }
+    return ds;
+  }
+
+  @Override
+  public double[] fastProjectDataToScaledSpace(NumberVector<?, ?> data) {
+    final int dim = data.getDimensionality();
+    double[] ds = new double[dim];
+    for(int d = 0; d < dim; d++) {
+      ds[d] = scales[d].getScaled(data.doubleValue(d + 1));
+    }
+    return ds;
+  }
+
+  @Override
+  public double[] fastProjectScaledToRenderSpace(double[] v) {
+    double x = (v[dim1] - 0.5) * SCALE;
+    double y = (v[dim2] - 0.5) * -SCALE;
     return new double[] { x, y };
   }
 
   @Override
-  public double[] fastProjectRelativeDataToRenderSpace(Vector data) {
-    double x = scales[dim1].getRelativeScaled(data.get(dim1)) * SCALE;
-    double y = scales[dim2].getRelativeScaled(data.get(dim2)) * -SCALE;
+  public double[] fastProjectRenderToDataSpace(double[] v) {
+    double[] ret = new double[scales.length];
+    for(int d = 0; d < scales.length; d++) {
+      if(d == dim1) {
+        ret[d] = scales[d].getUnscaled((v[0] / SCALE) + 0.5);
+      }
+      else if(d == dim2) {
+        ret[d] = scales[d].getUnscaled((v[1] / -SCALE) + 0.5);
+      }
+      else {
+        ret[d] = scales[d].getUnscaled(0.5);
+      }
+    }
+    return ret;
+  }
+
+  @Override
+  public double[] fastProjectRenderToScaledSpace(double[] v) {
+    double[] ret = new double[scales.length];
+    for(int d = 0; d < scales.length; d++) {
+      if(d == dim1) {
+        ret[d] = (v[0] / SCALE) + 0.5;
+      }
+      else if(d == dim2) {
+        ret[d] = (v[1] / -SCALE) + 0.5;
+      }
+      else {
+        ret[d] = 0.5;
+      }
+    }
+    return ret;
+  }
+
+  @Override
+  public double[] fastProjectRelativeDataToRenderSpace(double[] data) {
+    double x = scales[dim1].getRelativeScaled(data[dim1]) * SCALE;
+    double y = scales[dim2].getRelativeScaled(data[dim2]) * -SCALE;
     return new double[] { x, y };
   }
 
@@ -94,8 +148,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public double[] fastProjectRelativeScaledToRender(Vector v) {
-    final double[] vr = v.getArrayRef();
+  public double[] fastProjectRelativeScaledToRenderSpace(double[] vr) {
     double x = vr[dim1] * SCALE;
     double y = vr[dim2] * -SCALE;
     return new double[] { x, y };
