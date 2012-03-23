@@ -97,10 +97,8 @@ public class ClusteringComparison implements Evaluator {
     
     // db
     final Database db = ResultUtil.findDatabase(baseResult);
-    
-    
-    
 
+    
     // result to save evaluations
     ClusteringComparisonResult thisResult = new ClusteringComparisonResult("ClusteringComparison", "cc", clusterings.get(0));
     

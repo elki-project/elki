@@ -87,7 +87,6 @@ public class CSStylingPolicy implements ClassStylingPolicy {
   }
   
   public void selectObjects(SegmentID segment) {
-    System.out.println("policy: selecting segments");
     if (selectedSegments.contains(segment)) return;
     selectedSegments.add(segment);
     unselectedSegments.remove(segment);
@@ -158,7 +157,6 @@ public class CSStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public Iterator<DBID> iterateClass(int cnum) {
-    System.out.println("policy: serving style "+cnum);
     // unselected
     if (cnum == -2) return unselectedObjects.iterator();
     else if (cnum == -1) return DBIDUtil.newArray().iterator();

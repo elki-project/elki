@@ -153,7 +153,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
   private static enum Colors { BORDER("#FF0073"), CLUSTER_UNPAIRED("#ffffff"),
     HOVER_ALPHA("1.0"), HOVER_INCLUSTER("#008e9e"), HOVER_SELECTION("#73ff00"), HOVER_PAIRED("#4ba600"), HOVER_UNPAIRED("#b20000"),
     HOVER_SUBSET("#009900"), HOVER_INTERSECTION("#990000"),
-    SELECTED_SEGMENT("#009900"), SELECTED_BORDER("#000000");
+    SELECTED_SEGMENT("#009900"), SELECTED_BORDER("#000000"), SELECTED_UNPAIRED_SEGMENT("#bababa");
   
     // getter/setter
     String color;  
@@ -174,6 +174,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
   public CircleSegmentsVisualizer(VisualizationTask task) {
     super(task);
     ccr = task.getResult();
+    // Listen for result changes (Selection changed)
+    context.addResultListener(this);
   }
   
   public void showUnclusteredPairs(boolean show) {
@@ -229,13 +231,12 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
       // draw segment for every clustering
       
       for (int i=0; i<id.size(); i++) {
+
         double currentRadius = i*(Properties.RADIUS_DELTA.getValue()+Properties.CLUSTERING_DISTANCE.getValue())+Properties.RADIUS_INNER.getValue();
         
-        //
         // Add border if the next segment is a different cluster in the reference clustering
-        //
-        
         if ((refSegment != id.get(refClustering)) && refClustering==i) {
+          
           Element border = getSegment(offsetAngle-Properties.CLUSTER_DISTANCE.getValue(), centerx, centery, Properties.BORDER_WIDTH.getValue(), currentRadius, Properties.RADIUS_OUTER.getValue()-Properties.CLUSTERING_DISTANCE.getValue()).makeElement(svgp);
           border.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.CLR_BORDER_CLASS);
           visLayer.appendChild(border);  
@@ -248,35 +249,23 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
         
         int cluster = id.get(i);
         
-        //
-        // create ring segment
-        //
-        
+        // create ring segment       
         Element segment = getSegment(offsetAngle, centerx, centery, alpha, currentRadius, currentRadius+Properties.RADIUS_DELTA.getValue()).makeElement(svgp);
-        
         segment.setAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE, ""+cluster);
         segment.setAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE, ""+i);
         segment.setAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE, id.toString());
         //segment.setAttribute(CCConstants.SEG_PAIRCOUNT_ATTRIBUTE, pairSegments.get(id).toString());
         //segment.setAttribute(CCConstants.CLR_PAIRCOUNT_ATTRIBUTE, ""+segments.getPairCount(i, cluster));
 
-        //
         // MouseEvents on segment cluster
-        //
-        
         EventTarget targ = (EventTarget) segment;
         targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, mouseOver, false);
         targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, mouseOut, false);
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, mouseClick, false);
         
-        //
-        // Coloring based on clusterID
-        //
-        
-        if (cluster != 0) {
-          segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssClr[id.get(i)-1].getName());
-        }
-        // if its an unpaired cluster set color to white 
+        // Coloring based on clusterID        
+        if (cluster != 0) segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssClr[id.get(i)-1].getName());
+        // if its an unpaired cluster set color to white
         else segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.CLR_UNPAIRED_CLASS);
         
         visLayer.appendChild(segment);
@@ -321,9 +310,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     
     // create selection helper. SegmentSelection initializes and manages CSStylingPolicy. Could completely replace SegmentSelection
     this.selection      = new SegmentSelection(task, segments, selectionInfo);
-
-    // Listen for result changes (Selection changed)
-    context.addResultListener(this);
     
     // calculate properties for drawing
     calculateSegmentProperties();  
@@ -475,6 +461,11 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_SEGMENT.getColor()+" !important" );
     svgp.addCSSClassOrLogError(segment_selected);
     
+    // UNPAIRED SEGMENT SELECT
+    CSSClass unpaired_segment_selected = new CSSClass(this, CCConstants.SEG_UNPAIRED_SELECTED_CLASS);
+    unpaired_segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_UNPAIRED_SEGMENT.getColor()+" !important" );
+    svgp.addCSSClassOrLogError(unpaired_segment_selected);
+    
     //
     // SELECTION CLASSES
     // TODO refactor: mixed by classes in ClusteringComparisonVisualization & CCMarkers
@@ -483,6 +474,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     // Color classes for differentiation of segments
     int index = 0;
     for ( String colorValue : CCConstants.ColorArray) {
+      
       CSSClass bordercolor = new CSSClass(this, CCConstants.PRE_STROKE_COLOR_CLASS+index);
       bordercolor.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, colorValue+" !important");
       svgp.addCSSClassOrLogError(bordercolor);
