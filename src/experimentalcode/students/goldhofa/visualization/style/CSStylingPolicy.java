@@ -65,7 +65,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
    * 
    * @param clustering Clustering to use.
    */
-  public CSStylingPolicy(Clustering<?> clustering, StyleLibrary style, Segments segments) {
+  public CSStylingPolicy(Segments segments, StyleLibrary style) {
     super();
     
     this.segments = segments;
@@ -87,6 +87,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
   }
   
   public void selectObjects(SegmentID segment) {
+    System.out.println("policy: selecting segments");
     if (selectedSegments.contains(segment)) return;
     selectedSegments.add(segment);
     unselectedSegments.remove(segment);
@@ -95,12 +96,6 @@ public class CSStylingPolicy implements ClassStylingPolicy {
   
   public boolean hasSegmentSelected(SegmentID segment) {
     return selectedSegments.contains(segment);
-    /*
-    for (int i = 0; i < selectedSegments.size(); ++i) {
-      if (selectedSegments.get(i).compareTo(segment) == 0) return true;
-    }
-    return false;
-    */
   }
   
   public ArrayList<SegmentID> getSelectedSegments() {
@@ -163,7 +158,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public Iterator<DBID> iterateClass(int cnum) {
-
+    System.out.println("policy: serving style "+cnum);
     // unselected
     if (cnum == -2) return unselectedObjects.iterator();
     else if (cnum == -1) return DBIDUtil.newArray().iterator();

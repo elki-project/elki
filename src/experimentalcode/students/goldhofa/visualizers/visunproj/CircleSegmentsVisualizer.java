@@ -303,6 +303,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
   public void buildSegments() {
     
     VisualizationTask task = this.task;
+    // FIXME nullp exept. when using context of parent
     VisualizerContext context = task.getContext();
     
     this.segments   = ccr.getSegments();
@@ -316,11 +317,10 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     this.visLayer   = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.ctrlLayer  = svgp.svgElement(SVGConstants.SVG_G_TAG);
     
-    // create custom styling policy
-    this.policy = new CSStylingPolicy(ccr.getReference(), task.getContext().getStyleLibrary(), segments);
-    
     this.selectionInfo  = new UnorderedList(svgp);
-    this.selection      = new SegmentSelection(task, policy, visLayer, segments, selectionInfo);
+    
+    // create selection helper. SegmentSelection initializes and manages CSStylingPolicy. Could completely replace SegmentSelection
+    this.selection      = new SegmentSelection(task, segments, selectionInfo);
 
     // Listen for result changes (Selection changed)
     context.addResultListener(this);
