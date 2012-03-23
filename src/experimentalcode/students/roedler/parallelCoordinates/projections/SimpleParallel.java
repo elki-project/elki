@@ -23,6 +23,8 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
@@ -230,20 +232,29 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   }
 
   @Override
-  public double[] fastProjectDataToRenderSpace(Vector data) {
+  public double[] fastProjectDataToRenderSpace(double[] data) {
     double[] v = new double[visDims];
     for(int j = 0, o = 0; j < dims; j++) {
       if(hidden(j)) {
         continue;
       }
       int i = dimOrder[j];
-      v[o] = scales[i].getScaled(data.get(i));
+      v[o] = scales[i].getScaled(data[i]);
       if(inverted(i)) {
         v[o] = 1 - v[o];
       }
       o++;
     }
     return v;
+  }
+
+  @Override
+  public double fastProjectRenderToDataSpace(double v, int projdim) {
+    int truedim = dimOrder[projdim];
+    if(inverted(truedim)) {
+      v = 1 - v;
+    }
+    return scales[truedim].getUnscaled(v);
   }
 
   // @Override
@@ -312,24 +323,9 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   }
 
   // @Override
-  public Vector XXprojectDataToRenderSpace(NumberVector<?, ?> data) {
-    return projectScaledToRender(projectDataToScaledSpace(data));
-  }
-
-  // @Override
-  public Vector XXprojectDataToRenderSpace(NumberVector<?, ?> data, boolean sort) {
-    return YYprojectScaledToRender(projectDataToScaledSpace(data), sort);
-  }
-
-  // @Override
-  public Vector XXprojectDataToRenderSpace(Vector data) {
-    return projectScaledToRender(projectDataToScaledSpace(data));
-  }
-
-  // @Override
   public <NV extends NumberVector<NV, ?>> NV XXprojectRenderToDataSpace(Vector v, NV prototype) {
     final int dim = v.getDimensionality();
-    Vector vec = projectRenderToScaled(v);
+    Vector vec = XXprojectRenderToScaled(v);
     double[] ds = vec.getArrayRef();
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
@@ -340,24 +336,9 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   }
 
   // @Override
-  public Vector XXprojectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
-    return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
-  }
-
-  // @Override
-  public Vector XXprojectRelativeDataToRenderSpace(Vector data) {
-    return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
-  }
-
-  /*
-   * @Override public <NV extends NumberVector<NV, ?>> NV
-   * projectRelativeScaledToDataSpace(Vector v, NV prototype) { return null; }
-   */
-
-  // @Override
   public <NV extends NumberVector<NV, ?>> NV XXprojectRelativeRenderToDataSpace(Vector v, NV prototype) {
     final int dim = v.getDimensionality();
-    Vector vec = projectRelativeRenderToScaled(v);
+    Vector vec = XXprojectRelativeRenderToScaled(v);
     double[] ds = vec.getArrayRef();
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
@@ -419,85 +400,5 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public int getInputDimensionality() {
     return dims;
-  }
-
-  @Override
-  public Vector projectScaledToRender(Vector v) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectRenderToScaled(Vector v) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectRelativeScaledToRender(Vector v) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectRelativeRenderToScaled(Vector v) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectDataToScaledSpace(NumberVector<?, ?> data) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectDataToScaledSpace(Vector data) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectRelativeDataToScaledSpace(NumberVector<?, ?> data) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectRelativeDataToScaledSpace(Vector data) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectDataToRenderSpace(NumberVector<?, ?> data) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectDataToRenderSpace(Vector data) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public <NV extends NumberVector<NV, ?>> NV projectScaledToDataSpace(Vector v, NV factory) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public <NV extends NumberVector<NV, ?>> NV projectRenderToDataSpace(Vector v, NV prototype) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public Vector projectRelativeDataToRenderSpace(Vector data) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public <NV extends NumberVector<NV, ?>> NV projectRelativeScaledToDataSpace(Vector v, NV prototype) {
-    throw new UnsupportedOperationException("not yet implemented.");
-  }
-
-  @Override
-  public <NV extends NumberVector<NV, ?>> NV projectRelativeRenderToDataSpace(Vector v, NV prototype) {
-    throw new UnsupportedOperationException("not yet implemented.");
   }
 }

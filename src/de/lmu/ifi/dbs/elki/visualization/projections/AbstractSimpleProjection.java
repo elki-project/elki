@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractSimpleProjection extends AbstractProjection {
+public abstract class AbstractSimpleProjection extends AbstractFullProjection {
   /**
    * Constructor.
    * 

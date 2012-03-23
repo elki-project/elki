@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -40,7 +41,7 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
  * 
  * @author Erich Schubert
  */
-public class AffineProjection extends AbstractProjection implements Projection2D {
+public class AffineProjection extends AbstractFullProjection implements Projection2D {
   /**
    * Affine transformation used in projection
    */
@@ -167,18 +168,29 @@ public class AffineProjection extends AbstractProjection implements Projection2D
   }
 
   @Override
-  public double[] fastProjectDataToRenderSpace(Vector data) {
-    return fastProjectScaledToRender(projectDataToScaledSpace(data));
+  public double[] fastProjectDataToRenderSpace(double[] data) {
+    return fastProjectScaledToRenderSpace(fastProjectDataToScaledSpace(data));
   }
 
   @Override
   public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
-    return fastProjectScaledToRender(projectDataToScaledSpace(data));
+    return fastProjectScaledToRenderSpace(fastProjectDataToScaledSpace(data));
   }
 
   @Override
-  public double[] fastProjectScaledToRender(Vector v) {
-    final double[] vr = v.getArrayRef();
+  public double[] fastProjectDataToScaledSpace(double[] data) {
+    // FIXME: implement with less objects?
+    return projectDataToScaledSpace(new Vector(data)).getArrayRef();
+  }
+
+  @Override
+  public double[] fastProjectDataToScaledSpace(NumberVector<?, ?> data) {
+    // FIXME: implement with less objects?
+    return projectDataToScaledSpace(data).getArrayRef();
+  }
+
+  @Override
+  public double[] fastProjectScaledToRenderSpace(double[] vr) {
     double x = 0.0;
     double y = 0.0;
     double s = 0.0;
@@ -203,18 +215,19 @@ public class AffineProjection extends AbstractProjection implements Projection2D
   }
 
   @Override
-  public double[] fastProjectRelativeDataToRenderSpace(Vector data) {
-    return fastProjectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
+  public double[] fastProjectRelativeDataToRenderSpace(double[] data) {
+    // FIXME: implement with less objects?
+    return fastProjectRelativeScaledToRenderSpace(projectRelativeDataToScaledSpace(new Vector(data)).getArrayRef());
   }
 
   @Override
   public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
-    return fastProjectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
+    // FIXME: implement with less objects?
+    return fastProjectRelativeScaledToRenderSpace(projectRelativeDataToScaledSpace(data).getArrayRef());
   }
 
   @Override
-  public double[] fastProjectRelativeScaledToRender(Vector v) {
-    final double[] vr = v.getArrayRef();
+  public double[] fastProjectRelativeScaledToRenderSpace(double[] vr) {
     double x = 0.0;
     double y = 0.0;
 
@@ -231,6 +244,27 @@ public class AffineProjection extends AbstractProjection implements Projection2D
   }
 
   @Override
+  public double[] fastProjectRenderToDataSpace(double[] data) {
+    double[] ret = fastProjectRenderToScaledSpace(data);
+    for(int d = 0; d < scales.length; d++) {
+      ret[d] = scales[d].getUnscaled(ret[d]);
+    }
+    return ret;
+  }
+
+  @Override
+  public double[] fastProjectRenderToScaledSpace(double[] v) {
+    if(v.length == scales.length) {
+      return projectRenderToScaled(new Vector(v)).getArrayRef();
+    }
+    double[] c = Arrays.copyOf(v, scales.length);
+    for(int d = v.length; d < scales.length; d++) {
+      c[d] = 0.5;
+    }
+    return projectRenderToScaled(new Vector(c)).getArrayRef();
+  }
+
+  @Override
   public BitSet getVisibleDimensions2D() {
     final int dim = proj.getDimensionality();
     BitSet actDim = new BitSet(dim);
@@ -238,7 +272,7 @@ public class AffineProjection extends AbstractProjection implements Projection2D
     for(int d = 0; d < dim; d++) {
       vScale.setZero();
       vScale.set(d, 1);
-      double[] vRender = fastProjectScaledToRender(vScale);
+      double[] vRender = fastProjectScaledToRenderSpace(vScale.getArrayRef());
 
       // TODO: Can't we do this by inspecting the projection matrix directly?
       if(vRender[0] != 0.0 || vRender[1] != 0) {

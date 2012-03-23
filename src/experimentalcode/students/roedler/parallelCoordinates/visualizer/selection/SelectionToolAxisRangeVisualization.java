@@ -31,20 +31,16 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -68,7 +64,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * @apiviz.has RangeSelection oneway - - updates
  * 
  */
-public class SelectionToolAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener, DataStoreListener {
+public class SelectionToolAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
   /**
    * The logger for this class.
    */
@@ -83,11 +79,6 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
   private static final String CSS_RANGEMARKER = "selectionAxisRangeMarker";
-
-  /**
-   * Dimension
-   */
-  private int dim;
 
   /**
    * Element for selection rectangle
@@ -106,21 +97,14 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
    */
   public SelectionToolAxisRangeVisualization(VisualizationTask task) {
     super(task);
-    this.dim = DatabaseUtil.dimensionality(relation);
-    context.addDataStoreListener(this);
     incrementalRedraw();
+    context.addResultListener(this);
   }
 
   @Override
   public void destroy() {
+    context.removeResultListener(this);
     super.destroy();
-    context.removeDataStoreListener(this);
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
-
   }
 
   @Override
@@ -133,7 +117,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
     layer.appendChild(rtag);
 
     // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, 0.0, -.5 * getMarginY(), getSizeX(), getMarginY() * 1.5 + getAxisHeight(), this);
+    DragableArea drag = new DragableArea(svgp, -.1 * getMarginX(), -.1 * getMarginY(), getSizeX() + getMarginX() * .2, getAxisHeight() + getMarginY() * .2, this);
     etag = drag.getElement();
     layer.appendChild(etag);
   }
@@ -159,37 +143,34 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
    * @param y2 max y-value
    */
   private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
-
-    int minaxis = 0;
-    int maxaxis = 0;
-    boolean minx = true;
-    boolean maxx = false;
-    int count = -1;
-    for(int i = 0; i < dim; i++) {
-      if(proj.isVisible(i)) {
-        if(minx && proj.getXpos(i) > x1) {
-          minaxis = count + 1;
-          minx = false;
-          maxx = true;
-        }
-        if(maxx && (proj.getXpos(i) > x2 || i == dim - 1)) {
-          maxaxis = count;
-          if(i == dim - 1 && proj.getXpos(i) <= x2) {
-            maxaxis++;
-          }
+    final int dim = proj.getVisibleDimensions();
+    int minaxis = dim + 1;
+    int maxaxis = -1;
+    {
+      int i = 0;
+      while(i < dim) {
+        double axx = getAxisX(i);
+        if(x1 < axx || x2 < axx) {
+          minaxis = i;
           break;
         }
+        i++;
       }
-      count = i;
+      while(i < dim) {
+        double axx = getAxisX(i);
+        if(x2 < axx && x1 < axx) {
+          maxaxis = i;
+          break;
+        }
+        i++;
+      }
     }
+    double z1 = Math.max(Math.min(y1, y2),0);
+    double z2 = Math.min(Math.max(y1, y2), getAxisHeight());
     for(int i = minaxis; i <= maxaxis; i++) {
-      if(proj.isVisible(i)) {
-        Vector min = new Vector(1);
-        min.set(0, Math.min(-getMarginY() + getAxisHeight(), y1));
-        Vector max = new Vector(1);
-        max.set(0, Math.max(-getMarginY(), y2));
-        ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(proj.getScale(i).getUnscaled(proj.projectRenderToScaled(min).get(0)), proj.getScale(i).getUnscaled(proj.projectRenderToScaled(max).get(0)));
-      }
+      double v1 = proj.fastProjectRenderToDataSpace(z1, i);
+      double v2 = proj.fastProjectRenderToDataSpace(z2, i);
+      ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
     }
   }
 
@@ -245,6 +226,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
       double y1 = Math.max(p1.getY(), p2.getY());
       double y2 = Math.min(p1.getY(), p2.getY());
 
+      int dim = proj.getInputDimensionality();
       if(selContext instanceof RangeSelection) {
         ranges = ((RangeSelection) selContext).getRanges();
       }

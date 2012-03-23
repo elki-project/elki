@@ -35,9 +35,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
@@ -66,10 +64,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * 
  * @apiviz.has SelectionResult oneway - - updates
  * @apiviz.has RangeSelection oneway - - updates
- * 
- * @param <NV> Type of the NumberVector being visualized.
  */
-public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> extends P2DVisualization implements DragableArea.DragListener {
+public class SelectionToolCubeVisualization extends P2DVisualization implements DragableArea.DragListener {
   /**
    * The logger for this class.
    */
@@ -148,23 +144,18 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
    */
   private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
     BitSet actDim = proj.getVisibleDimensions2D();
-    Vector v1 = new Vector(dim);
-    Vector v2 = new Vector(dim);
-    v1.set(0, x1);
-    v1.set(1, y1);
-    v2.set(0, x2);
-    v2.set(1, y2);
+    double[] v1 = new double[dim];
+    double[] v2 = new double[dim];
+    v1[0] = x1;
+    v1[1] = y1;
+    v2[0] = x2;
+    v2[1] = y2;
 
-    // TODO: refactor to not require knowing the type?
-    @SuppressWarnings("unchecked")
-    final Relation<NV> nvrel = (Relation<NV>)rel;
-    NV factory = DatabaseUtil.assumeVectorField(nvrel).getFactory();
-
-    NV nv1 = proj.projectRenderToDataSpace(v1, factory);
-    NV nv2 = proj.projectRenderToDataSpace(v2, factory);
+    double[] nv1 = proj.fastProjectRenderToDataSpace(v1);
+    double[] nv2 = proj.fastProjectRenderToDataSpace(v2);
 
     for(int d = actDim.nextSetBit(0); d >= 0; d = actDim.nextSetBit(d + 1)) {
-      ranges[d] = new DoubleDoublePair(Math.min(nv1.doubleValue(d + 1), nv2.doubleValue(d + 1)), Math.max(nv1.doubleValue(d + 1), nv2.doubleValue(d + 1)));
+      ranges[d] = new DoubleDoublePair(Math.min(nv1[d], nv2[d]), Math.max(nv1[d], nv2[d]));
     }
   }
 
@@ -273,10 +264,8 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses SelectionToolCubeVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
-  public static class Factory<NV extends NumberVector<NV, ?>> extends AbstractVisFactory {
+  public static class Factory extends AbstractVisFactory {
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
@@ -287,7 +276,7 @@ public class SelectionToolCubeVisualization<NV extends NumberVector<NV, ?>> exte
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionToolCubeVisualization<NV>(task);
+      return new SelectionToolCubeVisualization(task);
     }
 
     @Override
