@@ -193,22 +193,24 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
   }
 
   protected void drawHullLines(int cnum, Vector cent, Polygon chres) {
-    for(int i = 1; i <= times; i++) {
-      SVGPath path = new SVGPath();
-      for(int p = 0; p < chres.size(); p++) {
-        Vector cur = cent.plusTimes(chres.get(p), i);
-        path.drawTo(cur);
+    if(chres.size() > 1) {
+      for(int i = 1; i <= times; i++) {
+        SVGPath path = new SVGPath();
+        for(int p = 0; p < chres.size(); p++) {
+          Vector cur = cent.plusTimes(chres.get(p), i);
+          path.drawTo(cur);
+        }
+        path.close();
+        Element ellipse = path.makeElement(svgp);
+        SVGUtil.addCSSClass(ellipse, EMBORDER + cnum);
+        if(opacStyle == 1) {
+          CSSClass cls = new CSSClass(null, "temp");
+          double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
+          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
+          SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
+        }
+        layer.appendChild(ellipse);
       }
-      path.close();
-      Element ellipse = path.makeElement(svgp);
-      SVGUtil.addCSSClass(ellipse, EMBORDER + cnum);
-      if(opacStyle == 1) {
-        CSSClass cls = new CSSClass(null, "temp");
-        double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
-        cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
-        SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
-      }
-      layer.appendChild(ellipse);
     }
   }
 
