@@ -105,8 +105,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
    * 
    * TODO: scale with StyleLibrary.SCALE
    */
-  private double centerx = 0.5;
-  private double centery = 0.5;
+  private final double centerx = 0.5 * StyleLibrary.SCALE;
+  private final double centery = 0.5 * StyleLibrary.SCALE;
   
   protected EventListener mouseOver;
   protected EventListener mouseOut;
@@ -126,12 +126,12 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
    */
   private static enum Properties {
     // Constant values
-    CLUSTERING_DISTANCE(0.01),    // Margin between two rings
+    CLUSTERING_DISTANCE(0.01 * StyleLibrary.SCALE),    // Margin between two rings
     CLUSTER_MIN_WIDTH(0.01),      // Minimum width (radian) of Segment
     CLUSTER_DISTANCE(0.01),       // Margin (radian) between segments
-    RADIUS_INNER(0.05),           // Offset from center to first ring
-    RADIUS_OUTER(0.46),           // Radius of whole CircleSegments except selection border
-    RADIUS_SELECTION(0.02),       // Radius of highlight selection (outer ring)
+    RADIUS_INNER(0.05 * StyleLibrary.SCALE),           // Offset from center to first ring
+    RADIUS_OUTER(0.46 * StyleLibrary.SCALE),           // Radius of whole CircleSegments except selection border
+    RADIUS_SELECTION(0.02 * StyleLibrary.SCALE),       // Radius of highlight selection (outer ring)
     
     // Calculated Values
     ANGLE_PAIR(0.0),              // width of a pair (radian)
@@ -320,7 +320,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     return layer;
 */
     // FIXME: scale to StyleLibrary.SCALE x StyleLibrary.SCALE for the inner part, not 1.0!
-    String transform = SVGUtil.makeMarginTransform(task.width, task.height, 1.0, 1.0, 0.1);
+    String transform = SVGUtil.makeMarginTransform(task.width, task.height, StyleLibrary.SCALE, StyleLibrary.SCALE, 0.1);
     this.layer      = svgp.svgElement(SVGConstants.SVG_G_TAG);
     this.layer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
@@ -408,7 +408,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
     
     ctrlLayer.setAttribute(CCConstants.UI_CONTROL_LAYER, "");
     // FIXME: use SCALE for scaling the circle, too.
-    ctrlLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale("+(0.1/StyleLibrary.SCALE)+")");
+    ctrlLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.1)");
     ctrlLayer.appendChild(info.asElement());
     
     visLayer.setAttribute(CCConstants.UI_VISUALIZATION_LAYER, "");
