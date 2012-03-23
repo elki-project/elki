@@ -7,8 +7,6 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -27,10 +25,8 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
  * interactive SVG-Element for selecting visible axis.
  * 
  * @author Robert Rödler
- * 
  */
-public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
-
+public class DimensionOrderVisualization extends ParallelVisualization<NumberVector<?, ?>> {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -39,17 +35,17 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
   /**
    * CSS class for a tool button
    */
-  public static final String SDO_BUTTON = "SDObutton";
+  public static final String SDO_BUTTON = "DObutton";
 
   /**
    * CSS class for a button border
    */
-  public static final String SDO_BORDER = "SDOborder";
+  public static final String SDO_BORDER = "DOborder";
 
   /**
    * CSS class for a button cross
    */
-  public static final String SDO_ARROW = "SDOarrow";
+  public static final String SDO_ARROW = "DOarrow";
 
   private int selecteddim = -1;
 
@@ -60,10 +56,10 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
    * 
    * @param task VisualizationTask
    */
-  public SelectionDimensionOrder(VisualizationTask task) {
+  public DimensionOrderVisualization(VisualizationTask task) {
     super(task);
     incrementalRedraw();
-    context.addDataStoreListener(this);
+    context.addResultListener(this);
   }
 
   @Override
@@ -142,10 +138,6 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
       @Override
       public void handleEvent(Event evt) {
-
-        /*
-         * if (i == -1){ hide = !hide; }
-         */
         if(j == 1) {
           selected = true;
           selecteddim = i;
@@ -170,9 +162,8 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
             proj.swapDimensions(i, proj.getNextVisibleDimension(i));
           }
         }
-
-        incrementalRedraw();
-        context.contentChanged(null);
+        // Notify
+        context.getHierarchy().resultChanged(proj);
       }
     }, false);
   }
@@ -216,12 +207,6 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
     return path.makeElement(svgp);
   }
 
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
-
-  }
-
   /**
    * Adds the required CSS-Classes
    * 
@@ -260,11 +245,10 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
   /**
    * Factory for dimension selection visualizer
    * 
-   * @author Erich Schubert
+   * @author RobertRödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses AxisVisualization oneway - - «create»
-   * 
+   * @apiviz.uses DimensionOrderVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**
@@ -281,7 +265,7 @@ public class SelectionDimensionOrder extends ParallelVisualization<NumberVector<
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionDimensionOrder(task);
+      return new DimensionOrderVisualization(task);
     }
 
     @Override

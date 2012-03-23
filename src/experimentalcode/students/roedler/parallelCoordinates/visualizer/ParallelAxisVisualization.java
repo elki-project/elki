@@ -1,8 +1,6 @@
 package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -21,7 +19,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
  * 
  * @apiviz.uses SVGSimpleLinearAxis
  */
-public class ParallelAxisVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+public class ParallelAxisVisualization extends ParallelVisualization<NumberVector<?, ?>> {
   /**
    * Constructor.
    * 
@@ -29,8 +27,8 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
    */
   public ParallelAxisVisualization(VisualizationTask task) {
     super(task);
-    context.addDataStoreListener(this);
     incrementalRedraw();
+    context.addResultListener(this);
   }
 
   @Override
@@ -41,23 +39,17 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
     try {
       for(int i = 0; i < dim; i++) {
         boolean inv = proj.isInverted(i);
-        // FIXME: re-add labels. Maybe here, or add a style "endlabels"?
         if(!inv) {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), getAxisHeight(), getAxisX(i), 0, SVGSimpleLinearAxis.LabelStyle.NOTHING, context.getStyleLibrary());
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), getAxisHeight(), getAxisX(i), 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
         }
         else {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), 0, getAxisX(i), getAxisHeight(), SVGSimpleLinearAxis.LabelStyle.NOTHING, context.getStyleLibrary());
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), 0, getAxisX(i), getAxisHeight(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
         }
       }
     }
     catch(CSSNamingConflict e) {
       throw new RuntimeException("Conflict in CSS naming for axes.", e);
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
   }
 
   /**

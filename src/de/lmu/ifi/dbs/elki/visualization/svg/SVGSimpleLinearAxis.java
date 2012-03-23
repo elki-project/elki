@@ -56,12 +56,12 @@ public class SVGSimpleLinearAxis {
   }
 
   /**
-   * Labeling style: left-handed, right-handed, no ticks.
+   * Labeling style: left-handed, right-handed, no ticks, labels at ends
    * 
    * @author Erich Schubert
    */
   public enum LabelStyle {
-    LEFTHAND, RIGHTHAND, NOLABELS, NOTHING
+    LEFTHAND, RIGHTHAND, NOLABELS, NOTHING, ENDLABEL
   }
 
   /**
@@ -146,6 +146,7 @@ public class SVGSimpleLinearAxis {
       labels = false;
       ticks = true;
       break;
+    case ENDLABEL: // end labels are handle specially
     case NOTHING:
     default:
       labels = false;
@@ -204,26 +205,39 @@ public class SVGSimpleLinearAxis {
             tey = y - th * 2.5 + textvoff;
           }
           Element text = plot.svgText(tex, tey, scale.formatValue(tick));
-          SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
+          text.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
           switch(pos){
           case LL:
           case RL:
-            SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_START_VALUE);
+            text.setAttribute(SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_START_VALUE);
             break;
           case LC:
           case RC:
-            SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
+            text.setAttribute(SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
             break;
           case LR:
           case RR:
-            SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
+            text.setAttribute(SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
             break;
           }
           parent.appendChild(text);
         }
       }
     }
+    if(labelstyle == LabelStyle.ENDLABEL) {
+      {
+        Element text = plot.svgText(x1 - tx * 0.02, y1 - ty * 0.02 + textvoff, scale.formatValue(scale.getMin()));
+        text.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
+        text.setAttribute(SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
+        parent.appendChild(text);
+      }
+      {
+        Element text = plot.svgText(x2 + tx * 0.02, y2 + ty * 0.02 + textvoff, scale.formatValue(scale.getMax()));
+        text.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
+        text.setAttribute(SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
+        parent.appendChild(text);
+      }
+    }
     setupCSSClasses(plot, plot.getCSSClassManager(), style);
   }
-
 }
