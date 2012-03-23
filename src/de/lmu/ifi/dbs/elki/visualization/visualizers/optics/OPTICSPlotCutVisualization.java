@@ -227,7 +227,7 @@ public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractO
       Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, optics.getOPTICSPlot(context).getDistanceAdapter(), epsilon);
       order.addChildResult(cl);
     }
-    context.resultChanged(this.task);
+    context.getHierarchy().resultChanged(this.task);
     // synchronizedRedraw();
     return true;
   }

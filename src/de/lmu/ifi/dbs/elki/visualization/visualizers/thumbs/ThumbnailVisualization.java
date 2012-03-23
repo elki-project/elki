@@ -64,7 +64,12 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   /**
    * Constant to listen for style result changes
    */
-  public static final int ON_STYLE = 3;
+  public static final int ON_STYLE = 4;
+
+  /**
+   * Constant to <em>not</em> listen for projection changes
+   */
+  public static final int NO_PROJECTION = 8;
 
   /**
    * Visualizer factory
@@ -87,7 +92,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   protected int tresolution;
 
   /**
-   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION}, {@link #ON_STYLE}
+   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION}, {@link #ON_STYLE}, {@link #NO_PROJECTION}
    */
   private int mask;
 
@@ -237,6 +242,10 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       return;
     }
     if((mask & ON_STYLE) == ON_STYLE && current instanceof StyleResult) {
+      refreshThumbnail();
+      return;
+    }
+    if (task.getProj() != null && (mask & NO_PROJECTION) != NO_PROJECTION && current == task.getProj()) {
       refreshThumbnail();
       return;
     }

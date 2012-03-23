@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @apiviz.composedOf ResultHierarchy
  * @apiviz.composedOf EventListenerList
  */
-public class VisualizerContext implements DataStoreListener, ResultListener, Result {
+public class VisualizerContext implements DataStoreListener, Result {
   /**
    * Logger.
    */
@@ -126,14 +126,15 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
     this.projectors = projectors;
     this.factories = factories;
 
-    // Ensure that various common results needed by visualizers are automatically created
+    // Ensure that various common results needed by visualizers are
+    // automatically created
     final Database db = ResultUtil.findDatabase(result);
     ResultUtil.ensureClusteringResult(db, result);
     this.selection = ResultUtil.ensureSelectionResult(db);
     for(Relation<?> rel : ResultUtil.getRelations(result)) {
       ResultUtil.getSamplingResult(rel);
       // FIXME: this is a really ugly workaround. :-(
-      if (TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<? extends NumberVector<?, ?>> vrel = (Relation<? extends NumberVector<?, ?>>) rel;
         ResultUtil.getScalesResult(vrel);
@@ -148,8 +149,23 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
 
     // For proxying events.
     ResultUtil.findDatabase(result).addDataStoreListener(this);
-    // Add ourselves as RL
-    addResultListener(this);
+    // Add a result listener. Don't expose these methods to avoid inappropriate use.
+    addResultListener(new ResultListener() {
+      @Override
+      public void resultAdded(Result child, Result parent) {
+        processNewResult(getResult(), child);
+      }
+
+      @Override
+      public void resultChanged(Result current) {
+        // FIXME: need to do anything?
+      }
+
+      @Override
+      public void resultRemoved(Result child, Result parent) {
+        // FIXME: implement
+      }
+    });
   }
 
   /**
@@ -333,21 +349,6 @@ public class VisualizerContext implements DataStoreListener, ResultListener, Res
    */
   public void removeResultListener(ResultListener listener) {
     getHierarchy().removeResultListener(listener);
-  }
-
-  @Override
-  public void resultAdded(Result child, Result parent) {
-    processNewResult(getResult(), child);
-  }
-
-  @Override
-  public void resultChanged(Result current) {
-    // FIXME: need to do anything?
-  }
-
-  @Override
-  public void resultRemoved(Result child, Result parent) {
-    // FIXME: implement
   }
 
   @Override

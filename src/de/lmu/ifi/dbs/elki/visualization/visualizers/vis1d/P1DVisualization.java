@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -49,5 +50,12 @@ public abstract class P1DVisualization extends AbstractVisualization {
   public P1DVisualization(VisualizationTask task) {
     super(task);
     this.proj = task.getProj();
+  }
+  
+  @Override
+  public void resultChanged(Result current) {
+    if(current == proj) {
+      synchronizedRedraw();
+    }
   }
 }

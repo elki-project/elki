@@ -399,7 +399,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   }
 
   @Override
-  public int getDimensionsPosition(int dim) {
+  public int findDimensionPosition(int dim) {
     for(int i = 0; i < dimOrder.length; i++) {
       if(dimOrder[i] == dim) {
         return i;

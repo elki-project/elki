@@ -75,7 +75,7 @@ public interface ProjectionParallel extends Projection {
 
   //public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort);
 
-  public int getDimensionsPosition(int dim);
+  public int findDimensionPosition(int dim);
 
   @Deprecated
   double getXpos(int dim);

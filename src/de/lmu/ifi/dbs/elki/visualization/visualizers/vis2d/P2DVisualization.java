@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -95,5 +96,12 @@ public abstract class P2DVisualization extends AbstractVisualization {
     final Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     return layer;
+  }
+  
+  @Override
+  public void resultChanged(Result current) {
+    if(current == proj) {
+      synchronizedRedraw();
+    }
   }
 }

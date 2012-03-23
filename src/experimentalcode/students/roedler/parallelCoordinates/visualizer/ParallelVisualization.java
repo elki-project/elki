@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -136,5 +137,12 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     Vector vec = new Vector(v);
     vec.timesEquals(getAxisHeight());
     return v;
+  }
+  
+  @Override
+  public void resultChanged(Result current) {
+    if(current == proj) {
+      synchronizedRedraw();
+    }
   }
 }

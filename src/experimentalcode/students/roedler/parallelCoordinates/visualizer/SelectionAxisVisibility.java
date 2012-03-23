@@ -75,6 +75,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
   public SelectionAxisVisibility(VisualizationTask task) {
     super(task);
     incrementalRedraw();
+    context.addResultListener(this);
   }
 
   @Override
@@ -205,8 +206,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
       public void handleEvent(Event evt) {
         if(proj.getVisibleDimensions() > 2 || !proj.isVisible(i)) {
           proj.setVisible(!proj.isVisible(i), i);
-          incrementalRedraw();
-          context.contentChanged(null);
+          context.getHierarchy().resultChanged(proj);
         }
       }
     }, false);
