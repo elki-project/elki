@@ -118,7 +118,7 @@ public class GrahamScanConvexHull2D {
     Collections.sort(this.points, new Comparator<Vector>() {
       @Override
       public int compare(Vector o1, Vector o2) {
-        return isLeft(o1, o2, origin) ? +1 : -1;
+        return isLeft(o1, o2, origin);
       }
     });
 
@@ -179,17 +179,17 @@ public class GrahamScanConvexHull2D {
    * @param a Vector A
    * @param b Vector B
    * @param o Origin vector
-   * @return true when left
+   * @return +1 when left, 0 when same, -1 when right
    */
-  protected final boolean isLeft(Vector a, Vector b, Vector o) {
+  protected final int isLeft(Vector a, Vector b, Vector o) {
     final double cross = getRX(a, o) * getRY(b, o) - getRY(a, o) * getRX(b, o);
     if(cross == 0) {
       // Compare manhattan distances - same angle!
       final double dista = Math.abs(getRX(a, o)) + Math.abs(getRY(a, o));
       final double distb = Math.abs(getRX(b, o)) + Math.abs(getRY(b, o));
-      return dista > distb;
+      return Double.compare(dista, distb);
     }
-    return cross > 0;
+    return Double.compare(cross, 0);
   }
 
   /**
