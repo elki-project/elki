@@ -154,16 +154,12 @@ public class SelectionConvexHullVisualization extends P2DVisualization implement
      */
     public Factory() {
       super();
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new SelectionConvexHullVisualization(task);
-    }
-
-    @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
 
     @Override

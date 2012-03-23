@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
 /**
@@ -170,6 +171,7 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
      */
     public Factory() {
       super();
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
     }
 
     @Override
@@ -182,7 +184,7 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
       IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(result, ParallelPlotProjector.class);
       for(ParallelPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 12);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
         baseResult.getHierarchy().add(p, task);
       }
     }

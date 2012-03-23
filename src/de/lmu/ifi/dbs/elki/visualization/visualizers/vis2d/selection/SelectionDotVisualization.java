@@ -139,16 +139,12 @@ public class SelectionDotVisualization extends P2DVisualization implements DataS
      */
     public Factory() {
       super();
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new SelectionDotVisualization(task);
-    }
-
-    @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
 
     @Override

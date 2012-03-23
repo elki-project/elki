@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -61,6 +62,11 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   public static final int ON_SELECTION = 2;
 
   /**
+   * Constant to listen for style result changes
+   */
+  public static final int ON_STYLE = 3;
+
+  /**
    * Visualizer factory
    */
   protected final VisFactory visFactory;
@@ -81,7 +87,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   protected int tresolution;
 
   /**
-   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION}
+   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION}, {@link #ON_STYLE}
    */
   private int mask;
 
@@ -227,6 +233,10 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   @Override
   public void resultChanged(Result current) {
     if((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
+      refreshThumbnail();
+      return;
+    }
+    if((mask & ON_STYLE) == ON_STYLE && current instanceof StyleResult) {
       refreshThumbnail();
       return;
     }
