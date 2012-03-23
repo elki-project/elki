@@ -137,7 +137,7 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
           amax = min[d] * getAxisHeight();
           amin = max[d] * getAxisHeight();
         }
-        Element rect = svgp.svgRect(getAxisX(d) - 0.005 * StyleLibrary.SCALE, amin, 0.01 * StyleLibrary.SCALE, amax - amin);
+        Element rect = svgp.svgRect(getAxisX(d) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
         SVGUtil.addCSSClass(rect, MARKER);
         layer.appendChild(rect);
       }

@@ -81,7 +81,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     this.proj = task.getProj();
     this.relation = task.getRelation();
 
-    margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.3 * StyleLibrary.SCALE };
+    margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.4 * StyleLibrary.SCALE };
     size = new double[] { task.width * StyleLibrary.SCALE, task.height * StyleLibrary.SCALE };
     axsep = size[0] / (proj.getInputDimensionality() - 1.);
 

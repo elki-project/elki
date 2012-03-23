@@ -33,8 +33,6 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -43,7 +41,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -65,7 +62,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * @apiviz.has DBIDSelection oneway - - updates
  * 
  */
-public class SelectionToolLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener, DataStoreListener {
+public class SelectionToolLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -95,8 +92,6 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
    */
   Element etag;
 
-  int dim;
-
   /**
    * Constructor.
    * 
@@ -104,33 +99,19 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
    */
   public SelectionToolLineVisualization(VisualizationTask task) {
     super(task);
-    context.addDataStoreListener(this);
     incrementalRedraw();
-    dim = DatabaseUtil.dimensionality(relation);
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    context.removeDataStoreListener(this);
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
   }
 
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
 
-    //
     rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
     layer.appendChild(rtag);
 
     // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, 0.0, -.5 * getMarginY(), getSizeX(), getMarginY() * 1.5 + getAxisHeight(), this);
+    DragableArea drag = new DragableArea(svgp, -.1 * getMarginX(), -.5 * getMarginY(), getSizeX() + .2 * getMarginX(), getMarginY() * 1.5 + getAxisHeight(), this);
     etag = drag.getElement();
     layer.appendChild(etag);
   }
@@ -238,26 +219,24 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
   }
 
   private int[] getAxisRange(double x1, double x2) {
-    double dim = DatabaseUtil.dimensionality(relation);
+    final int dim = proj.getVisibleDimensions();
     int minaxis = 0;
     int maxaxis = 0;
     boolean minx = true;
     boolean maxx = false;
     int count = -1;
     for(int i = 0; i < dim; i++) {
-      if(proj.isVisible(i)) {
-        if(minx && proj.getXpos(i) > x1) {
-          minaxis = count;
-          minx = false;
-          maxx = true;
+      if(minx && getAxisX(i) > x1) {
+        minaxis = count;
+        minx = false;
+        maxx = true;
+      }
+      if(maxx && (getAxisX(i) > x2 || i == dim - 1)) {
+        maxaxis = count + 1;
+        if(i == dim - 1 && getAxisX(i) <= x2) {
+          maxaxis++;
         }
-        if(maxx && (proj.getXpos(i) > x2 || i == dim - 1)) {
-          maxaxis = count + 1;
-          if(i == dim - 1 && proj.getXpos(i) <= x2) {
-            maxaxis++;
-          }
-          break;
-        }
+        break;
       }
       count = i;
     }
@@ -265,15 +244,16 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
   }
 
   private boolean checkSelected(int[] ar, double[] yPos, double x1, double x2, double y1, double y2) {
+    final int dim = proj.getVisibleDimensions();
+    if (ar[0] < 0) {
+      ar[0] = 0;
+    }
     if(ar[1] >= dim) {
       ar[1] = dim - 1;
     }
     for(int i = ar[0] + 1; i <= ar[1] - 1; i++) {
-      // FIXME: inconsistent axis numbering
-      if(proj.isVisible(i)) {
-        if(yPos[i] <= y1 && yPos[i] >= y2) {
-          return true;
-        }
+      if(yPos[i] <= y1 && yPos[i] >= y2) {
+        return true;
       }
     }
     Line2D.Double idline1 = new Line2D.Double(getAxisX(ar[0]), yPos[ar[0]], getAxisX(ar[0] + 1), yPos[ar[0] + 1]);
@@ -281,10 +261,10 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
     Line2D.Double rectline1 = new Line2D.Double(x2, y1, x1, y1);
     Line2D.Double rectline2 = new Line2D.Double(x2, y1, x2, y2);
     Line2D.Double rectline3 = new Line2D.Double(x2, y2, x1, y2);
-    Line2D.Double rectline4 = new Line2D.Double(x1, y1, x1, y2);
     if(idline1.intersectsLine(rectline1) || idline1.intersectsLine(rectline2) || idline1.intersectsLine(rectline3)) {
       return true;
     }
+    Line2D.Double rectline4 = new Line2D.Double(x1, y1, x1, y2);
     if(idline2.intersectsLine(rectline1) || idline2.intersectsLine(rectline4) || idline2.intersectsLine(rectline3)) {
       return true;
     }

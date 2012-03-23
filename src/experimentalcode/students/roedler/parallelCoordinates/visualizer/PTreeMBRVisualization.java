@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -201,14 +200,14 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
     */
    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth, int step) {
      if (pagevis[step] == true){
-       final int dim = DatabaseUtil.dimensionality(relation);
+       final int dim = proj.getVisibleDimensions();
        SVGPath path = new SVGPath();
-       // FIXME dimension indexes. Project min/max vectors instead.
+       // FIXME: Project min/max vectors instead.
        for (int i = 0; i < dim; i++){
-         path.drawTo(getAxisX(i), proj.projectDimension(i, entry.getMax(proj.getDimensionNumber(i) + 1)));
+         path.drawTo(getAxisX(i), proj.fastProjectDataToRenderSpace(i, entry.getMax(proj.getDimensionNumber(i) + 1)));
        }
        for (int i = dim - 1; i >= 0; i--){
-         path.drawTo(getAxisX(i), proj.projectDimension(i, entry.getMin(proj.getDimensionNumber(i) + 1)));
+         path.drawTo(getAxisX(i), proj.fastProjectDataToRenderSpace(i, entry.getMin(proj.getDimensionNumber(i) + 1)));
        }
        path.close();
        
