@@ -132,7 +132,7 @@ public class ClusterHullVisualization extends P2DVisualization {
         Polygon chres = hull.getHull();
 
         // Plot the convex hull:
-        if(chres != null) {
+        if(chres != null && chres.size() > 1) {
           SVGPath path = new SVGPath(chres);
           // Approximate area (using bounding box)
           double hullarea = SpatialUtil.volume(chres);
