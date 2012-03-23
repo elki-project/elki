@@ -174,7 +174,7 @@ public class SVGSimpleLinearAxis {
     }
     // vertical text offset; align approximately with middle instead of
     // baseline.
-    double textvoff = 0.015;
+    double textvoff = style.getTextSize(StyleLibrary.AXIS_LABEL) * .35;
 
     // draw ticks on x axis
     if(ticks || labels) {

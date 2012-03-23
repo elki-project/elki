@@ -62,7 +62,6 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @apiviz.has SelectionResult oneway - - updates
  * @apiviz.has RangeSelection oneway - - updates
- * 
  */
 public class SelectionToolAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
   /**
@@ -165,11 +164,14 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
         i++;
       }
     }
-    double z1 = Math.max(Math.min(y1, y2),0);
-    double z2 = Math.min(Math.max(y1, y2), getAxisHeight());
-    for(int i = minaxis; i <= maxaxis; i++) {
+    double z1 = Math.max(Math.min(y1, y2), 0) / StyleLibrary.SCALE;
+    double z2 = Math.min(Math.max(y1, y2), getAxisHeight()) / StyleLibrary.SCALE;
+    for(int i = minaxis; i < maxaxis; i++) {
       double v1 = proj.fastProjectRenderToDataSpace(z1, i);
       double v2 = proj.fastProjectRenderToDataSpace(z2, i);
+      if (logger.isDebugging()) {
+        logger.debug("Axis "+i+" dimension "+proj.getDimensionNumber(i)+" "+v1+" to "+v2);
+      }
       ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
     }
   }

@@ -40,7 +40,7 @@ public interface ProjectionParallel extends Projection {
 
   public int getFirstVisibleDimension();
 
-  public double projectDimension(int dim, double value);
+  public double fastProjectDataToRenderSpace(int dim, double value);
 
   public int getLastVisibleDimension();
 
@@ -77,7 +77,4 @@ public interface ProjectionParallel extends Projection {
   //public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort);
 
   public int findDimensionPosition(int dim);
-
-  @Deprecated
-  double getXpos(int dim);
 }

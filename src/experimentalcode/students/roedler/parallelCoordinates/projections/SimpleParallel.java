@@ -23,8 +23,6 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
@@ -257,121 +255,13 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
     return scales[truedim].getUnscaled(v);
   }
 
-  // @Override
-  public Vector XXprojectScaledToRender(Vector v) {
-    return YYprojectScaledToRender(v, true);
-  }
-
-  public Vector YYprojectScaledToRender(Vector v, boolean sort) {
-    Vector ret = new Vector(v.getDimensionality());
-    for(int i = 0; i < v.getDimensionality(); i++) {
-      if(isInverted(i)) {
-        ret.set(i, v.get(i));
-      }
-      else {
-        ret.set(i, 1 - v.get(i));
-      }
-    }
-    if(sort) {
-      return sortDims(ret);
-    }
-    else {
-      return ret;
-    }
-  }
-
-  // @Override
-  public double XXprojectScaledToRender(int dim, double d) {
-    if(isInverted(dim)) {
-      return d;
-    }
-    else {
-      return 1 - d;
-    }
-  }
-
-  // @Override
-  public Vector XXprojectRenderToScaled(Vector v) {
-    Vector ret = new Vector(v.getDimensionality());
-    for(int i = 0; i < v.getDimensionality(); i++) {
-      if(isInverted(i)) {
-        ret.set(i, v.get(i));
-      }
-      else {
-        ret.set(i, 1 - v.get(i));
-      }
-    }
-    return sortDims(ret);
-  }
-
-  // @Override
-  public Vector XXprojectRelativeScaledToRender(Vector v) {
-    Vector ret = new Vector(v.getDimensionality());
-    for(int i = 0; i < v.getDimensionality(); i++) {
-      ret.set(i, -v.get(i));
-    }
-    return sortDims(ret);
-  }
-
-  // @Override
-  public Vector XXprojectRelativeRenderToScaled(Vector v) {
-    Vector ret = new Vector(v.getDimensionality());
-    for(int i = 0; i < v.getDimensionality(); i++) {
-      ret.set(i, v.get(i));
-    }
-    return sortDims(ret);
-  }
-
-  // @Override
-  public <NV extends NumberVector<NV, ?>> NV XXprojectRenderToDataSpace(Vector v, NV prototype) {
-    final int dim = v.getDimensionality();
-    Vector vec = XXprojectRenderToScaled(v);
-    double[] ds = vec.getArrayRef();
-    // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
-    // vector.
-    for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getUnscaled(ds[d]);
-    }
-    return prototype.newNumberVector(vec.getArrayRef());
-  }
-
-  // @Override
-  public <NV extends NumberVector<NV, ?>> NV XXprojectRelativeRenderToDataSpace(Vector v, NV prototype) {
-    final int dim = v.getDimensionality();
-    Vector vec = XXprojectRelativeRenderToScaled(v);
-    double[] ds = vec.getArrayRef();
-    // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
-    // vector.
-    for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getRelativeUnscaled(ds[d]);
-    }
-    return prototype.newNumberVector(vec.getArrayRef());
-  }
-
   @Override
-  public double projectDimension(int dim, double value) {
+  public double fastProjectDataToRenderSpace(int dim, double value) {
     double temp = scales[dimOrder[dim]].getScaled(value);
     if(isInverted(dimOrder[dim])) {
       return temp;
     }
     return 1 - temp;
-  }
-
-  @Override
-  public double getXpos(int dim) {
-    if(dim < 0 || dim > dims) {
-      return -1;
-    }
-    int notvis = 0;
-    if(isVisible(dimOrder[dim]) == false) {
-      return -1.0;
-    }
-    for(int i = 0; i < dim; i++) {
-      if(isVisible(dimOrder[i]) == false) {
-        notvis++;
-      }
-    }
-    return (dim - notvis) / (double) dims;
   }
 
   @Override
