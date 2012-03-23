@@ -141,6 +141,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   
   @Override
   public void resultChanged(Result current) {
+    super.resultChanged(current);
     if(current == proj) {
       synchronizedRedraw();
     }
