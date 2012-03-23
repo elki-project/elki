@@ -128,7 +128,16 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
     int dim = proj.getVisibleDimensions();
     for(int d = 0; d < dim; d++) {
       if(ranges[proj.getDimensionNumber(d)] != null) {
-        Element rect = svgp.svgRect(getAxisX(d) - 0.05, max[d], 0.1, min[d] - max[d]);
+        double amin, amax;
+        if(min[d] < max[d]) {
+          amin = min[d] * getAxisHeight();
+          amax = max[d] * getAxisHeight();
+        }
+        else {
+          amax = min[d] * getAxisHeight();
+          amin = max[d] * getAxisHeight();
+        }
+        Element rect = svgp.svgRect(getAxisX(d) - 0.005 * StyleLibrary.SCALE, amin, 0.01 * StyleLibrary.SCALE, amax - amin);
         SVGUtil.addCSSClass(rect, MARKER);
         layer.appendChild(rect);
       }
