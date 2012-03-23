@@ -134,12 +134,12 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
    * 
    */
   public static class Factory extends AbstractVisFactory {
-
     /**
      * Constructor.
      */
     public Factory() {
       super();
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
     }
 
     @Override
@@ -154,16 +154,11 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
         IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
         for(ParallelPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 10);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA -1);
           baseResult.getHierarchy().add(selres, task);
           baseResult.getHierarchy().add(p, task);
         }
       }
-    }
-
-    @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
   }
 }

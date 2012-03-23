@@ -35,6 +35,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  */
 public abstract class AbstractVisFactory implements VisFactory {
   /**
+   * Mask for redrawing thumbnails
+   */
+  protected int thumbmask = 0;
+
+  /**
    * Constructor.
    */
   protected AbstractVisFactory() {
@@ -46,7 +51,7 @@ public abstract class AbstractVisFactory implements VisFactory {
     // Is this a thumbnail request?
     Boolean isthumb = task.get(VisualizationTask.THUMBNAIL, Boolean.class);
     if (isthumb != null && isthumb.booleanValue() && allowThumbnails(task)) {
-      return new ThumbnailVisualization(this, task, 0);
+      return new ThumbnailVisualization(this, task, thumbmask);
     }
     return makeVisualization(task);
   }

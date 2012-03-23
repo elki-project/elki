@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualize e.g. a clustering using different markers for different clusters.
@@ -154,6 +155,7 @@ public class MarkerVisualization extends P2DVisualization implements DataStoreLi
      */
     public Factory() {
       super();
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
     }
 
     @Override

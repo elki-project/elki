@@ -31,13 +31,13 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -52,14 +52,13 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
 import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
 /**
- * Visualizer for generating an SVG-Element
- * representing the selected range for each dimension
+ * Visualizer for generating an SVG-Element representing the selected range for
+ * each dimension
  * 
  * @author Robert Rödler
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has RangeSelection oneway - - visualizes
- * 
  */
 public class SelectionAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
@@ -95,10 +94,10 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
       cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
       cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      
+
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
       cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
-      
+
       svgp.addCSSClassOrLogError(cls);
     }
   }
@@ -106,30 +105,39 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
   @Override
   protected void redraw() {
     DBIDSelection selContext = context.getSelection();
-    if(selContext != null && selContext instanceof RangeSelection) {
-      DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-      int dim = DatabaseUtil.dimensionality(relation);
+    if(selContext == null || !(selContext instanceof RangeSelection)) {
+      return;
+    }
+    DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
+    if(ranges == null) {
+      return;
+    }
 
-      double[] min = new double[dim];
-      double[] max = new double[dim];
-      for(int d = 0; d < dim; d++) {
-        if(ranges != null && ranges[proj.getDimensionNumber(d)] != null) {
-          if (proj.isVisible(d)){
-            min[d] = proj.projectDimension(d, ranges[proj.getDimensionNumber(d)].first);
-            max[d] = proj.projectDimension(d, ranges[proj.getDimensionNumber(d)].second);
-            Element rect = svgp.svgRect(proj.getXpos(d) - 0.005, max[d], 0.01, min[d] - max[d]);
-            SVGUtil.addCSSClass(rect, MARKER);
-            layer.appendChild(rect);
-          }
-        }
+    // Project:
+    double[] min = new double[ranges.length];
+    double[] max = new double[ranges.length];
+    for(int d = 0; d < ranges.length; d++) {
+      if(ranges[d] != null) {
+        min[d] = ranges[d].first;
+        max[d] = ranges[d].second;
+      }
+    }
+    min = proj.fastProjectDataToRenderSpace(new Vector(min));
+    max = proj.fastProjectDataToRenderSpace(new Vector(max));
+
+    int dim = proj.getVisibleDimensions();
+    for(int d = 0; d < dim; d++) {
+      if(ranges[proj.getDimensionNumber(d)] != null) {
+        Element rect = svgp.svgRect(getAxisX(d) - 0.05, max[d], 0.1, min[d] - max[d]);
+        SVGUtil.addCSSClass(rect, MARKER);
+        layer.appendChild(rect);
       }
     }
   }
-  
+
   @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
-    
   }
 
   /**
@@ -140,15 +148,14 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses SelectionCubeVisualization oneway - - «create»
-   * 
    */
   public static class Factory extends AbstractVisFactory {
- 
     /**
      * Constructor.
      */
     public Factory() {
       super();
+      thumbmask |= ThumbnailVisualization.ON_SELECTION;
     }
 
     @Override
@@ -163,16 +170,11 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
         IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
         for(ParallelPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
           baseResult.getHierarchy().add(selres, task);
           baseResult.getHierarchy().add(p, task);
         }
       }
-    }
-
-    @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
   }
 }

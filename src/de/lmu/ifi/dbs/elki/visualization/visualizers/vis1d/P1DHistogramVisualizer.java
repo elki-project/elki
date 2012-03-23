@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
@@ -379,6 +380,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
       super();
       this.curves = curves;
       this.bins = bins;
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
     }
 
     @Override

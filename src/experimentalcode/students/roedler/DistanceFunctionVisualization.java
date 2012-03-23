@@ -251,16 +251,12 @@ public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> exten
      */
     public Factory() {
       super();
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
       return new DistanceFunctionVisualization<DoubleDistance>(task);
-    }
-
-    @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
 
     @Override

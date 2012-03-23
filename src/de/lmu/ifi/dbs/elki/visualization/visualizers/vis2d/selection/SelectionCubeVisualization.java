@@ -212,6 +212,7 @@ public class SelectionCubeVisualization extends P2DVisualization {
     public Factory(boolean nofill) {
       super();
       this.nofill = nofill;
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
     }
 
     @Override
@@ -231,11 +232,6 @@ public class SelectionCubeVisualization extends P2DVisualization {
           baseResult.getHierarchy().add(p, task);
         }
       }
-    }
-
-    @Override
-    public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-      return new ThumbnailVisualization(this, task, ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION);
     }
 
     /**
