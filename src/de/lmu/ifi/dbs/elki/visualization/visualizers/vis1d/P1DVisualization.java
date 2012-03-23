@@ -54,6 +54,7 @@ public abstract class P1DVisualization extends AbstractVisualization {
   
   @Override
   public void resultChanged(Result current) {
+    super.resultChanged(current);
     if(current == proj) {
       synchronizedRedraw();
     }

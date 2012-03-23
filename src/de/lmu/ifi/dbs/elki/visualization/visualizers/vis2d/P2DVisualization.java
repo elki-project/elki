@@ -100,6 +100,7 @@ public abstract class P2DVisualization extends AbstractVisualization {
   
   @Override
   public void resultChanged(Result current) {
+    super.resultChanged(current);
     if(current == proj) {
       synchronizedRedraw();
     }
