@@ -226,7 +226,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   @Override
   public ParsedURLData parseURL(String urlStr) {
     if(logger.isDebuggingFinest()) {
-      logger.debugFinest("parseURL: " + urlStr, new Throwable());
+      logger.debugFinest("parseURL: " + urlStr);
     }
     if(urlStr.startsWith(INTERNAL_PREFIX)) {
       InternalParsedURLData ret = new InternalParsedURLData(urlStr.substring(INTERNAL_PREFIX.length()));
