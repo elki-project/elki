@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.style;
 
 import gnu.trove.list.array.TIntArrayList;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
@@ -77,7 +79,12 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
     for(int i = 0;; i++) {
       Cluster<?> c = ci.next();
       ids.add(DBIDUtil.ensureSet(c.getIDs()));
-      colors.add(SVGUtil.stringToColor(colorset.getColor(i)).getRGB());
+      Color col = SVGUtil.stringToColor(colorset.getColor(i));
+      if (col != null) {
+        colors.add(col.getRGB());
+      } else {
+        LoggingUtil.warning("Unrecognized color name: "+colorset.getColor(i));
+      }
       if(!ci.hasNext()) {
         break;
       }
