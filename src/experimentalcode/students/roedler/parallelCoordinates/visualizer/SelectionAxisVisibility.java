@@ -101,7 +101,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
     rect = new Element[dim];
 
     for(int i = 0; i <= dim; i++) {
-      if(i == dim || proj.isVisible(i)) {
+      if(i == dim || proj.isAxisVisible(i)) {
         if(notvis != 0) {
           addEmptyButton(lastvis, i, notvis, dim, ls);
         }
@@ -210,8 +210,8 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
     targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
       @Override
       public void handleEvent(Event evt) {
-        if(proj.getVisibleDimensions() > 2 || !proj.isVisible(i)) {
-          proj.setVisible(!proj.isVisible(i), i);
+        if(proj.getVisibleDimensions() > 2) {
+          proj.toggleAxisVisible(i);
           context.getHierarchy().resultChanged(proj);
         }
       }

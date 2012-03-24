@@ -44,12 +44,12 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
 
     try {
       for(int i = 0; i < dim; i++) {
-        boolean inv = proj.isInverted(i);
+        boolean inv = proj.isAxisInverted(i);
         if(!inv) {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), getAxisHeight(), getAxisX(i), 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), getAxisX(i), getAxisHeight(), getAxisX(i), 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
         }
         else {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(i), getAxisX(i), 0, getAxisX(i), getAxisHeight(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), getAxisX(i), 0, getAxisX(i), getAxisHeight(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
         }
       }
     }

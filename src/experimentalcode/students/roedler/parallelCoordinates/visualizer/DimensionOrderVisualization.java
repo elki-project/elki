@@ -150,11 +150,11 @@ public class DimensionOrderVisualization extends ParallelVisualization<NumberVec
         }
         if(j == 3 || j == 4) {
           if(j == 3) {
-            proj.swapDimensions(selecteddim, i);
+            proj.swapAxes(selecteddim, i);
           }
           else {
             if(selecteddim != i) {
-              proj.shiftDimension(selecteddim, i);
+              proj.moveAxis(selecteddim, i);
             }
           }
           selected = false;
@@ -162,10 +162,10 @@ public class DimensionOrderVisualization extends ParallelVisualization<NumberVec
         }
         if(j == 0 || j == 2) {
           if(j == 0) {
-            proj.swapDimensions(i, proj.getPrevVisibleDimension(i));
+            proj.swapAxes(i, proj.getPrevVisibleDimension(i));
           }
           else {
-            proj.swapDimensions(i, proj.getNextVisibleDimension(i));
+            proj.swapAxes(i, proj.getNextVisibleDimension(i));
           }
         }
         // Notify

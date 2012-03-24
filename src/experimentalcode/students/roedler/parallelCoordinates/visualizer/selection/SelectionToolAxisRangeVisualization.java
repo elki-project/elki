@@ -168,9 +168,9 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
       double v1 = proj.fastProjectRenderToDataSpace(z1, i);
       double v2 = proj.fastProjectRenderToDataSpace(z2, i);
       if (logger.isDebugging()) {
-        logger.debug("Axis "+i+" dimension "+proj.getDimensionNumber(i)+" "+v1+" to "+v2);
+        logger.debug("Axis "+i+" dimension "+proj.getDimForVisibleAxis(i)+" "+v1+" to "+v2);
       }
-      ranges[proj.getDimensionNumber(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
+      ranges[proj.getDimForVisibleAxis(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
     }
   }
 

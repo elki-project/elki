@@ -28,6 +28,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -194,13 +195,15 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth, int step) {
      if (pagevis[step] == true){
        final int dim = proj.getVisibleDimensions();
+       double[] min = proj.fastProjectDataToRenderSpace(SpatialUtil.getMin(entry));
+       double[] max = proj.fastProjectDataToRenderSpace(SpatialUtil.getMax(entry));
+       assert(min.length == dim && max.length == dim);
        SVGPath path = new SVGPath();
-       // FIXME: Project min/max vectors instead.
        for (int i = 0; i < dim; i++){
-         path.drawTo(getAxisX(i), proj.fastProjectDataToRenderSpace(i, entry.getMax(proj.getDimensionNumber(i) + 1)));
+         path.drawTo(getAxisX(i), Math.max(min[i], max[i]));
        }
        for (int i = dim - 1; i >= 0; i--){
-         path.drawTo(getAxisX(i), proj.fastProjectDataToRenderSpace(i, entry.getMin(proj.getDimensionNumber(i) + 1)));
+         path.drawTo(getAxisX(i), Math.min(min[i], max[i]));
        }
        path.close();
        

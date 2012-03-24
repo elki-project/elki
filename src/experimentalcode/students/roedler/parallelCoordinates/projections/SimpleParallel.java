@@ -24,7 +24,6 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 
@@ -35,13 +34,9 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * Render space: not used here; no recentering needed.
  * 
  * @author Robert Rödler
+ * @author Erich Schubert
  */
 public class SimpleParallel extends BasicResult implements ProjectionParallel {
-  /**
-   * Number of dimensions
-   */
-  final int dims;
-
   /**
    * Number of visible dimensions
    */
@@ -82,51 +77,71 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   public SimpleParallel(LinearScale[] scales) {
     super("Parallel projection", "parallel-projection");
     this.scales = scales;
-    dims = scales.length;
-    visDims = dims;
-    flags = new byte[dims];
-    dimOrder = new int[dims];
+    visDims = scales.length;
+    flags = new byte[scales.length];
+    dimOrder = new int[scales.length];
     for(int i = 0; i < dimOrder.length; i++) {
       dimOrder[i] = i;
     }
   }
 
   @Override
-  public LinearScale getScale(int d) {
-    return scales[dimOrder[d]];
-  }
-
-  protected boolean inverted(int rawdim) {
-    return (flags[rawdim] & FLAG_INVERTED) == FLAG_INVERTED;
+  public LinearScale getScale(int dim) {
+    return scales[dim];
   }
 
   @Override
-  public boolean isInverted(int dim) {
-    return inverted(dimOrder[dim]);
+  public boolean isAxisInverted(int axis) {
+    return isDimInverted(dimOrder[axis]);
   }
 
   @Override
-  public void setInverted(int dim, boolean bool) {
+  public void setAxisInverted(int axis, boolean bool) {
+    setDimInverted(dimOrder[axis], bool);
+  }
+
+  @Override
+  public void toggleAxisInverted(int axis) {
+    toggleDimInverted(dimOrder[axis]);
+  }
+
+  @Override
+  public boolean isDimInverted(int truedim) {
+    return (flags[truedim] & FLAG_INVERTED) == FLAG_INVERTED;
+  }
+
+  @Override
+  public void setDimInverted(int truedim, boolean bool) {
     if(bool) {
-      flags[dimOrder[dim]] |= FLAG_INVERTED;
+      flags[truedim] |= FLAG_INVERTED;
     }
     else {
-      flags[dimOrder[dim]] &= ~FLAG_INVERTED;
+      flags[truedim] &= ~FLAG_INVERTED;
     }
   }
 
-  protected boolean hidden(int truedim) {
+  @Override
+  public void toggleDimInverted(int truedim) {
+    flags[truedim] ^= FLAG_INVERTED;
+  }
+
+  @Override
+  public LinearScale getAxisScale(int axis) {
+    return scales[dimOrder[axis]];
+  }
+
+  protected boolean isDimHidden(int truedim) {
     return (flags[truedim] & FLAG_HIDDEN) == FLAG_HIDDEN;
   }
 
   @Override
-  public boolean isVisible(int dim) {
-    return !hidden(dimOrder[dim]);
+  public boolean isAxisVisible(int dim) {
+    return !isDimHidden(dimOrder[dim]);
   }
 
   @Override
-  public void setVisible(boolean vis, int dim) {
-    boolean prev = isVisible(dim);
+  public void setAxisVisible(int dim, boolean vis) {
+    boolean prev = isAxisVisible(dim);
     if(prev == vis) {
       return;
     }
@@ -138,7 +153,19 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
       flags[dimOrder[dim]] |= FLAG_HIDDEN;
       visDims--;
     }
-    // TODO: signal change?
+  }
+
+  @Override
+  public void toggleAxisVisible(int dim) {
+    boolean prev = isAxisVisible(dim);
+    if(!prev) {
+      flags[dimOrder[dim]] &= ~FLAG_HIDDEN;
+      visDims++;
+    }
+    else {
+      flags[dimOrder[dim]] |= FLAG_HIDDEN;
+      visDims--;
+    }
   }
 
   @Override
@@ -147,59 +174,32 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   }
 
   @Override
-  public void toggleInverted(int dim) {
-    flags[dimOrder[dim]] ^= FLAG_INVERTED;
+  public int getDimForAxis(int pos) {
+    return dimOrder[pos];
   }
 
   @Override
-  public int getFirstVisibleDimension() {
-    for(int i = 0; i < dims; i++) {
-      if(!hidden(dimOrder[i])) {
-        return i;
-      }
-    }
-    return 0;
-  }
-
-  @Override
-  public int getLastVisibleDimension() {
-    for(int i = dims - 1; i >= 0; i--) {
-      if(!hidden(dimOrder[i])) {
-        return i;
+  public int getDimForVisibleAxis(int pos) {
+    for(int i = 0; i < scales.length; i++) {
+      if (isAxisVisible(i)) {
+        if (pos == 0) {
+          return dimOrder[i];
+        }
+        pos--;
       }
     }
     return -1;
   }
 
   @Override
-  public int getPrevVisibleDimension(int dim) {
-    for(int i = dim - 1; i >= 0; i--) {
-      if(!hidden(dimOrder[i])) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  @Override
-  public int getNextVisibleDimension(int dim) {
-    for(int i = dim + 1; i < dims; i++) {
-      if(!hidden(dimOrder[i])) {
-        return i;
-      }
-    }
-    return dim;
-  }
-
-  @Override
-  public void swapDimensions(int a, int b) {
+  public void swapAxes(int a, int b) {
     int temp = dimOrder[a];
     dimOrder[a] = dimOrder[b];
     dimOrder[b] = temp;
   }
 
   @Override
-  public void shiftDimension(int src, int dest) {
+  public void moveAxis(int src, int dest) {
     if(src > dest) {
       int temp = dimOrder[src];
       System.arraycopy(dimOrder, dest, dimOrder, dest + 1, src - dest);
@@ -215,13 +215,13 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
     double[] v = new double[visDims];
-    for(int j = 0, o = 0; j < dims; j++) {
-      if(hidden(j)) {
+    for(int j = 0, o = 0; j < scales.length; j++) {
+      if(isDimHidden(j)) {
         continue;
       }
       int i = dimOrder[j];
       v[o] = scales[i].getScaled(data.doubleValue(i + 1));
-      if(inverted(i)) {
+      if(isDimInverted(i)) {
         v[o] = 1 - v[o];
       }
       o++;
@@ -232,13 +232,13 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public double[] fastProjectDataToRenderSpace(double[] data) {
     double[] v = new double[visDims];
-    for(int j = 0, o = 0; j < dims; j++) {
-      if(hidden(j)) {
+    for(int j = 0, o = 0; j < scales.length; j++) {
+      if(isDimHidden(j)) {
         continue;
       }
       int i = dimOrder[j];
       v[o] = scales[i].getScaled(data[i]);
-      if(inverted(i)) {
+      if(isDimInverted(i)) {
         v[o] = 1 - v[o];
       }
       o++;
@@ -249,46 +249,33 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public double fastProjectRenderToDataSpace(double v, int projdim) {
     int truedim = dimOrder[projdim];
-    if(inverted(truedim)) {
+    if(isDimInverted(truedim)) {
       v = 1 - v;
     }
     return scales[truedim].getUnscaled(v);
   }
 
   @Override
-  public double fastProjectDataToRenderSpace(int dim, double value) {
+  public double fastProjectDataToRenderSpace(double value, int dim) {
     double temp = scales[dimOrder[dim]].getScaled(value);
-    if(isInverted(dimOrder[dim])) {
+    if(isAxisInverted(dimOrder[dim])) {
       return temp;
     }
     return 1 - temp;
   }
 
   @Override
-  public int getDimensionNumber(int pos) {
-    return dimOrder[pos];
-  }
-
-  @Override
-  public int findDimensionPosition(int dim) {
+  public int getAxisForDim(int truedim) {
     for(int i = 0; i < dimOrder.length; i++) {
-      if(dimOrder[i] == dim) {
+      if(dimOrder[i] == truedim) {
         return i;
       }
     }
     return -1;
   }
 
-  protected Vector sortDims(Vector s) {
-    Vector ret = new Vector(s.getDimensionality());
-    for(int i = 0; i < s.getDimensionality(); i++) {
-      ret.set(i, s.get(dimOrder[i]));
-    }
-    return ret;
-  }
-
   @Override
   public int getInputDimensionality() {
-    return dims;
+    return scales.length;
   }
 }
