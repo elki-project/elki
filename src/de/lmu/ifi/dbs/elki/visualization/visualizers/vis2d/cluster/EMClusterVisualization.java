@@ -144,7 +144,7 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends P2DV
         for(int i = 0; i < eps.size(); i++) {
           EigenPair ep = eps.getEigenPair(i);
           Vector sev = ep.getEigenvector().times(Math.sqrt(ep.getEigenvalue()));
-          pc[i] = new Vector(proj.fastProjectRelativeDataToRenderSpace(sev));
+          pc[i] = new Vector(proj.fastProjectRelativeDataToRenderSpace(sev.getArrayRef()));
         }
         if(drawStyle != 0 || eps.size() == 2) {
           drawSphere2D(cnum, cent, pc);

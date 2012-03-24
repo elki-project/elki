@@ -118,13 +118,13 @@ public class PolygonVisualization extends P2DVisualization implements DataStoreL
         SVGPath path = new SVGPath();
         for(Polygon ppoly : poly.getPolygons()) {
           Vector first = ppoly.get(0);
-          double[] f = proj.fastProjectDataToRenderSpace(first);
+          double[] f = proj.fastProjectDataToRenderSpace(first.getArrayRef());
           path.moveTo(f[0], f[1]);
           for(Vector v : ppoly) {
             if(v == first) {
               continue;
             }
-            double[] p = proj.fastProjectDataToRenderSpace(v);
+            double[] p = proj.fastProjectDataToRenderSpace(v.getArrayRef());
             path.drawTo(p[0], p[1]);
           }
           // close path.

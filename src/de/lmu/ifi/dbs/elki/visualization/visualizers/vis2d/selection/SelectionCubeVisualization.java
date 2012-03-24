@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
@@ -166,12 +165,12 @@ public class SelectionCubeVisualization extends P2DVisualization {
         }
       }
       if(nofill) {
-        Element r = SVGHyperCube.drawFrame(svgp, proj, new Vector(min), new Vector(max));
+        Element r = SVGHyperCube.drawFrame(svgp, proj, min, max);
         SVGUtil.setCSSClass(r, CSS_CUBEFRAME);
         layer.appendChild(r);
       }
       else {
-        Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, new Vector(min), new Vector(max));
+        Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, min, max);
         layer.appendChild(r);
       }
 

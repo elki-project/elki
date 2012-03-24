@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 /*
  This file is part of ELKI:
@@ -26,7 +26,9 @@ package experimentalcode.erich;
 import java.util.Arrays;
 
 /**
- * Class providing basic vector mathematics.
+ * Class providing basic vector mathematics, for low-level vectors stored as
+ * {@code double[]}. While this is less nice syntactically, it reduces memory
+ * usage and VM overhead.
  * 
  * @author Erich Schubert
  * 
@@ -36,7 +38,7 @@ public final class VMath {
   /**
    * A small number to handle numbers near 0 as 0.
    */
-  public static final double DELTA = 1E-3;
+  public static final double DELTA = 1E-5;
 
   /**
    * Fake constructor. Static class.

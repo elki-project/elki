@@ -31,7 +31,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 
 /**
@@ -52,7 +52,7 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return path element
    */
-  public static Element drawFrame(SVGPlot svgp, Projection2D proj, Vector min, Vector max) {
+  public static Element drawFrame(SVGPlot svgp, Projection2D proj, double[] min, double[] max) {
     SVGPath path = new SVGPath();
     ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
@@ -72,7 +72,7 @@ public class SVGHyperCube {
    */
   public static <V extends NumberVector<V, ?>> Element drawFrame(SVGPlot svgp, Projection2D proj, V min, V max) {
     SVGPath path = new SVGPath();
-    ArrayList<double[]> edges = getVisibleEdges(proj, min.getColumnVector(), max.getColumnVector());
+    ArrayList<double[]> edges = getVisibleEdges(proj, min.getColumnVector().getArrayRef(), max.getColumnVector().getArrayRef());
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
     recDrawEdges(path, rv_min, edges, 0, new BitSet());
     return path.makeElement(svgp);
@@ -88,7 +88,7 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return group element
    */
-  public static Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, Vector min, Vector max) {
+  public static Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, double[] min, double[] max) {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
     ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
@@ -109,7 +109,7 @@ public class SVGHyperCube {
    */
   public static <V extends NumberVector<V, ?>> Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, V min, V max) {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    ArrayList<double[]> edges = getVisibleEdges(proj, min.getColumnVector(), max.getColumnVector());
+    ArrayList<double[]> edges = getVisibleEdges(proj, min.getColumnVector().getArrayRef(), max.getColumnVector().getArrayRef());
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
     recDrawSides(svgp, group, cls, rv_min, edges, 0, new BitSet());
     return group;
@@ -123,12 +123,12 @@ public class SVGHyperCube {
    * @param s_max Maximum value (in scaled space)
    * @return Edge list
    */
-  private static ArrayList<double[]> getVisibleEdges(Projection2D proj, Vector s_min, Vector s_max) {
-    Vector s_deltas = s_max.minus(s_min);
+  private static ArrayList<double[]> getVisibleEdges(Projection2D proj, double[] s_min, double[] s_max) {
+    double[] s_deltas = VMath.minus(s_max, s_min);
     ArrayList<double[]> r_edges = new ArrayList<double[]>();
-    for(int i = 0; i < s_min.getDimensionality(); i++) {
-      Vector delta = new Vector(s_min.getDimensionality());
-      delta.set(i, s_deltas.get(i));
+    for(int i = 0; i < s_min.length; i++) {
+      double[] delta = new double[s_min.length];
+      delta[i] = s_deltas[i];
       double[] deltas = proj.fastProjectRelativeDataToRenderSpace(delta);
       if(deltas[0] != 0 || deltas[1] != 0) {
         r_edges.add(deltas);

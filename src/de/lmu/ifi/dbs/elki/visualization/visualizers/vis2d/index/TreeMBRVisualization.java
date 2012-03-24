@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -149,11 +148,11 @@ public class TreeMBRVisualization<N extends AbstractRStarTreeNode<N, E>, E exten
     SpatialComparable mbr = entry;
 
     if(fill) {
-      Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, new Vector(SpatialUtil.getMin(mbr)), new Vector(SpatialUtil.getMax(mbr)));
+      Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
       layer.appendChild(r);
     }
     else {
-      Element r = SVGHyperCube.drawFrame(svgp, proj, new Vector(SpatialUtil.getMin(mbr)), new Vector(SpatialUtil.getMax(mbr)));
+      Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
       SVGUtil.setCSSClass(r, INDEX + depth);
       layer.appendChild(r);
     }
