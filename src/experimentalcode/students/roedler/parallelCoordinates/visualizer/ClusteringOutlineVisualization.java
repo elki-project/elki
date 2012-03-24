@@ -2,7 +2,6 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -18,10 +17,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -34,16 +30,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
-import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
-import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
-import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMenuItem;
 
 /**
  * Generates a SVG-Element that visualizes cluster intervals.
  * 
  * @author Robert Rödler
  */
-public class ClusteringOutlineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
+public class ClusteringOutlineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -54,18 +47,6 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
    */
   private Clustering<Model> clustering;
 
-  /**
-   * selected cluster
-   */
-  private boolean[] clustervis;
-
-  /**
-   * menu items
-   */
-  CheckboxMenuItem items[];
-
-  List<Integer> list;
-
   boolean rounded;
 
   private static final double KAPPA = SVGHyperSphere.EUCLIDEAN_KAPPA;
@@ -75,14 +56,12 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
    * 
    * @param task VisualizationTask
    */
-  public ClusteringOutlineVisualization(VisualizationTask task, List<Integer> list, boolean rounded) {
+  public ClusteringOutlineVisualization(VisualizationTask task, boolean rounded) {
     super(task);
     this.clustering = task.getResult();
-    this.list = list;
     this.rounded = rounded;
     context.addDataStoreListener(this);
     context.addResultListener(this);
-    init();
     incrementalRedraw();
   }
 
@@ -91,20 +70,6 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
     context.removeDataStoreListener(this);
     context.removeResultListener(this);
     super.destroy();
-  }
-
-  private void init() {
-    clustervis = new boolean[clustering.getAllClusters().size()];
-    for(int i = 0; i < clustervis.length; i++) {
-      clustervis[i] = false;
-    }
-    if(list != null) {
-      for(Integer i : list) {
-        if(i < clustervis.length) {
-          clustervis[i] = true;
-        }
-      }
-    }
   }
 
   @Override
@@ -125,9 +90,6 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
         midmm[i].reset();
       }
 
-      if(!clustervis[cnum]) {
-        continue;
-      }
       for(DBID objId : clus.getIDs()) {
         double[] yPos = getYPositions(objId);
 
@@ -206,7 +168,6 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
   private void addCSSClasses(SVGPlot svgp) {
     if(!svgp.getCSSClassManager().contains(CLUSTERAREA)) {
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-      String color;
       int clusterID = 0;
 
       for(@SuppressWarnings("unused")
@@ -215,13 +176,13 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
         // cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY,
         // context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / 2.0);
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.5);
+        final String color;
         if(clustering.getAllClusters().size() == 1) {
-          color = "black";
+          color = SVGConstants.CSS_BLACK_VALUE;
         }
         else {
           color = colors.getColor(clusterID);
         }
-
         // cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
 
@@ -231,57 +192,13 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
     }
   }
 
-  @Override
-  public SubMenu getMenu() {
-    SubMenu myMenu = new SubMenu(CLUSTERAREA, this);
-    int clus = clustering.getAllClusters().size();
-
-    items = new CheckboxMenuItem[clus];
-
-    for(int num = 0; num < clus; num++) {
-      items[num] = myMenu.addCheckBoxItem("Cluster " + num, Integer.toString(num), clustervis[num]);
-    }
-    // myMenu.addCheckBoxItem("rounded", "rounded", rounded);
-
-    /*
-     * myMenu.addSeparator();
-     * 
-     * myMenu.addItem("Select all", "-1"); myMenu.addItem("Unselect all", "-2");
-     * myMenu.addItem("Invert all", "-3");
-     */
-    return myMenu;
-  }
-
-  @Override
-  public void menuPressed(String id, boolean checked) {
-    if(id == "rounded") {
-      rounded = checked;
-      incrementalRedraw();
-      return;
-    }
-
-    int iid = Integer.parseInt(id);
-    /*
-     * if (iid < 0){ if (iid == -1){ for(int i = 0; i < clustervis.length; i++){
-     * items[i].setSelected(true); clustervis[i] = true; } } if (iid == -2){
-     * for(int i = 0; i < clustervis.length; i++){ items[i].setSelected(false);
-     * clustervis[i] = false; } } if (iid == -3){ for(int i = 0; i <
-     * clustervis.length; i++){ items[i].setSelected(!clustervis[i]);
-     * clustervis[i] = !clustervis[i]; } } incrementalRedraw(); return; }
-     */
-
-    clustervis[iid] = checked;
-    incrementalRedraw();
-  }
-
   /**
    * Factory for axis visualizations
    * 
    * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses AxisVisualization oneway - - «create»
-   * 
+   * @apiviz.uses ClusteringOutlineVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**
@@ -289,30 +206,21 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
      */
     private static final String NAME = "Cluster Outline";
 
-    public static final OptionID VISIBLE_ID = OptionID.getOrCreateOptionID("parallel.clusteroutline.visible", "Select visible Clusteroutlines");
-
     public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("parallel.clusteroutline.rounded", "Draw lines rounded");
 
-    /**
-     * selected cluster
-     */
-    private List<Integer> list;
-
-    private boolean rounded;
+    private boolean rounded = true;
 
     /**
      * Constructor, adhering to
      * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
-    public Factory(List<Integer> list, boolean rounded) {
+    public Factory() {
       super();
-      this.list = list;
-      this.rounded = rounded;
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusteringOutlineVisualization(task, list, rounded);
+      return new ClusteringOutlineVisualization(task, rounded);
     }
 
     @Override
@@ -324,7 +232,8 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
           IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
           for(ParallelPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 4);
+            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA -1);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             baseResult.getHierarchy().add(c, task);
             baseResult.getHierarchy().add(p, task);
           }
@@ -336,38 +245,6 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
     public boolean allowThumbnails(VisualizationTask task) {
       // Don't use thumbnails
       return false;
-    }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      protected List<Integer> p;
-
-      protected boolean rounded = false;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        // Flag fillF = new Flag(FILL_ID);
-        // fillF.setDefaultValue(true);
-        // if(config.grab(fillF)) {
-        // rounded = fillF.getValue();
-        // }
-        final IntListParameter visL = new IntListParameter(VISIBLE_ID, true);
-        if(config.grab(visL)) {
-          p = visL.getValue();
-        }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(p, rounded);
-      }
     }
   }
 }
