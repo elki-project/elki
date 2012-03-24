@@ -24,31 +24,110 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
 /**
- * Projection to parallel coordinates.
+ * Projection to parallel coordinates that allows reordering and inversion of
+ * axes.
+ * 
+ * Note: when using this projection, pay attention to the two different schemes
+ * of dimension numbering: by input dimension and by axis position.
  * 
  * @author Robert Rödler
+ * @author Erich Schubert
  */
 public interface ProjectionParallel extends Projection {
-  public boolean isVisible(int dim);
+  /**
+   * Get inversion flag of axis.
+   * 
+   * @param axis Axis (reordered) position
+   * @return Inversion flag
+   */
+  public boolean isAxisInverted(int axis);
 
-  public void setVisible(boolean vis, int dim);
+  /**
+   * Set inversion flag of axis.
+   * 
+   * @param axis Axis (reordered) position
+   * @param bool Value of inversion flag
+   */
+  public void setAxisInverted(int axis, boolean bool);
 
+  /**
+   * Toggle inverted flag of axis.
+   * 
+   * @param axis Axis (reordered) position
+   */
+  public void toggleAxisInverted(int axis);
+
+  /**
+   * Get inversion flag of dimension.
+   * 
+   * @param truedim Dimension in original numbering
+   * @return Inversion flag
+   */
+  public boolean isDimInverted(int truedim);
+
+  /**
+   * Set inversion flag of a dimension.
+   * 
+   * @param truedim Dimension in original numbering
+   * @param bool Value of inversion flag
+   */
+  public void setDimInverted(int truedim, boolean bool);
+
+  /**
+   * Toggle inverted flag of dimension.
+   * 
+   * @param truedim Dimension in original numbering
+   */
+  public void toggleDimInverted(int truedim);
+
+  /**
+   * Get scale for the given axis
+   * 
+   * @param axis Axis (reordered) position
+   * @return Axis scale
+   */
+  public LinearScale getAxisScale(int axis);
+
+  /**
+   * Test whether the current axis is visible
+   * 
+   * @param axis Axis (reordered) position
+   * @return Visibility of axis
+   */
+  public boolean isAxisVisible(int axis);
+
+  /**
+   * Set the visibility of the axis.
+   * 
+   * @param axis Axis number
+   * @param vis Visibility status
+   */
+  public void setAxisVisible(int axis, boolean vis);
+
+  /**
+   * Toggle visibility of the axis.
+   * 
+   * @param axis Axis number
+   */
+  public void toggleAxisVisible(int axis);
+
+  /**
+   * Get the number of visible dimension.
+   * 
+   * @return Number of visible dimensions
+   */
   public int getVisibleDimensions();
 
-  public int getFirstVisibleDimension();
-
-  public double fastProjectDataToRenderSpace(int dim, double value);
-
-  public int getLastVisibleDimension();
-
-  public int getPrevVisibleDimension(int dim);
-
-  public int getNextVisibleDimension(int dim);
-
-  public void swapDimensions(int a, int b);
+  /**
+   * Exchange axes A and B
+   * @param a First axis
+   * @param b Second axis
+   */
+  public void swapAxes(int a, int b);
 
   /**
    * shift a dimension to another position
@@ -56,25 +135,63 @@ public interface ProjectionParallel extends Projection {
    * @param dim dimension to shift
    * @param rn new position
    */
-  public void shiftDimension(int dim, int rn);
+  public void moveAxis(int axis, int rn);
 
-  public int getDimensionNumber(int pos);
+  /**
+   * Get the dimension for the given axis number
+   * 
+   * @param axis Axis number
+   * @return Dimension
+   */
+  public int getDimForAxis(int axis);
 
-  public void toggleInverted(int dim);
+  /**
+   * Get the dimension for the given visible axis
+   * 
+   * @param axis Axis number (visible axes only)
+   * @return Dimension
+   */
+  public int getDimForVisibleAxis(int axis);
 
-  public void setInverted(int dim, boolean bool);
-
-  public boolean isInverted(int dim);
-  
+  /**
+   * Fast project a vector from data to render space
+   * 
+   * @param v Input vector
+   * @return Vector with reordering, inversions and scales applied.
+   */
   public double[] fastProjectDataToRenderSpace(double[] v);
 
+  /**
+   * Fast project a vector from data to render space
+   * 
+   * @param v Input vector
+   * @return Vector with reordering, inversions and scales applied.
+   */
   public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> v);
 
-  public double fastProjectRenderToDataSpace(double v, int projdim);
-  
-  //public double projectScaledToRender(int dim, double d);
+  /**
+   * Project the value of a single axis to its display value
+   * 
+   * @param value Input value
+   * @param axis Axis to use for scaling and inversion
+   * @return Transformed value
+   */
+  public double fastProjectDataToRenderSpace(double value, int axis);
 
-  //public Vector projectDataToRenderSpace(NumberVector<?, ?> data, boolean sort);
+  /**
+   * Project a display value back to the original data space
+   * 
+   * @param value transformed value
+   * @param axis Axis to use for scaling and inversion
+   * @return Original value
+   */
+  public double fastProjectRenderToDataSpace(double value, int axis);
 
-  public int findDimensionPosition(int dim);
+  /**
+   * Find the axis assinged to the given dimension.
+   * 
+   * @param truedim Dimension
+   * @return Axis number
+   */
+  public int getAxisForDim(int truedim);
 }

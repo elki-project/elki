@@ -134,7 +134,7 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
 
     int dim = proj.getVisibleDimensions();
     for(int d = 0; d < dim; d++) {
-      if(ranges[proj.getDimensionNumber(d)] != null) {
+      if(ranges[proj.getDimForVisibleAxis(d)] != null) {
         double amin, amax;
         if(min[d] < max[d]) {
           amin = min[d] * getAxisHeight();
