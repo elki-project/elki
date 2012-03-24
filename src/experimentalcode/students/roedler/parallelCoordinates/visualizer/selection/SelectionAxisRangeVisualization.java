@@ -29,7 +29,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
@@ -130,8 +129,8 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
         max[d] = ranges[d].second;
       }
     }
-    min = proj.fastProjectDataToRenderSpace(new Vector(min));
-    max = proj.fastProjectDataToRenderSpace(new Vector(max));
+    min = proj.fastProjectDataToRenderSpace(min);
+    max = proj.fastProjectDataToRenderSpace(max);
 
     int dim = proj.getVisibleDimensions();
     for(int d = 0; d < dim; d++) {
