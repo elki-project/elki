@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui.detail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -35,7 +36,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.AttributeModifier;
@@ -138,12 +138,14 @@ public class DetailView extends SVGPlot implements ResultListener {
   protected void redraw() {
     destroyVisualizations();
 
-    width = getRatio();
-    height = 1.0;
+    // Try to keep the area approximately 1.0
+    width = Math.sqrt(getRatio());
+    height = 1.0 / width;
 
     ArrayList<Visualization> layers = new ArrayList<Visualization>();
     // TODO: center/arrange visualizations?
-    for(VisualizationTask task : IterableUtil.fromIterator(visi.visIterator())) {
+    for(Iterator<VisualizationTask> tit = visi.tasks.iterator(); tit.hasNext();) {
+      VisualizationTask task = tit.next();
       if(VisualizerUtil.isVisible(task)) {
         try {
           Visualization v = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
@@ -155,7 +157,7 @@ public class DetailView extends SVGPlot implements ResultListener {
             LoggingUtil.exception("Visualization failed.", e);
           }
           else {
-            LoggingUtil.warning("Visualizer " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");
+            LoggingUtil.warning("Visualizer " + task.getFactory().getClass().getName() + " failed - enable debugging to see details: " + e.toString());
           }
         }
       }
@@ -163,7 +165,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     // Arrange
     for(Visualization layer : layers) {
       if(layer.getLayer() != null) {
-        this.getRoot().appendChild(layer.getLayer());
+        getRoot().appendChild(layer.getLayer());
       }
       else {
         LoggingUtil.warning("NULL layer seen.");

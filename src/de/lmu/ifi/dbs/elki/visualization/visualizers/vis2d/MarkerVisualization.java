@@ -160,8 +160,8 @@ public class MarkerVisualization extends P2DVisualization implements DataStoreLi
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       // Find a style result to visualize:
-      IterableIterator<StyleResult> clusterings = ResultUtil.filteredResults(result, StyleResult.class);
-      for(StyleResult c : clusterings) {
+      IterableIterator<StyleResult> styleres = ResultUtil.filteredResults(result, StyleResult.class);
+      for(StyleResult c : styleres) {
         IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
