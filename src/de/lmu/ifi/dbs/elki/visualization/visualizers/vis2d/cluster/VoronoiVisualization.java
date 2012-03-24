@@ -71,7 +71,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has MeanModel oneway - - visualizes
  */
 public class VoronoiVisualization extends P2DVisualization {
-
   /**
    * A short name characterizing this Visualizer.
    */
@@ -131,13 +130,13 @@ public class VoronoiVisualization extends P2DVisualization {
     }
 
     // Collect cluster means
-    ArrayList<Vector> means = new ArrayList<Vector>(clusters.size());
-    {
-      for(Cluster<MeanModel<? extends NumberVector<?, ?>>> clus : clusters) {
-        means.add(clus.getModel().getMean().getColumnVector());
-      }
-    }
     if(clusters.size() == 2) {
+      ArrayList<double[]> means = new ArrayList<double[]>(clusters.size());
+      {
+        for(Cluster<MeanModel<? extends NumberVector<?, ?>>> clus : clusters) {
+          means.add(clus.getModel().getMean().getColumnVector().getArrayRef());
+        }
+      }
       if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
         Element path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
         SVGUtil.addCSSClass(path, KMEANSBORDER);
@@ -150,8 +149,17 @@ public class VoronoiVisualization extends P2DVisualization {
       }
     }
     else {
+      ArrayList<Vector> vmeans = new ArrayList<Vector>(clusters.size());
+      ArrayList<double[]> means = new ArrayList<double[]>(clusters.size());
+      {
+        for(Cluster<MeanModel<? extends NumberVector<?, ?>>> clus : clusters) {
+          Vector v = clus.getModel().getMean().getColumnVector();
+          vmeans.add(v);
+          means.add(v.getArrayRef());
+        }
+      }
       // Compute Delaunay Triangulation
-      ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
+      ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(vmeans).getDelaunay();
       if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
         Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
         SVGUtil.addCSSClass(path, KMEANSBORDER);

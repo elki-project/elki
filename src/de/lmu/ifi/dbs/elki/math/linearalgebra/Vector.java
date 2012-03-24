@@ -137,6 +137,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * 
    * @return the dimensionality of this vector
    */
+  @Override
   public final int getDimensionality() {
     return elements.length;
   }
