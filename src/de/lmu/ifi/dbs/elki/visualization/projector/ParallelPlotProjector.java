@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.parallelCoordinates.projector;
+package de.lmu.ifi.dbs.elki.visualization.projector;
 
 /*
  This file is part of ELKI:
@@ -34,9 +34,8 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
-import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
-import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
-import experimentalcode.students.roedler.parallelCoordinates.projections.SimpleParallel;
+import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
+import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
 
 /**
  * ParallelPlotProjector is responsible for producing a parallel axes
@@ -46,7 +45,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projections.SimpleP
  * 
  * @param <V> Vector type
  */
-// TODO: support categorical features, too
+// TODO: support categorical features, and multiple relations too
 public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends AbstractHierarchicalResult implements Projector {
   /**
    * Relation we project

@@ -25,15 +25,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
 import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMenuItem;
 
 /**
@@ -41,7 +42,7 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMe
  * 
  * @author Robert Rödler
  */
-public class ClusteringMeanVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
+public class ClusteringMeanVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -104,7 +105,6 @@ public class ClusteringMeanVisualization extends ParallelVisualization<NumberVec
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = proj.getVisibleDimensions();
-    recalcAxisPositions();
 
     Mean[] mean = new Mean[dim];
     for(int i = 0; i < dim; i++) {
@@ -132,7 +132,7 @@ public class ClusteringMeanVisualization extends ParallelVisualization<NumberVec
 
       SVGPath path = new SVGPath();
       for(int i = 0; i < mean.length; i++) {
-        path.drawTo(getAxisX(i), mean[i].getMean());
+        path.drawTo(getVisibleAxisX(i), mean[i].getMean());
       }
 
       Element meanline = path.makeElement(svgp);

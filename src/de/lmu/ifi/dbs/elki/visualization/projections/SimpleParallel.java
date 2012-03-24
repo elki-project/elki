@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.parallelCoordinates.projections;
+package de.lmu.ifi.dbs.elki.visualization.projections;
 
 /*
  This file is part of ELKI:

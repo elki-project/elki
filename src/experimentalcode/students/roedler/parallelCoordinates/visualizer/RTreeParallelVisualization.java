@@ -45,16 +45,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
 import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
-import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
  /**
   * Visualize the  of an R-Tree based index.
@@ -67,7 +68,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
   * @param <E> Tree entry type
   */
  // TODO: listen for tree changes instead of data changes?
- public class RTreeParallelVisualization<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NumberVector<?, ?>> implements MenuOwner, DataStoreListener {
+ public class RTreeParallelVisualization<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector<?, ?>> implements MenuOwner, DataStoreListener {
    /**
     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
     */
@@ -200,10 +201,10 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
        assert(min.length == dim && max.length == dim);
        SVGPath path = new SVGPath();
        for (int i = 0; i < dim; i++){
-         path.drawTo(getAxisX(i), Math.max(min[i], max[i]));
+         path.drawTo(getVisibleAxisX(i), Math.max(min[i], max[i]));
        }
        for (int i = dim - 1; i >= 0; i--){
-         path.drawTo(getAxisX(i), Math.min(min[i], max[i]));
+         path.drawTo(getVisibleAxisX(i), Math.min(min[i], max[i]));
        }
        path.close();
        

@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -32,9 +33,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
 import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMenuItem;
 
 /**
@@ -42,7 +43,7 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMe
  * 
  * @author Robert Rödler
  */
-public class ClusteringOutlineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
+public class ClusteringOutlineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -110,7 +111,6 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = proj.getVisibleDimensions();
-    recalcAxisPositions();
 
     DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
     DoubleMinMax[] midmm = DoubleMinMax.newArray(dim - 1);
@@ -144,13 +144,13 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
       if(rounded) {
         for(int i = 0; i < dim; i++) {
           if(first) {
-            path.drawTo(getAxisX(i), mms[i].getMax());
+            path.drawTo(getVisibleAxisX(i), mms[i].getMax());
             first = false;
           }
           else {
-            double lx = getAxisX(i - 1);
-            double mx = getAxisX(i - .5);
-            double rx = getAxisX(i);
+            double lx = getVisibleAxisX(i - 1);
+            double mx = getVisibleAxisX(i - .5);
+            double rx = getVisibleAxisX(i);
             double lef = mms[i - 1].getMax();
             double mid = midmm[i - 1].getMax();
             double rig = mms[i].getMax();
@@ -161,13 +161,13 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
         first = true;
         for(int i = dim - 1; i > 0; i--) {
           if(first) {
-            path.drawTo(getAxisX(i), mms[i].getMin());
+            path.drawTo(getVisibleAxisX(i), mms[i].getMin());
             first = false;
           }
           else {
-            double lx = getAxisX(i - 1);
-            double mx = getAxisX(i - .5);
-            double rx = getAxisX(i);
+            double lx = getVisibleAxisX(i - 1);
+            double mx = getVisibleAxisX(i - .5);
+            double rx = getVisibleAxisX(i);
             double lef = mms[i - 1].getMin();
             double mid = midmm[i - 1].getMin();
             double rig = mms[i].getMin();
@@ -178,16 +178,16 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
       }
       else {
         for(int i = 0; i < dim; i++) {
-          path.drawTo(getAxisX(i), mms[i].getMax());
+          path.drawTo(getVisibleAxisX(i), mms[i].getMax());
           if(i < dim - 1) {
-            path.drawTo(getAxisX(i + .5), midmm[i].getMax());
+            path.drawTo(getVisibleAxisX(i + .5), midmm[i].getMax());
           }
         }
         for(int i = dim - 1; i >= 0; i--) {
           if(i < dim - 1) {
-            path.drawTo(getAxisX(i + .5), midmm[i].getMin());
+            path.drawTo(getVisibleAxisX(i + .5), midmm[i].getMin());
           }
-          path.drawTo(getAxisX(i), mms[i].getMin());
+          path.drawTo(getVisibleAxisX(i), mms[i].getMin());
         }
       }
       path.close();

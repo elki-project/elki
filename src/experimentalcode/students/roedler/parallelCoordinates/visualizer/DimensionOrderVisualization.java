@@ -13,20 +13,21 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
  * interactive SVG-Element for selecting visible axis.
  * 
  * @author Robert Rödler
  */
-public class DimensionOrderVisualization extends ParallelVisualization<NumberVector<?, ?>> {
+public class DimensionOrderVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -72,7 +73,6 @@ public class DimensionOrderVisualization extends ParallelVisualization<NumberVec
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = proj.getVisibleDimensions();
-    recalcAxisPositions();
 
     double last = -1.;
 
@@ -80,10 +80,10 @@ public class DimensionOrderVisualization extends ParallelVisualization<NumberVec
     double bs = as * 1.5;
     double hbs = bs / 2.;
     double qas = as / 4.;
-    double ypos = getAxisHeight() + getMarginY() * 2.;
+    double ypos = getSizeY() + getMarginTop() * 2.;
     double dist = 2.5 * as;
 
-    Element back = svgp.svgRect(0.0, getAxisHeight() + getMarginY() * 2., getSizeX(), getSizeY() / 35.);
+    Element back = svgp.svgRect(0.0, getSizeY() + getMarginTop() * 2., getSizeX(), getSizeY() / 35.);
     SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
     layer.appendChild(back);
 
@@ -98,10 +98,10 @@ public class DimensionOrderVisualization extends ParallelVisualization<NumberVec
           end = 2;
         }
         for(; j < end; j++) {
-          Element arrow = getArrow(j, (getAxisX(i) - dist) + j * dist, ypos + as, as);
+          Element arrow = getArrow(j, (getVisibleAxisX(i) - dist) + j * dist, ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
-          Element button = svgp.svgRect((getAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
+          Element button = svgp.svgRect((getVisibleAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
           addEventListener(button, i, j);
           layer.appendChild(button);
@@ -109,25 +109,25 @@ public class DimensionOrderVisualization extends ParallelVisualization<NumberVec
       }
       else {
         {
-          Element arrow = getArrow(3, getAxisX(i), ypos + as, as);
+          Element arrow = getArrow(3, getVisibleAxisX(i), ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
-          Element button = svgp.svgRect(getAxisX(i) - hbs, ypos + qas, bs, bs);
+          Element button = svgp.svgRect(getVisibleAxisX(i) - hbs, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
           addEventListener(button, i, 3);
           layer.appendChild(button);
         }
 
         if(last > 0.) {
-          Element arrow = getArrow(3, last + (getAxisX(i) - last) / 2., ypos + as, as);
+          Element arrow = getArrow(3, last + (getVisibleAxisX(i) - last) / 2., ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
-          Element button = svgp.svgRect(last + ((getAxisX(i) - last) / 2.) - hbs, ypos + qas, bs, bs);
+          Element button = svgp.svgRect(last + ((getVisibleAxisX(i) - last) / 2.) - hbs, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
           addEventListener(button, i, 4);
           layer.appendChild(button);
         }
-        last = getAxisX(i);
+        last = getVisibleAxisX(i);
       }
 
     }

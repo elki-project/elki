@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.parallelCoordinates.projections;
+package de.lmu.ifi.dbs.elki.visualization.projections;
 
 /*
  This file is part of ELKI:
@@ -25,7 +25,6 @@ package experimentalcode.students.roedler.parallelCoordinates.projections;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
 /**
  * Projection to parallel coordinates that allows reordering and inversion of

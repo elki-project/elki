@@ -1,4 +1,27 @@
-package experimentalcode.students.roedler.parallelCoordinates.visualizer;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.Iterator;
 
@@ -15,6 +38,7 @@ import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
@@ -25,14 +49,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
 /**
  * Generates data lines.
  * 
  * @author Robert Rödler
  */
-public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+public class LineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -55,7 +78,7 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
     context.addDataStoreListener(this);
     incrementalRedraw();
   }
-  
+
   @Override
   public void destroy() {
     context.removeDataStoreListener(this);
@@ -75,7 +98,6 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
   protected void redraw() {
     StylingPolicy sp = context.getStyleResult().getStylingPolicy();
     addCSSClasses(svgp, sp);
-    recalcAxisPositions();
 
     Iterator<DBID> ids = sample.getSample().iterator();
     if(ids == null || !ids.hasNext()) {
@@ -84,14 +106,14 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
     if(sp instanceof ClassStylingPolicy) {
       // FIXME: doesn't use sampling yet.
       ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-      for (int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
-        String key = DATALINE+"_"+c;
-        for (Iterator<DBID> iter = csp.iterateClass(c); iter.hasNext(); ) {
+      for(int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
+        String key = DATALINE + "_" + c;
+        for(Iterator<DBID> iter = csp.iterateClass(c); iter.hasNext();) {
           DBID id = iter.next();
           SVGPath path = new SVGPath();
           double[] yPos = getYPositions(id);
           for(int i = 0; i < yPos.length; i++) {
-            path.drawTo(getAxisX(i), yPos[i]);
+            path.drawTo(getVisibleAxisX(i), yPos[i]);
           }
           Element line = path.makeElement(svgp);
           SVGUtil.addCSSClass(line, key);
@@ -105,7 +127,7 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
         SVGPath path = new SVGPath();
         double[] yPos = getYPositions(id);
         for(int i = 0; i < yPos.length; i++) {
-          path.drawTo(getAxisX(i), yPos[i]);
+          path.drawTo(getVisibleAxisX(i), yPos[i]);
         }
         Element line = path.makeElement(svgp);
         SVGUtil.addCSSClass(line, DATALINE);
@@ -127,8 +149,8 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
     final double width = .5 * style.getLineWidth(StyleLibrary.PLOT);
     if(sp instanceof ClassStylingPolicy) {
       ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-      for (int i = csp.getMinStyle(); i < csp.getMaxStyle(); i++) {
-        String key = DATALINE+"_"+i;
+      for(int i = csp.getMinStyle(); i < csp.getMaxStyle(); i++) {
+        String key = DATALINE + "_" + i;
         if(!svgp.getCSSClassManager().contains(key)) {
           CSSClass cls = new CSSClass(this, key);
           cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);

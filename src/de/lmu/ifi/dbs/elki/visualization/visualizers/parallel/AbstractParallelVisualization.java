@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.parallelCoordinates.visualizer;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
 
 /*
  This file is part of ELKI:
@@ -32,20 +32,21 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
-import experimentalcode.students.roedler.parallelCoordinates.projections.ProjectionParallel;
 
 /**
- * Default class to handle parallel visualizations.
+ * Abstract base class for parallel visualizations.
  * 
  * @author Robert Rödler
+ * @author Erich Schubert
  * 
  * @param <NV> Vector type in relation
  */
-public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> extends AbstractVisualization {
+public abstract class AbstractParallelVisualization<NV extends NumberVector<?, ?>> extends AbstractVisualization {
   /**
    * The current projection
    */
@@ -76,7 +77,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
    * 
    * @param task Visualization task
    */
-  public ParallelVisualization(VisualizationTask task) {
+  public AbstractParallelVisualization(VisualizationTask task) {
     super(task);
     this.proj = task.getProj();
     this.relation = task.getRelation();
@@ -85,7 +86,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
 
     margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.4 * StyleLibrary.SCALE };
     size = new double[] { ratio * StyleLibrary.SCALE, StyleLibrary.SCALE };
-    axsep = size[0] / (proj.getInputDimensionality() - 1.);
+    recalcAxisPositions();
 
     this.layer = setupCanvas(svgp, proj, task.getWidth(), task.getHeight());
   }
@@ -106,6 +107,11 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     return layer;
   }
 
+  /**
+   * Get width of main canvas.
+   * 
+   * @return Width
+   */
   protected double getSizeX() {
     return size[0];
   }
@@ -114,30 +120,35 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     return size[1];
   }
 
-  protected double getMarginX() {
+  protected double getMarginLeft() {
     return margins[0];
   }
 
-  protected double getMarginY() {
+  protected double getMarginTop() {
     return margins[1];
   }
 
-  protected void recalcAxisPositions() {
+  /**
+   * Recalculate axis positions, in particular after projection changes.
+   */
+  private void recalcAxisPositions() {
     axsep = size[0] / (proj.getVisibleDimensions() - 1.);
   }
 
-  protected double getAxisHeight() {
-    return StyleLibrary.SCALE;
-  }
-
-  protected double getAxisX(double d) {
+  /**
+   * Get the position of visible axis d
+   * 
+   * @param d Visible axis number
+   * @return Position
+   */
+  protected double getVisibleAxisX(double d) {
     return d * axsep;
   }
 
   protected double[] getYPositions(DBID objId) {
     double[] v = proj.fastProjectDataToRenderSpace(relation.get(objId));
     Vector vec = new Vector(v);
-    vec.timesEquals(getAxisHeight());
+    vec.timesEquals(getSizeY());
     return v;
   }
   
@@ -145,6 +156,7 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
   public void resultChanged(Result current) {
     super.resultChanged(current);
     if(current == proj) {
+      recalcAxisPositions();
       synchronizedRedraw();
     }
   }

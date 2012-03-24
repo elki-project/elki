@@ -1,16 +1,40 @@
-package experimentalcode.students.roedler.parallelCoordinates.visualizer;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
 
 /**
  * Generates a SVG-Element containing axes, including labeling.
@@ -19,7 +43,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
  * 
  * @apiviz.uses SVGSimpleLinearAxis
  */
-public class ParallelAxisVisualization extends ParallelVisualization<NumberVector<?, ?>> {
+public class ParallelAxisVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> {
   /**
    * Constructor.
    * 
@@ -30,7 +54,7 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
     incrementalRedraw();
     context.addResultListener(this);
   }
-  
+
   @Override
   public void destroy() {
     context.removeResultListener(this);
@@ -39,17 +63,15 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
 
   @Override
   protected void redraw() {
-    int dim = proj.getVisibleDimensions();
-    recalcAxisPositions();
-
+    final int dim = proj.getVisibleDimensions();
     try {
       for(int i = 0; i < dim; i++) {
         boolean inv = proj.isAxisInverted(i);
         if(!inv) {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), getAxisX(i), getAxisHeight(), getAxisX(i), 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), getVisibleAxisX(i), getSizeY(), getVisibleAxisX(i), 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
         }
         else {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), getAxisX(i), 0, getAxisX(i), getAxisHeight(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), getVisibleAxisX(i), 0, getVisibleAxisX(i), getSizeY(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
         }
       }
     }
@@ -87,8 +109,9 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(result, ParallelPlotProjector.class);
-      for(ParallelPlotProjector<?> p : ps) {
+      Iterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(result, ParallelPlotProjector.class);
+      while(ps.hasNext()) {
+        ParallelPlotProjector<?> p = ps.next();
         final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
         baseResult.getHierarchy().add(p, task);
