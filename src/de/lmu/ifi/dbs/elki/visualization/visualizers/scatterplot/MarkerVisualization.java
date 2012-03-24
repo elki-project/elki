@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
 /*
  This file is part of ELKI:
@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @apiviz.uses StyleResult
  */
-public class MarkerVisualization extends P2DVisualization implements DataStoreListener {
+public class MarkerVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */

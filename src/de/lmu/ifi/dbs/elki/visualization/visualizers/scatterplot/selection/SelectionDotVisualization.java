@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.selection;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 
 /*
  This file is part of ELKI:
@@ -46,8 +46,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing dots as markers
@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
  */
-public class SelectionDotVisualization extends P2DVisualization implements DataStoreListener {
+public class SelectionDotVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */

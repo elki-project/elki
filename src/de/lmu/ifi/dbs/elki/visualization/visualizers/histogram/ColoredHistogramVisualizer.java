@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
 
 /*
  This file is part of ELKI:
@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  */
 // FIXME: make non-static, react to database changes!
 // FIXME: cache histogram instead of recomputing it.
-public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DVisualization {
+public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends AbstractHistogramVisualization {
   /**
    * Name for this visualizer.
    */
@@ -117,7 +117,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
    * @param curves Curves flag
    * @param bins Number of bins
    */
-  public P1DHistogramVisualizer(VisualizationTask task, boolean curves, int bins) {
+  public ColoredHistogramVisualizer(VisualizationTask task, boolean curves, int bins) {
     super(task);
     this.curves = curves;
     this.bins = bins;
@@ -385,7 +385,7 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new P1DHistogramVisualizer<NV>(task, curves, bins);
+      return new ColoredHistogramVisualizer<NV>(task, curves, bins);
     }
 
     @Override

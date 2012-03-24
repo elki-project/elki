@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
 /*
  This file is part of ELKI:
@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * 
  * @apiviz.has VisualizationTask oneway - - visualizes
  */
-public class ToolBox2DVisualization extends P2DVisualization {
+public class ToolBox2DVisualization extends AbstractScatterplotVisualization {
   /**
    * A short name characterizing this Visualizer.
    */

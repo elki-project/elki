@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 import experimentalcode.students.roedler.utils.DistanceFunctionDrawUtils;
 
 /**
@@ -48,7 +48,7 @@ import experimentalcode.students.roedler.utils.DistanceFunctionDrawUtils;
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
  */
-public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> extends P2DVisualization implements DataStoreListener {
+public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> extends AbstractScatterplotVisualization implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */

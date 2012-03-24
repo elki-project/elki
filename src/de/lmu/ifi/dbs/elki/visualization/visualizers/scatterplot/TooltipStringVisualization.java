@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
 /*
  This file is part of ELKI:
@@ -23,26 +23,20 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.text.NumberFormat;
-import java.util.List;
-import java.util.Locale;
+import java.util.ArrayList;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.ExternalID;
+import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -57,27 +51,35 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * as the cursor lingers on the marker.
  * 
  * @author Remigius Wojdanowski
+ * @author Erich Schubert
+ * 
+ * @apiviz.has Relation oneway - - visualizes
  */
-public class TooltipScoreVisualization extends AbstractTooltipVisualization {
+public class TooltipStringVisualization extends AbstractTooltipVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Outlier Score Tooltips";
+  public static final String NAME_ID = "ID Tooltips";
 
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME_GEN = "Score Tooltips";
+  public static final String NAME_LABEL = "Object Label Tooltips";
 
   /**
-   * Number format.
+   * A short name characterizing this Visualizer.
    */
-  NumberFormat nf;
+  public static final String NAME_CLASS = "Class Label Tooltips";
+
+  /**
+   * A short name characterizing this Visualizer.
+   */
+  public static final String NAME_EID = "External ID Tooltips";
 
   /**
    * Number value to visualize
    */
-  private Relation<? extends Number> result;
+  private Relation<?> result;
 
   /**
    * Font size to use.
@@ -85,22 +87,31 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
   private double fontsize;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param task Task
-   * @param nf Number Format
    */
-  public TooltipScoreVisualization(VisualizationTask task, NumberFormat nf) {
+  public TooltipStringVisualization(VisualizationTask task) {
     super(task);
     this.result = task.getResult();
-    this.nf = nf;
     this.fontsize = 3 * context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
     synchronizedRedraw();
   }
 
   @Override
   protected Element makeTooltip(DBID id, double x, double y, double dotsize) {
-    return svgp.svgText(x + dotsize, y + fontsize * 0.07, nf.format(result.get(id).doubleValue()));
+    final Object data = result.get(id);
+    String label;
+    if(data == null) {
+      label = "null";
+    }
+    else {
+      label = data.toString();
+    }
+    if(label == "" || label == null) {
+      label = "null";
+    }
+    return svgp.svgText(x + dotsize, y + fontsize * 0.07, label);
   }
 
   /**
@@ -140,112 +151,71 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
   }
 
   /**
-   * Factory for tooltip visualizers
+   * Factory
    * 
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses TooltipScoreVisualization oneway - - «create»
+   * @apiviz.uses TooltipStringVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**
-     * Parameter for the gamma-correction.
-     * 
-     * <p>
-     * Key: {@code -tooltip.digits}
-     * </p>
-     * 
-     * <p>
-     * Default value: 4
-     * </p>
+     * Constructor, adhering to
+     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
      */
-    public static final OptionID DIGITS_ID = OptionID.getOrCreateOptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
-
-    /**
-     * Number formatter used for visualization
-     */
-    NumberFormat nf = null;
-
-    /**
-     * Constructor.
-     * 
-     * @param digits number of digits
-     */
-    public Factory(int digits) {
+    public Factory() {
       super();
-      nf = NumberFormat.getInstance(Locale.ROOT);
-      nf.setGroupingUsed(false);
-      nf.setMaximumFractionDigits(digits);
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new TooltipScoreVisualization(task, nf);
+      return new TooltipStringVisualization(task);
     }
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      // TODO: we can also visualize other scores!
-      List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-      for(OutlierResult o : ors) {
-        IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), this);
-          task.put(VisualizationTask.META_TOOL, true);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          baseResult.getHierarchy().add(o.getScores(), task);
-          baseResult.getHierarchy().add(p, task);
-        }
-      }
-      List<Relation<?>> rrs = ResultUtil.filterResults(result, Relation.class);
-      for(Relation<?> r : rrs) {
-        if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation())) {
-          continue;
-        }
-        // Skip if we already considered it above
-        boolean add = true;
-        for(Result p : baseResult.getHierarchy().getChildren(r)) {
-          if(p instanceof VisualizationTask && ((VisualizationTask) p).getFactory() instanceof Factory) {
-            add = false;
-            break;
-          }
-        }
-        if(add) {
+      ArrayList<Relation<?>> reps = ResultUtil.filterResults(result, Relation.class);
+      for(Relation<?> rep : reps) {
+        if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
           IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
-            final VisualizationTask task = new VisualizationTask(NAME_GEN, r, p.getRelation(), this);
+            final VisualizationTask task = new VisualizationTask(NAME_ID, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
             task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-            baseResult.getHierarchy().add(r, task);
+            baseResult.getHierarchy().add(rep, task);
             baseResult.getHierarchy().add(p, task);
           }
         }
-      }
-    }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      protected int digits = 4;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        IntParameter DIGITS_PARAM = new IntParameter(DIGITS_ID, new GreaterEqualConstraint(0), 4);
-
-        if(config.grab(DIGITS_PARAM)) {
-          digits = DIGITS_PARAM.getValue();
+        if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          for(ScatterPlotProjector<?> p : ps) {
+            final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, p.getRelation(), this);
+            task.put(VisualizationTask.META_TOOL, true);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+            baseResult.getHierarchy().add(rep, task);
+            baseResult.getHierarchy().add(p, task);
+          }
         }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(digits);
+        if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          for(ScatterPlotProjector<?> p : ps) {
+            final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, p.getRelation(), this);
+            task.put(VisualizationTask.META_TOOL, true);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+            baseResult.getHierarchy().add(rep, task);
+            baseResult.getHierarchy().add(p, task);
+          }
+        }
+        if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          for(ScatterPlotProjector<?> p : ps) {
+            final VisualizationTask task = new VisualizationTask(NAME_EID, rep, p.getRelation(), this);
+            task.put(VisualizationTask.META_TOOL, true);
+            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+            baseResult.getHierarchy().add(rep, task);
+            baseResult.getHierarchy().add(p, task);
+          }
+        }
       }
     }
   }

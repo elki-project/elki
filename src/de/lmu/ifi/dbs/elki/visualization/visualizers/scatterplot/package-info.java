@@ -1,6 +1,12 @@
 /**
- * <p>Visualizers based on 1D projections.</p>
+ * <p>Visualizers based on scatterplots.</p>
  * 
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.batikutil.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.svg.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.result.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.index.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.data.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener
  */
 /*
 This file is part of ELKI:
@@ -24,4 +30,4 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;

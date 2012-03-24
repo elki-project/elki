@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.selection;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 
 /*
  This file is part of ELKI:
@@ -51,8 +51,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing a cube as marker
@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * @apiviz.has RangeSelection oneway - - visualizes
  * @apiviz.uses SVGHyperCube
  */
-public class SelectionCubeVisualization extends P2DVisualization {
+public class SelectionCubeVisualization extends AbstractScatterplotVisualization {
   /**
    * A short name characterizing this Visualizer.
    */

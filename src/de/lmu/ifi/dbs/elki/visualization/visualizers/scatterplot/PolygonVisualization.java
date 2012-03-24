@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
 /*
  This file is part of ELKI:
@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @apiviz.has PolygonsObject - - visualizes
  */
-public class PolygonVisualization extends P2DVisualization implements DataStoreListener {
+public class PolygonVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */

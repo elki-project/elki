@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
 /*
  This file is part of ELKI:
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * @apiviz.landmark
  * @apiviz.has Projection2D
  */
-public abstract class P2DVisualization extends AbstractVisualization {
+public abstract class AbstractScatterplotVisualization extends AbstractVisualization {
   /**
    * The current projection
    */
@@ -68,7 +68,7 @@ public abstract class P2DVisualization extends AbstractVisualization {
    * 
    * @param task Visualization task
    */
-  public P2DVisualization(VisualizationTask task) {
+  public AbstractScatterplotVisualization(VisualizationTask task) {
     super(task);
     this.proj = task.getProj();
     this.rel = task.getRelation();

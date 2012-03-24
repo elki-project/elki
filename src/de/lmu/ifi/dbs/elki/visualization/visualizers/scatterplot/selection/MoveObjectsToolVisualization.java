@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.selection;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 
 /*
  This file is part of ELKI:
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
  * Tool to move the currently selected objects.
@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
  * 
  * @apiviz.has NumberVector oneway - - edits
  */
-public class MoveObjectsToolVisualization extends P2DVisualization implements DragListener {
+public class MoveObjectsToolVisualization extends AbstractScatterplotVisualization implements DragListener {
   /**
    * A short name characterizing this Visualizer.
    */

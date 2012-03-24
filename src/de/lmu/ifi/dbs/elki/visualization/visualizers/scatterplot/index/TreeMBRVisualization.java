@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.index;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index;
 
 /*
  This file is part of ELKI:
@@ -28,24 +28,19 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -54,26 +49,26 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
- * Visualize the bounding sphere of a metric index.
+ * Visualize the bounding rectangles of an R-Tree based index.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has AbstractMTree oneway - - visualizes
- * @apiviz.uses SVGHyperSphere
+ * @apiviz.has AbstractRStarTree oneway - - visualizes
+ * @apiviz.uses SVGHyperCube
  * 
  * @param <N> Tree node type
  * @param <E> Tree entry type
  */
-// TODO: listen for tree changes!
-public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<?, D, N, E>, E extends MTreeEntry<D>> extends P2DVisualization implements DataStoreListener {
+// TODO: listen for tree changes instead of data changes?
+public class TreeMBRVisualization<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractScatterplotVisualization implements DataStoreListener {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -82,28 +77,7 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Index Spheres";
-
-  /**
-   * Drawing modes.
-   * 
-   * @apiviz.exclude
-   */
-  private enum Modus {
-    MANHATTAN, EUCLIDEAN, LPCROSS
-  }
-
-  protected double p;
-
-  /**
-   * Drawing mode (distance) to use
-   */
-  protected Modus dist = Modus.LPCROSS;
-
-  /**
-   * The tree we visualize
-   */
-  protected AbstractMTree<?, D, N, E> tree;
+  public static final String NAME = "Index MBRs";
 
   /**
    * Fill parameter.
@@ -111,46 +85,23 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
   protected boolean fill = false;
 
   /**
-   * Constructor
+   * The tree we visualize
+   */
+  protected AbstractRStarTree<N, E> tree;
+
+  /**
+   * Constructor.
    * 
-   * @param task Task
-   * @param fill fill flag
+   * @param task Visualization task
+   * @param fill Fill flag
    */
   @SuppressWarnings("unchecked")
-  public TreeSphereVisualization(VisualizationTask task, boolean fill) {
+  public TreeMBRVisualization(VisualizationTask task, boolean fill) {
     super(task);
-    this.tree = AbstractMTree.class.cast(task.getResult());
-    this.p = getLPNormP(this.tree);
+    this.tree = AbstractRStarTree.class.cast(task.getResult());
     this.fill = fill;
     incrementalRedraw();
     context.addDataStoreListener(this);
-  }
-
-  /**
-   * Get the "p" value of an Lp norm.
-   * 
-   * @param tree Tree to visualize
-   * @return p value
-   */
-  public static Double getLPNormP(AbstractMTree<?, ?, ?, ?> tree) {
-    // Note: we deliberately lose generics here, so the compilers complain less
-    // on the next typecheck and cast!
-    DistanceFunction<?, ?> distanceFunction = tree.getDistanceQuery().getDistanceFunction();
-    if(LPNormDistanceFunction.class.isInstance(distanceFunction)) {
-      return ((LPNormDistanceFunction) distanceFunction).getP();
-    }
-    return null;
-  }
-
-  /**
-   * Test for a visualizable index in the context's database.
-   * 
-   * @param tree Tree to visualize
-   * @return whether the tree is visualizable
-   */
-  public static boolean canVisualize(AbstractMTree<?, ?, ?, ?> tree) {
-    Double p = getLPNormP(tree);
-    return (p != null);
   }
 
   @Override
@@ -158,41 +109,28 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
     int projdim = proj.getVisibleDimensions2D().cardinality();
     ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-    p = getLPNormP(tree);
     if(tree != null) {
-      if(ManhattanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
-        dist = Modus.MANHATTAN;
-      }
-      else if(EuclideanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
-        dist = Modus.EUCLIDEAN;
-      }
-      else {
-        dist = Modus.LPCROSS;
-      }
       E root = tree.getRootEntry();
-      final int mtheight = tree.getHeight();
-      for(int i = 0; i < mtheight; i++) {
+      for(int i = 0; i < tree.getHeight(); i++) {
         CSSClass cls = new CSSClass(this, INDEX + i);
         // Relative depth of this level. 1.0 = toplevel
-        final double relDepth = 1. - (((double) i) / mtheight);
+        final double relDepth = 1. - (((double) i) / tree.getHeight());
         if(fill) {
           cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
           cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
-          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-          cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         }
         else {
           cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-          cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         }
+        cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         svgp.addCSSClassOrLogError(cls);
       }
-      visualizeMTreeEntry(svgp, this.layer, proj, tree, root, 0);
+      visualizeRTreeEntry(svgp, layer, proj, tree, root, 0);
     }
   }
 
@@ -202,38 +140,29 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
    * @param svgp SVG Plot
    * @param layer Layer
    * @param proj Projection
-   * @param mtree Mtree to visualize
+   * @param rtree Rtree to visualize
    * @param entry Current entry
    * @param depth Current depth
    */
-  private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<?, D, N, E> mtree, E entry, int depth) {
-    DBID roid = entry.getRoutingObjectID();
-    if(roid != null) {
-      NumberVector<?, ?> ro = rel.get(roid);
-      D rad = entry.getCoveringRadius();
+  private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth) {
+    SpatialComparable mbr = entry;
 
-      final Element r;
-      if(dist == Modus.MANHATTAN) {
-        r = SVGHyperSphere.drawManhattan(svgp, proj, ro, rad);
-      }
-      else if(dist == Modus.EUCLIDEAN) {
-        r = SVGHyperSphere.drawEuclidean(svgp, proj, ro, rad);
-      }
-      // TODO: add visualizer for infinity norm?
-      else {
-        // r = SVGHyperSphere.drawCross(svgp, proj, ro, rad);
-        r = SVGHyperSphere.drawLp(svgp, proj, ro, rad, p);
-      }
-      SVGUtil.setCSSClass(r, INDEX + (depth - 1));
+    if(fill) {
+      Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
+      layer.appendChild(r);
+    }
+    else {
+      Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
+      SVGUtil.setCSSClass(r, INDEX + depth);
       layer.appendChild(r);
     }
 
     if(!entry.isLeafEntry()) {
-      N node = mtree.getNode(entry);
+      N node = rtree.getNode(entry);
       for(int i = 0; i < node.getNumEntries(); i++) {
         E child = node.getEntry(i);
         if(!child.isLeafEntry()) {
-          visualizeMTreeEntry(svgp, layer, proj, mtree, child, depth + 1);
+          visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
         }
       }
     }
@@ -251,9 +180,18 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses TreeSphereVisualization oneway - - «create»
+   * @apiviz.uses TreeMBRVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
+    /**
+     * Flag for half-transparent filling of bubbles.
+     * 
+     * <p>
+     * Key: {@code -index.fill}
+     * </p>
+     */
+    public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("index.fill", "Partially transparent filling of index pages.");
+
     /**
      * Fill parameter.
      */
@@ -270,12 +208,17 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
     }
 
     @Override
+    public Visualization makeVisualization(VisualizationTask task) {
+      return new TreeMBRVisualization<RStarTreeNode, SpatialEntry>(task, fill);
+    }
+
+    @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        ArrayList<AbstractMTree<?, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
-        for(AbstractMTree<?, DoubleDistance, ?, ?> tree : trees) {
-          if(canVisualize(tree) && tree instanceof Result) {
+      ArrayList<AbstractRStarTree<RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
+      for(AbstractRStarTree<RStarTreeNode, SpatialEntry> tree : trees) {
+        if(tree instanceof Result) {
+          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          for(ScatterPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
             baseResult.getHierarchy().add((Result) tree, task);
@@ -283,11 +226,6 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
           }
         }
       }
-    }
-
-    @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new TreeSphereVisualization<DoubleDistance, MTreeNode<Object, DoubleDistance>, MTreeEntry<DoubleDistance>>(task, fill);
     }
 
     /**
@@ -303,7 +241,7 @@ public class TreeSphereVisualization<D extends NumberDistance<D, ?>, N extends A
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        Flag fillF = new Flag(TreeMBRVisualization.Factory.FILL_ID);
+        Flag fillF = new Flag(FILL_ID);
         if(config.grab(fillF)) {
           fill = fillF.getValue();
         }

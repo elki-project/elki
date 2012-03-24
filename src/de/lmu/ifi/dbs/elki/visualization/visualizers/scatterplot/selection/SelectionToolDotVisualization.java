@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.selection;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 
 /*
  This file is part of ELKI:
@@ -24,86 +24,79 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.selection;
  */
 
 import java.util.ArrayList;
-import java.util.BitSet;
 
+import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.P2DVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
- * Tool-Visualization for the tool to select ranges
+ * Tool-Visualization for the tool to select objects
  * 
  * @author Heidi Kolb
  * 
  * @apiviz.has SelectionResult oneway - - updates
- * @apiviz.has RangeSelection oneway - - updates
+ * @apiviz.has DBIDSelection oneway - - updates
  */
-public class SelectionToolCubeVisualization extends P2DVisualization implements DragableArea.DragListener {
-  /**
-   * The logger for this class.
-   */
-  protected static final Logging logger = Logging.getLogger(SelectionToolCubeVisualization.class);
-
+public class SelectionToolDotVisualization extends AbstractScatterplotVisualization implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Range Selection";
+  private static final String NAME = "Object Selection";
 
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * CSS class of the selection rectangle while selecting.
    */
   private static final String CSS_RANGEMARKER = "selectionRangeMarker";
 
   /**
-   * Dimension
+   * Input modes
+   * 
+   * @apiviz.exclude
    */
-  private int dim;
+  private enum Mode {
+    REPLACE, ADD, INVERT
+  }
 
   /**
    * Element for selection rectangle
    */
-  private Element rtag;
+  Element rtag;
 
   /**
    * Element for the rectangle to add listeners
    */
-  private Element etag;
+  Element etag;
 
   /**
    * Constructor.
    * 
    * @param task Task
    */
-  public SelectionToolCubeVisualization(VisualizationTask task) {
+  public SelectionToolDotVisualization(VisualizationTask task) {
     super(task);
-    this.dim = DatabaseUtil.dimensionality(rel);
     incrementalRedraw();
   }
 
@@ -111,7 +104,7 @@ public class SelectionToolCubeVisualization extends P2DVisualization implements 
   protected void redraw() {
     addCSSClasses(svgp);
 
-    // rtag: tag for the selected rect
+    //
     rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
     SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
     layer.appendChild(rtag);
@@ -133,32 +126,6 @@ public class SelectionToolCubeVisualization extends P2DVisualization implements 
     }
   }
 
-  /**
-   * Set the selected ranges and the mask for the actual dimensions in the
-   * context
-   * 
-   * @param x1 x-value of the first dimension
-   * @param x2 x-value of the second dimension
-   * @param y1 y-value of the first dimension
-   * @param y2 y-value of the second dimension
-   */
-  private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
-    BitSet actDim = proj.getVisibleDimensions2D();
-    double[] v1 = new double[dim];
-    double[] v2 = new double[dim];
-    v1[0] = x1;
-    v1[1] = y1;
-    v2[0] = x2;
-    v2[1] = y2;
-
-    double[] nv1 = proj.fastProjectRenderToDataSpace(v1);
-    double[] nv2 = proj.fastProjectRenderToDataSpace(v2);
-
-    for(int d = actDim.nextSetBit(0); d >= 0; d = actDim.nextSetBit(d + 1)) {
-      ranges[d] = new DoubleDoublePair(Math.min(nv1[d], nv2[d]), Math.max(nv1[d], nv2[d]));
-    }
-  }
-
   @Override
   public boolean startDrag(SVGPoint startPoint, Event evt) {
     return true;
@@ -177,67 +144,76 @@ public class SelectionToolCubeVisualization extends P2DVisualization implements 
 
   @Override
   public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
+    Mode mode = getInputMode(evt);
     deleteChildren(rtag);
     if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
-      updateSelection(proj, startPoint, dragPoint);
+      updateSelection(mode, proj, startPoint, dragPoint);
     }
     return true;
   }
 
   /**
-   * Update the selection in the context.
+   * Get the current input mode, on each mouse event.
    * 
-   * @param proj The projection
-   * @param p1 First Point of the selected rectangle
-   * @param p2 Second Point of the selected rectangle
+   * @param evt Mouse event.
+   * @return current input mode
    */
-  private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
-    DBIDSelection selContext = context.getSelection();
-    ModifiableDBIDs selection;
-    if(selContext != null) {
-      selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
-    }
-    else {
-      selection = DBIDUtil.newHashSet();
-    }
-    DoubleDoublePair[] ranges;
-
-    if(p1 == null || p2 == null) {
-      logger.warning("no rect selected: p1: " + p1 + " p2: " + p2);
-    }
-    else {
-      double x1 = Math.min(p1.getX(), p2.getX());
-      double x2 = Math.max(p1.getX(), p2.getX());
-      double y1 = Math.max(p1.getY(), p2.getY());
-      double y2 = Math.min(p1.getY(), p2.getY());
-
-      if(selContext instanceof RangeSelection) {
-        ranges = ((RangeSelection) selContext).getRanges();
+  private Mode getInputMode(Event evt) {
+    if(evt instanceof DOMMouseEvent) {
+      DOMMouseEvent domme = (DOMMouseEvent) evt;
+      // TODO: visual indication of mode possible?
+      if(domme.getShiftKey()) {
+        return Mode.ADD;
+      }
+      else if(domme.getCtrlKey()) {
+        return Mode.INVERT;
       }
       else {
-        ranges = new DoubleDoublePair[dim];
+        return Mode.REPLACE;
       }
-      updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
+    }
+    // Default mode is replace.
+    return Mode.REPLACE;
+  }
 
-      selection.clear();
-      boolean idIn = true;
-      for(DBID id : rel.iterDBIDs()) {
-        NumberVector<?, ?> dbTupel = rel.get(id);
-        idIn = true;
-        for(int i = 0; i < dim; i++) {
-          if(ranges != null && ranges[i] != null) {
-            if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
-              idIn = false;
-              break;
-            }
+  /**
+   * Updates the selection in the context.<br>
+   * 
+   * @param mode Input mode
+   * @param proj
+   * @param p1 first point of the selected rectangle
+   * @param p2 second point of the selected rectangle
+   */
+  private void updateSelection(Mode mode, Projection2D proj, SVGPoint p1, SVGPoint p2) {
+    DBIDSelection selContext = context.getSelection();
+    // Note: we rely on SET semantics below!
+    HashSetModifiableDBIDs selection;
+    if(selContext == null || mode == Mode.REPLACE) {
+      selection = DBIDUtil.newHashSet();
+    }
+    else {
+      selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
+    }
+    for(DBID id : rel.iterDBIDs()) {
+      double[] vec = proj.fastProjectDataToRenderSpace(rel.get(id));
+      if(vec[0] >= Math.min(p1.getX(), p2.getX()) && vec[0] <= Math.max(p1.getX(), p2.getX()) && vec[1] >= Math.min(p1.getY(), p2.getY()) && vec[1] <= Math.max(p1.getY(), p2.getY())) {
+        if(mode == Mode.INVERT) {
+          if(!selection.contains(id)) {
+            selection.add(id);
+          }
+          else {
+            selection.remove(id);
           }
         }
-        if(idIn == true) {
+        else {
+          // In REPLACE and ADD, add objects.
+          // The difference was done before by not re-using the selection.
+          // Since we are using a set, we can just add in any case.
           selection.add(id);
         }
       }
-      context.setSelection(new RangeSelection(selection, ranges));
     }
+    context.setSelection(new DBIDSelection(selection));
   }
 
   /**
@@ -257,13 +233,12 @@ public class SelectionToolCubeVisualization extends P2DVisualization implements 
   }
 
   /**
-   * Factory for tool visualizations for selecting ranges and the inclosed
-   * objects
+   * Factory for tool visualizations for selecting objects
    * 
    * @author Heidi Kolb
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses SelectionToolCubeVisualization oneway - - «create»
+   * @apiviz.uses SelectionToolDotVisualization - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**
@@ -276,7 +251,7 @@ public class SelectionToolCubeVisualization extends P2DVisualization implements 
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionToolCubeVisualization(task);
+      return new SelectionToolDotVisualization(task);
     }
 
     @Override
