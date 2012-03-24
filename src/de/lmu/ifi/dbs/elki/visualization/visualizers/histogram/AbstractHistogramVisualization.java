@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
 
 /*
  This file is part of ELKI:
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * @apiviz.landmark
  * @apiviz.has Projection1D
  */
-public abstract class P1DVisualization extends AbstractVisualization {
+public abstract class AbstractHistogramVisualization extends AbstractVisualization {
   /**
    * The current projection
    */
@@ -47,7 +47,7 @@ public abstract class P1DVisualization extends AbstractVisualization {
    * 
    * @param task Visualization task
    */
-  public P1DVisualization(VisualizationTask task) {
+  public AbstractHistogramVisualization(VisualizationTask task) {
     super(task);
     this.proj = task.getProj();
   }

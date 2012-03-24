@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
 /*
  This file is part of ELKI:
@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @apiviz.uses SVGSimpleLinearAxis
  */
-public class AxisVisualization extends P2DVisualization {
+public class AxisVisualization extends AbstractScatterplotVisualization {
   /**
    * Constructor.
    * 

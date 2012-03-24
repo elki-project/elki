@@ -1,5 +1,5 @@
 /**
- * <p>Visualizers for outlier scores based on 2D projections.</p>
+ * <p>Visualizers for index structures based on 2D projections.</p>
  */
 /*
  This file is part of ELKI:
@@ -23,4 +23,4 @@
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.outlier;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index;

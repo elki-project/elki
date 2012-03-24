@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
 /*
  This file is part of ELKI:
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @apiviz.has ReferencePointsResult oneway - - visualizes
  */
 // TODO: add a result listener for the reference points.
-public class ReferencePointsVisualization extends P2DVisualization {
+public class ReferencePointsVisualization extends AbstractScatterplotVisualization {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
