@@ -391,8 +391,8 @@ public class P1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends P1DV
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       // Find a style result to visualize:
-      IterableIterator<StyleResult> clusterings = ResultUtil.filteredResults(result, StyleResult.class);
-      for(StyleResult c : clusterings) {
+      IterableIterator<StyleResult> styleres = ResultUtil.filteredResults(result, StyleResult.class);
+      for(StyleResult c : styleres) {
         IterableIterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(baseResult, HistogramProjector.class);
         for(HistogramProjector<?> p : ps) {
           // register self

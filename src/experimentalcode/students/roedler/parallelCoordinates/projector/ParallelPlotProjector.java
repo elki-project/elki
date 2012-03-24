@@ -72,7 +72,7 @@ public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends Abstrac
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
 
       final PlotItem it = new PlotItem(2, 1., proj);
-      it.visualizations = tasks;
+      it.tasks = tasks;
       col.add(it);
     }
     return col;

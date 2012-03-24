@@ -78,7 +78,7 @@ public class OPTICSProjector<D extends Distance<D>> extends AbstractHierarchical
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0) {
       final PlotItem it = new PlotItem(4., 1., null);
-      it.visualizations = tasks;
+      it.tasks = tasks;
       col.add(it);
     }
     return col;

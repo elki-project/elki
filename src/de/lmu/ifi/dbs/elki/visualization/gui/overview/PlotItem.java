@@ -68,9 +68,9 @@ public class PlotItem {
   public final Projection proj;
 
   /**
-   * The visualizations at this location
+   * The visualization tasks at this location
    */
-  public List<VisualizationTask> visualizations = new LinkedList<VisualizationTask>();
+  public List<VisualizationTask> tasks = new LinkedList<VisualizationTask>();
 
   /**
    * Subitems to plot
@@ -110,10 +110,19 @@ public class PlotItem {
    * Sort all visualizers for their proper drawing order
    */
   public void sort() {
-    Collections.sort(visualizations);
+    Collections.sort(tasks);
     for(PlotItem subitem : subitems) {
       subitem.sort();
     }
+  }
+
+  /**
+   * Add a task to the item.
+   * 
+   * @param task Task to add
+   */
+  public void add(VisualizationTask task) {
+    tasks.add(task);
   }
 
   /**
@@ -121,8 +130,17 @@ public class PlotItem {
    * 
    * @return Iterator
    */
-  public Iterator<VisualizationTask> visIterator() {
+  public Iterator<VisualizationTask> taskIterator() {
     return new VisItr();
+  }
+
+  /**
+   * Number of tasks in this item.
+   * 
+   * @return Number of tasks.
+   */
+  public int taskSize() {
+    return tasks.size();
   }
 
   /**
@@ -151,7 +169,7 @@ public class PlotItem {
      */
     public VisItr() {
       super();
-      this.cur = visualizations.iterator();
+      this.cur = tasks.iterator();
       this.sub = subitems.iterator();
     }
 
@@ -161,7 +179,7 @@ public class PlotItem {
         return true;
       }
       if(sub.hasNext()) {
-        cur = sub.next().visIterator();
+        cur = sub.next().taskIterator();
         return hasNext();
       }
       return false;

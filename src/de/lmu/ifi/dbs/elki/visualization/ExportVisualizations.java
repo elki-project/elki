@@ -169,7 +169,7 @@ public class ExportVisualizations implements ResultHandler {
         continue;
       }
       PlotItem pi = new PlotItem(ratio, 1.0, null);
-      pi.visualizations.add(task);
+      pi.add(task);
       processItem(pi);
     }
   }
@@ -182,7 +182,7 @@ public class ExportVisualizations implements ResultHandler {
       PlotItem subitem = iter.next();
       processItem(subitem);
     }
-    if(item.visualizations.size() <= 0) {
+    if(item.taskSize() <= 0) {
       return;
     }
     item.sort();
@@ -193,7 +193,7 @@ public class ExportVisualizations implements ResultHandler {
     svgp.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
 
     ArrayList<Visualization> layers = new ArrayList<Visualization>();
-    for(Iterator<VisualizationTask> iter = item.visIterator(); iter.hasNext();) {
+    for(Iterator<VisualizationTask> iter = item.tasks.iterator(); iter.hasNext();) {
       VisualizationTask task = iter.next();
       {
         Boolean dis = task.getGenerics(VisualizationTask.META_NODETAIL, Boolean.class);
@@ -243,6 +243,9 @@ public class ExportVisualizations implements ResultHandler {
     }
     catch(Exception e) {
       logger.warning("Export of visualization failed.", e);
+    }
+    for(Visualization layer : layers) {
+      layer.destroy();
     }
     counter++;
   }

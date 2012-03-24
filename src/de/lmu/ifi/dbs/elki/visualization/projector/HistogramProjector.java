@@ -86,7 +86,7 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
       for(int d1 = 0; d1 < dmax; d1++) {
         Projection1D proj = new Simple1D(scales.getScales(), d1 + 1);
         final PlotItem it = new PlotItem(d1 + xoff, lheight, 1., hheight, proj);
-        it.visualizations = tasks;
+        it.tasks = tasks;
         master.subitems.add(it);
       }
       layout.add(master);
@@ -98,7 +98,7 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
         task.height = lheight;
         task.width = 1;
         task.put(VisualizationTask.META_NODETAIL, true); 
-        it.visualizations.add(task);
+        it.tasks.add(task);
         master.subitems.add(it);
       }
     }

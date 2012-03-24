@@ -88,7 +88,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
         {
           Projection2D proj = new Simple2D(scales.getScales(), 1, 2);
           PlotItem it = new PlotItem(.1, 0, 2., 2., proj);
-          it.visualizations = tasks;
+          it.tasks = tasks;
           master.subitems.add(it);
         }
         // Label at bottom
@@ -98,7 +98,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
           task.height = .1;
           task.width = 2.;
           task.put(VisualizationTask.META_NODETAIL, true);
-          it.visualizations.add(task);
+          it.tasks.add(task);
           master.subitems.add(it);
         }
         // Label on left
@@ -108,7 +108,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
           task.height = 2.;
           task.width = .1;
           task.put(VisualizationTask.META_NODETAIL, true);
-          it.visualizations.add(task);
+          it.tasks.add(task);
           master.subitems.add(it);
         }
       }
@@ -120,7 +120,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
           for(int d2 = d1 + 1; d2 <= dmax; d2++) {
             Projection2D proj = new Simple2D(scales.getScales(), d1, d2);
             PlotItem it = new PlotItem(d1 - 1 + .1, d2 - 2, 1., 1., proj);
-            it.visualizations = tasks;
+            it.tasks = tasks;
             master.subitems.add(it);
           }
         }
@@ -133,7 +133,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
           // p.addRotation(1, 3, Math.PI / 180 * 30.);
           Projection2D proj = new AffineProjection(scales.getScales(), p);
           PlotItem it = new PlotItem(sizeh + .1, 0, sizeh, sizeh, proj);
-          it.visualizations = tasks;
+          it.tasks = tasks;
           master.subitems.add(it);
         }
         // Labels at bottom
@@ -143,7 +143,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
           task.height = .1;
           task.width = 1;
           task.put(VisualizationTask.META_NODETAIL, true);
-          it.visualizations.add(task);
+          it.tasks.add(task);
           master.subitems.add(it);
         }
         // Labels on left
@@ -153,7 +153,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
           task.height = 1;
           task.width = .1;
           task.put(VisualizationTask.META_NODETAIL, true);
-          it.visualizations.add(task);
+          it.tasks.add(task);
           master.subitems.add(it);
         }
       }
