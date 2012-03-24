@@ -22,6 +22,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionToo
 de.lmu.ifi.dbs.elki.visualization.visualizers.histogram.ColoredHistogramVisualizer$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.LineVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.ParallelAxisVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster.ClusterParallelMeanVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.ClusterEvaluationVisFactory
