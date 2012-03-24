@@ -72,9 +72,7 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-    int dim = proj.getVisibleDimensions();
-
-    double last = -1.;
+    final int dim = proj.getVisibleDimensions();
 
     double as = getSizeY() / 70.;
     double bs = as * 1.5;
@@ -87,49 +85,63 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
     SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
     layer.appendChild(back);
 
-    for(int i = 0; i < dim; i++) {
-      if(!selected) {
-        int j = 0;
-        int end = 3;
-        if(i == 0 || i == proj.getFirstVisibleDimension()) {
-          j = 1;
-        }
-        if(i == proj.getLastVisibleDimension()) {
-          end = 2;
-        }
-        for(; j < end; j++) {
-          Element arrow = getArrow(j, (getVisibleAxisX(i) - dist) + j * dist, ypos + as, as);
+    if(!selected) {
+      for(int i = 0; i < dim; i++) {
+        if(i > 0) {
+          int j = 0;
+          Element arrow = makeArrow(Direction.LEFT, (getVisibleAxisX(i) - dist) + j * dist, ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
           Element button = svgp.svgRect((getVisibleAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
-          addEventListener(button, i, j);
+          addEventListener(button, i, Direction.LEFT);
+          layer.appendChild(button);
+        }
+        {
+          int j = 1;
+          Element arrow = makeArrow(Direction.DOWN, (getVisibleAxisX(i) - dist) + j * dist, ypos + as, as);
+          SVGUtil.addCSSClass(arrow, SDO_ARROW);
+          layer.appendChild(arrow);
+          Element button = svgp.svgRect((getVisibleAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
+          SVGUtil.addCSSClass(button, SDO_BUTTON);
+          addEventListener(button, i, Direction.DOWN);
+          layer.appendChild(button);
+        }
+        if(i < dim - 1) {
+          int j = 2;
+          Element arrow = makeArrow(Direction.RIGHT, (getVisibleAxisX(i) - dist) + j * dist, ypos + as, as);
+          SVGUtil.addCSSClass(arrow, SDO_ARROW);
+          layer.appendChild(arrow);
+          Element button = svgp.svgRect((getVisibleAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
+          SVGUtil.addCSSClass(button, SDO_BUTTON);
+          addEventListener(button, i, Direction.RIGHT);
           layer.appendChild(button);
         }
       }
-      else {
+    }
+    else {
+      double prev = -1.;
+      for(int i = 0; i < dim; i++) {
         {
-          Element arrow = getArrow(3, getVisibleAxisX(i), ypos + as, as);
+          Element arrow = makeArrow(Direction.LEFTOF, getVisibleAxisX(i), ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
           Element button = svgp.svgRect(getVisibleAxisX(i) - hbs, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
-          addEventListener(button, i, 3);
+          addEventListener(button, i, Direction.LEFTOF);
           layer.appendChild(button);
         }
-
-        if(last > 0.) {
-          Element arrow = getArrow(3, last + (getVisibleAxisX(i) - last) / 2., ypos + as, as);
+        if(i > 0.) {
+          Element arrow = makeArrow(Direction.RIGHTOF, prev + (getVisibleAxisX(i) - prev) / 2., ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
-          Element button = svgp.svgRect(last + ((getVisibleAxisX(i) - last) / 2.) - hbs, ypos + qas, bs, bs);
+          Element button = svgp.svgRect(prev + ((getVisibleAxisX(i) - prev) / 2.) - hbs, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
-          addEventListener(button, i, 4);
+          addEventListener(button, i, Direction.RIGHTOF);
           layer.appendChild(button);
         }
-        last = getVisibleAxisX(i);
+        prev = getVisibleAxisX(i);
       }
-
     }
   }
 
@@ -139,17 +151,17 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
    * @param tag Element to add the listener
    * @param i represented axis
    */
-  private void addEventListener(final Element tag, final int i, final int j) {
+  private void addEventListener(final Element tag, final int i, final Direction j) {
     EventTarget targ = (EventTarget) tag;
     targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
       @Override
       public void handleEvent(Event evt) {
-        if(j == 1) {
+        if(j == Direction.DOWN) {
           selected = true;
           selecteddim = i;
         }
-        if(j == 3 || j == 4) {
-          if(j == 3) {
+        if(j == Direction.LEFTOF || j == Direction.RIGHTOF) {
+          if(j == Direction.LEFTOF) {
             proj.swapAxes(selecteddim, i);
           }
           else {
@@ -160,12 +172,20 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
           selected = false;
           selecteddim = -1;
         }
-        if(j == 0 || j == 2) {
-          if(j == 0) {
-            proj.swapAxes(i, proj.getPrevVisibleDimension(i));
+        if(j == Direction.LEFT || j == Direction.RIGHT) {
+          if(j == Direction.LEFT) {
+            int prev = i - 1;
+            while(prev >= 0 && !proj.isAxisVisible(prev)) {
+              prev -= 1;
+            }
+            proj.swapAxes(i, prev);
           }
           else {
-            proj.swapAxes(i, proj.getNextVisibleDimension(i));
+            int next = i + 1;
+            while(next < proj.getInputDimensionality() - 1 && !proj.isAxisVisible(next)) {
+              next += 1;
+            }
+            proj.swapAxes(i, next);
           }
         }
         // Notify
@@ -174,41 +194,43 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
     }, false);
   }
 
-  private Element getArrow(int dir, double x, double y, double size) {
-    SVGPath path = new SVGPath();
-    double hs = size / 2.;
+  // Constants for arrow directions and insertion positions
+  private enum Direction {
+    LEFT, DOWN, RIGHT, UP, LEFTOF, RIGHTOF
+  }
+
+  private Element makeArrow(Direction dir, double x, double y, double size) {
+    final SVGPath path = new SVGPath();
+    final double hs = size / 2.;
 
     switch(dir){
-    case 0: {
+    case LEFT:
       path.drawTo(x + hs, y + hs);
       path.drawTo(x - hs, y);
       path.drawTo(x + hs, y - hs);
       path.drawTo(x + hs, y + hs);
       break;
-    }
-    case 1: {
+    case DOWN:
       path.drawTo(x - hs, y - hs);
       path.drawTo(x + hs, y - hs);
       path.drawTo(x, y + hs);
       path.drawTo(x - hs, y - hs);
       break;
-    }
-    case 2: {
+    case RIGHT:
       path.drawTo(x - hs, y - hs);
       path.drawTo(x + hs, y);
       path.drawTo(x - hs, y + hs);
       path.drawTo(x - hs, y - hs);
       break;
-    }
-    case 3: {
-
+    case UP:
+    case LEFTOF:
+    case RIGHTOF:
       path.drawTo(x - hs, y + hs);
       path.drawTo(x, y - hs);
       path.drawTo(x + hs, y + hs);
       path.drawTo(x - hs, y + hs);
+      break;
     }
-    }
-
     path.close();
     return path.makeElement(svgp);
   }
