@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -73,11 +75,18 @@ public abstract class AbstractVisualization implements Visualization, ResultList
     this.context = task.getContext();
     this.svgp = task.getPlot();
     this.layer = null;
+    // Note: we do not auto-add listeners, as we don't know what kind of
+    // listeners a visualizer needs, and the visualizer might need to do some initialization first
   }
 
   @Override
   public void destroy() {
+    // Always unregister listeners, as this is easy to forget otherwise
+    // TODO: remove destroy() overrides that are redundant?
     context.removeResultListener(this);
+    if (this instanceof DataStoreListener) {
+      context.removeDataStoreListener((DataStoreListener) this);
+    }
   }
 
   @Override
@@ -161,5 +170,17 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   @Override
   public void resultRemoved(Result child, Result parent) {
     // Ignore by default.
+  }
+
+  /**
+   * Default implementation for
+   * {@link de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener#contentChanged}
+   * 
+   * Not enabled or used by default, but saves redundant code.
+   * 
+   * @param e Data store event
+   */
+  public void contentChanged(DataStoreEvent e) {
+    synchronizedRedraw();
   }
 }

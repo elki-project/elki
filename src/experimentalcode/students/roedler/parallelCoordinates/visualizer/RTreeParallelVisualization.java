@@ -23,13 +23,11 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer;
   */
 
  import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -43,7 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -69,16 +66,16 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
   * @param <E> Tree entry type
   */
  // TODO: listen for tree changes instead of data changes?
- public class PTreeMBRVisualization<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NumberVector<?, ?>> implements MenuOwner, DataStoreListener {
+ public class RTreeParallelVisualization<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends ParallelVisualization<NumberVector<?, ?>> implements MenuOwner, DataStoreListener {
    /**
     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
     */
-   public static final String INDEX = "parallelindex";
+   public static final String INDEX = "parallelrtree";
 
    /**
     * A short name characterizing this Visualizer.
     */
-   public static final String NAME = "Parallel Index MBRs";
+   public static final String NAME = "R-Tree Index MBRs";
 
    /**
     * Fill parameter.
@@ -96,37 +93,33 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
    protected AbstractRStarTree<N, E> tree;
    
    /**
-    * disabled pagevisualization
-    */
-   protected List<Integer> list;
-
-   /**
     * Constructor.
     * 
     * @param task Visualization task
     * @param fill Fill flag
     */
    @SuppressWarnings("unchecked")
-   public PTreeMBRVisualization(VisualizationTask task, boolean fill, List<Integer> list) {
+   public RTreeParallelVisualization(VisualizationTask task, boolean fill) {
      super(task);
      this.tree = AbstractRStarTree.class.cast(task.getResult());
      this.fill = fill;
      context.addDataStoreListener(this);
+     context.addResultListener(this);
      init();
      incrementalRedraw();
    }
    
+   @Override
+   public void destroy() {
+     context.removeDataStoreListener(this);
+     context.removeResultListener(this);
+     super.destroy();
+   }
+
    private void init(){
      pagevis = new boolean[tree.getRootEntry().getDimensionality()];
      for (int i = 0; i < pagevis.length; i++){
        pagevis[i] = true;
-     }
-     if (list != null){
-       for (Integer i : list){
-         if (i < pagevis.length){
-           pagevis[i] = false;
-         }
-       }
      }
    }
 
@@ -253,28 +246,15 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
      incrementalRedraw();
    }
    
-   @Override
-   public void destroy() {
-     super.destroy();
-     context.removeDataStoreListener(this);
-   }
-   
-   @Override
-   public void contentChanged(DataStoreEvent e) {
-     synchronizedRedraw();
-   }
-
    /**
     * Factory
     * 
-    * @author Erich Schubert
+    * @author Robert Rödler
     * 
     * @apiviz.stereotype factory
-    * @apiviz.uses PTreeMBRVisualization oneway - - «create»
-    * 
+    * @apiviz.uses RTreeParallelVisualization oneway - - «create»
     */
    public static class Factory extends AbstractVisFactory {
-
      /**
       * Flag for half-transparent filling of pages.
       * 
@@ -283,15 +263,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
       * </p>
       */
      public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("parallel.index.fill", "Partially transparent filling of index pages.");
-    
-     
-     public static final OptionID PAGEVIS_ID = OptionID.getOrCreateOptionID("parallel.indexpage.notvisible", "Select not visible indexpages");
 
-     /**
-      * selected cluster
-      */
-     private List<Integer> list;
-     
      /**
       * Fill parameter.
       */
@@ -302,15 +274,14 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
       * 
       * @param fill
       */
-     public Factory(boolean fill, List<Integer> list) {
+     public Factory(boolean fill) {
        super();
        this.fill = fill;
-       this.list = list;
      }
 
      @Override
      public Visualization makeVisualization(VisualizationTask task) {
-       return new PTreeMBRVisualization<RStarTreeNode, SpatialEntry>(task, fill, list);
+       return new RTreeParallelVisualization<RStarTreeNode, SpatialEntry>(task, fill);
      }
 
      @Override
@@ -338,7 +309,6 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
       */
      public static class Parameterizer extends AbstractParameterizer {
        protected boolean fill = true;
-       protected List<Integer> p;
 
        @Override
        protected void makeOptions(Parameterization config) {
@@ -348,15 +318,11 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
          if(config.grab(fillF)) {
            fill = fillF.getValue();
          }
-         final IntListParameter visL = new IntListParameter(PAGEVIS_ID, true);
-         if(config.grab(visL)) {
-           p = visL.getValue();
-         }
        }
 
        @Override
        protected Factory makeInstance() {
-         return new Factory(fill, p);
+         return new Factory(fill);
        }
      }
    }

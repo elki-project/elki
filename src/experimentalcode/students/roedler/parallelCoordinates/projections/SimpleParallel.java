@@ -202,7 +202,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   public void shiftDimension(int src, int dest) {
     if(src > dest) {
       int temp = dimOrder[src];
-      System.arraycopy(dimOrder, src - 1, dimOrder, src, src - dest);
+      System.arraycopy(dimOrder, dest, dimOrder, dest + 1, src - dest);
       dimOrder[dest] = temp;
     }
     else if(src < dest) {

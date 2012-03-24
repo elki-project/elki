@@ -31,7 +31,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -139,11 +138,6 @@ public class PolygonVisualization extends P2DVisualization implements DataStoreL
         // ignore.
       }
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
   }
 
   /**

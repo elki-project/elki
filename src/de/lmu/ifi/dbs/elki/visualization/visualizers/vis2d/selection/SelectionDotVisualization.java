@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -123,11 +122,6 @@ public class SelectionDotVisualization extends P2DVisualization implements DataS
       cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
       svgp.addCSSClassOrLogError(cls);
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
   }
 
   /**

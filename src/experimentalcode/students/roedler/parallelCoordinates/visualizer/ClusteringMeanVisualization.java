@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.Mean;
@@ -43,7 +42,6 @@ import experimentalcode.students.roedler.parallelCoordinates.svg.menu.CheckboxMe
  * @author Robert Rödler
  */
 public class ClusteringMeanVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener, MenuOwner {
-
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -74,10 +72,18 @@ public class ClusteringMeanVisualization extends ParallelVisualization<NumberVec
   public ClusteringMeanVisualization(VisualizationTask task, List<Integer> list) {
     super(task);
     this.clustering = task.getResult();
-    context.addDataStoreListener(this);
     this.list = list;
+    context.addDataStoreListener(this);
+    context.addResultListener(this);
     init();
     incrementalRedraw();
+  }
+
+  @Override
+  public void destroy() {
+    context.removeDataStoreListener(this);
+    context.removeResultListener(this);
+    super.destroy();
   }
 
   private void init() {
@@ -166,12 +172,6 @@ public class ClusteringMeanVisualization extends ParallelVisualization<NumberVec
         clusterID++;
       }
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
-
   }
 
   @Override
@@ -275,7 +275,7 @@ public class ClusteringMeanVisualization extends ParallelVisualization<NumberVec
     /**
      * Parameterization class.
      * 
-     * @author Erich Schubert
+     * @author Robert Rödler
      * 
      * @apiviz.exclude
      */

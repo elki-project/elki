@@ -97,12 +97,10 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
   public SelectionToolAxisRangeVisualization(VisualizationTask task) {
     super(task);
     incrementalRedraw();
-    context.addResultListener(this);
   }
 
   @Override
   public void destroy() {
-    context.removeResultListener(this);
     super.destroy();
   }
 

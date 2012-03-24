@@ -80,9 +80,11 @@ public abstract class ParallelVisualization<NV extends NumberVector<?, ?>> exten
     super(task);
     this.proj = task.getProj();
     this.relation = task.getRelation();
+    
+    double ratio = task.width / task.height;
 
     margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.4 * StyleLibrary.SCALE };
-    size = new double[] { task.width * StyleLibrary.SCALE, task.height * StyleLibrary.SCALE };
+    size = new double[] { ratio * StyleLibrary.SCALE, StyleLibrary.SCALE };
     axsep = size[0] / (proj.getInputDimensionality() - 1.);
 
     this.layer = setupCanvas(svgp, proj, task.getWidth(), task.getHeight());

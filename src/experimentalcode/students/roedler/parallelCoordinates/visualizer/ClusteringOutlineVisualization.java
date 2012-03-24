@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -78,11 +77,19 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
   public ClusteringOutlineVisualization(VisualizationTask task, List<Integer> list, boolean rounded) {
     super(task);
     this.clustering = task.getResult();
-    context.addDataStoreListener(this);
     this.list = list;
     this.rounded = rounded;
+    context.addDataStoreListener(this);
+    context.addResultListener(this);
     init();
     incrementalRedraw();
+  }
+
+  @Override
+  public void destroy() {
+    context.removeDataStoreListener(this);
+    context.removeResultListener(this);
+    super.destroy();
   }
 
   private void init() {
@@ -222,12 +229,6 @@ public class ClusteringOutlineVisualization extends ParallelVisualization<Number
         clusterID++;
       }
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
-
   }
 
   @Override

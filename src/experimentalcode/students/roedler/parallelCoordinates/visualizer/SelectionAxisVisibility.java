@@ -79,6 +79,12 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
   }
 
   @Override
+  public void destroy() {
+    context.removeResultListener(this);
+    super.destroy();
+  }
+
+  @Override
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(relation);

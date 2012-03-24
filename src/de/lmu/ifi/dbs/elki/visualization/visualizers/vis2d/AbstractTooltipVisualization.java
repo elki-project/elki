@@ -30,7 +30,6 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -182,10 +181,5 @@ public abstract class AbstractTooltipVisualization extends P2DVisualization impl
     if(sample == current) {
       synchronizedRedraw();
     }
-  }
-  
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
   }
 }
